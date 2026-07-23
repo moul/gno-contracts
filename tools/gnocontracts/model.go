@@ -229,15 +229,24 @@ func isVersion(s string) bool {
 }
 
 // parseDeps returns the sorted, de-duplicated set of gno.land/* imports found in
-// the non-test .gno files of dir.
+// the non-test .gno files of dir (runtime dependencies, used for publish order).
 func parseDeps(dir string) ([]string, error) {
+	return parseDepsMode(dir, false)
+}
+
+// parseDepsMode is parseDeps with control over test files. Vendoring must
+// include test-only dependencies so `gno test` resolves them autonomously.
+func parseDepsMode(dir string, includeTests bool) ([]string, error) {
 	set := map[string]bool{}
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
 	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".gno") || strings.HasSuffix(e.Name(), "_test.gno") {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".gno") {
+			continue
+		}
+		if !includeTests && strings.HasSuffix(e.Name(), "_test.gno") {
 			continue
 		}
 		imps, err := parseImports(filepath.Join(dir, e.Name()))

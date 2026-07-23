@@ -26,7 +26,7 @@ before making changes.
 p/moul/<name>/vN/       pure package   → gno.land/p/moul/<name>/vN
 r/moul/<name>/vN/       realm          → gno.land/r/moul/<name>/vN
 vendor/gno.land/...     vendored external deps (committed)
-tools/                  Go maintenance CLI (see below)
+tools/gnocontracts/     Go maintenance CLI, run via `go tool gnocontracts` (see below)
 contracts.json          catalog: source of truth for the README table + publish
 gnowork.toml            empty workspace marker (enables local resolution)
 Makefile                task entrypoints
@@ -70,9 +70,11 @@ make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain st
    `contracts.json` — these human fields are preserved across regenerations.
 6. Commit.
 
-## The maintenance CLI (`tools/`)
+## The maintenance CLI (`tools/gnocontracts`)
 
-A dependency-free Go module (`go run ./tools <cmd>`), also driven by the Makefile:
+A dependency-free Go tool declared in `go.mod` (`tool` directive) and invoked as
+`go tool gnocontracts <cmd>` — **never** built into a committed binary. Also
+driven by the Makefile. Subcommands:
 
 - `manifest` — scan the trees, reconcile `contracts.json` (preserves
   `description`, `draft`, `published`).
@@ -100,6 +102,8 @@ upstream to reconcile *from*, deliberately — never auto-overwrite.
 - **Commit author:** `Manfred Touron <94029+moul@users.noreply.github.com>`
   (the push-safe noreply identity).
 - **Go tools:** stdlib only, no third-party deps (keeps the repo autonomous).
+- **Never commit a compiled binary.** The CLI runs via `go tool gnocontracts`
+  (declared in `go.mod`); there is no build artifact in the tree.
 - **Never** hand-edit the region between the README table markers, or the
   generated fields of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`,
   `version`, `deps`).

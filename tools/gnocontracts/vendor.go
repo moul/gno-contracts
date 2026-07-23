@@ -31,7 +31,8 @@ func cmdVendor(root string) error {
 		return err
 	}
 
-	// Seed the queue with our contracts' direct deps.
+	// Seed the queue with our contracts' direct deps, INCLUDING test-only
+	// dependencies (so `gno test` resolves everything from vendor/).
 	scanned, err := scanContracts(root)
 	if err != nil {
 		return err
@@ -39,7 +40,11 @@ func cmdVendor(root string) error {
 	queue := []string{}
 	enqueued := map[string]bool{}
 	for _, c := range scanned {
-		for _, d := range c.Deps {
+		deps, err := parseDepsMode(filepath.Join(root, filepath.FromSlash(c.Dir)), true)
+		if err != nil {
+			return err
+		}
+		for _, d := range deps {
 			if !provided[d] && !enqueued[d] {
 				queue = append(queue, d)
 				enqueued[d] = true

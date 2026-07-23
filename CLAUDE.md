@@ -17,6 +17,8 @@ Read it before doing anything. The essentials:
 - Conventional, single-line: `feat(<name>): …`, `fix: …`, `chore(deps): …`.
 - **Never** add Claude/AI co-author or `Co-Authored-By` trailers.
 - Author: `Manfred Touron <94029+moul@users.noreply.github.com>`.
+- **Never commit a compiled binary.** The maintenance CLI runs via
+  `go tool gnocontracts <cmd>` (declared in `go.mod`); the Makefile wraps it.
 
 ## Handy
 

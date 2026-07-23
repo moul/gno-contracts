@@ -1,5 +1,8 @@
-# build artifacts
+# build artifacts — never commit a compiled binary (use `go tool gnocontracts`)
 /bin/
+/gnocontracts
+/tools/gnocontracts/gnocontracts
+tools/tools
 
 # gno toolchain checkout used by CI / local dev
 /.gno/
