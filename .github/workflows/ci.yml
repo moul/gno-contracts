@@ -37,7 +37,9 @@ jobs:
         run: gno version
 
       - name: Build & vet tools
-        run: cd tools && go build ./... && go vet ./...
+        run: |
+          go vet ./tools
+          make tools
 
       - name: Vendor dependencies (verify committed vendor is current)
         run: |
