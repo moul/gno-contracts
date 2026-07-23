@@ -18,7 +18,7 @@ publish everything.
 p/moul/<name>/v1/         pure packages          → gno.land/p/moul/<name>/v1
 r/moul/<name>/v1/         realms                 → gno.land/r/moul/<name>/v1
 vendor/gno.land/...       vendored dependencies (committed, autonomous)
-tools/                    Go maintenance CLI (manifest, readme, vendor, sync, publish)
+tools/gnocontracts/       Go maintenance CLI (`go tool gnocontracts …`)
 contracts.json           the contract catalog (source of truth for the table below)
 gnowork.toml             gno workspace marker (enables local package resolution)
 Makefile                 test / lint / deps / gen / sync / publish
@@ -61,6 +61,7 @@ make help        # list all targets
 | Package | Kind | Description | Deps | portal-loop | test6 | topaz |
 |---|---|---|---|---|---|---|
 | `gno.land/p/moul/greet/v1` | pkg | Canary pure package: greeting helper (demonstrates versioned cross-package resolution). | — | — | — | — |
+| `gno.land/r/moul/gns/v1` | realm | GNS — ENS-equivalent naming (registration, records, reverse/primary names, subnames, policies) as one realm. | 2 | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->
