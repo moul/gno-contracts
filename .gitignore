@@ -1,0 +1,14 @@
+# build artifacts
+/bin/
+
+# gno toolchain checkout used by CI / local dev
+/.gno/
+
+# gno caches occasionally dropped in-tree
+**/.gno/
+*.gno.gen.go
+
+# OS / editor
+.DS_Store
+
+# NOTE: vendor/ is intentionally committed (autonomy). Do not ignore it.

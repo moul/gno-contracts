@@ -1,0 +1,65 @@
+{
+  "networks": [
+    {
+      "name": "portal-loop",
+      "chain_id": "portal-loopz",
+      "rpc": "https://rpc.gno.land:443"
+    },
+    {
+      "name": "test6",
+      "chain_id": "test6",
+      "rpc": "https://rpc.test6.testnets.gno.land:443"
+    },
+    {
+      "name": "topaz",
+      "chain_id": "topaz-1",
+      "rpc": "https://rpc.topaz.testnets.gno.land:443"
+    }
+  ],
+  "contracts": [
+    {
+      "pkgpath": "gno.land/p/moul/greet/v1",
+      "dir": "p/moul/greet/v1",
+      "kind": "p",
+      "name": "greet",
+      "version": "v1",
+      "description": "Canary pure package: greeting helper (demonstrates versioned cross-package resolution).",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/hello/v1",
+      "dir": "r/moul/hello/v1",
+      "kind": "r",
+      "name": "hello",
+      "version": "v1",
+      "description": "Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1).",
+      "deps": [
+        "gno.land/p/moul/greet/v1"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    }
+  ]
+}
