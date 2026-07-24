@@ -1,2 +1,3 @@
 module = "gno.land/p/moul/mdlist/v1"
 gno = "0.9"
+ignore = true
