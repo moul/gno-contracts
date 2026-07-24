@@ -3,8 +3,8 @@ package memory
 import (
 	"testing"
 
-	"gno.land/p/nt/testutils"
-	"gno.land/p/nt/uassert"
+	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/uassert/v0"
 )
 
 // findPairIndices returns two grid indices holding the same face, plus a third

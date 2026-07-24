@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"gno.land/p/nt/avl/v0"
-	"gno.land/p/nt/testutils"
+	"gno.land/p/nt/testutils/v0"
 )
 
 // reset clears package globals between tests (t.Run/subtests do not reset them).

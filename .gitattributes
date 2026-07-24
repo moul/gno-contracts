@@ -1,0 +1,10 @@
+# Treat gno sources as Go for GitHub language stats, highlighting, and diffs.
+*.gno linguist-language=Go
+
+# Generated gno/go sources (if any land here) shouldn't skew stats or diffs.
+*.gen.gno      linguist-generated
+*.gen_test.gno linguist-generated
+*.gen.go       linguist-generated
+
+# Vendored dependencies are not moul's code — exclude from language stats.
+vendor/** linguist-vendored

@@ -16,6 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
+  "status_checked_at": "2026-07-24T12:18:21Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -24,19 +25,23 @@
       "name": "addrset",
       "version": "v1",
       "description": "Set data structure for unique gno addresses.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/addrset",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -47,6 +52,8 @@
       "name": "authz",
       "version": "v1",
       "description": "Flexible authorization control for privileged actions.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/authz",
       "deps": [
         "gno.land/p/moul/addrset/v1",
         "gno.land/p/moul/once/v1",
@@ -57,13 +64,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -74,6 +83,8 @@
       "name": "dynreplacer",
       "version": "v1",
       "description": "Simple template engine for dynamic content replacement.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/dynreplacer",
       "deps": [],
       "draft": false,
       "published": {
@@ -95,6 +106,8 @@
       "name": "fifo",
       "version": "v1",
       "description": "Fixed-size FIFO (first-in-first-out) list.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/fifo",
       "deps": [],
       "draft": false,
       "published": {
@@ -105,7 +118,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -137,19 +151,23 @@
       "name": "helplink",
       "version": "v1",
       "description": "Helpers for building gnoweb help-page links.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/helplink",
       "deps": [
         "gno.land/p/moul/txlink/v1"
       ],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -160,19 +178,23 @@
       "name": "md",
       "version": "v1",
       "description": "Helpers for generating Markdown content programmatically.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/md",
       "deps": [
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -183,17 +205,21 @@
       "name": "mdtable",
       "version": "v1",
       "description": "Build Markdown tables.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/mdtable",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -204,17 +230,21 @@
       "name": "once",
       "version": "v1",
       "description": "One-time execution patterns.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/once",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -225,17 +255,21 @@
       "name": "realmpath",
       "version": "v1",
       "description": "Render.path parsing and link generation.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/realmpath",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -246,17 +280,21 @@
       "name": "txlink",
       "version": "v1",
       "description": "Build transaction (maketx) links for realms.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/txlink",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -267,17 +305,21 @@
       "name": "typeutil",
       "version": "v1",
       "description": "Type conversion utilities.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/typeutil",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -288,17 +330,21 @@
       "name": "ulist",
       "version": "v1",
       "description": "Append-only list backed by a binary tree.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/ulist",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -308,11 +354,11 @@
       "kind": "r",
       "name": "daily/x/blog",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -331,9 +377,9 @@
       "kind": "r",
       "name": "daily/x/bloomfilter",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -352,9 +398,9 @@
       "kind": "r",
       "name": "daily/x/bullscows",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -373,9 +419,9 @@
       "kind": "r",
       "name": "daily/x/calc",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -394,11 +440,11 @@
       "kind": "r",
       "name": "daily/x/coinflipduel",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -417,11 +463,11 @@
       "kind": "r",
       "name": "daily/x/collatz",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -440,11 +486,11 @@
       "kind": "r",
       "name": "daily/x/connect4",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -463,9 +509,9 @@
       "kind": "r",
       "name": "daily/x/counter",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -484,11 +530,11 @@
       "kind": "r",
       "name": "daily/x/dice",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -507,11 +553,11 @@
       "kind": "r",
       "name": "daily/x/dutchauction",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -530,9 +576,9 @@
       "kind": "r",
       "name": "daily/x/erc20",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -551,11 +597,11 @@
       "kind": "r",
       "name": "daily/x/escrow",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -574,11 +620,11 @@
       "kind": "r",
       "name": "daily/x/faucet",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -597,11 +643,11 @@
       "kind": "r",
       "name": "daily/x/guestbook",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -620,11 +666,11 @@
       "kind": "r",
       "name": "daily/x/handles",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -643,11 +689,11 @@
       "kind": "r",
       "name": "daily/x/hangman",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -666,11 +712,11 @@
       "kind": "r",
       "name": "daily/x/kingofdice",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -689,11 +735,11 @@
       "kind": "r",
       "name": "daily/x/kudos",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -712,11 +758,11 @@
       "kind": "r",
       "name": "daily/x/leaderboard",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -735,9 +781,9 @@
       "kind": "r",
       "name": "daily/x/life",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -756,11 +802,11 @@
       "kind": "r",
       "name": "daily/x/linktree",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -779,9 +825,9 @@
       "kind": "r",
       "name": "daily/x/lru",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -800,9 +846,9 @@
       "kind": "r",
       "name": "daily/x/memory",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -821,9 +867,9 @@
       "kind": "r",
       "name": "daily/x/microblog",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -842,9 +888,9 @@
       "kind": "r",
       "name": "daily/x/moodstone",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -863,11 +909,11 @@
       "kind": "r",
       "name": "daily/x/multisig",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -886,11 +932,11 @@
       "kind": "r",
       "name": "daily/x/numguess",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -909,11 +955,11 @@
       "kind": "r",
       "name": "daily/x/polls",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -932,9 +978,9 @@
       "kind": "r",
       "name": "daily/x/quotes",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -953,11 +999,11 @@
       "kind": "r",
       "name": "daily/x/reactions",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -976,9 +1022,9 @@
       "kind": "r",
       "name": "daily/x/ringlog",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -997,11 +1043,11 @@
       "kind": "r",
       "name": "daily/x/rps",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1020,11 +1066,11 @@
       "kind": "r",
       "name": "daily/x/rpsduel",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1043,11 +1089,11 @@
       "kind": "r",
       "name": "daily/x/rpsmatch",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1066,11 +1112,11 @@
       "kind": "r",
       "name": "daily/x/rpsoracle",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1089,11 +1135,11 @@
       "kind": "r",
       "name": "daily/x/splitter",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1112,9 +1158,9 @@
       "kind": "r",
       "name": "daily/x/stack",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1133,11 +1179,11 @@
       "kind": "r",
       "name": "daily/x/tamagotchi",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1156,11 +1202,11 @@
       "kind": "r",
       "name": "daily/x/tictactoe",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1179,12 +1225,12 @@
       "kind": "r",
       "name": "daily/x/timecapsule",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1203,11 +1249,11 @@
       "kind": "r",
       "name": "daily/x/todos",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1226,11 +1272,11 @@
       "kind": "r",
       "name": "daily/x/trivia",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1249,11 +1295,11 @@
       "kind": "r",
       "name": "daily/x/urlshort",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1272,11 +1318,11 @@
       "kind": "r",
       "name": "daily/x/vault",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1295,9 +1341,9 @@
       "kind": "r",
       "name": "daily/x/vestoken",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1316,9 +1362,9 @@
       "kind": "r",
       "name": "daily/x/wordle",
       "version": "v1",
-      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "description": "",
       "deps": [],
-      "draft": true,
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -1341,6 +1387,28 @@
       "deps": [
         "gno.land/p/moul/greet/v1"
       ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/sapin/v1",
+      "dir": "r/moul/sapin/v1",
+      "kind": "r",
+      "name": "sapin",
+      "version": "v1",
+      "description": "ASCII Christmas-tree (« sapin ») renderer.",
+      "source": "https://github.com/moul/gno-contracts/pull/15",
+      "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {

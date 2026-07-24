@@ -17,6 +17,9 @@ const manifestFile = "contracts.json"
 type Manifest struct {
 	// Networks are the chains we track upload status against.
 	Networks []Network `json:"networks"`
+	// StatusCheckedAt is when `status` last queried the chains (a single
+	// timestamp, so per-contract entries don't churn on every run).
+	StatusCheckedAt string `json:"status_checked_at,omitempty"`
 	// Contracts is the catalog, kept sorted by PkgPath.
 	Contracts []Contract `json:"contracts"`
 }
@@ -36,16 +39,28 @@ type Contract struct {
 	Name        string         `json:"name"`        // hello (may contain slashes)
 	Version     string         `json:"version"`     // v1
 	Description string         `json:"description"` // hand-authored; preserved across scans
-	Deps        []string       `json:"deps"`        // gno.land/* imports (non-test)
-	Draft       bool           `json:"draft"`       // work-in-progress, excluded from publish
-	Published   map[string]Pub `json:"published"`   // network name -> upload status
+	// Source is the provenance of an imported package: ideally the gno-contracts
+	// PR that added it, or the origin repo. Hand-authored; preserved; rendered
+	// into the package README.
+	Source string `json:"source,omitempty"`
+	// Upstream is the un-versioned monorepo path (gno.land/p/moul/addrset) for
+	// packages that originated in gnolang/gno (deployed without /vN on genesis
+	// chains). Set by manifest; used by the dual-path status check + README.
+	Upstream  string         `json:"upstream,omitempty"`
+	Deps      []string       `json:"deps"`      // gno.land/* imports (non-test)
+	Draft     bool           `json:"draft"`     // work-in-progress, excluded from publish
+	Published map[string]Pub `json:"published"` // network name -> upload status
 }
 
 // Pub is the upload status of a contract on a given network.
+//
+// Upstream note: monorepo-origin packages (Contract.Upstream set) are deployed
+// WITHOUT a /vN on the genesis/older chains, so the status checker probes both
+// PkgPath and Upstream; Which records what was found.
 type Pub struct {
-	Uploaded  bool   `json:"uploaded"`
-	Tx        string `json:"tx,omitempty"`
-	CheckedAt string `json:"checked_at,omitempty"`
+	Uploaded bool   `json:"uploaded"`
+	Tx       string `json:"tx,omitempty"`
+	Which    string `json:"which,omitempty"` // "v1", "monorepo", or "both"
 }
 
 // defaultNetworks seeds a fresh manifest. Adjust RPC/chain-id as chains change.
@@ -226,6 +241,18 @@ func isVersion(s string) bool {
 		}
 	}
 	return true
+}
+
+// inMonorepo reports whether the un-versioned pkgpath exists in the gnolang/gno
+// checkout at $GNOROOT (current master examples). Used to mark monorepo-origin
+// packages. Returns false when GNOROOT is unset or the path is absent.
+func inMonorepo(upath string) bool {
+	root := os.Getenv("GNOROOT")
+	if root == "" || !strings.HasPrefix(upath, "gno.land/") {
+		return false
+	}
+	rel := strings.TrimPrefix(upath, "gno.land/")
+	return fileExists(filepath.Join(root, "examples", "gno.land", filepath.FromSlash(rel)))
 }
 
 // parseDeps returns the sorted, de-duplicated set of gno.land/* imports found in

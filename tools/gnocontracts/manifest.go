@@ -27,11 +27,19 @@ func cmdManifest(root string) error {
 		if old, ok := prev[c.PkgPath]; ok {
 			// preserve human-owned fields
 			c.Description = old.Description
+			c.Source = old.Source
 			c.Draft = old.Draft
 			c.Published = old.Published
+			c.Upstream = old.Upstream // preserved; may be refreshed below
 			updated++
 		} else {
 			added++
+		}
+		// Mark monorepo-origin packages: the un-versioned path exists in the
+		// gnolang/gno checkout. Sticky once set (so it survives runs without
+		// GNOROOT), refreshable when the monorepo copy is present.
+		if u := unversioned(c.PkgPath); u != c.PkgPath && inMonorepo(u) {
+			c.Upstream = u
 		}
 		if c.Published == nil {
 			c.Published = map[string]Pub{}

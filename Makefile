@@ -25,7 +25,7 @@ VIEW := $(CURDIR)/.gnoroot-view
 PKG_DIRS := $(shell find p/moul r/moul -name gnomod.toml -exec dirname {} \; 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps test lint fmt gen manifest readme check sync publish view clean
+.PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -56,7 +56,10 @@ manifest: ## refresh contracts.json from the contract trees
 readme: ## regenerate the README contracts table
 	$(TOOL) readme
 
-gen: manifest readme ## manifest + readme
+readmes: ## ensure every package has a README (repo link + disclaimer)
+	$(TOOL) readmes
+
+gen: manifest readme readmes ## manifest + README table + per-package READMEs
 
 check: ## fail if contracts.json / README table are stale (CI guard)
 	$(TOOL) check
@@ -66,6 +69,15 @@ sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
 
 publish: ## dependency-ordered publish plan; NET=<net> CHECK=1 to query chain
 	$(TOOL) publish $(if $(NET),-net $(NET),) $(if $(CHECK),-check,)
+
+status: ## refresh on-chain upload status (all networks) + README; needs gnokey
+	$(TOOL) status $(if $(NET),-net $(NET),)
+
+report: ## analyze the PR diff (BASE=origin/main) into a Markdown report
+	$(TOOL) report $(if $(BASE),-base $(BASE),)
+
+graph: ## generate per-package + global dependency graphs into _assets/ (needs graphviz for svg/png)
+	$(TOOL) graph
 
 clean: ## remove build artifacts and the GNOROOT view
 	rm -rf bin "$(VIEW)"

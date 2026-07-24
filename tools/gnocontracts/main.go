@@ -37,9 +37,13 @@ func main() {
 		err = cmdManifest(root)
 	case "readme":
 		err = cmdReadme(root)
+	case "readmes":
+		err = cmdReadmes(root)
 	case "gen":
 		if err = cmdManifest(root); err == nil {
-			err = cmdReadme(root)
+			if err = cmdReadme(root); err == nil {
+				err = cmdReadmes(root)
+			}
 		}
 	case "check":
 		err = cmdCheck(root)
@@ -49,6 +53,12 @@ func main() {
 		err = cmdSync(root, args)
 	case "publish":
 		err = cmdPublish(root, args)
+	case "status":
+		err = cmdStatus(root, args)
+	case "report":
+		err = cmdReport(root, args)
+	case "graph":
+		err = cmdGraph(root)
 	case "help", "-h", "--help":
 		usage()
 		return
@@ -70,11 +80,15 @@ usage: go run ./tools <command> [flags]
 commands:
   manifest   refresh contracts.json from the p/moul and r/moul trees
   readme     regenerate the contracts table in README.md
+  readmes    ensure every package has a README (repo link + disclaimer)
   gen        manifest + readme
   check      gen and fail if anything changed (CI drift guard)
   vendor     fetch external gno.land dependencies into vendor/
   sync       report drift vs the gnolang/gno monorepo (needs GNOROOT)
   publish    order contracts by dependency; -net <name> [-check] for status
+  status     refresh on-chain upload status for all networks + README
+  report     analyze the PR diff (base...HEAD) → Markdown report for the PR bot
+  graph      write per-package + global dependency graphs into _assets/
 `)
 }
 
