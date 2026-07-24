@@ -77,7 +77,7 @@ make help        # list all targets
 | `gno.land/r/moul/present/v1` | realm | — | 10 | — | — | — | — |
 | `gno.land/r/moul/sapin/v1` | realm | ASCII Christmas-tree (« sapin ») renderer. | — | — | — | — | — |
 
-_On-chain status last checked: 2026-07-24T11:42:59Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-24T12:18:21Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
