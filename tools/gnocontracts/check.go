@@ -16,7 +16,10 @@ func cmdCheck(root string) error {
 	if err := cmdReadme(root); err != nil {
 		return err
 	}
-	dirty, err := gitDirty(root, "contracts.json", "README.md")
+	if err := cmdReadmes(root); err != nil {
+		return err
+	}
+	dirty, err := gitDirty(root, "contracts.json", "README.md", "p", "r")
 	if err != nil {
 		return err
 	}
