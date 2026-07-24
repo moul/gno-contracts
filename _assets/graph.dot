@@ -13,7 +13,9 @@ digraph gnocontracts {
   "gno.land/p/moul/realmpath/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/txlink/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/typeutil/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/udao/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/xdao/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/hello/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/sapin/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/addrset/v1" -> "gno.land/p/nt/avl/v0";
@@ -24,5 +26,6 @@ digraph gnocontracts {
   "gno.land/p/moul/authz/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/helplink/v1" -> "gno.land/p/moul/txlink/v1";
   "gno.land/p/moul/md/v1" -> "gno.land/p/nt/markdown/sanitize/v0";
+  "gno.land/p/moul/xdao/v1" -> "gno.land/p/moul/udao/v1";
   "gno.land/r/moul/hello/v1" -> "gno.land/p/moul/greet/v1";
 }
