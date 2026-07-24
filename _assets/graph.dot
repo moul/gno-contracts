@@ -20,6 +20,8 @@ digraph gnocontracts {
   "gno.land/p/moul/printfdebugging/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/printfdebugging/v2" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/realmpath/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/svg";
+  "gno.land/p/moul/svg/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/txlink/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v2" [style=filled, fillcolor="#cfe2ff"];
@@ -108,6 +110,9 @@ digraph gnocontracts {
   "gno.land/p/moul/memo/v2" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/printfdebugging/v1" -> "gno.land/p/nt/ufmt";
   "gno.land/p/moul/printfdebugging/v2" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/moul/svg/v1" -> "gno.land/p/moul/svg";
+  "gno.land/p/moul/svg/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/p/moul/svg/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/web25/v1" -> "gno.land/p/moul/realmpath/v1";
   "gno.land/p/moul/web25/v2" -> "gno.land/p/moul/realmpath/v1";
   "gno.land/r/moul/hello/v1" -> "gno.land/p/moul/greet/v1";
