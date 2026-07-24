@@ -36,9 +36,13 @@ type Contract struct {
 	Name        string         `json:"name"`        // hello (may contain slashes)
 	Version     string         `json:"version"`     // v1
 	Description string         `json:"description"` // hand-authored; preserved across scans
-	Deps        []string       `json:"deps"`        // gno.land/* imports (non-test)
-	Draft       bool           `json:"draft"`       // work-in-progress, excluded from publish
-	Published   map[string]Pub `json:"published"`   // network name -> upload status
+	// Source is the provenance of an imported package: ideally the gno-contracts
+	// PR that added it (so the PR holds the metadata/context), or the origin repo.
+	// Hand-authored; preserved across scans; rendered into the package README.
+	Source    string         `json:"source,omitempty"`
+	Deps      []string       `json:"deps"`      // gno.land/* imports (non-test)
+	Draft     bool           `json:"draft"`     // work-in-progress, excluded from publish
+	Published map[string]Pub `json:"published"` // network name -> upload status
 }
 
 // Pub is the upload status of a contract on a given network.

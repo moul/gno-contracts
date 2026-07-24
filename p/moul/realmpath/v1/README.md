@@ -8,6 +8,8 @@ Render.path parsing and link generation.
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+Provenance: imported — see [https://github.com/moul/gno-contracts/pull/2](https://github.com/moul/gno-contracts/pull/2) for context and metadata.
+
 > ⚠️ **Disclaimer:** provided as-is, without warranty; not security-audited. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
 <!-- END GNOCONTRACTS FOOTER -->

@@ -89,6 +89,13 @@ func pkgFooter(c Contract) string {
 	b.WriteString("Part of **[moul/gno-contracts](" + repoURL + ")** — moul's versioned " +
 		"gno.land contracts. See the repository for the full catalog, build/test " +
 		"tooling, and usage.\n\n")
+	if c.Source != "" {
+		src := c.Source
+		if strings.HasPrefix(src, "http") {
+			src = "[" + src + "](" + src + ")"
+		}
+		b.WriteString("Provenance: imported — see " + src + " for context and metadata.\n\n")
+	}
 	if isExperimental(c.Dir) {
 		b.WriteString("> 🧪 **Highly experimental — potentially vibe-coded.** Not audited; " +
 			"may break, change, or be removed at any time. Do not use with anything of " +
