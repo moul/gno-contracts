@@ -303,6 +303,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/config/v1",
+      "dir": "r/moul/config/v1",
+      "kind": "r",
+      "name": "config",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/authz"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/hello/v1",
       "dir": "r/moul/hello/v1",
       "kind": "r",
