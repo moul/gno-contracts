@@ -1,0 +1,56 @@
+name: publish-status
+
+# Refresh each contract's on-chain upload status (per network) and commit the
+# updated contracts.json + README table. Runs after every push to main and can
+# be triggered manually. The commit is tagged [skip ci] so it does not loop.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Avoid overlapping runs racing on the same commit.
+concurrency:
+  group: publish-status
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      # gno + gnokey from master, OUTSIDE the workspace (so the gnowork.toml
+      # workspace never discovers the toolchain's bundled packages).
+      - name: Build gno + gnokey (master)
+        run: |
+          git clone --depth 1 https://github.com/gnolang/gno "$HOME/gno"
+          mkdir -p "$HOME/.local/bin"
+          (cd "$HOME/gno" \
+            && go build -o "$HOME/.local/bin/gno" ./gnovm/cmd/gno \
+            && go build -o "$HOME/.local/bin/gnokey" ./gno.land/cmd/gnokey)
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
+
+      - name: Refresh on-chain status
+        run: make status
+
+      - name: Commit refreshed catalog
+        run: |
+          if [ -z "$(git status --porcelain contracts.json README.md)" ]; then
+            echo "No status changes."
+            exit 0
+          fi
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          git add contracts.json README.md
+          git commit -m "chore(status): refresh on-chain publish status [skip ci]"
+          git push

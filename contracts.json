@@ -16,6 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
+  "status_checked_at": "2026-07-24T11:29:03Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/demo/blog/v1",
@@ -30,6 +31,7 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/demo/blog",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -51,6 +53,7 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/demo/nestedpkg",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -76,6 +79,7 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/demo/svg",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -99,15 +103,18 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/addrset",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -126,15 +133,18 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/authz",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -147,6 +157,7 @@
       "description": "Simple template engine for dynamic content replacement.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/dynreplacer",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -168,6 +179,7 @@
       "description": "Fixed-size FIFO (first-in-first-out) list.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/fifo",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -176,7 +188,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -212,15 +225,18 @@
         "gno.land/p/moul/txlink/v1"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/helplink",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -235,15 +251,18 @@
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/md",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -256,15 +275,18 @@
       "description": "Build Markdown tables.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/mdtable",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -277,15 +299,18 @@
       "description": "One-time execution patterns.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/once",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -298,15 +323,18 @@
       "description": "Render.path parsing and link generation.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/realmpath",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -319,15 +347,18 @@
       "description": "Build transaction (maketx) links for realms.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/txlink",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -340,15 +371,18 @@
       "description": "Type conversion utilities.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/typeutil",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -361,15 +395,18 @@
       "description": "Append-only list backed by a binary tree.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/ulist",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -387,6 +424,7 @@
         "gno.land/r/gov/dao"
       ],
       "draft": false,
+      "upstream": "gno.land/r/gnoland/blog",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -414,6 +452,7 @@
         "gno.land/r/gnoland/blog"
       ],
       "draft": false,
+      "upstream": "gno.land/r/gnoland/home",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -439,6 +478,7 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/r/gov/dao",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -475,6 +515,27 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/sapin/v1",
+      "dir": "r/moul/sapin/v1",
+      "kind": "r",
+      "name": "sapin",
+      "version": "v1",
+      "description": "ASCII Christmas-tree (« sapin ») renderer.",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/sys/cla/v1",
       "dir": "r/sys/cla/v1",
       "kind": "r",
@@ -490,6 +551,7 @@
         "gno.land/r/gov/dao"
       ],
       "draft": false,
+      "upstream": "gno.land/r/sys/cla",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -514,6 +576,7 @@
         "gno.land/r/gov/dao"
       ],
       "draft": false,
+      "upstream": "gno.land/r/sys/params",
       "published": {
         "portal-loop": {
           "uploaded": false
