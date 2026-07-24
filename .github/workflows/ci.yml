@@ -19,19 +19,17 @@ jobs:
         with:
           go-version: "1.24"
 
-      - name: Checkout gno (master)
-        uses: actions/checkout@v4
-        with:
-          repository: gnolang/gno
-          ref: master
-          path: .gno
-
-      - name: Build gno toolchain
+      # Clone the gno toolchain OUTSIDE the repo workspace. If it lived inside
+      # (e.g. ./.gno), the gnowork.toml workspace would discover its bundled
+      # examples/ + pkg/mod packages and they would shadow our committed
+      # vendor/, breaking reproducible resolution.
+      - name: Checkout & build gno (master), outside the workspace
         run: |
+          git clone --depth 1 https://github.com/gnolang/gno "$HOME/gno"
           mkdir -p "$HOME/.local/bin"
-          (cd .gno && go build -o "$HOME/.local/bin/gno" ./gnovm/cmd/gno)
+          (cd "$HOME/gno" && go build -o "$HOME/.local/bin/gno" ./gnovm/cmd/gno)
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          echo "GNOROOT=$GITHUB_WORKSPACE/.gno" >> "$GITHUB_ENV"
+          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
 
       - name: gno version
         run: gno version
