@@ -1,0 +1,7 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/sys/params/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/sys/params/v1" -> "gno.land/p/sys/validators";
+  "gno.land/r/sys/params/v1" -> "gno.land/r/gov/dao";
+}

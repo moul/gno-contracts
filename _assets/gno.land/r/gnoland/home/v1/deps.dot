@@ -1,0 +1,10 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/gnoland/home/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/gnoland/home/v1" -> "gno.land/p/leon/svgbtn";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/p/moul/dynreplacer";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/p/nt/ownable/v0";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/r/devrels/events";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/r/gnoland/blog";
+}

@@ -1,6 +1,9 @@
 digraph gnocontracts {
   rankdir=LR;
   node [shape=box, fontname="sans-serif"];
+  "gno.land/p/demo/blog/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/demo/nestedpkg/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/demo/svg/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/addrset/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/authz/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/dynreplacer/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -14,8 +17,19 @@ digraph gnocontracts {
   "gno.land/p/moul/txlink/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/typeutil/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/gnoland/blog/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/gnoland/home/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/gov/dao/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/hello/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/sapin/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/sys/cla/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/sys/params/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/demo/blog/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/p/demo/blog/v1" -> "gno.land/p/nt/mux/v0";
+  "gno.land/p/demo/blog/v1" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/demo/svg/v1" -> "gno.land/p/demo/svg";
+  "gno.land/p/demo/svg/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/p/demo/svg/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/addrset/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/authz/v1" -> "gno.land/p/moul/addrset/v1";
   "gno.land/p/moul/authz/v1" -> "gno.land/p/moul/once/v1";
@@ -24,5 +38,25 @@ digraph gnocontracts {
   "gno.land/p/moul/authz/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/helplink/v1" -> "gno.land/p/moul/txlink/v1";
   "gno.land/p/moul/md/v1" -> "gno.land/p/nt/markdown/sanitize/v0";
+  "gno.land/r/gnoland/blog/v1" -> "gno.land/p/demo/blog";
+  "gno.land/r/gnoland/blog/v1" -> "gno.land/p/nt/bptree/v0";
+  "gno.land/r/gnoland/blog/v1" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/gnoland/blog/v1" -> "gno.land/r/gov/dao";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/p/leon/svgbtn";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/p/moul/dynreplacer";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/p/nt/ownable/v0";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/r/devrels/events";
+  "gno.land/r/gnoland/home/v1" -> "gno.land/r/gnoland/blog";
+  "gno.land/r/gov/dao/v1" -> "gno.land/p/nt/bptree/v0";
+  "gno.land/r/gov/dao/v1" -> "gno.land/p/nt/seqid/v0";
+  "gno.land/r/gov/dao/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/hello/v1" -> "gno.land/p/moul/greet/v1";
+  "gno.land/r/sys/cla/v1" -> "gno.land/p/moul/addrset";
+  "gno.land/r/sys/cla/v1" -> "gno.land/p/moul/helplink";
+  "gno.land/r/sys/cla/v1" -> "gno.land/p/moul/md";
+  "gno.land/r/sys/cla/v1" -> "gno.land/p/moul/mdtable";
+  "gno.land/r/sys/cla/v1" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/sys/cla/v1" -> "gno.land/r/gov/dao";
+  "gno.land/r/sys/params/v1" -> "gno.land/p/sys/validators";
+  "gno.land/r/sys/params/v1" -> "gno.land/r/gov/dao";
 }
