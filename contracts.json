@@ -16,6 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
+  "status_checked_at": "2026-07-24T08:36:09Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -31,13 +32,15 @@
       "upstream": "gno.land/p/moul/addrset",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -59,13 +62,15 @@
       "upstream": "gno.land/p/moul/authz",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -109,7 +114,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -148,13 +154,15 @@
       "upstream": "gno.land/p/moul/helplink",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -172,13 +180,15 @@
       "upstream": "gno.land/p/moul/md",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -194,13 +204,15 @@
       "upstream": "gno.land/p/moul/mdtable",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -216,13 +228,15 @@
       "upstream": "gno.land/p/moul/once",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -238,13 +252,15 @@
       "upstream": "gno.land/p/moul/realmpath",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -260,13 +276,15 @@
       "upstream": "gno.land/p/moul/txlink",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -282,13 +300,15 @@
       "upstream": "gno.land/p/moul/typeutil",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -304,13 +324,15 @@
       "upstream": "gno.land/p/moul/ulist",
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
