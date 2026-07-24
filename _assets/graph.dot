@@ -43,6 +43,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/dutchauction/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/eggling/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/englishauction/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/erc1155/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/erc721/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/escrow/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/faucet/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -121,6 +122,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/dutchauction/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/eggling/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/englishauction/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/erc1155/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/erc721/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/escrow/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/faucet/v1" -> "gno.land/p/nt/avl/v0";

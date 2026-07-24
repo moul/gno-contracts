@@ -1243,6 +1243,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/erc1155/v1",
+      "dir": "r/moul/x/daily/erc1155/v1",
+      "kind": "r",
+      "name": "x/daily/erc1155",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/erc20/v1",
       "dir": "r/moul/x/daily/erc20/v1",
       "kind": "r",
