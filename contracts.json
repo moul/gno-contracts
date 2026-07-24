@@ -616,6 +616,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/eggling/v1",
+      "dir": "r/moul/x/daily/eggling/v1",
+      "kind": "r",
+      "name": "x/daily/eggling",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (MCP daily); see r/moul/x/daily.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/erc20/v1",
       "dir": "r/moul/x/daily/erc20/v1",
       "kind": "r",
