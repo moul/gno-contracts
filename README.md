@@ -110,6 +110,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/crowdfund/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dice/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dutchauction/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/eggling/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/englishauction/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/erc20/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/erc721/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
@@ -153,6 +154,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/vault/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/wrapped/v1` | realm | — | 1 | — | — | — | — |
 
 _💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
 

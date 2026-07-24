@@ -41,6 +41,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/crowdfund/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/dice/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/dutchauction/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/eggling/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/englishauction/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/erc721/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/escrow/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -73,6 +74,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/trivia/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/urlshort/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/vault/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/wrapped/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/addrset/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/authz/v1" -> "gno.land/p/moul/addrset/v1";
   "gno.land/p/moul/authz/v1" -> "gno.land/p/moul/once/v1";
@@ -117,6 +119,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/crowdfund/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/dice/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/dutchauction/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/eggling/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/englishauction/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/erc721/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/escrow/v1" -> "gno.land/p/nt/avl/v0";
@@ -151,4 +154,5 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/trivia/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/urlshort/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/vault/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/wrapped/v1" -> "gno.land/p/nt/avl/v0";
 }
