@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T13:18:51Z",
+  "status_checked_at": "2026-07-24T14:04:21Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -345,27 +345,6 @@
         "topaz": {
           "uploaded": true,
           "which": "monorepo"
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/bertydao/v1",
-      "dir": "r/moul/bertydao/v1",
-      "kind": "r",
-      "name": "bertydao",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
