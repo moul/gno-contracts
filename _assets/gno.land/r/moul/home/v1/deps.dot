@@ -1,8 +1,0 @@
-digraph deps {
-  rankdir=LR;
-  node [shape=box, fontname="sans-serif"];
-  "gno.land/r/moul/home/v1" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/r/moul/home/v1" -> "gno.land/r/leon/hof";
-  "gno.land/r/moul/home/v1" -> "gno.land/r/moul/config";
-  "gno.land/r/moul/home/v1" -> "gno.land/r/moul/home";
-}
