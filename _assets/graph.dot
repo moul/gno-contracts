@@ -8,6 +8,7 @@ digraph gnocontracts {
   "gno.land/p/moul/greet/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/helplink/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/md/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/mdlist/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/mdtable/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/once/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/realmpath/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -24,5 +25,7 @@ digraph gnocontracts {
   "gno.land/p/moul/authz/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/helplink/v1" -> "gno.land/p/moul/txlink/v1";
   "gno.land/p/moul/md/v1" -> "gno.land/p/nt/markdown/sanitize/v0";
+  "gno.land/p/moul/mdlist/v1" -> "gno.land/p/moul/md/v1";
+  "gno.land/p/moul/mdlist/v1" -> "gno.land/p/moul/mdlist/v1";
   "gno.land/r/moul/hello/v1" -> "gno.land/p/moul/greet/v1";
 }
