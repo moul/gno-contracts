@@ -89,12 +89,25 @@ func pkgFooter(c Contract) string {
 	b.WriteString("Part of **[moul/gno-contracts](" + repoURL + ")** — moul's versioned " +
 		"gno.land contracts. See the repository for the full catalog, build/test " +
 		"tooling, and usage.\n\n")
+	if len(c.Deps) > 0 {
+		// Embed the generated per-package dependency graph (regenerated on main
+		// by `make graph`; referenced by absolute raw URL so it resolves in the
+		// rendered README once merged).
+		img := "https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/" + c.PkgPath + "/deps.png"
+		b.WriteString("**Dependency graph:**\n\n")
+		b.WriteString("![" + c.PkgPath + " dependency graph](" + img + ")\n\n")
+	}
 	if c.Source != "" {
 		src := c.Source
 		if strings.HasPrefix(src, "http") {
 			src = "[" + src + "](" + src + ")"
 		}
 		b.WriteString("Provenance: imported — see " + src + " for context and metadata.\n\n")
+	}
+	if c.Ignored {
+		b.WriteString("> 💤 **Archived version.** This package does not build on current " +
+			"gno master and is marked `ignore = true` (skipped by the toolchain and CI). " +
+			"It is kept for reference; use the latest ported version of this package instead.\n\n")
 	}
 	if isExperimental(c.Dir) {
 		b.WriteString("> 🧪 **Highly experimental — potentially vibe-coded.** Not audited; " +
