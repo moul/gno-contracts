@@ -1,0 +1,38 @@
+# 🎲 Provably-Fair Dice
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A dice game realm for gno.land where every roll is verifiable. There is no true
+randomness on-chain, so each roll's 1-6 face is derived **deterministically** from
+public block entropy (the block height) mixed with the caller's address and their
+running roll count. Anyone can recompute a roll from public data and confirm it was
+never tampered with — that is what "provably fair" means here. The realm keeps a
+per-caller roll history and a global distribution across the six faces.
+
+- **Realm path:** `gno.land/r/REPLACE_ADDR/dice`
+- **Network:** test13 (gno 0.9)
+
+## Example calls
+
+```sh
+# Roll the dice (state-changing crossing call, returns the 1-6 face)
+gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/dice" \
+  -func Roll -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast ...
+
+# Query the current view (distribution chart + recent rolls)
+gnokey query "vm/qrender" -data "gno.land/r/REPLACE_ADDR/dice:"
+
+# Read one account's roll history (read-only helper)
+gnokey query "vm/qeval" \
+  -data 'gno.land/r/REPLACE_ADDR/dice.RollsOf("g1...")'
+```
+
+`Render(path)` output shows the total rolls, a `▓░` distribution bar chart for
+faces 1-6 with percentages, and the most recent rolls.

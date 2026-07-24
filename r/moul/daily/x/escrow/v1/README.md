@@ -1,0 +1,36 @@
+# Escrow
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A minimal 2-party escrow realm for gno.land (a port of the classic Solidity escrow
+idea, accounting only — no funds move). One party opens a deal against a
+counterparty with free-form terms; both parties confirm to settle it, and the
+creator can cancel any deal that is still open.
+
+**Realm path:** `gno.land/r/REPLACE_ADDR/escrow`
+
+## Example calls
+
+```
+# Alice opens a deal with Bob; returns the new deal id (e.g. 0)
+Create(g1bob..., "swap NFT for 100 GNOT")
+
+# Each party confirms; when both have confirmed, the deal becomes "Settled"
+Confirm(0)   # called by Alice
+Confirm(0)   # called by Bob -> Settled
+
+# The creator may cancel while the deal is still Open
+Cancel(0)    # called by Alice
+```
+
+## Read (Render)
+
+- `/` — table of all deals: id, parties, state, confirmations, terms.
+- `/<id>` — details for a single deal (e.g. `/0`).

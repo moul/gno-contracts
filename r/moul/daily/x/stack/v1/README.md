@@ -1,0 +1,47 @@
+# Stack & Queue
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+An educational data-structure playground that maintains BOTH a LIFO **stack**
+and a FIFO **queue** of ints side by side. Push/Pop the stack, Enqueue/Dequeue
+the queue, and `Render` shows both structures with the top/front element
+labeled, their sizes, and a one-line reminder of how LIFO differs from FIFO.
+Popping or dequeuing an empty structure panics (a cross-realm abort).
+
+Realm path: `gno.land/r/REPLACE_ADDR/stack`
+
+## Example calls
+
+```
+# Stack (LIFO)
+Push 1
+Push 2
+Push 3
+Pop        # -> 3
+Pop        # -> 2
+
+# Queue (FIFO)
+Enqueue 1
+Enqueue 2
+Enqueue 3
+Dequeue    # -> 1
+Dequeue    # -> 2
+```
+
+Via `gnokey`:
+
+```sh
+gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/stack" -func Push     -args 42 ...
+gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/stack" -func Pop      ...
+gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/stack" -func Enqueue  -args 42 ...
+gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/stack" -func Dequeue  ...
+```
+
+Read the live view with `Render` (e.g. via `gnokey query vm/qrender`).

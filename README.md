@@ -73,6 +73,52 @@ make help        # list all targets
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | — | — | — |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | — | — | — |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | — | — | — |
+| `gno.land/r/moul/daily/x/blog/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/bloomfilter/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/bullscows/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/calc/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/coinflipduel/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/collatz/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/connect4/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/counter/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/dice/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/dutchauction/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/erc20/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/escrow/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/faucet/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/guestbook/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/handles/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/hangman/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/kingofdice/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/kudos/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/leaderboard/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/life/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/linktree/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/lru/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/memory/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/microblog/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/moodstone/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/multisig/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/numguess/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/polls/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/quotes/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/reactions/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/ringlog/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/rps/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/rpsduel/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/rpsmatch/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/rpsoracle/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/splitter/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/stack/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/tamagotchi/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/tictactoe/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/timecapsule/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 2 | — | — | — |
+| `gno.land/r/moul/daily/x/todos/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/trivia/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/urlshort/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/vault/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | 1 | — | — | — |
+| `gno.land/r/moul/daily/x/vestoken/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
+| `gno.land/r/moul/daily/x/wordle/v1` | realm | 🚧 Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x. | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->

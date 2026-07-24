@@ -1,0 +1,40 @@
+# Tamagotchi
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A tiny on-chain virtual pet. Hatch one, then keep it alive by feeding, playing,
+and letting it sleep — hunger, happiness, and energy all decay with block
+height, so neglect (or just forgetting to check in) eventually kills it.
+Hatching a new pet after a death keeps your lifetime feed/play/death counts,
+so the leaderboard rewards long-term care rather than a single lucky run.
+
+Realm: `gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/tamagotchi`
+
+## Example calls
+
+```
+maketx call ... -func Hatch -args "Fluffy"     # start a pet
+maketx call ... -func Feed                     # -30 hunger, +5 energy
+maketx call ... -func Play                     # +20 happiness, -10 energy, +5 hunger
+maketx call ... -func Sleep                    # +40 energy, +5 hunger
+```
+
+`Render("")` lists every pet ever hatched with alive/dead status and lifetime
+stats. `Render("<owner-address>")` shows one pet's detail card.
+
+## Toolchain status
+
+`gno test .` passes (10/10 tests) against `~/p/gh/gnolang/gno` as `GNOROOT`.
+Uses only `chain/runtime`, `sort`, `strconv`, and the kept `gno.land/p/nt/avl/v0`
+/ `gno.land/p/nt/testutils/v0` packages per the test13 stdlib reference. Panic
+paths are tested through non-crossing helper functions (`hatch`, `feed`,
+`play`, `sleep`) rather than through the exported `cur realm` entry points,
+since panics raised inside a realm-crossing call aren't `recover()`-able from
+the caller on this toolchain version.

@@ -1,0 +1,81 @@
+# Guestbook
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A public, on-chain guestbook realm for gno.land. Anyone can leave a signed
+message; every entry records the signer's address, the message, and the block
+height at which it was signed. The realm's `Render` page shows all entries as a
+Markdown table, newest-first, with a running total.
+
+Built for the **test13** testnet (gno 0.9).
+
+## Realm path
+
+```
+gno.land/r/REPLACE_ADDR/guestbook
+```
+
+(`REPLACE_ADDR` is substituted with the deployer's address at publish time.)
+
+## Public API
+
+- `Sign(cur realm, message string)` — crossing tx. Appends an entry attributed
+  to the immediate caller. Panics on an empty or over-long (>280 bytes) message.
+- `Count() int` — total number of signatures (read-only).
+- `Render(path string) string` — Markdown table of all entries, newest-first.
+
+## Example calls
+
+Sign the guestbook (from an EOA via `gnokey`):
+
+```sh
+gnokey maketx call \
+  -pkgpath "gno.land/r/REPLACE_ADDR/guestbook" \
+  -func Sign \
+  -args "gm gno.land!" \
+  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -broadcast -chainid test13 -remote <rpc> mykey
+```
+
+From another realm, invoke it as a crossing call:
+
+```go
+guestbook.Sign(cross(cur), "hello from my realm")
+```
+
+View the rendered guestbook:
+
+```sh
+gnokey query vm/qrender --data "gno.land/r/REPLACE_ADDR/guestbook:"
+```
+
+## Example render output
+
+```markdown
+# Guestbook
+
+**Total signatures:** 2
+
+| # | Who | Message | Height |
+|---|-----|---------|--------|
+| 2 | g1v9jxgu…0gh | hello from my realm | 4210 |
+| 1 | g1jg8mtu…qf5 | gm gno.land! | 4180 |
+```
+
+## Notes
+
+- Caller identity uses the gno 0.9 interrealm convention: `Sign` is a crossing
+  function that checks `cur.IsCurrent()` before deriving the author from
+  `cur.Previous().Address()`.
+- Block height comes from `chain/runtime.ChainHeight()` — deterministic.
+- Entries are stored in a `gno.land/p/nt/avl/v0` tree keyed by a zero-padded
+  sequence number so iteration order is deterministic and matches insertion
+  order (reversed for newest-first rendering).
+```

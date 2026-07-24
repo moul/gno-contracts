@@ -303,6 +303,1035 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/daily/x/blog/v1",
+      "dir": "r/moul/daily/x/blog/v1",
+      "kind": "r",
+      "name": "daily/x/blog",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/bloomfilter/v1",
+      "dir": "r/moul/daily/x/bloomfilter/v1",
+      "kind": "r",
+      "name": "daily/x/bloomfilter",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/bullscows/v1",
+      "dir": "r/moul/daily/x/bullscows/v1",
+      "kind": "r",
+      "name": "daily/x/bullscows",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/calc/v1",
+      "dir": "r/moul/daily/x/calc/v1",
+      "kind": "r",
+      "name": "daily/x/calc",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/coinflipduel/v1",
+      "dir": "r/moul/daily/x/coinflipduel/v1",
+      "kind": "r",
+      "name": "daily/x/coinflipduel",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/collatz/v1",
+      "dir": "r/moul/daily/x/collatz/v1",
+      "kind": "r",
+      "name": "daily/x/collatz",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/connect4/v1",
+      "dir": "r/moul/daily/x/connect4/v1",
+      "kind": "r",
+      "name": "daily/x/connect4",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/counter/v1",
+      "dir": "r/moul/daily/x/counter/v1",
+      "kind": "r",
+      "name": "daily/x/counter",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/dice/v1",
+      "dir": "r/moul/daily/x/dice/v1",
+      "kind": "r",
+      "name": "daily/x/dice",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/dutchauction/v1",
+      "dir": "r/moul/daily/x/dutchauction/v1",
+      "kind": "r",
+      "name": "daily/x/dutchauction",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/erc20/v1",
+      "dir": "r/moul/daily/x/erc20/v1",
+      "kind": "r",
+      "name": "daily/x/erc20",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/escrow/v1",
+      "dir": "r/moul/daily/x/escrow/v1",
+      "kind": "r",
+      "name": "daily/x/escrow",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/faucet/v1",
+      "dir": "r/moul/daily/x/faucet/v1",
+      "kind": "r",
+      "name": "daily/x/faucet",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/guestbook/v1",
+      "dir": "r/moul/daily/x/guestbook/v1",
+      "kind": "r",
+      "name": "daily/x/guestbook",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/handles/v1",
+      "dir": "r/moul/daily/x/handles/v1",
+      "kind": "r",
+      "name": "daily/x/handles",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/hangman/v1",
+      "dir": "r/moul/daily/x/hangman/v1",
+      "kind": "r",
+      "name": "daily/x/hangman",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/kingofdice/v1",
+      "dir": "r/moul/daily/x/kingofdice/v1",
+      "kind": "r",
+      "name": "daily/x/kingofdice",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/kudos/v1",
+      "dir": "r/moul/daily/x/kudos/v1",
+      "kind": "r",
+      "name": "daily/x/kudos",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/leaderboard/v1",
+      "dir": "r/moul/daily/x/leaderboard/v1",
+      "kind": "r",
+      "name": "daily/x/leaderboard",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/life/v1",
+      "dir": "r/moul/daily/x/life/v1",
+      "kind": "r",
+      "name": "daily/x/life",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/linktree/v1",
+      "dir": "r/moul/daily/x/linktree/v1",
+      "kind": "r",
+      "name": "daily/x/linktree",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/lru/v1",
+      "dir": "r/moul/daily/x/lru/v1",
+      "kind": "r",
+      "name": "daily/x/lru",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/memory/v1",
+      "dir": "r/moul/daily/x/memory/v1",
+      "kind": "r",
+      "name": "daily/x/memory",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/microblog/v1",
+      "dir": "r/moul/daily/x/microblog/v1",
+      "kind": "r",
+      "name": "daily/x/microblog",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/moodstone/v1",
+      "dir": "r/moul/daily/x/moodstone/v1",
+      "kind": "r",
+      "name": "daily/x/moodstone",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/multisig/v1",
+      "dir": "r/moul/daily/x/multisig/v1",
+      "kind": "r",
+      "name": "daily/x/multisig",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/numguess/v1",
+      "dir": "r/moul/daily/x/numguess/v1",
+      "kind": "r",
+      "name": "daily/x/numguess",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/polls/v1",
+      "dir": "r/moul/daily/x/polls/v1",
+      "kind": "r",
+      "name": "daily/x/polls",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/quotes/v1",
+      "dir": "r/moul/daily/x/quotes/v1",
+      "kind": "r",
+      "name": "daily/x/quotes",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/reactions/v1",
+      "dir": "r/moul/daily/x/reactions/v1",
+      "kind": "r",
+      "name": "daily/x/reactions",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/ringlog/v1",
+      "dir": "r/moul/daily/x/ringlog/v1",
+      "kind": "r",
+      "name": "daily/x/ringlog",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/rps/v1",
+      "dir": "r/moul/daily/x/rps/v1",
+      "kind": "r",
+      "name": "daily/x/rps",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/rpsduel/v1",
+      "dir": "r/moul/daily/x/rpsduel/v1",
+      "kind": "r",
+      "name": "daily/x/rpsduel",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/rpsmatch/v1",
+      "dir": "r/moul/daily/x/rpsmatch/v1",
+      "kind": "r",
+      "name": "daily/x/rpsmatch",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/rpsoracle/v1",
+      "dir": "r/moul/daily/x/rpsoracle/v1",
+      "kind": "r",
+      "name": "daily/x/rpsoracle",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/splitter/v1",
+      "dir": "r/moul/daily/x/splitter/v1",
+      "kind": "r",
+      "name": "daily/x/splitter",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/stack/v1",
+      "dir": "r/moul/daily/x/stack/v1",
+      "kind": "r",
+      "name": "daily/x/stack",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/tamagotchi/v1",
+      "dir": "r/moul/daily/x/tamagotchi/v1",
+      "kind": "r",
+      "name": "daily/x/tamagotchi",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/tictactoe/v1",
+      "dir": "r/moul/daily/x/tictactoe/v1",
+      "kind": "r",
+      "name": "daily/x/tictactoe",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/timecapsule/v1",
+      "dir": "r/moul/daily/x/timecapsule/v1",
+      "kind": "r",
+      "name": "daily/x/timecapsule",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/todos/v1",
+      "dir": "r/moul/daily/x/todos/v1",
+      "kind": "r",
+      "name": "daily/x/todos",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/trivia/v1",
+      "dir": "r/moul/daily/x/trivia/v1",
+      "kind": "r",
+      "name": "daily/x/trivia",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/urlshort/v1",
+      "dir": "r/moul/daily/x/urlshort/v1",
+      "kind": "r",
+      "name": "daily/x/urlshort",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/vault/v1",
+      "dir": "r/moul/daily/x/vault/v1",
+      "kind": "r",
+      "name": "daily/x/vault",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/vestoken/v1",
+      "dir": "r/moul/daily/x/vestoken/v1",
+      "kind": "r",
+      "name": "daily/x/vestoken",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/daily/x/wordle/v1",
+      "dir": "r/moul/daily/x/wordle/v1",
+      "kind": "r",
+      "name": "daily/x/wordle",
+      "version": "v1",
+      "description": "Auto-generated experimental realm (unsupervised MCP test corpus); see r/moul/daily/x.",
+      "deps": [],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/hello/v1",
       "dir": "r/moul/hello/v1",
       "kind": "r",

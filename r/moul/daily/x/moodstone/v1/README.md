@@ -1,0 +1,41 @@
+# 🪨 Moodstone
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+An on-chain mood tracker for the Gno ecosystem. Users log how they're feeling with a short note, and the realm shows live community sentiment stats — all stored immutably on gno.land.
+
+**Realm path:** `gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/moodstone`
+
+## Moods
+
+`happy` · `sad` · `excited` · `calm` · `anxious` · `angry` · `neutral`
+
+## Example Calls
+
+```bash
+# Log a mood
+gnokey maketx call \
+  -pkgpath gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/moodstone \
+  -func LogMood \
+  -args 'happy' -args 'Just deployed my first realm!' \
+  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -broadcast -chainid test5 \
+  test5.gno.land:443
+
+# Query total entries (read-only)
+gnokey query vm/qeval \
+  -remote test5.gno.land:443 \
+  -data 'gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/moodstone.TotalEntries()'
+
+# Query dominant mood
+gnokey query vm/qeval \
+  -remote test5.gno.land:443 \
+  -data 'gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/moodstone.DominantMood()'
+```

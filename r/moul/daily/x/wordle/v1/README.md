@@ -1,0 +1,53 @@
+# Daily Word Puzzle
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A Wordle-like realm for gno.land (gno 0.9 / test13). Every "day" — a span of
+blocks derived deterministically from the block height — the realm picks one
+secret 5-letter word from a built-in 15-word dictionary. Players submit guesses
+and get per-letter emoji feedback (🟩 correct spot, 🟨 wrong spot, ⬜ absent),
+with up to 6 attempts per day and a per-caller board rendered as Markdown.
+
+## Realm path
+
+`gno.land/r/REPLACE_ADDR/wordle`
+
+## How it works
+
+- The day index is `ChainHeight() / blocksPerDay`; the secret word is
+  `words[day % len(words)]` — fully deterministic, no randomness.
+- `Guess(word)` is a crossing function (`Guess(cross(cur), word)`) that records
+  a guess for the caller against today's word. Boards reset automatically when a
+  new day rolls over.
+- `Render(path)` shows the calling viewer's board, attempts left, win/lose state,
+  and the rules legend.
+
+## Example calls
+
+```sh
+# submit a guess (crossing tx)
+gnokey maketx call \
+  -pkgpath "gno.land/r/REPLACE_ADDR/wordle" \
+  -func Guess -args "crane" \
+  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -broadcast -chainid test13 <keyname>
+```
+
+View the board in gnoweb at:
+
+```
+https://gno.land/r/REPLACE_ADDR/wordle
+```
+
+## Test
+
+```sh
+gno test .
+```

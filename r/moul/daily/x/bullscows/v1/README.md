@@ -1,0 +1,44 @@
+# Bulls & Cows
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A shared on-chain [Bulls & Cows](https://en.wikipedia.org/wiki/Bulls_and_Cows) puzzle
+(the classic ancestor of Mastermind and Wordle-for-digits). One secret 4-digit code
+with no repeated digits is live at a time; anyone can call `Guess` with a candidate
+code and gets back **bulls** (right digit, right position) and **cows** (right digit,
+wrong position). First caller to land 4 bulls cracks the round, lands on the
+leaderboard, and a fresh secret is drawn immediately so the next round starts at once.
+
+Realm: `gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/bullscows`
+
+## Example calls
+
+```
+Guess("1972")   -> "1972 -> 1 bulls, 2 cows"
+Guess("7192")   -> "*** SOLVED *** 7192 was it — round 3 cracked in 5 guesses. New round 4 has begun, good luck!"
+GiveUp()        -> "round 4's code was 4082 — round 5 is live now."
+```
+
+`Render("")` shows the current round, attempts so far, the last 10 guesses with
+their bulls/cows, and the top-5 fastest-solve leaderboard.
+
+The secret is generated deterministically from the on-chain block height and the
+round counter via a small LCG (`newSecret`/`nextRand` in `bullscows.gno`) — no
+external randomness needed, and nobody can precompute the next code before its
+round actually starts.
+
+## Toolchain status
+
+Verified locally with `gno test -v .` and `gno lint .` against a `gno.land/gnolang/gno`
+master checkout used as `GNOROOT` (the default installed `gno` binary had a stale/
+missing `GNOROOT`, so `GNOROOT=<path-to-gnolang/gno> gno test .` was used instead).
+All 7 tests pass, lint is clean. This exercises current test13 (gno 0.9) stdlib
+paths (`chain/runtime`, no `std` package) and the `cur realm` / `cross(cur)` crossing
+convention.

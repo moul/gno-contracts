@@ -1,0 +1,55 @@
+# Rock-Paper-Scissors Duel
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+Asynchronous, two-player rock-paper-scissors with a real commit-reveal
+handshake: the challenger locks in a move as a sha256 commitment, the
+opponent replies in the open (seeing only a hash gives them nothing to go
+on), and the challenger reveals last to settle the round. A challenger who
+tries to dodge a losing reveal can be forfeited by the opponent once a
+50-block reveal window expires — no house move, no single-tx shortcut, just
+two players and a fairness primitive.
+
+**Realm path:** `gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel`
+
+## Example calls
+
+```sh
+# 1. Compute your commitment off-chain (or via a read-only query)
+gnokey query vm/qeval \
+  --data 'gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel.ComputeCommit("rock", "xyz123")'
+
+# 2. Open a duel against an opponent with that commitment
+gnokey maketx call \
+  -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel" \
+  -func Open -args "g1opponentaddr..." -args "<64-char hex commit>" \
+  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid test13 <key>
+
+# 3. Opponent replies in the clear
+gnokey maketx call \
+  -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel" \
+  -func Accept -args "1" -args "paper" \
+  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid test13 <key>
+
+# 4. Challenger reveals to settle it
+gnokey maketx call \
+  -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel" \
+  -func Reveal -args "1" -args "rock" -args "xyz123" \
+  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid test13 <key>
+
+# View the lobby, a specific duel, or a player's record
+gnokey query vm/qrender --data "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel:"
+gnokey query vm/qrender --data "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel:1"
+```
+
+## Toolchain status
+
+Compiled and tested against the `chain/test13` (gno 0.9) toolchain tag from
+`gnolang/gno` — `gno test .` and `gno lint .` both pass clean.

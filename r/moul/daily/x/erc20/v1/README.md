@@ -1,0 +1,44 @@
+# MiniToken (ERC-20)
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A minimal fungible-token realm for gno.land (gno 0.9 / test13), porting the
+classic Solidity ERC-20 idea. It keeps package-level state — a balances map, a
+total supply, and per-owner allowances — behind gno 0.9 crossing functions that
+authenticate the caller via `cur.IsCurrent()` + `cur.Previous()`. `Render`
+returns a Markdown dashboard with the token metadata and a table of holders.
+
+**Realm path:** `gno.land/r/REPLACE_ADDR/erc20` (deploy address injected at deploy time).
+
+## Exported API
+
+- `Mint(cur realm, to address, amount uint64)` — create new tokens for `to`.
+- `Transfer(cur realm, to address, amount uint64)` — send tokens from the caller.
+- `Approve(cur realm, spender address, amount uint64)` — grant a spending allowance.
+- `TransferFrom(cur realm, from, to address, amount uint64)` — spend an allowance.
+- `BalanceOf(holder address) uint64` · `Allowance(owner, spender address) uint64`
+- `TotalSupply() uint64` · `Name() string` · `Symbol() string`
+- `Render(path string) string` — Markdown view for gnoweb.
+
+## Example calls
+
+```sh
+# Mint 1000 MINI to yourself
+gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/erc20" \
+  -func Mint -args "<your-addr>" -args 1000 \
+  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 <key>
+
+# Transfer 250 MINI to another account
+gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/erc20" \
+  -func Transfer -args "<recipient-addr>" -args 250 \
+  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 <key>
+```
+
+View the token dashboard at `https://gno.land/r/REPLACE_ADDR/erc20` on gnoweb.

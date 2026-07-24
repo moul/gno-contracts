@@ -1,0 +1,29 @@
+# Connect Four
+
+> ⚠️ **Experimental — generated with no human supervision.** This realm was
+> produced automatically by an MCP-driven agent to exercise the gno MCP server
+> and tooling, and to generate test content for gno compilers, linters and
+> formatters. **Not audited. Not for production.** Full context & folder README:
+> [r/moul/daily/x](https://github.com/moul/gno-contracts/blob/main/r/moul/daily/x/README.md)
+
+---
+
+
+A two-player Connect Four realm on a 7-wide × 6-tall board. The game creator plays 🔴 and moves first; the named opponent plays 🟡. `Drop` enforces turn order by caller, rejects full and out-of-range columns, and detects a horizontal, vertical, or diagonal 4-in-a-row (or a draw). `Render` draws the board with 🔴🟡· and shows whose turn it is or who won.
+
+Realm path: `gno.land/r/REPLACE_ADDR/connect4`
+
+## Example calls
+
+```
+# create a game against another address (you are 🔴, returns the game id)
+NewGame(g1zabc...opponent)   # -> 1
+
+# drop discs into columns 0-6 (turns alternate, enforced by caller)
+Drop(1, 3)   # 🔴 drops in column 3
+Drop(1, 3)   # 🟡 drops in column 3 (called from opponent's key)
+
+# view state
+render:            # lists all games
+render:1           # shows board for game 1
+```
