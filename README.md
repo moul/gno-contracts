@@ -62,18 +62,42 @@ make help        # list all targets
 |---|---|---|---|---|---|---|---|
 | `gno.land/p/moul/addrset/v1` | pkg | Set data structure for unique gno addresses. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 📦 | — | 📦 |
 | `gno.land/p/moul/authz/v1` | pkg | Flexible authorization control for privileged actions. | 5 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 📦 | — | 📦 |
+| `gno.land/p/moul/collection/v1` | pkg | 💤  | 3 | — | — | — | — |
+| `gno.land/p/moul/collection/v2` | pkg | — | 3 | — | — | — | — |
+| `gno.land/p/moul/cow/v1` | pkg | 💤  | — | — | — | — | — |
+| `gno.land/p/moul/cow/v2` | pkg | — | — | — | — | — | — |
+| `gno.land/p/moul/debug/v1` | pkg | 💤  | 4 | — | — | — | — |
+| `gno.land/p/moul/debug/v2` | pkg | — | 4 | — | — | — | — |
+| `gno.land/p/moul/deque/v1` | pkg | 💤  | — | — | — | — | — |
+| `gno.land/p/moul/deque/v2` | pkg | — | — | — | — | — | — |
 | `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer) | — | — | — |
+| `gno.land/p/moul/errs/v1` | pkg | 💤  | — | — | — | — | — |
+| `gno.land/p/moul/errs/v2` | pkg | — | — | — | — | — | — |
 | `gno.land/p/moul/fifo/v1` | pkg | Fixed-size FIFO (first-in-first-out) list. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo) | — | — | 📦 |
+| `gno.land/p/moul/fp/v1` | pkg | 💤  | — | — | — | — | — |
+| `gno.land/p/moul/fp/v2` | pkg | — | — | — | — | — | — |
 | `gno.land/p/moul/greet/v1` | pkg | Canary pure package: greeting helper (demonstrates versioned cross-package resolution). | — | — | — | — | — |
 | `gno.land/p/moul/helplink/v1` | pkg | Helpers for building gnoweb help-page links. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 📦 | — | 📦 |
 | `gno.land/p/moul/md/v1` | pkg | Helpers for generating Markdown content programmatically. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 📦 | — | 📦 |
+| `gno.land/p/moul/mdlist/v1` | pkg | 💤  | 2 | — | — | — | — |
+| `gno.land/p/moul/mdlist/v2` | pkg | — | 2 | — | — | — | — |
 | `gno.land/p/moul/mdtable/v1` | pkg | Build Markdown tables. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | 📦 | — | 📦 |
+| `gno.land/p/moul/memo/v1` | pkg | 💤  | 2 | — | — | — | — |
+| `gno.land/p/moul/memo/v2` | pkg | — | 2 | — | — | — | — |
 | `gno.land/p/moul/once/v1` | pkg | One-time execution patterns. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | 📦 | — | 📦 |
+| `gno.land/p/moul/printfdebugging/v1` | pkg | 💤  | 1 | — | — | — | — |
+| `gno.land/p/moul/printfdebugging/v2` | pkg | — | 1 | — | — | — | — |
 | `gno.land/p/moul/realmpath/v1` | pkg | Render.path parsing and link generation. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | 📦 | — | 📦 |
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | 📦 | — | 📦 |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | 📦 | — | 📦 |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | 📦 | — | 📦 |
+| `gno.land/p/moul/web25/v1` | pkg | 💤  | 1 | — | — | — | — |
+| `gno.land/p/moul/web25/v2` | pkg | — | 1 | — | — | — | — |
+| `gno.land/p/moul/xmath/v1` | pkg | 💤  | — | — | — | — | — |
+| `gno.land/p/moul/xmath/v2` | pkg | — | — | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
+| `gno.land/r/moul/outfmt/v1` | realm | 💤  | 1 | — | — | — | — |
+| `gno.land/r/moul/outfmt/v2` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/sapin/v1` | realm | ASCII Christmas-tree (« sapin ») renderer. | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/blog/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/bloomfilter/v1` | realm | — | — | — | — | — | — |
@@ -83,11 +107,16 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/collatz/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/connect4/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/counter/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/crowdfund/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dice/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dutchauction/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/eggling/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/englishauction/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/erc20/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/erc721/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/escrow/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/faucet/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/governor/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/guestbook/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/handles/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/hangman/v1` | realm | — | 1 | — | — | — | — |
@@ -96,8 +125,10 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/leaderboard/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/life/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/linktree/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/lottery/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/lru/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/memory/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/merkledrop/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/microblog/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/moodstone/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/multisig/v1` | realm | — | 1 | — | — | — | — |
@@ -112,19 +143,22 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/rpsoracle/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/splitter/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/stack/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/staking/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/tamagotchi/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/tictactoe/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/timecapsule/v1` | realm | — | 2 | — | — | — | — |
+| `gno.land/r/moul/x/daily/timelock/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 2 | — | — | — | — |
 | `gno.land/r/moul/x/daily/todos/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/trivia/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/urlshort/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/vault/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/wrapped/v1` | realm | — | 1 | — | — | — | — |
 
 _💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
 
-_On-chain status last checked: 2026-07-24T14:04:21Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-24T20:18:01Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 

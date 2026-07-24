@@ -1,0 +1,6 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/moul/outfmt/v2" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/outfmt/v2" -> "gno.land/p/nt/ufmt/v0";
+}
