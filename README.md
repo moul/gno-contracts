@@ -70,7 +70,6 @@ make help        # list all targets
 | `gno.land/p/moul/mdtable/v1` | pkg | Build Markdown tables. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | 📦 | — | 📦 |
 | `gno.land/p/moul/once/v1` | pkg | One-time execution patterns. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | 📦 | — | 📦 |
 | `gno.land/p/moul/realmpath/v1` | pkg | Render.path parsing and link generation. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | 📦 | — | 📦 |
-| `gno.land/p/moul/template/v1` | pkg | — | 3 | — | — | — | — |
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | 📦 | — | 📦 |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | 📦 | — | 📦 |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | 📦 | — | 📦 |
@@ -123,7 +122,9 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
 
-_On-chain status last checked: 2026-07-24T13:18:51Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
+
+_On-chain status last checked: 2026-07-24T13:51:25Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 

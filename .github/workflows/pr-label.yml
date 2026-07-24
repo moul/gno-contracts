@@ -1,0 +1,57 @@
+name: pr-label
+
+# Auto-label each PR by the paths it touches:
+#   p     — pure packages under p/
+#   r     — realms under r/
+#   meta  — CI / tooling / docs / repo meta (.github, tools, Makefile, *.md, …)
+#   other — anything matching none of the above (catch-all, so nothing is unlabelled)
+# A PR gets the union of the buckets its changed files fall into. Labels are only
+# added (never removed), so manual labels stick.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-label-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for the diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute + apply path labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          git fetch origin "$BASE" --depth=100
+          p=0; r=0; meta=0; other=0
+          while read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              p/*) p=1 ;;
+              r/*) r=1 ;;
+              .github/*|tools/*|vendor/*|_assets/*|Makefile|go.mod|go.sum|gnowork.toml|.gitattributes|.gitignore|contracts.json|*.md) meta=1 ;;
+              *) other=1 ;;
+            esac
+          done < <(git diff --name-only "origin/$BASE...HEAD")
+          labels=()
+          [ "$p" = 1 ] && labels+=(p)
+          [ "$r" = 1 ] && labels+=(r)
+          [ "$meta" = 1 ] && labels+=(meta)
+          [ "$other" = 1 ] && labels+=(other)
+          echo "labels: ${labels[*]:-<none>}"
+          [ ${#labels[@]} -eq 0 ] && exit 0
+          args=(); for l in "${labels[@]}"; do args+=(--add-label "$l"); done
+          gh pr edit "$PR" -R "$REPO" "${args[@]}"
