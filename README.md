@@ -122,6 +122,8 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
 
+_💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
+
 _On-chain status last checked: 2026-07-24T13:18:51Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
