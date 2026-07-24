@@ -8,6 +8,12 @@ _TODO: describe this package._
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+**Dependency graph:**
+
+![gno.land/p/moul/mdlist/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/p/moul/mdlist/v1/deps.png)
+
+> 💤 **Archived version.** This package does not build on current gno master and is marked `ignore = true` (skipped by the toolchain and CI). It is kept for reference; use the latest ported version of this package instead.
+
 > ⚠️ **Disclaimer:** provided as-is, without warranty; not security-audited. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
 <!-- END GNOCONTRACTS FOOTER -->
