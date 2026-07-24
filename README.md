@@ -73,6 +73,7 @@ make help        # list all targets
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | — | — | — |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | — | — | — |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | — | — | — |
+| `gno.land/r/moul/gnohello/v1` | realm | — | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->
