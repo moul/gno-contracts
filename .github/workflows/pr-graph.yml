@@ -1,0 +1,58 @@
+name: pr-graph
+
+# On each PR, (re)generate dependency-graph assets under _assets/ and commit
+# them to the PR branch. Deterministic: `.dot` is the source of truth; svg/png
+# are re-rendered only when a `.dot` changes, so runs don't churn.
+#
+# The asset commit is NOT tagged [skip ci]: it must trigger CI so the PR head
+# always carries a real gno test/lint result. A [skip ci] asset commit would
+# become the PR head with no CI status, masking a red CI as green. No loop
+# results: the graph is idempotent, so the re-triggered run finds no _assets
+# changes and exits without committing.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pr-graph-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  graph:
+    # Only same-repo PRs (fork PRs can't push back with the default token).
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Install graphviz
+        run: sudo apt-get update && sudo apt-get install -y graphviz
+
+      - name: Generate graphs
+        run: make graph
+
+      - name: Commit assets to the PR branch
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if [ -z "$(git status --porcelain _assets)" ]; then
+            echo "No asset changes."
+            exit 0
+          fi
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          git add _assets
+          git commit -m "chore(assets): regenerate dependency graphs"
+          git push origin "HEAD:$BRANCH"
