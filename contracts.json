@@ -324,6 +324,31 @@
           "uploaded": false
         }
       }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/home/v1",
+      "dir": "r/moul/home/v1",
+      "kind": "r",
+      "name": "home",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/r/leon/hof",
+        "gno.land/r/moul/config",
+        "gno.land/r/moul/home"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
     }
   ]
 }
