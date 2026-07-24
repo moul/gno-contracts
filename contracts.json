@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T13:18:51Z",
+  "status_checked_at": "2026-07-24T13:51:25Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -86,29 +86,6 @@
       "source": "https://github.com/moul/gno-contracts/pull/2",
       "upstream": "gno.land/p/moul/dynreplacer",
       "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/entity/v1",
-      "dir": "p/moul/entity/v1",
-      "kind": "p",
-      "name": "entity",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/users"
-      ],
       "draft": false,
       "published": {
         "portal-loop": {
@@ -272,27 +249,6 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/ownable/v1",
-      "dir": "p/moul/ownable/v1",
-      "kind": "p",
-      "name": "ownable",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
       "pkgpath": "gno.land/p/moul/realmpath/v1",
       "dir": "p/moul/realmpath/v1",
       "kind": "p",
@@ -314,29 +270,6 @@
         "topaz": {
           "uploaded": true,
           "which": "monorepo"
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/safe/v1",
-      "dir": "p/moul/safe/v1",
-      "kind": "p",
-      "name": "safe",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/avl"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
