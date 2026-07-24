@@ -115,6 +115,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/tamagotchi/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/tictactoe/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/timecapsule/v1` | realm | — | 2 | — | — | — | — |
+| `gno.land/r/moul/x/daily/timelock/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 2 | — | — | — | — |
 | `gno.land/r/moul/x/daily/todos/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/trivia/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/urlshort/v1` | realm | — | 1 | — | — | — | — |
