@@ -1,0 +1,53 @@
+name: pr-report
+
+# Analyze each PR and post/update a single sticky report comment: new/updated
+# packages, size, test counts, and emoji-flagged signals. Pure git + Go (no gno
+# toolchain needed), so it's fast. The check set grows over time in
+# `tools/gnocontracts/report.go`.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-report-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for the diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Generate report
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=100
+          make report BASE="origin/${{ github.base_ref }}" | tee /tmp/pr-report.md
+
+      - name: Upsert sticky PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          marker="<!-- gnocontracts-pr-report -->"
+          id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                --jq ".[] | select(.body|contains(\"$marker\")) | .id" | head -1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@/tmp/pr-report.md >/dev/null
+            echo "updated comment $id"
+          else
+            gh api "repos/$REPO/issues/$PR/comments" -F body=@/tmp/pr-report.md >/dev/null
+            echo "created comment"
+          fi
