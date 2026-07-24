@@ -22,7 +22,7 @@ TOOL ?= go tool gnocontracts
 VIEW := $(CURDIR)/.gnoroot-view
 
 # Every package directory (one gnomod.toml each) under the contract trees.
-PKG_DIRS := $(shell find p/moul r/moul -name gnomod.toml -exec dirname {} \; 2>/dev/null | sort)
+PKG_DIRS := $(shell find p r -name gnomod.toml -exec dirname {} \; 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
 .PHONY: help deps test lint fmt gen manifest readme check sync publish view clean

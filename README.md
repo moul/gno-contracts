@@ -60,6 +60,9 @@ make help        # list all targets
 
 | Package | Kind | Description | Deps | portal-loop | test6 | topaz |
 |---|---|---|---|---|---|---|
+| `gno.land/p/demo/blog/v1` | pkg | — | 3 | — | — | — |
+| `gno.land/p/demo/nestedpkg/v1` | pkg | — | — | — | — | — |
+| `gno.land/p/demo/svg/v1` | pkg | — | 3 | — | — | — |
 | `gno.land/p/moul/addrset/v1` | pkg | Set data structure for unique gno addresses. | 1 | — | — | — |
 | `gno.land/p/moul/authz/v1` | pkg | Flexible authorization control for privileged actions. | 5 | — | — | — |
 | `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | — | — | — |
@@ -73,7 +76,12 @@ make help        # list all targets
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | — | — | — |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | — | — | — |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | — | — | — |
+| `gno.land/r/gnoland/blog/v1` | realm | — | 4 | — | — | — |
+| `gno.land/r/gnoland/home/v1` | realm | — | 5 | — | — | — |
+| `gno.land/r/gov/dao/v1` | realm | — | 3 | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
+| `gno.land/r/sys/cla/v1` | realm | — | 6 | — | — | — |
+| `gno.land/r/sys/params/v1` | realm | — | 2 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->
 

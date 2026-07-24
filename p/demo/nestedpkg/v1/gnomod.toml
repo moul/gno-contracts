@@ -1,0 +1,2 @@
+module = "gno.land/p/demo/nestedpkg/v1"
+gno = "0.9"
