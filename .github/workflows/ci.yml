@@ -48,5 +48,7 @@ jobs:
       - name: Test
         run: make test
 
-      - name: Catalog up to date (contracts.json + README table)
-        run: make check
+      # NOTE: no `make check` here. PRs carry only package SOURCE — the generated
+      # catalog (contracts.json), README table, and _assets/ graphs are NOT
+      # expected to be fresh in a PR. They are regenerated on `main` after merge
+      # by the `regen` workflow, so PRs never conflict on generated files.
