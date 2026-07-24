@@ -1,5 +1,7 @@
 # `gno.land/p/moul/ulist/lplist/v1`
 
-A subpackage of [`ulist`](../../v1) — a paged/linked-list helper built on top of
-`ulist`. Imported alongside `ulist` (it was originally nested under it in the
-monorepo but got missed on the first import).
+`LayeredProxyList` — a layered proxy over [`ulist`](../../v1) enabling **lazy,
+append-only schema migration**: it wraps a source list with a target list and
+transforms source entries only when accessed (source stays immutable), and layers
+can be chained for multi-step migrations. Nested under `ulist` in the monorepo; it
+was missed on the original `ulist` import.
