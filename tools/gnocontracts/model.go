@@ -39,10 +39,17 @@ type Contract struct {
 	Name        string         `json:"name"`        // hello (may contain slashes)
 	Version     string         `json:"version"`     // v1
 	Description string         `json:"description"` // hand-authored; preserved across scans
-	Deps        []string       `json:"deps"`        // gno.land/* imports (non-test)
-	Draft       bool           `json:"draft"`       // work-in-progress, excluded from publish
-	Upstream    string         `json:"upstream,omitempty"` // un-versioned monorepo path (see below)
-	Published   map[string]Pub `json:"published"`   // network name -> upload status
+	// Source is the provenance of an imported package: ideally the gno-contracts
+	// PR that added it, or the origin repo. Hand-authored; preserved; rendered
+	// into the package README.
+	Source string `json:"source,omitempty"`
+	// Upstream is the un-versioned monorepo path (gno.land/p/moul/addrset) for
+	// packages that originated in gnolang/gno (deployed without /vN on genesis
+	// chains). Set by manifest; used by the dual-path status check + README.
+	Upstream  string         `json:"upstream,omitempty"`
+	Deps      []string       `json:"deps"`      // gno.land/* imports (non-test)
+	Draft     bool           `json:"draft"`     // work-in-progress, excluded from publish
+	Published map[string]Pub `json:"published"` // network name -> upload status
 }
 
 // Pub is the upload status of a contract on a given network.

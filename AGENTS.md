@@ -108,7 +108,28 @@ upstream to reconcile *from*, deliberately — never auto-overwrite.
   generated fields of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`,
   `version`, `deps`).
 
+## Every package MUST have a README
+
+Each package/realm directory ships a standalone `README.md` that:
+
+1. **Explains the package** — what it is, what it does, minimal API/usage. This
+   is hand-authored, ABOVE the generated footer marker.
+2. **Links back to the repo** and **carries the disclaimer** — this lives in a
+   generated managed block (between the `<!-- BEGIN/END GNOCONTRACTS FOOTER -->`
+   markers). Do not hand-edit inside it; run `make readmes`.
+3. **Experimental (`/x/`) packages** get the stronger disclaimer automatically:
+   "Highly experimental — potentially vibe-coded", linking to
+   [`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
+   treated as experimental/AI-assisted and not for production use.
+
+`make readmes` creates a stub + footer for any package missing a README and
+refreshes the footer everywhere; `make gen` runs it, and `make check` fails if a
+package README is missing or its footer is stale. The full disclaimer is
+[`DISCLAIMER.md`](./DISCLAIMER.md) (the long form); the per-package minimal
+disclaimer links to it.
+
 ## CI invariants (must stay green)
 
 `gno lint` + `gno test` pass for every contract; committed `vendor/` matches
-`make deps`; `contracts.json` + README table match `make gen`.
+`make deps`; `contracts.json` + README table + every package README match
+`make gen` (enforced by `make check`).
