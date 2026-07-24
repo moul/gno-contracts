@@ -598,6 +598,27 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/nestedpkg/v1",
+      "dir": "p/moul/nestedpkg/v1",
+      "kind": "p",
+      "name": "nestedpkg",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/once/v1",
       "dir": "p/moul/once/v1",
       "kind": "p",
@@ -691,6 +712,31 @@
         "topaz": {
           "uploaded": true,
           "which": "monorepo"
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/svg/v1",
+      "dir": "p/moul/svg/v1",
+      "kind": "p",
+      "name": "svg",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/svg",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -846,6 +892,413 @@
       "version": "v2",
       "description": "",
       "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/args/v1",
+      "dir": "r/moul/demo/args/v1",
+      "kind": "r",
+      "name": "demo/args",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/args/v2",
+      "dir": "r/moul/demo/args/v2",
+      "kind": "r",
+      "name": "demo/args",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/data/v1",
+      "dir": "r/moul/demo/data/v1",
+      "kind": "r",
+      "name": "demo/data",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/data/v2",
+      "dir": "r/moul/demo/data/v2",
+      "kind": "r",
+      "name": "demo/data",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/grc20/v1",
+      "dir": "r/moul/demo/grc20/v1",
+      "kind": "r",
+      "name": "demo/grc20",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/grc/grc20"
+      ],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/grc20/v2",
+      "dir": "r/moul/demo/grc20/v2",
+      "kind": "r",
+      "name": "demo/grc20",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/tokens/grc20"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/hello/v1",
+      "dir": "r/moul/demo/hello/v1",
+      "kind": "r",
+      "name": "demo/hello",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/hello/v2",
+      "dir": "r/moul/demo/hello/v2",
+      "kind": "r",
+      "name": "demo/hello",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/importdemo/v1",
+      "dir": "r/moul/demo/importdemo/v1",
+      "kind": "r",
+      "name": "demo/importdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/avl",
+        "gno.land/p/demo/dom"
+      ],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/importdemo/v2",
+      "dir": "r/moul/demo/importdemo/v2",
+      "kind": "r",
+      "name": "demo/importdemo",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/archive/dom"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/microposts/v1",
+      "dir": "r/moul/demo/microposts/v1",
+      "kind": "r",
+      "name": "demo/microposts",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/microposts/v2",
+      "dir": "r/moul/demo/microposts/v2",
+      "kind": "r",
+      "name": "demo/microposts",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/render/v1",
+      "dir": "r/moul/demo/render/v1",
+      "kind": "r",
+      "name": "demo/render",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/render/v2",
+      "dir": "r/moul/demo/render/v2",
+      "kind": "r",
+      "name": "demo/render",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/vault/v1",
+      "dir": "r/moul/demo/vault/v1",
+      "kind": "r",
+      "name": "demo/vault",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/grc/exts/vault",
+        "gno.land/p/demo/grc/grc20"
+      ],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/vault/v2",
+      "dir": "r/moul/demo/vault/v2",
+      "kind": "r",
+      "name": "demo/vault",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/tokens/grc20"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/wikicoin/v1",
+      "dir": "r/moul/demo/wikicoin/v1",
+      "kind": "r",
+      "name": "demo/wikicoin",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/avl",
+        "gno.land/p/demo/ufmt"
+      ],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/wikicoin/v2",
+      "dir": "r/moul/demo/wikicoin/v2",
+      "kind": "r",
+      "name": "demo/wikicoin",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
       "draft": false,
       "published": {
         "portal-loop": {
@@ -1197,6 +1650,50 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/eggling/v1",
+      "dir": "r/moul/x/daily/eggling/v1",
+      "kind": "r",
+      "name": "x/daily/eggling",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/eightball/v1",
+      "dir": "r/moul/x/daily/eightball/v1",
+      "kind": "r",
+      "name": "x/daily/eightball",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/englishauction/v1",
       "dir": "r/moul/x/daily/englishauction/v1",
       "kind": "r",
@@ -1207,6 +1704,29 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/erc1155/v1",
+      "dir": "r/moul/x/daily/erc1155/v1",
+      "kind": "r",
+      "name": "x/daily/erc1155",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -2152,6 +2672,29 @@
       "version": "v1",
       "description": "",
       "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/wrapped/v1",
+      "dir": "r/moul/x/daily/wrapped/v1",
+      "kind": "r",
+      "name": "x/daily/wrapped",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
       "draft": false,
       "published": {
         "portal-loop": {
