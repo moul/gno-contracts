@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T11:42:59Z",
+  "status_checked_at": "2026-07-24T12:18:21Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -25,11 +25,12 @@
       "name": "addrset",
       "version": "v1",
       "description": "Set data structure for unique gno addresses.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/addrset",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
-      "upstream": "gno.land/p/moul/addrset",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -51,6 +52,8 @@
       "name": "authz",
       "version": "v1",
       "description": "Flexible authorization control for privileged actions.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/authz",
       "deps": [
         "gno.land/p/moul/addrset/v1",
         "gno.land/p/moul/once/v1",
@@ -59,7 +62,6 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
-      "upstream": "gno.land/p/moul/authz",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -81,9 +83,10 @@
       "name": "dynreplacer",
       "version": "v1",
       "description": "Simple template engine for dynamic content replacement.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/dynreplacer",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/dynreplacer",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -103,9 +106,10 @@
       "name": "fifo",
       "version": "v1",
       "description": "Fixed-size FIFO (first-in-first-out) list.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/fifo",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/fifo",
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -147,11 +151,12 @@
       "name": "helplink",
       "version": "v1",
       "description": "Helpers for building gnoweb help-page links.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/helplink",
       "deps": [
         "gno.land/p/moul/txlink/v1"
       ],
       "draft": false,
-      "upstream": "gno.land/p/moul/helplink",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -173,11 +178,12 @@
       "name": "md",
       "version": "v1",
       "description": "Helpers for generating Markdown content programmatically.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/md",
       "deps": [
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
-      "upstream": "gno.land/p/moul/md",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -199,9 +205,10 @@
       "name": "mdtable",
       "version": "v1",
       "description": "Build Markdown tables.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/mdtable",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/mdtable",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -223,9 +230,10 @@
       "name": "once",
       "version": "v1",
       "description": "One-time execution patterns.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/once",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/once",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -247,9 +255,10 @@
       "name": "realmpath",
       "version": "v1",
       "description": "Render.path parsing and link generation.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/realmpath",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/realmpath",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -271,9 +280,10 @@
       "name": "txlink",
       "version": "v1",
       "description": "Build transaction (maketx) links for realms.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/txlink",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/txlink",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -295,9 +305,10 @@
       "name": "typeutil",
       "version": "v1",
       "description": "Type conversion utilities.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/typeutil",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/typeutil",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -319,9 +330,10 @@
       "name": "ulist",
       "version": "v1",
       "description": "Append-only list backed by a binary tree.",
+      "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/ulist",
       "deps": [],
       "draft": false,
-      "upstream": "gno.land/p/moul/ulist",
       "published": {
         "portal-loop": {
           "uploaded": true,
@@ -390,6 +402,7 @@
       "name": "sapin",
       "version": "v1",
       "description": "ASCII Christmas-tree (« sapin ») renderer.",
+      "source": "https://github.com/moul/gno-contracts/pull/15",
       "deps": [],
       "draft": false,
       "published": {

@@ -77,7 +77,7 @@ make help        # list all targets
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
 | `gno.land/r/moul/sapin/v1` | realm | ASCII Christmas-tree (« sapin ») renderer. | — | — | — | — | — |
 
-_On-chain status last checked: 2026-07-24T11:42:59Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-24T12:18:21Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 

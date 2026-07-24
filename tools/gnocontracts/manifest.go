@@ -27,6 +27,7 @@ func cmdManifest(root string) error {
 		if old, ok := prev[c.PkgPath]; ok {
 			// preserve human-owned fields
 			c.Description = old.Description
+			c.Source = old.Source
 			c.Draft = old.Draft
 			c.Published = old.Published
 			c.Upstream = old.Upstream // preserved; may be refreshed below
