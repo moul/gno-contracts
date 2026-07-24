@@ -1,7 +1,14 @@
 digraph gnocontracts {
   rankdir=LR;
   node [shape=box, fontname="sans-serif"];
+  "gno.land/p/archive/dom";
+  "gno.land/p/demo/avl";
   "gno.land/p/demo/btree";
+  "gno.land/p/demo/dom";
+  "gno.land/p/demo/grc/exts/vault";
+  "gno.land/p/demo/grc/grc20";
+  "gno.land/p/demo/tokens/grc20";
+  "gno.land/p/demo/ufmt";
   "gno.land/p/moul/addrset/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/authz/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/collection/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -33,6 +40,14 @@ digraph gnocontracts {
   "gno.land/p/nt/seqid/v0";
   "gno.land/p/nt/ufmt";
   "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/demo/grc20/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/grc20/v2" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/importdemo/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/importdemo/v2" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/vault/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/vault/v2" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/wikicoin/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/wikicoin/v2" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/hello/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/outfmt/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/outfmt/v2" [style=filled, fillcolor="#cfe2ff"];
@@ -115,6 +130,18 @@ digraph gnocontracts {
   "gno.land/p/moul/svg/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/web25/v1" -> "gno.land/p/moul/realmpath/v1";
   "gno.land/p/moul/web25/v2" -> "gno.land/p/moul/realmpath/v1";
+  "gno.land/r/moul/demo/grc20/v1" -> "gno.land/p/demo/grc/grc20";
+  "gno.land/r/moul/demo/grc20/v2" -> "gno.land/p/demo/tokens/grc20";
+  "gno.land/r/moul/demo/importdemo/v1" -> "gno.land/p/demo/avl";
+  "gno.land/r/moul/demo/importdemo/v1" -> "gno.land/p/demo/dom";
+  "gno.land/r/moul/demo/importdemo/v2" -> "gno.land/p/archive/dom";
+  "gno.land/r/moul/demo/vault/v1" -> "gno.land/p/demo/grc/exts/vault";
+  "gno.land/r/moul/demo/vault/v1" -> "gno.land/p/demo/grc/grc20";
+  "gno.land/r/moul/demo/vault/v2" -> "gno.land/p/demo/tokens/grc20";
+  "gno.land/r/moul/demo/wikicoin/v1" -> "gno.land/p/demo/avl";
+  "gno.land/r/moul/demo/wikicoin/v1" -> "gno.land/p/demo/ufmt";
+  "gno.land/r/moul/demo/wikicoin/v2" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/demo/wikicoin/v2" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/hello/v1" -> "gno.land/p/moul/greet/v1";
   "gno.land/r/moul/outfmt/v1" -> "gno.land/p/nt/ufmt";
   "gno.land/r/moul/outfmt/v2" -> "gno.land/p/nt/ufmt/v0";

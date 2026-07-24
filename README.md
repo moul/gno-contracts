@@ -97,8 +97,24 @@ make help        # list all targets
 | `gno.land/p/moul/web25/v2` | pkg | — | 1 | — | — | — | — |
 | `gno.land/p/moul/xmath/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/xmath/v2` | pkg | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/args/v1` | realm | 💤  | — | — | — | — | — |
+| `gno.land/r/moul/demo/args/v2` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/data/v1` | realm | 💤  | — | — | — | — | — |
+| `gno.land/r/moul/demo/data/v2` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/grc20/v1` | realm | 💤  | 1 | — | — | — | — |
+| `gno.land/r/moul/demo/grc20/v2` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/demo/hello/v1` | realm | 💤  | — | — | — | — | — |
+| `gno.land/r/moul/demo/hello/v2` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/importdemo/v1` | realm | 💤  | 2 | — | — | — | — |
+| `gno.land/r/moul/demo/importdemo/v2` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/demo/microposts/v1` | realm | 💤  | — | — | — | — | — |
 | `gno.land/r/moul/demo/microposts/v2` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/render/v1` | realm | 💤  | — | — | — | — | — |
+| `gno.land/r/moul/demo/render/v2` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/vault/v1` | realm | 💤  | 2 | — | — | — | — |
+| `gno.land/r/moul/demo/vault/v2` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/demo/wikicoin/v1` | realm | 💤  | 2 | — | — | — | — |
+| `gno.land/r/moul/demo/wikicoin/v2` | realm | — | 2 | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v1` | realm | 💤  | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v2` | realm | — | 1 | — | — | — | — |
