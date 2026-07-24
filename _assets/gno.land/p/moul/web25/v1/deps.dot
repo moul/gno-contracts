@@ -1,6 +1,0 @@
-digraph deps {
-  rankdir=LR;
-  node [shape=box, fontname="sans-serif"];
-  "gno.land/p/moul/web25/v1" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/p/moul/web25/v1" -> "gno.land/p/moul/realmpath/v1";
-}
