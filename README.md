@@ -86,6 +86,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/dice/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dutchauction/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/erc20/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/erc721/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/escrow/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/faucet/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/guestbook/v1` | realm | — | 1 | — | — | — | — |
