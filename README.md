@@ -60,7 +60,19 @@ make help        # list all targets
 
 | Package | Kind | Description | Deps | portal-loop | test6 | topaz |
 |---|---|---|---|---|---|---|
+| `gno.land/p/moul/addrset/v1` | pkg | Set data structure for unique gno addresses. | 1 | — | — | — |
+| `gno.land/p/moul/authz/v1` | pkg | Flexible authorization control for privileged actions. | 5 | — | — | — |
+| `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | — | — | — |
+| `gno.land/p/moul/fifo/v1` | pkg | Fixed-size FIFO (first-in-first-out) list. | — | — | — | — |
 | `gno.land/p/moul/greet/v1` | pkg | Canary pure package: greeting helper (demonstrates versioned cross-package resolution). | — | — | — | — |
+| `gno.land/p/moul/helplink/v1` | pkg | Helpers for building gnoweb help-page links. | 1 | — | — | — |
+| `gno.land/p/moul/md/v1` | pkg | Helpers for generating Markdown content programmatically. | 1 | — | — | — |
+| `gno.land/p/moul/mdtable/v1` | pkg | Build Markdown tables. | — | — | — | — |
+| `gno.land/p/moul/once/v1` | pkg | One-time execution patterns. | — | — | — | — |
+| `gno.land/p/moul/realmpath/v1` | pkg | Render.path parsing and link generation. | — | — | — | — |
+| `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | — | — | — |
+| `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | — | — | — |
+| `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->
