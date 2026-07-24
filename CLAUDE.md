@@ -9,7 +9,13 @@ Read it before doing anything. The essentials:
   `gnowork.toml`; external `gno.land/*` deps are vendored under `vendor/`
   (`make deps`). Don't rely on `$GNOROOT/examples` for anything but stdlibs.
 - **Keep the catalog honest.** After adding/removing a contract run `make gen`
-  (updates `contracts.json` + the README table); CI fails if stale (`make check`).
+  (updates `contracts.json` + the README table + every package README); CI fails
+  if stale (`make check`).
+- **Every package has a README.** It explains the package (hand-written, above
+  the footer marker) and carries a repo link + disclaimer (generated footer, via
+  `make readmes`). Packages under an `/x/` path get the stronger
+  "highly experimental / potentially vibe-coded" disclaimer automatically. Full
+  disclaimer: [DISCLAIMER.md](./DISCLAIMER.md).
 - **Green before commit:** `make lint test` (needs `GNOROOT` = a gnolang/gno checkout).
 
 ## Commits
