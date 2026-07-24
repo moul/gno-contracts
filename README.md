@@ -83,6 +83,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/collatz/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/connect4/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/counter/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/crowdfund/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dice/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dutchauction/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/englishauction/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
