@@ -115,6 +115,7 @@ make help        # list all targets
 | `gno.land/r/moul/demo/vault/v2` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/demo/wikicoin/v1` | realm | 💤  | 2 | — | — | — | — |
 | `gno.land/r/moul/demo/wikicoin/v2` | realm | — | 2 | — | — | — | — |
+| `gno.land/r/moul/gns/v1` | realm | — | 2 | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v1` | realm | 💤  | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v2` | realm | — | 1 | — | — | — | — |
