@@ -1,0 +1,6 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/moul/basics/grc20/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/grc20/v1" -> "gno.land/p/demo/grc/grc20";
+}

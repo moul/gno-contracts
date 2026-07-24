@@ -14,6 +14,14 @@ digraph gnocontracts {
   "gno.land/p/moul/txlink/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/typeutil/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/args/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/data/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/grc20/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/hello/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/importdemo/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/render/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/vault/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/basics/wikicoin/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/hello/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/sapin/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/addrset/v1" -> "gno.land/p/nt/avl/v0";
@@ -24,5 +32,12 @@ digraph gnocontracts {
   "gno.land/p/moul/authz/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/helplink/v1" -> "gno.land/p/moul/txlink/v1";
   "gno.land/p/moul/md/v1" -> "gno.land/p/nt/markdown/sanitize/v0";
+  "gno.land/r/moul/basics/grc20/v1" -> "gno.land/p/demo/grc/grc20";
+  "gno.land/r/moul/basics/importdemo/v1" -> "gno.land/p/demo/avl";
+  "gno.land/r/moul/basics/importdemo/v1" -> "gno.land/p/demo/dom";
+  "gno.land/r/moul/basics/vault/v1" -> "gno.land/p/demo/grc/exts/vault";
+  "gno.land/r/moul/basics/vault/v1" -> "gno.land/p/demo/grc/grc20";
+  "gno.land/r/moul/basics/wikicoin/v1" -> "gno.land/p/demo/avl";
+  "gno.land/r/moul/basics/wikicoin/v1" -> "gno.land/p/demo/ufmt";
   "gno.land/r/moul/hello/v1" -> "gno.land/p/moul/greet/v1";
 }
