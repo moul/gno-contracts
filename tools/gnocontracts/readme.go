@@ -61,6 +61,9 @@ func renderTable(m *Manifest) string {
 		if c.Draft {
 			desc = "🚧 " + desc
 		}
+		if c.Ignored {
+			desc = "💤 " + desc
+		}
 		if desc == "" {
 			desc = "—"
 		}
@@ -74,6 +77,7 @@ func renderTable(m *Manifest) string {
 		}
 		b.WriteString("\n")
 	}
+	b.WriteString("\n_💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._\n")
 	if m.StatusCheckedAt != "" {
 		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = /v1, 📦 = un-versioned monorepo path)._\n")
 	}
