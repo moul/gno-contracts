@@ -95,6 +95,8 @@ make help        # list all targets
 | `gno.land/p/moul/web25/v2` | pkg | — | 1 | — | — | — | — |
 | `gno.land/p/moul/xmath/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/xmath/v2` | pkg | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/microposts/v1` | realm | 💤  | — | — | — | — | — |
+| `gno.land/r/moul/demo/microposts/v2` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v1` | realm | 💤  | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v2` | realm | — | 1 | — | — | — | — |
@@ -110,7 +112,9 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/crowdfund/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dice/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dutchauction/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/eggling/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/englishauction/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/erc1155/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/erc20/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/erc721/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/escrow/v1` | realm | — | 1 | — | — | — | — |
@@ -153,6 +157,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/vault/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/wrapped/v1` | realm | — | 1 | — | — | — | — |
 
 _💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
 

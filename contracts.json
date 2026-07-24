@@ -860,6 +860,49 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/demo/microposts/v1",
+      "dir": "r/moul/demo/microposts/v1",
+      "kind": "r",
+      "name": "demo/microposts",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/microposts/v2",
+      "dir": "r/moul/demo/microposts/v2",
+      "kind": "r",
+      "name": "demo/microposts",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/hello/v1",
       "dir": "r/moul/hello/v1",
       "kind": "r",
@@ -1197,6 +1240,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/eggling/v1",
+      "dir": "r/moul/x/daily/eggling/v1",
+      "kind": "r",
+      "name": "x/daily/eggling",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/englishauction/v1",
       "dir": "r/moul/x/daily/englishauction/v1",
       "kind": "r",
@@ -1207,6 +1273,29 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/erc1155/v1",
+      "dir": "r/moul/x/daily/erc1155/v1",
+      "kind": "r",
+      "name": "x/daily/erc1155",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
       "published": {
         "portal-loop": {
           "uploaded": false
@@ -2152,6 +2241,29 @@
       "version": "v1",
       "description": "",
       "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/wrapped/v1",
+      "dir": "r/moul/x/daily/wrapped/v1",
+      "kind": "r",
+      "name": "x/daily/wrapped",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
       "draft": false,
       "published": {
         "portal-loop": {
