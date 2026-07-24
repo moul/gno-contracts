@@ -8,10 +8,10 @@ import (
 
 	"chain/runtime"
 
-	"gno.land/p/moul/md"
-	"gno.land/p/moul/mdtable"
-	"gno.land/p/moul/realmpath"
-	"gno.land/p/moul/txlink"
+	"gno.land/p/moul/md/v1"
+	"gno.land/p/moul/mdtable/v1"
+	"gno.land/p/moul/realmpath/v1"
+	"gno.land/p/moul/txlink/v1"
 	"gno.land/p/nt/avl/v0"
 	"gno.land/p/nt/avl/v0/pager"
 	"gno.land/p/nt/ownable/v0"
