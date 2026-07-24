@@ -40,6 +40,12 @@ func cmdVendor(root string) error {
 	queue := []string{}
 	enqueued := map[string]bool{}
 	for _, c := range scanned {
+		// Archived (ignore=true) packages are skipped by the gno toolchain and
+		// their (often stale) imports may not resolve on master — don't try to
+		// vendor their deps.
+		if c.Ignored {
+			continue
+		}
 		deps, err := parseDepsMode(filepath.Join(root, filepath.FromSlash(c.Dir)), true)
 		if err != nil {
 			return err
