@@ -116,6 +116,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/rpsoracle/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/splitter/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/stack/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/staking/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/tamagotchi/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/tictactoe/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/timecapsule/v1` | realm | — | 2 | — | — | — | — |
