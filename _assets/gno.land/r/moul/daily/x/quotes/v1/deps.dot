@@ -1,5 +1,0 @@
-digraph deps {
-  rankdir=LR;
-  node [shape=box, fontname="sans-serif"];
-  "gno.land/r/moul/daily/x/quotes/v1" [style=filled, fillcolor="#cfe2ff"];
-}
