@@ -1,0 +1,5 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/p/moul/xmath/v1" [style=filled, fillcolor="#cfe2ff"];
+}

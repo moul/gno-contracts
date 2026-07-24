@@ -1,0 +1,9 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/p/moul/debug/v2" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/debug/v2" -> "gno.land/p/moul/md/v1";
+  "gno.land/p/moul/debug/v2" -> "gno.land/p/moul/mdtable/v1";
+  "gno.land/p/moul/debug/v2" -> "gno.land/p/moul/realmpath/v1";
+  "gno.land/p/moul/debug/v2" -> "gno.land/p/nt/ufmt/v0";
+}

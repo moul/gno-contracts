@@ -13,6 +13,9 @@ name: regen
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "23 * * * *" # hourly self-heal: catch anything a push run missed
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -46,13 +49,16 @@ jobs:
 
       - name: Commit regenerated artifacts
         run: |
-          if [ -z "$(git status --porcelain contracts.json README.md _assets)" ]; then
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          # Stage ALL regenerated output — catalog, root README table, per-package
+          # README footers, and _assets. (Staging only a subset left `make gen`'s
+          # per-package README edits unstaged, which broke `git pull --rebase`.)
+          git add -A
+          if git diff --cached --quiet; then
             echo "Nothing to regenerate."
             exit 0
           fi
-          git config user.name "Manfred Touron"
-          git config user.email "94029+moul@users.noreply.github.com"
-          git add contracts.json README.md _assets
           git commit -m "chore: regenerate catalog + READMEs + graphs"
           # rebase onto any concurrent main update (e.g. publish-status) before pushing
           git pull --rebase origin main
