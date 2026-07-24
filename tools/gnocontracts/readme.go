@@ -46,11 +46,11 @@ func renderTable(m *Manifest) string {
 	}
 	var b strings.Builder
 	// header
-	b.WriteString("| Package | Kind | Description | Deps |")
+	b.WriteString("| Package | Kind | Description | Deps | Monorepo |")
 	for _, n := range m.Networks {
 		b.WriteString(" " + n.Name + " |")
 	}
-	b.WriteString("\n|---|---|---|---|")
+	b.WriteString("\n|---|---|---|---|---|")
 	for range m.Networks {
 		b.WriteString("---|")
 	}
@@ -68,13 +68,25 @@ func renderTable(m *Manifest) string {
 		if c.Kind == "r" {
 			kind = "realm"
 		}
-		b.WriteString("| `" + c.PkgPath + "` | " + kind + " | " + desc + " | " + depBadge(c.Deps) + " |")
+		b.WriteString("| `" + c.PkgPath + "` | " + kind + " | " + desc + " | " + depBadge(c.Deps) + " | " + monorepoLink(c.Upstream) + " |")
 		for _, n := range m.Networks {
 			b.WriteString(" " + publishedBadge(c.Published[n.Name]) + " |")
 		}
 		b.WriteString("\n")
 	}
+	if m.StatusCheckedAt != "" {
+		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = /v1, 📦 = un-versioned monorepo path)._\n")
+	}
 	return b.String()
+}
+
+// monorepoLink renders a link to the un-versioned package in the gnolang/gno
+// monorepo, for contracts that originated there.
+func monorepoLink(upstream string) string {
+	if upstream == "" {
+		return "—"
+	}
+	return "[src](https://github.com/gnolang/gno/tree/master/examples/" + upstream + ")"
 }
 
 func depBadge(deps []string) string {
@@ -85,8 +97,15 @@ func depBadge(deps []string) string {
 }
 
 func publishedBadge(p Pub) string {
-	if p.Uploaded {
+	if !p.Uploaded {
+		return "—"
+	}
+	switch p.Which {
+	case "monorepo":
+		return "📦"
+	case "both":
+		return "✅📦"
+	default:
 		return "✅"
 	}
-	return "—"
 }
