@@ -96,6 +96,11 @@ func pkgFooter(c Contract) string {
 		}
 		b.WriteString("Provenance: imported — see " + src + " for context and metadata.\n\n")
 	}
+	if c.Ignored {
+		b.WriteString("> 💤 **Archived version.** This package does not build on current " +
+			"gno master and is marked `ignore = true` (skipped by the toolchain and CI). " +
+			"It is kept for reference; use the latest ported version of this package instead.\n\n")
+	}
 	if isExperimental(c.Dir) {
 		b.WriteString("> 🧪 **Highly experimental — potentially vibe-coded.** Not audited; " +
 			"may break, change, or be removed at any time. Do not use with anything of " +

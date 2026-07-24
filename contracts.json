@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T13:18:51Z",
+  "status_checked_at": "2026-07-24T13:51:25Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -380,29 +380,6 @@
       "description": "ASCII Christmas-tree (« sapin ») renderer.",
       "source": "https://github.com/moul/gno-contracts/pull/15",
       "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/stuff/hijack/v1",
-      "dir": "r/moul/stuff/hijack/v1",
-      "kind": "r",
-      "name": "stuff/hijack",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/r/gc24/raffle"
-      ],
       "draft": false,
       "published": {
         "portal-loop": {
