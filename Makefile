@@ -21,8 +21,11 @@ TOOL ?= go tool gnocontracts
 # Ephemeral stdlib-only view of the toolchain (empty examples/ → vendor wins).
 VIEW := $(CURDIR)/.gnoroot-view
 
-# Every package directory (one gnomod.toml each) under the contract trees.
-PKG_DIRS := $(shell find p/moul r/moul -name gnomod.toml -exec dirname {} \; 2>/dev/null | sort)
+# Every buildable package directory under the contract trees: one gnomod.toml
+# each, EXCLUDING archived packages marked `ignore = true` (the gno toolchain
+# skips ignored modules for `lint` but NOT for an explicitly-targeted `test`, so
+# we must filter them out here or CI would try to build them).
+PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
 .PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean
