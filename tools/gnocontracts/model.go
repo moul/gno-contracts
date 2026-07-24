@@ -151,7 +151,7 @@ func (m *Manifest) byPkgPath() map[string]*Contract {
 // every directory containing a gnomod.toml.
 func scanContracts(root string) ([]Contract, error) {
 	var out []Contract
-	for _, base := range []string{"p", "r"} {
+	for _, base := range []string{"p/moul", "r/moul"} {
 		bp := filepath.Join(root, base)
 		if !fileExists(bp) {
 			continue
@@ -231,9 +231,9 @@ func parseModuleIgnore(gnomodPath string) bool {
 // "gno.land/r/moul/hello/v1" or "gno.land/p/moul/defi/amm/v2".
 func deriveContract(module, dir, absDir string) (Contract, error) {
 	parts := strings.Split(module, "/")
-	// gno.land / (p|r) / <namespace> / <name...> / vN
-	if len(parts) < 5 || parts[0] != "gno.land" {
-		return Contract{}, fmt.Errorf("unexpected module path %q (want gno.land/{p,r}/<ns>/<name>/vN)", module)
+	// gno.land / (p|r) / moul / <name...> / vN
+	if len(parts) < 5 || parts[0] != "gno.land" || parts[2] != "moul" {
+		return Contract{}, fmt.Errorf("unexpected module path %q (want gno.land/{p,r}/moul/<name>/vN)", module)
 	}
 	kind := parts[1]
 	if kind != "p" && kind != "r" {

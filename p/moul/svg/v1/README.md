@@ -1,4 +1,4 @@
-# `gno.land/p/demo/nestedpkg/v1`
+# `gno.land/p/moul/svg/v1`
 
 _TODO: describe this package._
 

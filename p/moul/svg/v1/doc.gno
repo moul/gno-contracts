@@ -9,7 +9,7 @@ Canvas objects represent the root SVG container and support global dimensions, v
 
 Example:
 
-	import "gno.land/p/demo/svg"
+	import "gno.land/p/moul/svg"
 
 	func Foo() string {
 		canvas := svg.NewCanvas(200, 200).WithViewBox(0, 0, 200, 200)
@@ -27,4 +27,4 @@ Example:
 		mysvg := canvas.Base64()
 	}
 */
-package svg // import "gno.land/p/demo/svg"
+package svg // import "gno.land/p/moul/svg"
