@@ -25,7 +25,7 @@ VIEW := $(CURDIR)/.gnoroot-view
 PKG_DIRS := $(shell find p/moul r/moul -name gnomod.toml -exec dirname {} \; 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report view clean
+.PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -75,6 +75,9 @@ status: ## refresh on-chain upload status (all networks) + README; needs gnokey
 
 report: ## analyze the PR diff (BASE=origin/main) into a Markdown report
 	$(TOOL) report $(if $(BASE),-base $(BASE),)
+
+graph: ## generate per-package + global dependency graphs into _assets/ (needs graphviz for svg/png)
+	$(TOOL) graph
 
 clean: ## remove build artifacts and the GNOROOT view
 	rm -rf bin "$(VIEW)"
