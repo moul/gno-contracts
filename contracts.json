@@ -18,6 +18,29 @@
   ],
   "contracts": [
     {
+      "pkgpath": "gno.land/p/moul/entity/v1",
+      "dir": "p/moul/entity/v1",
+      "kind": "p",
+      "name": "entity",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/users"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/greet/v1",
       "dir": "p/moul/greet/v1",
       "kind": "p",
@@ -25,6 +48,166 @@
       "version": "v1",
       "description": "Canary pure package: greeting helper (demonstrates versioned cross-package resolution).",
       "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/mdlist/v1",
+      "dir": "p/moul/mdlist/v1",
+      "kind": "p",
+      "name": "mdlist",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v1",
+        "gno.land/p/moul/mdlist/v1"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/ownable/v1",
+      "dir": "p/moul/ownable/v1",
+      "kind": "p",
+      "name": "ownable",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/pageable/v1",
+      "dir": "p/moul/pageable/v1",
+      "kind": "p",
+      "name": "pageable",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/safe/v1",
+      "dir": "p/moul/safe/v1",
+      "kind": "p",
+      "name": "safe",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/avl"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/template/v1",
+      "dir": "p/moul/template/v1",
+      "kind": "p",
+      "name": "template",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v1",
+        "gno.land/p/moul/template/v1",
+        "gno.land/p/moul/typeutil/v1"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/udao/v1",
+      "dir": "p/moul/udao/v1",
+      "kind": "p",
+      "name": "udao",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/xdao/v1",
+      "dir": "p/moul/xdao/v1",
+      "kind": "p",
+      "name": "xdao",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/udao/v1"
+      ],
       "draft": false,
       "published": {
         "portal-loop": {
