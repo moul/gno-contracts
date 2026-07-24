@@ -39,6 +39,31 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/template/v1",
+      "dir": "p/moul/template/v1",
+      "kind": "p",
+      "name": "template",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v1",
+        "gno.land/p/moul/template/v1",
+        "gno.land/p/moul/typeutil/v1"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/hello/v1",
       "dir": "r/moul/hello/v1",
       "kind": "r",

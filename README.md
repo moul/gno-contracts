@@ -61,6 +61,7 @@ make help        # list all targets
 | Package | Kind | Description | Deps | portal-loop | test6 | topaz |
 |---|---|---|---|---|---|---|
 | `gno.land/p/moul/greet/v1` | pkg | Canary pure package: greeting helper (demonstrates versioned cross-package resolution). | — | — | — | — |
+| `gno.land/p/moul/template/v1` | pkg | — | 3 | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->
