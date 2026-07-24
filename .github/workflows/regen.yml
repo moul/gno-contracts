@@ -1,0 +1,59 @@
+name: regen
+
+# After anything lands on main, regenerate the derived artifacts and commit them
+# — so PRs never have to carry (or conflict on) generated files. PRs are
+# source-only; this is the single writer of:
+#   - contracts.json      (catalog: adds/removes contracts, marks ignored)
+#   - README.md table
+#   - per-package README footers (repo link, disclaimer, embedded deps graph)
+#   - _assets/**           (per-package + global dependency graphs)
+#
+# Idempotent: a run that changes nothing commits nothing. Commits pushed here use
+# GITHUB_TOKEN, which by design does not re-trigger workflows, so there is no loop.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: regen
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Install graphviz
+        run: sudo apt-get update && sudo apt-get install -y graphviz
+
+      - name: Regenerate catalog, READMEs, and graphs
+        run: |
+          make gen
+          make graph
+
+      - name: Commit regenerated artifacts
+        run: |
+          if [ -z "$(git status --porcelain contracts.json README.md _assets)" ]; then
+            echo "Nothing to regenerate."
+            exit 0
+          fi
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          git add contracts.json README.md _assets
+          git commit -m "chore: regenerate catalog + READMEs + graphs"
+          # rebase onto any concurrent main update (e.g. publish-status) before pushing
+          git pull --rebase origin main
+          git push origin HEAD:main
