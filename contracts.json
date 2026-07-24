@@ -1394,6 +1394,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/timelock/v1",
+      "dir": "r/moul/x/daily/timelock/v1",
+      "kind": "r",
+      "name": "x/daily/timelock",
+      "version": "v1",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/todos/v1",
       "dir": "r/moul/x/daily/todos/v1",
       "kind": "r",
