@@ -74,6 +74,7 @@ make help        # list all targets
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | — | — | — |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
+| `gno.land/r/moul/present/v1` | realm | — | 10 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->
 
