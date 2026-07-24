@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os/exec"
 	"sort"
 	"strings"
+	"time"
 )
 
 // cmdPublish orders contracts by dependency (so a package is always published
@@ -147,7 +149,10 @@ func topoOrder(contracts []Contract) ([]Contract, error) {
 // `gnokey query vm/qfile`. A successful, non-empty response means the package
 // exists on chain.
 func queryUploaded(rpc, pkgpath string) bool {
-	cmd := exec.Command("gnokey", "query", "vm/qfile", "--data", pkgpath, "--remote", rpc)
+	// Bound each query so an unreachable/slow RPC can't stall the job.
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "gnokey", "query", "vm/qfile", "--data", pkgpath, "--remote", rpc)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return false
