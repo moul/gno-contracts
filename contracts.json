@@ -25,22 +25,20 @@
       "version": "v1",
       "description": "Set data structure for unique gno addresses.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/addrset",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -52,6 +50,7 @@
       "version": "v1",
       "description": "Flexible authorization control for privileged actions.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/authz",
       "deps": [
         "gno.land/p/moul/addrset/v1",
         "gno.land/p/moul/once/v1",
@@ -62,16 +61,13 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -83,20 +79,18 @@
       "version": "v1",
       "description": "Simple template engine for dynamic content replacement.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/dynreplacer",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -108,20 +102,18 @@
       "version": "v1",
       "description": "Fixed-size FIFO (first-in-first-out) list.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/fifo",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -136,16 +128,13 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -157,22 +146,20 @@
       "version": "v1",
       "description": "Helpers for building gnoweb help-page links.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/helplink",
       "deps": [
         "gno.land/p/moul/txlink/v1"
       ],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -184,22 +171,20 @@
       "version": "v1",
       "description": "Helpers for generating Markdown content programmatically.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/md",
       "deps": [
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -211,20 +196,18 @@
       "version": "v1",
       "description": "Build Markdown tables.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/mdtable",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -236,20 +219,18 @@
       "version": "v1",
       "description": "One-time execution patterns.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/once",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -261,20 +242,18 @@
       "version": "v1",
       "description": "Render.path parsing and link generation.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/realmpath",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -286,20 +265,18 @@
       "version": "v1",
       "description": "Build transaction (maketx) links for realms.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/txlink",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -311,20 +288,18 @@
       "version": "v1",
       "description": "Type conversion utilities.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/typeutil",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -336,20 +311,18 @@
       "version": "v1",
       "description": "Append-only list backed by a binary tree.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
+      "upstream": "gno.land/p/moul/ulist",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -366,16 +339,13 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -391,16 +361,13 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     }
