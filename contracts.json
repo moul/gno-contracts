@@ -860,6 +860,49 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/demo/microposts/v1",
+      "dir": "r/moul/demo/microposts/v1",
+      "kind": "r",
+      "name": "demo/microposts",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/microposts/v2",
+      "dir": "r/moul/demo/microposts/v2",
+      "kind": "r",
+      "name": "demo/microposts",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/hello/v1",
       "dir": "r/moul/hello/v1",
       "kind": "r",

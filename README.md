@@ -95,6 +95,8 @@ make help        # list all targets
 | `gno.land/p/moul/web25/v2` | pkg | — | 1 | — | — | — | — |
 | `gno.land/p/moul/xmath/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/xmath/v2` | pkg | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/microposts/v1` | realm | 💤  | — | — | — | — | — |
+| `gno.land/r/moul/demo/microposts/v2` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v1` | realm | 💤  | 1 | — | — | — | — |
 | `gno.land/r/moul/outfmt/v2` | realm | — | 1 | — | — | — | — |
