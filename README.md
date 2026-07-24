@@ -60,9 +60,6 @@ make help        # list all targets
 
 | Package | Kind | Description | Deps | Monorepo | portal-loop | test6 | topaz |
 |---|---|---|---|---|---|---|---|
-| `gno.land/p/demo/blog/v1` | pkg | — | 3 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/demo/blog) | — | — | — |
-| `gno.land/p/demo/nestedpkg/v1` | pkg | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/demo/nestedpkg) | — | — | — |
-| `gno.land/p/demo/svg/v1` | pkg | — | 3 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/demo/svg) | — | — | — |
 | `gno.land/p/moul/addrset/v1` | pkg | Set data structure for unique gno addresses. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 📦 | — | 📦 |
 | `gno.land/p/moul/authz/v1` | pkg | Flexible authorization control for privileged actions. | 5 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 📦 | — | 📦 |
 | `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer) | — | — | — |
@@ -76,9 +73,6 @@ make help        # list all targets
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | 📦 | — | 📦 |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | 📦 | — | 📦 |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | 📦 | — | 📦 |
-| `gno.land/r/gnoland/blog/v1` | realm | — | 4 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/r/gnoland/blog) | — | — | — |
-| `gno.land/r/gnoland/home/v1` | realm | — | 5 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/r/gnoland/home) | — | — | — |
-| `gno.land/r/gov/dao/v1` | realm | — | 3 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/r/gov/dao) | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
 | `gno.land/r/moul/sapin/v1` | realm | ASCII Christmas-tree (« sapin ») renderer. | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/blog/v1` | realm | — | 1 | — | — | — | — |
@@ -127,10 +121,10 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/vault/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
-| `gno.land/r/sys/cla/v1` | realm | — | 6 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/r/sys/cla) | — | — | — |
-| `gno.land/r/sys/params/v1` | realm | — | 2 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/r/sys/params) | — | — | — |
 
-_On-chain status last checked: 2026-07-24T13:18:51Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
+
+_On-chain status last checked: 2026-07-24T14:04:21Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 

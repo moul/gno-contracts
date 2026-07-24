@@ -47,8 +47,14 @@ type Contract struct {
 	// packages that originated in gnolang/gno (deployed without /vN on genesis
 	// chains). Set by manifest; used by the dual-path status check + README.
 	Upstream  string         `json:"upstream,omitempty"`
-	Deps      []string       `json:"deps"`      // gno.land/* imports (non-test)
-	Draft     bool           `json:"draft"`     // work-in-progress, excluded from publish
+	Deps  []string `json:"deps"`  // gno.land/* imports (non-test)
+	Draft bool     `json:"draft"` // work-in-progress, excluded from publish
+	// Ignored mirrors `ignore = true` in the package's gnomod.toml: the gno
+	// toolchain (lint/test/publish) skips it, so it is neither green nor red in
+	// CI. Used for archived originals that don't build on current master and are
+	// superseded by a ported later version — kept in-tree for reference. Derived
+	// from the gnomod on every scan (not human-owned).
+	Ignored   bool           `json:"ignored,omitempty"`
 	Published map[string]Pub `json:"published"` // network name -> upload status
 }
 
@@ -170,6 +176,7 @@ func scanContracts(root string) ([]Contract, error) {
 			if err != nil {
 				return fmt.Errorf("%s: %w", rel, err)
 			}
+			c.Ignored = parseModuleIgnore(path)
 			out = append(out, c)
 			return nil
 		})
@@ -198,6 +205,26 @@ func parseModule(gnomodPath string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("no module declaration in %s", gnomodPath)
+}
+
+// parseModuleIgnore reports whether the gnomod.toml declares `ignore = true`
+// (with the gno toolchain skipping the package). Tolerant of spacing/quotes.
+func parseModuleIgnore(gnomodPath string) bool {
+	b, err := os.ReadFile(gnomodPath)
+	if err != nil {
+		return false
+	}
+	for _, line := range strings.Split(string(b), "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "ignore") {
+			continue
+		}
+		rest := strings.TrimSpace(strings.TrimPrefix(line, "ignore"))
+		if strings.HasPrefix(rest, "=") {
+			return strings.Contains(strings.ToLower(rest), "true")
+		}
+	}
+	return false
 }
 
 // deriveContract builds a Contract from a module path such as
