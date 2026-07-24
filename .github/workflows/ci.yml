@@ -39,6 +39,19 @@ jobs:
       - name: Vet tools
         run: go vet ./tools/...
 
+      - name: DEBUG resolution
+        run: |
+          echo "== GNOROOT env: $GNOROOT =="
+          make view
+          echo "== view examples (should be empty) =="; ls -la .gnoroot-view/examples || true
+          echo "== vendored avl has ITree? =="; grep -c 'type ITree' vendor/gno.land/p/nt/avl/v0/tree.gno || true
+          echo "== gnomod of vendored avl =="; cat vendor/gno.land/p/nt/avl/v0/gnomod.toml || true
+          echo "== gnowork.toml present? =="; ls -la gnowork.toml || true
+          echo "== lint addrset with view, verbose =="
+          GNOROOT="$PWD/.gnoroot-view" gno lint ./p/moul/addrset/v1 || true
+          echo "== does .gnoroot-view resolve OR does workspace find .gno? =="
+          find .gnoroot-view -maxdepth 2 -name 'examples' -o -name 'gnovm' | head
+
       # Committed vendor/ is the pinned, authoritative source of gno.land/*
       # dependencies. We do NOT re-vendor from live master here (that would
       # couple CI to monorepo drift). lint/test resolve deps from vendor/ via
