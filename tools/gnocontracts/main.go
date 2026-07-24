@@ -51,6 +51,8 @@ func main() {
 		err = cmdPublish(root, args)
 	case "status":
 		err = cmdStatus(root, args)
+	case "graph":
+		err = cmdGraph(root)
 	case "help", "-h", "--help":
 		usage()
 		return
@@ -78,6 +80,7 @@ commands:
   sync       report drift vs the gnolang/gno monorepo (needs GNOROOT)
   publish    order contracts by dependency; -net <name> [-check] for status
   status     refresh on-chain upload status for all networks + README
+  graph      write per-package + global dependency graphs into _assets/
 `)
 }
 

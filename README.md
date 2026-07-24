@@ -82,6 +82,13 @@ The table is generated from [`contracts.json`](./contracts.json) by
 `make readme`; CI fails if it is stale (`make check`). Descriptions and upload
 status are hand-authored/queried and preserved across regenerations.
 
+## Dependency graph
+
+Whole-repo dependency graph (generated into [`_assets/`](./_assets) by
+`make graph`; each package also has its own `_assets/<pkgpath>/deps.svg`):
+
+![dependency graph](./_assets/graph.svg)
+
 ## Contributing / agents
 
 This repo is built to be worked on by humans and coding agents alike. Start with
