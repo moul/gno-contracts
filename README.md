@@ -85,7 +85,6 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/counter/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/dice/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/dutchauction/v1` | realm | — | 1 | — | — | — | — |
-| `gno.land/r/moul/x/daily/eightball/v1` | realm | 🚧 Magic 8-Ball: block-height-driven answers (experimental, auto-generated). | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/erc20/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/escrow/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/faucet/v1` | realm | — | 1 | — | — | — | — |

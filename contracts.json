@@ -616,27 +616,6 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/eightball/v1",
-      "dir": "r/moul/x/daily/eightball/v1",
-      "kind": "r",
-      "name": "x/daily/eightball",
-      "version": "v1",
-      "description": "Magic 8-Ball: block-height-driven answers (experimental, auto-generated).",
-      "deps": [],
-      "draft": true,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
       "pkgpath": "gno.land/r/moul/x/daily/erc20/v1",
       "dir": "r/moul/x/daily/erc20/v1",
       "kind": "r",
