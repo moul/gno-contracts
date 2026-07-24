@@ -15,6 +15,7 @@ digraph gnocontracts {
   "gno.land/p/moul/typeutil/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/hello/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/microposts/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/sapin/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/addrset/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/authz/v1" -> "gno.land/p/moul/addrset/v1";
