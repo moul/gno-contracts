@@ -19,38 +19,23 @@ jobs:
         with:
           go-version: "1.24"
 
-      - name: Checkout gno (master)
-        uses: actions/checkout@v4
-        with:
-          repository: gnolang/gno
-          ref: master
-          path: .gno
-
-      - name: Build gno toolchain
+      # Clone the gno toolchain OUTSIDE the repo workspace. If it lived inside
+      # (e.g. ./.gno), the gnowork.toml workspace would discover its bundled
+      # examples/ + pkg/mod packages and they would shadow our committed
+      # vendor/, breaking reproducible resolution.
+      - name: Checkout & build gno (master), outside the workspace
         run: |
+          git clone --depth 1 https://github.com/gnolang/gno "$HOME/gno"
           mkdir -p "$HOME/.local/bin"
-          (cd .gno && go build -o "$HOME/.local/bin/gno" ./gnovm/cmd/gno)
+          (cd "$HOME/gno" && go build -o "$HOME/.local/bin/gno" ./gnovm/cmd/gno)
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          echo "GNOROOT=$GITHUB_WORKSPACE/.gno" >> "$GITHUB_ENV"
+          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
 
       - name: gno version
         run: gno version
 
       - name: Vet tools
         run: go vet ./tools/...
-
-      - name: DEBUG resolution
-        run: |
-          echo "== GNOROOT env: $GNOROOT =="
-          make view
-          echo "== view examples (should be empty) =="; ls -la .gnoroot-view/examples || true
-          echo "== vendored avl has ITree? =="; grep -c 'type ITree' vendor/gno.land/p/nt/avl/v0/tree.gno || true
-          echo "== gnomod of vendored avl =="; cat vendor/gno.land/p/nt/avl/v0/gnomod.toml || true
-          echo "== gnowork.toml present? =="; ls -la gnowork.toml || true
-          echo "== lint addrset with view, verbose =="
-          GNOROOT="$PWD/.gnoroot-view" gno lint ./p/moul/addrset/v1 || true
-          echo "== does .gnoroot-view resolve OR does workspace find .gno? =="
-          find .gnoroot-view -maxdepth 2 -name 'examples' -o -name 'gnovm' | head
 
       # Committed vendor/ is the pinned, authoritative source of gno.land/*
       # dependencies. We do NOT re-vendor from live master here (that would
