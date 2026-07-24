@@ -122,7 +122,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
 
-_On-chain status last checked: 2026-07-24T12:18:21Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-24T13:18:51Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
