@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T13:18:51Z",
+  "status_checked_at": "2026-07-24T13:51:25Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -77,99 +77,6 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/collection/v1",
-      "dir": "p/moul/collection/v1",
-      "kind": "p",
-      "name": "collection",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/avl",
-        "gno.land/p/nt/seqid",
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/cow/v1",
-      "dir": "p/moul/cow/v1",
-      "kind": "p",
-      "name": "cow",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/debug/v1",
-      "dir": "p/moul/debug/v1",
-      "kind": "p",
-      "name": "debug",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/md/v1",
-        "gno.land/p/moul/mdtable/v1",
-        "gno.land/p/moul/realmpath/v1",
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/deque/v1",
-      "dir": "p/moul/deque/v1",
-      "kind": "p",
-      "name": "deque",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
       "pkgpath": "gno.land/p/moul/dynreplacer/v1",
       "dir": "p/moul/dynreplacer/v1",
       "kind": "p",
@@ -178,27 +85,6 @@
       "description": "Simple template engine for dynamic content replacement.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
       "upstream": "gno.land/p/moul/dynreplacer",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/errs/v1",
-      "dir": "p/moul/errs/v1",
-      "kind": "p",
-      "name": "errs",
-      "version": "v1",
-      "description": "",
       "deps": [],
       "draft": false,
       "published": {
@@ -234,27 +120,6 @@
         "topaz": {
           "uploaded": true,
           "which": "monorepo"
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/fp/v1",
-      "dir": "p/moul/fp/v1",
-      "kind": "p",
-      "name": "fp",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
@@ -359,30 +224,6 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/memo/v1",
-      "dir": "p/moul/memo/v1",
-      "kind": "p",
-      "name": "memo",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/btree",
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
       "pkgpath": "gno.land/p/moul/once/v1",
       "dir": "p/moul/once/v1",
       "kind": "p",
@@ -404,29 +245,6 @@
         "topaz": {
           "uploaded": true,
           "which": "monorepo"
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/printfdebugging/v1",
-      "dir": "p/moul/printfdebugging/v1",
-      "kind": "p",
-      "name": "printfdebugging",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
@@ -531,50 +349,6 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/web25/v1",
-      "dir": "p/moul/web25/v1",
-      "kind": "p",
-      "name": "web25",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/realmpath/v1"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/xmath/v1",
-      "dir": "p/moul/xmath/v1",
-      "kind": "p",
-      "name": "xmath",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
       "pkgpath": "gno.land/r/moul/hello/v1",
       "dir": "r/moul/hello/v1",
       "kind": "r",
@@ -583,29 +357,6 @@
       "description": "Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1).",
       "deps": [
         "gno.land/p/moul/greet/v1"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/outfmt/v1",
-      "dir": "r/moul/outfmt/v1",
-      "kind": "r",
-      "name": "outfmt",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/ufmt"
       ],
       "draft": false,
       "published": {
