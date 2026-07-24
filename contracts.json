@@ -16,6 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
+  "status_checked_at": "2026-07-24T11:29:03Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -28,18 +29,18 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/addrset",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -58,18 +59,18 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/authz",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -82,18 +83,16 @@
       "description": "Simple template engine for dynamic content replacement.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/dynreplacer",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -106,18 +105,17 @@
       "description": "Fixed-size FIFO (first-in-first-out) list.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/fifo",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -132,16 +130,13 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -156,18 +151,18 @@
         "gno.land/p/moul/txlink/v1"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/helplink",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -182,18 +177,18 @@
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
+      "upstream": "gno.land/p/moul/md",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -206,18 +201,18 @@
       "description": "Build Markdown tables.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/mdtable",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -230,18 +225,18 @@
       "description": "One-time execution patterns.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/once",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -254,18 +249,18 @@
       "description": "Render.path parsing and link generation.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/realmpath",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -278,18 +273,18 @@
       "description": "Build transaction (maketx) links for realms.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/txlink",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -302,18 +297,18 @@
       "description": "Type conversion utilities.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/typeutil",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -326,18 +321,18 @@
       "description": "Append-only list backed by a binary tree.",
       "deps": [],
       "draft": false,
+      "upstream": "gno.land/p/moul/ulist",
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -354,16 +349,13 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     },
@@ -373,21 +365,18 @@
       "kind": "r",
       "name": "sapin",
       "version": "v1",
-      "description": "",
+      "description": "ASCII Christmas-tree (« sapin ») renderer.",
       "deps": [],
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "test6": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         },
         "topaz": {
-          "uploaded": false,
-          "checked_at": "2026-07-24T08:14:52Z"
+          "uploaded": false
         }
       }
     }
