@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T13:18:51Z",
+  "status_checked_at": "2026-07-24T13:51:25Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -357,31 +357,6 @@
       "description": "Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1).",
       "deps": [
         "gno.land/p/moul/greet/v1"
-      ],
-      "draft": false,
-      "published": {
-        "portal-loop": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/home/v1",
-      "dir": "r/moul/home/v1",
-      "kind": "r",
-      "name": "home",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/r/leon/hof",
-        "gno.land/r/moul/config",
-        "gno.land/r/moul/home"
       ],
       "draft": false,
       "published": {

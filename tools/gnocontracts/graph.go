@@ -102,20 +102,43 @@ func globalDot(m *Manifest) string {
 	for _, c := range m.Contracts {
 		own[c.PkgPath] = true
 	}
-	var b strings.Builder
-	b.WriteString("digraph gnocontracts {\n  rankdir=LR;\n  node [shape=box, fontname=\"sans-serif\"];\n")
 	contracts := append([]Contract{}, m.Contracts...)
 	sort.Slice(contracts, func(i, j int) bool { return contracts[i].PkgPath < contracts[j].PkgPath })
-	for _, c := range contracts {
-		// moul's own packages filled; external deps left plain.
-		b.WriteString(fmt.Sprintf("  %q [style=filled, fillcolor=\"#cfe2ff\"];\n", c.PkgPath))
-	}
+
+	// Collect edges and the set of nodes that participate in at least one edge
+	// (as source or target). Isolated packages — no deps and depended on by
+	// nothing — are omitted so the global graph shows only what's connected.
+	type edge struct{ from, to string }
+	var edges []edge
+	linked := map[string]bool{}
 	for _, c := range contracts {
 		deps := append([]string{}, c.Deps...)
 		sort.Strings(deps)
 		for _, d := range deps {
-			b.WriteString(fmt.Sprintf("  %q -> %q;\n", c.PkgPath, d))
+			edges = append(edges, edge{c.PkgPath, d})
+			linked[c.PkgPath] = true
+			linked[d] = true
 		}
+	}
+
+	var b strings.Builder
+	b.WriteString("digraph gnocontracts {\n  rankdir=LR;\n  node [shape=box, fontname=\"sans-serif\"];\n")
+	// node declarations, only for linked nodes; moul's own packages filled,
+	// external deps left plain. Sorted for deterministic output.
+	nodes := make([]string, 0, len(linked))
+	for n := range linked {
+		nodes = append(nodes, n)
+	}
+	sort.Strings(nodes)
+	for _, n := range nodes {
+		if own[n] {
+			b.WriteString(fmt.Sprintf("  %q [style=filled, fillcolor=\"#cfe2ff\"];\n", n))
+		} else {
+			b.WriteString(fmt.Sprintf("  %q;\n", n))
+		}
+	}
+	for _, e := range edges {
+		b.WriteString(fmt.Sprintf("  %q -> %q;\n", e.from, e.to))
 	}
 	b.WriteString("}\n")
 	return b.String()
