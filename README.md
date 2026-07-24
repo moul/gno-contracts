@@ -87,13 +87,20 @@ make help        # list all targets
 | `gno.land/r/moul/outfmt/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/sapin/v1` | realm | ASCII Christmas-tree (« sapin ») renderer. | — | — | — | — | — |
 
-_On-chain status last checked: 2026-07-24T11:29:03Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-24T11:42:59Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
 The table is generated from [`contracts.json`](./contracts.json) by
 `make readme`; CI fails if it is stale (`make check`). Descriptions and upload
 status are hand-authored/queried and preserved across regenerations.
+
+## Dependency graph
+
+Whole-repo dependency graph (generated into [`_assets/`](./_assets) by
+`make graph`; each package also has its own `_assets/<pkgpath>/deps.svg`):
+
+![dependency graph](./_assets/graph.svg)
 
 ## Contributing / agents
 
