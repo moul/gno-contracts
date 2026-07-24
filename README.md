@@ -76,8 +76,54 @@ make help        # list all targets
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — | — |
 | `gno.land/r/moul/home/v1` | realm | — | 3 | — | — | — | — |
 | `gno.land/r/moul/sapin/v1` | realm | ASCII Christmas-tree (« sapin ») renderer. | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/blog/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/bloomfilter/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/bullscows/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/calc/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/coinflipduel/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/collatz/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/connect4/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/counter/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/dice/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/dutchauction/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/erc20/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/escrow/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/faucet/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/guestbook/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/handles/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/hangman/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/kingofdice/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/kudos/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/leaderboard/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/life/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/linktree/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/lru/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/memory/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/microblog/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/moodstone/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/multisig/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/numguess/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/polls/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/quotes/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/reactions/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/ringlog/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/rps/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/rpsduel/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/rpsmatch/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/rpsoracle/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/splitter/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/stack/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/tamagotchi/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/tictactoe/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/timecapsule/v1` | realm | — | 2 | — | — | — | — |
+| `gno.land/r/moul/x/daily/todos/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/trivia/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/urlshort/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/vault/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/vestoken/v1` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/x/daily/wordle/v1` | realm | — | — | — | — | — | — |
 
-_On-chain status last checked: 2026-07-24T11:42:59Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-24T13:18:51Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
