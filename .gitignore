@@ -7,6 +7,9 @@ tools/tools
 # gno toolchain checkout used by CI / local dev
 /.gno/
 
+# ephemeral stdlib-only GNOROOT view built by `make view` (empty examples/)
+/.gnoroot-view/
+
 # gno caches occasionally dropped in-tree
 **/.gno/
 *.gno.gen.go

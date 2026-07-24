@@ -39,12 +39,11 @@ jobs:
       - name: Vet tools
         run: go vet ./tools/...
 
-      - name: Vendor dependencies (verify committed vendor is current)
-        run: |
-          make deps
-          git diff --exit-code -- vendor/ \
-            || (echo "::error::vendor/ is out of date — run 'make deps' and commit"; exit 1)
-
+      # Committed vendor/ is the pinned, authoritative source of gno.land/*
+      # dependencies. We do NOT re-vendor from live master here (that would
+      # couple CI to monorepo drift). lint/test resolve deps from vendor/ via
+      # the Makefile's stdlib-only GNOROOT view (empty examples/). Dependency
+      # bumps are deliberate: run `make deps` locally and commit.
       - name: Lint
         run: make lint
 
