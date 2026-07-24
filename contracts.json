@@ -16,6 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
+  "status_checked_at": "2026-07-24T11:42:59Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -32,13 +33,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -61,13 +64,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -113,7 +118,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -153,13 +159,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -178,13 +186,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -201,13 +211,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -224,13 +236,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -247,13 +261,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -270,13 +286,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -293,13 +311,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -316,13 +336,15 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         }
       }
     },
@@ -355,7 +377,7 @@
       "kind": "r",
       "name": "sapin",
       "version": "v1",
-      "description": "ASCII Christmas-tree (« sapin ») renderer: Sapin(size) draws a tree, Render serves it via gnoweb.",
+      "description": "ASCII Christmas-tree (« sapin ») renderer.",
       "source": "https://github.com/moul/gno-contracts/pull/15",
       "deps": [],
       "draft": false,
