@@ -89,6 +89,14 @@ func pkgFooter(c Contract) string {
 	b.WriteString("Part of **[moul/gno-contracts](" + repoURL + ")** — moul's versioned " +
 		"gno.land contracts. See the repository for the full catalog, build/test " +
 		"tooling, and usage.\n\n")
+	if len(c.Deps) > 0 {
+		// Embed the generated per-package dependency graph (regenerated on main
+		// by `make graph`; referenced by absolute raw URL so it resolves in the
+		// rendered README once merged).
+		img := "https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/" + c.PkgPath + "/deps.png"
+		b.WriteString("**Dependency graph:**\n\n")
+		b.WriteString("![" + c.PkgPath + " dependency graph](" + img + ")\n\n")
+	}
 	if c.Source != "" {
 		src := c.Source
 		if strings.HasPrefix(src, "http") {
