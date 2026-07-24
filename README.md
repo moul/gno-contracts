@@ -71,6 +71,7 @@ make help        # list all targets
 | `gno.land/p/moul/deque/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/deque/v2` | pkg | — | — | — | — | — | — |
 | `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer) | — | — | — |
+| `gno.land/p/moul/entropy/v1` | pkg | — | — | — | — | — | — |
 | `gno.land/p/moul/errs/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/errs/v2` | pkg | — | — | — | — | — | — |
 | `gno.land/p/moul/fifo/v1` | pkg | Fixed-size FIFO (first-in-first-out) list. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo) | — | — | 📦 |
@@ -102,6 +103,7 @@ make help        # list all targets
 | `gno.land/r/moul/demo/args/v2` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/demo/data/v1` | realm | 💤  | — | — | — | — | — |
 | `gno.land/r/moul/demo/data/v2` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/gnoface/v1` | realm | — | 2 | — | — | — | — |
 | `gno.land/r/moul/demo/grc20/v1` | realm | 💤  | 1 | — | — | — | — |
 | `gno.land/r/moul/demo/grc20/v2` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/demo/hello/v1` | realm | 💤  | — | — | — | — | — |
@@ -110,6 +112,7 @@ make help        # list all targets
 | `gno.land/r/moul/demo/importdemo/v2` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/demo/microposts/v1` | realm | 💤  | — | — | — | — | — |
 | `gno.land/r/moul/demo/microposts/v2` | realm | — | — | — | — | — | — |
+| `gno.land/r/moul/demo/millipede/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/demo/render/v1` | realm | 💤  | — | — | — | — | — |
 | `gno.land/r/moul/demo/render/v2` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/demo/vault/v1` | realm | 💤  | 2 | — | — | — | — |
