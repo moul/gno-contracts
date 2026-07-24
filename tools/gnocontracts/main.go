@@ -53,6 +53,8 @@ func main() {
 		err = cmdStatus(root, args)
 	case "report":
 		err = cmdReport(root, args)
+	case "graph":
+		err = cmdGraph(root)
 	case "help", "-h", "--help":
 		usage()
 		return
@@ -81,6 +83,7 @@ commands:
   publish    order contracts by dependency; -net <name> [-check] for status
   status     refresh on-chain upload status for all networks + README
   report     analyze the PR diff (base...HEAD) → Markdown report for the PR bot
+  graph      write per-package + global dependency graphs into _assets/
 `)
 }
 
