@@ -96,6 +96,7 @@ make help        # list all targets
 | `gno.land/r/moul/x/daily/leaderboard/v1` | realm | — | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/life/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/linktree/v1` | realm | — | 1 | — | — | — | — |
+| `gno.land/r/moul/x/daily/lottery/v1` | realm | 🚧 Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily. | 1 | — | — | — | — |
 | `gno.land/r/moul/x/daily/lru/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/memory/v1` | realm | — | — | — | — | — | — |
 | `gno.land/r/moul/x/daily/microblog/v1` | realm | — | — | — | — | — | — |
