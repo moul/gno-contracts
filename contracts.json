@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T13:18:51Z",
+  "status_checked_at": "2026-07-24T13:41:55Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
