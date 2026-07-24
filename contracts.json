@@ -324,6 +324,29 @@
           "uploaded": false
         }
       }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/stuff/hijack/v1",
+      "dir": "r/moul/stuff/hijack/v1",
+      "kind": "r",
+      "name": "stuff/hijack",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/r/gc24/raffle"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
     }
   ]
 }
