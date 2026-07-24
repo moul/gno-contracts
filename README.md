@@ -92,6 +92,7 @@ make help        # list all targets
 | `gno.land/p/moul/svg/v1` | pkg | — | 3 | — | — | — | — |
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | 📦 | — | 📦 |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | 📦 | — | 📦 |
+| `gno.land/p/moul/ulist/lplist/v1` | pkg | — | 1 | — | — | — | — |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | 📦 | — | 📦 |
 | `gno.land/p/moul/web25/v1` | pkg | 💤  | 1 | — | — | — | — |
 | `gno.land/p/moul/web25/v2` | pkg | — | 1 | — | — | — | — |

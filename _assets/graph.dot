@@ -30,6 +30,8 @@ digraph gnocontracts {
   "gno.land/p/moul/svg";
   "gno.land/p/moul/svg/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/txlink/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/ulist/lplist/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v2" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/nt/avl";
@@ -129,6 +131,7 @@ digraph gnocontracts {
   "gno.land/p/moul/svg/v1" -> "gno.land/p/moul/svg";
   "gno.land/p/moul/svg/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/svg/v1" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/moul/ulist/lplist/v1" -> "gno.land/p/moul/ulist/v1";
   "gno.land/p/moul/web25/v1" -> "gno.land/p/moul/realmpath/v1";
   "gno.land/p/moul/web25/v2" -> "gno.land/p/moul/realmpath/v1";
   "gno.land/r/moul/demo/grc20/v1" -> "gno.land/p/demo/grc/grc20";
