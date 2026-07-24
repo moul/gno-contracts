@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-24T14:04:21Z",
+  "status_checked_at": "2026-07-24T14:43:37Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -33,8 +33,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -64,8 +63,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -159,8 +157,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -186,8 +183,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -211,8 +207,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -236,8 +231,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -261,8 +255,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -286,8 +279,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -311,8 +303,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -336,8 +327,7 @@
       "draft": false,
       "published": {
         "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
