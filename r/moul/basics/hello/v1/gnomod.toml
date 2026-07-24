@@ -1,3 +1,0 @@
-module = "gno.land/r/moul/basics/hello/v1"
-gno = "0.9"
-ignore = true
