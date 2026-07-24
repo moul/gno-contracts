@@ -673,6 +673,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/erc721/v1",
+      "dir": "r/moul/x/daily/erc721/v1",
+      "kind": "r",
+      "name": "x/daily/erc721",
+      "version": "v1",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": true,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/escrow/v1",
       "dir": "r/moul/x/daily/escrow/v1",
       "kind": "r",
