@@ -42,8 +42,8 @@ func clamp(v, lo, hi int) int {
 }
 
 func get(owner address) (*pet, bool) {
-	v, ok := pets.Get(owner.String())
-	if !ok {
+	v := pets.Get(owner.String())
+	if v == nil {
 		return nil, false
 	}
 	return v.(*pet), true

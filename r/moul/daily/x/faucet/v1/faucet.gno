@@ -48,7 +48,7 @@ func Claim(cur realm) {
 	height := runtime.ChainHeight()
 
 	var c *claimer
-	if v, ok := claimers.Get(key); ok {
+	if v := claimers.Get(key); v != nil {
 		c = v.(*claimer)
 		wait := c.LastClaim + CooldownBlocks - height
 		if wait > 0 {
@@ -78,7 +78,7 @@ func Claim(cur realm) {
 
 // BalanceOf returns the current point balance of addr (0 if never claimed).
 func BalanceOf(addr string) int64 {
-	if v, ok := claimers.Get(addr); ok {
+	if v := claimers.Get(addr); v != nil {
 		return v.(*claimer).Balance
 	}
 	return 0

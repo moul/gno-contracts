@@ -76,8 +76,8 @@ func NewGame(cur realm, opponent address) int64 {
 }
 
 func getGame(id int64) (*Game, error) {
-	v, ok := games.Get(idKey(id))
-	if !ok {
+	v := games.Get(idKey(id))
+	if v == nil {
 		return nil, errors.New("game not found: " + strconv.FormatInt(id, 10))
 	}
 	return v.(*Game), nil

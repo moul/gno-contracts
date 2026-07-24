@@ -41,7 +41,7 @@ func Give(cur realm, to address, reason string) {
 
 	key := to.String()
 	n := int64(0)
-	if v, ok := counts.Get(key); ok {
+	if v := counts.Get(key); v != nil {
 		n = v.(int64)
 	}
 	counts.Set(key, n+1)

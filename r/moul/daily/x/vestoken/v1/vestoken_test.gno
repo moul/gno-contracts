@@ -3,13 +3,17 @@ package vestoken
 import (
 	"strings"
 	"testing"
+
+	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/uassert/v0"
 )
 
-// Fixed test addresses (valid-length bech32-style literals), same convention
-// used across the other daily-dapp realms.
-const (
-	alice = address("g1alicexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-	bob   = address("g1bobxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+// Fixed test addresses. testutils.TestAddress derives real, valid-length
+// addresses; literal strings would fail address.IsValid() and trip the realm's
+// zero-address guard.
+var (
+	alice = testutils.TestAddress("alice")
+	bob   = testutils.TestAddress("bob")
 )
 
 // reset clears package state between tests so cases stay independent.
@@ -68,12 +72,11 @@ func TestActiveGrantBlocksNewGrant(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	MintVested(cross(cur), alice, 100, 10)
 
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("expected panic minting over an active grant, got none")
-		}
-	}()
-	MintVested(cross(cur), alice, 50, 10)
+	// Aborts from a cross(cur) call cannot be caught by a plain recover();
+	// assert on the abort message instead.
+	uassert.AbortsWithMessage(t, cur, "vestoken: beneficiary already has an unclaimed grant", func() {
+		MintVested(cross(cur), alice, 50, 10)
+	})
 }
 
 // TestTransferClaimedBalance checks claimed tokens behave like a normal

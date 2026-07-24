@@ -137,7 +137,7 @@ func NewRound(cur realm) string {
 
 // incAttempt bumps the caller's attempt counter for the current round.
 func incAttempt(addr string) {
-	if v, ok := attempts.Get(addr); ok {
+	if v := attempts.Get(addr); v != nil {
 		p := v.(*int)
 		*p++
 		return
@@ -148,7 +148,7 @@ func incAttempt(addr string) {
 
 // attemptsOf returns how many guesses addr has made this round.
 func attemptsOf(addr string) int {
-	if v, ok := attempts.Get(addr); ok {
+	if v := attempts.Get(addr); v != nil {
 		return *(v.(*int))
 	}
 	return 0

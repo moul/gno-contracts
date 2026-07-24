@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/uassert/v0"
 )
 
 // resetWall clears package state between tests (globals persist in-process,
@@ -36,24 +37,22 @@ func TestPostTooLongPanics(cur realm, t *testing.T) {
 	resetWall()
 	testing.SetRealm(testing.NewUserRealm(testutils.TestAddress("bob")))
 
-	defer func() {
-		if r := recover(); r == nil {
-			t.Fatal("expected panic for over-long message, got none")
-		}
-	}()
-	Post(cross(cur), strings.Repeat("x", maxMsgLen+1))
+	// Aborts from a cross(cur) call cannot be caught by a plain recover();
+	// assert on the abort message instead.
+	uassert.AbortsWithMessage(t, cur, "microblog: message too long (max 280 bytes)", func() {
+		Post(cross(cur), strings.Repeat("x", maxMsgLen+1))
+	})
 }
 
 func TestPostEmptyPanics(cur realm, t *testing.T) {
 	resetWall()
 	testing.SetRealm(testing.NewUserRealm(testutils.TestAddress("bob")))
 
-	defer func() {
-		if r := recover(); r == nil {
-			t.Fatal("expected panic for empty message, got none")
-		}
-	}()
-	Post(cross(cur), "")
+	// Aborts from a cross(cur) call cannot be caught by a plain recover();
+	// assert on the abort message instead.
+	uassert.AbortsWithMessage(t, cur, "microblog: empty message", func() {
+		Post(cross(cur), "")
+	})
 }
 
 func TestPostMaxLenOK(cur realm, t *testing.T) {

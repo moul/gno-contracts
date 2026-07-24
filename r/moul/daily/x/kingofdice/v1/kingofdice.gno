@@ -37,7 +37,7 @@ var (
 // get returns the stored *playerStats for addr, creating one if absent.
 func get(addr address) *playerStats {
 	key := addr.String()
-	if v, ok := players.Get(key); ok {
+	if v := players.Get(key); v != nil {
 		return v.(*playerStats)
 	}
 	ps := &playerStats{addr: addr}

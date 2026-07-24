@@ -2,6 +2,7 @@ package moodstone
 
 import (
 	"chain/runtime"
+	"chain/runtime/unsafe"
 	"strconv"
 	"strings"
 )
@@ -71,7 +72,7 @@ func LogMood(_ realm, mood, note string) {
 		panic("invalid mood; choose from: " + strings.Join(validMoods, ", "))
 	}
 	entries = append(entries, Entry{
-		Author: runtime.OriginCaller(),
+		Author: unsafe.OriginCaller(),
 		Mood:   mood,
 		Note:   strings.TrimSpace(note),
 		Block:  runtime.ChainHeight(),

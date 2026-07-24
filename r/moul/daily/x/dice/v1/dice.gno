@@ -69,7 +69,7 @@ func Roll(cur realm) int {
 	addr := cur.Previous().Address().String()
 
 	var h *history
-	if v, ok := players.Get(addr); ok {
+	if v := players.Get(addr); v != nil {
 		h = v.(*history)
 	} else {
 		h = &history{}
@@ -88,8 +88,8 @@ func Roll(cur realm) int {
 // RollsOf returns the recorded roll history for an address (oldest first).
 // Read-only helper, safe to call as a query.
 func RollsOf(addr string) []int {
-	v, ok := players.Get(addr)
-	if !ok {
+	v := players.Get(addr)
+	if v == nil {
 		return nil
 	}
 	out := v.(*history).rolls

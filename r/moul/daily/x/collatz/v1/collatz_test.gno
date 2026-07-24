@@ -31,15 +31,15 @@ func TestComputeAndLeaderboard(cur realm, t *testing.T) {
 	addr := testutils.TestAddress("alice")
 	testing.SetRealm(testing.NewUserRealm(addr))
 
-	cross(Compute)(cur, 27)
-	cross(Compute)(cur, 6)
+	Compute(cross(cur), 27)
+	Compute(cross(cur), 6)
 
 	out := Render("")
 	uassert.True(t, strings.Contains(out, "Leaderboard"), "has leaderboard")
 	uassert.True(t, strings.Contains(out, "9232"), "shows peak of 27")
 	// 27 has more steps than 6, so it must appear first (rank 1).
-	i27 := strings.Index(out, "| 27 |")
-	i6 := strings.Index(out, "| 6 |")
+	i27 := strings.Index(out, "[27]")
+	i6 := strings.Index(out, "[6]")
 	uassert.True(t, i27 >= 0 && i6 >= 0, "both rows present")
 	uassert.True(t, i27 < i6, "27 ranked above 6")
 }
@@ -47,8 +47,8 @@ func TestComputeAndLeaderboard(cur realm, t *testing.T) {
 func TestComputeRejectsNonPositive(cur realm, t *testing.T) {
 	addr := testutils.TestAddress("bob")
 	testing.SetRealm(testing.NewUserRealm(addr))
-	uassert.AbortsWithMessage(t, "n must be > 0", func() {
-		cross(Compute)(cur, 0)
+	uassert.AbortsWithMessage(t, cur, "n must be > 0", func() {
+		Compute(cross(cur), 0)
 	})
 }
 

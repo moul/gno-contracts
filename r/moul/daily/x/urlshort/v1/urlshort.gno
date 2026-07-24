@@ -62,7 +62,7 @@ func Shorten(cur realm, alias string, url string, note string) {
 
 	caller := unsafe.PreviousRealm().Address()
 
-	if v, ok := aliases.Get(alias); ok {
+	if v := aliases.Get(alias); v != nil {
 		e := v.(*entry)
 		if e.owner != caller {
 			panic("alias already taken by another owner")
@@ -81,8 +81,8 @@ func Shorten(cur realm, alias string, url string, note string) {
 // Remove deletes an alias owned by the caller. Aborts if the alias does not
 // exist or the caller is not the owner.
 func Remove(cur realm, alias string) {
-	v, ok := aliases.Get(alias)
-	if !ok {
+	v := aliases.Get(alias)
+	if v == nil {
 		panic("alias not found")
 	}
 	e := v.(*entry)
@@ -97,8 +97,8 @@ func Remove(cur realm, alias string) {
 // Lookup returns the target url for an alias and whether it exists. It is a
 // read-only helper and does NOT increment the click counter.
 func Lookup(alias string) (string, bool) {
-	v, ok := aliases.Get(alias)
-	if !ok {
+	v := aliases.Get(alias)
+	if v == nil {
 		return "", false
 	}
 	return v.(*entry).url, true
@@ -112,8 +112,8 @@ func Render(path string) string {
 	}
 
 	alias := strings.TrimPrefix(path, "/")
-	v, ok := aliases.Get(alias)
-	if !ok {
+	v := aliases.Get(alias)
+	if v == nil {
 		return "# URL Shortener\n\nNo alias named `" + alias + "`.\n\n[← all aliases](/)\n"
 	}
 

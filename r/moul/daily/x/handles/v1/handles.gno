@@ -127,8 +127,8 @@ func Transfer(cur realm, to address) {
 // caller does not own a handle.
 func ownRecord(cur realm) *record {
 	caller := cur.Previous().Address()
-	v, ok := byOwner.Get(caller.String())
-	if !ok {
+	v := byOwner.Get(caller.String())
+	if v == nil {
 		panic("this address does not own a handle")
 	}
 	return v.(*record)
@@ -136,8 +136,8 @@ func ownRecord(cur realm) *record {
 
 // OwnerOf returns the owner of handle and whether it exists.
 func OwnerOf(handle string) (address, bool) {
-	v, ok := byHandle.Get(handle)
-	if !ok {
+	v := byHandle.Get(handle)
+	if v == nil {
 		return address(""), false
 	}
 	return v.(*record).owner, true
@@ -145,8 +145,8 @@ func OwnerOf(handle string) (address, bool) {
 
 // HandleOf returns the handle owned by addr, if any.
 func HandleOf(addr address) (string, bool) {
-	v, ok := byOwner.Get(addr.String())
-	if !ok {
+	v := byOwner.Get(addr.String())
+	if v == nil {
 		return "", false
 	}
 	return v.(*record).handle, true
@@ -192,8 +192,8 @@ func renderIndex() string {
 }
 
 func renderHandle(handle string) string {
-	v, ok := byHandle.Get(handle)
-	if !ok {
+	v := byHandle.Get(handle)
+	if v == nil {
 		return "# Handles\n\nNo handle named `" + handle + "`.\n\n[← all handles](/)\n"
 	}
 	r := v.(*record)

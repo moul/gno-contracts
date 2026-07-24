@@ -150,8 +150,8 @@ func Approve(cur realm, id int) {
 		panic(errNotOwner)
 	}
 
-	v, ok := proposals.Get(strconv.Itoa(id))
-	if !ok {
+	v := proposals.Get(strconv.Itoa(id))
+	if v == nil {
 		panic(errNoProposal)
 	}
 	p := v.(*proposal)

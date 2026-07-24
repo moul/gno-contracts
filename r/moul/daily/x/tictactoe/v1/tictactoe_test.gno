@@ -49,7 +49,7 @@ func TestTurnAndTakenGuards(cur realm, t *testing.T) {
 
 	// bob (O) cannot move first — it's X's turn.
 	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsWithMessage(t, "not your turn", func() {
+	uassert.AbortsWithMessage(t, cur, "not your turn", func() {
 		Move(cross(cur), id, 0)
 	})
 
@@ -59,19 +59,19 @@ func TestTurnAndTakenGuards(cur realm, t *testing.T) {
 
 	// alice cannot play twice in a row.
 	testing.SetRealm(testing.NewUserRealm(alice))
-	uassert.AbortsWithMessage(t, "not your turn", func() {
+	uassert.AbortsWithMessage(t, cur, "not your turn", func() {
 		Move(cross(cur), id, 1)
 	})
 
 	// bob cannot take an occupied cell.
 	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsWithMessage(t, "cell already taken", func() {
+	uassert.AbortsWithMessage(t, cur, "cell already taken", func() {
 		Move(cross(cur), id, 0)
 	})
 
 	// carol is not a player.
 	testing.SetRealm(testing.NewUserRealm(carol))
-	uassert.AbortsWithMessage(t, "caller is not a player in this game", func() {
+	uassert.AbortsWithMessage(t, cur, "caller is not a player in this game", func() {
 		Move(cross(cur), id, 5)
 	})
 }

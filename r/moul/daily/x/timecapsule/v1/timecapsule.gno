@@ -155,8 +155,8 @@ func renderCapsule(idStr string) string {
 	if err != nil {
 		return "> [!WARNING]\n> Invalid capsule id\n"
 	}
-	v, ok := capsules.Get(idKey(id))
-	if !ok {
+	v := capsules.Get(idKey(id))
+	if v == nil {
 		return "> [!WARNING]\n> Capsule not found\n"
 	}
 	c := v.(*capsule)

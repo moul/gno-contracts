@@ -90,7 +90,7 @@ func dayKey(day int64) string {
 func current() *round {
 	day := dayIndex()
 	key := dayKey(day)
-	if v, ok := rounds.Get(key); ok {
+	if v := rounds.Get(key); v != nil {
 		return v.(*round)
 	}
 	r := &round{

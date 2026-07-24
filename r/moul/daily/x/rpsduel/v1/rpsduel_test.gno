@@ -78,8 +78,8 @@ func TestFullDuelChallengerWins(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	Open(cross(cur), bob.String(), commit)
 
-	v, ok := duels.Get("1")
-	if !ok {
+	v := duels.Get("1")
+	if v == nil {
 		t.Fatal("expected duel #1 to exist")
 	}
 	d := v.(*duel)
@@ -189,7 +189,7 @@ func TestClaimForfeitAfterDeadline(cur realm, t *testing.T) {
 
 	ClaimForfeit(cross(cur), "1")
 
-	v, _ := duels.Get("1")
+	v := duels.Get("1")
 	d := v.(*duel)
 	if d.Status != statusForfeited {
 		t.Fatalf("Status = %v, want forfeited", d.Status)
@@ -213,7 +213,7 @@ func TestCancel(cur realm, t *testing.T) {
 	Open(cross(cur), bob.String(), ComputeCommit("rock", "s3cr3t"))
 	Cancel(cross(cur), "1")
 
-	v, _ := duels.Get("1")
+	v := duels.Get("1")
 	d := v.(*duel)
 	if d.Status != statusCancelled {
 		t.Fatalf("Status = %v, want cancelled", d.Status)

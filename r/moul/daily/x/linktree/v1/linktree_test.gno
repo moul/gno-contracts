@@ -12,9 +12,9 @@ func TestProfileLifecycle(cur realm, t *testing.T) {
 	alice := testutils.TestAddress("alice")
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	cross(cur, SetBio)("gnome builder")
-	cross(cur, AddLink)("Home", "https://alice.example")
-	cross(cur, AddLink)("GitHub", "https://github.com/alice")
+	SetBio(cross(cur), "gnome builder")
+	AddLink(cross(cur), "Home", "https://alice.example")
+	AddLink(cross(cur), "GitHub", "https://github.com/alice")
 
 	out := Render("/" + alice.String())
 	uassert.True(t, strings.Contains(out, "gnome builder"), "bio present")
@@ -22,7 +22,7 @@ func TestProfileLifecycle(cur realm, t *testing.T) {
 	uassert.True(t, strings.Contains(out, "[GitHub](https://github.com/alice)"), "second link present")
 
 	// Remove the first link; second must survive.
-	cross(cur, RemoveLink)(0)
+	RemoveLink(cross(cur), 0)
 	out = Render("/" + alice.String())
 	uassert.False(t, strings.Contains(out, "[Home]"), "removed link gone")
 	uassert.True(t, strings.Contains(out, "[GitHub](https://github.com/alice)"), "kept link present")
@@ -33,10 +33,10 @@ func TestIndexAndOwnership(cur realm, t *testing.T) {
 	bob := testutils.TestAddress("bob2")
 
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur, AddLink)("A", "https://a.example")
+	AddLink(cross(cur), "A", "https://a.example")
 
 	testing.SetRealm(testing.NewUserRealm(bob))
-	cross(cur, AddLink)("B", "https://b.example")
+	AddLink(cross(cur), "B", "https://b.example")
 
 	// Root index lists both addresses.
 	idx := Render("")
@@ -49,8 +49,8 @@ func TestIndexAndOwnership(cur realm, t *testing.T) {
 	uassert.False(t, strings.Contains(bobOut, "[A]"), "bob does not have alice's link")
 
 	// Out-of-range removal on bob aborts.
-	uassert.AbortsWithMessage(t, "index out of range", func() {
-		cross(cur, RemoveLink)(99)
+	uassert.AbortsWithMessage(t, cur, "index out of range", func() {
+		RemoveLink(cross(cur), 99)
 	})
 }
 

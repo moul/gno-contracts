@@ -101,7 +101,7 @@ func pickHouseMove(caller address, n int) Move {
 
 func getOrCreate(addr address) *playerState {
 	key := addr.String()
-	if v, ok := players.Get(key); ok {
+	if v := players.Get(key); v != nil {
 		return v.(*playerState)
 	}
 	ps := &playerState{}
@@ -227,8 +227,8 @@ func renderPlayer(rawAddr string) string {
 	addr := strings.TrimSpace(rawAddr)
 	safe := escapeInline(addr)
 
-	v, ok := players.Get(addr)
-	if !ok {
+	v := players.Get(addr)
+	if v == nil {
 		return "# Player " + safe + "\n\nNo recorded throws yet.\n"
 	}
 	ps := v.(*playerState)

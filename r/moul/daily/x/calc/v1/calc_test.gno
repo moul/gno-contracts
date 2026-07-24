@@ -57,7 +57,7 @@ func TestDivideByZeroAborts(cur realm, t *testing.T) {
 	Push(cross(cur), "1")
 	Push(cross(cur), "0")
 
-	uassert.AbortsWithMessage(t, ErrDivByZero.Error(), func() {
+	uassert.AbortsWithMessage(t, cur, ErrDivByZero.Error(), func() {
 		Push(cross(cur), "/")
 	})
 }
@@ -68,7 +68,7 @@ func TestUnderflowAborts(cur realm, t *testing.T) {
 	Clear(cross(cur))
 	Push(cross(cur), "42")
 
-	uassert.AbortsWithMessage(t, ErrUnderflow.Error(), func() {
+	uassert.AbortsWithMessage(t, cur, ErrUnderflow.Error(), func() {
 		Push(cross(cur), "+")
 	})
 }

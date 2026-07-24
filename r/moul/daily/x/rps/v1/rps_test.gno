@@ -51,9 +51,9 @@ func TestPlayRecordsTally(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(user))
 
 	before := totalRounds
-	cross(cur, Play, "rock")
-	cross(cur, Play, "paper")
-	cross(cur, Play, "scissors")
+	Play(cross(cur),"rock")
+	Play(cross(cur),"paper")
+	Play(cross(cur),"scissors")
 
 	uassert.Equal(t, before+3, totalRounds, "global rounds incremented")
 
@@ -68,7 +68,7 @@ func TestPlayRecordsTally(cur realm, t *testing.T) {
 	uassert.True(t, strings.Contains(out, "Recent rounds"), "render has recent rounds")
 
 	// Invalid choice aborts (crossing fn -> cross-realm abort).
-	uassert.AbortsWithMessage(t, "invalid choice: use rock, paper, or scissors", func() {
-		cross(cur, Play, "lizard")
+	uassert.AbortsWithMessage(t, cur, "invalid choice: use rock, paper, or scissors", func() {
+		Play(cross(cur),"lizard")
 	})
 }

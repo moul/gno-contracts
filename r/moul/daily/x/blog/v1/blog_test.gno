@@ -13,11 +13,11 @@ func TestPublishAndRender(cur realm, t *testing.T) {
 	bob := testutils.TestAddress("bob")
 
 	testing.SetRealm(testing.NewUserRealm(alice))
-	id0 := cross(cur, Publish, "First Post", "Hello from alice.")
+	id0 := Publish(cross(cur), "First Post", "Hello from alice.")
 	uassert.Equal(t, 0, id0)
 
 	testing.SetRealm(testing.NewUserRealm(bob))
-	id1 := cross(cur, Publish, "Second Post", "A longer body\nwith a newline from bob.")
+	id1 := Publish(cross(cur), "Second Post", "A longer body\nwith a newline from bob.")
 	uassert.Equal(t, 1, id1)
 
 	uassert.Equal(t, 2, PostCount())
@@ -43,10 +43,10 @@ func TestPublishEmptyTitleAborts(cur realm, t *testing.T) {
 	carol := testutils.TestAddress("carol")
 	testing.SetRealm(testing.NewUserRealm(carol))
 
-	uassert.AbortsWithMessage(t, "blog: title must not be empty", func() {
-		cross(cur, Publish, "   ", "some body")
+	uassert.AbortsWithMessage(t, cur, "blog: title must not be empty", func() {
+		Publish(cross(cur), "   ", "some body")
 	})
-	uassert.AbortsWithMessage(t, "blog: body must not be empty", func() {
-		cross(cur, Publish, "a title", "")
+	uassert.AbortsWithMessage(t, cur, "blog: body must not be empty", func() {
+		Publish(cross(cur), "a title", "")
 	})
 }

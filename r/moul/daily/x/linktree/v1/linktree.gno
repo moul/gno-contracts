@@ -52,8 +52,8 @@ func AddLink(cur realm, label string, url string) {
 func RemoveLink(cur realm, index int) {
 	addr := unsafe.PreviousRealm().Address()
 	key := addr.String()
-	v, ok := profiles.Get(key)
-	if !ok {
+	v := profiles.Get(key)
+	if v == nil {
 		panic("no profile for caller")
 	}
 	p := v.(*profile)
@@ -66,7 +66,7 @@ func RemoveLink(cur realm, index int) {
 
 // getOrCreate returns the profile for key, creating an empty one if absent.
 func getOrCreate(key string) *profile {
-	if v, ok := profiles.Get(key); ok {
+	if v := profiles.Get(key); v != nil {
 		return v.(*profile)
 	}
 	p := &profile{}
@@ -108,8 +108,8 @@ func renderProfile(addr string) string {
 	b.WriteString(addr)
 	b.WriteString("\n\n")
 
-	v, ok := profiles.Get(addr)
-	if !ok {
+	v := profiles.Get(addr)
+	if v == nil {
 		b.WriteString("_No profile for this address._\n")
 		return b.String()
 	}

@@ -13,8 +13,8 @@ func TestSetAndRender(cur realm, t *testing.T) {
 	alice := testutils.TestAddress("alice")
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	cross(cur, Set)("greeting", "hello")
-	cross(cur, Set)("lang", "gno")
+	Set(cross(cur), "greeting", "hello")
+	Set(cross(cur), "lang", "gno")
 
 	out := renderAddress(alice.String())
 	uassert.True(t, strings.Contains(out, "greeting"), "should contain key greeting")
@@ -30,29 +30,29 @@ func TestDeleteAndIsolation(cur realm, t *testing.T) {
 	bob := testutils.TestAddress("bob2")
 
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur, Set)("shared", "alice-value")
+	Set(cross(cur), "shared", "alice-value")
 
 	testing.SetRealm(testing.NewUserRealm(bob))
-	cross(cur, Set)("shared", "bob-value")
+	Set(cross(cur), "shared", "bob-value")
 
 	// Namespaces are isolated: same key, different owners.
-	av, _ := vaults.Get(alice.String())
-	bv, _ := vaults.Get(bob.String())
-	avVal, _ := av.(*avl.Tree).Get("shared")
-	bvVal, _ := bv.(*avl.Tree).Get("shared")
+	av := vaults.Get(alice.String())
+	bv := vaults.Get(bob.String())
+	avVal := av.(*avl.Tree).Get("shared")
+	bvVal := bv.(*avl.Tree).Get("shared")
 	uassert.Equal(t, "alice-value", avVal.(string))
 	uassert.Equal(t, "bob-value", bvVal.(string))
 
 	// Bob deletes his own key; alice's remains.
-	cross(cur, Delete)("shared")
-	_, bobStill := vaults.Get(bob.String())
+	Delete(cross(cur), "shared")
+	bobStill := vaults.Has(bob.String())
 	uassert.False(t, bobStill, "bob's vault should be gone after last key removed")
-	_, aliceStill := vaults.Get(alice.String())
+	aliceStill := vaults.Has(alice.String())
 	uassert.True(t, aliceStill, "alice's vault should remain")
 
 	// Deleting a missing key aborts.
 	testing.SetRealm(testing.NewUserRealm(alice))
-	uassert.AbortsWithMessage(t, "key not found", func() {
-		cross(cur, Delete)("nope")
+	uassert.AbortsWithMessage(t, cur, "key not found", func() {
+		Delete(cross(cur), "nope")
 	})
 }

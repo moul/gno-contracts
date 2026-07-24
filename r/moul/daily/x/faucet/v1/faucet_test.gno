@@ -12,7 +12,7 @@ func TestClaimGrantsPoints(cur realm, t *testing.T) {
 	alice := testutils.TestAddress("alice")
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	cross(cur).Claim()
+	Claim(cross(cur))
 
 	uassert.Equal(t, int64(ClaimAmount), BalanceOf(alice.String()),
 		"first claim should grant ClaimAmount")
@@ -26,13 +26,13 @@ func TestClaimCooldownAborts(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(bob))
 
 	// First claim succeeds at the current height.
-	cross(cur).Claim()
+	Claim(cross(cur))
 
 	// Immediate second claim (same block) must abort due to cooldown.
-	uassert.AbortsWithMessage(t,
+	uassert.AbortsWithMessage(t, cur,
 		"cooldown active: 100 block(s) remaining before you can claim again",
 		func() {
-			cross(cur).Claim()
+			Claim(cross(cur))
 		},
 		"second immediate claim should abort on cooldown",
 	)
@@ -41,7 +41,7 @@ func TestClaimCooldownAborts(cur realm, t *testing.T) {
 func TestRenderContainsStats(cur realm, t *testing.T) {
 	carol := testutils.TestAddress("carol")
 	testing.SetRealm(testing.NewUserRealm(carol))
-	cross(cur).Claim()
+	Claim(cross(cur))
 
 	out := Render("")
 	uassert.True(t, strings.Contains(out, "# Token Faucet"), "has title")

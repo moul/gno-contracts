@@ -117,7 +117,7 @@ func Answer(cur realm, choiceIdx int) string {
 
 // addScore bumps addr's lifetime point count.
 func addScore(addr string) {
-	if v, ok := scores.Get(addr); ok {
+	if v := scores.Get(addr); v != nil {
 		p := v.(*int)
 		*p++
 		return
@@ -127,7 +127,7 @@ func addScore(addr string) {
 }
 
 func scoreOf(addr string) int {
-	if v, ok := scores.Get(addr); ok {
+	if v := scores.Get(addr); v != nil {
 		return *(v.(*int))
 	}
 	return 0

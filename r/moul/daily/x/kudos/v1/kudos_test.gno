@@ -45,7 +45,7 @@ func TestCannotKudosSelf(cur realm, t *testing.T) {
 	feed = nil
 
 	testing.SetRealm(testing.NewUserRealm(dave))
-	uassert.AbortsWithMessage(t, "cannot give kudos to yourself", func() {
+	uassert.AbortsWithMessage(t, cur, "cannot give kudos to yourself", func() {
 		Give(cross(cur), dave, "self five")
 	})
 }
@@ -58,7 +58,7 @@ func TestEmptyReasonAborts(cur realm, t *testing.T) {
 	feed = nil
 
 	testing.SetRealm(testing.NewUserRealm(eve))
-	uassert.AbortsWithMessage(t, "reason must not be empty", func() {
+	uassert.AbortsWithMessage(t, cur, "reason must not be empty", func() {
 		Give(cross(cur), frank, "   ")
 	})
 }

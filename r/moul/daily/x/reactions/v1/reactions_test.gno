@@ -13,10 +13,10 @@ func TestReactAndRender(cur realm, t *testing.T) {
 	bob := testutils.TestAddress("bob")
 
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur, React, "launch", "👍")
+	React(cross(cur),"launch", "👍")
 
 	testing.SetRealm(testing.NewUserRealm(bob))
-	cross(cur, React, "launch", "❤️")
+	React(cross(cur),"launch", "❤️")
 
 	if got := TopicCount(); got != 1 {
 		t.Fatalf("expected 1 topic, got %d", got)
@@ -38,11 +38,11 @@ func TestOneReactionPerCaller(cur realm, t *testing.T) {
 	alice := testutils.TestAddress("alice")
 
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur, React, "topicA", "🎉")
+	React(cross(cur),"topicA", "🎉")
 
 	// Second reaction by same caller to same topic must abort.
-	uassert.AbortsWithMessage(t, "caller already reacted to this topic: topicA", func() {
-		cross(cur, React, "topicA", "😀")
+	uassert.AbortsWithMessage(t, cur, "caller already reacted to this topic: topicA", func() {
+		React(cross(cur),"topicA", "😀")
 	})
 }
 
@@ -50,13 +50,13 @@ func TestCreateTopicAndDuplicate(cur realm, t *testing.T) {
 	dave := testutils.TestAddress("dave")
 	testing.SetRealm(testing.NewUserRealm(dave))
 
-	cross(cur, CreateTopic, "poll")
+	CreateTopic(cross(cur),"poll")
 	if !topics.Has("poll") {
 		t.Fatalf("expected topic 'poll' to exist")
 	}
 
-	uassert.AbortsWithMessage(t, "topic already exists: poll", func() {
-		cross(cur, CreateTopic, "poll")
+	uassert.AbortsWithMessage(t, cur, "topic already exists: poll", func() {
+		CreateTopic(cross(cur),"poll")
 	})
 
 	// A freshly created topic renders as having no reactions.
@@ -72,11 +72,11 @@ func TestTallyRowOrdering(cur realm, t *testing.T) {
 	c := testutils.TestAddress("u3")
 
 	testing.SetRealm(testing.NewUserRealm(a))
-	cross(cur, React, "party", "🎉")
+	React(cross(cur),"party", "🎉")
 	testing.SetRealm(testing.NewUserRealm(b))
-	cross(cur, React, "party", "🎉")
+	React(cross(cur),"party", "🎉")
 	testing.SetRealm(testing.NewUserRealm(c))
-	cross(cur, React, "party", "👍")
+	React(cross(cur),"party", "👍")
 
 	out := Render("party")
 	// 🎉 has 2, 👍 has 1 — 🎉 must come first (count desc).

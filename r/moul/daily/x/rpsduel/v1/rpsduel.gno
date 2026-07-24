@@ -142,7 +142,7 @@ func ComputeCommit(moveStr, salt string) string {
 
 func getOrCreate(addr address) *playerState {
 	key := addr.String()
-	if v, ok := players.Get(key); ok {
+	if v := players.Get(key); v != nil {
 		return v.(*playerState)
 	}
 	ps := &playerState{}
@@ -235,8 +235,8 @@ func Open(cur realm, opponentAddr string, commitHex string) string {
 func Accept(cur realm, id string, moveStr string) string {
 	caller := cur.Previous().Address()
 
-	v, ok := duels.Get(id)
-	if !ok {
+	v := duels.Get(id)
+	if v == nil {
 		panic("no such duel")
 	}
 	d := v.(*duel)
@@ -270,8 +270,8 @@ func Accept(cur realm, id string, moveStr string) string {
 func Reveal(cur realm, id string, moveStr string, salt string) string {
 	caller := cur.Previous().Address()
 
-	v, ok := duels.Get(id)
-	if !ok {
+	v := duels.Get(id)
+	if v == nil {
 		panic("no such duel")
 	}
 	d := v.(*duel)
@@ -322,8 +322,8 @@ func outcomeMsg(d *duel) string {
 func ClaimForfeit(cur realm, id string) string {
 	caller := cur.Previous().Address()
 
-	v, ok := duels.Get(id)
-	if !ok {
+	v := duels.Get(id)
+	if v == nil {
 		panic("no such duel")
 	}
 	d := v.(*duel)
@@ -362,8 +362,8 @@ func ClaimForfeit(cur realm, id string) string {
 func Cancel(cur realm, id string) string {
 	caller := cur.Previous().Address()
 
-	v, ok := duels.Get(id)
-	if !ok {
+	v := duels.Get(id)
+	if v == nil {
 		panic("no such duel")
 	}
 	d := v.(*duel)
@@ -444,8 +444,8 @@ func renderHome() string {
 }
 
 func renderDuel(id string) string {
-	v, ok := duels.Get(id)
-	if !ok {
+	v := duels.Get(id)
+	if v == nil {
 		return "# Duel #" + escapeInline(id) + "\n\nNo such duel.\n"
 	}
 	d := v.(*duel)
@@ -471,8 +471,8 @@ func renderPlayer(rawAddr string) string {
 	addr := strings.TrimSpace(rawAddr)
 	safe := escapeInline(addr)
 
-	v, ok := players.Get(addr)
-	if !ok {
+	v := players.Get(addr)
+	if v == nil {
 		return "# Player " + safe + "\n\nNo recorded duels yet.\n"
 	}
 	ps := v.(*playerState)

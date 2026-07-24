@@ -11,7 +11,7 @@ import (
 	"gno.land/p/nt/testutils/v0"
 )
 
-var realmAddr = chain.PackageAddress("gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/dutchauction")
+var realmAddr = chain.PackageAddress("gno.land/r/moul/daily/x/dutchauction/v1")
 
 func reset() {
 	auctions = avl.Tree{}

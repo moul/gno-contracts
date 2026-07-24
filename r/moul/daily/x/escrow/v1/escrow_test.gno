@@ -62,7 +62,7 @@ func TestNonPartyCannotConfirm(cur realm, t *testing.T) {
 
 	// Carol is not a party.
 	testing.SetRealm(testing.NewUserRealm(carol))
-	uassert.AbortsWithMessage(t, "escrow: caller is not a party to this deal", func() {
+	uassert.AbortsWithMessage(t, cur, "escrow: caller is not a party to this deal", func() {
 		Confirm(cross(cur), id)
 	})
 }
@@ -74,7 +74,7 @@ func TestOnlyCreatorCancels(cur realm, t *testing.T) {
 	id := Create(cross(cur), bob, "loan")
 
 	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsWithMessage(t, "escrow: only the creator can cancel", func() {
+	uassert.AbortsWithMessage(t, cur, "escrow: only the creator can cancel", func() {
 		Cancel(cross(cur), id)
 	})
 }

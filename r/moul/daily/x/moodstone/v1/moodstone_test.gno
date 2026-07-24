@@ -11,12 +11,12 @@ var (
 	bob   = testutils.TestAddress("bob")
 )
 
-func TestLogMoodBasic(t *testing.T) {
+func TestLogMoodBasic(cur realm, t *testing.T) {
 	entries = nil
 	testing.SetOriginCaller(alice)
 
-	LogMood(cross, "happy", "great day!")
-	LogMood(cross, "calm", "")
+	LogMood(cross(cur),"happy", "great day!")
+	LogMood(cross(cur),"calm", "")
 
 	if len(entries) != 2 {
 		t.Fatalf("expected 2 entries, got %d", len(entries))
@@ -32,11 +32,11 @@ func TestLogMoodBasic(t *testing.T) {
 	}
 }
 
-func TestLogMoodCaseInsensitive(t *testing.T) {
+func TestLogMoodCaseInsensitive(cur realm, t *testing.T) {
 	entries = nil
 	testing.SetOriginCaller(alice)
 
-	LogMood(cross, "HAPPY", "uppercase input")
+	LogMood(cross(cur),"HAPPY", "uppercase input")
 	if entries[0].Mood != "happy" {
 		t.Errorf("expected normalized to happy, got %s", entries[0].Mood)
 	}
@@ -56,13 +56,13 @@ func TestIsValid(t *testing.T) {
 	}
 }
 
-func TestMoodCount(t *testing.T) {
+func TestMoodCount(cur realm, t *testing.T) {
 	entries = nil
 	testing.SetOriginCaller(alice)
 
-	LogMood(cross, "happy", "")
-	LogMood(cross, "happy", "")
-	LogMood(cross, "sad", "")
+	LogMood(cross(cur),"happy", "")
+	LogMood(cross(cur),"happy", "")
+	LogMood(cross(cur),"sad", "")
 
 	if MoodCount("happy") != 2 {
 		t.Errorf("expected 2 happy, got %d", MoodCount("happy"))
@@ -75,20 +75,20 @@ func TestMoodCount(t *testing.T) {
 	}
 }
 
-func TestTotalEntries(t *testing.T) {
+func TestTotalEntries(cur realm, t *testing.T) {
 	entries = nil
 
 	if TotalEntries() != 0 {
 		t.Errorf("expected 0, got %d", TotalEntries())
 	}
 	testing.SetOriginCaller(alice)
-	LogMood(cross, "excited", "testing!")
+	LogMood(cross(cur),"excited", "testing!")
 	if TotalEntries() != 1 {
 		t.Errorf("expected 1, got %d", TotalEntries())
 	}
 }
 
-func TestDominantMood(t *testing.T) {
+func TestDominantMood(cur realm, t *testing.T) {
 	entries = nil
 
 	if DominantMood() != "none" {
@@ -96,18 +96,18 @@ func TestDominantMood(t *testing.T) {
 	}
 
 	testing.SetOriginCaller(alice)
-	LogMood(cross, "happy", "")
-	LogMood(cross, "happy", "")
+	LogMood(cross(cur),"happy", "")
+	LogMood(cross(cur),"happy", "")
 
 	testing.SetOriginCaller(bob)
-	LogMood(cross, "sad", "")
+	LogMood(cross(cur),"sad", "")
 
 	if DominantMood() != "happy" {
 		t.Errorf("expected happy to dominate, got %s", DominantMood())
 	}
 }
 
-func TestRender(t *testing.T) {
+func TestRender(cur realm, t *testing.T) {
 	entries = nil
 
 	out := Render("")
@@ -116,7 +116,7 @@ func TestRender(t *testing.T) {
 	}
 
 	testing.SetOriginCaller(alice)
-	LogMood(cross, "neutral", "just checking the render")
+	LogMood(cross(cur),"neutral", "just checking the render")
 
 	out = Render("")
 	if len(out) == 0 {

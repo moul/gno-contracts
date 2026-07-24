@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"gno.land/p/nt/avl/v0"
 	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
 )
@@ -16,7 +17,8 @@ func reset() {
 	threshold = 0
 	initialized = false
 	nextID = 0
-	init()
+	owners = avl.NewTree()
+	proposals = avl.NewTree()
 }
 
 func TestSetupAndPropose(cur realm, t *testing.T) {
@@ -42,7 +44,7 @@ func TestSetupAndPropose(cur realm, t *testing.T) {
 	// a non-owner cannot propose
 	dave := testutils.TestAddress("dave")
 	testing.SetRealm(testing.NewUserRealm(dave))
-	uassert.AbortsWithMessage(t, errNotOwner.Error(), func() {
+	uassert.AbortsWithMessage(t, cur, errNotOwner.Error(), func() {
 		Propose(cross(cur), "sneaky proposal")
 	})
 }
@@ -64,14 +66,14 @@ func TestApproveReachesThreshold(cur realm, t *testing.T) {
 	// first approval: still pending
 	testing.SetRealm(testing.NewUserRealm(a))
 	Approve(cross(cur), id)
-	v, _ := proposals.Get("0")
+	v := proposals.Get("0")
 	p := v.(*proposal)
 	uassert.Equal(t, statePending.String(), p.state.String())
 	uassert.Equal(t, 1, p.approvals.Size())
 
 	// duplicate approval by same owner aborts
 	testing.SetRealm(testing.NewUserRealm(a))
-	uassert.AbortsWithMessage(t, errDupApproval.Error(), func() {
+	uassert.AbortsWithMessage(t, cur, errDupApproval.Error(), func() {
 		Approve(cross(cur), id)
 	})
 
@@ -83,7 +85,7 @@ func TestApproveReachesThreshold(cur realm, t *testing.T) {
 
 	// approving an executed proposal aborts
 	testing.SetRealm(testing.NewUserRealm(c))
-	uassert.AbortsWithMessage(t, errExecuted.Error(), func() {
+	uassert.AbortsWithMessage(t, cur, errExecuted.Error(), func() {
 		Approve(cross(cur), id)
 	})
 }

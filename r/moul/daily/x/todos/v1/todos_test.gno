@@ -55,7 +55,7 @@ func TestAddToggleRemove(cur realm, t *testing.T) {
 	if open != 1 || done != 0 {
 		t.Fatalf("after remove: open=%d done=%d, want 1/0", open, done)
 	}
-	if _, ok := items.Get(idKey(1)); ok {
+	if items.Has(idKey(1)) {
 		t.Fatalf("item #1 still present after Remove")
 	}
 }

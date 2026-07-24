@@ -46,11 +46,11 @@ func TestParseOptions(t *testing.T) {
 	}
 }
 
-func TestCreateAndVote(t *testing.T) {
+func TestCreateAndVote(cur realm, t *testing.T) {
 	resetState()
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	id := CreatePoll(cross, "Best chain?", "gno,eth,btc")
+	id := CreatePoll(cross(cur), "Best chain?", "gno,eth,btc")
 	if id != 0 {
 		t.Fatalf("first poll id = %d, want 0", id)
 	}
@@ -59,15 +59,15 @@ func TestCreateAndVote(t *testing.T) {
 	}
 
 	// alice votes gno.
-	Vote(cross, id, 0)
+	Vote(cross(cur), id, 0)
 
 	// bob votes eth.
 	testing.SetRealm(testing.NewUserRealm(bob))
-	Vote(cross, id, 1)
+	Vote(cross(cur), id, 1)
 
 	// carol votes gno.
 	testing.SetRealm(testing.NewUserRealm(carol))
-	Vote(cross, id, 0)
+	Vote(cross(cur), id, 0)
 
 	p := getPoll(id)
 	if p.Tallies[0] != 2 {
@@ -81,40 +81,40 @@ func TestCreateAndVote(t *testing.T) {
 	}
 }
 
-func TestDoubleVotePanics(t *testing.T) {
+func TestDoubleVotePanics(cur realm, t *testing.T) {
 	resetState()
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	id := CreatePoll(cross, "Coffee or tea?", "coffee,tea")
-	Vote(cross, id, 0)
+	id := CreatePoll(cross(cur), "Coffee or tea?", "coffee,tea")
+	Vote(cross(cur), id, 0)
 
 	// A second vote by the same address aborts (cross-realm panic).
-	uassert.AbortsWithMessage(t, "address already voted on this poll", func() {
-		Vote(cross, id, 1)
+	uassert.AbortsWithMessage(t, cur, "address already voted on this poll", func() {
+		Vote(cross(cur), id, 1)
 	})
 }
 
-func TestVoteBounds(t *testing.T) {
+func TestVoteBounds(cur realm, t *testing.T) {
 	resetState()
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	id := CreatePoll(cross, "A or B?", "a,b")
+	id := CreatePoll(cross(cur), "A or B?", "a,b")
 
-	uassert.AbortsWithMessage(t, "option index out of range", func() {
-		Vote(cross, id, 5)
+	uassert.AbortsWithMessage(t, cur, "option index out of range", func() {
+		Vote(cross(cur), id, 5)
 	})
 }
 
-func TestCreatePollNeedsTwoOptions(t *testing.T) {
+func TestCreatePollNeedsTwoOptions(cur realm, t *testing.T) {
 	resetState()
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	uassert.AbortsWithMessage(t, "a poll needs at least 2 options", func() {
-		CreatePoll(cross, "One?", "only")
+	uassert.AbortsWithMessage(t, cur, "a poll needs at least 2 options", func() {
+		CreatePoll(cross(cur), "One?", "only")
 	})
 }
 
-func TestRender(t *testing.T) {
+func TestRender(cur realm, t *testing.T) {
 	resetState()
 	testing.SetRealm(testing.NewUserRealm(alice))
 
@@ -123,8 +123,8 @@ func TestRender(t *testing.T) {
 		t.Errorf("empty Render should mention no polls, got:\n%s", got)
 	}
 
-	id := CreatePoll(cross, "Pick one", "x,y")
-	Vote(cross, id, 0)
+	id := CreatePoll(cross(cur), "Pick one", "x,y")
+	Vote(cross(cur), id, 0)
 
 	// Index lists the poll and bar chart glyphs.
 	idx := Render("")

@@ -49,7 +49,7 @@ func TestShortenAndRender(cur realm, t *testing.T) {
 	alice := testutils.TestAddress("alice")
 	testing.SetRealm(testing.NewUserRealm(alice))
 
-	cross(cur).Shorten("gno", "https://gno.land", "the chain")
+	Shorten(cross(cur), "gno", "https://gno.land", "the chain")
 
 	url, ok := Lookup("gno")
 	uassert.True(t, ok, "alias should exist")
@@ -70,28 +70,28 @@ func TestShortenOwnershipRules(cur realm, t *testing.T) {
 	bob := testutils.TestAddress("bob2")
 
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur).Shorten("mine", "https://a.example", "")
+	Shorten(cross(cur), "mine", "https://a.example", "")
 
 	// Bob cannot overwrite alice's alias.
 	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsWithMessage(t, "alias already taken by another owner", func() {
-		cross(cur).Shorten("mine", "https://b.example", "")
+	uassert.AbortsWithMessage(t, cur, "alias already taken by another owner", func() {
+		Shorten(cross(cur), "mine", "https://b.example", "")
 	})
 
 	// Alice can update her own.
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur).Shorten("mine", "https://a2.example", "updated")
+	Shorten(cross(cur), "mine", "https://a2.example", "updated")
 	url, _ := Lookup("mine")
 	uassert.Equal(t, "https://a2.example", url)
 
 	// Invalid alias aborts.
-	uassert.AbortsWithMessage(t, "alias must be non-empty and alphanumeric", func() {
-		cross(cur).Shorten("bad alias", "https://x.example", "")
+	uassert.AbortsWithMessage(t, cur, "alias must be non-empty and alphanumeric", func() {
+		Shorten(cross(cur), "bad alias", "https://x.example", "")
 	})
 
 	// Empty url aborts.
-	uassert.AbortsWithMessage(t, "url must be non-empty", func() {
-		cross(cur).Shorten("okalias", "", "")
+	uassert.AbortsWithMessage(t, cur, "url must be non-empty", func() {
+		Shorten(cross(cur), "okalias", "", "")
 	})
 }
 
@@ -100,17 +100,17 @@ func TestRemoveRules(cur realm, t *testing.T) {
 	bob := testutils.TestAddress("bob3")
 
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur).Shorten("rm", "https://rm.example", "")
+	Shorten(cross(cur), "rm", "https://rm.example", "")
 
 	// Bob cannot remove alice's alias.
 	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsWithMessage(t, "only the owner can remove an alias", func() {
-		cross(cur).Remove("rm")
+	uassert.AbortsWithMessage(t, cur, "only the owner can remove an alias", func() {
+		Remove(cross(cur), "rm")
 	})
 
 	// Alice removes her own.
 	testing.SetRealm(testing.NewUserRealm(alice))
-	cross(cur).Remove("rm")
+	Remove(cross(cur), "rm")
 	_, ok := Lookup("rm")
 	uassert.False(t, ok, "alias should be gone")
 }

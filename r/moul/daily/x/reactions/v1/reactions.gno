@@ -28,8 +28,8 @@ type topic struct {
 var topics = avl.NewTree()
 
 func getOrPanic(name string) *topic {
-	v, ok := topics.Get(name)
-	if !ok {
+	v := topics.Get(name)
+	if v == nil {
 		panic("topic does not exist: " + name)
 	}
 	return v.(*topic)
@@ -76,7 +76,7 @@ func React(cur realm, name, emoji string) {
 	caller := unsafe.PreviousRealm().Address().String()
 
 	var t *topic
-	if v, ok := topics.Get(name); ok {
+	if v := topics.Get(name); v != nil {
 		t = v.(*topic)
 	} else {
 		t = newTopic(name)
@@ -88,7 +88,7 @@ func React(cur realm, name, emoji string) {
 	t.voters.Set(caller, struct{}{})
 
 	count := 0
-	if v, ok := t.tallies.Get(emoji); ok {
+	if v := t.tallies.Get(emoji); v != nil {
 		count = v.(int)
 	}
 	t.tallies.Set(emoji, count+1)
@@ -149,8 +149,8 @@ func Render(path string) string {
 	path = strings.TrimSpace(strings.Trim(path, "/"))
 
 	if path != "" {
-		v, ok := topics.Get(path)
-		if !ok {
+		v := topics.Get(path)
+		if v == nil {
 			return "# Reaction Board\n\nTopic not found: `" + path + "`\n"
 		}
 		t := v.(*topic)

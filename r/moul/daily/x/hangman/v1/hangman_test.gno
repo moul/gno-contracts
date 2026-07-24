@@ -99,12 +99,12 @@ func TestGuessCrossing(cur realm, t *testing.T) {
 	}
 
 	// Re-guessing the same letter aborts.
-	uassert.AbortsWithMessage(t, "letter already guessed: "+first, func() {
+	uassert.AbortsWithMessage(t, cur, "letter already guessed: "+first, func() {
 		Guess(cross(cur), first)
 	})
 
 	// Invalid input aborts.
-	uassert.AbortsWithMessage(t, "guess must be a single letter a-z", func() {
+	uassert.AbortsWithMessage(t, cur, "guess must be a single letter a-z", func() {
 		Guess(cross(cur), "42")
 	})
 

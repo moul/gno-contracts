@@ -67,8 +67,8 @@ func NewGame(cur realm, opponent address) int {
 
 // Move plays cell (0-8) for the calling player. Enforces turn order and rejects taken cells.
 func Move(cur realm, gameID int, cell int) {
-	v, ok := games.Get(pad(gameID))
-	if !ok {
+	v := games.Get(pad(gameID))
+	if v == nil {
 		panic("game not found")
 	}
 	g := v.(*Game)
@@ -156,8 +156,8 @@ func cellGlyph(m int) string {
 
 // GetGame returns a game by id (read helper for tests / callers).
 func GetGame(id int) (*Game, error) {
-	v, ok := games.Get(pad(id))
-	if !ok {
+	v := games.Get(pad(id))
+	if v == nil {
 		return nil, errors.New("game not found")
 	}
 	return v.(*Game), nil

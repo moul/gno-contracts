@@ -15,7 +15,7 @@ var vaults avl.Tree
 // vaultFor returns the caller's namespace tree, creating it if needed.
 func vaultFor(owner address) *avl.Tree {
 	k := owner.String()
-	if v, ok := vaults.Get(k); ok {
+	if v := vaults.Get(k); v != nil {
 		return v.(*avl.Tree)
 	}
 	t := &avl.Tree{}
@@ -38,8 +38,8 @@ func Set(cur realm, key string, value string) {
 func Delete(cur realm, key string) {
 	caller := unsafe.PreviousRealm().Address()
 	k := caller.String()
-	v, ok := vaults.Get(k)
-	if !ok {
+	v := vaults.Get(k)
+	if v == nil {
 		panic("no vault for caller")
 	}
 	t := v.(*avl.Tree)
@@ -93,8 +93,8 @@ func renderAddress(addr string) string {
 	b.WriteString("# Vault: ")
 	b.WriteString(addr)
 	b.WriteString("\n\n")
-	v, ok := vaults.Get(addr)
-	if !ok {
+	v := vaults.Get(addr)
+	if v == nil {
 		b.WriteString("_No vault for this address._\n")
 		return b.String()
 	}

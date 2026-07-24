@@ -3,15 +3,19 @@ package erc20
 import (
 	"strings"
 	"testing"
+
+	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/uassert/v0"
 )
 
-// Fixed test addresses (valid-length bech32-style literals). The uverse
-// `address` type is used directly by the realm; tests construct it the same way.
-const (
-	alice   = address("g1alicexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-	bob     = address("g1bobxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-	spender = address("g1spenderxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-	dest    = address("g1destxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+// Fixed test addresses. testutils.TestAddress derives real, valid-length
+// addresses; literal strings would fail address.IsValid() and trip the realm's
+// zero-address guard.
+var (
+	alice   = testutils.TestAddress("alice")
+	bob     = testutils.TestAddress("bob")
+	spender = testutils.TestAddress("spender")
+	dest    = testutils.TestAddress("dest")
 )
 
 // reset clears package state between tests so cases stay independent.
@@ -83,14 +87,12 @@ func TestTransferInsufficientPanics(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	Mint(cross(cur), alice, 10)
 
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("expected panic on over-transfer, got none")
-		}
-	}()
-
+	// Aborts from a cross(cur) call cannot be caught by a plain recover();
+	// assert on the abort message instead.
 	testing.SetRealm(testing.NewUserRealm(alice))
-	Transfer(cross(cur), bob, 100) // more than balance -> panic
+	uassert.AbortsWithMessage(t, cur, "erc20: insufficient balance", func() {
+		Transfer(cross(cur), bob, 100) // more than balance -> panic
+	})
 }
 
 // TestRenderContainsMetadata checks the Markdown view exposes name/symbol/supply.

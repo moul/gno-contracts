@@ -75,7 +75,7 @@ func Vote(cur realm, pollID int, optionIndex int) {
 	if optionIndex < 0 || optionIndex >= len(p.Options) {
 		panic("option index out of range")
 	}
-	if _, voted := p.voted.Get(voter); voted {
+	if p.voted.Has(voter) {
 		panic("address already voted on this poll")
 	}
 

@@ -38,14 +38,14 @@ func TestChallengeAndAccept(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	Challenge(cross(cur), bob.String(), "heads")
 
-	if _, ok := duels.Get("1"); !ok {
+	if !duels.Has("1") {
 		t.Fatal("expected duel #1 to exist")
 	}
 
 	testing.SetRealm(testing.NewUserRealm(bob))
 	Accept(cross(cur), "1")
 
-	v, _ := duels.Get("1")
+	v := duels.Get("1")
 	d := v.(*duel)
 	if d.Status != statusResolved {
 		t.Fatalf("Status = %v, want resolved", d.Status)
@@ -104,7 +104,7 @@ func TestCancel(cur realm, t *testing.T) {
 	Challenge(cross(cur), bob.String(), "heads")
 	Cancel(cross(cur), "1")
 
-	v, _ := duels.Get("1")
+	v := duels.Get("1")
 	d := v.(*duel)
 	if d.Status != statusCancelled {
 		t.Fatalf("Status = %v, want cancelled", d.Status)

@@ -204,8 +204,8 @@ func priceAt(a *auction, height int64) int64 {
 }
 
 func getAuction(id string) *auction {
-	v, ok := auctions.Get(id)
-	if !ok {
+	v := auctions.Get(id)
+	if v == nil {
 		panic(errNotFound)
 	}
 	return v.(*auction)
@@ -244,7 +244,7 @@ func Render(path string) string {
 	})
 	for i := len(ids) - 1; i >= 0; i-- {
 		id := strconv.FormatUint(ids[i], 10)
-		v, _ := auctions.Get(id)
+		v := auctions.Get(id)
 		a := v.(*auction)
 		b.WriteString("| " + a.ID + " | " + a.Item + " | " + a.Status.String() +
 			" | " + strconv.FormatInt(priceAt(a, height), 10) +

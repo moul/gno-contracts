@@ -94,7 +94,7 @@ func decide(playerMove, houseM int) int {
 }
 
 func getTally(key string) *tally {
-	if v, ok := players.Get(key); ok {
+	if v := players.Get(key); v != nil {
 		return v.(*tally)
 	}
 	return nil

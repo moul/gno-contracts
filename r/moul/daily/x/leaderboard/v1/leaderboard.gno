@@ -28,7 +28,7 @@ var players avl.Tree
 // get returns the stored *player for addr, creating one if absent.
 func get(addr address) *player {
 	key := addr.String()
-	if v, ok := players.Get(key); ok {
+	if v := players.Get(key); v != nil {
 		return v.(*player)
 	}
 	p := &player{addr: addr}

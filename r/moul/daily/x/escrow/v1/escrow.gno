@@ -114,8 +114,8 @@ func Cancel(cur realm, id int) {
 }
 
 func mustGet(id int) *Deal {
-	v, ok := deals.Get(strconv.Itoa(id))
-	if !ok {
+	v := deals.Get(strconv.Itoa(id))
+	if v == nil {
 		panic(errNotFound)
 	}
 	return v.(*Deal)
@@ -127,8 +127,8 @@ func Render(path string) string {
 	path = strings.TrimSpace(strings.Trim(path, "/"))
 	if path != "" {
 		if id, err := strconv.Atoi(path); err == nil {
-			v, ok := deals.Get(strconv.Itoa(id))
-			if !ok {
+			v := deals.Get(strconv.Itoa(id))
+			if v == nil {
 				return "# Escrow\n\nDeal `" + path + "` not found.\n"
 			}
 			return renderOne(v.(*Deal))

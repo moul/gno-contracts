@@ -75,7 +75,7 @@ func TestRenderTableWithMedalsAndName(cur realm, t *testing.T) {
 func TestSetNameTooLongPanics(cur realm, t *testing.T) {
 	resetState()
 	testing.SetRealm(testing.NewUserRealm(address(alice)))
-	uassert.AbortsWithMessage(t, "name too long (max 32)", func() {
+	uassert.AbortsWithMessage(t, cur, "name too long (max 32)", func() {
 		SetName(cross(cur), strings.Repeat("x", 33))
 	})
 }
@@ -83,7 +83,7 @@ func TestSetNameTooLongPanics(cur realm, t *testing.T) {
 func TestAddPointsRejectsNonPositive(cur realm, t *testing.T) {
 	resetState()
 	testing.SetRealm(testing.NewUserRealm(address(alice)))
-	uassert.AbortsWithMessage(t, "points must be positive", func() {
+	uassert.AbortsWithMessage(t, cur, "points must be positive", func() {
 		AddPoints(cross(cur), 0)
 	})
 }

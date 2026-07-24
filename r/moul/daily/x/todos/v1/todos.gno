@@ -58,8 +58,8 @@ func Toggle(cur realm, id int) {
 	if !cur.IsCurrent() {
 		panic("spoofed realm")
 	}
-	v, ok := items.Get(idKey(id))
-	if !ok {
+	v := items.Get(idKey(id))
+	if v == nil {
 		panic("todos: item not found: #" + strconv.Itoa(id))
 	}
 	it := v.(*item)

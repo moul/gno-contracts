@@ -53,10 +53,10 @@ func TestEmptyPanics(cur realm, t *testing.T) {
 	addr := testutils.TestAddress("carol")
 	testing.SetRealm(testing.NewUserRealm(addr))
 
-	uassert.AbortsWithMessage(t, "stack is empty: nothing to pop", func() {
+	uassert.AbortsWithMessage(t, cur, "stack is empty: nothing to pop", func() {
 		Pop(cross(cur))
 	})
-	uassert.AbortsWithMessage(t, "queue is empty: nothing to dequeue", func() {
+	uassert.AbortsWithMessage(t, cur, "queue is empty: nothing to dequeue", func() {
 		Dequeue(cross(cur))
 	})
 }

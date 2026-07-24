@@ -95,8 +95,8 @@ func RecordIncome(cur realm, id int, amount int) {
 	if amount <= 0 {
 		panic("splitter: amount must be positive")
 	}
-	v, ok := groups.Get(key(id))
-	if !ok {
+	v := groups.Get(key(id))
+	if v == nil {
 		panic("splitter: unknown group id: " + strconv.Itoa(id))
 	}
 	g := v.(*group)

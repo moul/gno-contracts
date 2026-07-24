@@ -103,8 +103,8 @@ func Render(path string) string {
 	if err != nil {
 		return "# Not found\n\nInvalid post path: `" + path + "`\n\n[← back](/r/REPLACE_ADDR/blog)\n"
 	}
-	v, ok := posts.Get(key(id))
-	if !ok {
+	v := posts.Get(key(id))
+	if v == nil {
 		return "# Not found\n\nNo post with id " + idStr + ".\n\n[← back](/r/REPLACE_ADDR/blog)\n"
 	}
 	return renderPost(v.(*Post))
