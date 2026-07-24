@@ -1,6 +1,0 @@
-digraph deps {
-  rankdir=LR;
-  node [shape=box, fontname="sans-serif"];
-  "gno.land/r/moul/stuff/hijack/v1" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/r/moul/stuff/hijack/v1" -> "gno.land/r/gc24/raffle";
-}
