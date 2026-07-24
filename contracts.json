@@ -303,6 +303,185 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/basics/args/v1",
+      "dir": "r/moul/basics/args/v1",
+      "kind": "r",
+      "name": "basics/args",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/basics/data/v1",
+      "dir": "r/moul/basics/data/v1",
+      "kind": "r",
+      "name": "basics/data",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/basics/grc20/v1",
+      "dir": "r/moul/basics/grc20/v1",
+      "kind": "r",
+      "name": "basics/grc20",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/grc/grc20"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/basics/hello/v1",
+      "dir": "r/moul/basics/hello/v1",
+      "kind": "r",
+      "name": "basics/hello",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/basics/importdemo/v1",
+      "dir": "r/moul/basics/importdemo/v1",
+      "kind": "r",
+      "name": "basics/importdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/avl",
+        "gno.land/p/demo/dom"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/basics/render/v1",
+      "dir": "r/moul/basics/render/v1",
+      "kind": "r",
+      "name": "basics/render",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/basics/vault/v1",
+      "dir": "r/moul/basics/vault/v1",
+      "kind": "r",
+      "name": "basics/vault",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/grc/exts/vault",
+        "gno.land/p/demo/grc/grc20"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/basics/wikicoin/v1",
+      "dir": "r/moul/basics/wikicoin/v1",
+      "kind": "r",
+      "name": "basics/wikicoin",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/avl",
+        "gno.land/p/demo/ufmt"
+      ],
+      "draft": false,
+      "published": {
+        "portal-loop": {
+          "uploaded": false
+        },
+        "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/hello/v1",
       "dir": "r/moul/hello/v1",
       "kind": "r",

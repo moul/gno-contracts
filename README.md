@@ -73,6 +73,14 @@ make help        # list all targets
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | — | — | — |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | — | — | — |
 | `gno.land/p/moul/ulist/v1` | pkg | Append-only list backed by a binary tree. | — | — | — | — |
+| `gno.land/r/moul/basics/args/v1` | realm | — | — | — | — | — |
+| `gno.land/r/moul/basics/data/v1` | realm | — | — | — | — | — |
+| `gno.land/r/moul/basics/grc20/v1` | realm | — | 1 | — | — | — |
+| `gno.land/r/moul/basics/hello/v1` | realm | — | — | — | — | — |
+| `gno.land/r/moul/basics/importdemo/v1` | realm | — | 2 | — | — | — |
+| `gno.land/r/moul/basics/render/v1` | realm | — | — | — | — | — |
+| `gno.land/r/moul/basics/vault/v1` | realm | — | 2 | — | — | — |
+| `gno.land/r/moul/basics/wikicoin/v1` | realm | — | 2 | — | — | — |
 | `gno.land/r/moul/hello/v1` | realm | Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1). | 1 | — | — | — |
 
 <!-- END CONTRACTS TABLE -->
