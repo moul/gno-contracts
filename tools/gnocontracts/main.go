@@ -49,6 +49,10 @@ func main() {
 		err = cmdSync(root, args)
 	case "publish":
 		err = cmdPublish(root, args)
+	case "status":
+		err = cmdStatus(root, args)
+	case "report":
+		err = cmdReport(root, args)
 	case "help", "-h", "--help":
 		usage()
 		return
@@ -75,6 +79,8 @@ commands:
   vendor     fetch external gno.land dependencies into vendor/
   sync       report drift vs the gnolang/gno monorepo (needs GNOROOT)
   publish    order contracts by dependency; -net <name> [-check] for status
+  status     refresh on-chain upload status for all networks + README
+  report     analyze the PR diff (base...HEAD) → Markdown report for the PR bot
 `)
 }
 
