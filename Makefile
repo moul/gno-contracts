@@ -21,8 +21,6 @@ TOOL ?= go tool gnocontracts
 # Ephemeral stdlib-only view of the toolchain (empty examples/ → vendor wins).
 VIEW := $(CURDIR)/.gnoroot-view
 
-# Every package directory (one gnomod.toml each) under the contract trees.
-PKG_DIRS := $(shell find p r -name gnomod.toml -exec dirname {} \; 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
 .PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean
