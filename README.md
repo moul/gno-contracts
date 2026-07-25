@@ -95,20 +95,20 @@ make help        # list all targets
 
 | Package | Kind | Description | Deps | Monorepo | portal-loop | test6 | topaz |
 |---|---|---|---|---|---|---|---|
-| `gno.land/p/moul/addrset/v1` | pkg | Set data structure for unique gno addresses. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 📦 | — | 📦 |
+| `gno.land/p/moul/addrset/v1` | pkg | Set data structure for unique gno addresses. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 📦 | — | ✅📦 |
 | `gno.land/p/moul/authz/v1` | pkg | Flexible authorization control for privileged actions. | 5 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 📦 | — | 📦 |
 | `gno.land/p/moul/collection/v1` | pkg | 💤  | 3 | — | — | — | — |
-| `gno.land/p/moul/collection/v2` | pkg | — | 3 | — | — | — | — |
+| `gno.land/p/moul/collection/v2` | pkg | — | 3 | — | — | — | ✅ |
 | `gno.land/p/moul/cow/v1` | pkg | 💤  | — | — | — | — | — |
-| `gno.land/p/moul/cow/v2` | pkg | — | — | — | — | — | — |
+| `gno.land/p/moul/cow/v2` | pkg | — | — | — | — | — | ✅ |
 | `gno.land/p/moul/debug/v1` | pkg | 💤  | 4 | — | — | — | — |
 | `gno.land/p/moul/debug/v2` | pkg | — | 4 | — | — | — | — |
 | `gno.land/p/moul/deque/v1` | pkg | 💤  | — | — | — | — | — |
-| `gno.land/p/moul/deque/v2` | pkg | — | — | — | — | — | — |
-| `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer) | — | — | — |
-| `gno.land/p/moul/entropy/v1` | pkg | — | — | — | — | — | — |
+| `gno.land/p/moul/deque/v2` | pkg | — | — | — | — | — | ✅ |
+| `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer) | — | — | ✅ |
+| `gno.land/p/moul/entropy/v1` | pkg | — | — | — | — | — | ✅ |
 | `gno.land/p/moul/errs/v1` | pkg | 💤  | — | — | — | — | — |
-| `gno.land/p/moul/errs/v2` | pkg | — | — | — | — | — | — |
+| `gno.land/p/moul/errs/v2` | pkg | — | — | — | — | — | ✅ |
 | `gno.land/p/moul/fifo/v1` | pkg | Fixed-size FIFO (first-in-first-out) list. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo) | — | — | 📦 |
 | `gno.land/p/moul/fp/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/fp/v2` | pkg | — | — | — | — | — | — |
@@ -220,7 +220,7 @@ make help        # list all targets
 
 _💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
 
-_On-chain status last checked: 2026-07-25T14:13:44Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-25T15:29:09Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
