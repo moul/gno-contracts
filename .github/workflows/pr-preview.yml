@@ -74,17 +74,20 @@ jobs:
         run: |
           git config user.name "Manfred Touron"
           git config user.email "94029+moul@users.noreply.github.com"
-          tmp=$(mktemp -d)
-          git worktree add --force "$tmp" gh-pages 2>/dev/null || {
-            git worktree add --force --orphan -b gh-pages "$tmp"
-            : > "$tmp/.nojekyll"
-          }
-          rm -rf "$tmp/pr-$PR"
-          mkdir -p "$tmp/pr-$PR"
-          cp -r _preview/. "$tmp/pr-$PR/"
-          ( cd "$tmp" && git add -A && git diff --cached --quiet || git commit -q -m "preview: PR #$PR" )
-          ( cd "$tmp" && git push origin gh-pages )
-          git worktree remove --force "$tmp"
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          rm -rf .ghp
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add .ghp origin/gh-pages
+            ( cd .ghp && git checkout -B gh-pages )
+          else
+            git worktree add --detach .ghp
+            ( cd .ghp && git checkout --orphan gh-pages && git reset --hard >/dev/null 2>&1; rm -rf ./* ./.[!.]* 2>/dev/null; : > .nojekyll )
+          fi
+          rm -rf ".ghp/pr-$PR"
+          mkdir -p ".ghp/pr-$PR"
+          cp -r _preview/. ".ghp/pr-$PR/"
+          ( cd .ghp && git add -A && (git diff --cached --quiet || git commit -q -m "preview: PR #$PR") && git push origin gh-pages )
+          git worktree remove --force .ghp
 
       - name: Sticky comment
         env:
@@ -130,9 +133,9 @@ _Static snapshot; interactive actions and nav that leaves these pages won't work
         run: |
           git config user.name "Manfred Touron"
           git config user.email "94029+moul@users.noreply.github.com"
-          tmp=$(mktemp -d)
-          if git worktree add --force "$tmp" gh-pages 2>/dev/null; then
-            rm -rf "$tmp/pr-$PR"
-            ( cd "$tmp" && git add -A && git diff --cached --quiet || { git commit -q -m "preview: remove PR #$PR"; git push origin gh-pages; } )
-            git worktree remove --force "$tmp"
-          fi
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          git show-ref --verify --quiet refs/remotes/origin/gh-pages || exit 0
+          git worktree add .ghp origin/gh-pages
+          ( cd .ghp && git checkout -B gh-pages && rm -rf "pr-$PR" \
+            && git add -A && (git diff --cached --quiet || { git commit -q -m "preview: remove PR #$PR"; git push origin gh-pages; }) )
+          git worktree remove --force .ghp
