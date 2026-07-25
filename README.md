@@ -220,7 +220,7 @@ make help        # list all targets
 
 _💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
 
-_On-chain status last checked: 2026-07-25T10:13:15Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-25T10:25:13Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
