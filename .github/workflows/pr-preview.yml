@@ -49,9 +49,11 @@ jobs:
       - name: Determine changed realms
         id: realms
         run: |
-          git fetch origin "${{ github.base_ref }}" --depth=1
+          git fetch --no-tags origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
+          base=$(git merge-base "origin/${{ github.base_ref }}" HEAD)
+          echo "diffing $base..HEAD"
           sels=""
-          for d in $(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+          for d in $(git diff --name-only "$base" HEAD \
                      | grep -E '^r/moul/.*\.gno$' \
                      | sed -E 's#/[^/]+$##' | sort -u); do
             # nearest dir containing gnomod.toml, and only if not ignored
@@ -68,23 +70,28 @@ jobs:
         if: steps.realms.outputs.selectors != ''
         run: |
           python3 tools/gnopreview/gnopreview.py --out _preview ${{ steps.realms.outputs.selectors }}
+          echo "--- _preview tree ---"; find _preview -maxdepth 3 2>/dev/null | head -30 || echo "(none)"
 
       - name: Publish to gh-pages/pr-<N>
         if: steps.realms.outputs.selectors != ''
         run: |
+          if [ ! -d _preview ] || [ -z "$(ls -A _preview 2>/dev/null)" ]; then
+            echo "nothing rendered — skipping publish"; exit 0
+          fi
           git config user.name "Manfred Touron"
           git config user.email "94029+moul@users.noreply.github.com"
-          tmp=$(mktemp -d)
-          git worktree add --force "$tmp" gh-pages 2>/dev/null || {
-            git worktree add --force --orphan -b gh-pages "$tmp"
-            : > "$tmp/.nojekyll"
-          }
-          rm -rf "$tmp/pr-$PR"
-          mkdir -p "$tmp/pr-$PR"
-          cp -r _preview/. "$tmp/pr-$PR/"
-          ( cd "$tmp" && git add -A && git diff --cached --quiet || git commit -q -m "preview: PR #$PR" )
-          ( cd "$tmp" && git push origin gh-pages )
-          git worktree remove --force "$tmp"
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          rm -rf .ghp
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add .ghp origin/gh-pages
+            ( cd .ghp && git checkout -B gh-pages )
+          else
+            git worktree add --detach .ghp
+            ( cd .ghp && git checkout --orphan gh-pages && git reset --hard >/dev/null 2>&1; rm -rf ./* ./.[!.]* 2>/dev/null; : > .nojekyll )
+          fi
+          rm -rf ".ghp/pr-$PR"; mkdir -p ".ghp/pr-$PR"; cp -r _preview/. ".ghp/pr-$PR/"
+          ( cd .ghp && git add -A && (git diff --cached --quiet || git commit -q -m "preview: PR #$PR") && git push origin gh-pages )
+          git worktree remove --force .ghp
 
       - name: Sticky comment
         env:
