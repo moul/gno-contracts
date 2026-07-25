@@ -92,28 +92,28 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           marker="<!-- gnocontracts-pr-preview -->"
-          if [ -z "${{ steps.realms.outputs.selectors }}" ]; then
-            body="$marker
-### 🖼️ PR preview
-No realm changes in this PR — nothing to preview."
-          else
-            list=$(for s in ${{ steps.realms.outputs.selectors }}; do
-                     pp="gno.land/${s#./}"; url="${pp#gno.land/}"
-                     echo "- [\`$pp\`](${PAGES_URL}${url}/)"; done)
-            body="$marker
-### 🖼️ PR preview
-Rendered with gnodev → static gnoweb. **[Open preview index](${PAGES_URL})**
-
-$list
-
-_Static snapshot; interactive actions and nav that leaves these pages won't work. Removed when the PR closes._"
-          fi
+          {
+            echo "$marker"
+            echo "### 🖼️ PR preview"
+            if [ -z "${{ steps.realms.outputs.selectors }}" ]; then
+              echo "No realm changes in this PR — nothing to preview."
+            else
+              echo "Rendered with gnodev → static gnoweb. **[Open preview index](${PAGES_URL})**"
+              echo
+              for s in ${{ steps.realms.outputs.selectors }}; do
+                pp="gno.land/${s#./}"; url="${pp#gno.land/}"
+                echo "- [\`$pp\`](${PAGES_URL}${url}/)"
+              done
+              echo
+              echo "_Static snapshot; interactive actions and nav that leaves these pages won't work. Removed when the PR closes._"
+            fi
+          } > /tmp/preview-comment.md
           id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
                 --jq ".[] | select(.body|contains(\"$marker\")) | .id" | head -1)
           if [ -n "$id" ]; then
-            gh api -X PATCH "repos/$REPO/issues/comments/$id" -f body="$body" >/dev/null
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@/tmp/preview-comment.md >/dev/null
           else
-            gh api "repos/$REPO/issues/$PR/comments" -f body="$body" >/dev/null
+            gh api "repos/$REPO/issues/$PR/comments" -F body=@/tmp/preview-comment.md >/dev/null
           fi
 
   # ---- tear down the subfolder when the PR closes ------------------------
