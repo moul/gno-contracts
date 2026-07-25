@@ -15,6 +15,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -173,7 +174,7 @@ func run() error {
 	if *dryRun {
 		fmt.Println("\nequivalent gnokey commands:")
 		for _, p := range todo {
-			fmt.Println("  " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, *gasWanted, *deposit, net.ChainID, net.RPC, *home))
+			fmt.Println("# " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, *gasWanted, *deposit, net.ChainID, net.RPC, *home))
 		}
 		fmt.Println("\n(dry-run) not broadcasting.")
 		return nil
@@ -251,13 +252,16 @@ func run() error {
 		fmt.Printf("gas-wanted: %d (%s)\n", wanted, gasNote(*gasWanted))
 		fmt.Println("equivalent gnokey commands (batched into one tx):")
 		for _, p := range todo {
-			fmt.Println("  " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
+			fmt.Println("# " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
 		}
 		res, err := client.AddPackage(cfgWith(acc.Sequence, wanted), msgs...)
 		if err != nil {
 			return fmt.Errorf("broadcast merged tx: %w%s", err, txDetail(res))
 		}
-		fmt.Printf("✅ merged tx: %d package(s) in one block — hash %s (gas %d/%d)\n", len(msgs), res.Hash, res.DeliverTx.GasUsed, wanted)
+		fmt.Printf("✅ merged tx: %d package(s) in one block — hash %s (gas %d/%d)\n", len(msgs), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
+		for _, p := range todo {
+			fmt.Println("   " + mdLink(pkgURL(net, p.c.PkgPath)))
+		}
 		return nil
 	}
 	// individual: one tx (block) per package, sequence incremented locally.
@@ -269,12 +273,12 @@ func run() error {
 			return fmt.Errorf("estimate gas for %s: %w", p.c.PkgPath, err)
 		}
 		// Debug: the equivalent gnokey command (with the sized gas), just before broadcasting.
-		fmt.Println("+ " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
+		fmt.Println("# " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
 		res, err := client.AddPackage(cfgWith(seq, wanted), msg)
 		if err != nil {
 			return fmt.Errorf("broadcast %s (%d/%d) [gas-wanted %d]: %w%s", p.c.PkgPath, i+1, len(msgs), wanted, err, txDetail(res))
 		}
-		fmt.Printf("✅ %2d/%d %s — hash %s (gas %d/%d)\n", i+1, len(msgs), p.c.PkgPath, res.Hash, res.DeliverTx.GasUsed, wanted)
+		fmt.Printf("✅ %2d/%d %s — %s\n     hash %s (gas %d/%d)\n", i+1, len(msgs), p.c.PkgPath, mdLink(pkgURL(net, p.c.PkgPath)), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
 		seq++
 	}
 	fmt.Printf("\ndone: published %d package(s) on %s.\n", len(msgs), net.Name)
@@ -576,6 +580,46 @@ func gnokeyAddpkg(pkgPath, dir, keyName, gasFee string, gasWanted int64, deposit
 	}
 	b.WriteString(" " + keyName)
 	return b.String()
+}
+
+// txHash renders a broadcast tx hash as the full base64 string (the same
+// encoding gno's tooling/indexer use). res.Hash is raw bytes, so printing it
+// with %s yields binary garbage — always go through this.
+func txHash(h []byte) string { return base64.StdEncoding.EncodeToString(h) }
+
+// mdLink renders a Markdown link whose label is the URL itself, so terminals /
+// viewers that understand Markdown make it clickable.
+func mdLink(u string) string { return "[" + u + "](" + u + ")" }
+
+// webBase returns the gnoweb base URL for a network, derived from its RPC:
+// the "rpc." host prefix is dropped (rpc.gno.land -> gno.land) and the port is
+// stripped; a local devnet (127.0.0.1/localhost) maps to gnodev's web port 8888.
+func webBase(n network) string {
+	scheme, rest := "https://", n.RPC
+	if i := strings.Index(rest, "://"); i >= 0 {
+		scheme, rest = rest[:i+3], rest[i+3:]
+	}
+	if i := strings.IndexByte(rest, '/'); i >= 0 {
+		rest = rest[:i]
+	}
+	host := rest
+	if i := strings.LastIndexByte(host, ':'); i >= 0 {
+		host = host[:i]
+	}
+	if host == "127.0.0.1" || host == "localhost" {
+		return "http://" + host + ":8888"
+	}
+	return scheme + strings.TrimPrefix(host, "rpc.")
+}
+
+// pkgURL is the gnoweb URL where a published package is viewable, e.g.
+// gno.land/p/moul/hello/v1 -> https://gno.land/p/moul/hello/v1.
+func pkgURL(n network, pkgpath string) string {
+	path := pkgpath
+	if i := strings.IndexByte(path, '/'); i >= 0 {
+		path = path[i:] // drop the "gno.land" chain-domain prefix, keep "/p/..."
+	}
+	return webBase(n) + path
 }
 
 // shquote single-quotes s for a shell if it contains anything beyond a safe set.
