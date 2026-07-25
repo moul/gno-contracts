@@ -28,6 +28,7 @@ import (
 	"github.com/gnolang/gno/gnovm/pkg/gnoenv"
 	"github.com/gnolang/gno/gnovm/pkg/gnolang"
 	rpcclient "github.com/gnolang/gno/tm2/pkg/bft/rpc/client"
+	ctypes "github.com/gnolang/gno/tm2/pkg/bft/rpc/core/types"
 	"github.com/gnolang/gno/tm2/pkg/crypto/keys"
 	"github.com/gnolang/gno/tm2/pkg/std"
 	"golang.org/x/term"
@@ -75,7 +76,8 @@ func run() error {
 	mode := fs.String("mode", "individual", "\"individual\" (one tx per package) or \"merge\" (one tx for all)")
 	full := fs.Bool("full", false, "also re-publish packages whose on-chain content differs from local")
 	gasFee := fs.String("gas-fee", "1000000ugnot", "gas fee")
-	gasWanted := fs.Int64("gas-wanted", 20000000, "gas wanted")
+	gasWanted := fs.Int64("gas-wanted", 0, "gas wanted (0 = auto: simulate the tx and add the buffer)")
+	gasBuffer := fs.Int("gas-buffer", 20, "percent buffer added on top of the simulated gas")
 	deposit := fs.String("deposit", "", "max storage deposit (e.g. 1000000ugnot); empty = node default")
 	dryRun := fs.Bool("dry-run", false, "print the plan and exit without broadcasting")
 	yes := fs.Bool("yes", false, "skip the confirmation prompt")
@@ -169,6 +171,10 @@ func run() error {
 	}
 
 	if *dryRun {
+		fmt.Println("\nequivalent gnokey commands:")
+		for _, p := range todo {
+			fmt.Println("  " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, *gasWanted, *deposit, net.ChainID, net.RPC, *home))
+		}
 		fmt.Println("\n(dry-run) not broadcasting.")
 		return nil
 	}
@@ -226,10 +232,10 @@ func run() error {
 		msgs = append(msgs, vm.MsgAddPackage{Creator: addr, Package: mempkg, MaxDeposit: maxDep})
 	}
 
-	baseCfg := func(seq uint64) gnoclient.BaseTxCfg {
+	cfgWith := func(seq uint64, wanted int64) gnoclient.BaseTxCfg {
 		return gnoclient.BaseTxCfg{
 			GasFee:         *gasFee,
-			GasWanted:      *gasWanted,
+			GasWanted:      wanted,
 			AccountNumber:  acc.AccountNumber,
 			SequenceNumber: seq,
 			Memo:           "gnopublish",
@@ -238,25 +244,99 @@ func run() error {
 
 	fmt.Println()
 	if *mode == "merge" {
-		res, err := client.AddPackage(baseCfg(acc.Sequence), msgs...)
+		wanted, err := sizeGas(client, *gasFee, *gasWanted, *gasBuffer, msgs...)
 		if err != nil {
-			return fmt.Errorf("broadcast merged tx: %w", err)
+			return fmt.Errorf("estimate gas (merged tx): %w", err)
 		}
-		fmt.Printf("✅ merged tx: %d package(s) in one block — hash %s\n", len(msgs), res.Hash)
+		fmt.Printf("gas-wanted: %d (%s)\n", wanted, gasNote(*gasWanted))
+		fmt.Println("equivalent gnokey commands (batched into one tx):")
+		for _, p := range todo {
+			fmt.Println("  " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
+		}
+		res, err := client.AddPackage(cfgWith(acc.Sequence, wanted), msgs...)
+		if err != nil {
+			return fmt.Errorf("broadcast merged tx: %w%s", err, txDetail(res))
+		}
+		fmt.Printf("✅ merged tx: %d package(s) in one block — hash %s (gas %d/%d)\n", len(msgs), res.Hash, res.DeliverTx.GasUsed, wanted)
 		return nil
 	}
 	// individual: one tx (block) per package, sequence incremented locally.
 	seq := acc.Sequence
 	for i, msg := range msgs {
-		res, err := client.AddPackage(baseCfg(seq), msg)
+		p := todo[i]
+		wanted, err := sizeGas(client, *gasFee, *gasWanted, *gasBuffer, msg)
 		if err != nil {
-			return fmt.Errorf("broadcast %s (%d/%d): %w", todo[i].c.PkgPath, i+1, len(msgs), err)
+			return fmt.Errorf("estimate gas for %s: %w", p.c.PkgPath, err)
 		}
-		fmt.Printf("✅ %2d/%d %s — hash %s\n", i+1, len(msgs), todo[i].c.PkgPath, res.Hash)
+		// Debug: the equivalent gnokey command (with the sized gas), just before broadcasting.
+		fmt.Println("+ " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
+		res, err := client.AddPackage(cfgWith(seq, wanted), msg)
+		if err != nil {
+			return fmt.Errorf("broadcast %s (%d/%d) [gas-wanted %d]: %w%s", p.c.PkgPath, i+1, len(msgs), wanted, err, txDetail(res))
+		}
+		fmt.Printf("✅ %2d/%d %s — hash %s (gas %d/%d)\n", i+1, len(msgs), p.c.PkgPath, res.Hash, res.DeliverTx.GasUsed, wanted)
 		seq++
 	}
 	fmt.Printf("\ndone: published %d package(s) on %s.\n", len(msgs), net.Name)
 	return nil
+}
+
+// sizeGas returns the gas-wanted for msgs: the explicit override if >0, else the
+// simulated gas plus a percentage buffer (floored at 100k). Simulation signs a
+// throwaway high-gas tx with account/sequence (0,0) — the node's simulate path
+// doesn't verify the signature — and reads back the gas actually used.
+func sizeGas(c *gnoclient.Client, gasFee string, override int64, bufferPct int, msgs ...vm.MsgAddPackage) (int64, error) {
+	if override > 0 {
+		return override, nil
+	}
+	simTx, err := gnoclient.NewAddPackageTx(gnoclient.BaseTxCfg{GasFee: gasFee, GasWanted: 100_000_000, Memo: "gnopublish-sim"}, msgs...)
+	if err != nil {
+		return 0, err
+	}
+	signed, err := c.SignTx(*simTx, 0, 0)
+	if err != nil {
+		return 0, fmt.Errorf("sign for simulation: %w", err)
+	}
+	used, err := c.EstimateGas(signed)
+	if err != nil {
+		return 0, fmt.Errorf("simulate: %w", err)
+	}
+	wanted := used + used*int64(bufferPct)/100
+	if wanted < 100_000 {
+		wanted = 100_000
+	}
+	return wanted, nil
+}
+
+func gasNote(override int64) string {
+	if override > 0 {
+		return "explicit -gas-wanted"
+	}
+	return "simulated + buffer"
+}
+
+// txDetail formats the on-chain result of a failed broadcast (gas + node log),
+// so an "out of gas" / abort is actually diagnosable.
+func txDetail(res *ctypes.ResultBroadcastTxCommit) string {
+	if res == nil {
+		return ""
+	}
+	var b strings.Builder
+	if res.CheckTx.IsErr() || res.CheckTx.Log != "" {
+		fmt.Fprintf(&b, "\n  checkTx:   gas %d/%d  %s", res.CheckTx.GasUsed, res.CheckTx.GasWanted, oneLine(res.CheckTx.Log))
+	}
+	if res.DeliverTx.IsErr() || res.DeliverTx.Log != "" {
+		fmt.Fprintf(&b, "\n  deliverTx: gas %d/%d  %s", res.DeliverTx.GasUsed, res.DeliverTx.GasWanted, oneLine(res.DeliverTx.Log))
+	}
+	return b.String()
+}
+
+func oneLine(s string) string {
+	s = strings.TrimSpace(strings.ReplaceAll(s, "\n", " ⏎ "))
+	if len(s) > 400 {
+		s = s[:400] + "…"
+	}
+	return s
 }
 
 // --- selection & ordering -------------------------------------------------
@@ -469,6 +549,44 @@ func fullNote(full bool) string {
 		return " and content-current"
 	}
 	return ""
+}
+
+// gnokeyAddpkg renders the equivalent `gnokey maketx addpkg` command line for a
+// single package — for transparency/debugging (this is what gnopublish does via
+// gnoclient instead). Not executed; purely informational.
+func gnokeyAddpkg(pkgPath, dir, keyName, gasFee string, gasWanted int64, deposit, chainID, rpc, home string) string {
+	var b strings.Builder
+	b.WriteString("gnokey maketx addpkg")
+	b.WriteString(" -pkgpath " + shquote(pkgPath))
+	b.WriteString(" -pkgdir " + shquote(dir))
+	b.WriteString(" -gas-fee " + gasFee)
+	if gasWanted > 0 {
+		b.WriteString(fmt.Sprintf(" -gas-wanted %d", gasWanted))
+	} else {
+		b.WriteString(" -gas-wanted <auto: simulated at publish time>")
+	}
+	if deposit != "" {
+		b.WriteString(" -max-deposit " + deposit)
+	}
+	b.WriteString(" -broadcast")
+	b.WriteString(" -chainid " + shquote(chainID))
+	b.WriteString(" -remote " + shquote(rpc))
+	if home != "" {
+		b.WriteString(" -home " + shquote(home))
+	}
+	b.WriteString(" " + keyName)
+	return b.String()
+}
+
+// shquote single-quotes s for a shell if it contains anything beyond a safe set.
+func shquote(s string) string {
+	if s != "" && strings.IndexFunc(s, func(r rune) bool {
+		return !(r == '.' || r == '/' || r == '-' || r == '_' || r == ':' ||
+			(r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9'))
+	}) < 0 {
+		return s
+	}
+	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
 }
 
 func promptPassword(prompt string) (string, error) {
