@@ -29,15 +29,31 @@ CSSURL_RE = re.compile(r'url\((/public/[^)"\']*)')
 
 
 def load_realms(root, selectors):
-    with open(os.path.join(root, "contracts.json")) as f:
-        m = json.load(f)
+    """Discover realms by scanning the filesystem (NOT contracts.json) — so realms
+    added in a source-only PR, which aren't in the catalog yet, are still found.
+    Only realms (r/*) that aren't `ignore = true` are previewed."""
     out = []
-    for c in m["contracts"]:
-        if c["kind"] != "r" or c.get("draft") or c.get("ignored"):
+    rroot = os.path.join(root, "r")
+    if not os.path.isdir(rroot):
+        return out
+    for dirpath, _dirs, files in os.walk(rroot):
+        if "gnomod.toml" not in files:
             continue
-        if matches(c["dir"], selectors):
-            out.append(c)
-    return out
+        gm = os.path.join(dirpath, "gnomod.toml")
+        module = ignore = None
+        with open(gm) as f:
+            for line in f:
+                t = line.strip()
+                if t.startswith("module") and '"' in t:
+                    module = t.split('"')[1]
+                elif t.replace(" ", "").startswith("ignore=true"):
+                    ignore = True
+        if not module or ignore or "/r/" not in module:
+            continue
+        reldir = os.path.relpath(dirpath, root)
+        if matches(reldir, selectors):
+            out.append({"pkgpath": module, "dir": reldir})
+    return sorted(out, key=lambda c: c["pkgpath"])
 
 
 def matches(dir, selectors):
