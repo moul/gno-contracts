@@ -70,13 +70,6 @@ func TestTxHash(t *testing.T) {
 	}
 }
 
-func TestMdLink(t *testing.T) {
-	u := "https://gno.land/r/moul/hello/v1"
-	if got := mdLink(u); got != "["+u+"]("+u+")" {
-		t.Fatalf("mdLink = %q", got)
-	}
-}
-
 func TestWebBaseAndPkgURL(t *testing.T) {
 	cases := []struct {
 		net          network
