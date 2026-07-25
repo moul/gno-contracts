@@ -34,18 +34,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-
-      - name: Build gnodev from gno master
-        run: |
-          git clone --depth=1 https://github.com/gnolang/gno "$HOME/gno"
-          ( cd "$HOME/gno/contribs/gnodev" && GOTOOLCHAIN=auto go build -o "$HOME/gnodev" . )
-          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
-          echo "GNODEV=$HOME/gnodev" >> "$GITHUB_ENV"
-
       - name: Determine changed realms
         id: realms
         run: |
@@ -65,6 +53,53 @@ jobs:
           sels=$(echo $sels | xargs -n1 | sort -u | xargs)
           echo "selectors=$sels" >> "$GITHUB_OUTPUT"
           echo "changed realm selectors: ${sels:-<none>}"
+
+      # Post the sticky comment with the PERSISTENT preview URL up-front — BEFORE the
+      # slow gnodev build. The per-PR gh-pages URL never changes, so the link is always
+      # present; while a new build runs, the comment keeps pointing at the last
+      # published version (no need to wait for CI to see something).
+      - name: Sticky comment (persistent URL)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          marker="<!-- gnocontracts-pr-preview -->"
+          {
+            echo "$marker"
+            echo "### 🖼️ PR preview"
+            if [ -z "${{ steps.realms.outputs.selectors }}" ]; then
+              echo "No realm changes in this PR — nothing to preview."
+            else
+              echo "**[Open preview index](${PAGES_URL})** — rendered with gnodev → static gnoweb."
+              echo "_Stable link; updates a minute or two after each push (shows the previous build until the new one finishes)._"
+              echo
+              for s in ${{ steps.realms.outputs.selectors }}; do
+                pp="gno.land/${s#./}"; url="${pp#gno.land/}"
+                echo "- [\`$pp\`](${PAGES_URL}${url}/)"
+              done
+              echo
+              echo "_Static snapshot; interactive actions and nav that leaves these pages won't work. Removed when the PR closes._"
+            fi
+          } > /tmp/preview-comment.md
+          id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                --jq ".[] | select(.body|contains(\"$marker\")) | .id" | head -1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@/tmp/preview-comment.md >/dev/null
+          else
+            gh api "repos/$REPO/issues/$PR/comments" -F body=@/tmp/preview-comment.md >/dev/null
+          fi
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build gnodev from gno master
+        run: |
+          git clone --depth=1 https://github.com/gnolang/gno "$HOME/gno"
+          ( cd "$HOME/gno/contribs/gnodev" && GOTOOLCHAIN=auto go build -o "$HOME/gnodev" . )
+          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
+          echo "GNODEV=$HOME/gnodev" >> "$GITHUB_ENV"
 
       - name: Render preview
         if: steps.realms.outputs.selectors != ''
@@ -92,36 +127,6 @@ jobs:
           rm -rf ".ghp/pr-$PR"; mkdir -p ".ghp/pr-$PR"; cp -r _preview/. ".ghp/pr-$PR/"
           ( cd .ghp && git add -A && (git diff --cached --quiet || git commit -q -m "preview: PR #$PR") && git push origin gh-pages )
           git worktree remove --force .ghp
-
-      - name: Sticky comment
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-        run: |
-          marker="<!-- gnocontracts-pr-preview -->"
-          {
-            echo "$marker"
-            echo "### 🖼️ PR preview"
-            if [ -z "${{ steps.realms.outputs.selectors }}" ]; then
-              echo "No realm changes in this PR — nothing to preview."
-            else
-              echo "Rendered with gnodev → static gnoweb. **[Open preview index](${PAGES_URL})**"
-              echo
-              for s in ${{ steps.realms.outputs.selectors }}; do
-                pp="gno.land/${s#./}"; url="${pp#gno.land/}"
-                echo "- [\`$pp\`](${PAGES_URL}${url}/)"
-              done
-              echo
-              echo "_Static snapshot; interactive actions and nav that leaves these pages won't work. Removed when the PR closes._"
-            fi
-          } > /tmp/preview-comment.md
-          id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
-                --jq ".[] | select(.body|contains(\"$marker\")) | .id" | head -1)
-          if [ -n "$id" ]; then
-            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@/tmp/preview-comment.md >/dev/null
-          else
-            gh api "repos/$REPO/issues/$PR/comments" -F body=@/tmp/preview-comment.md >/dev/null
-          fi
 
   # ---- tear down the subfolder when the PR closes ------------------------
   cleanup:
