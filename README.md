@@ -12,6 +12,40 @@ This repository is the home for contracts that previously lived in the
 that a single `git clone` + a gno toolchain is enough to build, test, lint, and
 publish everything.
 
+## Features
+
+- **Mandatory versioning** — every contract is `.../<name>/vN`; breaking changes
+  ship as a new `vN`, never an in-place edit. Originals that no longer build on
+  master are kept as `ignore = true` (archived, 💤, skipped by CI) beside a ported
+  `vN+1`.
+- **Autonomous builds** — external `gno.land/*` deps are vendored; only the gno
+  stdlibs come from the toolchain. One clone builds offline, independent of
+  monorepo drift.
+- **CI against gno master** — every package is `gno lint`-ed and `gno test`-ed on
+  each PR; `make sync` reports drift from the upstream monorepo copies.
+- **Self-maintaining catalog** — [`contracts.json`](./contracts.json) + the table
+  below, every per-package README (docs + repo link + disclaimer + embedded
+  dependency graph), and the `_assets/` graphs are **regenerated after merge** by a
+  bot, so PRs carry only source and never conflict on generated files.
+- **Dependency graphs** — per-package and a global graph of everything, in
+  [`_assets/`](./_assets).
+- **On-chain status** — the table shows where each contract is published
+  (✅ `/v1`, 📦 un-versioned monorepo path), refreshed by a scheduled job.
+- **PR bots** — a sticky **analysis report** (new/updated packages, sizes, test
+  counts, ⚠️/🔥 signals), automatic **path labels** (`p`/`r`/`meta`), and a
+  **live realm preview** (below).
+- **Publishing** — [`gnopublish`](./tools/gnopublish) queries a network for what's
+  missing, orders by dependency, and broadcasts (one tx per package or merged),
+  asking your gnokey password once.
+
+### 🖼️ Realm previews on every PR
+
+When a PR touches a realm, a bot renders it with **gnodev → static gnoweb** and
+publishes a browsable snapshot to `https://moul.github.io/gno-contracts/pr-<N>/`,
+linked from a sticky PR comment — so reviewers can *see* the rendered output
+without checking out the branch. The preview is removed when the PR closes.
+(See [`tools/gnopreview`](./tools/gnopreview).)
+
 ## Layout
 
 ```
@@ -51,6 +85,7 @@ make lint        # gno lint every package
 make gen         # refresh contracts.json + the table below
 make sync        # report drift vs the monorepo (someone changed my contract?)
 make publish     # print dependency-ordered publish plan (-net/-check for status)
+make upload ARGS="-net portal-loop -key mykey -dry-run ./..."   # broadcast (gnopublish)
 make help        # list all targets
 ```
 
