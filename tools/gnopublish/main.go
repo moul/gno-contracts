@@ -76,6 +76,9 @@ func run() error {
 	yes := fs.Bool("yes", false, "skip the confirmation prompt")
 	fs.Usage = usage(fs)
 	if err := fs.Parse(os.Args[1:]); err != nil {
+		if err == flag.ErrHelp {
+			return nil // -h/-help already printed usage; exit cleanly
+		}
 		return err
 	}
 	selectors := fs.Args()
@@ -299,6 +302,9 @@ func topoOrder(cs []contract) ([]contract, error) {
 	for _, c := range cs {
 		n := 0
 		for _, d := range c.Deps {
+			if d == c.PkgPath {
+				continue // ignore self-deps so they can't fake a cycle
+			}
 			if _, ok := in[d]; ok {
 				n++
 				dependents[d] = append(dependents[d], c.PkgPath)

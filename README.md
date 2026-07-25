@@ -115,8 +115,8 @@ make help        # list all targets
 | `gno.land/p/moul/greet/v1` | pkg | Canary pure package: greeting helper (demonstrates versioned cross-package resolution). | — | — | — | — | — |
 | `gno.land/p/moul/helplink/v1` | pkg | Helpers for building gnoweb help-page links. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 📦 | — | 📦 |
 | `gno.land/p/moul/md/v1` | pkg | Helpers for generating Markdown content programmatically. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 📦 | — | 📦 |
-| `gno.land/p/moul/mdlist/v1` | pkg | 💤  | 2 | — | — | — | — |
-| `gno.land/p/moul/mdlist/v2` | pkg | — | 2 | — | — | — | — |
+| `gno.land/p/moul/mdlist/v1` | pkg | 💤  | 1 | — | — | — | — |
+| `gno.land/p/moul/mdlist/v2` | pkg | — | 1 | — | — | — | — |
 | `gno.land/p/moul/mdtable/v1` | pkg | Build Markdown tables. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | 📦 | — | 📦 |
 | `gno.land/p/moul/memo/v1` | pkg | 💤  | 2 | — | — | — | — |
 | `gno.land/p/moul/memo/v2` | pkg | — | 2 | — | — | — | — |

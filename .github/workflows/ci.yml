@@ -37,6 +37,9 @@ jobs:
       - name: Vet tools
         run: go vet ./tools/...
 
+      - name: Test tools
+        run: go test ./tools/...
+
       # Committed vendor/ is the pinned, authoritative source of gno.land/*
       # dependencies. We do NOT re-vendor from live master here (that would
       # couple CI to monorepo drift). lint/test resolve deps from vendor/ via

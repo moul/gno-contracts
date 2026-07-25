@@ -248,6 +248,9 @@ func deriveContract(module, dir, absDir string) (Contract, error) {
 	if err != nil {
 		return Contract{}, err
 	}
+	// A package never depends on itself; drop any self-reference defensively (a
+	// filetest importing its own package used to leak in as a self-dep → cycle).
+	deps = dropString(deps, module)
 	return Contract{
 		PkgPath: module,
 		Dir:     dir,
@@ -256,6 +259,17 @@ func deriveContract(module, dir, absDir string) (Contract, error) {
 		Version: version,
 		Deps:    deps,
 	}, nil
+}
+
+// dropString returns s with every occurrence of v removed.
+func dropString(s []string, v string) []string {
+	out := s[:0:0]
+	for _, x := range s {
+		if x != v {
+			out = append(out, x)
+		}
+	}
+	return out
 }
 
 func isVersion(s string) bool {
@@ -300,8 +314,8 @@ func parseDepsMode(dir string, includeTests bool) ([]string, error) {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".gno") {
 			continue
 		}
-		if !includeTests && strings.HasSuffix(e.Name(), "_test.gno") {
-			continue
+		if !includeTests && (strings.HasSuffix(e.Name(), "_test.gno") || strings.HasSuffix(e.Name(), "_filetest.gno")) {
+			continue // test + filetest imports are not runtime dependencies
 		}
 		imps, err := parseImports(filepath.Join(dir, e.Name()))
 		if err != nil {
