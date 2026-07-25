@@ -25,6 +25,7 @@ import (
 
 	"github.com/gnolang/gno/gno.land/pkg/gnoclient"
 	vm "github.com/gnolang/gno/gno.land/pkg/sdk/vm"
+	"github.com/gnolang/gno/gnovm/pkg/gnoenv"
 	"github.com/gnolang/gno/gnovm/pkg/gnolang"
 	rpcclient "github.com/gnolang/gno/tm2/pkg/bft/rpc/client"
 	"github.com/gnolang/gno/tm2/pkg/crypto/keys"
@@ -62,10 +63,14 @@ func main() {
 
 func run() error {
 	fs := flag.NewFlagSet("gnopublish", flag.ContinueOnError)
-	netName := fs.String("net", "", "network name from contracts.json (default: first network)")
+	netName := fs.String("net", "gnodev", "network: a name from contracts.json, or the built-in \"gnodev\" (local devnet)")
 	rpcURL := fs.String("rpc", "", "override RPC endpoint")
 	chainID := fs.String("chain-id", "", "override chain id")
-	keyName := fs.String("key", os.Getenv("GNOKEY_KEY"), "gnokey key name or bech32 address (or $GNOKEY_KEY)")
+	defaultKey := os.Getenv("GNOKEY_KEY")
+	if defaultKey == "" {
+		defaultKey = "moul"
+	}
+	keyName := fs.String("key", defaultKey, "gnokey key name or bech32 address (or $GNOKEY_KEY)")
 	home := fs.String("home", gnokeyHome(), "gnokey home directory")
 	mode := fs.String("mode", "individual", "\"individual\" (one tx per package) or \"merge\" (one tx for all)")
 	full := fs.Bool("full", false, "also re-publish packages whose on-chain content differs from local")
@@ -372,6 +377,14 @@ func contentUpToDate(c *gnoclient.Client, pkgpath, absDir string) (bool, error) 
 
 // --- helpers --------------------------------------------------------------
 
+// builtinNetworks are always available without being listed in contracts.json.
+// "gnodev"/"dev" is a local devnet as served by `gnodev` (RPC on 127.0.0.1:26657,
+// chain-id "dev").
+var builtinNetworks = map[string]network{
+	"gnodev": {Name: "gnodev", ChainID: "dev", RPC: "http://127.0.0.1:26657"},
+	"dev":    {Name: "gnodev", ChainID: "dev", RPC: "http://127.0.0.1:26657"},
+}
+
 func pickNetwork(m *manifest, name, rpc, chainID string) (network, error) {
 	var n network
 	switch {
@@ -382,8 +395,11 @@ func pickNetwork(m *manifest, name, rpc, chainID string) (network, error) {
 				n, found = x, true
 			}
 		}
+		if b, ok := builtinNetworks[name]; ok && !found {
+			n, found = b, true
+		}
 		if !found {
-			return n, fmt.Errorf("unknown network %q (see contracts.json)", name)
+			return n, fmt.Errorf("unknown network %q (see contracts.json, or use the built-in \"gnodev\")", name)
 		}
 	case len(m.Networks) > 0:
 		n = m.Networks[0]
@@ -436,10 +452,9 @@ func gnokeyHome() string {
 	if h := os.Getenv("GNOKEY_HOME"); h != "" {
 		return h
 	}
-	if h, err := os.UserHomeDir(); err == nil {
-		return filepath.Join(h, ".gnokey")
-	}
-	return ".gnokey"
+	// Same default gnokey/gnodev use ($GNOHOME, else os.UserConfigDir()+"/gno" —
+	// e.g. ~/Library/Application Support/gno on macOS). NOT ~/.gnokey.
+	return gnoenv.HomeDir()
 }
 
 func skipReason(c contract) string {
