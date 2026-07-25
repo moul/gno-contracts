@@ -1,0 +1,138 @@
+name: pr-preview
+
+# POC for #43. For each PR, render the realms it changed with gnodev/gnoweb, extract
+# a self-contained static site, and publish it to a per-PR subfolder on the gh-pages
+# branch: https://moul.github.io/gno-contracts/pr-<N>/ . On close, the subfolder is
+# removed. Same-repo PRs only (needs the write token to push gh-pages).
+#
+# Requires: GitHub Pages enabled with source = gh-pages branch.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # ---- build + publish the preview ---------------------------------------
+  preview:
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      PR: ${{ github.event.pull_request.number }}
+      PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build gnodev from gno master
+        run: |
+          git clone --depth=1 https://github.com/gnolang/gno "$HOME/gno"
+          ( cd "$HOME/gno/contribs/gnodev" && GOTOOLCHAIN=auto go build -o "$HOME/gnodev" . )
+          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
+          echo "GNODEV=$HOME/gnodev" >> "$GITHUB_ENV"
+
+      - name: Determine changed realms
+        id: realms
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          sels=""
+          for d in $(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+                     | grep -E '^r/moul/.*\.gno$' \
+                     | sed -E 's#/[^/]+$##' | sort -u); do
+            # nearest dir containing gnomod.toml, and only if not ignored
+            while [ -n "$d" ] && [ ! -f "$d/gnomod.toml" ]; do d=$(dirname "$d"); done
+            [ -f "$d/gnomod.toml" ] || continue
+            grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$d/gnomod.toml" && continue
+            sels="$sels ./$d"
+          done
+          sels=$(echo $sels | xargs -n1 | sort -u | xargs)
+          echo "selectors=$sels" >> "$GITHUB_OUTPUT"
+          echo "changed realm selectors: ${sels:-<none>}"
+
+      - name: Render preview
+        if: steps.realms.outputs.selectors != ''
+        run: |
+          python3 tools/gnopreview/gnopreview.py --out _preview ${{ steps.realms.outputs.selectors }}
+
+      - name: Publish to gh-pages/pr-<N>
+        if: steps.realms.outputs.selectors != ''
+        run: |
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          tmp=$(mktemp -d)
+          git worktree add --force "$tmp" gh-pages 2>/dev/null || {
+            git worktree add --force --orphan -b gh-pages "$tmp"
+            : > "$tmp/.nojekyll"
+          }
+          rm -rf "$tmp/pr-$PR"
+          mkdir -p "$tmp/pr-$PR"
+          cp -r _preview/. "$tmp/pr-$PR/"
+          ( cd "$tmp" && git add -A && git diff --cached --quiet || git commit -q -m "preview: PR #$PR" )
+          ( cd "$tmp" && git push origin gh-pages )
+          git worktree remove --force "$tmp"
+
+      - name: Sticky comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          marker="<!-- gnocontracts-pr-preview -->"
+          if [ -z "${{ steps.realms.outputs.selectors }}" ]; then
+            body="$marker
+### 🖼️ PR preview
+No realm changes in this PR — nothing to preview."
+          else
+            list=$(for s in ${{ steps.realms.outputs.selectors }}; do
+                     pp="gno.land/${s#./}"; url="${pp#gno.land/}"
+                     echo "- [\`$pp\`](${PAGES_URL}${url}/)"; done)
+            body="$marker
+### 🖼️ PR preview
+Rendered with gnodev → static gnoweb. **[Open preview index](${PAGES_URL})**
+
+$list
+
+_Static snapshot; interactive actions and nav that leaves these pages won't work. Removed when the PR closes._"
+          fi
+          id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                --jq ".[] | select(.body|contains(\"$marker\")) | .id" | head -1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -f body="$body" >/dev/null
+          else
+            gh api "repos/$REPO/issues/$PR/comments" -f body="$body" >/dev/null
+          fi
+
+  # ---- tear down the subfolder when the PR closes ------------------------
+  cleanup:
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove gh-pages/pr-<N>
+        run: |
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          tmp=$(mktemp -d)
+          if git worktree add --force "$tmp" gh-pages 2>/dev/null; then
+            rm -rf "$tmp/pr-$PR"
+            ( cd "$tmp" && git add -A && git diff --cached --quiet || { git commit -q -m "preview: remove PR #$PR"; git push origin gh-pages; } )
+            git worktree remove --force "$tmp"
+          fi
