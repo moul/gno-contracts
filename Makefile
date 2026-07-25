@@ -28,7 +28,7 @@ VIEW := $(CURDIR)/.gnoroot-view
 PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean
+.PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean upload
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -72,6 +72,9 @@ sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
 
 publish: ## dependency-ordered publish plan; NET=<net> CHECK=1 to query chain
 	$(TOOL) publish $(if $(NET),-net $(NET),) $(if $(CHECK),-check,)
+
+upload: ## broadcast packages to a network via gnopublish, e.g. ARGS="-net portal-loop -key mykey -dry-run ./..."
+	cd tools/gnopublish && GOTOOLCHAIN=auto go run . $(ARGS)
 
 status: ## refresh on-chain upload status (all networks) + README; needs gnokey
 	$(TOOL) status $(if $(NET),-net $(NET),)
