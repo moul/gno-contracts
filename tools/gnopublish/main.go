@@ -169,6 +169,10 @@ func run() error {
 	}
 
 	if *dryRun {
+		fmt.Println("\nequivalent gnokey commands:")
+		for _, p := range todo {
+			fmt.Println("  " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, *gasWanted, *deposit, net.ChainID, net.RPC, *home))
+		}
 		fmt.Println("\n(dry-run) not broadcasting.")
 		return nil
 	}
@@ -238,6 +242,10 @@ func run() error {
 
 	fmt.Println()
 	if *mode == "merge" {
+		fmt.Println("equivalent gnokey commands (batched into one tx):")
+		for _, p := range todo {
+			fmt.Println("  " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, *gasWanted, *deposit, net.ChainID, net.RPC, *home))
+		}
 		res, err := client.AddPackage(baseCfg(acc.Sequence), msgs...)
 		if err != nil {
 			return fmt.Errorf("broadcast merged tx: %w", err)
@@ -248,6 +256,8 @@ func run() error {
 	// individual: one tx (block) per package, sequence incremented locally.
 	seq := acc.Sequence
 	for i, msg := range msgs {
+		p := todo[i]
+		fmt.Println("+ " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, *gasWanted, *deposit, net.ChainID, net.RPC, *home))
 		res, err := client.AddPackage(baseCfg(seq), msg)
 		if err != nil {
 			return fmt.Errorf("broadcast %s (%d/%d): %w", todo[i].c.PkgPath, i+1, len(msgs), err)
@@ -469,6 +479,40 @@ func fullNote(full bool) string {
 		return " and content-current"
 	}
 	return ""
+}
+
+// gnokeyAddpkg renders the equivalent `gnokey maketx addpkg` command line for a
+// single package — for transparency/debugging (this is what gnopublish does via
+// gnoclient instead). Not executed; purely informational.
+func gnokeyAddpkg(pkgPath, dir, keyName, gasFee string, gasWanted int64, deposit, chainID, rpc, home string) string {
+	var b strings.Builder
+	b.WriteString("gnokey maketx addpkg")
+	b.WriteString(" -pkgpath " + shquote(pkgPath))
+	b.WriteString(" -pkgdir " + shquote(dir))
+	b.WriteString(" -gas-fee " + gasFee)
+	b.WriteString(fmt.Sprintf(" -gas-wanted %d", gasWanted))
+	if deposit != "" {
+		b.WriteString(" -max-deposit " + deposit)
+	}
+	b.WriteString(" -broadcast")
+	b.WriteString(" -chainid " + shquote(chainID))
+	b.WriteString(" -remote " + shquote(rpc))
+	if home != "" {
+		b.WriteString(" -home " + shquote(home))
+	}
+	b.WriteString(" " + keyName)
+	return b.String()
+}
+
+// shquote single-quotes s for a shell if it contains anything beyond a safe set.
+func shquote(s string) string {
+	if s != "" && strings.IndexFunc(s, func(r rune) bool {
+		return !(r == '.' || r == '/' || r == '-' || r == '_' || r == ':' ||
+			(r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9'))
+	}) < 0 {
+		return s
+	}
+	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
 }
 
 func promptPassword(prompt string) (string, error) {
