@@ -260,7 +260,7 @@ func run() error {
 		}
 		fmt.Printf("✅ merged tx: %d package(s) in one block — hash %s (gas %d/%d)\n", len(msgs), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
 		for _, p := range todo {
-			fmt.Println("   " + mdLink(pkgURL(net, p.c.PkgPath)))
+			fmt.Println("   " + pkgURL(net, p.c.PkgPath))
 		}
 		return nil
 	}
@@ -278,7 +278,7 @@ func run() error {
 		if err != nil {
 			return fmt.Errorf("broadcast %s (%d/%d) [gas-wanted %d]: %w%s", p.c.PkgPath, i+1, len(msgs), wanted, err, txDetail(res))
 		}
-		fmt.Printf("✅ %2d/%d %s — %s\n     hash %s (gas %d/%d)\n", i+1, len(msgs), p.c.PkgPath, mdLink(pkgURL(net, p.c.PkgPath)), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
+		fmt.Printf("✅ %2d/%d %s — %s\n     hash %s (gas %d/%d)\n", i+1, len(msgs), p.c.PkgPath, pkgURL(net, p.c.PkgPath), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
 		seq++
 	}
 	fmt.Printf("\ndone: published %d package(s) on %s.\n", len(msgs), net.Name)
@@ -586,10 +586,6 @@ func gnokeyAddpkg(pkgPath, dir, keyName, gasFee string, gasWanted int64, deposit
 // encoding gno's tooling/indexer use). res.Hash is raw bytes, so printing it
 // with %s yields binary garbage — always go through this.
 func txHash(h []byte) string { return base64.StdEncoding.EncodeToString(h) }
-
-// mdLink renders a Markdown link whose label is the URL itself, so terminals /
-// viewers that understand Markdown make it clickable.
-func mdLink(u string) string { return "[" + u + "](" + u + ")" }
 
 // webBase returns the gnoweb base URL for a network, derived from its RPC:
 // the "rpc." host prefix is dropped (rpc.gno.land -> gno.land) and the port is
