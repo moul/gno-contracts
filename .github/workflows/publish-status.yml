@@ -53,4 +53,7 @@ jobs:
           git config user.email "94029+moul@users.noreply.github.com"
           git add contracts.json README.md
           git commit -m "chore(status): refresh on-chain publish status [skip ci]"
-          git push
+          # rebase onto any concurrent main update (regen/other) before pushing,
+          # so the push can't be rejected non-fast-forward
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main
