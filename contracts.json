@@ -1903,7 +1903,7 @@
       "kind": "r",
       "name": "sapin",
       "version": "v1",
-      "description": "ASCII Christmas-tree (\u00ab sapin \u00bb) renderer.",
+      "description": "ASCII Christmas-tree (« sapin ») renderer.",
       "source": "https://github.com/moul/gno-contracts/pull/15",
       "deps": [],
       "draft": false,
@@ -2155,7 +2155,7 @@
       "kind": "r",
       "name": "x/daily/crowdfund",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -2298,7 +2298,7 @@
       "kind": "r",
       "name": "x/daily/englishauction",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -2383,7 +2383,7 @@
       "kind": "r",
       "name": "x/daily/erc721",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -2470,7 +2470,7 @@
       "kind": "r",
       "name": "x/daily/governor",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -2729,7 +2729,7 @@
       "kind": "r",
       "name": "x/daily/lottery",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -2812,7 +2812,7 @@
       "kind": "r",
       "name": "x/daily/merkledrop",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -3237,7 +3237,7 @@
       "kind": "r",
       "name": "x/daily/staking",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -3354,7 +3354,7 @@
       "kind": "r",
       "name": "x/daily/timelock",
       "version": "v1",
-      "description": "Solidity\u2192Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
       "deps": [
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/ufmt/v0"
