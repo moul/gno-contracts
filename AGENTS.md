@@ -164,14 +164,16 @@ Each package/realm directory ships a standalone `README.md` that:
    [`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
    treated as experimental/AI-assisted and not for production use.
 
-`make readmes` creates a stub + footer for any package missing a README and
-refreshes the footer everywhere; `make gen` runs it, and `make check` fails if a
-package README is missing or its footer is stale. The full disclaimer is
-[`DISCLAIMER.md`](./DISCLAIMER.md) (the long form); the per-package minimal
-disclaimer links to it.
+A PR includes the **hand-authored top** of each new package's README (the
+explanation above the footer marker). The generated footer, the root README
+table, and the catalog are all produced on `main`: `make readmes` creates/
+refreshes footers and `make gen` runs it, invoked by the `regen` workflow after
+merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
+(the long form); the per-package minimal disclaimer links to it.
 
 ## CI invariants (must stay green)
 
-`gno lint` + `gno test` pass for every contract; committed `vendor/` matches
-`make deps`; `contracts.json` + README table + every package README match
-`make gen` (enforced by `make check`).
+PR CI checks only **source**: `gno lint` + `gno test` pass for every contract,
+and committed `vendor/` matches `make deps`. It does **not** run `make check` —
+`contracts.json`, the README table, per-package footers and `_assets/` are
+regenerated and committed on `main` by the `regen` / `publish-status` workflows.
