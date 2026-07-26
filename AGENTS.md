@@ -25,9 +25,13 @@ before making changes.
    the workspace (`gnowork.toml`); external `gno.land/*` deps are **vendored**
    under `vendor/` (committed). Never introduce a dependency that only resolves
    from `$GNOROOT/examples` — vendor it (`make deps`).
-3. **The catalog is generated, keep it honest.** `contracts.json` and the README
-   table are produced by the tools. After adding/removing a contract, run
-   `make gen` and commit the result. CI fails if they are stale (`make check`).
+3. **The catalog is generated on `main`, not in PRs.** `contracts.json`, the
+   README table, per-package README footers, and `_assets/` graphs are all
+   produced by the tools. **A PR carries only package SOURCE** — never run
+   `make gen` or commit those generated files in a branch/PR. The `regen`
+   workflow regenerates and commits them on `main` after every merge, and the
+   `publish-status` workflow refreshes on-chain status; committing them in a PR
+   only creates conflicts. (CI does **not** run `make check`.)
 
 ## Repository map
 
@@ -58,8 +62,8 @@ make help      # list targets
 make test      # gno test every contract
 make lint      # gno lint every contract
 make deps      # vendor external gno.land deps into vendor/
-make gen       # refresh contracts.json + README table  (run after add/remove)
-make check     # verify the catalog is not stale (what CI runs)
+make gen       # refresh contracts.json + README table  (bot runs this on main; local preview only)
+make check     # verify the catalog is not stale (used by the regen bot, NOT PR CI)
 make sync      # report drift vs the gnolang/gno monorepo
 make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain status
 ```
@@ -74,10 +78,11 @@ make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain st
 2. Add sources + tests. Prefer table-driven tests; realms should have a `Render`.
 3. If it imports an external `gno.land/*` package, run `make deps` to vendor it.
 4. `make lint test` until green.
-5. `make gen` to register it in `contracts.json` and the README table, then
-   edit the contract's `description` (and `draft: true` if WIP) in
-   `contracts.json` — these human fields are preserved across regenerations.
-6. Commit.
+5. **Commit only the new source files** (the contract directory). Do **not** run
+   `make gen` and do **not** stage `contracts.json`, `README.md`, or `_assets/` —
+   the `regen` workflow generates those on `main` after merge. (You can run
+   `make gen` locally to preview the catalog, but revert it before committing.)
+6. Commit + open the PR.
 
 ### Libraries vs. demos — split reusable logic into `p/` + `r/`
 

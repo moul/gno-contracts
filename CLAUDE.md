@@ -8,9 +8,10 @@ Read it before doing anything. The essentials:
 - **Keep the repo autonomous.** Local `p/moul` ↔ `r/moul` imports resolve via
   `gnowork.toml`; external `gno.land/*` deps are vendored under `vendor/`
   (`make deps`). Don't rely on `$GNOROOT/examples` for anything but stdlibs.
-- **Keep the catalog honest.** After adding/removing a contract run `make gen`
-  (updates `contracts.json` + the README table + every package README); CI fails
-  if stale (`make check`).
+- **PRs carry only source.** `contracts.json`, the README table, per-package
+  README footers and `_assets/` are generated **on `main`** by the `regen`
+  workflow after merge — never run `make gen` or commit those files in a PR
+  (it only causes conflicts). CI runs no `make check`.
 - **Every package has a README.** It explains the package (hand-written, above
   the footer marker) and carries a repo link + disclaimer (generated footer, via
   `make readmes`). Packages under an `/x/` path get the stronger
