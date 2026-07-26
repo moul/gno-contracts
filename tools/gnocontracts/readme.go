@@ -57,8 +57,10 @@ func renderTable(m *Manifest) string {
 	b.WriteString("---|---|\n")
 	// rows
 	for _, c := range m.Contracts {
-		// kind emoji after the package name (outside the backtick): 📦 pkg, 🏛️ realm.
-		name := "`" + c.PkgPath + "` " + kindEmoji(c.Kind)
+		// Package column: path without the gno.land/ prefix, linked to the
+		// contract's folder in this repo. Kind emoji after (outside the backtick).
+		label := strings.TrimPrefix(c.PkgPath, "gno.land/")
+		name := "[`" + label + "`](" + c.Dir + ") " + kindEmoji(c.Kind)
 		if c.Draft {
 			name += " 🚧"
 		}
