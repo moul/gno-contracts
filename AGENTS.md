@@ -79,6 +79,34 @@ make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain st
    `contracts.json` — these human fields are preserved across regenerations.
 6. Commit.
 
+### Libraries vs. demos — split reusable logic into `p/` + `r/`
+
+When a contract is **reusable logic** (a codec, algorithm, data structure,
+utility — most `x/daily/*` ports fall here), don't ship it as a single realm.
+Split it into two contracts:
+
+- a **pure library** `p/moul/<…>/<name>/vN` — the reusable API as exported
+  types/functions, with no realm-global state and no chain imports where they
+  can be avoided (the caller supplies context such as the block height or the
+  address). Unit-tested (table-driven).
+- a **thin demo realm** `r/moul/<…>/<name>demo/vN` — imports the library, wires
+  it to the chain (`runtime.ChainHeight()`, `unsafe.PreviousRealm()`, package-
+  level state) and shows it off through `Render`. **No logic of its own.**
+
+The two must **cross-reference each other** in both the package doc-comment and
+the README: the library links to its demo ("Live demo: `r/…`"), the demo says it
+is a demo of the library ("Demo of the `p/…` library"). Worked examples:
+`p/moul/x/daily/b58` + `r/moul/x/daily/b58demo` (#53); `p/moul/x/daily/ratelimit`
++ `r/moul/x/daily/ratelimitdemo` (#50).
+
+Only keep a lone realm when the contract is inherently a stateful app with
+nothing reusable to extract.
+
+> This convention grows from moul's PR feedback. When moul gives new guidance on
+> how to structure a contract, record it **here** (and in `CLAUDE.md`) so the
+> next contract follows it from the start — the contract-building agent rereads
+> these files each time.
+
 ## The maintenance CLI (`tools/gnocontracts`)
 
 A dependency-free Go tool declared in `go.mod` (`tool` directive) and invoked as

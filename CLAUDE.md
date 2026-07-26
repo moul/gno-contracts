@@ -16,6 +16,12 @@ Read it before doing anything. The essentials:
   `make readmes`). Packages under an `/x/` path get the stronger
   "highly experimental / potentially vibe-coded" disclaimer automatically. Full
   disclaimer: [DISCLAIMER.md](./DISCLAIMER.md).
+- **Reusable logic ⇒ split `p/` lib + `r/` demo.** A codec/algorithm/utility
+  (most `x/daily/*` ports) ships as a pure, unit-tested library
+  `p/moul/<…>/<name>` plus a thin demo realm `r/moul/<…>/<name>demo` that imports
+  it and shows it via `Render`; the two cross-reference each other in comments +
+  READMEs. Only a lone realm when it's a stateful app with nothing to extract.
+  Details + examples in AGENTS.md.
 - **Green before commit:** `make lint test` (needs `GNOROOT` = a gnolang/gno checkout).
 
 ## Commits
