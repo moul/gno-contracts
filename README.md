@@ -95,8 +95,8 @@ make help        # list all targets
 
 | Package | topaz | betanet | staging | Monorepo | Deps |
 |---|---|---|---|---|---|
-| `gno.land/p/moul/addrset/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/addrset/v1) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
-| `gno.land/p/moul/authz/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/authz/v1) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
+| `gno.land/p/moul/addrset/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/addrset/v1) | — | [🗄️](https://gno.land/p/moul/addrset) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
+| `gno.land/p/moul/authz/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/authz/v1) | — | [🗄️](https://gno.land/p/moul/authz) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
 | `gno.land/p/moul/collection/v1` 📦 💤 | — | — | — | — | 3 |
 | `gno.land/p/moul/collection/v2` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/collection/v2) | — | — | — | 3 |
 | `gno.land/p/moul/cow/v1` 📦 💤 | — | — | — | — | — |
@@ -113,23 +113,23 @@ make help        # list all targets
 | `gno.land/p/moul/fp/v1` 📦 💤 | — | — | — | — | — |
 | `gno.land/p/moul/fp/v2` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/fp/v2) | — | — | — | — |
 | `gno.land/p/moul/greet/v1` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/greet/v1) | — | — | — | — |
-| `gno.land/p/moul/helplink/v1` 📦 | [🗄️](https://topaz.testnets.gno.land/p/moul/helplink) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 1 |
-| `gno.land/p/moul/md/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/md/v1) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 1 |
+| `gno.land/p/moul/helplink/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/helplink/v1) | — | [🗄️](https://gno.land/p/moul/helplink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 1 |
+| `gno.land/p/moul/md/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/md/v1) | — | [🗄️](https://gno.land/p/moul/md) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 1 |
 | `gno.land/p/moul/mdlist/v1` 📦 💤 | — | — | — | — | 1 |
 | `gno.land/p/moul/mdlist/v2` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/mdlist/v2) | — | — | — | 1 |
-| `gno.land/p/moul/mdtable/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/mdtable/v1) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
+| `gno.land/p/moul/mdtable/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/mdtable/v1) | — | [🗄️](https://gno.land/p/moul/mdtable) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
 | `gno.land/p/moul/memo/v1` 📦 💤 | — | — | — | — | 2 |
 | `gno.land/p/moul/memo/v2` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/memo/v2) | — | — | — | 2 |
 | `gno.land/p/moul/nestedpkg/v1` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/nestedpkg/v1) | — | — | — | — |
-| `gno.land/p/moul/once/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/once/v1) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
+| `gno.land/p/moul/once/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/once/v1) | — | [🗄️](https://gno.land/p/moul/once) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
 | `gno.land/p/moul/printfdebugging/v1` 📦 💤 | — | — | — | — | 1 |
 | `gno.land/p/moul/printfdebugging/v2` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/printfdebugging/v2) | — | — | — | 1 |
-| `gno.land/p/moul/realmpath/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/realmpath/v1) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
+| `gno.land/p/moul/realmpath/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/realmpath/v1) | — | [🗄️](https://gno.land/p/moul/realmpath) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
 | `gno.land/p/moul/svg/v1` 📦 | [✅](https://topaz.testnets.gno.land/p/moul/svg/v1) | — | — | — | 3 |
-| `gno.land/p/moul/txlink/v1` 📦 | [🗄️](https://topaz.testnets.gno.land/p/moul/txlink) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
-| `gno.land/p/moul/typeutil/v1` 📦 | [🗄️](https://topaz.testnets.gno.land/p/moul/typeutil) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | — |
+| `gno.land/p/moul/txlink/v1` 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/txlink/v1) | — | [🗄️](https://gno.land/p/moul/txlink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
+| `gno.land/p/moul/typeutil/v1` 📦 | [🗄️](https://topaz.testnets.gno.land/p/moul/typeutil) | — | [🗄️](https://gno.land/p/moul/typeutil) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | — |
 | `gno.land/p/moul/ulist/lplist/v1` 📦 | — | — | — | — | 1 |
-| `gno.land/p/moul/ulist/v1` 📦 | [🗄️](https://topaz.testnets.gno.land/p/moul/ulist) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | — |
+| `gno.land/p/moul/ulist/v1` 📦 | [🗄️](https://topaz.testnets.gno.land/p/moul/ulist) | — | [🗄️](https://gno.land/p/moul/ulist) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | — |
 | `gno.land/p/moul/web25/v1` 📦 💤 | — | — | — | — | 1 |
 | `gno.land/p/moul/web25/v2` 📦 | — | — | — | — | 1 |
 | `gno.land/p/moul/xmath/v1` 📦 💤 | — | — | — | — | — |
@@ -220,7 +220,7 @@ make help        # list all targets
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._
 
-_On-chain status last checked: 2026-07-26T08:09:15Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-26T08:27:45Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 

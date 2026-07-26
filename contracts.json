@@ -16,7 +16,7 @@
       "rpc": "https://rpc.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-26T08:09:15Z",
+  "status_checked_at": "2026-07-26T08:27:45Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -40,7 +40,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
@@ -77,7 +78,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
@@ -580,14 +582,15 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -613,7 +616,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
@@ -704,7 +708,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
@@ -825,7 +830,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
@@ -916,7 +922,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
@@ -979,14 +986,15 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -1010,7 +1018,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
@@ -1070,7 +1079,8 @@
           "which": "monorepo"
         },
         "staging": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "test6": {
           "uploaded": false
