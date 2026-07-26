@@ -96,36 +96,36 @@ make help        # list all targets
 | Package | Kind | Description | Deps | Monorepo | portal-loop | test6 | topaz |
 |---|---|---|---|---|---|---|---|
 | `gno.land/p/moul/addrset/v1` | pkg | Set data structure for unique gno addresses. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 📦 | — | ✅📦 |
-| `gno.land/p/moul/authz/v1` | pkg | Flexible authorization control for privileged actions. | 5 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 📦 | — | 📦 |
+| `gno.land/p/moul/authz/v1` | pkg | Flexible authorization control for privileged actions. | 5 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 📦 | — | ✅📦 |
 | `gno.land/p/moul/collection/v1` | pkg | 💤  | 3 | — | — | — | — |
 | `gno.land/p/moul/collection/v2` | pkg | — | 3 | — | — | — | ✅ |
 | `gno.land/p/moul/cow/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/cow/v2` | pkg | — | — | — | — | — | ✅ |
 | `gno.land/p/moul/debug/v1` | pkg | 💤  | 4 | — | — | — | — |
-| `gno.land/p/moul/debug/v2` | pkg | — | 4 | — | — | — | — |
+| `gno.land/p/moul/debug/v2` | pkg | — | 4 | — | — | — | ✅ |
 | `gno.land/p/moul/deque/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/deque/v2` | pkg | — | — | — | — | — | ✅ |
 | `gno.land/p/moul/dynreplacer/v1` | pkg | Simple template engine for dynamic content replacement. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer) | — | — | ✅ |
 | `gno.land/p/moul/entropy/v1` | pkg | — | — | — | — | — | ✅ |
 | `gno.land/p/moul/errs/v1` | pkg | 💤  | — | — | — | — | — |
 | `gno.land/p/moul/errs/v2` | pkg | — | — | — | — | — | ✅ |
-| `gno.land/p/moul/fifo/v1` | pkg | Fixed-size FIFO (first-in-first-out) list. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo) | — | — | 📦 |
+| `gno.land/p/moul/fifo/v1` | pkg | Fixed-size FIFO (first-in-first-out) list. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo) | — | — | ✅📦 |
 | `gno.land/p/moul/fp/v1` | pkg | 💤  | — | — | — | — | — |
-| `gno.land/p/moul/fp/v2` | pkg | — | — | — | — | — | — |
-| `gno.land/p/moul/greet/v1` | pkg | Canary pure package: greeting helper (demonstrates versioned cross-package resolution). | — | — | — | — | — |
+| `gno.land/p/moul/fp/v2` | pkg | — | — | — | — | — | ✅ |
+| `gno.land/p/moul/greet/v1` | pkg | Canary pure package: greeting helper (demonstrates versioned cross-package resolution). | — | — | — | — | ✅ |
 | `gno.land/p/moul/helplink/v1` | pkg | Helpers for building gnoweb help-page links. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 📦 | — | 📦 |
-| `gno.land/p/moul/md/v1` | pkg | Helpers for generating Markdown content programmatically. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 📦 | — | 📦 |
+| `gno.land/p/moul/md/v1` | pkg | Helpers for generating Markdown content programmatically. | 1 | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 📦 | — | ✅📦 |
 | `gno.land/p/moul/mdlist/v1` | pkg | 💤  | 1 | — | — | — | — |
-| `gno.land/p/moul/mdlist/v2` | pkg | — | 1 | — | — | — | — |
-| `gno.land/p/moul/mdtable/v1` | pkg | Build Markdown tables. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | 📦 | — | 📦 |
+| `gno.land/p/moul/mdlist/v2` | pkg | — | 1 | — | — | — | ✅ |
+| `gno.land/p/moul/mdtable/v1` | pkg | Build Markdown tables. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | 📦 | — | ✅📦 |
 | `gno.land/p/moul/memo/v1` | pkg | 💤  | 2 | — | — | — | — |
-| `gno.land/p/moul/memo/v2` | pkg | — | 2 | — | — | — | — |
-| `gno.land/p/moul/nestedpkg/v1` | pkg | — | — | — | — | — | — |
-| `gno.land/p/moul/once/v1` | pkg | One-time execution patterns. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | 📦 | — | 📦 |
+| `gno.land/p/moul/memo/v2` | pkg | — | 2 | — | — | — | ✅ |
+| `gno.land/p/moul/nestedpkg/v1` | pkg | — | — | — | — | — | ✅ |
+| `gno.land/p/moul/once/v1` | pkg | One-time execution patterns. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | 📦 | — | ✅📦 |
 | `gno.land/p/moul/printfdebugging/v1` | pkg | 💤  | 1 | — | — | — | — |
-| `gno.land/p/moul/printfdebugging/v2` | pkg | — | 1 | — | — | — | — |
-| `gno.land/p/moul/realmpath/v1` | pkg | Render.path parsing and link generation. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | 📦 | — | 📦 |
-| `gno.land/p/moul/svg/v1` | pkg | — | 3 | — | — | — | — |
+| `gno.land/p/moul/printfdebugging/v2` | pkg | — | 1 | — | — | — | ✅ |
+| `gno.land/p/moul/realmpath/v1` | pkg | Render.path parsing and link generation. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | 📦 | — | ✅📦 |
+| `gno.land/p/moul/svg/v1` | pkg | — | 3 | — | — | — | ✅ |
 | `gno.land/p/moul/txlink/v1` | pkg | Build transaction (maketx) links for realms. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | 📦 | — | 📦 |
 | `gno.land/p/moul/typeutil/v1` | pkg | Type conversion utilities. | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | 📦 | — | 📦 |
 | `gno.land/p/moul/ulist/lplist/v1` | pkg | — | 1 | — | — | — | — |
@@ -220,7 +220,7 @@ make help        # list all targets
 
 _💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._
 
-_On-chain status last checked: 2026-07-25T15:35:02Z (✅ = /v1, 📦 = un-versioned monorepo path)._
+_On-chain status last checked: 2026-07-26T08:09:15Z (✅ = /v1, 📦 = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 

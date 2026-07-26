@@ -16,7 +16,7 @@
       "rpc": "https://rpc.topaz.testnets.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-07-25T15:35:02Z",
+  "status_checked_at": "2026-07-26T08:09:15Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -72,7 +72,7 @@
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -221,7 +221,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
@@ -379,7 +380,7 @@
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -422,7 +423,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
@@ -443,7 +445,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
@@ -497,7 +500,7 @@
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -544,7 +547,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
@@ -569,7 +573,7 @@
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -618,7 +622,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
@@ -639,7 +644,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
@@ -664,7 +670,7 @@
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -711,7 +717,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
@@ -736,7 +743,7 @@
         },
         "topaz": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         }
       }
     },
@@ -761,7 +768,8 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         }
       }
     },
