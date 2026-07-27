@@ -82,6 +82,7 @@ func run() error {
 	deposit := fs.String("deposit", "", "max storage deposit (e.g. 1000000ugnot); empty = node default")
 	dryRun := fs.Bool("dry-run", false, "print the plan and exit without broadcasting")
 	yes := fs.Bool("yes", false, "skip the confirmation prompt")
+	stopOnError := fs.Bool("stop-on-error", false, "individual mode: abort the whole run on the first failure (default: skip it and continue)")
 	fs.Usage = usage(fs)
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		if err == flag.ErrHelp {
@@ -264,24 +265,46 @@ func run() error {
 		}
 		return nil
 	}
-	// individual: one tx (block) per package, sequence incremented locally.
+	// individual: one tx (block) per package. Each tx is independent, so by
+	// default a package that fails (bad gas sim, missing dep, broadcast error)
+	// is reported and SKIPPED — the rest still publish. seq only advances on a
+	// successful broadcast. -stop-on-error restores fail-fast.
 	seq := acc.Sequence
+	var failed []string
 	for i, msg := range msgs {
 		p := todo[i]
 		wanted, err := sizeGas(client, *gasFee, *gasWanted, *gasBuffer, msg)
 		if err != nil {
-			return fmt.Errorf("estimate gas for %s: %w", p.c.PkgPath, err)
+			fmt.Printf("❌ %2d/%d %s — gas estimation failed: %s\n", i+1, len(msgs), p.c.PkgPath, oneLine(err.Error()))
+			if *stopOnError {
+				return fmt.Errorf("estimate gas for %s: %w", p.c.PkgPath, err)
+			}
+			failed = append(failed, p.c.PkgPath)
+			continue
 		}
 		// Debug: the equivalent gnokey command (with the sized gas), just before broadcasting.
 		fmt.Println("# " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
 		res, err := client.AddPackage(cfgWith(seq, wanted), msg)
 		if err != nil {
-			return fmt.Errorf("broadcast %s (%d/%d) [gas-wanted %d]: %w%s", p.c.PkgPath, i+1, len(msgs), wanted, err, txDetail(res))
+			fmt.Printf("❌ %2d/%d %s — broadcast failed [gas-wanted %d]: %s%s\n", i+1, len(msgs), p.c.PkgPath, wanted, oneLine(err.Error()), txDetail(res))
+			if *stopOnError {
+				return fmt.Errorf("broadcast %s (%d/%d) [gas-wanted %d]: %w%s", p.c.PkgPath, i+1, len(msgs), wanted, err, txDetail(res))
+			}
+			failed = append(failed, p.c.PkgPath)
+			continue
 		}
 		fmt.Printf("✅ %2d/%d %s — %s — hash %s gas %d/%d\n", i+1, len(msgs), p.c.PkgPath, pkgURL(net, p.c.PkgPath), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
 		seq++
 	}
-	fmt.Printf("\ndone: published %d package(s) on %s.\n", len(msgs), net.Name)
+	published := len(msgs) - len(failed)
+	if len(failed) > 0 {
+		fmt.Printf("\ndone with errors on %s: %d/%d published, %d failed:\n", net.Name, published, len(msgs), len(failed))
+		for _, f := range failed {
+			fmt.Println("  ❌ " + f)
+		}
+		return fmt.Errorf("%d of %d package(s) failed to publish", len(failed), len(msgs))
+	}
+	fmt.Printf("\ndone: published %d package(s) on %s.\n", published, net.Name)
 	return nil
 }
 
