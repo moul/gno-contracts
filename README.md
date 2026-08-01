@@ -132,6 +132,7 @@ make help        # list all targets
 | [`p/moul/ulist/v1`](p/moul/ulist/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/ulist/v1) | [🗄️](https://gno.land/p/moul/ulist) | [🗄️](https://staging.gno.land/p/moul/ulist) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | — |
 | [`p/moul/web25/v1`](p/moul/web25/v1) 📦 💤 | — | — | — | — | 1 |
 | [`p/moul/web25/v2`](p/moul/web25/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/web25/v2) | — | — | — | 1 |
+| [`p/moul/x/daily/ratelimit/v1`](p/moul/x/daily/ratelimit/v1) 📦 | — | — | — | — | 1 |
 | [`p/moul/xmath/v1`](p/moul/xmath/v1) 📦 💤 | — | — | — | — | — |
 | [`p/moul/xmath/v2`](p/moul/xmath/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/xmath/v2) | — | — | — | — |
 | [`r/moul/demo/args/v1`](r/moul/demo/args/v1) 🏛️ 💤 | — | — | — | — | — |
@@ -197,6 +198,7 @@ make help        # list all targets
 | [`r/moul/x/daily/numguess/v1`](r/moul/x/daily/numguess/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/quotes/v1`](r/moul/x/daily/quotes/v1) 🏛️ | — | — | — | — | — |
+| [`r/moul/x/daily/ratelimitdemo/v1`](r/moul/x/daily/ratelimitdemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/reactions/v1`](r/moul/x/daily/reactions/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/ringlog/v1`](r/moul/x/daily/ringlog/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps/v1) 🏛️ | — | — | — | — | 1 |

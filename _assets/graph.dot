@@ -35,6 +35,7 @@ digraph gnocontracts {
   "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v2" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/ratelimit/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/nt/avl";
   "gno.land/p/nt/avl/v0";
   "gno.land/p/nt/avl/v0/rotree";
@@ -83,6 +84,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/multisig/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/numguess/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/polls/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/ratelimitdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/reactions/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/rps/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/rpsduel/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -135,6 +137,7 @@ digraph gnocontracts {
   "gno.land/p/moul/ulist/lplist/v1" -> "gno.land/p/moul/ulist/v1";
   "gno.land/p/moul/web25/v1" -> "gno.land/p/moul/realmpath/v1";
   "gno.land/p/moul/web25/v2" -> "gno.land/p/moul/realmpath/v1";
+  "gno.land/p/moul/x/daily/ratelimit/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/demo/gnoface/v1" -> "gno.land/p/moul/entropy/v1";
   "gno.land/r/moul/demo/gnoface/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/demo/grc20/v1" -> "gno.land/p/demo/grc/grc20";
@@ -181,6 +184,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/multisig/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/numguess/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/polls/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/ratelimitdemo/v1" -> "gno.land/p/moul/x/daily/ratelimit/v1";
   "gno.land/r/moul/x/daily/reactions/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/rps/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/rpsduel/v1" -> "gno.land/p/nt/avl/v0";
