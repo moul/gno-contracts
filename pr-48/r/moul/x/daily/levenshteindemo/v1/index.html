@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gno.land - /r/moul/x/daily/levenshtein/v1</title>
+  <title>gno.land - /r/moul/x/daily/levenshteindemo/v1</title>
 
   
   <link rel="preload" href="../../../../../../public/fonts/intervar/Intervar.woff2" as="font" type="font/woff2" crossorigin />
@@ -19,7 +19,7 @@
   
 
   
-  <meta property="og:title" content="gno.land - /r/moul/x/daily/levenshtein/v1" />
+  <meta property="og:title" content="gno.land - /r/moul/x/daily/levenshteindemo/v1" />
   <meta property="og:description" content="" />
   <meta property="og:image" content="" />
   <meta property="og:url" content="" />
@@ -27,7 +27,7 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="gno.land - /r/moul/x/daily/levenshtein/v1" />
+  <meta name="twitter:title" content="gno.land - /r/moul/x/daily/levenshteindemo/v1" />
   <meta name="twitter:description" content="" />
   <meta name="twitter:image" content="" />
 
@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="../../../../../../public/_chroma/style.css" />
 
   
-  <link rel="stylesheet" href="../../../../../../public/main.css?v=20260726135046" />
+  <link rel="stylesheet" href="../../../../../../public/main.css?v=20260801194331" />
 
   
   <meta name="gnoconnect:rpc" content="tcp://127.0.0.1:26657" />
@@ -400,7 +400,7 @@
               gno.land Search
             </label>
             <input id="header-input-search" data-searchbar-target="input"
-              type="text" value="../../../../../../r/moul/x/daily/levenshtein/v1" role="combobox"
+              type="text" value="../../../../../../r/moul/x/daily/levenshteindemo/v1" role="combobox"
               aria-expanded="false" aria-controls="omnisearch-results"
               aria-autocomplete="list" autocomplete="off"
               data-action="input->searchbar#search" />
@@ -432,12 +432,12 @@
       </a>
     </li>
     <li class="element">
-      <a href="../../../../../../r/moul/x/daily/levenshtein">
-        levenshtein
+      <a href="../../../../../../r/moul/x/daily/levenshteindemo">
+        levenshteindemo
       </a>
     </li>
     <li class="element">
-      <a href="../../../../../../r/moul/x/daily/levenshtein/v1">
+      <a href="../../../../../../r/moul/x/daily/levenshteindemo/v1">
         v1
       </a>
     </li>
@@ -505,7 +505,7 @@
       <input id="header-input-devmode" type="checkbox" name="devmode" class="u-sr-only menu-toggle-input" checked />
       <div role="menu" class="menu-dev">
         
-<a href="../../../../../../r/moul/x/daily/levenshtein/v1" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/levenshteindemo/v1" class="b-menu-link" role="menuitem">
   <div class="link  link--icon link--is-active u-text-stroke">
     
     <svg>
@@ -516,7 +516,7 @@
   </div>
 </a>
 
-<a href="../../../../../../r/moul/x/daily/levenshtein/v1$state" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/levenshteindemo/v1$state" class="b-menu-link" role="menuitem">
   <div class="link  link--icon">
     
     <svg>
@@ -527,7 +527,7 @@
   </div>
 </a>
 
-<a href="../../../../../../r/moul/x/daily/levenshtein/v1$source" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/levenshteindemo/v1$source" class="b-menu-link" role="menuitem">
   <div class="link  link--icon">
     
     <svg>
@@ -538,7 +538,7 @@
   </div>
 </a>
 
-<a href="../../../../../../r/moul/x/daily/levenshtein/v1$help" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/levenshteindemo/v1$help" class="b-menu-link" role="menuitem">
   <div class="link  link--icon">
     
     <svg>
@@ -603,14 +603,14 @@
 
 
 <md-renderer class="c-realm-view"  data-controller="tooltip"><h1 id="levenshtein-edit-distance">Levenshtein edit distance</h1>
-<p>The <strong>Levenshtein distance</strong> between two strings is the minimum number of single-character edits — <em>insertions</em>, <em>deletions</em>, or <em>substitutions</em> — needed to turn one string into the other. This realm reimplements the classic dynamic-programming algorithm (à la Go's <code>agext/levenshtein</code>) fully rune-aware and on-chain.</p>
+<p>Demo of the <a href="../../../../../../p/moul/x/daily/levenshtein/v1"><code>p/moul/x/daily/levenshtein</code></a> library. The <strong>Levenshtein distance</strong> between two strings is the minimum number of single-character edits — <em>insertions</em>, <em>deletions</em>, or <em>substitutions</em> — needed to turn one string into the other. The library implements the classic dynamic-programming algorithm (à la Go's <code>agext/levenshtein</code>) fully rune-aware and on-chain.</p>
 <h2 id="try-it">Try it</h2>
 <p>Append two words as <code>/&lt;a&gt;/&lt;b&gt;</code>:</p>
 <ul>
-<li><a href="../../../../../../r/moul/x/daily/levenshtein:kitten/sitting"><code>/kitten/sitting</code></a> → distance <strong>3</strong></li>
-<li><a href="../../../../../../r/moul/x/daily/levenshtein:flaw/lawn"><code>/flaw/lawn</code></a> → distance <strong>2</strong></li>
-<li><a href="../../../../../../r/moul/x/daily/levenshtein:sunday/saturday"><code>/sunday/saturday</code></a> → distance <strong>3</strong></li>
-<li><a href="../../../../../../r/moul/x/daily/levenshtein:gno/gnoland"><code>/gno/gnoland</code></a> → distance <strong>4</strong></li>
+<li><a href="../../../../../../r/moul/x/daily/levenshteindemo/v1:kitten/sitting"><code>/kitten/sitting</code></a> → distance <strong>3</strong></li>
+<li><a href="../../../../../../r/moul/x/daily/levenshteindemo/v1:flaw/lawn"><code>/flaw/lawn</code></a> → distance <strong>2</strong></li>
+<li><a href="../../../../../../r/moul/x/daily/levenshteindemo/v1:sunday/saturday"><code>/sunday/saturday</code></a> → distance <strong>3</strong></li>
+<li><a href="../../../../../../r/moul/x/daily/levenshteindemo/v1:gno/gnoland"><code>/gno/gnoland</code></a> → distance <strong>4</strong></li>
 </ul>
 <h2 id="the-classic-example">The classic example</h2>
 <p><code>kitten</code> → <code>sitting</code> = <strong>3</strong>:</p>
@@ -736,7 +736,7 @@
 </footer>
 
 
-<script type="module" src="../../../../../../public/js/controller.js?v=20260726135046"></script>
-<script type="module" src="../../../../../../public/js/index.js?v=20260726135046"></script></body>
+<script type="module" src="../../../../../../public/js/controller.js?v=20260801194331"></script>
+<script type="module" src="../../../../../../public/js/index.js?v=20260801194331"></script></body>
 
 </html>
