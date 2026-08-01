@@ -150,6 +150,36 @@ upstream to reconcile *from*, deliberately — never auto-overwrite.
   generated fields of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`,
   `version`, `deps`).
 
+## Every realm MUST test its `Render` (filetest)
+
+A realm's `Render(path)` is user-facing output — lock it down with a gno
+**filetest**, a testable example whose printed output gno verifies exactly. Add
+`render_filetest.gno` next to the realm (**especially demos**):
+
+```gno
+package main
+
+import "gno.land/r/moul/x/daily/foodemo/v1"
+
+func main() {
+	print(foodemo.Render("")) // root; add more mains for representative paths
+}
+
+// Output:
+// …
+```
+
+Populate the `// Output:` with `gno test -update-golden-tests ./r/moul/…`, then
+confirm plain `gno test ./r/moul/…` passes. Cover the root plus a couple of
+argument paths. Keep the rendered output **deterministic**: a filetest runs at a
+fixed chain height, but don't render wall-clock/random values that could differ
+between the `-update-golden-tests` run and CI.
+
+Note: Go-style `Example…()` funcs with `// Output:` are **NOT** checked by gno's
+test runner — only `*_filetest.gno` output is. Use a filetest. (Filetests are
+already excluded from catalog dependency scanning, so importing the realm from
+its own `_filetest.gno` is fine.)
+
 ## Every package MUST have a README
 
 Each package/realm directory ships a standalone `README.md` that:

@@ -23,6 +23,11 @@ Read it before doing anything. The essentials:
   it and shows it via `Render`; the two cross-reference each other in comments +
   READMEs. Only a lone realm when it's a stateful app with nothing to extract.
   Details + examples in AGENTS.md.
+- **Every realm tests its `Render`.** Add a `render_filetest.gno` (a gno
+  testable example) that prints `Render(<path>)` with `// Output:` populated by
+  `gno test -update-golden-tests`; gno verifies it exactly. Especially for demos.
+  Keep the output deterministic. `Example…()`+`// Output:` are NOT checked by gno.
+  Details in AGENTS.md.
 - **Green before commit:** `make lint test` (needs `GNOROOT` = a gnolang/gno checkout).
 
 ## Commits
