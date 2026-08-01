@@ -1,9 +1,13 @@
 // Package cowsay is an on-chain Gno port of the classic `cowsay` program:
-// it prints an ASCII cow with a speech bubble containing a message.
+// it builds an ASCII cow with a speech bubble containing a message — as a
+// reusable pure package.
 //
 // Original: cowsay by Tony Monroe (1999), a Perl program later ported to Go
-// many times. This realm reimplements the core rendering — bubble framing,
+// many times. This package reimplements the core rendering — bubble framing,
 // word-wrapping and the cow art — as pure, deterministic string logic.
+//
+// A live demo of this package (an interactive cow that says whatever you put in
+// the path) is at [r/moul/x/daily/cowsaydemo](/r/moul/x/daily/cowsaydemo/v1).
 package cowsay
 
 import (
@@ -126,22 +130,3 @@ const cow = `        \   ^__^
                 ||----w |
                 ||     ||
 `
-
-// Render displays the cow for gnoweb.
-//
-//	Render("")            -> default message ("Moo!")
-//	Render("/hello there") -> renders "hello there", word-wrapped
-func Render(path string) string {
-	msg := strings.TrimLeft(path, "/")
-	art := Say(msg)
-
-	var b strings.Builder
-	b.WriteString("# cowsay\n\n")
-	if strings.TrimSpace(msg) == "" {
-		b.WriteString("_Tip: pass a message in the path, e.g._ `/Hello, gno.land!`\n\n")
-	}
-	b.WriteString("```\n")
-	b.WriteString(art)
-	b.WriteString("```\n")
-	return b.String()
-}
