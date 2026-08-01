@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gno.land - /r/moul/x/daily/rot13/v1</title>
+  <title>gno.land - /r/moul/x/daily/rot13demo/v1</title>
 
   
   <link rel="preload" href="../../../../../../public/fonts/intervar/Intervar.woff2" as="font" type="font/woff2" crossorigin />
@@ -19,7 +19,7 @@
   
 
   
-  <meta property="og:title" content="gno.land - /r/moul/x/daily/rot13/v1" />
+  <meta property="og:title" content="gno.land - /r/moul/x/daily/rot13demo/v1" />
   <meta property="og:description" content="" />
   <meta property="og:image" content="" />
   <meta property="og:url" content="" />
@@ -27,7 +27,7 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="gno.land - /r/moul/x/daily/rot13/v1" />
+  <meta name="twitter:title" content="gno.land - /r/moul/x/daily/rot13demo/v1" />
   <meta name="twitter:description" content="" />
   <meta name="twitter:image" content="" />
 
@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="../../../../../../public/_chroma/style.css" />
 
   
-  <link rel="stylesheet" href="../../../../../../public/main.css?v=20260726135057" />
+  <link rel="stylesheet" href="../../../../../../public/main.css?v=20260801194418" />
 
   
   <meta name="gnoconnect:rpc" content="tcp://127.0.0.1:26657" />
@@ -400,7 +400,7 @@
               gno.land Search
             </label>
             <input id="header-input-search" data-searchbar-target="input"
-              type="text" value="../../../../../../r/moul/x/daily/rot13/v1" role="combobox"
+              type="text" value="../../../../../../r/moul/x/daily/rot13demo/v1" role="combobox"
               aria-expanded="false" aria-controls="omnisearch-results"
               aria-autocomplete="list" autocomplete="off"
               data-action="input->searchbar#search" />
@@ -432,12 +432,12 @@
       </a>
     </li>
     <li class="element">
-      <a href="../../../../../../r/moul/x/daily/rot13">
-        rot13
+      <a href="../../../../../../r/moul/x/daily/rot13demo">
+        rot13demo
       </a>
     </li>
     <li class="element">
-      <a href="../../../../../../r/moul/x/daily/rot13/v1">
+      <a href="../../../../../../r/moul/x/daily/rot13demo/v1">
         v1
       </a>
     </li>
@@ -505,7 +505,7 @@
       <input id="header-input-devmode" type="checkbox" name="devmode" class="u-sr-only menu-toggle-input" checked />
       <div role="menu" class="menu-dev">
         
-<a href="../../../../../../r/moul/x/daily/rot13/v1" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/rot13demo/v1" class="b-menu-link" role="menuitem">
   <div class="link  link--icon link--is-active u-text-stroke">
     
     <svg>
@@ -516,7 +516,7 @@
   </div>
 </a>
 
-<a href="../../../../../../r/moul/x/daily/rot13/v1$state" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/rot13demo/v1$state" class="b-menu-link" role="menuitem">
   <div class="link  link--icon">
     
     <svg>
@@ -527,7 +527,7 @@
   </div>
 </a>
 
-<a href="../../../../../../r/moul/x/daily/rot13/v1$source" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/rot13demo/v1$source" class="b-menu-link" role="menuitem">
   <div class="link  link--icon">
     
     <svg>
@@ -538,7 +538,7 @@
   </div>
 </a>
 
-<a href="../../../../../../r/moul/x/daily/rot13/v1$help" class="b-menu-link" role="menuitem">
+<a href="../../../../../../r/moul/x/daily/rot13demo/v1$help" class="b-menu-link" role="menuitem">
   <div class="link  link--icon">
     
     <svg>
@@ -598,7 +598,7 @@
 
 
 <md-renderer class="c-realm-view"  data-controller="tooltip"><h1 id="rot13">ROT13</h1>
-<p>On-chain port of Go's classic <strong>ROT13</strong> cipher — the standard-library <code>strings.Map</code> / <code>io.Reader</code> teaching example. Each ASCII letter is rotated 13 places through the alphabet; everything else is left alone.</p>
+<p>Demo of the <a href="../../../../../../p/moul/x/daily/rot13/v1"><code>p/moul/x/daily/rot13</code></a> library — an on-chain port of Go's classic <strong>ROT13</strong> cipher, the standard-library <code>strings.Map</code> / <code>io.Reader</code> teaching example. Each ASCII letter is rotated 13 places through the alphabet; everything else is left alone.</p>
 <p>Because the alphabet has 26 letters and 13 is exactly half, <strong>ROT13 is its own inverse</strong> — encoding twice returns the original text.</p>
 <h2 id="example">Example</h2>
 <table>
@@ -628,10 +628,10 @@
 <li><code>Render(&quot;/Uryyb, Tab!&quot;)</code> — decode any text (append it to the path).</li>
 <li><code>Render(&quot;/caesar/3/attack at dawn&quot;)</code> — a general Caesar shift.</li>
 </ul>
-<p>Or call the exported functions directly:</p>
-<pre class="chroma-chroma chroma-light"><code><span class="chroma-line"><span class="chroma-ln" id="L1"><a class="chroma-lnlinks" href="#L1">1</a></span><span class="chroma-cl"><span class="chroma-nf">Rot13</span><span class="chroma-p">(</span><span class="chroma-s">&#34;Hello, Gno!&#34;</span><span class="chroma-p">)</span><span class="chroma-w">     </span><span class="chroma-c1">// &#34;Uryyb, Tab!&#34;</span><span class="chroma-w">
-</span></span></span><span class="chroma-line"><span class="chroma-ln" id="L2"><a class="chroma-lnlinks" href="#L2">2</a></span><span class="chroma-cl"><span class="chroma-nf">Caesar</span><span class="chroma-p">(</span><span class="chroma-s">&#34;attack&#34;</span><span class="chroma-p">,</span><span class="chroma-w"> </span><span class="chroma-mi">3</span><span class="chroma-p">)</span><span class="chroma-w">      </span><span class="chroma-c1">// &#34;dwwdfn&#34;</span><span class="chroma-w">
-</span></span></span><span class="chroma-line"><span class="chroma-ln" id="L3"><a class="chroma-lnlinks" href="#L3">3</a></span><span class="chroma-cl"><span class="chroma-nf">Caesar</span><span class="chroma-p">(</span><span class="chroma-s">&#34;Hello&#34;</span><span class="chroma-p">,</span><span class="chroma-w"> </span><span class="chroma-mi">13</span><span class="chroma-p">)</span><span class="chroma-w">      </span><span class="chroma-c1">// same as Rot13: &#34;Uryyb&#34;</span><span class="chroma-w">
+<p>Or call the library functions directly:</p>
+<pre class="chroma-chroma chroma-light"><code><span class="chroma-line"><span class="chroma-ln" id="L1"><a class="chroma-lnlinks" href="#L1">1</a></span><span class="chroma-cl"><span class="chroma-nx">rot13</span><span class="chroma-p">.</span><span class="chroma-nf">Rot13</span><span class="chroma-p">(</span><span class="chroma-s">&#34;Hello, Gno!&#34;</span><span class="chroma-p">)</span><span class="chroma-w">     </span><span class="chroma-c1">// &#34;Uryyb, Tab!&#34;</span><span class="chroma-w">
+</span></span></span><span class="chroma-line"><span class="chroma-ln" id="L2"><a class="chroma-lnlinks" href="#L2">2</a></span><span class="chroma-cl"><span class="chroma-nx">rot13</span><span class="chroma-p">.</span><span class="chroma-nf">Caesar</span><span class="chroma-p">(</span><span class="chroma-s">&#34;attack&#34;</span><span class="chroma-p">,</span><span class="chroma-w"> </span><span class="chroma-mi">3</span><span class="chroma-p">)</span><span class="chroma-w">      </span><span class="chroma-c1">// &#34;dwwdfn&#34;</span><span class="chroma-w">
+</span></span></span><span class="chroma-line"><span class="chroma-ln" id="L3"><a class="chroma-lnlinks" href="#L3">3</a></span><span class="chroma-cl"><span class="chroma-nx">rot13</span><span class="chroma-p">.</span><span class="chroma-nf">Caesar</span><span class="chroma-p">(</span><span class="chroma-s">&#34;Hello&#34;</span><span class="chroma-p">,</span><span class="chroma-w"> </span><span class="chroma-mi">13</span><span class="chroma-p">)</span><span class="chroma-w">      </span><span class="chroma-c1">// same as Rot13: &#34;Uryyb&#34;</span><span class="chroma-w">
 </span></span></span></code></pre></md-renderer>
  </section>
   </main>
@@ -743,7 +743,7 @@
 </footer>
 
 
-<script type="module" src="../../../../../../public/js/controller.js?v=20260726135057"></script>
-<script type="module" src="../../../../../../public/js/index.js?v=20260726135057"></script></body>
+<script type="module" src="../../../../../../public/js/controller.js?v=20260801194418"></script>
+<script type="module" src="../../../../../../public/js/index.js?v=20260801194418"></script></body>
 
 </html>
