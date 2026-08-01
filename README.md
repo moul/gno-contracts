@@ -137,14 +137,14 @@ make help        # list all targets
 | [`p/moul/xmath/v1`](p/moul/xmath/v1) 📦 💤 | — | — | — | — | — |
 | [`p/moul/xmath/v2`](p/moul/xmath/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/xmath/v2) | — | — | — | — |
 | [`r/moul/demo/args/v1`](r/moul/demo/args/v1) 🏛️ 💤 | — | — | — | — | — |
-| [`r/moul/demo/args/v2`](r/moul/demo/args/v2) 🏛️ | — | — | — | — | — |
+| [`r/moul/demo/args/v2`](r/moul/demo/args/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/args/v2) | — | — | — | — |
 | [`r/moul/demo/data/v1`](r/moul/demo/data/v1) 🏛️ 💤 | — | — | — | — | — |
-| [`r/moul/demo/data/v2`](r/moul/demo/data/v2) 🏛️ | — | — | — | — | — |
-| [`r/moul/demo/gnoface/v1`](r/moul/demo/gnoface/v1) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/demo/data/v2`](r/moul/demo/data/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/data/v2) | — | — | — | — |
+| [`r/moul/demo/gnoface/v1`](r/moul/demo/gnoface/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/gnoface/v1) | — | — | — | 2 |
 | [`r/moul/demo/grc20/v1`](r/moul/demo/grc20/v1) 🏛️ 💤 | — | — | — | — | 1 |
-| [`r/moul/demo/grc20/v2`](r/moul/demo/grc20/v2) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/demo/grc20/v2`](r/moul/demo/grc20/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/grc20/v2) | — | — | — | 1 |
 | [`r/moul/demo/hello/v1`](r/moul/demo/hello/v1) 🏛️ 💤 | — | — | — | — | — |
-| [`r/moul/demo/hello/v2`](r/moul/demo/hello/v2) 🏛️ | — | — | — | — | — |
+| [`r/moul/demo/hello/v2`](r/moul/demo/hello/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/hello/v2) | — | — | — | — |
 | [`r/moul/demo/importdemo/v1`](r/moul/demo/importdemo/v1) 🏛️ 💤 | — | — | — | — | 2 |
 | [`r/moul/demo/importdemo/v2`](r/moul/demo/importdemo/v2) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/demo/microposts/v1`](r/moul/demo/microposts/v1) 🏛️ 💤 | — | — | — | — | — |
@@ -224,7 +224,7 @@ make help        # list all targets
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._
 
-_On-chain status last checked: 2026-07-26T13:53:32Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_On-chain status last checked: 2026-08-01T19:54:04Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
