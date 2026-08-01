@@ -1,5 +1,5 @@
 // Package piglatin ports the classic "Pig Latin" translator — a staple Go
-// beginner exercise — to an on-chain gno.land realm.
+// beginner exercise — to gno.land as a reusable pure package.
 //
 // Rules implemented (the standard English game):
 //   - A word that starts with a vowel gets "way" appended:   "apple" -> "appleway"
@@ -13,6 +13,9 @@
 //     "Hello," -> "Ellohay,".
 //
 // Everything is pure strings/unicode — deterministic and reproducible on-chain.
+//
+// A live demo of this package (an interactive sentence translator) is at
+// [r/moul/x/daily/piglatindemo](/r/moul/x/daily/piglatindemo/v1).
 package piglatin
 
 import (
@@ -161,55 +164,5 @@ func Translate(sentence string) string {
 		word.WriteRune(r)
 	}
 	flush()
-	return b.String()
-}
-
-// Render is the gnoweb entrypoint (Markdown). Root explains the rules; any
-// other path is treated as a sentence to translate, e.g. Render("/Hello world").
-func Render(path string) string {
-	var b strings.Builder
-
-	sentence := strings.TrimPrefix(path, "/")
-	sentence = strings.TrimSpace(sentence)
-
-	if sentence == "" {
-		b.WriteString("# Pig Latin\n\n")
-		b.WriteString("A tiny on-chain port of the classic **Pig Latin** translator ")
-		b.WriteString("(the go-to beginner exercise). Pure `strings`/`unicode`, fully deterministic.\n\n")
-		b.WriteString("## Rules\n\n")
-		b.WriteString("1. Word starts with a **vowel** → append `way`. `apple` → `appleway`\n")
-		b.WriteString("2. Word starts with **consonant(s)** → move the leading consonant cluster to the end, then add `ay`. `string` → `ingstray`\n")
-		b.WriteString("3. `y` is a consonant only as the first letter (`yellow` → `ellowyay`); otherwise a vowel (`myth` → `ythmay`).\n")
-		b.WriteString("4. **Capitalization** is preserved: `Hello` → `Ellohay`, `NASA` → `ASANAY`.\n")
-		b.WriteString("5. **Punctuation** glued to a word stays put: `Hello,` → `Ellohay,`.\n\n")
-		b.WriteString("## Try it\n\n")
-		b.WriteString("Append a sentence to the path — spaces are fine:\n\n")
-		for _, ex := range []string{"hello world", "The quick brown fox", "I love Gno!"} {
-			b.WriteString("- [`/")
-			b.WriteString(ex)
-			b.WriteString("`](/r/moul/x/daily/piglatin/v1:/")
-			b.WriteString(ex)
-			b.WriteString(") → `")
-			b.WriteString(Translate(ex))
-			b.WriteString("`\n")
-		}
-		b.WriteString("\n## Examples\n\n")
-		b.WriteString("| Input | Pig Latin |\n|---|---|\n")
-		for _, w := range []string{"pig", "banana", "smile", "eat", "yellow", "myth", "Hello,", "GNO"} {
-			b.WriteString("| `")
-			b.WriteString(w)
-			b.WriteString("` | `")
-			b.WriteString(Translate(w))
-			b.WriteString("` |\n")
-		}
-		return b.String()
-	}
-
-	b.WriteString("# Pig Latin\n\n")
-	b.WriteString("**Original:**\n\n> ")
-	b.WriteString(sentence)
-	b.WriteString("\n\n**Pig Latin:**\n\n> ")
-	b.WriteString(Translate(sentence))
-	b.WriteString("\n\n---\n\n[← rules & examples](/r/moul/x/daily/piglatin/v1)\n")
 	return b.String()
 }

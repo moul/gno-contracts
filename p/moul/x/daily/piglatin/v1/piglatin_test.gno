@@ -16,10 +16,10 @@ func TestTranslateWord(t *testing.T) {
 		{"string", "ingstray"},
 		{"eat", "eatway"},
 		{"apple", "appleway"},
-		{"yellow", "ellowyay"},  // leading y = consonant
-		{"myth", "ythmay"},      // internal y = vowel
-		{"Hello", "Ellohay"},    // title-case preserved
-		{"NASA", "ASANAY"},      // all caps preserved
+		{"yellow", "ellowyay"}, // leading y = consonant
+		{"myth", "ythmay"},     // internal y = vowel
+		{"Hello", "Ellohay"},   // title-case preserved
+		{"NASA", "ASANAY"},     // all caps preserved
 	}
 	for _, c := range cases {
 		got := translateWord(c.in)
