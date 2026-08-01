@@ -1,0 +1,18 @@
+# `gno.land/p/moul/x/daily/piglatin/v1`
+
+**Pig Latin translator** — `Translate`, `TranslateToken`.
+
+Pure `strings`/`unicode`, fully deterministic. Vowel-start words get `way`;
+consonant-start words move the leading consonant cluster to the end and add `ay`;
+`y` is a consonant only as the first letter; capitalization and edge punctuation
+are preserved.
+
+```go
+import "gno.land/p/moul/x/daily/piglatin/v1"
+
+piglatin.Translate("Hello, world!")   // "Ellohay, orldway!"
+piglatin.TranslateToken("string")     // "ingstray"
+```
+
+**Live demo:** [`r/moul/x/daily/piglatindemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/piglatindemo/v1)
+· render it at [`/r/moul/x/daily/piglatindemo/v1`](https://gno.land/r/moul/x/daily/piglatindemo/v1).
