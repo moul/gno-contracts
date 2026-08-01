@@ -159,38 +159,48 @@ upstream to reconcile *from*, deliberately — never auto-overwrite.
   generated fields of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`,
   `version`, `deps`).
 
-## Every realm MUST test its `Render` (filetest)
+## Every realm MUST test its `Render` (example test)
 
 A realm's `Render(path)` is user-facing output — lock it down with a gno
-**filetest**, a testable example whose printed output gno verifies exactly. Add
-it in a **`filetests/` subdirectory** of the realm (this exact layout is what
-`-update-golden-tests` writes to), e.g. `r/moul/x/daily/foodemo/v1/filetests/render_filetest.gno`
-(**especially demos**):
+**example test** (`Example…` functions, gno's recent example-test feature). Put
+it in a normal `_test.gno` **in the realm's package** so it calls `Render`
+directly, no self-import (**especially demos**):
 
 ```gno
-package main
+package foodemo
 
-import "gno.land/r/moul/x/daily/foodemo/v1"
+import "fmt"
 
-func main() {
-	println(foodemo.Render("")) // root; add more filetests for representative paths
+// ExampleRender pins the realm's Render output as a testable example.
+func ExampleRender() {
+	fmt.Println(Render("")) // root; add more Example funcs for representative paths
+	// Output:
+	// …
 }
-
-// Output:
-// …
 ```
 
-Populate the `// Output:` with `gno test -update-golden-tests ./r/moul/…/foodemo/v1`
-(it writes the golden into `filetests/`), then confirm plain
-`gno test ./r/moul/…/foodemo/v1` passes. Cover the root plus a couple of
-argument paths (one filetest each). Keep the rendered output **deterministic**: a filetest runs at a
-fixed chain height, but don't render wall-clock/random values that could differ
-between the `-update-golden-tests` run and CI.
+Rules that make it actually run and verify:
 
-Note: Go-style `Example…()` funcs with `// Output:` are **NOT** checked by gno's
-test runner — only `*_filetest.gno` output is. Use a filetest. (Filetests are
-already excluded from catalog dependency scanning, so importing the realm from
-its own `_filetest.gno` is fine.)
+- The **`// Output:` block is required** — an example with no `// Output:` is
+  silently **skipped**. Its content must match `Render`'s output exactly
+  (leading/trailing whitespace is trimmed).
+- Print to **stdout** with `fmt.Println`/`fmt.Print` — `println` writes to
+  stderr and is **not** captured.
+- Cover the root plus a couple of argument paths (one `ExampleRender…` each).
+- Keep output **deterministic**: tests run at a fixed chain height, but don't
+  render wall-clock/random values.
+- Validated by `gno test` on a **master** gno (what CI builds). Older gno
+  binaries silently skip examples, so verify with a freshly built master gno
+  (`go build -o /tmp/gno ./gnovm/cmd/gno` in your gno checkout) — a plain `ok`
+  from a stale local `gno` does not prove the example ran.
+
+Populating `// Output:`: run the example once with an empty `// Output:` and copy
+the `got:` block the failure prints, or reuse the value from a scratch
+`-update-golden-tests` filetest. Worked examples: the `x/daily/*demo` realms.
+
+Filetests (`filetests/*_filetest.gno`, auto-populated by `-update-golden-tests`)
+remain a fallback when an example test doesn't fit — e.g. testing a package's
+`main`/entrypoint, or asserting a panic/error path.
 
 ## Every package MUST have a README
 
