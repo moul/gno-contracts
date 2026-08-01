@@ -163,7 +163,9 @@ upstream to reconcile *from*, deliberately — never auto-overwrite.
 
 A realm's `Render(path)` is user-facing output — lock it down with a gno
 **filetest**, a testable example whose printed output gno verifies exactly. Add
-`render_filetest.gno` next to the realm (**especially demos**):
+it in a **`filetests/` subdirectory** of the realm (this exact layout is what
+`-update-golden-tests` writes to), e.g. `r/moul/x/daily/foodemo/v1/filetests/render_filetest.gno`
+(**especially demos**):
 
 ```gno
 package main
@@ -171,16 +173,17 @@ package main
 import "gno.land/r/moul/x/daily/foodemo/v1"
 
 func main() {
-	print(foodemo.Render("")) // root; add more mains for representative paths
+	println(foodemo.Render("")) // root; add more filetests for representative paths
 }
 
 // Output:
 // …
 ```
 
-Populate the `// Output:` with `gno test -update-golden-tests ./r/moul/…`, then
-confirm plain `gno test ./r/moul/…` passes. Cover the root plus a couple of
-argument paths. Keep the rendered output **deterministic**: a filetest runs at a
+Populate the `// Output:` with `gno test -update-golden-tests ./r/moul/…/foodemo/v1`
+(it writes the golden into `filetests/`), then confirm plain
+`gno test ./r/moul/…/foodemo/v1` passes. Cover the root plus a couple of
+argument paths (one filetest each). Keep the rendered output **deterministic**: a filetest runs at a
 fixed chain height, but don't render wall-clock/random values that could differ
 between the `-update-golden-tests` run and CI.
 
