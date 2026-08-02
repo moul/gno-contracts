@@ -44,8 +44,31 @@ view: ## (re)build the stdlib-only GNOROOT view used by lint/test
 deps: ## vendor external gno.land dependencies into vendor/ (reads real GNOROOT/examples)
 	$(TOOL) vendor
 
-test: view ## gno test every contract (deps resolved from committed vendor/)
+test: toolcheck guard-examples view ## gno test every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== test $$d =="; GNOROOT="$(VIEW)" $(GNO) test ./$$d; done
+
+# Prove the gno toolchain actually VALIDATES example tests. gno silently skips
+# Example funcs on toolchains that lack the feature, turning every ExampleRender
+# into a no-op that passes (false green). Run a package whose example output is
+# deliberately wrong and require `gno test` to FAIL on it; if it passes, the
+# toolchain is blind to examples — abort.
+toolcheck: view ## verify the gno toolchain validates example tests
+	@tmp=$$(mktemp -d); \
+	printf 'module = "gno.land/p/moul/toolcheck/v1"\ngno = "0.9"\n' > $$tmp/gnomod.toml; \
+	printf 'package toolcheck\n\nfunc H() string { return "hi" }\n' > $$tmp/x.gno; \
+	printf 'package toolcheck\n\nimport "fmt"\n\nfunc ExampleH() {\n\tfmt.Println(H())\n\t// Output:\n\t// WRONG-ON-PURPOSE\n}\n' > $$tmp/x_test.gno; \
+	if GNOROOT="$(VIEW)" $(GNO) test $$tmp >/dev/null 2>&1; then \
+	  rm -rf $$tmp; \
+	  echo "ERROR: this gno does NOT validate example tests — they would be false-green."; \
+	  echo "       Build gno from gnolang/gno master (go build -o gno ./gnovm/cmd/gno)."; \
+	  exit 1; \
+	fi; \
+	rm -rf $$tmp; echo "toolcheck: gno validates example tests"
+
+# Every gno Example* test must pin an `// Output:` block, else gno skips it
+# silently (a test that asserts nothing).
+guard-examples: ## fail if any Example* test lacks an // Output: block
+	@python3 tools/guard_examples.py
 
 lint: view ## gno lint every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
