@@ -148,83 +148,83 @@ make help        # list all targets
 | [`r/moul/demo/importdemo/v1`](r/moul/demo/importdemo/v1) 🏛️ 💤 | — | — | — | — | 2 |
 | [`r/moul/demo/importdemo/v2`](r/moul/demo/importdemo/v2) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/demo/microposts/v1`](r/moul/demo/microposts/v1) 🏛️ 💤 | — | — | — | — | — |
-| [`r/moul/demo/microposts/v2`](r/moul/demo/microposts/v2) 🏛️ | — | — | — | — | — |
-| [`r/moul/demo/millipede/v1`](r/moul/demo/millipede/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/demo/microposts/v2`](r/moul/demo/microposts/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/microposts/v2) | — | — | — | — |
+| [`r/moul/demo/millipede/v1`](r/moul/demo/millipede/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/millipede/v1) | — | — | — | 1 |
 | [`r/moul/demo/render/v1`](r/moul/demo/render/v1) 🏛️ 💤 | — | — | — | — | — |
 | [`r/moul/demo/render/v2`](r/moul/demo/render/v2) 🏛️ | — | — | — | — | — |
 | [`r/moul/demo/vault/v1`](r/moul/demo/vault/v1) 🏛️ 💤 | — | — | — | — | 2 |
-| [`r/moul/demo/vault/v2`](r/moul/demo/vault/v2) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/demo/vault/v2`](r/moul/demo/vault/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/vault/v2) | — | — | — | 1 |
 | [`r/moul/demo/wikicoin/v1`](r/moul/demo/wikicoin/v1) 🏛️ 💤 | — | — | — | — | 2 |
-| [`r/moul/demo/wikicoin/v2`](r/moul/demo/wikicoin/v2) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/demo/wikicoin/v2`](r/moul/demo/wikicoin/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/demo/wikicoin/v2) | — | — | — | 2 |
 | [`r/moul/gns/v1`](r/moul/gns/v1) 🏛️ | — | — | — | — | 2 |
-| [`r/moul/hello/v1`](r/moul/hello/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/hello/v1`](r/moul/hello/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/hello/v1) | — | — | — | 1 |
 | [`r/moul/outfmt/v1`](r/moul/outfmt/v1) 🏛️ 💤 | — | — | — | — | 1 |
-| [`r/moul/outfmt/v2`](r/moul/outfmt/v2) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/sapin/v1`](r/moul/sapin/v1) 🏛️ | — | — | — | — | — |
-| [`r/moul/x/daily/blog/v1`](r/moul/x/daily/blog/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/outfmt/v2`](r/moul/outfmt/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/outfmt/v2) | — | — | — | 1 |
+| [`r/moul/sapin/v1`](r/moul/sapin/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/sapin/v1) | — | — | — | — |
+| [`r/moul/x/daily/blog/v1`](r/moul/x/daily/blog/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/blog/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/bloomfilter/v1`](r/moul/x/daily/bloomfilter/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/bullscows/v1`](r/moul/x/daily/bullscows/v1) 🏛️ | — | — | — | — | — |
-| [`r/moul/x/daily/calc/v1`](r/moul/x/daily/calc/v1) 🏛️ | — | — | — | — | — |
-| [`r/moul/x/daily/coinflipduel/v1`](r/moul/x/daily/coinflipduel/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/collatz/v1`](r/moul/x/daily/collatz/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/connect4/v1`](r/moul/x/daily/connect4/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/counter/v1`](r/moul/x/daily/counter/v1) 🏛️ | — | — | — | — | — |
+| [`r/moul/x/daily/calc/v1`](r/moul/x/daily/calc/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/calc/v1) | — | — | — | — |
+| [`r/moul/x/daily/coinflipduel/v1`](r/moul/x/daily/coinflipduel/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/coinflipduel/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/collatz/v1`](r/moul/x/daily/collatz/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/collatz/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/connect4/v1`](r/moul/x/daily/connect4/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/connect4/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/counter/v1`](r/moul/x/daily/counter/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/counter/v1) | — | — | — | — |
 | [`r/moul/x/daily/crowdfund/v1`](r/moul/x/daily/crowdfund/v1) 🏛️ 🚧 | — | — | — | — | 1 |
-| [`r/moul/x/daily/dice/v1`](r/moul/x/daily/dice/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/dutchauction/v1`](r/moul/x/daily/dutchauction/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/eggling/v1`](r/moul/x/daily/eggling/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/dice/v1`](r/moul/x/daily/dice/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/dice/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/dutchauction/v1`](r/moul/x/daily/dutchauction/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/dutchauction/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/eggling/v1`](r/moul/x/daily/eggling/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/eggling/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/eightball/v1`](r/moul/x/daily/eightball/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/englishauction/v1`](r/moul/x/daily/englishauction/v1) 🏛️ 🚧 | — | — | — | — | 1 |
-| [`r/moul/x/daily/erc1155/v1`](r/moul/x/daily/erc1155/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/erc1155/v1`](r/moul/x/daily/erc1155/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/erc1155/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/erc20/v1`](r/moul/x/daily/erc20/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/erc721/v1`](r/moul/x/daily/erc721/v1) 🏛️ 🚧 | — | — | — | — | 1 |
-| [`r/moul/x/daily/escrow/v1`](r/moul/x/daily/escrow/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/escrow/v1`](r/moul/x/daily/escrow/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/escrow/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/faucet/v1`](r/moul/x/daily/faucet/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/governor/v1`](r/moul/x/daily/governor/v1) 🏛️ 🚧 | — | — | — | — | 1 |
-| [`r/moul/x/daily/guestbook/v1`](r/moul/x/daily/guestbook/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/guestbook/v1`](r/moul/x/daily/guestbook/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/guestbook/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/handles/v1`](r/moul/x/daily/handles/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/hangman/v1`](r/moul/x/daily/hangman/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/kingofdice/v1`](r/moul/x/daily/kingofdice/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/kudos/v1`](r/moul/x/daily/kudos/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/hangman/v1`](r/moul/x/daily/hangman/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/hangman/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/kingofdice/v1`](r/moul/x/daily/kingofdice/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/kingofdice/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/kudos/v1`](r/moul/x/daily/kudos/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/kudos/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/leaderboard/v1`](r/moul/x/daily/leaderboard/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/life/v1`](r/moul/x/daily/life/v1) 🏛️ | — | — | — | — | — |
-| [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/life/v1`](r/moul/x/daily/life/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/life/v1) | — | — | — | — |
+| [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/linktree/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/lottery/v1`](r/moul/x/daily/lottery/v1) 🏛️ 🚧 | — | — | — | — | 1 |
-| [`r/moul/x/daily/lru/v1`](r/moul/x/daily/lru/v1) 🏛️ | — | — | — | — | — |
-| [`r/moul/x/daily/memory/v1`](r/moul/x/daily/memory/v1) 🏛️ | — | — | — | — | — |
+| [`r/moul/x/daily/lru/v1`](r/moul/x/daily/lru/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/lru/v1) | — | — | — | — |
+| [`r/moul/x/daily/memory/v1`](r/moul/x/daily/memory/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/memory/v1) | — | — | — | — |
 | [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop/v1) 🏛️ 🚧 | — | — | — | — | 1 |
 | [`r/moul/x/daily/microblog/v1`](r/moul/x/daily/microblog/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/moodstone/v1`](r/moul/x/daily/moodstone/v1) 🏛️ | — | — | — | — | — |
-| [`r/moul/x/daily/multisig/v1`](r/moul/x/daily/multisig/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/multisig/v1`](r/moul/x/daily/multisig/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/multisig/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/numguess/v1`](r/moul/x/daily/numguess/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/piglatindemo/v1`](r/moul/x/daily/piglatindemo/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/polls/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/quotes/v1`](r/moul/x/daily/quotes/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/ratelimitdemo/v1`](r/moul/x/daily/ratelimitdemo/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/reactions/v1`](r/moul/x/daily/reactions/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/reactions/v1`](r/moul/x/daily/reactions/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/reactions/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/ringlog/v1`](r/moul/x/daily/ringlog/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/rpsduel/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/rpsmatch/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/rpsoracle/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/splitter/v1`](r/moul/x/daily/splitter/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/stack/v1`](r/moul/x/daily/stack/v1) 🏛️ | — | — | — | — | — |
+| [`r/moul/x/daily/stack/v1`](r/moul/x/daily/stack/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/stack/v1) | — | — | — | — |
 | [`r/moul/x/daily/staking/v1`](r/moul/x/daily/staking/v1) 🏛️ 🚧 | — | — | — | — | 1 |
 | [`r/moul/x/daily/tamagotchi/v1`](r/moul/x/daily/tamagotchi/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/tictactoe/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule/v1) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/timelock/v1`](r/moul/x/daily/timelock/v1) 🏛️ 🚧 | — | — | — | — | 2 |
-| [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/todos/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/trivia/v1`](r/moul/x/daily/trivia/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/urlshort/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/vault/v1`](r/moul/x/daily/vault/v1) 🏛️ | — | — | — | — | 1 |
-| [`r/moul/x/daily/vestoken/v1`](r/moul/x/daily/vestoken/v1) 🏛️ | — | — | — | — | — |
-| [`r/moul/x/daily/wordle/v1`](r/moul/x/daily/wordle/v1) 🏛️ | — | — | — | — | — |
+| [`r/moul/x/daily/vestoken/v1`](r/moul/x/daily/vestoken/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/vestoken/v1) | — | — | — | — |
+| [`r/moul/x/daily/wordle/v1`](r/moul/x/daily/wordle/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/wordle/v1) | — | — | — | — |
 | [`r/moul/x/daily/wrapped/v1`](r/moul/x/daily/wrapped/v1) 🏛️ | — | — | — | — | 1 |
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._
 
-_On-chain status last checked: 2026-08-01T19:54:04Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_On-chain status last checked: 2026-08-02T11:28:09Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
