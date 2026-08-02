@@ -40,20 +40,32 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
 
-      - name: Refresh on-chain status
-        run: make status
-
-      - name: Commit refreshed catalog
+      # Regenerate the status on the LATEST main each attempt, then push. Never
+      # rebase the generated files (contracts.json/README.md) — the regen bot
+      # writes the same files, so a rebase conflicts and the push silently fails
+      # (that stalled the status refresh entirely). Instead, on a rejected push,
+      # reset to fresh main, re-run `make status`, and retry. `make status` is
+      # deterministic given on-chain state, so regenerating is always safe.
+      - name: Refresh on-chain status and push
         run: |
-          if [ -z "$(git status --porcelain contracts.json README.md)" ]; then
-            echo "No status changes."
-            exit 0
-          fi
           git config user.name "Manfred Touron"
           git config user.email "94029+moul@users.noreply.github.com"
-          git add contracts.json README.md
-          git commit -m "chore(status): refresh on-chain publish status [skip ci]"
-          # rebase onto any concurrent main update (regen/other) before pushing,
-          # so the push can't be rejected non-fast-forward
-          git pull --rebase --autostash origin main
-          git push origin HEAD:main
+          for attempt in 1 2 3 4 5; do
+            git fetch --quiet origin main
+            git reset --quiet --hard origin/main
+            make status
+            if [ -z "$(git status --porcelain contracts.json README.md)" ]; then
+              echo "No status changes."
+              exit 0
+            fi
+            git add contracts.json README.md
+            git commit -q -m "chore(status): refresh on-chain publish status [skip ci]"
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "push rejected (main moved); regenerating on latest — attempt $attempt"
+            sleep $((RANDOM % 5 + 2))
+          done
+          echo "::error::could not push status after 5 attempts"
+          exit 1
