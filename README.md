@@ -224,7 +224,7 @@ make help        # list all targets
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._
 
-_On-chain status last checked: 2026-08-02T11:28:09Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_On-chain status last checked: 2026-08-02T11:45:42Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
