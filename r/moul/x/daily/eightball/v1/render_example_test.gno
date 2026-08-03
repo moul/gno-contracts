@@ -1,10 +1,8 @@
 package eightball
 
-import "fmt"
-
 // ExampleRender pins the realm's Render output as a testable example.
 func ExampleRender() {
-	fmt.Println(Render(""))
+	print(Render(""))
 	// Output:
 	// # 🎱 Magic 8-Ball
 	//

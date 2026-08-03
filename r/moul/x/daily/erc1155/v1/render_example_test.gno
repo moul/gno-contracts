@@ -1,10 +1,8 @@
 package erc1155
 
-import "fmt"
-
 // ExampleRender pins the realm's Render output as a testable example.
 func ExampleRender() {
-	fmt.Println(Render(""))
+	print(Render(""))
 	// Output:
 	// # ERC-1155 Multi-Token
 	//

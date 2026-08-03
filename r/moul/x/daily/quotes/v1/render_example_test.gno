@@ -1,10 +1,8 @@
 package quotes
 
-import "fmt"
-
 // ExampleRender pins the realm's Render output as a testable example.
 func ExampleRender() {
-	fmt.Println(Render(""))
+	print(Render(""))
 	// Output:
 	// # Quote of the Moment
 	//
