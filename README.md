@@ -121,7 +121,6 @@ make help        # list all targets
 | [`p/moul/mdtable/v1`](p/moul/mdtable/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/mdtable/v1) | [🗄️](https://gno.land/p/moul/mdtable) | [🗄️](https://staging.gno.land/p/moul/mdtable) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
 | [`p/moul/memo/v1`](p/moul/memo/v1) 📦 💤 | — | — | — | — | 2 |
 | [`p/moul/memo/v2`](p/moul/memo/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/memo/v2) | — | — | — | 2 |
-| [`p/moul/memo/v3`](p/moul/memo/v3) 📦 | — | — | — | — | 2 |
 | [`p/moul/nestedpkg/v1`](p/moul/nestedpkg/v1) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/nestedpkg/v1) | — | — | — | — |
 | [`p/moul/once/v1`](p/moul/once/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/once/v1) | [🗄️](https://gno.land/p/moul/once) | [🗄️](https://staging.gno.land/p/moul/once) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
 | [`p/moul/printfdebugging/v1`](p/moul/printfdebugging/v1) 📦 💤 | — | — | — | — | 1 |
