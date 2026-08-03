@@ -195,12 +195,19 @@ Rules that make it actually run and verify:
   from a stale local `gno` does not prove the example ran.
 
 Populating `// Output:`: run the example once with an empty `// Output:` and copy
-the `got:` block the failure prints, or reuse the value from a scratch
-`-update-golden-tests` filetest. Worked examples: the `x/daily/*demo` realms.
+the `got:` block the failure prints. Worked examples: the `x/daily/*demo` realms.
 
-Filetests (`filetests/*_filetest.gno`, auto-populated by `-update-golden-tests`)
-remain a fallback when an example test doesn't fit — e.g. testing a package's
-`main`/entrypoint, or asserting a panic/error path.
+**Consecutive blank lines can't be pinned by an example.** gno (like Go)
+**collapses consecutive blank lines** in a `// Output:` block, so any output with
+two-or-more blank lines in a row (a lot of markdown `Render`s) will never match.
+When that happens, don't use an example — assert the output in a normal `Test`
+with `uassert.Equal(t, expected, got)` using a raw-string literal (backticks),
+which preserves blank lines exactly, stays in-package, and needs no `fmt`. Worked
+example: `p/moul/mdlist/v2` `TestEntriesRendering`.
+
+Order of preference: **example test** → **`Test` + `uassert.Equal`** (blank-line
+or panic/error outputs) → **filetest** (`filetests/*_filetest.gno`, auto-populated
+by `-update-golden-tests`; last resort, e.g. a package `main`/entrypoint).
 
 ## Every package MUST have a README
 

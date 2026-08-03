@@ -26,14 +26,13 @@ Read it before doing anything. The essentials:
   it and shows it via `Render`; the two cross-reference each other in comments +
   READMEs. Only a lone realm when it's a stateful app with nothing to extract.
   Details + examples in AGENTS.md.
-- **Every realm tests its `Render`.** Add an in-package `ExampleRender()` (gno's
-  example-test feature) in a `_test.gno` that `fmt.Println(Render(<path>))` with a
-  matching `// Output:` block (required — an example without it is skipped; use
-  stdout, not `println`). `gno test` on a **master** gno verifies it (CI does;
-  stale local gno silently skips examples). Keep output deterministic. Especially
-  demos. Filetests are a fallback. Details in AGENTS.md.
-  Keep the output deterministic. `Example…()`+`// Output:` are NOT checked by gno.
-  Details in AGENTS.md.
+- **Every realm tests its `Render`.** Prefer an in-package `ExampleRender()` (gno's
+  example-test feature) that `fmt.Println(Render(<path>))` with a matching
+  `// Output:` block (required — an example without it is skipped; stdout, not
+  `println`; deterministic). Verified by `gno test` on a **master** gno (CI does;
+  a stale local gno silently skips examples). **If the output has consecutive
+  blank lines** (examples collapse them), assert it with `uassert.Equal` in a
+  normal `Test` instead; filetest last resort. Details in AGENTS.md.
 - **Green before commit:** `make lint test` (needs `GNOROOT` = a gnolang/gno checkout).
 
 ## Commits
