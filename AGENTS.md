@@ -7,10 +7,19 @@ before making changes.
 
 ## The three rules
 
-1. **Everything is versioned.** Every contract path ends in an explicit version
-   segment — `gno.land/{p,r}/moul/<name>/v1` (then `v2`, `v3`, …). There is *no*
-   un-versioned contract, ever. A breaking change is a **new `vN` directory**,
-   never an in-place edit of an existing published version.
+1. **Everything is versioned; bump only on a compatibility change.** Every
+   contract path ends in an explicit version segment —
+   `gno.land/{p,r}/moul/<name>/v1` (then `v2`, `v3`, …). There is *no*
+   un-versioned contract, ever.
+   - **Bump to a new `vN` directory** for a **compatibility / breaking change**:
+     removing, renaming, or changing the signature or on-chain behavior of an
+     existing exported symbol, or changing storage layout / the backing data
+     structure (e.g. swapping `avl` → `bptree`). Never make such a change in
+     place on a published version.
+   - **Edit in place (same `vN`)** for everything **non-breaking**: adding new
+     exported functions, unit tests, comments, README/docs. (Test files and
+     READMEs are not part of the deployed package, so they never change its
+     on-chain hash; adding a function is backward-compatible.)
    - **Archived originals.** An original version that does *not* build on current
      gno master (e.g. imported/vibe-coded code written for an older testnet API)
      is **not** fixed in place and **not** deleted. Add `ignore = true` to its

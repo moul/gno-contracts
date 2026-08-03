@@ -3,8 +3,11 @@
 This repository has a single, authoritative guide for agents: **[AGENTS.md](./AGENTS.md)**.
 Read it before doing anything. The essentials:
 
-- **Version everything.** Contracts live at `gno.land/{p,r}/moul/<name>/vN`.
-  Breaking change ⇒ new `vN` directory, never edit a published version in place.
+- **Version everything; bump only on a compatibility change.** Contracts live at
+  `gno.land/{p,r}/moul/<name>/vN`. A **breaking change** — removing/renaming an
+  exported symbol, changing its signature/behavior, or a storage/data-structure
+  swap (e.g. `avl`→`bptree`) ⇒ **new `vN`** dir. **Non-breaking** work (new
+  functions, unit tests, comments, docs) stays in place in the same `vN`.
 - **Keep the repo autonomous.** Local `p/moul` ↔ `r/moul` imports resolve via
   `gnowork.toml`; external `gno.land/*` deps are vendored under `vendor/`
   (`make deps`). Don't rely on `$GNOROOT/examples` for anything but stdlibs.
