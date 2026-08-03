@@ -18,3 +18,4 @@ tools/tools
 .DS_Store
 
 # NOTE: vendor/ is intentionally committed (autonomy). Do not ignore it.
+tools/gnopublish/gnopublish

@@ -42,24 +42,31 @@ jobs:
       - name: Install graphviz
         run: sudo apt-get update && sudo apt-get install -y graphviz
 
-      - name: Regenerate catalog, READMEs, and graphs
-        run: |
-          make gen
-          make graph
-
-      - name: Commit regenerated artifacts
+      # Regenerate on the LATEST main each attempt, then push. Never rebase the
+      # generated files — publish-status writes the same contracts.json/README.md,
+      # so a rebase conflicts and the push fails. On a rejected push, reset to
+      # fresh main, re-run make gen/graph, and retry (regeneration is idempotent).
+      - name: Regenerate and push
         run: |
           git config user.name "Manfred Touron"
           git config user.email "94029+moul@users.noreply.github.com"
-          # Stage ALL regenerated output — catalog, root README table, per-package
-          # README footers, and _assets. (Staging only a subset left `make gen`'s
-          # per-package README edits unstaged, which broke `git pull --rebase`.)
-          git add -A
-          if git diff --cached --quiet; then
-            echo "Nothing to regenerate."
-            exit 0
-          fi
-          git commit -m "chore: regenerate catalog + READMEs + graphs"
-          # rebase onto any concurrent main update (e.g. publish-status) before pushing
-          git pull --rebase origin main
-          git push origin HEAD:main
+          for attempt in 1 2 3 4 5; do
+            git fetch --quiet origin main
+            git reset --quiet --hard origin/main
+            make gen
+            make graph
+            git add -A
+            if git diff --cached --quiet; then
+              echo "Nothing to regenerate."
+              exit 0
+            fi
+            git commit -q -m "chore: regenerate catalog + READMEs + graphs"
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "push rejected (main moved); regenerating on latest — attempt $attempt"
+            sleep $((RANDOM % 5 + 2))
+          done
+          echo "::error::could not push regen after 5 attempts"
+          exit 1

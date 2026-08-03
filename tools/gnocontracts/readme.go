@@ -45,43 +45,48 @@ func renderTable(m *Manifest) string {
 		return "_No contracts yet._\n"
 	}
 	var b strings.Builder
-	// header
-	b.WriteString("| Package | Kind | Description | Deps | Monorepo |")
+	// header: Package, then one column per network, then Monorepo + Deps.
+	b.WriteString("| Package |")
 	for _, n := range m.Networks {
 		b.WriteString(" " + n.Name + " |")
 	}
-	b.WriteString("\n|---|---|---|---|---|")
+	b.WriteString(" Monorepo | Deps |\n|---|")
 	for range m.Networks {
 		b.WriteString("---|")
 	}
-	b.WriteString("\n")
+	b.WriteString("---|---|\n")
 	// rows
 	for _, c := range m.Contracts {
-		desc := c.Description
+		// Package column: path without the gno.land/ prefix, linked to the
+		// contract's folder in this repo. Kind emoji after (outside the backtick).
+		label := strings.TrimPrefix(c.PkgPath, "gno.land/")
+		name := "[`" + label + "`](" + c.Dir + ") " + kindEmoji(c.Kind)
 		if c.Draft {
-			desc = "🚧 " + desc
+			name += " 🚧"
 		}
 		if c.Ignored {
-			desc = "💤 " + desc
+			name += " 💤"
 		}
-		if desc == "" {
-			desc = "—"
-		}
-		kind := "pkg"
-		if c.Kind == "r" {
-			kind = "realm"
-		}
-		b.WriteString("| `" + c.PkgPath + "` | " + kind + " | " + desc + " | " + depBadge(c.Deps) + " | " + monorepoLink(c.Upstream) + " |")
+		b.WriteString("| " + name + " |")
 		for _, n := range m.Networks {
-			b.WriteString(" " + publishedBadge(c.Published[n.Name]) + " |")
+			b.WriteString(" " + publishedCell(n, c) + " |")
 		}
-		b.WriteString("\n")
+		b.WriteString(" " + monorepoLink(c.Upstream) + " | " + depBadge(c.Deps) + " |\n")
 	}
-	b.WriteString("\n_💤 = archived: `ignore = true` in gnomod, skipped by CI; kept for reference and superseded by a later version._\n")
+	b.WriteString("\n_📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._\n")
 	if m.StatusCheckedAt != "" {
-		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = /v1, 📦 = un-versioned monorepo path)._\n")
+		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = /v1, 🗄️ = un-versioned monorepo path)._\n")
 	}
 	return b.String()
+}
+
+// kindEmoji marks a contract as a package or a realm, shown after the package
+// name (outside the backtick) in place of a dedicated Kind column.
+func kindEmoji(kind string) string {
+	if kind == "r" {
+		return "🏛️"
+	}
+	return "📦"
 }
 
 // monorepoLink renders a link to the un-versioned package in the gnolang/gno
@@ -106,10 +111,56 @@ func publishedBadge(p Pub) string {
 	}
 	switch p.Which {
 	case "monorepo":
-		return "📦"
+		return "🗄️"
 	case "both":
-		return "✅📦"
+		return "✅🗄️"
 	default:
 		return "✅"
 	}
+}
+
+// publishedCell renders the per-network status badge, made clickable to the
+// package's gnoweb page on that network when it is on chain. A monorepo-only
+// hit links the un-versioned path (that is what is actually deployed there).
+func publishedCell(n Network, c Contract) string {
+	p := c.Published[n.Name]
+	badge := publishedBadge(p)
+	if !p.Uploaded {
+		return badge
+	}
+	path := gnowebPath(c.PkgPath)
+	if p.Which == "monorepo" && c.Upstream != "" {
+		path = gnowebPath(c.Upstream)
+	}
+	return "[" + badge + "](" + webBase(n) + path + ")"
+}
+
+// webBase returns the gnoweb base URL for a network, derived from its RPC: the
+// "rpc." host prefix is dropped (rpc.gno.land -> gno.land) and the port is
+// stripped; a local devnet (127.0.0.1/localhost) maps to gnodev's web port 8888.
+func webBase(n Network) string {
+	scheme, rest := "https://", n.RPC
+	if i := strings.Index(rest, "://"); i >= 0 {
+		scheme, rest = rest[:i+3], rest[i+3:]
+	}
+	if i := strings.IndexByte(rest, '/'); i >= 0 {
+		rest = rest[:i]
+	}
+	host := rest
+	if i := strings.LastIndexByte(host, ':'); i >= 0 {
+		host = host[:i]
+	}
+	if host == "127.0.0.1" || host == "localhost" {
+		return "http://" + host + ":8888"
+	}
+	return scheme + strings.TrimPrefix(host, "rpc.")
+}
+
+// gnowebPath drops the chain-domain prefix from a pkgpath, keeping the gnoweb
+// path: gno.land/p/moul/hello/v1 -> /p/moul/hello/v1.
+func gnowebPath(pkgpath string) string {
+	if i := strings.IndexByte(pkgpath, '/'); i >= 0 {
+		return pkgpath[i:]
+	}
+	return "/" + pkgpath
 }
