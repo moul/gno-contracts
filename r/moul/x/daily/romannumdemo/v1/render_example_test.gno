@@ -1,10 +1,8 @@
 package romannumdemo
 
-import "fmt"
-
 // ExampleRender pins the realm's Render output as a gno testable example.
 func ExampleRender() {
-	fmt.Println(Render(""))
+	print(Render(""))
 	// Output:
 	// # Roman numeral converter
 	//
