@@ -1,0 +1,3 @@
+module = "gno.land/p/moul/ownable/v1"
+gno = "0.9"
+ignore = true
