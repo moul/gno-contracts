@@ -169,11 +169,9 @@ directly, no self-import (**especially demos**):
 ```gno
 package foodemo
 
-import "fmt"
-
 // ExampleRender pins the realm's Render output as a testable example.
 func ExampleRender() {
-	fmt.Println(Render("")) // root; add more Example funcs for representative paths
+	print(Render("")) // root; add more Example funcs for representative paths
 	// Output:
 	// …
 }
@@ -184,8 +182,9 @@ Rules that make it actually run and verify:
 - The **`// Output:` block is required** — an example with no `// Output:` is
   silently **skipped**. Its content must match `Render`'s output exactly
   (leading/trailing whitespace is trimmed).
-- Print to **stdout** with `fmt.Println`/`fmt.Print` — `println` writes to
-  stderr and is **not** captured.
+- Use the builtin **`print(...)`** — its output is captured on stdout in tests,
+  and it needs **no import** (prefer it over `fmt.Println` to keep the test file
+  import-free). Trailing whitespace is trimmed, so the missing newline is fine.
 - Cover the root plus a couple of argument paths (one `ExampleRender…` each).
 - Keep output **deterministic**: tests run at a fixed chain height, but don't
   render wall-clock/random values.
