@@ -25,7 +25,10 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
-          bad=$(git diff --name-only "$BASE" "$HEAD" -- \
+          # three-dot: diff the merge-base..head, i.e. only what THIS PR changed.
+          # (two-dot would also flag files that merely advanced on main — e.g. the
+          # regen/status bots' README.md/contracts.json — falsely failing older PRs.)
+          bad=$(git diff --name-only "$BASE...$HEAD" -- \
                   README.md contracts.json '_assets' '_assets/**')
           if [ -n "$bad" ]; then
             echo "::error::This PR modifies generated files. Remove them — they are"
