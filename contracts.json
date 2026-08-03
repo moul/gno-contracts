@@ -54,6 +54,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/addrset/v2",
+      "dir": "p/moul/addrset/v2",
+      "kind": "p",
+      "name": "addrset",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/bptree/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/authz/v1",
       "dir": "p/moul/authz/v1",
       "kind": "p",
