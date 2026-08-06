@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-02T11:45:42Z",
+  "status_checked_at": "2026-08-03T16:55:21Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -50,6 +50,29 @@
         "topaz": {
           "uploaded": true,
           "which": "both"
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/addrset/v2",
+      "dir": "p/moul/addrset/v2",
+      "kind": "p",
+      "name": "addrset",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/bptree/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },

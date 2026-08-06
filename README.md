@@ -96,6 +96,7 @@ make help        # list all targets
 | Package | topaz | betanet | staging | Monorepo | Deps |
 |---|---|---|---|---|---|
 | [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/addrset/v1) | [🗄️](https://gno.land/p/moul/addrset) | [🗄️](https://staging.gno.land/p/moul/addrset) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
+| [`p/moul/addrset/v2`](p/moul/addrset/v2) 📦 | — | — | — | — | 1 |
 | [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/authz/v1) | [🗄️](https://gno.land/p/moul/authz) | [🗄️](https://staging.gno.land/p/moul/authz) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
 | [`p/moul/collection/v1`](p/moul/collection/v1) 📦 💤 | — | — | — | — | 3 |
 | [`p/moul/collection/v2`](p/moul/collection/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/collection/v2) | — | — | — | 3 |
@@ -224,7 +225,7 @@ make help        # list all targets
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._
 
-_On-chain status last checked: 2026-08-02T11:45:42Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_On-chain status last checked: 2026-08-03T16:55:21Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
