@@ -1,0 +1,18 @@
+# `gno.land/p/moul/x/daily/sieve/v1`
+
+**Sieve of Eratosthenes** — `PrimesUpTo`, `NthPrime`, `IsPrime`, `MaxN`.
+
+A deterministic, allocation-friendly port of Go's classic concurrent prime-sieve
+example — no goroutines, channels, or clocks, so it runs reproducibly on-chain.
+`MaxN` (10000) bounds the sieve so gas stays predictable.
+
+```go
+import "gno.land/p/moul/x/daily/sieve/v1"
+
+primes := sieve.PrimesUpTo(30)  // [2 3 5 7 11 13 17 19 23 29]
+p := sieve.NthPrime(10)         // 29 (1-indexed; 0 beyond MaxN)
+ok := sieve.IsPrime(9973)       // true
+```
+
+**Live demo:** [`r/moul/x/daily/sievedemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/sievedemo/v1)
+· render it at [`/r/moul/x/daily/sievedemo/v1`](https://gno.land/r/moul/x/daily/sievedemo/v1).
