@@ -148,3 +148,28 @@ func TestParseImports(t *testing.T) {
 		}
 	}
 }
+
+func TestClassifyUpstream(t *testing.T) {
+	// build a dir with a prod .gno, a test .gno, and a gnomod
+	mk := func(prod, test, mod string) string {
+		d := t.TempDir()
+		writeFile(t, d, "a.gno", prod)
+		writeFile(t, d, "a_test.gno", test)
+		writeFile(t, d, "gnomod.toml", mod)
+		return d
+	}
+	our := mk("X", "T1", `module = "gno.land/p/moul/x/v2"`)
+	cases := []struct {
+		name, prod, test, mod, want string
+	}{
+		{"exact", "X", "T1", `module = "gno.land/p/moul/x/v2"`, "exact"},
+		{"gno (meta differs)", "X", "T1", `module = "gno.land/p/moul/x"`, "gno"},
+		{"gno-notest (tests differ)", "X", "T2", `module = "gno.land/p/moul/x"`, "gno-notest"},
+		{"diff (prod differs)", "Y", "T1", `module = "gno.land/p/moul/x"`, "diff"},
+	}
+	for _, c := range cases {
+		if got := classifyUpstream(our, mk(c.prod, c.test, c.mod)); got != c.want {
+			t.Errorf("%s: classifyUpstream = %q, want %q", c.name, got, c.want)
+		}
+	}
+}
