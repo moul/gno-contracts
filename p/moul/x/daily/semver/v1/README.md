@@ -1,0 +1,23 @@
+# `gno.land/p/moul/x/daily/semver/v1`
+
+**Semantic Versioning 2.0.0 parser + comparator** — `Parse`, `Compare`, and the
+`Version` type (with `Canonical`).
+
+An on-chain port of the core of Go's [`golang.org/x/mod/semver`](https://pkg.go.dev/golang.org/x/mod/semver)
+(and the spirit of [`Masterminds/semver`](https://github.com/Masterminds/semver)).
+Parses `vMAJOR.MINOR.PATCH[-prerelease][+build]` and compares with correct
+precedence: numeric fields compare numerically (so `1.2.3 < 1.2.10`), a
+pre-release ranks below its release (`1.0.0-alpha < 1.0.0`), numeric pre-release
+identifiers rank below alphanumeric ones, and build metadata is ignored. Pure
+and deterministic — no `avl`, no chain imports, no ambient state.
+
+```go
+import "gno.land/p/moul/x/daily/semver/v1"
+
+v, err := semver.Parse("v1.0.0-rc.1+ci.7") // Version{Major:1, Pre:["rc","1"], …}
+semver.Compare("1.2.3", "1.2.10")          // -1
+v.Canonical()                              // "1.0.0-rc.1+ci.7"
+```
+
+**Live demo:** [`r/moul/x/daily/semverdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/semverdemo/v1)
+· render it at [`/r/moul/x/daily/semverdemo/v1`](https://gno.land/r/moul/x/daily/semverdemo/v1).
