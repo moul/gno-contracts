@@ -1,0 +1,14 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/moul/present/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/present/v1" -> "gno.land/p/demo/avl/pager";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/demo/ownable";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/demo/seqid";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/demo/ufmt";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/moul/collection";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/moul/md";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/moul/mdtable";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/moul/realmpath";
+  "gno.land/r/moul/present/v1" -> "gno.land/p/moul/txlink";
+}

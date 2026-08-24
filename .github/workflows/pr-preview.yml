@@ -34,24 +34,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-
-      - name: Build gnodev from gno master
-        run: |
-          git clone --depth=1 https://github.com/gnolang/gno "$HOME/gno"
-          ( cd "$HOME/gno/contribs/gnodev" && GOTOOLCHAIN=auto go build -o "$HOME/gnodev" . )
-          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
-          echo "GNODEV=$HOME/gnodev" >> "$GITHUB_ENV"
-
       - name: Determine changed realms
         id: realms
         run: |
-          git fetch origin "${{ github.base_ref }}" --depth=1
+          git fetch --no-tags origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
+          base=$(git merge-base "origin/${{ github.base_ref }}" HEAD)
+          echo "diffing $base..HEAD"
           sels=""
-          for d in $(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+          for d in $(git diff --name-only "$base" HEAD \
                      | grep -E '^r/moul/.*\.gno$' \
                      | sed -E 's#/[^/]+$##' | sort -u); do
             # nearest dir containing gnomod.toml, and only if not ignored
@@ -64,57 +54,79 @@ jobs:
           echo "selectors=$sels" >> "$GITHUB_OUTPUT"
           echo "changed realm selectors: ${sels:-<none>}"
 
-      - name: Render preview
-        if: steps.realms.outputs.selectors != ''
-        run: |
-          python3 tools/gnopreview/gnopreview.py --out _preview ${{ steps.realms.outputs.selectors }}
-
-      - name: Publish to gh-pages/pr-<N>
-        if: steps.realms.outputs.selectors != ''
-        run: |
-          git config user.name "Manfred Touron"
-          git config user.email "94029+moul@users.noreply.github.com"
-          tmp=$(mktemp -d)
-          git worktree add --force "$tmp" gh-pages 2>/dev/null || {
-            git worktree add --force --orphan -b gh-pages "$tmp"
-            : > "$tmp/.nojekyll"
-          }
-          rm -rf "$tmp/pr-$PR"
-          mkdir -p "$tmp/pr-$PR"
-          cp -r _preview/. "$tmp/pr-$PR/"
-          ( cd "$tmp" && git add -A && git diff --cached --quiet || git commit -q -m "preview: PR #$PR" )
-          ( cd "$tmp" && git push origin gh-pages )
-          git worktree remove --force "$tmp"
-
-      - name: Sticky comment
+      # Post the sticky comment with the PERSISTENT preview URL up-front — BEFORE the
+      # slow gnodev build. The per-PR gh-pages URL never changes, so the link is always
+      # present; while a new build runs, the comment keeps pointing at the last
+      # published version (no need to wait for CI to see something).
+      - name: Sticky comment (persistent URL)
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
           marker="<!-- gnocontracts-pr-preview -->"
-          if [ -z "${{ steps.realms.outputs.selectors }}" ]; then
-            body="$marker
-### 🖼️ PR preview
-No realm changes in this PR — nothing to preview."
-          else
-            list=$(for s in ${{ steps.realms.outputs.selectors }}; do
-                     pp="gno.land/${s#./}"; url="${pp#gno.land/}"
-                     echo "- [\`$pp\`](${PAGES_URL}${url}/)"; done)
-            body="$marker
-### 🖼️ PR preview
-Rendered with gnodev → static gnoweb. **[Open preview index](${PAGES_URL})**
-
-$list
-
-_Static snapshot; interactive actions and nav that leaves these pages won't work. Removed when the PR closes._"
-          fi
+          {
+            echo "$marker"
+            echo "### 🖼️ PR preview"
+            if [ -z "${{ steps.realms.outputs.selectors }}" ]; then
+              echo "No realm changes in this PR — nothing to preview."
+            else
+              echo "**[Open preview index](${PAGES_URL})** — rendered with gnodev → static gnoweb."
+              echo "_Stable link; updates a minute or two after each push (shows the previous build until the new one finishes)._"
+              echo
+              for s in ${{ steps.realms.outputs.selectors }}; do
+                pp="gno.land/${s#./}"; url="${pp#gno.land/}"
+                echo "- [\`$pp\`](${PAGES_URL}${url}/)"
+              done
+              echo
+              echo "_Static snapshot; interactive actions and nav that leaves these pages won't work. Removed when the PR closes._"
+            fi
+          } > /tmp/preview-comment.md
           id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
                 --jq ".[] | select(.body|contains(\"$marker\")) | .id" | head -1)
           if [ -n "$id" ]; then
-            gh api -X PATCH "repos/$REPO/issues/comments/$id" -f body="$body" >/dev/null
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@/tmp/preview-comment.md >/dev/null
           else
-            gh api "repos/$REPO/issues/$PR/comments" -f body="$body" >/dev/null
+            gh api "repos/$REPO/issues/$PR/comments" -F body=@/tmp/preview-comment.md >/dev/null
           fi
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build gnodev from gno master
+        run: |
+          git clone --depth=1 https://github.com/gnolang/gno "$HOME/gno"
+          ( cd "$HOME/gno/contribs/gnodev" && GOTOOLCHAIN=auto go build -o "$HOME/gnodev" . )
+          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
+          echo "GNODEV=$HOME/gnodev" >> "$GITHUB_ENV"
+
+      - name: Render preview
+        if: steps.realms.outputs.selectors != ''
+        run: |
+          python3 tools/gnopreview/gnopreview.py --out _preview ${{ steps.realms.outputs.selectors }}
+          echo "--- _preview tree ---"; find _preview -maxdepth 3 2>/dev/null | head -30 || echo "(none)"
+
+      - name: Publish to gh-pages/pr-<N>
+        if: steps.realms.outputs.selectors != ''
+        run: |
+          if [ ! -d _preview ] || [ -z "$(ls -A _preview 2>/dev/null)" ]; then
+            echo "nothing rendered — skipping publish"; exit 0
+          fi
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          rm -rf .ghp
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add .ghp origin/gh-pages
+            ( cd .ghp && git checkout -B gh-pages )
+          else
+            git worktree add --detach .ghp
+            ( cd .ghp && git checkout --orphan gh-pages && git reset --hard >/dev/null 2>&1; rm -rf ./* ./.[!.]* 2>/dev/null; : > .nojekyll )
+          fi
+          rm -rf ".ghp/pr-$PR"; mkdir -p ".ghp/pr-$PR"; cp -r _preview/. ".ghp/pr-$PR/"
+          ( cd .ghp && git add -A && (git diff --cached --quiet || git commit -q -m "preview: PR #$PR") && git push origin gh-pages )
+          git worktree remove --force .ghp
 
   # ---- tear down the subfolder when the PR closes ------------------------
   cleanup:
