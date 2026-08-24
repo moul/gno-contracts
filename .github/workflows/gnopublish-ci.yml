@@ -1,0 +1,43 @@
+name: gnopublish-ci
+
+# Build + vet + unit-test the gnopublish tool. It's a separate, heavy module (links
+# the full gno client stack via cgo), so it runs ONLY when tools/gnopublish changes
+# — it must not slow every PR. The committed go.mod `replace` points at a local gno
+# checkout; here we repoint it at a fresh gno master clone.
+on:
+  pull_request:
+    paths: ["tools/gnopublish/**"]
+  push:
+    branches: [main]
+    paths: ["tools/gnopublish/**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/gnopublish
+    env:
+      GOFLAGS: -mod=mod
+      GOTOOLCHAIN: auto
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Clone gno master + repoint the replace
+        run: |
+          git clone --depth=1 https://github.com/gnolang/gno "$HOME/gno"
+          go mod edit -replace github.com/gnolang/gno="$HOME/gno"
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...

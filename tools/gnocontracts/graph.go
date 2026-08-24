@@ -29,7 +29,7 @@ func cmdGraph(root string) error {
 	if _, err := exec.LookPath("dot"); err == nil {
 		haveDot = true
 	}
-	changed, rendered := 0, 0
+	changed, rendered, failed := 0, 0, 0
 
 	render := func(dotRel string, dotChanged bool) error {
 		base := strings.TrimSuffix(dotRel, ".dot")
@@ -43,11 +43,18 @@ func cmdGraph(root string) error {
 			return nil
 		}
 		dot := filepath.Join(root, dotRel)
+		// Resilient: a single failed render must not abort the whole run — the
+		// .dot is still committed, and a later run (or the hourly self-heal) will
+		// retry the missing svg/png. Report failures but keep going.
 		if err := exec.Command("dot", "-Tsvg", dot, "-o", svg).Run(); err != nil {
-			return fmt.Errorf("render svg %s: %w", dotRel, err)
+			fmt.Fprintf(os.Stderr, "warning: render svg %s failed: %v (will retry next run)\n", dotRel, err)
+			failed++
+			return nil
 		}
 		if err := exec.Command("dot", "-Tpng", dot, "-o", png).Run(); err != nil {
-			return fmt.Errorf("render png %s: %w", dotRel, err)
+			fmt.Fprintf(os.Stderr, "warning: render png %s failed: %v (will retry next run)\n", dotRel, err)
+			failed++
+			return nil
 		}
 		rendered++
 		return nil
@@ -80,7 +87,7 @@ func cmdGraph(root string) error {
 		return err
 	}
 
-	fmt.Printf("graph: %d dot changed, %d rendered (graphviz: %t)\n", changed, rendered, haveDot)
+	fmt.Printf("graph: %d dot changed, %d rendered, %d failed (graphviz: %t)\n", changed, rendered, failed, haveDot)
 	return nil
 }
 

@@ -7,10 +7,19 @@ before making changes.
 
 ## The three rules
 
-1. **Everything is versioned.** Every contract path ends in an explicit version
-   segment — `gno.land/{p,r}/moul/<name>/v1` (then `v2`, `v3`, …). There is *no*
-   un-versioned contract, ever. A breaking change is a **new `vN` directory**,
-   never an in-place edit of an existing published version.
+1. **Everything is versioned; bump only on a compatibility change.** Every
+   contract path ends in an explicit version segment —
+   `gno.land/{p,r}/moul/<name>/v1` (then `v2`, `v3`, …). There is *no*
+   un-versioned contract, ever.
+   - **Bump to a new `vN` directory** for a **compatibility / breaking change**:
+     removing, renaming, or changing the signature or on-chain behavior of an
+     existing exported symbol, or changing storage layout / the backing data
+     structure (e.g. swapping `avl` → `bptree`). Never make such a change in
+     place on a published version.
+   - **Edit in place (same `vN`)** for everything **non-breaking**: adding new
+     exported functions, unit tests, comments, README/docs. (Test files and
+     READMEs are not part of the deployed package, so they never change its
+     on-chain hash; adding a function is backward-compatible.)
    - **Archived originals.** An original version that does *not* build on current
      gno master (e.g. imported/vibe-coded code written for an older testnet API)
      is **not** fixed in place and **not** deleted. Add `ignore = true` to its
@@ -25,9 +34,13 @@ before making changes.
    the workspace (`gnowork.toml`); external `gno.land/*` deps are **vendored**
    under `vendor/` (committed). Never introduce a dependency that only resolves
    from `$GNOROOT/examples` — vendor it (`make deps`).
-3. **The catalog is generated, keep it honest.** `contracts.json` and the README
-   table are produced by the tools. After adding/removing a contract, run
-   `make gen` and commit the result. CI fails if they are stale (`make check`).
+3. **The catalog is generated on `main`, not in PRs.** `contracts.json`, the
+   README table, per-package README footers, and `_assets/` graphs are all
+   produced by the tools. **A PR carries only package SOURCE** — never run
+   `make gen` or commit those generated files in a branch/PR. The `regen`
+   workflow regenerates and commits them on `main` after every merge, and the
+   `publish-status` workflow refreshes on-chain status; committing them in a PR
+   only creates conflicts. (CI does **not** run `make check`.)
 
 ## Repository map
 
@@ -58,8 +71,8 @@ make help      # list targets
 make test      # gno test every contract
 make lint      # gno lint every contract
 make deps      # vendor external gno.land deps into vendor/
-make gen       # refresh contracts.json + README table  (run after add/remove)
-make check     # verify the catalog is not stale (what CI runs)
+make gen       # refresh contracts.json + README table  (bot runs this on main; local preview only)
+make check     # verify the catalog is not stale (used by the regen bot, NOT PR CI)
 make sync      # report drift vs the gnolang/gno monorepo
 make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain status
 ```
@@ -74,10 +87,39 @@ make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain st
 2. Add sources + tests. Prefer table-driven tests; realms should have a `Render`.
 3. If it imports an external `gno.land/*` package, run `make deps` to vendor it.
 4. `make lint test` until green.
-5. `make gen` to register it in `contracts.json` and the README table, then
-   edit the contract's `description` (and `draft: true` if WIP) in
-   `contracts.json` — these human fields are preserved across regenerations.
-6. Commit.
+5. **Commit only the new source files** (the contract directory). Do **not** run
+   `make gen` and do **not** stage `contracts.json`, `README.md`, or `_assets/` —
+   the `regen` workflow generates those on `main` after merge. (You can run
+   `make gen` locally to preview the catalog, but revert it before committing.)
+6. Commit + open the PR.
+
+### Libraries vs. demos — split reusable logic into `p/` + `r/`
+
+When a contract is **reusable logic** (a codec, algorithm, data structure,
+utility — most `x/daily/*` ports fall here), don't ship it as a single realm.
+Split it into two contracts:
+
+- a **pure library** `p/moul/<…>/<name>/vN` — the reusable API as exported
+  types/functions, with no realm-global state and no chain imports where they
+  can be avoided (the caller supplies context such as the block height or the
+  address). Unit-tested (table-driven).
+- a **thin demo realm** `r/moul/<…>/<name>demo/vN` — imports the library, wires
+  it to the chain (`runtime.ChainHeight()`, `unsafe.PreviousRealm()`, package-
+  level state) and shows it off through `Render`. **No logic of its own.**
+
+The two must **cross-reference each other** in both the package doc-comment and
+the README: the library links to its demo ("Live demo: `r/…`"), the demo says it
+is a demo of the library ("Demo of the `p/…` library"). Worked examples:
+`p/moul/x/daily/b58` + `r/moul/x/daily/b58demo` (#53); `p/moul/x/daily/ratelimit`
++ `r/moul/x/daily/ratelimitdemo` (#50).
+
+Only keep a lone realm when the contract is inherently a stateful app with
+nothing reusable to extract.
+
+> This convention grows from moul's PR feedback. When moul gives new guidance on
+> how to structure a contract, record it **here** (and in `CLAUDE.md`) so the
+> next contract follows it from the start — the contract-building agent rereads
+> these files each time.
 
 ## The maintenance CLI (`tools/gnocontracts`)
 
@@ -117,6 +159,55 @@ upstream to reconcile *from*, deliberately — never auto-overwrite.
   generated fields of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`,
   `version`, `deps`).
 
+## Every realm MUST test its `Render` (example test)
+
+A realm's `Render(path)` is user-facing output — lock it down with a gno
+**example test** (`Example…` functions, gno's recent example-test feature). Put
+it in a normal `_test.gno` **in the realm's package** so it calls `Render`
+directly, no self-import (**especially demos**):
+
+```gno
+package foodemo
+
+// ExampleRender pins the realm's Render output as a testable example.
+func ExampleRender() {
+	print(Render("")) // root; add more Example funcs for representative paths
+	// Output:
+	// …
+}
+```
+
+Rules that make it actually run and verify:
+
+- The **`// Output:` block is required** — an example with no `// Output:` is
+  silently **skipped**. Its content must match `Render`'s output exactly
+  (leading/trailing whitespace is trimmed).
+- Use the builtin **`print(...)`** — its output is captured on stdout in tests,
+  and it needs **no import** (prefer it over `fmt.Println` to keep the test file
+  import-free). Trailing whitespace is trimmed, so the missing newline is fine.
+- Cover the root plus a couple of argument paths (one `ExampleRender…` each).
+- Keep output **deterministic**: tests run at a fixed chain height, but don't
+  render wall-clock/random values.
+- Validated by `gno test` on a **master** gno (what CI builds). Older gno
+  binaries silently skip examples, so verify with a freshly built master gno
+  (`go build -o /tmp/gno ./gnovm/cmd/gno` in your gno checkout) — a plain `ok`
+  from a stale local `gno` does not prove the example ran.
+
+Populating `// Output:`: run the example once with an empty `// Output:` and copy
+the `got:` block the failure prints. Worked examples: the `x/daily/*demo` realms.
+
+**Consecutive blank lines can't be pinned by an example.** gno (like Go)
+**collapses consecutive blank lines** in a `// Output:` block, so any output with
+two-or-more blank lines in a row (a lot of markdown `Render`s) will never match.
+When that happens, don't use an example — assert the output in a normal `Test`
+with `uassert.Equal(t, expected, got)` using a raw-string literal (backticks),
+which preserves blank lines exactly, stays in-package, and needs no `fmt`. Worked
+example: `p/moul/mdlist/v2` `TestEntriesRendering`.
+
+Order of preference: **example test** → **`Test` + `uassert.Equal`** (blank-line
+or panic/error outputs) → **filetest** (`filetests/*_filetest.gno`, auto-populated
+by `-update-golden-tests`; last resort, e.g. a package `main`/entrypoint).
+
 ## Every package MUST have a README
 
 Each package/realm directory ships a standalone `README.md` that:
@@ -131,14 +222,16 @@ Each package/realm directory ships a standalone `README.md` that:
    [`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
    treated as experimental/AI-assisted and not for production use.
 
-`make readmes` creates a stub + footer for any package missing a README and
-refreshes the footer everywhere; `make gen` runs it, and `make check` fails if a
-package README is missing or its footer is stale. The full disclaimer is
-[`DISCLAIMER.md`](./DISCLAIMER.md) (the long form); the per-package minimal
-disclaimer links to it.
+A PR includes the **hand-authored top** of each new package's README (the
+explanation above the footer marker). The generated footer, the root README
+table, and the catalog are all produced on `main`: `make readmes` creates/
+refreshes footers and `make gen` runs it, invoked by the `regen` workflow after
+merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
+(the long form); the per-package minimal disclaimer links to it.
 
 ## CI invariants (must stay green)
 
-`gno lint` + `gno test` pass for every contract; committed `vendor/` matches
-`make deps`; `contracts.json` + README table + every package README match
-`make gen` (enforced by `make check`).
+PR CI checks only **source**: `gno lint` + `gno test` pass for every contract,
+and committed `vendor/` matches `make deps`. It does **not** run `make check` —
+`contracts.json`, the README table, per-package footers and `_assets/` are
+regenerated and committed on `main` by the `regen` / `publish-status` workflows.
