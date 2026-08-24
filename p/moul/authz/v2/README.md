@@ -19,8 +19,6 @@ Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul
 
 ![gno.land/p/moul/authz/v2 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/p/moul/authz/v2/deps.png)
 
-Provenance: B+ tree port of `p/moul/authz/v1` — see [https://github.com/moul/gno-contracts/pull/2](https://github.com/moul/gno-contracts/pull/2) for the original import context and metadata.
-
 > ⚠️ **Disclaimer:** provided as-is, without warranty; not security-audited. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
 <!-- END GNOCONTRACTS FOOTER -->
