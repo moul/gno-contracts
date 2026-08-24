@@ -30,7 +30,8 @@ func cmdManifest(root string) error {
 			c.Source = old.Source
 			c.Draft = old.Draft
 			c.Published = old.Published
-			c.Upstream = old.Upstream // preserved; may be refreshed below
+			c.Upstream = old.Upstream           // preserved; may be refreshed below
+			c.UpstreamMatch = old.UpstreamMatch // preserved; may be refreshed below
 			updated++
 		} else {
 			added++
@@ -40,6 +41,11 @@ func cmdManifest(root string) error {
 		// GNOROOT), refreshable when the monorepo copy is present.
 		if u := unversioned(c.PkgPath); u != c.PkgPath && inMonorepo(u) {
 			c.Upstream = u
+		}
+		// Classify how the versioned copy compares to the monorepo copy (needs
+		// $GNOROOT/examples). Sticky: keep the stored value when unavailable.
+		if mm := classifyContractUpstream(root, &c); mm != "" {
+			c.UpstreamMatch = mm
 		}
 		if c.Published == nil {
 			c.Published = map[string]Pub{}

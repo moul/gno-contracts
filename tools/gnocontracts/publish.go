@@ -97,6 +97,9 @@ func topoOrder(contracts []Contract) ([]Contract, error) {
 	for _, c := range contracts {
 		indeg[c.PkgPath] = indeg[c.PkgPath] // ensure present
 		for _, d := range c.Deps {
+			if d == c.PkgPath {
+				continue // ignore self-deps so they can't fake a cycle
+			}
 			if _, ok := inSet[d]; ok {
 				deps[c.PkgPath] = append(deps[c.PkgPath], d)
 			}
