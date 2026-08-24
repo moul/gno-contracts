@@ -134,6 +134,115 @@ func gnoFiles(dir string) (map[string]string, error) {
 	return out, nil
 }
 
+// isTestGno reports whether a .gno file is a test/filetest (not part of the
+// deployed package).
+func isTestGno(name string) bool {
+	return strings.HasSuffix(name, "_test.gno") || strings.HasSuffix(name, "_filetest.gno")
+}
+
+// classifyContractUpstream classifies contract c against its un-versioned
+// monorepo copy, or returns "" when c has no upstream or the monorepo copy is
+// unavailable ($GNOROOT unset / path absent — caller keeps the stored value).
+func classifyContractUpstream(root string, c *Contract) string {
+	if c.Upstream == "" {
+		return ""
+	}
+	upDir, ok := monorepoDir(c.Upstream)
+	if !ok {
+		return ""
+	}
+	return classifyUpstream(filepath.Join(root, filepath.FromSlash(c.Dir)), upDir)
+}
+
+// classifyUpstream compares a versioned contract dir against its un-versioned
+// monorepo copy: "exact" (every file byte-identical), "gno" (all .gno identical;
+// non-.gno files such as gnomod.toml may differ), "gno-notest" (.gno identical
+// once test files are skipped on both sides), or "diff" (production .gno differ).
+func classifyUpstream(ourDir, upDir string) string {
+	if allFilesEqual(ourDir, upDir) {
+		return "exact"
+	}
+	if gnoSetsEqual(ourDir, upDir, true) {
+		return "gno"
+	}
+	if gnoSetsEqual(ourDir, upDir, false) {
+		return "gno-notest"
+	}
+	return "diff"
+}
+
+// gnoSetsEqual reports whether both dirs hold the same set of .gno files with
+// identical content. When includeTests is false, *_test.gno / *_filetest.gno are
+// ignored on both sides.
+func gnoSetsEqual(ourDir, upDir string, includeTests bool) bool {
+	ours, err := gnoFiles(ourDir)
+	if err != nil {
+		return false
+	}
+	up, err := gnoFiles(upDir)
+	if err != nil {
+		return false
+	}
+	keep := func(m map[string]string) map[string]string {
+		if includeTests {
+			return m
+		}
+		out := map[string]string{}
+		for k, v := range m {
+			if !isTestGno(k) {
+				out[k] = v
+			}
+		}
+		return out
+	}
+	return sameStringMap(keep(ours), keep(up))
+}
+
+// allFilesEqual reports whether both dirs hold exactly the same top-level files
+// (by name) with identical content.
+func allFilesEqual(ourDir, upDir string) bool {
+	a, err := allFiles(ourDir)
+	if err != nil {
+		return false
+	}
+	b, err := allFiles(upDir)
+	if err != nil {
+		return false
+	}
+	return sameStringMap(a, b)
+}
+
+func allFiles(dir string) (map[string]string, error) {
+	out := map[string]string{}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		b, err := os.ReadFile(filepath.Join(dir, e.Name()))
+		if err != nil {
+			return nil, err
+		}
+		out[e.Name()] = string(b)
+	}
+	return out, nil
+}
+
+func sameStringMap(a, b map[string]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for k, v := range a {
+		if bv, ok := b[k]; !ok || bv != v {
+			return false
+		}
+	}
+	return true
+}
+
 // upstreamPackages returns the un-versioned pkgpaths of every gno package
 // directory under base (a monorepo .../moul tree).
 func upstreamPackages(base, prefix string) ([]string, error) {

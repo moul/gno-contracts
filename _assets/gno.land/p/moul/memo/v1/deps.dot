@@ -1,0 +1,7 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/p/moul/memo/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/memo/v1" -> "gno.land/p/demo/btree";
+  "gno.land/p/moul/memo/v1" -> "gno.land/p/nt/ufmt";
+}
