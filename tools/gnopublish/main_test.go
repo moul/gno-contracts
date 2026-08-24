@@ -62,6 +62,46 @@ func TestTopoOrderDepsFirstWithSelfDep(t *testing.T) {
 	}
 }
 
+func TestTxHash(t *testing.T) {
+	// raw bytes -> full base64 (never truncated at a non-printable byte).
+	got := txHash([]byte{0x00, 0xff, 0x10, 0x20})
+	if got != "AP8QIA==" {
+		t.Fatalf("txHash = %q, want AP8QIA==", got)
+	}
+}
+
+func TestWebBaseAndPkgURL(t *testing.T) {
+	cases := []struct {
+		net          network
+		wantBase     string
+		pkgpath, url string
+	}{
+		{
+			network{Name: "portal-loop", RPC: "https://rpc.gno.land:443"},
+			"https://gno.land",
+			"gno.land/p/moul/hello/v1", "https://gno.land/p/moul/hello/v1",
+		},
+		{
+			network{Name: "test6", RPC: "https://rpc.test6.testnets.gno.land:443"},
+			"https://test6.testnets.gno.land",
+			"gno.land/r/moul/x/daily/blog/v1", "https://test6.testnets.gno.land/r/moul/x/daily/blog/v1",
+		},
+		{
+			network{Name: "gnodev", RPC: "http://127.0.0.1:26657"},
+			"http://127.0.0.1:8888",
+			"gno.land/p/moul/hello/v1", "http://127.0.0.1:8888/p/moul/hello/v1",
+		},
+	}
+	for _, c := range cases {
+		if got := webBase(c.net); got != c.wantBase {
+			t.Errorf("webBase(%s) = %q, want %q", c.net.Name, got, c.wantBase)
+		}
+		if got := pkgURL(c.net, c.pkgpath); got != c.url {
+			t.Errorf("pkgURL(%s, %s) = %q, want %q", c.net.Name, c.pkgpath, got, c.url)
+		}
+	}
+}
+
 func TestTopoOrderCycle(t *testing.T) {
 	cs := []contract{
 		{PkgPath: "a", Deps: []string{"b"}},
