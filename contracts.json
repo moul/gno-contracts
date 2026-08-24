@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-06T22:06:53Z",
+  "status_checked_at": "2026-08-24T10:13:22Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -48,8 +48,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -110,8 +109,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -199,8 +197,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -280,8 +277,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -346,8 +342,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -402,8 +397,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -433,8 +427,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -461,8 +454,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -517,8 +509,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -548,8 +539,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -604,8 +594,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -632,8 +621,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -667,8 +655,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -702,8 +689,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -762,8 +748,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -795,8 +780,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -857,8 +841,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -909,8 +892,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -942,8 +924,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1002,8 +983,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1035,8 +1015,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1067,8 +1046,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1124,8 +1102,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1157,8 +1134,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1187,8 +1163,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1220,8 +1195,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1280,8 +1254,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1550,8 +1523,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1606,8 +1578,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1662,8 +1633,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1693,8 +1663,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1753,8 +1722,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1809,8 +1777,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1925,8 +1892,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1955,8 +1921,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2071,8 +2036,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2133,8 +2097,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2193,8 +2156,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2253,8 +2215,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2345,8 +2306,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2398,8 +2358,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2480,8 +2439,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2510,8 +2468,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2540,8 +2497,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2570,8 +2526,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2598,8 +2553,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2680,8 +2634,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2710,8 +2663,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2740,8 +2692,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2826,8 +2777,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2912,8 +2862,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3000,8 +2949,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3059,8 +3007,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3089,8 +3036,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3119,8 +3065,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3199,8 +3144,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3229,8 +3173,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3286,8 +3229,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3337,8 +3279,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3450,8 +3391,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3532,8 +3472,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3612,8 +3551,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3744,8 +3682,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3774,8 +3711,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3804,8 +3740,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3908,8 +3843,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3996,8 +3930,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -4086,8 +4019,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -4145,8 +4077,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -4202,8 +4133,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -4230,8 +4160,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
