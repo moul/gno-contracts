@@ -37,11 +37,20 @@ jobs:
       - name: Vet tools
         run: go vet ./tools/...
 
+      - name: Test tools
+        run: go test ./tools/...
+
       # Committed vendor/ is the pinned, authoritative source of gno.land/*
       # dependencies. We do NOT re-vendor from live master here (that would
       # couple CI to monorepo drift). lint/test resolve deps from vendor/ via
       # the Makefile's stdlib-only GNOROOT view (empty examples/). Dependency
       # bumps are deliberate: run `make deps` locally and commit.
+      # Prove the toolchain actually validates example tests, and that no
+      # Example* is silently skipped (missing // Output:) — otherwise an
+      # ExampleRender is a false-green test that asserts nothing.
+      - name: Validate example tests are real
+        run: make toolcheck guard-examples
+
       - name: Lint
         run: make lint
 

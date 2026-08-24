@@ -3,10 +3,13 @@ name: pr-label
 # Auto-label each PR by the paths it touches:
 #   p     — pure packages under p/
 #   r     — realms under r/
-#   meta  — CI / tooling / docs / repo meta (.github, tools, Makefile, *.md, …)
-#   other — anything matching none of the above (catch-all, so nothing is unlabelled)
-# A PR gets the union of the buckets its changed files fall into. Labels are only
-# added (never removed), so manual labels stick.
+#   meta  — repo infrastructure ONLY: .github/, tools/, Makefile, root docs
+#           (README/AGENTS/CLAUDE/DISCLAIMER), go.mod, gnowork.toml, .gitattributes
+#   other — source outside p/ r/ and the meta set
+# vendor/, _assets/, and contracts.json are NEUTRAL (dependency / generated
+# artifacts, not PR intent) — they contribute no label. The workflow reconciles
+# these four managed labels (adds those that apply, removes those that no longer
+# do); any other label (manual ones like enhancement/bug) is left untouched.
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -42,16 +45,19 @@ jobs:
             case "$f" in
               p/*) p=1 ;;
               r/*) r=1 ;;
-              .github/*|tools/*|vendor/*|_assets/*|Makefile|go.mod|go.sum|gnowork.toml|.gitattributes|.gitignore|contracts.json|*.md) meta=1 ;;
+              # repo infrastructure only
+              .github/*|tools/*|Makefile|go.mod|go.sum|gnowork.toml|.gitattributes|.gitignore|README.md|AGENTS.md|CLAUDE.md|DISCLAIMER.md) meta=1 ;;
+              # neutral: dependency + generated artifacts contribute no label
+              vendor/*|_assets/*|contracts.json) ;;
               *) other=1 ;;
             esac
           done < <(git diff --name-only "origin/$BASE...HEAD")
-          labels=()
-          [ "$p" = 1 ] && labels+=(p)
-          [ "$r" = 1 ] && labels+=(r)
-          [ "$meta" = 1 ] && labels+=(meta)
-          [ "$other" = 1 ] && labels+=(other)
-          echo "labels: ${labels[*]:-<none>}"
-          [ ${#labels[@]} -eq 0 ] && exit 0
-          args=(); for l in "${labels[@]}"; do args+=(--add-label "$l"); done
+          # Reconcile the 4 managed labels: add those that apply, remove those
+          # that don't. Any other (manual) label is left untouched.
+          args=()
+          for pair in "p:$p" "r:$r" "meta:$meta" "other:$other"; do
+            name=${pair%:*}; on=${pair#*:}
+            if [ "$on" = 1 ]; then args+=(--add-label "$name"); else args+=(--remove-label "$name"); fi
+          done
+          echo "reconciling: ${args[*]}"
           gh pr edit "$PR" -R "$REPO" "${args[@]}"

@@ -1,0 +1,43 @@
+name: no-generated-files
+
+# Guard: a PR must carry only SOURCE. contracts.json, the README table, and
+# _assets/ are generated on `main` by the `regen` / `publish-status` workflows
+# after merge — committing them in a PR is the recurring cause of merge
+# conflicts (every main-side regen re-conflicts the PR). This job fails a PR
+# that modifies any generated path, telling the author to drop it.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reject generated-file changes
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # three-dot: diff the merge-base..head, i.e. only what THIS PR changed.
+          # (two-dot would also flag files that merely advanced on main — e.g. the
+          # regen/status bots' README.md/contracts.json — falsely failing older PRs.)
+          bad=$(git diff --name-only "$BASE...$HEAD" -- \
+                  README.md contracts.json '_assets' '_assets/**')
+          if [ -n "$bad" ]; then
+            echo "::error::This PR modifies generated files. Remove them — they are"
+            echo "::error::regenerated on 'main' by the regen/publish-status workflows."
+            echo "Offending paths:"
+            echo "$bad" | sed 's/^/  - /'
+            echo
+            echo "Fix: git checkout origin/main -- README.md contracts.json _assets"
+            echo "     (or rebuild the branch with only your source changes), then push."
+            exit 1
+          fi
+          echo "OK — PR touches only source files."
