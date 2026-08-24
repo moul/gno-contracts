@@ -46,7 +46,14 @@ type Contract struct {
 	// Upstream is the un-versioned monorepo path (gno.land/p/moul/addrset) for
 	// packages that originated in gnolang/gno (deployed without /vN on genesis
 	// chains). Set by manifest; used by the dual-path status check + README.
-	Upstream  string         `json:"upstream,omitempty"`
+	Upstream string `json:"upstream,omitempty"`
+	// UpstreamMatch classifies how this versioned contract compares to its
+	// un-versioned monorepo copy (only set when Upstream is): "exact" (every
+	// file identical), "gno" (all .gno identical, non-.gno like gnomod differ),
+	// "gno-notest" (.gno identical once test files are skipped), or "diff"
+	// (production .gno differ). Computed by manifest when the monorepo is
+	// available ($GNOROOT/examples); sticky otherwise.
+	UpstreamMatch string `json:"upstream_match,omitempty"`
 	Deps  []string `json:"deps"`  // gno.land/* imports (non-test)
 	Draft bool     `json:"draft"` // work-in-progress, excluded from publish
 	// Ignored mirrors `ignore = true` in the package's gnomod.toml: the gno
@@ -248,6 +255,9 @@ func deriveContract(module, dir, absDir string) (Contract, error) {
 	if err != nil {
 		return Contract{}, err
 	}
+	// A package never depends on itself; drop any self-reference defensively (a
+	// filetest importing its own package used to leak in as a self-dep → cycle).
+	deps = dropString(deps, module)
 	return Contract{
 		PkgPath: module,
 		Dir:     dir,
@@ -256,6 +266,17 @@ func deriveContract(module, dir, absDir string) (Contract, error) {
 		Version: version,
 		Deps:    deps,
 	}, nil
+}
+
+// dropString returns s with every occurrence of v removed.
+func dropString(s []string, v string) []string {
+	out := s[:0:0]
+	for _, x := range s {
+		if x != v {
+			out = append(out, x)
+		}
+	}
+	return out
 }
 
 func isVersion(s string) bool {
@@ -282,6 +303,22 @@ func inMonorepo(upath string) bool {
 	return fileExists(filepath.Join(root, "examples", "gno.land", filepath.FromSlash(rel)))
 }
 
+// monorepoDir returns the $GNOROOT/examples directory for an un-versioned
+// monorepo pkgpath, and whether it exists. Returns ("", false) when GNOROOT is
+// unset or the path is absent (so callers can preserve a sticky value).
+func monorepoDir(upath string) (string, bool) {
+	root := os.Getenv("GNOROOT")
+	if root == "" || !strings.HasPrefix(upath, "gno.land/") {
+		return "", false
+	}
+	rel := strings.TrimPrefix(upath, "gno.land/")
+	dir := filepath.Join(root, "examples", "gno.land", filepath.FromSlash(rel))
+	if !fileExists(dir) {
+		return "", false
+	}
+	return dir, true
+}
+
 // parseDeps returns the sorted, de-duplicated set of gno.land/* imports found in
 // the non-test .gno files of dir (runtime dependencies, used for publish order).
 func parseDeps(dir string) ([]string, error) {
@@ -300,8 +337,8 @@ func parseDepsMode(dir string, includeTests bool) ([]string, error) {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".gno") {
 			continue
 		}
-		if !includeTests && strings.HasSuffix(e.Name(), "_test.gno") {
-			continue
+		if !includeTests && (strings.HasSuffix(e.Name(), "_test.gno") || strings.HasSuffix(e.Name(), "_filetest.gno")) {
+			continue // test + filetest imports are not runtime dependencies
 		}
 		imps, err := parseImports(filepath.Join(dir, e.Name()))
 		if err != nil {
