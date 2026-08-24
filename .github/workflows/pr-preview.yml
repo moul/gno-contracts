@@ -107,6 +107,13 @@ jobs:
           python3 tools/gnopreview/gnopreview.py --out _preview ${{ steps.realms.outputs.selectors }}
           echo "--- _preview tree ---"; find _preview -maxdepth 3 2>/dev/null | head -30 || echo "(none)"
 
+      # Rebuild the pr-<N> subfolder on the LATEST gh-pages each attempt, then
+      # push. Concurrent PRs share this one branch (each owns only its own
+      # pr-<N>/ subdir), so a parallel push makes ours non-fast-forward — the
+      # recurring cause of a red `preview` on an otherwise-fine PR. On a
+      # rejected push, re-fetch gh-pages and replay the copy: it only ever
+      # rewrites our own subfolder, so replaying is idempotent and can't clobber
+      # another PR's preview. Same idiom as regen.yml / publish-status.yml.
       - name: Publish to gh-pages/pr-<N>
         if: steps.realms.outputs.selectors != ''
         run: |
@@ -115,18 +122,29 @@ jobs:
           fi
           git config user.name "Manfred Touron"
           git config user.email "94029+moul@users.noreply.github.com"
-          git fetch origin gh-pages --depth=1 2>/dev/null || true
-          rm -rf .ghp
-          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
-            git worktree add .ghp origin/gh-pages
-            ( cd .ghp && git checkout -B gh-pages )
-          else
-            git worktree add --detach .ghp
-            ( cd .ghp && git checkout --orphan gh-pages && git reset --hard >/dev/null 2>&1; rm -rf ./* ./.[!.]* 2>/dev/null; : > .nojekyll )
-          fi
-          rm -rf ".ghp/pr-$PR"; mkdir -p ".ghp/pr-$PR"; cp -r _preview/. ".ghp/pr-$PR/"
-          ( cd .ghp && git add -A && (git diff --cached --quiet || git commit -q -m "preview: PR #$PR") && git push origin gh-pages )
-          git worktree remove --force .ghp
+          for attempt in 1 2 3 4 5; do
+            git fetch origin gh-pages --depth=1 2>/dev/null || true
+            rm -rf .ghp; git worktree prune
+            if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+              git worktree add .ghp origin/gh-pages
+              ( cd .ghp && git checkout -B gh-pages )
+            else
+              git worktree add --detach .ghp
+              ( cd .ghp && git checkout --orphan gh-pages && git reset --hard >/dev/null 2>&1; rm -rf ./* ./.[!.]* 2>/dev/null; : > .nojekyll )
+            fi
+            rm -rf ".ghp/pr-$PR"; mkdir -p ".ghp/pr-$PR"; cp -r _preview/. ".ghp/pr-$PR/"
+            ( cd .ghp && git add -A && (git diff --cached --quiet || git commit -q -m "preview: PR #$PR") )
+            if ( cd .ghp && git push origin gh-pages ); then
+              echo "pushed on attempt $attempt"
+              git worktree remove --force .ghp
+              exit 0
+            fi
+            echo "push rejected (gh-pages moved); replaying on latest — attempt $attempt"
+            git worktree remove --force .ghp
+            sleep $((RANDOM % 5 + 2))
+          done
+          echo "::error::could not publish preview after 5 attempts"
+          exit 1
 
   # ---- tear down the subfolder when the PR closes ------------------------
   cleanup:
@@ -138,13 +156,36 @@ jobs:
       PR: ${{ github.event.pull_request.number }}
     steps:
       - uses: actions/checkout@v4
+      # Same concurrency story as the publish step: retry on a rejected push,
+      # re-deleting our own pr-<N>/ on the latest gh-pages each time.
       - name: Remove gh-pages/pr-<N>
         run: |
           git config user.name "Manfred Touron"
           git config user.email "94029+moul@users.noreply.github.com"
-          tmp=$(mktemp -d)
-          if git worktree add --force "$tmp" gh-pages 2>/dev/null; then
-            rm -rf "$tmp/pr-$PR"
-            ( cd "$tmp" && git add -A && git diff --cached --quiet || { git commit -q -m "preview: remove PR #$PR"; git push origin gh-pages; } )
-            git worktree remove --force "$tmp"
-          fi
+          for attempt in 1 2 3 4 5; do
+            git fetch origin gh-pages --depth=1 2>/dev/null || true
+            git show-ref --verify --quiet refs/remotes/origin/gh-pages || {
+              echo "no gh-pages branch — nothing to clean"; exit 0
+            }
+            rm -rf .ghp
+            git worktree add .ghp origin/gh-pages
+            ( cd .ghp && git checkout -B gh-pages )
+            rm -rf ".ghp/pr-$PR"
+            ( cd .ghp && git add -A )
+            if ( cd .ghp && git diff --cached --quiet ); then
+              echo "no preview for PR #$PR — nothing to clean"
+              git worktree remove --force .ghp
+              exit 0
+            fi
+            ( cd .ghp && git commit -q -m "preview: remove PR #$PR" )
+            if ( cd .ghp && git push origin gh-pages ); then
+              echo "cleaned on attempt $attempt"
+              git worktree remove --force .ghp
+              exit 0
+            fi
+            echo "push rejected (gh-pages moved); retrying — attempt $attempt"
+            git worktree remove --force .ghp
+            sleep $((RANDOM % 5 + 2))
+          done
+          echo "::error::could not clean preview after 5 attempts"
+          exit 1
