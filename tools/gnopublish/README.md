@@ -26,6 +26,11 @@ the CI `gnocontracts` tool). Building it needs:
 - a local **gno checkout** — the `replace` in `go.mod` points at `../../../../gnoland/gno`
   (i.e. `~/p/gh/gnoland/gno`). Adjust it if yours lives elsewhere.
 
+> Note: the cgo storage backend (mdbx) prints one harmless line at startup —
+> `rthc_afterfork: … rthc entries`. It comes from a C constructor that runs before
+> `main`, so it can't be silenced from within the program; ignore it (or filter with
+> `gnopublish … 2> >(grep -v rthc >&2)`).
+
 ## Usage
 
 Run it from anywhere inside the repo (it finds the root via `gnowork.toml`):
