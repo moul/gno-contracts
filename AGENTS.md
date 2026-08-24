@@ -7,10 +7,19 @@ before making changes.
 
 ## The three rules
 
-1. **Everything is versioned.** Every contract path ends in an explicit version
-   segment — `gno.land/{p,r}/moul/<name>/v1` (then `v2`, `v3`, …). There is *no*
-   un-versioned contract, ever. A breaking change is a **new `vN` directory**,
-   never an in-place edit of an existing published version.
+1. **Everything is versioned; bump only on a compatibility change.** Every
+   contract path ends in an explicit version segment —
+   `gno.land/{p,r}/moul/<name>/v1` (then `v2`, `v3`, …). There is *no*
+   un-versioned contract, ever.
+   - **Bump to a new `vN` directory** for a **compatibility / breaking change**:
+     removing, renaming, or changing the signature or on-chain behavior of an
+     existing exported symbol, or changing storage layout / the backing data
+     structure (e.g. swapping `avl` → `bptree`). Never make such a change in
+     place on a published version.
+   - **Edit in place (same `vN`)** for everything **non-breaking**: adding new
+     exported functions, unit tests, comments, README/docs. (Test files and
+     READMEs are not part of the deployed package, so they never change its
+     on-chain hash; adding a function is backward-compatible.)
    - **Archived originals.** An original version that does *not* build on current
      gno master (e.g. imported/vibe-coded code written for an older testnet API)
      is **not** fixed in place and **not** deleted. Add `ignore = true` to its
@@ -149,6 +158,55 @@ upstream to reconcile *from*, deliberately — never auto-overwrite.
 - **Never** hand-edit the region between the README table markers, or the
   generated fields of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`,
   `version`, `deps`).
+
+## Every realm MUST test its `Render` (example test)
+
+A realm's `Render(path)` is user-facing output — lock it down with a gno
+**example test** (`Example…` functions, gno's recent example-test feature). Put
+it in a normal `_test.gno` **in the realm's package** so it calls `Render`
+directly, no self-import (**especially demos**):
+
+```gno
+package foodemo
+
+// ExampleRender pins the realm's Render output as a testable example.
+func ExampleRender() {
+	print(Render("")) // root; add more Example funcs for representative paths
+	// Output:
+	// …
+}
+```
+
+Rules that make it actually run and verify:
+
+- The **`// Output:` block is required** — an example with no `// Output:` is
+  silently **skipped**. Its content must match `Render`'s output exactly
+  (leading/trailing whitespace is trimmed).
+- Use the builtin **`print(...)`** — its output is captured on stdout in tests,
+  and it needs **no import** (prefer it over `fmt.Println` to keep the test file
+  import-free). Trailing whitespace is trimmed, so the missing newline is fine.
+- Cover the root plus a couple of argument paths (one `ExampleRender…` each).
+- Keep output **deterministic**: tests run at a fixed chain height, but don't
+  render wall-clock/random values.
+- Validated by `gno test` on a **master** gno (what CI builds). Older gno
+  binaries silently skip examples, so verify with a freshly built master gno
+  (`go build -o /tmp/gno ./gnovm/cmd/gno` in your gno checkout) — a plain `ok`
+  from a stale local `gno` does not prove the example ran.
+
+Populating `// Output:`: run the example once with an empty `// Output:` and copy
+the `got:` block the failure prints. Worked examples: the `x/daily/*demo` realms.
+
+**Consecutive blank lines can't be pinned by an example.** gno (like Go)
+**collapses consecutive blank lines** in a `// Output:` block, so any output with
+two-or-more blank lines in a row (a lot of markdown `Render`s) will never match.
+When that happens, don't use an example — assert the output in a normal `Test`
+with `uassert.Equal(t, expected, got)` using a raw-string literal (backticks),
+which preserves blank lines exactly, stays in-package, and needs no `fmt`. Worked
+example: `p/moul/mdlist/v2` `TestEntriesRendering`.
+
+Order of preference: **example test** → **`Test` + `uassert.Equal`** (blank-line
+or panic/error outputs) → **filetest** (`filetests/*_filetest.gno`, auto-populated
+by `-update-golden-tests`; last resort, e.g. a package `main`/entrypoint).
 
 ## Every package MUST have a README
 

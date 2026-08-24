@@ -96,9 +96,12 @@ make help        # list all targets
 | Package | topaz | betanet | staging | Monorepo | Deps |
 |---|---|---|---|---|---|
 | [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/addrset/v1) | [🗄️](https://gno.land/p/moul/addrset) | [🗄️](https://staging.gno.land/p/moul/addrset) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
+| [`p/moul/addrset/v2`](p/moul/addrset/v2) 📦 | — | — | — | — | 1 |
 | [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/authz/v1) | [🗄️](https://gno.land/p/moul/authz) | [🗄️](https://staging.gno.land/p/moul/authz) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
+| [`p/moul/authz/v2`](p/moul/authz/v2) 📦 | — | — | — | — | 3 |
 | [`p/moul/collection/v1`](p/moul/collection/v1) 📦 💤 | — | — | — | — | 3 |
 | [`p/moul/collection/v2`](p/moul/collection/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/collection/v2) | — | — | — | 3 |
+| [`p/moul/collection/v3`](p/moul/collection/v3) 📦 | — | — | — | — | 3 |
 | [`p/moul/cow/v1`](p/moul/cow/v1) 📦 💤 | — | — | — | — | — |
 | [`p/moul/cow/v2`](p/moul/cow/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/cow/v2) | — | — | — | — |
 | [`p/moul/debug/v1`](p/moul/debug/v1) 📦 💤 | — | — | — | — | 4 |
@@ -120,20 +123,30 @@ make help        # list all targets
 | [`p/moul/mdtable/v1`](p/moul/mdtable/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/mdtable/v1) | [🗄️](https://gno.land/p/moul/mdtable) | [🗄️](https://staging.gno.land/p/moul/mdtable) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
 | [`p/moul/memo/v1`](p/moul/memo/v1) 📦 💤 | — | — | — | — | 2 |
 | [`p/moul/memo/v2`](p/moul/memo/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/memo/v2) | — | — | — | 2 |
+| [`p/moul/memo/v3`](p/moul/memo/v3) 📦 | — | — | — | — | 2 |
 | [`p/moul/nestedpkg/v1`](p/moul/nestedpkg/v1) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/nestedpkg/v1) | — | — | — | — |
 | [`p/moul/once/v1`](p/moul/once/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/once/v1) | [🗄️](https://gno.land/p/moul/once) | [🗄️](https://staging.gno.land/p/moul/once) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
 | [`p/moul/printfdebugging/v1`](p/moul/printfdebugging/v1) 📦 💤 | — | — | — | — | 1 |
 | [`p/moul/printfdebugging/v2`](p/moul/printfdebugging/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/printfdebugging/v2) | — | — | — | 1 |
 | [`p/moul/realmpath/v1`](p/moul/realmpath/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/realmpath/v1) | [🗄️](https://gno.land/p/moul/realmpath) | [🗄️](https://staging.gno.land/p/moul/realmpath) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
 | [`p/moul/svg/v1`](p/moul/svg/v1) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/svg/v1) | — | — | — | 3 |
+| [`p/moul/svg/v2`](p/moul/svg/v2) 📦 | — | — | — | — | 2 |
 | [`p/moul/txlink/v1`](p/moul/txlink/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/txlink/v1) | [🗄️](https://gno.land/p/moul/txlink) | [🗄️](https://staging.gno.land/p/moul/txlink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
 | [`p/moul/typeutil/v1`](p/moul/typeutil/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/typeutil/v1) | [🗄️](https://gno.land/p/moul/typeutil) | [🗄️](https://staging.gno.land/p/moul/typeutil) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | — |
 | [`p/moul/ulist/lplist/v1`](p/moul/ulist/lplist/v1) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/ulist/lplist/v1) | — | — | — | 1 |
 | [`p/moul/ulist/v1`](p/moul/ulist/v1) 📦 | [✅🗄️](https://topaz.testnets.gno.land/p/moul/ulist/v1) | [🗄️](https://gno.land/p/moul/ulist) | [🗄️](https://staging.gno.land/p/moul/ulist) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | — |
 | [`p/moul/web25/v1`](p/moul/web25/v1) 📦 💤 | — | — | — | — | 1 |
 | [`p/moul/web25/v2`](p/moul/web25/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/web25/v2) | — | — | — | 1 |
+| [`p/moul/x/daily/b58/v1`](p/moul/x/daily/b58/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/cowsay/v1`](p/moul/x/daily/cowsay/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/levenshtein/v1`](p/moul/x/daily/levenshtein/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/markov/v1`](p/moul/x/daily/markov/v1) 📦 | — | — | — | — | 1 |
 | [`p/moul/x/daily/piglatin/v1`](p/moul/x/daily/piglatin/v1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/ratelimit/v1`](p/moul/x/daily/ratelimit/v1) 📦 | — | — | — | — | 1 |
+| [`p/moul/x/daily/romannum/v1`](p/moul/x/daily/romannum/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/rot13/v1`](p/moul/x/daily/rot13/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/semver/v1`](p/moul/x/daily/semver/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/sieve/v1`](p/moul/x/daily/sieve/v1) 📦 | — | — | — | — | — |
 | [`p/moul/xmath/v1`](p/moul/xmath/v1) 📦 💤 | — | — | — | — | — |
 | [`p/moul/xmath/v2`](p/moul/xmath/v2) 📦 | [✅](https://topaz.testnets.gno.land/p/moul/xmath/v2) | — | — | — | — |
 | [`r/moul/demo/args/v1`](r/moul/demo/args/v1) 🏛️ 💤 | — | — | — | — | — |
@@ -160,7 +173,10 @@ make help        # list all targets
 | [`r/moul/hello/v1`](r/moul/hello/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/hello/v1) | — | — | — | 1 |
 | [`r/moul/outfmt/v1`](r/moul/outfmt/v1) 🏛️ 💤 | — | — | — | — | 1 |
 | [`r/moul/outfmt/v2`](r/moul/outfmt/v2) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/outfmt/v2) | — | — | — | 1 |
+| [`r/moul/present/v1`](r/moul/present/v1) 🏛️ 💤 | — | — | — | — | 9 |
+| [`r/moul/present/v2`](r/moul/present/v2) 🏛️ | — | — | — | — | 9 |
 | [`r/moul/sapin/v1`](r/moul/sapin/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/sapin/v1) | — | — | — | — |
+| [`r/moul/x/daily/b58demo/v1`](r/moul/x/daily/b58demo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/blog/v1`](r/moul/x/daily/blog/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/blog/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/bloomfilter/v1`](r/moul/x/daily/bloomfilter/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/bullscows/v1`](r/moul/x/daily/bullscows/v1) 🏛️ | — | — | — | — | — |
@@ -169,6 +185,7 @@ make help        # list all targets
 | [`r/moul/x/daily/collatz/v1`](r/moul/x/daily/collatz/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/collatz/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/connect4/v1`](r/moul/x/daily/connect4/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/connect4/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/counter/v1`](r/moul/x/daily/counter/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/counter/v1) | — | — | — | — |
+| [`r/moul/x/daily/cowsaydemo/v1`](r/moul/x/daily/cowsaydemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/crowdfund/v1`](r/moul/x/daily/crowdfund/v1) 🏛️ 🚧 | — | — | — | — | 1 |
 | [`r/moul/x/daily/dice/v1`](r/moul/x/daily/dice/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/dice/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/dutchauction/v1`](r/moul/x/daily/dutchauction/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/dutchauction/v1) | — | — | — | 1 |
@@ -187,10 +204,12 @@ make help        # list all targets
 | [`r/moul/x/daily/kingofdice/v1`](r/moul/x/daily/kingofdice/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/kingofdice/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/kudos/v1`](r/moul/x/daily/kudos/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/kudos/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/leaderboard/v1`](r/moul/x/daily/leaderboard/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/levenshteindemo/v1`](r/moul/x/daily/levenshteindemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/life/v1`](r/moul/x/daily/life/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/life/v1) | — | — | — | — |
 | [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/linktree/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/lottery/v1`](r/moul/x/daily/lottery/v1) 🏛️ 🚧 | — | — | — | — | 1 |
 | [`r/moul/x/daily/lru/v1`](r/moul/x/daily/lru/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/lru/v1) | — | — | — | — |
+| [`r/moul/x/daily/markovdemo/v1`](r/moul/x/daily/markovdemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/memory/v1`](r/moul/x/daily/memory/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/memory/v1) | — | — | — | — |
 | [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop/v1) 🏛️ 🚧 | — | — | — | — | 1 |
 | [`r/moul/x/daily/microblog/v1`](r/moul/x/daily/microblog/v1) 🏛️ | — | — | — | — | — |
@@ -203,10 +222,14 @@ make help        # list all targets
 | [`r/moul/x/daily/ratelimitdemo/v1`](r/moul/x/daily/ratelimitdemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/reactions/v1`](r/moul/x/daily/reactions/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/reactions/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/ringlog/v1`](r/moul/x/daily/ringlog/v1) 🏛️ | — | — | — | — | — |
+| [`r/moul/x/daily/romannumdemo/v1`](r/moul/x/daily/romannumdemo/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/rot13demo/v1`](r/moul/x/daily/rot13demo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/rpsduel/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/rpsmatch/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/rpsoracle/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/semverdemo/v1`](r/moul/x/daily/semverdemo/v1) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/x/daily/sievedemo/v1`](r/moul/x/daily/sievedemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/splitter/v1`](r/moul/x/daily/splitter/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/stack/v1`](r/moul/x/daily/stack/v1) 🏛️ | [✅](https://topaz.testnets.gno.land/r/moul/x/daily/stack/v1) | — | — | — | — |
 | [`r/moul/x/daily/staking/v1`](r/moul/x/daily/staking/v1) 🏛️ 🚧 | — | — | — | — | 1 |
@@ -224,7 +247,9 @@ make help        # list all targets
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._
 
-_On-chain status last checked: 2026-08-02T11:45:42Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
+
+_On-chain status last checked: 2026-08-06T22:06:53Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 

@@ -3,8 +3,11 @@
 This repository has a single, authoritative guide for agents: **[AGENTS.md](./AGENTS.md)**.
 Read it before doing anything. The essentials:
 
-- **Version everything.** Contracts live at `gno.land/{p,r}/moul/<name>/vN`.
-  Breaking change ⇒ new `vN` directory, never edit a published version in place.
+- **Version everything; bump only on a compatibility change.** Contracts live at
+  `gno.land/{p,r}/moul/<name>/vN`. A **breaking change** — removing/renaming an
+  exported symbol, changing its signature/behavior, or a storage/data-structure
+  swap (e.g. `avl`→`bptree`) ⇒ **new `vN`** dir. **Non-breaking** work (new
+  functions, unit tests, comments, docs) stays in place in the same `vN`.
 - **Keep the repo autonomous.** Local `p/moul` ↔ `r/moul` imports resolve via
   `gnowork.toml`; external `gno.land/*` deps are vendored under `vendor/`
   (`make deps`). Don't rely on `$GNOROOT/examples` for anything but stdlibs.
@@ -23,6 +26,13 @@ Read it before doing anything. The essentials:
   it and shows it via `Render`; the two cross-reference each other in comments +
   READMEs. Only a lone realm when it's a stateful app with nothing to extract.
   Details + examples in AGENTS.md.
+- **Every realm tests its `Render`.** Prefer an in-package `ExampleRender()` (gno's
+  example-test feature) that `print(Render(<path>))` (builtin — captured on
+  stdout, no import) with a matching `// Output:` block (required — an example
+  without it is skipped; deterministic). Verified by `gno test` on a **master** gno (CI does;
+  a stale local gno silently skips examples). **If the output has consecutive
+  blank lines** (examples collapse them), assert it with `uassert.Equal` in a
+  normal `Test` instead; filetest last resort. Details in AGENTS.md.
 - **Green before commit:** `make lint test` (needs `GNOROOT` = a gnolang/gno checkout).
 
 ## Commits
