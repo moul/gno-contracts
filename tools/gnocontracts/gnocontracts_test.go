@@ -149,6 +149,58 @@ func TestParseImports(t *testing.T) {
 	}
 }
 
+// Imports that only *look* like imports — inside a doc comment showing example
+// usage, or commented out — must not be reported as dependencies. Regression:
+// p/moul/svg/v1/doc.gno documents `import "gno.land/p/moul/svg"`, which the
+// line-based scanner used to take literally, inventing a dependency on a
+// package present in no checkout and failing `make deps`.
+func TestParseImportsIgnoresComments(t *testing.T) {
+	cases := []struct {
+		name, body string
+		want       []string
+	}{
+		{
+			name: "block doc comment with example import",
+			body: "/*\nPackage svg …\n\nExample:\n\n\timport \"gno.land/p/moul/svg\"\n*/\npackage svg // import \"gno.land/p/moul/svg\"\n\nimport \"gno.land/p/moul/md/v1\"\n",
+			want: []string{"gno.land/p/moul/md/v1"},
+		},
+		{
+			name: "line-commented import",
+			body: "package p\n\n// import \"gno.land/p/moul/ghost/v1\"\nimport \"strings\"\n",
+			want: []string{"strings"},
+		},
+		{
+			name: "commented entry inside an import group",
+			body: "package p\n\nimport (\n\t\"strings\"\n\t// \"gno.land/p/moul/ghost/v1\"\n\t\"gno.land/p/moul/md/v1\"\n)\n",
+			want: []string{"strings", "gno.land/p/moul/md/v1"},
+		},
+		{
+			name: "inline block comment on the same line",
+			body: "package p\n\nimport \"strings\" /* not \"gno.land/p/moul/ghost/v1\" */\n",
+			want: []string{"strings"},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			dir := t.TempDir()
+			writeFile(t, dir, "p.gno", c.body)
+			got, err := parseImports(filepath.Join(dir, "p.gno"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(got) != len(c.want) {
+				t.Fatalf("imports = %v, want %v", got, c.want)
+			}
+			for i := range got {
+				if got[i] != c.want[i] {
+					t.Errorf("imports = %v, want %v", got, c.want)
+					break
+				}
+			}
+		})
+	}
+}
+
 func TestClassifyUpstream(t *testing.T) {
 	// build a dir with a prod .gno, a test .gno, and a gnomod
 	mk := func(prod, test, mod string) string {

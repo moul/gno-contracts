@@ -367,9 +367,40 @@ func parseImports(file string) ([]string, error) {
 	}
 	var out []string
 	lines := strings.Split(string(b), "\n")
-	inBlock := false
+	inBlock := false   // inside an import ( … ) group
+	inComment := false // inside a /* … */ comment
 	for _, line := range lines {
 		t := strings.TrimSpace(line)
+
+		// Strip comments first. A doc comment that *shows* example usage —
+		// e.g. p/moul/svg/v1/doc.gno's "\timport \"gno.land/p/moul/svg\"" —
+		// trims to a line this scanner would otherwise read as a real import,
+		// inventing a dependency on a package that exists nowhere and breaking
+		// `make deps` outright.
+		if inComment {
+			i := strings.Index(t, "*/")
+			if i < 0 {
+				continue
+			}
+			inComment = false
+			t = strings.TrimSpace(t[i+2:])
+		}
+		if strings.HasPrefix(t, "//") {
+			continue
+		}
+		if i := strings.Index(t, "/*"); i >= 0 {
+			rest := t[i+2:]
+			if j := strings.Index(rest, "*/"); j >= 0 {
+				t = strings.TrimSpace(t[:i] + rest[j+2:])
+			} else {
+				inComment = true
+				t = strings.TrimSpace(t[:i])
+			}
+		}
+		if t == "" {
+			continue
+		}
+
 		switch {
 		case inBlock:
 			if t == ")" {
