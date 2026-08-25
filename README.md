@@ -177,6 +177,7 @@ make help        # list all targets
 | [`r/moul/present/v2`](r/moul/present/v2) 🏛️ | — | — | — | — | 9 |
 | [`r/moul/sapin/v1`](r/moul/sapin/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/b58demo/v1`](r/moul/x/daily/b58demo/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/ballot/v1`](r/moul/x/daily/ballot/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/blog/v1`](r/moul/x/daily/blog/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/bloomfilter/v1`](r/moul/x/daily/bloomfilter/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/bullscows/v1`](r/moul/x/daily/bullscows/v1) 🏛️ | — | — | — | — | — |
@@ -238,6 +239,7 @@ make help        # list all targets
 | [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule/v1) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/timelock/v1`](r/moul/x/daily/timelock/v1) 🏛️ 🚧 | — | — | — | — | 2 |
+| [`r/moul/x/daily/tipjar/v1`](r/moul/x/daily/tipjar/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/trivia/v1`](r/moul/x/daily/trivia/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort/v1) 🏛️ | — | — | — | — | 1 |

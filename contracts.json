@@ -2334,6 +2334,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/ballot/v1",
+      "dir": "r/moul/x/daily/ballot/v1",
+      "kind": "r",
+      "name": "x/daily/ballot",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/blog/v1",
       "dir": "r/moul/x/daily/blog/v1",
       "kind": "r",
@@ -4011,6 +4034,29 @@
           "uploaded": false
         },
         "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/tipjar/v1",
+      "dir": "r/moul/x/daily/tipjar/v1",
+      "kind": "r",
+      "name": "x/daily/tipjar",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         },
         "topaz": {
