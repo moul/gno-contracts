@@ -3629,6 +3629,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/rpgroom/v1",
+      "dir": "r/moul/x/daily/rpgroom/v1",
+      "kind": "r",
+      "name": "x/daily/rpgroom",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/rps/v1",
       "dir": "r/moul/x/daily/rps/v1",
       "kind": "r",

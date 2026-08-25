@@ -224,6 +224,7 @@ make help        # list all targets
 | [`r/moul/x/daily/ringlog/v1`](r/moul/x/daily/ringlog/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/romannumdemo/v1`](r/moul/x/daily/romannumdemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/rot13demo/v1`](r/moul/x/daily/rot13demo/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/rpgroom/v1`](r/moul/x/daily/rpgroom/v1) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch/v1) 🏛️ | — | — | — | — | 1 |
