@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-03T16:55:21Z",
+  "status_checked_at": "2026-08-24T12:43:22Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -48,8 +48,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -110,8 +109,32 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/authz/v2",
+      "dir": "p/moul/authz/v2",
+      "kind": "p",
+      "name": "authz",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/addrset/v2",
+        "gno.land/p/moul/once/v1",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -174,8 +197,32 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/collection/v3",
+      "dir": "p/moul/collection/v3",
+      "kind": "p",
+      "name": "collection",
+      "version": "v3",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/bptree/v0",
+        "gno.land/p/nt/seqid/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -230,8 +277,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -296,8 +342,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -352,8 +397,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -383,8 +427,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -411,8 +454,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -467,8 +509,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -498,8 +539,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -554,8 +594,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -582,8 +621,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -617,8 +655,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -652,8 +689,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -712,8 +748,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -745,8 +780,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -807,8 +841,31 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/memo/v3",
+      "dir": "p/moul/memo/v3",
+      "kind": "p",
+      "name": "memo",
+      "version": "v3",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/bptree/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -835,8 +892,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -868,8 +924,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -928,8 +983,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -961,8 +1015,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -993,8 +1046,31 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/svg/v2",
+      "dir": "p/moul/svg/v2",
+      "kind": "p",
+      "name": "svg",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/bptree/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -1026,8 +1102,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1059,8 +1134,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1089,8 +1163,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1122,8 +1195,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "both"
+          "uploaded": false
         }
       }
     },
@@ -1182,8 +1254,93 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/b58/v1",
+      "dir": "p/moul/x/daily/b58/v1",
+      "kind": "p",
+      "name": "x/daily/b58",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/cowsay/v1",
+      "dir": "p/moul/x/daily/cowsay/v1",
+      "kind": "p",
+      "name": "x/daily/cowsay",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/levenshtein/v1",
+      "dir": "p/moul/x/daily/levenshtein/v1",
+      "kind": "p",
+      "name": "x/daily/levenshtein",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/markov/v1",
+      "dir": "p/moul/x/daily/markov/v1",
+      "kind": "p",
+      "name": "x/daily/markov",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -1218,6 +1375,90 @@
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/romannum/v1",
+      "dir": "p/moul/x/daily/romannum/v1",
+      "kind": "p",
+      "name": "x/daily/romannum",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/rot13/v1",
+      "dir": "p/moul/x/daily/rot13/v1",
+      "kind": "p",
+      "name": "x/daily/rot13",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/semver/v1",
+      "dir": "p/moul/x/daily/semver/v1",
+      "kind": "p",
+      "name": "x/daily/semver",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/sieve/v1",
+      "dir": "p/moul/x/daily/sieve/v1",
+      "kind": "p",
+      "name": "x/daily/sieve",
+      "version": "v1",
+      "description": "",
+      "deps": [],
       "draft": false,
       "published": {
         "betanet": {
@@ -1282,8 +1523,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1338,8 +1578,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1394,8 +1633,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1425,8 +1663,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1485,8 +1722,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1541,8 +1777,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1657,8 +1892,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1687,8 +1921,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1803,8 +2036,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1865,8 +2097,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1925,8 +2156,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -1985,8 +2215,70 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/present/v1",
+      "dir": "r/moul/present/v1",
+      "kind": "r",
+      "name": "present",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/demo/avl/pager",
+        "gno.land/p/demo/ownable",
+        "gno.land/p/demo/seqid",
+        "gno.land/p/demo/ufmt",
+        "gno.land/p/moul/collection",
+        "gno.land/p/moul/md",
+        "gno.land/p/moul/mdtable",
+        "gno.land/p/moul/realmpath",
+        "gno.land/p/moul/txlink"
+      ],
+      "draft": false,
+      "ignored": true,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/present/v2",
+      "dir": "r/moul/present/v2",
+      "kind": "r",
+      "name": "present",
+      "version": "v2",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v1",
+        "gno.land/p/moul/mdtable/v1",
+        "gno.land/p/moul/realmpath/v1",
+        "gno.land/p/moul/txlink/v1",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/avl/v0/pager",
+        "gno.land/p/nt/ownable/v0",
+        "gno.land/p/nt/seqid/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -2014,8 +2306,30 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/b58demo/v1",
+      "dir": "r/moul/x/daily/b58demo/v1",
+      "kind": "r",
+      "name": "x/daily/b58demo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/b58/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -2044,8 +2358,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2126,8 +2439,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2156,8 +2468,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2186,8 +2497,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2216,8 +2526,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2244,8 +2553,30 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/cowsaydemo/v1",
+      "dir": "r/moul/x/daily/cowsaydemo/v1",
+      "kind": "r",
+      "name": "x/daily/cowsaydemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/cowsay/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -2303,8 +2634,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2333,8 +2663,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2363,8 +2692,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2449,8 +2777,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2535,8 +2862,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2623,8 +2949,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2682,8 +3007,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2712,8 +3036,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2742,8 +3065,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2777,6 +3099,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/levenshteindemo/v1",
+      "dir": "r/moul/x/daily/levenshteindemo/v1",
+      "kind": "r",
+      "name": "x/daily/levenshteindemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/levenshtein/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/life/v1",
       "dir": "r/moul/x/daily/life/v1",
       "kind": "r",
@@ -2799,8 +3144,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2829,8 +3173,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -2886,8 +3229,30 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/markovdemo/v1",
+      "dir": "r/moul/x/daily/markovdemo/v1",
+      "kind": "r",
+      "name": "x/daily/markovdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/markov/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -2914,8 +3279,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3027,8 +3391,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3109,8 +3472,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3189,8 +3551,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3214,6 +3575,52 @@
           "uploaded": false
         },
         "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/romannumdemo/v1",
+      "dir": "r/moul/x/daily/romannumdemo/v1",
+      "kind": "r",
+      "name": "x/daily/romannumdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/romannum/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/rot13demo/v1",
+      "dir": "r/moul/x/daily/rot13demo/v1",
+      "kind": "r",
+      "name": "x/daily/rot13demo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/rot13/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         },
         "topaz": {
@@ -3275,8 +3682,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3305,8 +3711,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3335,8 +3740,54 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/semverdemo/v1",
+      "dir": "r/moul/x/daily/semverdemo/v1",
+      "kind": "r",
+      "name": "x/daily/semverdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/semver/v1",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/sievedemo/v1",
+      "dir": "r/moul/x/daily/sievedemo/v1",
+      "kind": "r",
+      "name": "x/daily/sievedemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/sieve/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
         }
       }
     },
@@ -3392,8 +3843,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3480,8 +3930,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3570,8 +4019,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3629,8 +4077,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3686,8 +4133,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },
@@ -3714,8 +4160,7 @@
           "uploaded": false
         },
         "topaz": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         }
       }
     },

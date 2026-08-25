@@ -1,6 +1,7 @@
 package mdlist
 
 import (
+	"gno.land/p/moul/md/v1"
 	"strings"
 	"testing"
 
@@ -75,4 +76,100 @@ func TestTruncateText(t *testing.T) {
 	urequire.Equal(t, short, truncateText(short, 10, false))
 	urequire.Equal(t, "abcd\nef...", truncateText(long, 10, true))
 	urequire.Equal(t, "short", truncateText(short, 10, true))
+}
+
+func TestEntriesRendering(t *testing.T) {
+	list := Entries{
+		Entry{
+			Title: "Entry 1",
+			Body:  "Body 1",
+			Links: []string{
+				md.Link("Example", "https://example.com"),
+			},
+		},
+		Entry{
+			Title: "Entry 2",
+			Body:  "Body 2",
+		},
+		Entry{
+			Title: "Entry 3",
+			Body:  "Body 3",
+			Links: []string{
+				md.Link("Example1", "https://example.com/1"),
+				md.Link("Example2", "https://example.com/2"),
+			},
+		},
+		Entry{
+			Title: "Entry 4",
+			Body:  "Body 4",
+			Link:  "https://example.com/4",
+		},
+		Entry{
+			Title: "Entry 5",
+			Body:  "Body 5",
+			Link:  "https://example.com/5",
+			Links: []string{
+				md.Link("Example3", "https://example.com/3"),
+			},
+		},
+	}
+
+	uassert.Equal(t, `<gno-columns>
+## Entry 1
+Body 1
+
+[Example](https://example.com)
+
+
+<gno-columns-sep>
+## Entry 2
+Body 2
+
+
+
+
+<gno-columns-sep>
+## Entry 3
+Body 3
+
+[Example1](https://example.com/1) [Example2](https://example.com/2)
+
+
+<gno-columns-sep>
+## [Entry 4](https://example.com/4)
+Body 4
+
+
+
+
+<gno-columns-sep>
+## [Entry 5](https://example.com/5)
+Body 5
+
+[Example3](https://example.com/3)
+
+
+</gno-columns>
+`, list.Columns())
+	uassert.Equal(t, `- **Entry 1**: *Body 1* [Example](https://example.com)
+- **Entry 2**: *Body 2*
+- **Entry 3**: *Body 3* [Example1](https://example.com/1) [Example2](https://example.com/2)
+- **[Entry 4](https://example.com/4)**: *Body 4*
+- **[Entry 5](https://example.com/5)**: *Body 5* [Example3](https://example.com/3)
+`, list.BulletList())
+	uassert.Equal(t, `1. **Entry 1**: *Body 1* [Example](https://example.com)
+2. **Entry 2**: *Body 2*
+3. **Entry 3**: *Body 3* [Example1](https://example.com/1) [Example2](https://example.com/2)
+4. **[Entry 4](https://example.com/4)**: *Body 4*
+5. **[Entry 5](https://example.com/5)**: *Body 5* [Example3](https://example.com/3)
+`, list.NumberedList())
+	uassert.Equal(t, `**Entry 1**. Body 1 [Example](https://example.com)
+
+**Entry 2**. Body 2
+
+**Entry 3**. Body 3 [Example1](https://example.com/1) [Example2](https://example.com/2)
+
+**[Entry 4](https://example.com/4)**. Body 4
+
+**[Entry 5](https://example.com/5)**. Body 5 [Example3](https://example.com/3)`, list.Paragraphs())
 }
