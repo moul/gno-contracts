@@ -71,9 +71,10 @@ func renderTable(m *Manifest) string {
 		for _, n := range m.Networks {
 			b.WriteString(" " + publishedCell(n, c) + " |")
 		}
-		b.WriteString(" " + monorepoLink(c.Upstream) + " | " + depBadge(c.Deps) + " |\n")
+		b.WriteString(" " + monorepoLink(c.Upstream, c.UpstreamMatch) + " | " + depBadge(c.Deps) + " |\n")
 	}
 	b.WriteString("\n_📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._\n")
+	b.WriteString("\n_Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._\n")
 	if m.StatusCheckedAt != "" {
 		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = /v1, 🗄️ = un-versioned monorepo path)._\n")
 	}
@@ -90,12 +91,23 @@ func kindEmoji(kind string) string {
 }
 
 // monorepoLink renders a link to the un-versioned package in the gnolang/gno
-// monorepo, for contracts that originated there.
-func monorepoLink(upstream string) string {
+// monorepo, plus a marker for how our versioned copy compares to it.
+func monorepoLink(upstream, match string) string {
 	if upstream == "" {
 		return "—"
 	}
-	return "[src](https://github.com/gnolang/gno/tree/master/examples/" + upstream + ")"
+	link := "[src](https://github.com/gnolang/gno/tree/master/examples/" + upstream + ")"
+	switch match {
+	case "exact":
+		return link + " 🟰" // every file identical
+	case "gno":
+		return link + " ≈" // all .gno identical (gnomod/meta differ)
+	case "gno-notest":
+		return link + " 〜" // .gno identical except tests
+	case "diff":
+		return link + " ✂️" // production .gno drifted
+	}
+	return link
 }
 
 func depBadge(deps []string) string {
