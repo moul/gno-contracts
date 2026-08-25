@@ -26,7 +26,7 @@ kept on-chain and viewable per-address.
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsmatch" \
   -func Throw -args "rock" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 <key>
+  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 
 # View the arena dashboard
 gnokey query vm/qrender \
@@ -39,7 +39,7 @@ gnokey query vm/qrender \
 
 ## Toolchain
 
-Written against the test13 (gno 0.9) stdlib split (`chain`, `chain/runtime`,
+Written against the sapphire (gno 0.9) stdlib split (`chain`, `chain/runtime`,
 `gno.land/p/nt/avl/v0`). The `gno` binary on `PATH` here is a newer/older
 mismatch of its own `GNOROOT` (native-function drift), so tests were run
 against a `gno` built from the exact pseudo-version pinned in that binary's

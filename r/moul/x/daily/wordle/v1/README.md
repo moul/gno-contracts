@@ -9,7 +9,7 @@
 ---
 
 
-A Wordle-like realm for gno.land (gno 0.9 / test13). Every "day" — a span of
+A Wordle-like realm for gno.land (gno 0.9 / sapphire). Every "day" — a span of
 blocks derived deterministically from the block height — the realm picks one
 secret 5-letter word from a built-in 15-word dictionary. Players submit guesses
 and get per-letter emoji feedback (🟩 correct spot, 🟨 wrong spot, ⬜ absent),
@@ -37,7 +37,7 @@ gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/wordle" \
   -func Guess -args "crane" \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 <keyname>
+  -broadcast -chainid sapphire-1 <keyname>
 ```
 
 View the board in gnoweb at:

@@ -27,7 +27,7 @@ means the oracle has less to work with).
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsoracle" \
   -func Play -args "rock" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 <key>
+  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 
 # View the oracle's dashboard (total rounds, oracle win rate, top outwitter)
 gnokey query vm/qrender \
@@ -40,7 +40,7 @@ gnokey query vm/qrender \
 
 ## Toolchain
 
-Written against the test13 (gno 0.9) stdlib split (`chain`, `chain/runtime`,
+Written against the sapphire (gno 0.9) stdlib split (`chain`, `chain/runtime`,
 `gno.land/p/nt/avl/v0`, `gno.land/p/nt/testutils/v0`), following the same
 crossing-function (`cur realm`) and `avl.Tree`-backed state patterns already
 verified on this chain by the `rpsmatch` realm in this repo. The `gno` binary

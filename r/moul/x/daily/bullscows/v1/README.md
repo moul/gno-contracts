@@ -39,7 +39,7 @@ round actually starts.
 Verified locally with `gno test -v .` and `gno lint .` against a `gno.land/gnolang/gno`
 master checkout used as `GNOROOT` (the default installed `gno` binary had a stale/
 missing `GNOROOT`, so `GNOROOT=<path-to-gnolang/gno> gno test .` was used instead).
-All 7 tests pass, lint is clean. This exercises current test13 (gno 0.9) stdlib
+All 7 tests pass, lint is clean. This exercises current sapphire (gno 0.9) stdlib
 paths (`chain/runtime`, no `std` package) and the `cur realm` / `cross(cur)` crossing
 convention.
 

@@ -22,15 +22,15 @@ changes ever made, and a table of the recent history.
 ```sh
 # Increment the shared counter
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/counter" \
-  -func Inc -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 KEY
+  -func Inc -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 KEY
 
 # Decrement it
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/counter" \
-  -func Dec -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 KEY
+  -func Dec -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 KEY
 
 # Reset back to zero
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/counter" \
-  -func Reset -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 KEY
+  -func Reset -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 KEY
 ```
 
 View the current value and history by rendering the realm in a gno.land

@@ -15,7 +15,7 @@ at which it was made. The `Render` view shows the wall newest-first, 20 posts
 per page, with total count and prev/next pagination driven by the render path.
 
 - **Realm path:** `gno.land/r/REPLACE_ADDR/microblog`
-- **Gno version:** 0.9 (test13)
+- **Gno version:** 0.9 (sapphire)
 
 ## API
 
@@ -34,7 +34,7 @@ gnokey maketx call \
   -func Post \
   -args "gm gno.land 👋" \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> mykey
+  -broadcast -chainid sapphire-1 -remote <rpc> mykey
 ```
 
 View the wall in gnoweb:

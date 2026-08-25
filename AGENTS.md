@@ -60,7 +60,7 @@ Makefile                task entrypoints
 - `GNOROOT` must point at a `gnolang/gno` checkout (provides the gno binary's
   stdlibs). CI builds gno from `master`; locally, set it to your checkout.
 - The gno version convention is `gno = "0.9"` in every `gnomod.toml`, built
-  against gno **master** (the topaz-era API: `chain`, `chain/runtime`,
+  against gno **master** (the sapphire-era API: `chain`, `chain/runtime`,
   `chain/banker`, `gno.land/p/nt/avl/v0`, …). State-mutating exported realm
   functions are crossing functions (first parameter `cur realm`).
 
@@ -74,7 +74,7 @@ make deps      # vendor external gno.land deps into vendor/
 make gen       # refresh contracts.json + README table  (bot runs this on main; local preview only)
 make check     # verify the catalog is not stale (used by the regen bot, NOT PR CI)
 make sync      # report drift vs the gnolang/gno monorepo
-make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain status
+make publish NET=sapphire CHECK=1   # dependency-ordered publish plan + on-chain status
 ```
 
 ## Adding a contract

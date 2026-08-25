@@ -1,5 +1,5 @@
 // Package erc20 implements MiniToken, a minimal fungible token modeled on the
-// Solidity ERC-20 idea, ported to gno.land (gno 0.9 / test13).
+// Solidity ERC-20 idea, ported to gno.land (gno 0.9 / sapphire).
 //
 // State is package-level and persistent. All state-mutating exported functions
 // are crossing functions (they take `cur realm` as the first parameter) per the

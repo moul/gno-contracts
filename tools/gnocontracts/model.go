@@ -76,12 +76,27 @@ type Pub struct {
 	Which    string `json:"which,omitempty"` // "v1", "monorepo", or "both"
 }
 
-// defaultNetworks seeds a fresh manifest. Adjust RPC/chain-id as chains change.
+// defaultNetworks is the AUTHORITATIVE set of chains we track upload status
+// against; `manifest` reconciles contracts.json against it on every run (see
+// cmdManifest). Editing contracts.json by hand does not work — it is generated
+// on main and the `no-generated-files` guard rejects PRs that touch it — so
+// adding or retiring a network means editing this list.
+//
+// Retiring a network only drops its README column and stops it being probed;
+// the per-contract `published` entries keep their old key (harmless, and the
+// same thing happened to portal-loop/test6 before).
 func defaultNetworks() []Network {
 	return []Network{
-		{Name: "portal-loop", ChainID: "portal-loopz", RPC: "https://rpc.gno.land:443"},
-		{Name: "test6", ChainID: "test6", RPC: "https://rpc.test6.testnets.gno.land:443"},
-		{Name: "topaz", ChainID: "topaz-1", RPC: "https://rpc.topaz.testnets.gno.land:443"},
+		// Current primary testnet. chain_id verified live against
+		// https://rpc.sapphire.testnets.gno.land/status (2026-08-25).
+		{Name: "sapphire", ChainID: "sapphire-1", RPC: "https://rpc.sapphire.testnets.gno.land:443"},
+		// Second testnet, not launched yet: rpc.pearl.testnets.gno.land currently
+		// resolves to sapphire (wildcard DNS) and reports chain_id "sapphire-1",
+		// so these values follow the sapphire naming pattern and are UNVERIFIED.
+		// Confirm both before trusting any pearl publish/status output.
+		{Name: "pearl", ChainID: "pearl-1", RPC: "https://rpc.pearl.testnets.gno.land:443"},
+		{Name: "betanet", ChainID: "gnoland1", RPC: "https://rpc.gno.land:443"},
+		{Name: "staging", ChainID: "staging", RPC: "https://rpc.staging.gno.land:443"},
 	}
 }
 

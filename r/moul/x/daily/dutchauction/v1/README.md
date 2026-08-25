@@ -46,7 +46,7 @@ with `GNOROOT` pointed at a full checkout — the local `gno` on `PATH` ships
 without a bundled stdlib tree, so `GNOROOT` had to be set explicitly to
 resolve `chain`, `chain/banker`, `chain/runtime`, and
 `gno.land/p/nt/avl/v0`/`testutils/v0`. `gno lint .` is clean. Target chain is
-test13 (gno 0.9); code sticks to the documented `chain/*` stdlib family and
+sapphire (gno 0.9); code sticks to the documented `chain/*` stdlib family and
 crossing-function (`cur realm`) convention used by the other realms in this
 batch.
 

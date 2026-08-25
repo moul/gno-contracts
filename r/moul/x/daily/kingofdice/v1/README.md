@@ -9,7 +9,7 @@
 ---
 
 
-A "king of the hill" dice game for gno.land (test13 / gno 0.9). Call `Roll()`
+A "king of the hill" dice game for gno.land (sapphire / gno 0.9). Call `Roll()`
 to throw a deterministic 1-100 die; beat the reigning king's roll and you
 dethrone them, becoming king yourself. Unlike a typical leaderboard that just
 sums points, this one ranks players by **accumulated reign length in blocks**
@@ -32,7 +32,7 @@ gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/kingofdice" \
   -func Roll \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> <keyname>
+  -broadcast -chainid sapphire-1 -remote <rpc> <keyname>
 ```
 
 View the dashboard in gnoweb at `/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/kingofdice`,

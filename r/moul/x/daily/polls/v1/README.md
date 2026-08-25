@@ -9,7 +9,7 @@
 ---
 
 
-An on-chain poll and voting realm for gno.land (test13, gno 0.9). Anyone can
+An on-chain poll and voting realm for gno.land (sapphire, gno 0.9). Anyone can
 create a poll with a question and a comma-separated set of options; every caller
 address may cast exactly one vote per poll. The realm's `Render` page lists each
 poll with its options, live tallies drawn as `▓░` bar charts, per-option
@@ -41,12 +41,12 @@ address is read via `runtime.PreviousRealm().Address()`.
 # create a poll (returns its id, e.g. 0)
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/polls" \
   -func CreatePoll -args "Best L1 for smart contracts?" -args "gno,eth,sol" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 mykey
+  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 mykey
 
 # vote for option index 0 on poll 0
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/polls" \
   -func Vote -args 0 -args 0 \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 mykey
+  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 mykey
 
 # view results in gnoweb
 #   https://gno.land/r/REPLACE_ADDR/polls
