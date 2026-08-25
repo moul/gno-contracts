@@ -1,0 +1,39 @@
+# Pixel Canvas
+
+> ⚠️ **Experimental — generated with no human supervision** by the daily MCP pipeline to exercise gno tooling. Not audited. See [r/moul/x/daily](https://github.com/moul/gno-contracts/blob/main/r/moul/x/daily/README.md).
+
+---
+
+A shared 16x16 canvas. Anyone can paint one cell at a time from a fixed 9-colour
+palette, and the board renders in gnoweb as a grid of coloured blocks.
+
+Painting is **last-write-wins** — that's the point of a shared canvas. Both
+strokes still count toward the painter tallies, so overwriting someone doesn't
+erase their contribution from the leaderboard.
+
+```
+Paint(x, y, colour)   → colours a cell, returns the total stroke count
+At(x, y)              → the colour name of a cell ("white" when untouched)
+PainterAt(x, y)       → who last painted it ("" when untouched)
+Strokes()             → total paints ever
+Palette()             → the accepted colour names
+
+/r/moul/x/daily/pixelcanvas/v1        → the canvas, palette and top painters
+/r/moul/x/daily/pixelcanvas/v1:4,9    → who painted that cell, and what colour
+```
+
+Coordinates are 0-based with `(0,0)` at the **top-left**, and are `x` (column)
+then `y` (row) — so `(3,7)` is column 3 of row 7. Colour names are matched
+case- and space-insensitively.
+
+Palette: `white`, `red`, `orange`, `yellow`, `green`, `blue`, `purple`,
+`brown`, `black`.
+
+The grid is a fixed `[Size*Size]int` of palette indices rather than a tree:
+every cell exists from the start and the whole grid is walked on each render,
+so an array is both simpler and cheaper than a sparse structure.
+
+Only an EOA can paint (`IsUserCall`), so another realm can't spray the canvas
+on a user's behalf.
+
+Built for gno 0.9.
