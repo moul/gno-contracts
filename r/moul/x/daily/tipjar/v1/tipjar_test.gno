@@ -11,7 +11,7 @@ import (
 	"gno.land/p/nt/testutils/v0"
 )
 
-var realmAddr = chain.PackageAddress("gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/tipjar")
+var realmAddr = chain.PackageAddress("gno.land/r/moul/x/daily/tipjar/v1")
 
 // reset clears package globals between tests, pinning owner to a known test
 // address rather than whatever init() captured from the test harness.
