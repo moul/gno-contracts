@@ -36,4 +36,4 @@ so an array is both simpler and cheaper than a sparse structure.
 Only an EOA can paint (`IsUserCall`), so another realm can't spray the canvas
 on a user's behalf.
 
-Built for gno 0.9.
+Built for gno 0.9. Live demo (agent address): https://sapphire.testnets.gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/pixelcanvas
