@@ -31,4 +31,4 @@ Checking in twice in the same window is rejected — the streak only moves when
 the window does. Only an EOA can check in (`IsUserCall`), so another realm
 can't farm streaks on your behalf.
 
-Built for gno 0.9.
+Built for gno 0.9. Live demo (agent address): https://sapphire.testnets.gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/streak
