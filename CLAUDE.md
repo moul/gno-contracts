@@ -50,7 +50,7 @@ make help          # all targets
 make test lint     # verify
 make gen           # regenerate catalog after adding a contract
 make sync          # drift vs the gnolang/gno monorepo
-make publish NET=sapphire CHECK=1
+make publish NET=sapphire CHECK=1   # or NET=pearl — the two live testnets
 ```
 
 Everything else — layout, the `tools/` CLI, how to add a contract, the monorepo

@@ -87,13 +87,11 @@ type Pub struct {
 // same thing happened to portal-loop/test6 before).
 func defaultNetworks() []Network {
 	return []Network{
-		// Current primary testnet. chain_id verified live against
-		// https://rpc.sapphire.testnets.gno.land/status (2026-08-25).
+		// The two live testnets. Both chain_ids verified against the nodes'
+		// /status (2026-08-27); both run gno v1.0.0-rc.0 and expose the same
+		// gnoweb + agent-faucet host pattern, so they are interchangeable
+		// publish targets rather than one superseding the other.
 		{Name: "sapphire", ChainID: "sapphire-1", RPC: "https://rpc.sapphire.testnets.gno.land:443"},
-		// Second testnet, not launched yet: rpc.pearl.testnets.gno.land currently
-		// resolves to sapphire (wildcard DNS) and reports chain_id "sapphire-1",
-		// so these values follow the sapphire naming pattern and are UNVERIFIED.
-		// Confirm both before trusting any pearl publish/status output.
 		{Name: "pearl", ChainID: "pearl-1", RPC: "https://rpc.pearl.testnets.gno.land:443"},
 		{Name: "betanet", ChainID: "gnoland1", RPC: "https://rpc.gno.land:443"},
 		{Name: "staging", ChainID: "staging", RPC: "https://rpc.staging.gno.land:443"},
