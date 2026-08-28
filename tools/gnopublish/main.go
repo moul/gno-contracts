@@ -316,6 +316,22 @@ func run() error {
 				return fmt.Errorf("broadcast %s (%d/%d) [gas-wanted %d]: %w%s", p.c.PkgPath, i+1, len(msgs), wanted, err, txDetail(res))
 			}
 			failed = append(failed, p.c.PkgPath)
+			// "Failed" is not one thing, and the difference decides the sequence:
+			// a tx rejected in CheckTx (bad signature, bad sequence) never enters
+			// a block and consumes nothing, but one that PASSES CheckTx and then
+			// fails in DeliverTx — a type-check error, say — WAS included and DID
+			// consume it. Treating every failure as "not consumed" desyncs every
+			// later package into spurious "signature verification failed": one
+			// type-check error turned the next six into bogus failures.
+			//
+			// Read it off the response rather than re-querying the account: the
+			// query races the block commit and can still report the pre-tx
+			// sequence, which silently does nothing and leaves the desync in
+			// place.
+			if res != nil && !res.CheckTx.IsErr() {
+				seq++
+				fmt.Printf("   ↻ sequence → %d (that tx passed CheckTx, so it was included and consumed one)\n", seq)
+			}
 			continue
 		}
 		fmt.Printf("✅ %2d/%d %s — %s — hash %s gas %d/%d\n", i+1, len(msgs), p.c.PkgPath, pkgURL(net, p.c.PkgPath), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
@@ -333,6 +349,20 @@ func run() error {
 	return nil
 }
 
+// simGasWanted is the ceiling the SIMULATION runs under. It must be the
+// consensus maximum, not merely a "large" number: the simulation is itself
+// metered, so a ceiling below what the package needs makes the simulate die
+// with "out of gas" and no estimate is ever produced. r/moul/gns/v1 needs
+// 86,681,411 gas and failed estimation on every run under the old 100M
+// ceiling; the node said so outright:
+//
+//	gas used (86681411) exceeds tx's gas wanted (60000000) …
+//	simulate with consensus maximum (3000000000) to get real transaction usage
+//
+// Simulation is never broadcast and costs nothing, so there is no reason to
+// cap it below what the chain itself allows.
+const simGasWanted = 3_000_000_000
+
 // sizeGas returns the gas-wanted for msgs: the explicit override if >0, else the
 // simulated gas plus a percentage buffer (floored at 100k). Simulation signs a
 // throwaway high-gas tx with account/sequence (0,0) — the node's simulate path
@@ -341,7 +371,7 @@ func sizeGas(c *gnoclient.Client, gasFee string, override int64, bufferPct int, 
 	if override > 0 {
 		return override, nil
 	}
-	simTx, err := gnoclient.NewAddPackageTx(gnoclient.BaseTxCfg{GasFee: gasFee, GasWanted: 100_000_000, Memo: "gnopublish-sim"}, msgs...)
+	simTx, err := gnoclient.NewAddPackageTx(gnoclient.BaseTxCfg{GasFee: gasFee, GasWanted: simGasWanted, Memo: "gnopublish-sim"}, msgs...)
 	if err != nil {
 		return 0, err
 	}
