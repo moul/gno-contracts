@@ -140,6 +140,7 @@ make help        # list all targets
 | [`p/moul/x/daily/b58/v1`](p/moul/x/daily/b58/v1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/cowsay/v1`](p/moul/x/daily/cowsay/v1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/levenshtein/v1`](p/moul/x/daily/levenshtein/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/luhn/v1`](p/moul/x/daily/luhn/v1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/markov/v1`](p/moul/x/daily/markov/v1) 📦 | — | — | — | — | 1 |
 | [`p/moul/x/daily/piglatin/v1`](p/moul/x/daily/piglatin/v1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/ratelimit/v1`](p/moul/x/daily/ratelimit/v1) 📦 | — | — | — | — | 1 |
@@ -147,6 +148,7 @@ make help        # list all targets
 | [`p/moul/x/daily/rot13/v1`](p/moul/x/daily/rot13/v1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/semver/v1`](p/moul/x/daily/semver/v1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/sieve/v1`](p/moul/x/daily/sieve/v1) 📦 | — | — | — | — | — |
+| [`p/moul/x/daily/trie/v1`](p/moul/x/daily/trie/v1) 📦 | — | — | — | — | — |
 | [`p/moul/xmath/v1`](p/moul/xmath/v1) 📦 💤 | — | — | — | — | — |
 | [`p/moul/xmath/v2`](p/moul/xmath/v2) 📦 | — | — | — | — | — |
 | [`r/moul/demo/args/v1`](r/moul/demo/args/v1) 🏛️ 💤 | — | — | — | — | — |
@@ -210,6 +212,7 @@ make help        # list all targets
 | [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/lottery/v1`](r/moul/x/daily/lottery/v1) 🏛️ 🚧 | — | — | — | — | 1 |
 | [`r/moul/x/daily/lru/v1`](r/moul/x/daily/lru/v1) 🏛️ | — | — | — | — | — |
+| [`r/moul/x/daily/luhndemo/v1`](r/moul/x/daily/luhndemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/markovdemo/v1`](r/moul/x/daily/markovdemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/memory/v1`](r/moul/x/daily/memory/v1) 🏛️ | — | — | — | — | — |
 | [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop/v1) 🏛️ 🚧 | — | — | — | — | 1 |
@@ -241,6 +244,7 @@ make help        # list all targets
 | [`r/moul/x/daily/timelock/v1`](r/moul/x/daily/timelock/v1) 🏛️ 🚧 | — | — | — | — | 2 |
 | [`r/moul/x/daily/tipjar/v1`](r/moul/x/daily/tipjar/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos/v1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/daily/triedemo/v1`](r/moul/x/daily/triedemo/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/trivia/v1`](r/moul/x/daily/trivia/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort/v1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/vault/v1`](r/moul/x/daily/vault/v1) 🏛️ | — | — | — | — | 1 |
