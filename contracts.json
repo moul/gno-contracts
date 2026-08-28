@@ -1806,6 +1806,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/toposort/v1",
+      "dir": "p/moul/x/daily/toposort/v1",
+      "kind": "p",
+      "name": "x/daily/toposort",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/trie/v1",
       "dir": "p/moul/x/daily/trie/v1",
       "kind": "p",
@@ -4286,6 +4310,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/pixelcanvas/v1",
+      "dir": "r/moul/x/daily/pixelcanvas/v1",
+      "kind": "r",
+      "name": "x/daily/pixelcanvas",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/polls/v1",
       "dir": "r/moul/x/daily/polls/v1",
       "kind": "r",
@@ -4316,6 +4366,32 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/quizstreak/v1",
+      "dir": "r/moul/x/daily/quizstreak/v1",
+      "kind": "r",
+      "name": "x/daily/quizstreak",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
@@ -4841,6 +4917,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/streak/v1",
+      "dir": "r/moul/x/daily/streak/v1",
+      "kind": "r",
+      "name": "x/daily/streak",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/tamagotchi/v1",
       "dir": "r/moul/x/daily/tamagotchi/v1",
       "kind": "r",
@@ -5042,6 +5144,32 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/toposortdemo/v1",
+      "dir": "r/moul/x/daily/toposortdemo/v1",
+      "kind": "r",
+      "name": "x/daily/toposortdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/toposort/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }

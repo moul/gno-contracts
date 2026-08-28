@@ -148,6 +148,7 @@ make help        # list all targets
 | [`p/moul/x/daily/rot13/v1`](p/moul/x/daily/rot13/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/semver/v1`](p/moul/x/daily/semver/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/sieve/v1`](p/moul/x/daily/sieve/v1) 📦 | — | — | — | — | — | — |
+| [`p/moul/x/daily/toposort/v1`](p/moul/x/daily/toposort/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/trie/v1`](p/moul/x/daily/trie/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/xmath/v1`](p/moul/xmath/v1) 📦 💤 | — | — | — | — | — | — |
 | [`p/moul/xmath/v2`](p/moul/xmath/v2) 📦 | — | — | — | — | — | — |
@@ -221,7 +222,9 @@ make help        # list all targets
 | [`r/moul/x/daily/multisig/v1`](r/moul/x/daily/multisig/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/numguess/v1`](r/moul/x/daily/numguess/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/piglatindemo/v1`](r/moul/x/daily/piglatindemo/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/pixelcanvas/v1`](r/moul/x/daily/pixelcanvas/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/quizstreak/v1`](r/moul/x/daily/quizstreak/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/quotes/v1`](r/moul/x/daily/quotes/v1) 🏛️ | — | — | — | — | — | — |
 | [`r/moul/x/daily/ratelimitdemo/v1`](r/moul/x/daily/ratelimitdemo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/reactions/v1`](r/moul/x/daily/reactions/v1) 🏛️ | — | — | — | — | — | 1 |
@@ -238,12 +241,14 @@ make help        # list all targets
 | [`r/moul/x/daily/splitter/v1`](r/moul/x/daily/splitter/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/stack/v1`](r/moul/x/daily/stack/v1) 🏛️ | — | — | — | — | — | — |
 | [`r/moul/x/daily/staking/v1`](r/moul/x/daily/staking/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/streak/v1`](r/moul/x/daily/streak/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/tamagotchi/v1`](r/moul/x/daily/tamagotchi/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule/v1) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/daily/timelock/v1`](r/moul/x/daily/timelock/v1) 🏛️ 🚧 | — | — | — | — | — | 2 |
 | [`r/moul/x/daily/tipjar/v1`](r/moul/x/daily/tipjar/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/toposortdemo/v1`](r/moul/x/daily/toposortdemo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/triedemo/v1`](r/moul/x/daily/triedemo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/trivia/v1`](r/moul/x/daily/trivia/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort/v1) 🏛️ | — | — | — | — | — | 1 |
