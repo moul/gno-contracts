@@ -25,7 +25,10 @@ VIEW := $(CURDIR)/.gnoroot-view
 # each, EXCLUDING archived packages marked `ignore = true` (the gno toolchain
 # skips ignored modules for `lint` but NOT for an explicitly-targeted `test`, so
 # we must filter them out here or CI would try to build them).
-PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
+# Dot-directories are skipped: they are scratch (see TOOLCHECK_DIR), never
+# contracts, and a canary left behind by an interrupted run must not become a
+# package that lint/test tries to build.
+PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -not -path '*/.*' -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
 .PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean upload
@@ -52,18 +55,27 @@ test: toolcheck guard-examples view ## gno test every contract (deps resolved fr
 # into a no-op that passes (false green). Run a package whose example output is
 # deliberately wrong and require `gno test` to FAIL on it; if it passes, the
 # toolchain is blind to examples — abort.
+#
+# The canary MUST live inside this workspace, hence TOOLCHECK_DIR under p/moul
+# rather than a mktemp -d. The skip is workspace-dependent: a toolchain that
+# skips every example in this repo still VALIDATES a byte-identical package
+# placed in /tmp (verified against gno master.3130 — skips in-tree, validates
+# out-of-tree). A canary in /tmp therefore goes green on exactly the broken
+# toolchain this target exists to catch.
+TOOLCHECK_DIR := p/moul/.toolcheck
+
 toolcheck: view ## verify the gno toolchain validates example tests
-	@tmp=$$(mktemp -d); \
-	printf 'module = "gno.land/p/moul/toolcheck/v1"\ngno = "0.9"\n' > $$tmp/gnomod.toml; \
-	printf 'package toolcheck\n\nfunc H() string { return "hi" }\n' > $$tmp/x.gno; \
-	printf 'package toolcheck\n\nimport "fmt"\n\nfunc ExampleH() {\n\tfmt.Println(H())\n\t// Output:\n\t// WRONG-ON-PURPOSE\n}\n' > $$tmp/x_test.gno; \
-	if GNOROOT="$(VIEW)" $(GNO) test $$tmp >/dev/null 2>&1; then \
-	  rm -rf $$tmp; \
+	@rm -rf "$(TOOLCHECK_DIR)"; mkdir -p "$(TOOLCHECK_DIR)"; \
+	trap 'rm -rf "$(TOOLCHECK_DIR)"' EXIT; \
+	printf 'module = "gno.land/p/moul/toolcheck/v1"\ngno = "0.9"\n' > "$(TOOLCHECK_DIR)/gnomod.toml"; \
+	printf 'package toolcheck\n\nfunc H() string { return "hi" }\n' > "$(TOOLCHECK_DIR)/x.gno"; \
+	printf 'package toolcheck\n\nfunc ExampleH() {\n\tprint(H())\n\t// Output:\n\t// WRONG-ON-PURPOSE\n}\n' > "$(TOOLCHECK_DIR)/x_test.gno"; \
+	if GNOROOT="$(VIEW)" $(GNO) test ./$(TOOLCHECK_DIR) >/dev/null 2>&1; then \
 	  echo "ERROR: this gno does NOT validate example tests — they would be false-green."; \
 	  echo "       Build gno from gnolang/gno master (go build -o gno ./gnovm/cmd/gno)."; \
 	  exit 1; \
 	fi; \
-	rm -rf $$tmp; echo "toolcheck: gno validates example tests"
+	echo "toolcheck: gno validates example tests (workspace-resolved)"
 
 # Every gno Example* test must pin an `// Output:` block, else gno skips it
 # silently (a test that asserts nothing).
