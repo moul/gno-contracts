@@ -14,7 +14,7 @@ message; every entry records the signer's address, the message, and the block
 height at which it was signed. The realm's `Render` page shows all entries as a
 Markdown table, newest-first, with a running total.
 
-Built for the **test13** testnet (gno 0.9).
+Built for the **sapphire** testnet (gno 0.9).
 
 ## Realm path
 
@@ -41,7 +41,7 @@ gnokey maketx call \
   -func Sign \
   -args "gm gno.land!" \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> mykey
+  -broadcast -chainid sapphire-1 -remote <rpc> mykey
 ```
 
 From another realm, invoke it as a crossing call:

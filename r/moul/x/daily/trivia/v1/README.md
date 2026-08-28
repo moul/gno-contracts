@@ -23,7 +23,7 @@ Realm path: `gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/trivia`
 ```
 # answer the live question (choice index 0-3, shown in Render)
 gnokey maketx call -pkgpath gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/trivia \
-  -func Answer -args 2 -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid test13 <key>
+  -func Answer -args 2 -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 ```
 
 View `Render("")` (or just the realm path in gnoweb) to see the current
@@ -34,8 +34,8 @@ questions answered correctly so far.
 
 `gno test .` passes locally against a `gnolang/gno` checkout (`GNOROOT` set
 explicitly — the default env had a stale `GNOROOT` from an unrelated
-checkout). Local `gno` is `master.3130+bf5b31eda`, newer than test13 (gno
-0.9); code sticks to the documented test13-safe surface (`chain`,
+checkout). Local `gno` is `master.3130+bf5b31eda`, newer than sapphire (gno
+0.9); code sticks to the documented sapphire-safe surface (`chain`,
 `chain/runtime`, crossing functions with `cur realm`, `gno.land/p/nt/avl/v0`)
 per the `gno` skill's stdlib reference.
 

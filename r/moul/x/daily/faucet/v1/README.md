@@ -9,7 +9,7 @@
 ---
 
 
-A toy points faucet realm for the gno.land test13 testnet. Any caller can
+A toy points faucet realm for the gno.land sapphire testnet. Any caller can
 `Claim` 100 points, but only once every 100 blocks per address — the cooldown is
 enforced deterministically via `runtime.ChainHeight()`. Per-caller balances and
 last-claim heights are stored in an `avl.Tree`, and `Render` shows the total
@@ -29,7 +29,7 @@ gno.land/r/REPLACE_ADDR/faucet
 # Claim 100 points (subject to the 100-block cooldown).
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/faucet" \
   -func Claim -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast \
-  -chainid test13 mykey
+  -chainid sapphire-1 mykey
 
 # Query a balance (read-only).
 gnokey query "vm/qeval" -data \

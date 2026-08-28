@@ -12,7 +12,7 @@ import (
 // entry point for the post-merge / manually-triggered CI job.
 //
 //	go tool gnocontracts status            # all networks in contracts.json
-//	go tool gnocontracts status -net topaz # a single network
+//	go tool gnocontracts status -net sapphire # a single network
 //
 // Uses read-only chain queries (vm/qfile) via gnokey — no key required.
 func cmdStatus(root string, args []string) error {

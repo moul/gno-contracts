@@ -9,7 +9,7 @@
 ---
 
 
-A community quote board realm for gno.land (test13, gno 0.9). Anyone can submit
+A community quote board realm for gno.land (sapphire, gno 0.9). Anyone can submit
 a quote; each entry records the text, the submitter's address, and the block
 height at submission. The board ships pre-seeded with a handful of Stoic quotes
 so a fresh deploy renders nicely, and the rendered page rotates a "featured"
@@ -31,7 +31,7 @@ gnokey maketx call \
   -func AddQuote \
   -args "Luck is what happens when preparation meets opportunity." \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> <key>
+  -broadcast -chainid sapphire-1 -remote <rpc> <key>
 ```
 
 View the rendered board in gnoweb:

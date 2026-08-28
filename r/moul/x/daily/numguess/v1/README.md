@@ -9,7 +9,7 @@
 ---
 
 
-A gno.land realm (test13 / gno 0.9) that hides a number between 1 and 100 and
+A gno.land realm (sapphire / gno 0.9) that hides a number between 1 and 100 and
 lets anyone guess it. The target is derived **deterministically** from the block
 height at which the round started (the GnoVM has no runtime RNG), so play is
 reproducible and verifiable. Each guess returns `higher`, `lower`, or `correct`,

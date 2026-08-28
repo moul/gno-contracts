@@ -17,7 +17,7 @@ never tampered with — that is what "provably fair" means here. The realm keeps
 per-caller roll history and a global distribution across the six faces.
 
 - **Realm path:** `gno.land/r/REPLACE_ADDR/dice`
-- **Network:** test13 (gno 0.9)
+- **Network:** sapphire (gno 0.9)
 
 ## Example calls
 

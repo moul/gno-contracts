@@ -24,8 +24,8 @@ The realm maintains a 16-slot ring buffer backed by a fixed-size array. `head` t
 gnokey maketx call -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/ringlog" \
   -func Post -args "hello gno.land" \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 \
-  -remote https://rpc.test13.gnoteam.com:443 \
+  -broadcast -chainid sapphire-1 \
+  -remote https://rpc.sapphire.testnets.gno.land:443 \
   <keyname>
 ```
 
@@ -33,11 +33,10 @@ gnokey maketx call -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz
 
 ```bash
 # View via gnoweb
-open "https://test13.gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/ringlog"
 
 # Get entries programmatically
 gnokey query vm/qeval \
-  -remote https://rpc.test13.gnoteam.com:443 \
+  -remote https://rpc.sapphire.testnets.gno.land:443 \
   -data 'gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/ringlog.Len()'
 ```
 

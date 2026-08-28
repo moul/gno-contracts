@@ -15,7 +15,7 @@ import (
 // chain for current upload status and records it in contracts.json.
 //
 //	go run ./tools publish                 # print upload order
-//	go run ./tools publish -net topaz -check   # + refresh on-chain status
+//	go run ./tools publish -net sapphire -check   # + refresh on-chain status
 func cmdPublish(root string, args []string) error {
 	fs := flag.NewFlagSet("publish", flag.ContinueOnError)
 	net := fs.String("net", "", "network name to check status against (see contracts.json)")

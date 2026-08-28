@@ -60,7 +60,7 @@ Makefile                task entrypoints
 - `GNOROOT` must point at a `gnolang/gno` checkout (provides the gno binary's
   stdlibs). CI builds gno from `master`; locally, set it to your checkout.
 - The gno version convention is `gno = "0.9"` in every `gnomod.toml`, built
-  against gno **master** (the topaz-era API: `chain`, `chain/runtime`,
+  against gno **master** (the sapphire-era API: `chain`, `chain/runtime`,
   `chain/banker`, `gno.land/p/nt/avl/v0`, …). State-mutating exported realm
   functions are crossing functions (first parameter `cur realm`).
 
@@ -74,8 +74,24 @@ make deps      # vendor external gno.land deps into vendor/
 make gen       # refresh contracts.json + README table  (bot runs this on main; local preview only)
 make check     # verify the catalog is not stale (used by the regen bot, NOT PR CI)
 make sync      # report drift vs the gnolang/gno monorepo
-make publish NET=topaz CHECK=1   # dependency-ordered publish plan + on-chain status
+make publish NET=sapphire CHECK=1   # dependency-ordered publish plan + on-chain status
+make publish NET=pearl CHECK=1      # …same, against the other testnet
 ```
+
+### Networks
+
+Two live testnets, both on gno `v1.0.0-rc.0` and interchangeable as publish
+targets — `sapphire` (`sapphire-1`) and `pearl` (`pearl-1`). Each exposes the
+same host pattern: `rpc.<net>.testnets.gno.land`, gnoweb at
+`<net>.testnets.gno.land`, and an agent faucet at
+`faucet-agent.<net>.testnets.gno.land` (`/fund` is POST-only; `/limits` reports
+the grant and the per-address window — the bare root has no index route and
+404s, which says nothing about the faucet being up).
+
+The network list is **code-owned**: edit `defaultNetworks()` in
+`tools/gnocontracts/model.go`. `manifest` reconciles `contracts.json` against
+it, so the change lands via the `regen` workflow — hand-editing the catalog
+can't work, the `no-generated-files` guard rejects PRs that touch it.
 
 ## Adding a contract
 

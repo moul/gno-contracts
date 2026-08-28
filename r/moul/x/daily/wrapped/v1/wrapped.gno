@@ -1,7 +1,7 @@
 // Package wrapped is an accounting-only port of Wrapped Ether (WETH).
 //
 // The canonical WETH contract lets anyone lock native ETH and mint a 1:1
-// ERC-20 representation (and burn it back). On gno.land / topaz there is no
+// ERC-20 representation (and burn it back). On gno.land / sapphire there is no
 // msg.value / payable, so there is NO real coin transfer here: Deposit and
 // Withdraw are pure accounting operations that model the wrap/unwrap. Balances
 // and totalSupply are plain uint64 ledgers kept in an avl.Tree.

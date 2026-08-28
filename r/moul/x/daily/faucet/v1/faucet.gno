@@ -1,4 +1,4 @@
-// Package faucet is a toy points faucet realm for the gno.land test13 testnet.
+// Package faucet is a toy points faucet realm for the gno.land sapphire testnet.
 //
 // Any caller may Claim() 100 points, but only once per cooldown window of 100
 // blocks. Cooldown is enforced deterministically via runtime.ChainHeight() — no

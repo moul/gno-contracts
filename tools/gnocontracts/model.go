@@ -76,12 +76,25 @@ type Pub struct {
 	Which    string `json:"which,omitempty"` // "v1", "monorepo", or "both"
 }
 
-// defaultNetworks seeds a fresh manifest. Adjust RPC/chain-id as chains change.
+// defaultNetworks is the AUTHORITATIVE set of chains we track upload status
+// against; `manifest` reconciles contracts.json against it on every run (see
+// cmdManifest). Editing contracts.json by hand does not work — it is generated
+// on main and the `no-generated-files` guard rejects PRs that touch it — so
+// adding or retiring a network means editing this list.
+//
+// Retiring a network only drops its README column and stops it being probed;
+// the per-contract `published` entries keep their old key (harmless, and the
+// same thing happened to portal-loop/test6 before).
 func defaultNetworks() []Network {
 	return []Network{
-		{Name: "portal-loop", ChainID: "portal-loopz", RPC: "https://rpc.gno.land:443"},
-		{Name: "test6", ChainID: "test6", RPC: "https://rpc.test6.testnets.gno.land:443"},
-		{Name: "topaz", ChainID: "topaz-1", RPC: "https://rpc.topaz.testnets.gno.land:443"},
+		// The two live testnets. Both chain_ids verified against the nodes'
+		// /status (2026-08-27); both run gno v1.0.0-rc.0 and expose the same
+		// gnoweb + agent-faucet host pattern, so they are interchangeable
+		// publish targets rather than one superseding the other.
+		{Name: "sapphire", ChainID: "sapphire-1", RPC: "https://rpc.sapphire.testnets.gno.land:443"},
+		{Name: "pearl", ChainID: "pearl-1", RPC: "https://rpc.pearl.testnets.gno.land:443"},
+		{Name: "betanet", ChainID: "gnoland1", RPC: "https://rpc.gno.land:443"},
+		{Name: "staging", ChainID: "staging", RPC: "https://rpc.staging.gno.land:443"},
 	}
 }
 

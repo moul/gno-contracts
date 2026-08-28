@@ -33,7 +33,7 @@ stats. `Render("<owner-address>")` shows one pet's detail card.
 
 `gno test .` passes (10/10 tests) against `~/p/gh/gnolang/gno` as `GNOROOT`.
 Uses only `chain/runtime`, `sort`, `strconv`, and the kept `gno.land/p/nt/avl/v0`
-/ `gno.land/p/nt/testutils/v0` packages per the test13 stdlib reference. Panic
+/ `gno.land/p/nt/testutils/v0` packages per the sapphire stdlib reference. Panic
 paths are tested through non-crossing helper functions (`hatch`, `feed`,
 `play`, `sleep`) rather than through the exported `cur realm` entry points,
 since panics raised inside a realm-crossing call aren't `recover()`-able from

@@ -17,7 +17,7 @@ there is no true randomness on-chain.
 - `Asked() int` — how many questions have been asked (read-only).
 - `Render(path string) string` — shows the last answer and a table of recent shakes.
 
-Built for the topaz testnet (gno `0.9`). Example:
+Built for the sapphire testnet (gno `0.9`). Example:
 
 ```
 gnokey maketx call -pkgpath gno.land/r/moul/x/daily/eightball/v1 \

@@ -19,7 +19,7 @@ They exist to:
   don't rely on them for anything.
 - The `x/` segment stands for **exploration / experimental** — a deliberate sandbox
   kept separate from the real, curated `r/moul/*` contracts.
-- Each realm was generated targeting the test13 testnet (gno `0.9`, topaz-era API:
+- Each realm was generated targeting the sapphire testnet (gno `0.9`, sapphire-era API:
   `chain`, `chain/runtime`, `chain/runtime/unsafe`, `gno.land/p/nt/avl/v0`, …) and
   most were deployed live under an agent-controlled address; the copies here are the
   source.

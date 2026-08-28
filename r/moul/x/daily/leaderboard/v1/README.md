@@ -9,7 +9,7 @@
 ---
 
 
-An on-chain score leaderboard realm for gno.land (test13 / gno 0.9). Any account
+An on-chain score leaderboard realm for gno.land (sapphire / gno 0.9). Any account
 can accumulate points with `AddPoints(n)` and optionally attach a display name
 with `SetName(name)`. `Render` returns a Markdown table ranked by points
 descending — gold/silver/bronze medals for the top three — plus the total player
@@ -33,14 +33,14 @@ gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/leaderboard" \
   -func AddPoints -args 10 \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> <keyname>
+  -broadcast -chainid sapphire-1 -remote <rpc> <keyname>
 
 # Set your display name
 gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/leaderboard" \
   -func SetName -args "Alice" \
   -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> <keyname>
+  -broadcast -chainid sapphire-1 -remote <rpc> <keyname>
 ```
 
 View the rendered leaderboard in gnoweb at

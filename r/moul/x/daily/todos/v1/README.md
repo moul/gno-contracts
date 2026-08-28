@@ -9,7 +9,7 @@
 ---
 
 
-An on-chain, shared to-do list realm for the gno.land **test13** testnet (gno 0.9).
+An on-chain, shared to-do list realm for the gno.land **sapphire** testnet (gno 0.9).
 Anyone can add an item to the board; each item records the caller's address as
 its author, and can be toggled open/done or removed. `Render` shows the board as
 Markdown checkboxes with live open/done counts, newest item first.
@@ -33,17 +33,17 @@ be invoked with `cross(cur)` from another realm, or directly via `MsgCall`.
 # Add an item (returns the new id)
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/todos" \
   -func Add -args "buy milk" -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> mykey
+  -broadcast -chainid sapphire-1 -remote <rpc> mykey
 
 # Mark item #3 done (toggle)
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/todos" \
   -func Toggle -args 3 -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> mykey
+  -broadcast -chainid sapphire-1 -remote <rpc> mykey
 
 # Remove item #3
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/todos" \
   -func Remove -args 3 -gas-fee 1000000ugnot -gas-wanted 2000000 \
-  -broadcast -chainid test13 -remote <rpc> mykey
+  -broadcast -chainid sapphire-1 -remote <rpc> mykey
 ```
 
 ## Example render output

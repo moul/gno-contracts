@@ -308,3 +308,78 @@ func TestCanonicalImportCommentsMatchModulePath(t *testing.T) {
 	}
 	t.Logf("checked %d canonical import comment(s)", checked)
 }
+
+// defaultNetworks is the single place a chain is added or retired, so guard its
+// shape: names unique, chain_id and RPC present, and the two live testnets
+// actually listed (a silent drop would quietly stop status/publish tracking).
+func TestDefaultNetworksAreWellFormed(t *testing.T) {
+	nets := defaultNetworks()
+	seen := map[string]bool{}
+	for _, n := range nets {
+		if n.Name == "" || n.ChainID == "" || n.RPC == "" {
+			t.Errorf("incomplete network entry: %+v", n)
+		}
+		if seen[n.Name] {
+			t.Errorf("duplicate network %q", n.Name)
+		}
+		seen[n.Name] = true
+	}
+	for _, want := range []string{"sapphire", "pearl"} {
+		if !seen[want] {
+			t.Errorf("live testnet %q missing from defaultNetworks", want)
+		}
+	}
+	if seen["topaz"] {
+		t.Error("topaz is retired and must not be a tracked network")
+	}
+}
+
+// manifest reconciles the catalog's network list from defaultNetworks(), which
+// is the ONLY way a network change can land (contracts.json is generated on
+// main and the no-generated-files guard rejects PRs that touch it). Retiring a
+// network must not drop the historical per-contract `published` entries.
+func TestManifestReconcilesNetworksAndKeepsPublished(t *testing.T) {
+	root := t.TempDir()
+	writeFile(t, root, "gnowork.toml", "")
+	if err := os.MkdirAll(filepath.Join(root, "p/moul/real/v1"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeFile(t, filepath.Join(root, "p/moul/real/v1"), "gnomod.toml",
+		"module = \"gno.land/p/moul/real/v1\"\ngno = \"0.9\"\n")
+	writeFile(t, filepath.Join(root, "p/moul/real/v1"), "x.gno", "package real\n")
+
+	// A catalog carrying a retired network, both in the list and in published.
+	writeFile(t, root, "contracts.json", `{
+  "networks": [{"name":"topaz","chain_id":"topaz-1","rpc":"https://rpc.topaz.example:443"}],
+  "contracts": [{"pkgpath":"gno.land/p/moul/real/v1","dir":"p/moul/real/v1","kind":"p","name":"real","version":"v1","deps":[],"draft":false,
+    "published":{"topaz":{"uploaded":true,"tx":"deadbeef"}}}]
+}`)
+
+	if err := cmdManifest(root); err != nil {
+		t.Fatal(err)
+	}
+	m, err := loadManifest(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var names []string
+	for _, n := range m.Networks {
+		names = append(names, n.Name)
+	}
+	if strings.Join(names, ",") != "sapphire,pearl,betanet,staging" {
+		t.Fatalf("networks = %v, want the defaultNetworks() set", names)
+	}
+	if len(m.Contracts) != 1 {
+		t.Fatalf("contracts = %d, want 1", len(m.Contracts))
+	}
+	pub := m.Contracts[0].Published
+	if got, ok := pub["topaz"]; !ok || got.Tx != "deadbeef" {
+		t.Errorf("retiring a network dropped its historical published entry: %+v", pub)
+	}
+	for _, n := range []string{"sapphire", "pearl"} {
+		if _, ok := pub[n]; !ok {
+			t.Errorf("no published slot created for live network %q", n)
+		}
+	}
+}

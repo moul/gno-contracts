@@ -9,7 +9,7 @@
 ---
 
 
-An on-chain alias registry for the gno.land test13 testnet. Each caller can
+An on-chain alias registry for the gno.land sapphire testnet. Each caller can
 register `alias -> url` mappings they own: an alias is claimed on a first-come
 basis, only its owner may update or remove it, and every resolution through
 `Render("/<alias>")` bumps a per-alias click counter. Aliases must be non-empty
