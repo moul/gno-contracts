@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-28T09:58:45Z",
+  "status_checked_at": "2026-08-28T10:05:17Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -42,7 +42,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -80,7 +80,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -116,7 +117,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -156,7 +157,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -225,7 +227,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -262,7 +265,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -400,7 +404,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -467,7 +472,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -502,7 +508,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -536,7 +543,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -639,7 +647,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": false
@@ -708,7 +716,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -741,7 +750,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -779,7 +789,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -820,7 +830,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -894,7 +904,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -930,7 +941,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -1006,7 +1017,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -1042,7 +1054,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1069,7 +1082,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -1105,7 +1119,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -1179,7 +1193,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -1215,7 +1230,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -1254,7 +1269,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -1290,7 +1306,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1320,7 +1337,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "both"
         },
         "portal-loop": {
           "uploaded": true,
@@ -1358,7 +1375,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": true,
@@ -1395,7 +1413,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -1430,7 +1449,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": true,
@@ -1503,7 +1523,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -1536,7 +1557,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1563,7 +1585,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1590,7 +1613,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1617,7 +1641,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1646,7 +1671,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1673,7 +1699,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1702,7 +1729,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1729,7 +1757,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1783,7 +1812,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1810,7 +1840,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1861,7 +1892,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -1922,7 +1954,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -1989,7 +2022,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2056,7 +2090,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2092,7 +2127,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2163,7 +2199,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2230,7 +2267,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2369,7 +2407,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2404,7 +2443,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2471,7 +2511,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2543,7 +2584,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2616,7 +2658,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2687,7 +2730,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
