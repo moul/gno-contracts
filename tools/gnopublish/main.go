@@ -349,15 +349,30 @@ func run() error {
 	return nil
 }
 
+// simGasWanted is the ceiling the SIMULATION runs under. It must be the
+// consensus maximum, not a "generously large" number: the simulation is itself
+// metered, so a ceiling below what the package needs makes the simulate fail
+// with "out of gas" and the estimate never happens. r/moul/gns/v1 needs
+// 86,681,411 gas — under the old 100M ceiling it estimated fine in principle
+// but tipped over in practice, and the node said so explicitly:
+//
+//	gas used (86681411) exceeds tx's gas wanted (60000000) …
+//	simulate with consensus maximum (3000000000) to get real transaction usage
+//
+// Simulation costs nothing and is never broadcast, so there is no downside to
+// giving it the whole budget.
+const simGasWanted = 3_000_000_000
+
 // sizeGas returns the gas-wanted for msgs: the explicit override if >0, else the
 // simulated gas plus a percentage buffer (floored at 100k). Simulation signs a
-// throwaway high-gas tx with account/sequence (0,0) — the node's simulate path
-// doesn't verify the signature — and reads back the gas actually used.
+// throwaway tx with account/sequence (0,0) — the node's simulate path is not
+// supposed to verify the signature, though some chains do (see the caller's
+// fallback) — and reads back the gas actually used.
 func sizeGas(c *gnoclient.Client, gasFee string, override int64, bufferPct int, msgs ...vm.MsgAddPackage) (int64, error) {
 	if override > 0 {
 		return override, nil
 	}
-	simTx, err := gnoclient.NewAddPackageTx(gnoclient.BaseTxCfg{GasFee: gasFee, GasWanted: 100_000_000, Memo: "gnopublish-sim"}, msgs...)
+	simTx, err := gnoclient.NewAddPackageTx(gnoclient.BaseTxCfg{GasFee: gasFee, GasWanted: simGasWanted, Memo: "gnopublish-sim"}, msgs...)
 	if err != nil {
 		return 0, err
 	}
