@@ -129,7 +129,7 @@ make help        # list all targets
 | [`p/moul/printfdebugging/v1`](p/moul/printfdebugging/v1) 📦 💤 | — | — | — | — | 1 |
 | [`p/moul/printfdebugging/v2`](p/moul/printfdebugging/v2) 📦 | — | — | — | — | 1 |
 | [`p/moul/realmpath/v1`](p/moul/realmpath/v1) 📦 | — | [🗄️](https://gno.land/p/moul/realmpath) | [🗄️](https://staging.gno.land/p/moul/realmpath) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
-| [`p/moul/svg/v1`](p/moul/svg/v1) 📦 | — | — | — | — | 3 |
+| [`p/moul/svg/v1`](p/moul/svg/v1) 📦 | — | — | — | — | 2 |
 | [`p/moul/svg/v2`](p/moul/svg/v2) 📦 | — | — | — | — | 2 |
 | [`p/moul/txlink/v1`](p/moul/txlink/v1) 📦 | — | [🗄️](https://gno.land/p/moul/txlink) | [🗄️](https://staging.gno.land/p/moul/txlink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
 | [`p/moul/typeutil/v1`](p/moul/typeutil/v1) 📦 | — | [🗄️](https://gno.land/p/moul/typeutil) | [🗄️](https://staging.gno.land/p/moul/typeutil) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | — |

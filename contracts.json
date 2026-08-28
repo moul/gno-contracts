@@ -1027,7 +1027,6 @@
       "version": "v1",
       "description": "",
       "deps": [
-        "gno.land/p/moul/svg",
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
