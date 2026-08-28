@@ -278,8 +278,10 @@ func run() error {
 	}
 	// individual: one tx (block) per package. Each tx is independent, so by
 	// default a package that fails (bad gas sim, missing dep, broadcast error)
-	// is reported and SKIPPED — the rest still publish. seq only advances on a
-	// successful broadcast. -stop-on-error restores fail-fast.
+	// is reported and SKIPPED — the rest still publish. seq advances on success
+	// and is re-read from the chain after a failure, since a tx that fails in
+	// DeliverTx still lands in a block and consumes it. -stop-on-error restores
+	// fail-fast.
 	seq := acc.Sequence
 	var failed []string
 	for i, msg := range msgs {
@@ -316,6 +318,20 @@ func run() error {
 				return fmt.Errorf("broadcast %s (%d/%d) [gas-wanted %d]: %w%s", p.c.PkgPath, i+1, len(msgs), wanted, err, txDetail(res))
 			}
 			failed = append(failed, p.c.PkgPath)
+			// Resync the sequence from the chain before the next package.
+			//
+			// "Failed" is not one thing: a tx rejected in CheckTx (bad signature,
+			// bad sequence) never enters a block and consumes nothing, but one
+			// that reaches DeliverTx and fails there — a type-check error, say —
+			// WAS included and DID consume the sequence. Assuming failure means
+			// "not consumed" desynced us for every remaining package: one
+			// type-check failure turned the next six into spurious
+			// "unauthorized error / signature verification failed". Ask the
+			// chain instead of inferring.
+			if a, _, aerr := client.QueryAccount(addr); aerr == nil && a.Sequence != seq {
+				fmt.Printf("   ↻ sequence resynced %d → %d (the failed tx was included on chain)\n", seq, a.Sequence)
+				seq = a.Sequence
+			}
 			continue
 		}
 		fmt.Printf("✅ %2d/%d %s — %s — hash %s gas %d/%d\n", i+1, len(msgs), p.c.PkgPath, pkgURL(net, p.c.PkgPath), txHash(res.Hash), res.DeliverTx.GasUsed, wanted)
