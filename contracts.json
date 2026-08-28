@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-28T09:36:51Z",
+  "status_checked_at": "2026-08-28T09:58:45Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -41,14 +41,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -113,14 +115,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -634,13 +638,15 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -772,14 +778,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -811,14 +819,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -919,14 +929,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -1092,14 +1104,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -1200,14 +1214,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,
@@ -1303,14 +1319,16 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "staging": {
           "uploaded": true,

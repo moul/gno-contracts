@@ -95,9 +95,9 @@ make help        # list all targets
 
 | Package | sapphire | pearl | betanet | staging | Monorepo | Deps |
 |---|---|---|---|---|---|---|
-| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/addrset) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
+| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/addrset) | [🗄️](https://pearl.testnets.gno.land/p/moul/addrset) | — | [🗄️](https://staging.gno.land/p/moul/addrset) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
 | [`p/moul/addrset/v2`](p/moul/addrset/v2) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/authz) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
+| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/authz) | [🗄️](https://pearl.testnets.gno.land/p/moul/authz) | — | [🗄️](https://staging.gno.land/p/moul/authz) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
 | [`p/moul/authz/v2`](p/moul/authz/v2) 📦 | — | — | — | — | — | 3 |
 | [`p/moul/collection/v1`](p/moul/collection/v1) 📦 💤 | — | — | — | — | — | 3 |
 | [`p/moul/collection/v2`](p/moul/collection/v2) 📦 | — | — | — | — | — | 3 |
@@ -112,26 +112,26 @@ make help        # list all targets
 | [`p/moul/entropy/v1`](p/moul/entropy/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/errs/v1`](p/moul/errs/v1) 📦 💤 | — | — | — | — | — | — |
 | [`p/moul/errs/v2`](p/moul/errs/v2) 📦 | — | — | — | — | — | — |
-| [`p/moul/fifo/v1`](p/moul/fifo/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/fifo) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo) | — |
+| [`p/moul/fifo/v1`](p/moul/fifo/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/fifo) | [🗄️](https://pearl.testnets.gno.land/p/moul/fifo) | — | [🗄️](https://staging.gno.land/p/moul/fifo) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo) | — |
 | [`p/moul/fp/v1`](p/moul/fp/v1) 📦 💤 | — | — | — | — | — | — |
 | [`p/moul/fp/v2`](p/moul/fp/v2) 📦 | — | — | — | — | — | — |
 | [`p/moul/greet/v1`](p/moul/greet/v1) 📦 | — | — | — | — | — | — |
-| [`p/moul/helplink/v1`](p/moul/helplink/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/helplink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 1 |
-| [`p/moul/md/v1`](p/moul/md/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/md) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 1 |
+| [`p/moul/helplink/v1`](p/moul/helplink/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/helplink) | [🗄️](https://pearl.testnets.gno.land/p/moul/helplink) | — | [🗄️](https://staging.gno.land/p/moul/helplink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 1 |
+| [`p/moul/md/v1`](p/moul/md/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/md) | [🗄️](https://pearl.testnets.gno.land/p/moul/md) | — | [🗄️](https://staging.gno.land/p/moul/md) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 1 |
 | [`p/moul/mdlist/v1`](p/moul/mdlist/v1) 📦 💤 | — | — | — | — | — | 1 |
 | [`p/moul/mdlist/v2`](p/moul/mdlist/v2) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/mdtable/v1`](p/moul/mdtable/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/mdtable) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
+| [`p/moul/mdtable/v1`](p/moul/mdtable/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/mdtable) | [🗄️](https://pearl.testnets.gno.land/p/moul/mdtable) | — | [🗄️](https://staging.gno.land/p/moul/mdtable) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
 | [`p/moul/memo/v1`](p/moul/memo/v1) 📦 💤 | — | — | — | — | — | 2 |
 | [`p/moul/memo/v2`](p/moul/memo/v2) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/memo/v3`](p/moul/memo/v3) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/nestedpkg/v1`](p/moul/nestedpkg/v1) 📦 | — | — | — | — | — | — |
-| [`p/moul/once/v1`](p/moul/once/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/once) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
+| [`p/moul/once/v1`](p/moul/once/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/once) | [🗄️](https://pearl.testnets.gno.land/p/moul/once) | — | [🗄️](https://staging.gno.land/p/moul/once) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
 | [`p/moul/printfdebugging/v1`](p/moul/printfdebugging/v1) 📦 💤 | — | — | — | — | — | 1 |
 | [`p/moul/printfdebugging/v2`](p/moul/printfdebugging/v2) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/realmpath/v1`](p/moul/realmpath/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/realmpath) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
+| [`p/moul/realmpath/v1`](p/moul/realmpath/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/realmpath) | [🗄️](https://pearl.testnets.gno.land/p/moul/realmpath) | — | [🗄️](https://staging.gno.land/p/moul/realmpath) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
 | [`p/moul/svg/v1`](p/moul/svg/v1) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/svg/v2`](p/moul/svg/v2) 📦 | — | — | — | — | — | 2 |
-| [`p/moul/txlink/v1`](p/moul/txlink/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/txlink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
+| [`p/moul/txlink/v1`](p/moul/txlink/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/txlink) | [🗄️](https://pearl.testnets.gno.land/p/moul/txlink) | — | [🗄️](https://staging.gno.land/p/moul/txlink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
 | [`p/moul/typeutil/v1`](p/moul/typeutil/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/typeutil) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | — |
 | [`p/moul/ulist/lplist/v1`](p/moul/ulist/lplist/v1) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/ulist/v1`](p/moul/ulist/v1) 📦 | — | — | — | [🗄️](https://staging.gno.land/p/moul/ulist) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | — |
@@ -261,7 +261,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gn
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-08-28T09:36:51Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_On-chain status last checked: 2026-08-28T09:58:45Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
