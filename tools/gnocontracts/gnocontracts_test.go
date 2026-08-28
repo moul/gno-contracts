@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -257,4 +259,52 @@ func TestScanContractsSkipsDotDirs(t *testing.T) {
 	if got[0].PkgPath != "gno.land/p/moul/real/v1" {
 		t.Fatalf("scanContracts = %q", got[0].PkgPath)
 	}
+}
+
+// A canonical import comment (`package x // import "…"`) tells callers the one
+// path this package may be imported as. It must match the module path in the
+// package's gnomod.toml — in particular it must carry the /vN segment, since
+// rule 1 of this repo is that no contract is ever un-versioned. p/moul/svg/v1
+// shipped `// import "gno.land/p/moul/svg"`, pointing at a path that exists
+// nowhere, so anyone following the doc would have written an unresolvable
+// import. This walks the real trees rather than a fixture: the invariant is
+// about the repository, not about a function.
+func TestCanonicalImportCommentsMatchModulePath(t *testing.T) {
+	root, err := repoRoot()
+	if err != nil {
+		t.Skipf("not inside the repo: %v", err)
+	}
+	re := regexp.MustCompile(`(?m)^package\s+\w+\s*//\s*import\s+"([^"]+)"`)
+
+	contracts, err := scanContracts(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	checked := 0
+	for _, c := range contracts {
+		dir := filepath.Join(root, filepath.FromSlash(c.Dir))
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, e := range entries {
+			if e.IsDir() || !strings.HasSuffix(e.Name(), ".gno") {
+				continue
+			}
+			b, err := os.ReadFile(filepath.Join(dir, e.Name()))
+			if err != nil {
+				t.Fatal(err)
+			}
+			m := re.FindSubmatch(b)
+			if m == nil {
+				continue
+			}
+			checked++
+			if got := string(m[1]); got != c.PkgPath {
+				t.Errorf("%s/%s: canonical import %q, want %q",
+					c.Dir, e.Name(), got, c.PkgPath)
+			}
+		}
+	}
+	t.Logf("checked %d canonical import comment(s)", checked)
 }
