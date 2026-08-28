@@ -180,6 +180,13 @@ func scanContracts(root string) ([]Contract, error) {
 			if err != nil {
 				return err
 			}
+			// Skip dot-directories wholesale: they are scratch, never contracts.
+			// The Makefile's toolcheck canary lives in one (p/moul/.toolcheck),
+			// and an interrupted run can leave it behind — it must never be
+			// catalogued as a package.
+			if info.IsDir() && strings.HasPrefix(info.Name(), ".") && path != bp {
+				return filepath.SkipDir
+			}
 			if info.IsDir() || info.Name() != "gnomod.toml" {
 				return nil
 			}

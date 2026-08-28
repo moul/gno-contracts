@@ -175,6 +175,39 @@ func TestClassifyUpstream(t *testing.T) {
 	}
 }
 
+// Scratch dot-directories must never be catalogued. The Makefile's toolcheck
+// canary lives in p/moul/.toolcheck and an interrupted run can leave it behind;
+// if scanContracts picked it up it would land in contracts.json and the README
+// table as a phantom package.
+func TestScanContractsSkipsDotDirs(t *testing.T) {
+	root := t.TempDir()
+	mkpkg := func(dir, module string) {
+		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		writeFile(t, filepath.Join(root, dir), "gnomod.toml", "module = \""+module+"\"\ngno = \"0.9\"\n")
+		writeFile(t, filepath.Join(root, dir), "x.gno", "package x\n")
+	}
+	mkpkg("p/moul/real/v1", "gno.land/p/moul/real/v1")
+	mkpkg("p/moul/.toolcheck", "gno.land/p/moul/toolcheck/v1")
+	mkpkg("r/moul/.scratch/v1", "gno.land/r/moul/scratch/v1")
+
+	got, err := scanContracts(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 {
+		var paths []string
+		for _, c := range got {
+			paths = append(paths, c.PkgPath)
+		}
+		t.Fatalf("scanContracts returned %v, want only the real package", paths)
+	}
+	if got[0].PkgPath != "gno.land/p/moul/real/v1" {
+		t.Fatalf("scanContracts = %q", got[0].PkgPath)
+	}
+}
+
 // defaultNetworks is the single place a chain is added or retired, so guard its
 // shape: names unique, chain_id and RPC present, and the two live testnets
 // actually listed (a silent drop would quietly stop status/publish tracking).
