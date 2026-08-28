@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestMatchesAny(t *testing.T) {
 	cases := []struct {
@@ -9,8 +12,8 @@ func TestMatchesAny(t *testing.T) {
 		want bool
 	}{
 		{"p/moul/hello/v1", []string{"./..."}, true},
-		{"p/moul/hello/v1", []string{"./p/moul/hello"}, true},   // all versions
-		{"p/moul/hello/v2", []string{"./p/moul/hello"}, true},   // all versions
+		{"p/moul/hello/v1", []string{"./p/moul/hello"}, true},    // all versions
+		{"p/moul/hello/v2", []string{"./p/moul/hello"}, true},    // all versions
 		{"p/moul/hello/v1", []string{"./p/moul/hello/v1"}, true}, // exact
 		{"p/moul/hello/v2", []string{"./p/moul/hello/v1"}, false},
 		{"r/moul/x/daily/blog/v1", []string{"./r/moul/..."}, true},
@@ -109,5 +112,51 @@ func TestTopoOrderCycle(t *testing.T) {
 	}
 	if _, err := topoOrder(cs); err == nil {
 		t.Fatal("expected a cycle error")
+	}
+}
+
+// externalDeps must flag exactly the deps nobody in this run will create.
+// Getting this wrong is what let p/archive/dom sink r/moul/demo/importdemo/v2
+// at package 122 of 131, with an opaque type-check error instead of a
+// prerequisite named before anything was broadcast.
+func TestExternalDeps(t *testing.T) {
+	mk := func(path string, deps ...string) contract {
+		return contract{PkgPath: path, Deps: deps}
+	}
+	lib := mk("gno.land/p/moul/lib/v1")
+	a := mk("gno.land/r/moul/a/v1", "gno.land/p/moul/lib/v1", "gno.land/p/archive/dom", "strings")
+	b := mk("gno.land/r/moul/b/v1", "gno.land/p/archive/dom", "gno.land/p/nt/avl/v0")
+
+	ordered := []contract{lib, a, b}
+	todo := []plan{{c: lib}, {c: a}, {c: b}}
+
+	got := externalDeps(ordered, todo)
+	if len(got) != 2 {
+		t.Fatalf("externalDeps = %+v, want 2 entries", got)
+	}
+	// sorted by path
+	if got[0].pkg != "gno.land/p/archive/dom" || got[1].pkg != "gno.land/p/nt/avl/v0" {
+		t.Fatalf("order/paths = %+v", got)
+	}
+	// shared dep lists every dependent, sorted and deduped
+	if strings.Join(got[0].neededBy, ",") != "gno.land/r/moul/a/v1,gno.land/r/moul/b/v1" {
+		t.Errorf("neededBy = %v", got[0].neededBy)
+	}
+	// a dep we publish ourselves is NOT external, and stdlib is ignored
+	for _, d := range got {
+		if d.pkg == "gno.land/p/moul/lib/v1" || d.pkg == "strings" {
+			t.Errorf("unexpected entry %q", d.pkg)
+		}
+	}
+}
+
+// A dep that is published by this run must never be reported, even when it is
+// only reachable through another package's dep list.
+func TestExternalDepsIgnoresSelfPublished(t *testing.T) {
+	lib := contract{PkgPath: "gno.land/p/moul/lib/v1"}
+	demo := contract{PkgPath: "gno.land/r/moul/demo/v1", Deps: []string{"gno.land/p/moul/lib/v1"}}
+	got := externalDeps([]contract{lib, demo}, []plan{{c: lib}, {c: demo}})
+	if len(got) != 0 {
+		t.Fatalf("externalDeps = %+v, want none", got)
 	}
 }

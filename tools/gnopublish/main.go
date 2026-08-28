@@ -79,6 +79,7 @@ func run() error {
 	gasFee := fs.String("gas-fee", "1000000ugnot", "gas fee")
 	gasWanted := fs.Int64("gas-wanted", 0, "gas wanted (0 = auto: simulate the tx and add the buffer)")
 	gasBuffer := fs.Int("gas-buffer", 20, "percent buffer added on top of the simulated gas")
+	gasFallback := fs.Int64("gas-fallback", 60_000_000, "gas wanted to use when simulation fails (0 = treat a failed simulation as fatal)")
 	deposit := fs.String("deposit", "", "max storage deposit (e.g. 1000000ugnot); empty = node default")
 	dryRun := fs.Bool("dry-run", false, "print the plan and exit without broadcasting")
 	yes := fs.Bool("yes", false, "skip the confirmation prompt")
@@ -131,10 +132,6 @@ func run() error {
 	fmt.Printf("network: %s (%s)  rpc: %s\n", net.Name, net.ChainID, net.RPC)
 	fmt.Printf("selected %d package(s); %d skipped (draft/ignored)\n\n", len(ordered), len(skipped))
 
-	type plan struct {
-		c      contract
-		reason string // "missing" | "out-of-date"
-	}
 	var todo []plan
 	fmt.Println("status (dependency order):")
 	for _, c := range ordered {
@@ -165,6 +162,20 @@ func run() error {
 	if len(todo) == 0 {
 		fmt.Println("\nNothing to publish — everything selected is already on chain" + fullNote(*full) + ".")
 		return nil
+	}
+
+	// Prerequisites: deps that this run will NOT publish (someone else's
+	// packages — p/nt/*, p/demo/*, p/archive/*, …) must already be on chain.
+	// topoOrder only sequences packages we own, so a missing external dep used
+	// to surface as an opaque type-check failure deep into the run (p/archive/dom
+	// killed r/moul/demo/importdemo/v2 at 122/131). It is knowable up front, so
+	// say so before broadcasting anything.
+	if missing := missingExternalDeps(client, ordered, todo); len(missing) > 0 {
+		fmt.Printf("\n⚠️  %d external dependency(ies) are NOT on %s and are not published by this run:\n", len(missing), net.Name)
+		for _, d := range missing {
+			fmt.Printf("  ❌ %-46s needed by: %s\n", d.pkg, strings.Join(d.neededBy, ", "))
+		}
+		fmt.Println("  Those dependents will fail their on-chain type-check until these exist.")
 	}
 
 	fmt.Printf("\nplan: publish %d package(s) in this order (%s mode):\n", len(todo), *mode)
@@ -275,12 +286,26 @@ func run() error {
 		p := todo[i]
 		wanted, err := sizeGas(client, *gasFee, *gasWanted, *gasBuffer, msg)
 		if err != nil {
-			fmt.Printf("❌ %2d/%d %s — gas estimation failed: %s\n", i+1, len(msgs), p.c.PkgPath, oneLine(err.Error()))
+			// Estimation is a CONVENIENCE, not a gate: it only sizes gas-wanted.
+			// Its simulate signs a throwaway tx with account/sequence (0,0) and
+			// assumes the node skips signature verification — an assumption that
+			// does not hold everywhere (pearl answers "unauthorized error"), and
+			// it also fails for reasons that say nothing about publishability.
+			// Treating that as fatal skipped packages that were perfectly fine.
+			// Fall back to -gas-fallback and let the chain be the judge; a real
+			// problem then surfaces as a broadcast error, with the actual reason.
 			if *stopOnError {
 				return fmt.Errorf("estimate gas for %s: %w", p.c.PkgPath, err)
 			}
-			failed = append(failed, p.c.PkgPath)
-			continue
+			if *gasFallback <= 0 { // opt back into treating a failed simulation as fatal
+				fmt.Printf("❌ %2d/%d %s — gas estimation failed: %s\n",
+					i+1, len(msgs), p.c.PkgPath, oneLine(err.Error()))
+				failed = append(failed, p.c.PkgPath)
+				continue
+			}
+			fmt.Printf("⚠️  %2d/%d %s — gas estimation failed (%s); falling back to -gas-wanted %d\n",
+				i+1, len(msgs), p.c.PkgPath, oneLine(err.Error()), *gasFallback)
+			wanted = *gasFallback
 		}
 		// Debug: the equivalent gnokey command (with the sized gas), just before broadcasting.
 		fmt.Println("# " + gnokeyAddpkg(p.c.PkgPath, p.c.Dir, *keyName, *gasFee, wanted, *deposit, net.ChainID, net.RPC, *home))
@@ -453,6 +478,72 @@ func topoOrder(cs []contract) ([]contract, error) {
 }
 
 // --- on-chain queries -----------------------------------------------------
+
+// plan is one package this run intends to publish, and why.
+type plan struct {
+	c      contract
+	reason string // "missing" | "out-of-date"
+}
+
+// extDep is one external dependency that is absent on chain, with the selected
+// packages that need it.
+type extDep struct {
+	pkg      string
+	neededBy []string
+}
+
+// missingExternalDeps returns the gno.land dependencies of `todo` that this run
+// will not publish itself and that are absent on chain, sorted by path.
+//
+// "External" means: not among the packages selected for this run. Those are the
+// only deps nobody is going to create — a dep we DO publish is handled by
+// topoOrder, which sequences it first.
+func missingExternalDeps(c *gnoclient.Client, ordered []contract, todo []plan) []extDep {
+	var out []extDep
+	// One query per distinct dep, not per dependent.
+	for _, d := range externalDeps(ordered, todo) {
+		if packageExists(c, d.pkg) {
+			continue
+		}
+		out = append(out, d)
+	}
+	return out
+}
+
+// externalDeps returns the gno.land dependencies of todo that this run will not
+// publish itself, each with the packages needing it. Sorted, deduped, pure —
+// no chain access, so the selection rule is testable on its own.
+func externalDeps(ordered []contract, todo []plan) []extDep {
+	ours := make(map[string]bool, len(ordered))
+	for _, x := range ordered {
+		ours[x.PkgPath] = true
+	}
+	needed := map[string]map[string]bool{}
+	for _, p := range todo {
+		for _, d := range p.c.Deps {
+			// Skip what we publish ourselves (topoOrder sequences those first)
+			// and anything that is not a gno.land package (stdlib).
+			if ours[d] || !strings.HasPrefix(d, "gno.land/") {
+				continue
+			}
+			if needed[d] == nil {
+				needed[d] = map[string]bool{}
+			}
+			needed[d][p.c.PkgPath] = true
+		}
+	}
+	out := make([]extDep, 0, len(needed))
+	for d, by := range needed {
+		names := make([]string, 0, len(by))
+		for n := range by {
+			names = append(names, n)
+		}
+		sort.Strings(names)
+		out = append(out, extDep{pkg: d, neededBy: names})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].pkg < out[j].pkg })
+	return out
+}
 
 // packageExists reports whether pkgpath resolves on chain (vm/qfile of the dir
 // returns the file listing).
