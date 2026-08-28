@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -150,6 +151,58 @@ func TestParseImports(t *testing.T) {
 	}
 }
 
+// Imports that only *look* like imports — inside a doc comment showing example
+// usage, or commented out — must not be reported as dependencies. Regression:
+// p/moul/svg/v1/doc.gno documents `import "gno.land/p/moul/svg"`, which the
+// line-based scanner used to take literally, inventing a dependency on a
+// package present in no checkout and failing `make deps`.
+func TestParseImportsIgnoresComments(t *testing.T) {
+	cases := []struct {
+		name, body string
+		want       []string
+	}{
+		{
+			name: "block doc comment with example import",
+			body: "/*\nPackage svg …\n\nExample:\n\n\timport \"gno.land/p/moul/svg\"\n*/\npackage svg // import \"gno.land/p/moul/svg\"\n\nimport \"gno.land/p/moul/md/v1\"\n",
+			want: []string{"gno.land/p/moul/md/v1"},
+		},
+		{
+			name: "line-commented import",
+			body: "package p\n\n// import \"gno.land/p/moul/ghost/v1\"\nimport \"strings\"\n",
+			want: []string{"strings"},
+		},
+		{
+			name: "commented entry inside an import group",
+			body: "package p\n\nimport (\n\t\"strings\"\n\t// \"gno.land/p/moul/ghost/v1\"\n\t\"gno.land/p/moul/md/v1\"\n)\n",
+			want: []string{"strings", "gno.land/p/moul/md/v1"},
+		},
+		{
+			name: "inline block comment on the same line",
+			body: "package p\n\nimport \"strings\" /* not \"gno.land/p/moul/ghost/v1\" */\n",
+			want: []string{"strings"},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			dir := t.TempDir()
+			writeFile(t, dir, "p.gno", c.body)
+			got, err := parseImports(filepath.Join(dir, "p.gno"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(got) != len(c.want) {
+				t.Fatalf("imports = %v, want %v", got, c.want)
+			}
+			for i := range got {
+				if got[i] != c.want[i] {
+					t.Errorf("imports = %v, want %v", got, c.want)
+					break
+				}
+			}
+		})
+	}
+}
+
 func TestClassifyUpstream(t *testing.T) {
 	// build a dir with a prod .gno, a test .gno, and a gnomod
 	mk := func(prod, test, mod string) string {
@@ -206,6 +259,54 @@ func TestScanContractsSkipsDotDirs(t *testing.T) {
 	if got[0].PkgPath != "gno.land/p/moul/real/v1" {
 		t.Fatalf("scanContracts = %q", got[0].PkgPath)
 	}
+}
+
+// A canonical import comment (`package x // import "…"`) tells callers the one
+// path this package may be imported as. It must match the module path in the
+// package's gnomod.toml — in particular it must carry the /vN segment, since
+// rule 1 of this repo is that no contract is ever un-versioned. p/moul/svg/v1
+// shipped `// import "gno.land/p/moul/svg"`, pointing at a path that exists
+// nowhere, so anyone following the doc would have written an unresolvable
+// import. This walks the real trees rather than a fixture: the invariant is
+// about the repository, not about a function.
+func TestCanonicalImportCommentsMatchModulePath(t *testing.T) {
+	root, err := repoRoot()
+	if err != nil {
+		t.Skipf("not inside the repo: %v", err)
+	}
+	re := regexp.MustCompile(`(?m)^package\s+\w+\s*//\s*import\s+"([^"]+)"`)
+
+	contracts, err := scanContracts(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	checked := 0
+	for _, c := range contracts {
+		dir := filepath.Join(root, filepath.FromSlash(c.Dir))
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, e := range entries {
+			if e.IsDir() || !strings.HasSuffix(e.Name(), ".gno") {
+				continue
+			}
+			b, err := os.ReadFile(filepath.Join(dir, e.Name()))
+			if err != nil {
+				t.Fatal(err)
+			}
+			m := re.FindSubmatch(b)
+			if m == nil {
+				continue
+			}
+			checked++
+			if got := string(m[1]); got != c.PkgPath {
+				t.Errorf("%s/%s: canonical import %q, want %q",
+					c.Dir, e.Name(), got, c.PkgPath)
+			}
+		}
+	}
+	t.Logf("checked %d canonical import comment(s)", checked)
 }
 
 // defaultNetworks is the single place a chain is added or retired, so guard its

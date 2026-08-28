@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -13,7 +14,19 @@ import (
 // each with its gnomod.toml, so the gno workspace resolves them without relying
 // on $GNOROOT/examples. Only gno stdlib imports (non-gno.land) are left to the
 // toolchain. Source is $GNOROOT/examples.
-func cmdVendor(root string) error {
+//
+// By default only MISSING dependencies are fetched — an already-vendored
+// package is left untouched, so a plain run is a no-op once everything resolves.
+// That is deliberate (vendor/ is a pinned snapshot; bumps are explicit), but it
+// means vendor/ silently rots as the monorepo moves. `-refresh` re-copies every
+// dependency from the current $GNOROOT/examples: that IS the gno bump.
+func cmdVendor(root string, args []string) error {
+	fs := flag.NewFlagSet("vendor", flag.ContinueOnError)
+	refresh := fs.Bool("refresh", false, "re-copy already-vendored packages from $GNOROOT/examples (bump the pinned snapshot)")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
 	gnoroot := os.Getenv("GNOROOT")
 	if gnoroot == "" {
 		return fmt.Errorf("GNOROOT must be set (path to a gnolang/gno checkout)")
@@ -29,6 +42,35 @@ func cmdVendor(root string) error {
 	provided, err := workspaceModules(root)
 	if err != nil {
 		return err
+	}
+
+	// On -refresh, empty vendor/ and re-derive `provided` from our own contracts
+	// alone, so every external dep is re-fetched from the current examples/.
+	// Wiping (rather than copying over) is what drops files deleted upstream —
+	// copyGnoPackage only ever writes, so a stale leftover would survive.
+	// .gitkeep is preserved: it is what keeps vendor/ present when empty.
+	if *refresh {
+		entries, err := os.ReadDir(vendorDir)
+		if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		for _, e := range entries {
+			if e.Name() == ".gitkeep" {
+				continue
+			}
+			if err := os.RemoveAll(filepath.Join(vendorDir, e.Name())); err != nil {
+				return err
+			}
+		}
+		ours := map[string]bool{}
+		contracts, err := scanContracts(root)
+		if err != nil {
+			return err
+		}
+		for _, c := range contracts {
+			ours[c.PkgPath] = true
+		}
+		provided = ours
 	}
 
 	// Seed the queue with our contracts' direct deps, INCLUDING test-only

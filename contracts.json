@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-25T15:41:02Z",
+  "status_checked_at": "2026-08-28T09:36:51Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -33,8 +33,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -94,8 +93,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -640,8 +638,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -674,8 +671,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -765,8 +761,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -909,8 +904,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1000,8 +994,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1027,7 +1020,6 @@
       "version": "v1",
       "description": "",
       "deps": [
-        "gno.land/p/moul/svg",
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
@@ -1087,8 +1079,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1119,8 +1110,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1180,8 +1170,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1305,6 +1294,27 @@
       "dir": "p/moul/x/daily/levenshtein/v1",
       "kind": "p",
       "name": "x/daily/levenshtein",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/luhn/v1",
+      "dir": "p/moul/x/daily/luhn/v1",
+      "kind": "p",
+      "name": "x/daily/luhn",
       "version": "v1",
       "description": "",
       "deps": [],
@@ -1456,6 +1466,27 @@
       "dir": "p/moul/x/daily/sieve/v1",
       "kind": "p",
       "name": "x/daily/sieve",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/trie/v1",
+      "dir": "p/moul/x/daily/trie/v1",
+      "kind": "p",
+      "name": "x/daily/trie",
       "version": "v1",
       "description": "",
       "deps": [],
@@ -3257,6 +3288,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/luhndemo/v1",
+      "dir": "r/moul/x/daily/luhndemo/v1",
+      "kind": "r",
+      "name": "x/daily/luhndemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/luhn/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/markovdemo/v1",
       "dir": "r/moul/x/daily/markovdemo/v1",
       "kind": "r",
@@ -4086,6 +4140,29 @@
           "uploaded": false
         },
         "test6": {
+          "uploaded": false
+        },
+        "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/triedemo/v1",
+      "dir": "r/moul/x/daily/triedemo/v1",
+      "kind": "r",
+      "name": "x/daily/triedemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/trie/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         },
         "topaz": {

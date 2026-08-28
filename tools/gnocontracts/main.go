@@ -48,7 +48,7 @@ func main() {
 	case "check":
 		err = cmdCheck(root)
 	case "vendor":
-		err = cmdVendor(root)
+		err = cmdVendor(root, args)
 	case "sync":
 		err = cmdSync(root, args)
 	case "publish":
