@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-25T15:41:02Z",
+  "status_checked_at": "2026-08-28T09:27:33Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -33,8 +33,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -94,8 +93,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -640,8 +638,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -674,8 +671,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -765,8 +761,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -909,8 +904,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1000,8 +994,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1086,8 +1079,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1118,8 +1110,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
@@ -1179,8 +1170,7 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": true,
