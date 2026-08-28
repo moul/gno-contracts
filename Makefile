@@ -31,7 +31,7 @@ VIEW := $(CURDIR)/.gnoroot-view
 PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -not -path '*/.*' -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean upload
+.PHONY: help deps bump-deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean upload
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -44,8 +44,15 @@ view: ## (re)build the stdlib-only GNOROOT view used by lint/test
 		[ "$$b" = examples ] || ln -sfn "$$e" "$(VIEW)/$$b"; \
 	done
 
-deps: ## vendor external gno.land dependencies into vendor/ (reads real GNOROOT/examples)
+deps: ## vendor MISSING external gno.land deps into vendor/ (reads real GNOROOT/examples)
 	$(TOOL) vendor
+
+# `deps` only fetches what's absent, so vendor/ stays pinned — and silently
+# drifts from the monorepo. This re-copies every dep from the current
+# GNOROOT/examples: the deliberate "bump gno" step. Review the diff, then
+# `make lint test` against a matching gno build before committing.
+bump-deps: ## re-vendor ALL external deps from GNOROOT/examples (bump the pinned snapshot)
+	$(TOOL) vendor -refresh
 
 test: toolcheck guard-examples view ## gno test every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== test $$d =="; GNOROOT="$(VIEW)" $(GNO) test ./$$d; done
