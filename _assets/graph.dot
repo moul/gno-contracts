@@ -76,6 +76,7 @@ digraph gnocontracts {
   "gno.land/r/moul/demo/grc20/v2" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/importdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/importdemo/v2" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/demo/importdemo/v3" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/millipede/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/vault/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/vault/v2" [style=filled, fillcolor="#cfe2ff"];
@@ -205,6 +206,8 @@ digraph gnocontracts {
   "gno.land/r/moul/demo/importdemo/v1" -> "gno.land/p/demo/avl";
   "gno.land/r/moul/demo/importdemo/v1" -> "gno.land/p/demo/dom";
   "gno.land/r/moul/demo/importdemo/v2" -> "gno.land/p/archive/dom";
+  "gno.land/r/moul/demo/importdemo/v3" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/demo/importdemo/v3" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/demo/millipede/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/demo/vault/v1" -> "gno.land/p/demo/grc/exts/vault";
   "gno.land/r/moul/demo/vault/v1" -> "gno.land/p/demo/grc/grc20";

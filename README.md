@@ -162,7 +162,8 @@ make help        # list all targets
 | [`r/moul/demo/hello/v1`](r/moul/demo/hello/v1) 🏛️ 💤 | — | — | — | — | — | — |
 | [`r/moul/demo/hello/v2`](r/moul/demo/hello/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/hello/v2) | — | — | — | — |
 | [`r/moul/demo/importdemo/v1`](r/moul/demo/importdemo/v1) 🏛️ 💤 | — | — | — | — | — | 2 |
-| [`r/moul/demo/importdemo/v2`](r/moul/demo/importdemo/v2) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/demo/importdemo/v2`](r/moul/demo/importdemo/v2) 🏛️ 💤 | — | — | — | — | — | 1 |
+| [`r/moul/demo/importdemo/v3`](r/moul/demo/importdemo/v3) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/demo/microposts/v1`](r/moul/demo/microposts/v1) 🏛️ 💤 | — | — | — | — | — | — |
 | [`r/moul/demo/microposts/v2`](r/moul/demo/microposts/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/microposts/v2) | — | — | — | — |
 | [`r/moul/demo/millipede/v1`](r/moul/demo/millipede/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/millipede/v1) | — | — | — | 1 |

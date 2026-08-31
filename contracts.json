@@ -2339,6 +2339,7 @@
         "gno.land/p/archive/dom"
       ],
       "draft": false,
+      "ignored": true,
       "published": {
         "betanet": {
           "uploaded": false
@@ -2359,6 +2360,33 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/importdemo/v3",
+      "dir": "r/moul/demo/importdemo/v3",
+      "kind": "r",
+      "name": "demo/importdemo",
+      "version": "v3",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
