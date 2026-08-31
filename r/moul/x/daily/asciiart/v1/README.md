@@ -1,0 +1,9 @@
+# ASCII Art Generator
+
+> ⚠️ **Experimental — generated with no human supervision** by the daily MCP pipeline to exercise gno tooling. Not audited. See [r/moul/x/daily](https://github.com/moul/gno-contracts/blob/main/r/moul/x/daily/README.md).
+
+---
+
+An on-chain ASCII art generator that draws patterns (diamond, pyramid, Sierpinski triangle, checkerboard) from short deterministic formulas instead of a hand-authored font table -- the Sierpinski gasket is just `row & col == 0`. Call Generate(pattern, size) to render a piece and add it to a public gallery; browse the gallery or a specific piece via Render. It's a neat, self-contained example of generative art as pure on-chain logic.
+
+Built for sapphire (gno 0.9). Live demo (agent address): https://sapphire.testnets.gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/asciiart
