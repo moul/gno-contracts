@@ -64,6 +64,34 @@ Makefile                task entrypoints
   `chain/banker`, `gno.land/p/nt/avl/v0`, …). State-mutating exported realm
   functions are crossing functions (first parameter `cur realm`).
 
+### Where gno differs from Go (these have each broken CI)
+
+gno is close enough to Go that Go habits compile in your head and fail in CI.
+The ones that have actually bitten this repo:
+
+- **`avl/v0`'s `Get` returns ONE value**, not `(value, ok)`. A miss is a nil
+  interface, so it is `v := t.Get(k); if v == nil { … }`. Writing
+  `v, ok := t.Get(k)` is `assignment mismatch: 2 variables but Get returns 1
+  value` — it turned `r/moul/x/daily/asciiart/v1` red. The comma-ok form IS
+  right on the *type assertion* of the result: `p, ok := t.Get(k).(*poll)`.
+- **`sort.Slice` does not exist.** gno's `sort` has `Sort(Interface)` and the
+  `Search*` helpers only, so ordering needs an explicit `sort.Interface`. Break
+  ties deterministically (e.g. on address) — a `Render` that reshuffles between
+  identical calls is a bug, and gno map iteration order is unspecified, so never
+  iterate a map to build output.
+- **`testing.SkipHeights` is RELATIVE and there is no `testing.Height`.** There
+  is no absolute height setter, so tests must drive block height forward from
+  wherever the previous test left it and never assert an absolute height or
+  derived value — ask the realm (e.g. a `Day()` helper) instead.
+- **`ufmt` supports NO width or padding flags.** `ufmt.Sprintf("%03d", 7)`
+  returns `"7"`, not `"007"` — silently, with no error. This matters for avl
+  keys: unpadded numeric keys sort `"0","1","10","11","2"`, so anything keyed
+  that way silently loses insertion order past nine entries. Pad by hand (see
+  `padIdx` in `r/moul/demo/importdemo/v3`).
+
+When a new divergence costs a red CI, add it here: this file is pulled by the
+daily build agent before every generation, so a line here stops the next repeat.
+
 ## Common tasks
 
 ```sh
