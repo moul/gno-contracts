@@ -4588,6 +4588,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/qvote/v1",
+      "dir": "r/moul/x/daily/qvote/v1",
+      "kind": "r",
+      "name": "x/daily/qvote",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/ratelimitdemo/v1",
       "dir": "r/moul/x/daily/ratelimitdemo/v1",
       "kind": "r",

@@ -228,6 +228,7 @@ make help        # list all targets
 | [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/polls/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/quizstreak/v1`](r/moul/x/daily/quizstreak/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/quizstreak/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/quotes/v1`](r/moul/x/daily/quotes/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/quotes/v1) | — | — | — | — |
+| [`r/moul/x/daily/qvote/v1`](r/moul/x/daily/qvote/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/ratelimitdemo/v1`](r/moul/x/daily/ratelimitdemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/ratelimitdemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/reactions/v1`](r/moul/x/daily/reactions/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/reactions/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/ringlog/v1`](r/moul/x/daily/ringlog/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/ringlog/v1) | — | — | — | — |
