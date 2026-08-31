@@ -86,8 +86,10 @@ func TestGenerateAddsToGallery(cur realm, t *testing.T) {
 		t.Fatalf("nextID = %d, want 1", nextID)
 	}
 
-	v, ok := gallery.Get(padID(1))
-	if !ok {
+	// avl/v0's Get returns a single `any` (a miss is a nil interface), not the
+	// value, ok pair a Go map yields — asciiart.gno:230 already does it this way.
+	v := gallery.Get(padID(1))
+	if v == nil {
 		t.Fatal("expected piece #1 to exist in the gallery")
 	}
 	p := v.(*piece)
