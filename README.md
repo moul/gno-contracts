@@ -186,6 +186,7 @@ make help        # list all targets
 | [`r/moul/x/daily/bloomfilter/v1`](r/moul/x/daily/bloomfilter/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/bloomfilter/v1) | — | — | — | — |
 | [`r/moul/x/daily/bullscows/v1`](r/moul/x/daily/bullscows/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/bullscows/v1) | — | — | — | — |
 | [`r/moul/x/daily/calc/v1`](r/moul/x/daily/calc/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/calc/v1) | — | — | — | — |
+| [`r/moul/x/daily/closestguess/v1`](r/moul/x/daily/closestguess/v1) 🏛️ | — | — | — | — | — | — |
 | [`r/moul/x/daily/coinflipduel/v1`](r/moul/x/daily/coinflipduel/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/coinflipduel/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/collatz/v1`](r/moul/x/daily/collatz/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/collatz/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/connect4/v1`](r/moul/x/daily/connect4/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/connect4/v1) | — | — | — | 1 |

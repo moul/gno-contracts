@@ -3162,6 +3162,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/closestguess/v1",
+      "dir": "r/moul/x/daily/closestguess/v1",
+      "kind": "r",
+      "name": "x/daily/closestguess",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/coinflipduel/v1",
       "dir": "r/moul/x/daily/coinflipduel/v1",
       "kind": "r",
