@@ -179,6 +179,7 @@ make help        # list all targets
 | [`r/moul/present/v1`](r/moul/present/v1) 🏛️ 💤 | — | — | — | — | — | 9 |
 | [`r/moul/present/v2`](r/moul/present/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/present/v2) | — | — | — | 9 |
 | [`r/moul/sapin/v1`](r/moul/sapin/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/sapin/v1) | — | — | — | — |
+| [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/b58demo/v1`](r/moul/x/daily/b58demo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/b58demo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/ballot/v1`](r/moul/x/daily/ballot/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/ballot/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/blog/v1`](r/moul/x/daily/blog/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/blog/v1) | — | — | — | 1 |

@@ -2938,6 +2938,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/asciiart/v1",
+      "dir": "r/moul/x/daily/asciiart/v1",
+      "kind": "r",
+      "name": "x/daily/asciiart",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/b58demo/v1",
       "dir": "r/moul/x/daily/b58demo/v1",
       "kind": "r",
