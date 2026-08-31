@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-08-28T15:39:47Z",
+  "status_checked_at": "2026-08-31T13:43:37Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v1",
@@ -38,7 +38,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -113,7 +114,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -265,8 +267,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -787,7 +788,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -828,7 +830,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -939,7 +942,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -1117,7 +1121,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -1228,7 +1233,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -1335,7 +1341,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -1374,7 +1381,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -1448,7 +1456,8 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": true,
@@ -2475,8 +2484,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": false
@@ -2727,7 +2735,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -2981,7 +2990,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -3472,8 +3482,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": false
@@ -3542,8 +3551,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": false
@@ -3968,7 +3976,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -4208,8 +4217,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -4570,8 +4578,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -4787,7 +4794,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -4847,8 +4855,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": false
@@ -4883,8 +4890,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": false
@@ -5052,8 +5058,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": false
@@ -5257,7 +5262,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "portal-loop": {
           "uploaded": false
@@ -5394,7 +5400,8 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "v1"
         },
         "sapphire": {
           "uploaded": false
@@ -5450,8 +5457,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "portal-loop": {
           "uploaded": false

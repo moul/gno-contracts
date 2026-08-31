@@ -95,13 +95,13 @@ make help        # list all targets
 
 | Package | sapphire | pearl | betanet | staging | Monorepo | Deps |
 |---|---|---|---|---|---|---|
-| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/addrset) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/addrset/v1) | — | [🗄️](https://staging.gno.land/p/moul/addrset) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
+| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/addrset) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/addrset/v1) | [🗄️](https://gno.land/p/moul/addrset) | [🗄️](https://staging.gno.land/p/moul/addrset) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
 | [`p/moul/addrset/v2`](p/moul/addrset/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/addrset/v2) | — | — | — | 1 |
-| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/authz) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/authz/v1) | — | [🗄️](https://staging.gno.land/p/moul/authz) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
+| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/authz) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/authz/v1) | [🗄️](https://gno.land/p/moul/authz) | [🗄️](https://staging.gno.land/p/moul/authz) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 5 |
 | [`p/moul/authz/v2`](p/moul/authz/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/authz/v2) | — | — | — | 3 |
 | [`p/moul/collection/v1`](p/moul/collection/v1) 📦 💤 | — | — | — | — | — | 3 |
 | [`p/moul/collection/v2`](p/moul/collection/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/collection/v2) | — | — | — | 3 |
-| [`p/moul/collection/v3`](p/moul/collection/v3) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/collection/v3) | — | — | — | 3 |
+| [`p/moul/collection/v3`](p/moul/collection/v3) 📦 | — | — | — | — | — | 3 |
 | [`p/moul/cow/v1`](p/moul/cow/v1) 📦 💤 | — | — | — | — | — | — |
 | [`p/moul/cow/v2`](p/moul/cow/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/cow/v2) | — | — | — | — |
 | [`p/moul/debug/v1`](p/moul/debug/v1) 📦 💤 | — | — | — | — | — | 4 |
@@ -116,25 +116,25 @@ make help        # list all targets
 | [`p/moul/fp/v1`](p/moul/fp/v1) 📦 💤 | — | — | — | — | — | — |
 | [`p/moul/fp/v2`](p/moul/fp/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/fp/v2) | — | — | — | — |
 | [`p/moul/greet/v1`](p/moul/greet/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/greet/v1) | — | — | — | — |
-| [`p/moul/helplink/v1`](p/moul/helplink/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/helplink) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/helplink/v1) | — | [🗄️](https://staging.gno.land/p/moul/helplink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 1 |
-| [`p/moul/md/v1`](p/moul/md/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/md) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/md/v1) | — | [🗄️](https://staging.gno.land/p/moul/md) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 1 |
+| [`p/moul/helplink/v1`](p/moul/helplink/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/helplink) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/helplink/v1) | [🗄️](https://gno.land/p/moul/helplink) | [🗄️](https://staging.gno.land/p/moul/helplink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink) | 1 |
+| [`p/moul/md/v1`](p/moul/md/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/md) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/md/v1) | [🗄️](https://gno.land/p/moul/md) | [🗄️](https://staging.gno.land/p/moul/md) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md) | 1 |
 | [`p/moul/mdlist/v1`](p/moul/mdlist/v1) 📦 💤 | — | — | — | — | — | 1 |
 | [`p/moul/mdlist/v2`](p/moul/mdlist/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/mdlist/v2) | — | — | — | 1 |
-| [`p/moul/mdtable/v1`](p/moul/mdtable/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/mdtable) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/mdtable/v1) | — | [🗄️](https://staging.gno.land/p/moul/mdtable) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
+| [`p/moul/mdtable/v1`](p/moul/mdtable/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/mdtable) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/mdtable/v1) | [🗄️](https://gno.land/p/moul/mdtable) | [🗄️](https://staging.gno.land/p/moul/mdtable) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable) | — |
 | [`p/moul/memo/v1`](p/moul/memo/v1) 📦 💤 | — | — | — | — | — | 2 |
 | [`p/moul/memo/v2`](p/moul/memo/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/memo/v2) | — | — | — | 2 |
 | [`p/moul/memo/v3`](p/moul/memo/v3) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/memo/v3) | — | — | — | 2 |
 | [`p/moul/nestedpkg/v1`](p/moul/nestedpkg/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/nestedpkg/v1) | — | — | — | — |
-| [`p/moul/once/v1`](p/moul/once/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/once) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/once/v1) | — | [🗄️](https://staging.gno.land/p/moul/once) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
+| [`p/moul/once/v1`](p/moul/once/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/once) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/once/v1) | [🗄️](https://gno.land/p/moul/once) | [🗄️](https://staging.gno.land/p/moul/once) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once) | — |
 | [`p/moul/printfdebugging/v1`](p/moul/printfdebugging/v1) 📦 💤 | — | — | — | — | — | 1 |
 | [`p/moul/printfdebugging/v2`](p/moul/printfdebugging/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/printfdebugging/v2) | — | — | — | 1 |
-| [`p/moul/realmpath/v1`](p/moul/realmpath/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/realmpath) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/realmpath/v1) | — | [🗄️](https://staging.gno.land/p/moul/realmpath) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
+| [`p/moul/realmpath/v1`](p/moul/realmpath/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/realmpath) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/realmpath/v1) | [🗄️](https://gno.land/p/moul/realmpath) | [🗄️](https://staging.gno.land/p/moul/realmpath) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath) | — |
 | [`p/moul/svg/v1`](p/moul/svg/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/svg/v1) | — | — | — | 2 |
 | [`p/moul/svg/v2`](p/moul/svg/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/svg/v2) | — | — | — | 2 |
-| [`p/moul/txlink/v1`](p/moul/txlink/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/txlink) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/txlink/v1) | — | [🗄️](https://staging.gno.land/p/moul/txlink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
-| [`p/moul/typeutil/v1`](p/moul/typeutil/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/typeutil/v1) | — | [🗄️](https://staging.gno.land/p/moul/typeutil) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | — |
+| [`p/moul/txlink/v1`](p/moul/txlink/v1) 📦 | [🗄️](https://sapphire.testnets.gno.land/p/moul/txlink) | [✅🗄️](https://pearl.testnets.gno.land/p/moul/txlink/v1) | [🗄️](https://gno.land/p/moul/txlink) | [🗄️](https://staging.gno.land/p/moul/txlink) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink) | — |
+| [`p/moul/typeutil/v1`](p/moul/typeutil/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/typeutil/v1) | [🗄️](https://gno.land/p/moul/typeutil) | [🗄️](https://staging.gno.land/p/moul/typeutil) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil) | — |
 | [`p/moul/ulist/lplist/v1`](p/moul/ulist/lplist/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/ulist/lplist/v1) | — | — | — | 1 |
-| [`p/moul/ulist/v1`](p/moul/ulist/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/ulist/v1) | — | [🗄️](https://staging.gno.land/p/moul/ulist) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | — |
+| [`p/moul/ulist/v1`](p/moul/ulist/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/ulist/v1) | [🗄️](https://gno.land/p/moul/ulist) | [🗄️](https://staging.gno.land/p/moul/ulist) | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist) | — |
 | [`p/moul/web25/v1`](p/moul/web25/v1) 📦 💤 | — | — | — | — | — | 1 |
 | [`p/moul/web25/v2`](p/moul/web25/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/web25/v2) | — | — | — | 1 |
 | [`p/moul/x/daily/b58/v1`](p/moul/x/daily/b58/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/x/daily/b58/v1) | — | — | — | — |
@@ -166,21 +166,21 @@ make help        # list all targets
 | [`r/moul/demo/importdemo/v3`](r/moul/demo/importdemo/v3) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/demo/microposts/v1`](r/moul/demo/microposts/v1) 🏛️ 💤 | — | — | — | — | — | — |
 | [`r/moul/demo/microposts/v2`](r/moul/demo/microposts/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/microposts/v2) | — | — | — | — |
-| [`r/moul/demo/millipede/v1`](r/moul/demo/millipede/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/millipede/v1) | — | — | — | 1 |
+| [`r/moul/demo/millipede/v1`](r/moul/demo/millipede/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/demo/render/v1`](r/moul/demo/render/v1) 🏛️ 💤 | — | — | — | — | — | — |
 | [`r/moul/demo/render/v2`](r/moul/demo/render/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/render/v2) | — | — | — | — |
 | [`r/moul/demo/vault/v1`](r/moul/demo/vault/v1) 🏛️ 💤 | — | — | — | — | — | 2 |
 | [`r/moul/demo/vault/v2`](r/moul/demo/vault/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/vault/v2) | — | — | — | 1 |
 | [`r/moul/demo/wikicoin/v1`](r/moul/demo/wikicoin/v1) 🏛️ 💤 | — | — | — | — | — | 2 |
 | [`r/moul/demo/wikicoin/v2`](r/moul/demo/wikicoin/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/demo/wikicoin/v2) | — | — | — | 2 |
-| [`r/moul/gns/v1`](r/moul/gns/v1) 🏛️ | — | — | — | — | — | 2 |
+| [`r/moul/gns/v1`](r/moul/gns/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/gns/v1) | — | — | — | 2 |
 | [`r/moul/hello/v1`](r/moul/hello/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/hello/v1) | — | — | — | 1 |
 | [`r/moul/outfmt/v1`](r/moul/outfmt/v1) 🏛️ 💤 | — | — | — | — | — | 1 |
 | [`r/moul/outfmt/v2`](r/moul/outfmt/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/outfmt/v2) | — | — | — | 1 |
 | [`r/moul/present/v1`](r/moul/present/v1) 🏛️ 💤 | — | — | — | — | — | 9 |
 | [`r/moul/present/v2`](r/moul/present/v2) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/present/v2) | — | — | — | 9 |
 | [`r/moul/sapin/v1`](r/moul/sapin/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/sapin/v1) | — | — | — | — |
-| [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/asciiart/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/b58demo/v1`](r/moul/x/daily/b58demo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/b58demo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/ballot/v1`](r/moul/x/daily/ballot/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/ballot/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/blog/v1`](r/moul/x/daily/blog/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/blog/v1) | — | — | — | 1 |
@@ -195,9 +195,9 @@ make help        # list all targets
 | [`r/moul/x/daily/cowsaydemo/v1`](r/moul/x/daily/cowsaydemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/cowsaydemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/crowdfund/v1`](r/moul/x/daily/crowdfund/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/dice/v1`](r/moul/x/daily/dice/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/dice/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/dutchauction/v1`](r/moul/x/daily/dutchauction/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/dutchauction/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/dutchauction/v1`](r/moul/x/daily/dutchauction/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/eggling/v1`](r/moul/x/daily/eggling/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/eggling/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/eightball/v1`](r/moul/x/daily/eightball/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/eightball/v1) | — | — | — | — |
+| [`r/moul/x/daily/eightball/v1`](r/moul/x/daily/eightball/v1) 🏛️ | — | — | — | — | — | — |
 | [`r/moul/x/daily/englishauction/v1`](r/moul/x/daily/englishauction/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/erc1155/v1`](r/moul/x/daily/erc1155/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/erc1155/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/erc20/v1`](r/moul/x/daily/erc20/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/erc20/v1) | — | — | — | — |
@@ -209,14 +209,14 @@ make help        # list all targets
 | [`r/moul/x/daily/handles/v1`](r/moul/x/daily/handles/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/hangman/v1`](r/moul/x/daily/hangman/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/hangman/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/kingofdice/v1`](r/moul/x/daily/kingofdice/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/kingofdice/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/kudos/v1`](r/moul/x/daily/kudos/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/kudos/v1`](r/moul/x/daily/kudos/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/kudos/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/leaderboard/v1`](r/moul/x/daily/leaderboard/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/leaderboard/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/levenshteindemo/v1`](r/moul/x/daily/levenshteindemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/levenshteindemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/life/v1`](r/moul/x/daily/life/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/life/v1) | — | — | — | — |
 | [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/linktree/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/lottery/v1`](r/moul/x/daily/lottery/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/lru/v1`](r/moul/x/daily/lru/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/lru/v1) | — | — | — | — |
-| [`r/moul/x/daily/luhndemo/v1`](r/moul/x/daily/luhndemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/luhndemo/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/luhndemo/v1`](r/moul/x/daily/luhndemo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/markovdemo/v1`](r/moul/x/daily/markovdemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/markovdemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/memory/v1`](r/moul/x/daily/memory/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/memory/v1) | — | — | — | — |
 | [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |
@@ -227,34 +227,34 @@ make help        # list all targets
 | [`r/moul/x/daily/piglatindemo/v1`](r/moul/x/daily/piglatindemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/piglatindemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/pixelcanvas/v1`](r/moul/x/daily/pixelcanvas/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/pixelcanvas/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/polls/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/quizstreak/v1`](r/moul/x/daily/quizstreak/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/quizstreak/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/quizstreak/v1`](r/moul/x/daily/quizstreak/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/quotes/v1`](r/moul/x/daily/quotes/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/quotes/v1) | — | — | — | — |
 | [`r/moul/x/daily/qvote/v1`](r/moul/x/daily/qvote/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/ratelimitdemo/v1`](r/moul/x/daily/ratelimitdemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/ratelimitdemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/reactions/v1`](r/moul/x/daily/reactions/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/reactions/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/ringlog/v1`](r/moul/x/daily/ringlog/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/ringlog/v1) | — | — | — | — |
 | [`r/moul/x/daily/romannumdemo/v1`](r/moul/x/daily/romannumdemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/romannumdemo/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/rot13demo/v1`](r/moul/x/daily/rot13demo/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/rot13demo/v1`](r/moul/x/daily/rot13demo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/rot13demo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/rpgroom/v1`](r/moul/x/daily/rpgroom/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/rpgroom/v1) | — | — | — | 2 |
-| [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/rps/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/rpsduel/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/rpsmatch/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/rpsoracle/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/semverdemo/v1`](r/moul/x/daily/semverdemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/semverdemo/v1) | — | — | — | 2 |
 | [`r/moul/x/daily/sievedemo/v1`](r/moul/x/daily/sievedemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/sievedemo/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/splitter/v1`](r/moul/x/daily/splitter/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/splitter/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/splitter/v1`](r/moul/x/daily/splitter/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/stack/v1`](r/moul/x/daily/stack/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/stack/v1) | — | — | — | — |
 | [`r/moul/x/daily/staking/v1`](r/moul/x/daily/staking/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/streak/v1`](r/moul/x/daily/streak/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/streak/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/tamagotchi/v1`](r/moul/x/daily/tamagotchi/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/tamagotchi/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/tictactoe/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule/v1) 🏛️ | — | — | — | — | — | 2 |
+| [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/timecapsule/v1) | — | — | — | 2 |
 | [`r/moul/x/daily/timelock/v1`](r/moul/x/daily/timelock/v1) 🏛️ 🚧 | — | — | — | — | — | 2 |
 | [`r/moul/x/daily/tipjar/v1`](r/moul/x/daily/tipjar/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/tipjar/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/todos/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/toposortdemo/v1`](r/moul/x/daily/toposortdemo/v1) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/toposortdemo/v1`](r/moul/x/daily/toposortdemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/toposortdemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/triedemo/v1`](r/moul/x/daily/triedemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/triedemo/v1) | — | — | — | 1 |
-| [`r/moul/x/daily/trivia/v1`](r/moul/x/daily/trivia/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/trivia/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/trivia/v1`](r/moul/x/daily/trivia/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/urlshort/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/vault/v1`](r/moul/x/daily/vault/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/vault/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/vestoken/v1`](r/moul/x/daily/vestoken/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/vestoken/v1) | — | — | — | — |
@@ -265,7 +265,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gn
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-08-28T15:39:47Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
+_On-chain status last checked: 2026-08-31T13:43:37Z (✅ = /v1, 🗄️ = un-versioned monorepo path)._
 
 <!-- END CONTRACTS TABLE -->
 
