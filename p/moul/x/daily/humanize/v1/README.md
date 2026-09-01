@@ -1,0 +1,31 @@
+# `gno.land/p/moul/x/daily/humanize/v1`
+
+**Human-facing number formatting** — `Bytes`, `Comma`, `Ordinal`, `Plural`,
+`Blocks`, `Truncate`.
+
+```go
+import "gno.land/p/moul/x/daily/humanize/v1"
+
+humanize.Bytes(1536)        // "1.5 KiB"
+humanize.Comma(1234567)     // "1,234,567"
+humanize.Ordinal(12)        // "12th"  — not "12nd"
+humanize.Plural(2, "mouse", "mice")  // "2 mice"
+humanize.Blocks(1234)       // "~1,200 blocks"
+humanize.Truncate("ééé", 2) // "é…"
+```
+
+**Integer-only, on purpose.** No floats anywhere: a rendered value that differed
+between nodes would be a consensus bug, so the single decimal place in `Bytes`
+comes from scaling by 10 and taking a remainder.
+
+**Durations are in blocks, never seconds.** There is no wall clock on chain, so
+"about 2 hours" is a lie dressed as precision. `Blocks` says `~1,200 blocks` and
+lets the caller decide what that means on their chain — and rounds deliberately,
+because false precision is worse than none.
+
+`Ordinal` handles the teens (`11th`/`12th`/`13th`, not `11st`/`12nd`/`13rd`) —
+the case naive implementations get wrong. `Truncate` counts **runes**, so
+multi-byte text is never sliced mid-character.
+
+**Live demo:** [`r/moul/x/daily/humanizedemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/humanizedemo/v1)
+· render it at [`/r/moul/x/daily/humanizedemo/v1`](https://gno.land/r/moul/x/daily/humanizedemo/v1).
