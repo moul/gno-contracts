@@ -1,0 +1,34 @@
+# `gno.land/p/moul/x/daily/soundex/v1`
+
+**Soundex phonetic algorithm** — `Encode`, `Match`, `EncodeAll`, `Normalize`.
+
+Names that sound alike in English encode to the same four-character key:
+`Robert` and `Rupert` both give `R163`.
+
+```go
+import "gno.land/p/moul/x/daily/soundex/v1"
+
+soundex.Encode("Robert")    // "R163"
+soundex.Encode("Ashcraft")  // "A261"
+soundex.Match("Robert", "Rupert")  // true
+```
+
+The 1918 Russell/Odell algorithm as used by the US census, with the three rules
+that are usually got wrong implemented explicitly — each has a test:
+
+- **the first letter keeps its own code** and still suppresses a following
+  consonant of the same code, so `Pfister` → `P236`, not `P123`;
+- **`h` and `w` are transparent**: consonants either side are treated as
+  adjacent, so `Ashcraft` → `A261`, not `A226`;
+- **vowels are not transparent** — they separate, so a repeated code after a
+  vowel is emitted again: `Tymczak` → `T522`.
+
+Non-letters are ignored, so `O'Brien` and `OBrien` agree. Input with no ASCII
+letters has **no key** (`""`), and `Match` never reports two such inputs as
+matching — "no name" is not a name they share.
+
+Soundex is English-centric and lossy *by design*: it is a **blocking key** for
+finding candidates cheaply, never proof that two names are the same.
+
+**Live demo:** [`r/moul/x/daily/soundexdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/soundexdemo/v1)
+· render it at [`/r/moul/x/daily/soundexdemo/v1`](https://gno.land/r/moul/x/daily/soundexdemo/v1).
