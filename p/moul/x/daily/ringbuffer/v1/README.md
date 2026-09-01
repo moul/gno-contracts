@@ -1,0 +1,31 @@
+# `gno.land/p/moul/x/daily/ringbuffer/v1`
+
+**Fixed-capacity FIFO that overwrites its oldest entry** — `New`, `Push`, `Pop`,
+`Peek`, `At`, `Slice`, `Reset`, `Len`, `Cap`, `Full`, `Empty`, `MaxCap`.
+
+The bounded cousin of a queue, and the bound is the point: on chain an unbounded
+queue is an unbounded storage bill, whereas a ring buffer's cost is decided once,
+at construction. The right shape for "last N events", "recent messages", or any
+rolling window.
+
+```go
+import "gno.land/p/moul/x/daily/ringbuffer/v1"
+
+r := ringbuffer.New(3)
+r.Push("a"); r.Push("b"); r.Push("c")
+evicted, dropped := r.Push("d")   // "a", true
+r.Slice()                         // ["b" "c" "d"]
+```
+
+`Push` **returns what it evicted**, so a rolling window never loses data
+silently — the one thing this shape must not do. Backed by a flat slice with
+head/length indices: no per-element allocation, no shifting on `Pop`. `Pop` and
+`Reset` clear the vacated slots so no reference is pinned after it is logically
+gone.
+
+A zero-capacity buffer stores nothing and says so (`Push` hands the value
+straight back), and is never reported as `Full` — a buffer that holds nothing
+cannot be full.
+
+**Live demo:** [`r/moul/x/daily/ringbufferdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/ringbufferdemo/v1)
+· render it at [`/r/moul/x/daily/ringbufferdemo/v1`](https://gno.land/r/moul/x/daily/ringbufferdemo/v1).
