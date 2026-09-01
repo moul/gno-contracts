@@ -139,6 +139,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/splitter/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/staking/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/streak/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/streaks/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/tamagotchi/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/tictactoe/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/timecapsule/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -292,6 +293,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/splitter/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/staking/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/streak/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/streaks/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/tamagotchi/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/tictactoe/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/timecapsule/v1" -> "gno.land/p/nt/avl/v0";

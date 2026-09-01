@@ -246,6 +246,7 @@ make help        # list all targets
 | [`r/moul/x/daily/stack/v1`](r/moul/x/daily/stack/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/stack/v1) | — | — | — | — |
 | [`r/moul/x/daily/staking/v1`](r/moul/x/daily/staking/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/streak/v1`](r/moul/x/daily/streak/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/streak/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/streaks/v1`](r/moul/x/daily/streaks/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/tamagotchi/v1`](r/moul/x/daily/tamagotchi/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/tamagotchi/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/tictactoe/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule/v1) 🏛️ | — | — | — | — | — | 2 |

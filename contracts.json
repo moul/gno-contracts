@@ -5168,6 +5168,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/streaks/v1",
+      "dir": "r/moul/x/daily/streaks/v1",
+      "kind": "r",
+      "name": "x/daily/streaks",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/tamagotchi/v1",
       "dir": "r/moul/x/daily/tamagotchi/v1",
       "kind": "r",
