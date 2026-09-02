@@ -1,0 +1,35 @@
+# `gno.land/p/moul/x/daily/base32/v1`
+
+**RFC 4648 and Crockford base32** — `Encode`, `EncodeUnpadded`,
+`EncodeCrockford`, `Decode`, `DecodeCrockford`.
+
+```go
+import "gno.land/p/moul/x/daily/base32/v1"
+
+base32.Encode("foobar")           // "MZXW6YTBOI======"
+base32.EncodeCrockford("hello")   // "D1JPRV3F"
+base32.DecodeCrockford("d1-jprv3f")  // "hello" — case folded, hyphen ignored
+```
+
+**Two alphabets, for two different jobs.** RFC 4648 (`A–Z`, `2–7`, `=` padding)
+is the interoperable one — use it when something else has to decode the result.
+Crockford (`0–9`, `A–Z` minus `I`, `L`, `O`, `U`) is designed to be **read aloud
+and typed back**: decoding folds case, reads `I`/`L` as `1` and `O` as `0`, and
+ignores hyphens, so a mis-heard identifier still decodes. `U` is excluded to
+avoid accidental obscenities.
+
+Verified against the **RFC 4648 §10 vectors** at every partial-group length, and
+the demo's pinned output is that vector set — so the example doubles as a
+conformance test.
+
+Decoding is strict where it matters: leftover bits after the final byte must be
+**zero padding, never data**, so `"MB"` is rejected rather than silently
+truncated. It is lenient where it is safe: lowercase and missing padding are
+accepted.
+
+Base32 costs 60% expansion (8 characters per 5 bytes) against base64's 33%. You
+pay that to get an alphabet that survives case-insensitive systems and the
+telephone.
+
+**Live demo:** [`r/moul/x/daily/base32demo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/base32demo/v1)
+· render it at [`/r/moul/x/daily/base32demo/v1`](https://gno.land/r/moul/x/daily/base32demo/v1).
