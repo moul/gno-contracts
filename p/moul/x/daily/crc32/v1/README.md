@@ -1,0 +1,32 @@
+# `gno.land/p/moul/x/daily/crc32/v1`
+
+**CRC-32 checksum** — `Checksum`, `ChecksumHex`, `ChecksumWith`, `Verify`,
+`MakeTable`, `Update`, `Finalize`, `Hex`, `Split`.
+
+Treats a message as one enormous binary number and takes the remainder of
+dividing it by a fixed polynomial. The bit-reflected, table-driven form — the
+one zip, gzip, PNG and Ethernet actually use.
+
+```go
+import "gno.land/p/moul/x/daily/crc32/v1"
+
+crc32.ChecksumHex("123456789")   // "cbf43926" — the standard check value
+crc32.Checksum("abc")            // 0x352441C2
+crc32.Verify("abc", 0x352441C2)  // true
+```
+
+Three polynomials: `IEEE` (zip/gzip/PNG, the default), `Castagnoli`
+(iSCSI/btrfs, better error detection) and `Koopman`. `MakeTable` builds the
+256-entry table once — that is the whole point of the table-driven form, trading
+1 KiB for eight bit-shifts per byte.
+
+`Update`/`Finalize` take and return the **raw register**, not the finished
+checksum, so a long message can be fed in chunks. Chaining on final values would
+be wrong; there is a test asserting chunked equals one-shot.
+
+> ⚠️ **A CRC detects accidents, not tampering.** It is linear, so anyone can
+> craft a different message with the same checksum. Never use it to
+> authenticate anything.
+
+**Live demo:** [`r/moul/x/daily/crc32demo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/crc32demo/v1)
+· render it at [`/r/moul/x/daily/crc32demo/v1`](https://gno.land/r/moul/x/daily/crc32demo/v1).
