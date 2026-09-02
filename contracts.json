@@ -1584,6 +1584,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/bitset/v1",
+      "dir": "p/moul/x/daily/bitset/v1",
+      "kind": "p",
+      "name": "x/daily/bitset",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/cowsay/v1",
       "dir": "p/moul/x/daily/cowsay/v1",
       "kind": "p",
@@ -1607,6 +1631,30 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/disjointset/v1",
+      "dir": "p/moul/x/daily/disjointset/v1",
+      "kind": "p",
+      "name": "x/daily/disjointset",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
@@ -1751,6 +1799,54 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/ringbuffer/v1",
+      "dir": "p/moul/x/daily/ringbuffer/v1",
+      "kind": "p",
+      "name": "x/daily/ringbuffer",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/rle/v1",
+      "dir": "p/moul/x/daily/rle/v1",
+      "kind": "p",
+      "name": "x/daily/rle",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
@@ -3064,6 +3160,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/bitsetdemo/v1",
+      "dir": "r/moul/x/daily/bitsetdemo/v1",
+      "kind": "r",
+      "name": "x/daily/bitsetdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/bitset/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/blog/v1",
       "dir": "r/moul/x/daily/blog/v1",
       "kind": "r",
@@ -3464,6 +3586,32 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/disjointsetdemo/v1",
+      "dir": "r/moul/x/daily/disjointsetdemo/v1",
+      "kind": "r",
+      "name": "x/daily/disjointsetdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/disjointset/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
@@ -4722,6 +4870,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/ringbufferdemo/v1",
+      "dir": "r/moul/x/daily/ringbufferdemo/v1",
+      "kind": "r",
+      "name": "x/daily/ringbufferdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/ringbuffer/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/ringlog/v1",
       "dir": "r/moul/x/daily/ringlog/v1",
       "kind": "r",
@@ -4751,6 +4925,32 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/rledemo/v1",
+      "dir": "r/moul/x/daily/rledemo/v1",
+      "kind": "r",
+      "name": "x/daily/rledemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/rle/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
