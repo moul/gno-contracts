@@ -48,6 +48,7 @@ digraph gnocontracts {
   "gno.land/p/moul/web25/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v2" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/b58/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/base32/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/bitset/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/cowsay/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/crc32/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -57,6 +58,7 @@ digraph gnocontracts {
   "gno.land/p/moul/x/daily/levenshtein/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/luhn/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/markov/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/orderedmap/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/piglatin/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/ratelimit/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/ringbuffer/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -99,6 +101,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/asciiart/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/b58demo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/ballot/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/base32demo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/bitsetdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/blog/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/coinflipduel/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -133,6 +136,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/merkledrop/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/multisig/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/numguess/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/orderedmapdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/piglatindemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/pixelcanvas/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/polls/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -259,6 +263,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/b58demo/v1" -> "gno.land/p/moul/x/daily/b58/v1";
   "gno.land/r/moul/x/daily/ballot/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/base32demo/v1" -> "gno.land/p/moul/x/daily/base32/v1";
   "gno.land/r/moul/x/daily/bitsetdemo/v1" -> "gno.land/p/moul/x/daily/bitset/v1";
   "gno.land/r/moul/x/daily/blog/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/coinflipduel/v1" -> "gno.land/p/nt/avl/v0";
@@ -293,6 +298,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/merkledrop/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/multisig/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/numguess/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/orderedmapdemo/v1" -> "gno.land/p/moul/x/daily/orderedmap/v1";
   "gno.land/r/moul/x/daily/piglatindemo/v1" -> "gno.land/p/moul/x/daily/piglatin/v1";
   "gno.land/r/moul/x/daily/pixelcanvas/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/polls/v1" -> "gno.land/p/nt/avl/v0";
