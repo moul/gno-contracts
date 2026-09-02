@@ -1,0 +1,34 @@
+# `gno.land/p/moul/x/daily/orderedmap/v1`
+
+**Map that remembers insertion order** — `New`, `Set`, `Get`, `Has`, `Delete`,
+`Keys`, `Values`, `Iterate`, `At`, `Clone`, `Len`, `MaxKeys`.
+
+```go
+import "gno.land/p/moul/x/daily/orderedmap/v1"
+
+o := orderedmap.New()
+o.Set("delta", "4"); o.Set("alpha", "1")
+o.Keys()             // ["delta" "alpha"] — insertion order, not sorted
+o.Set("delta", "99") // updates in place, keeps position
+```
+
+**This matters more on chain than off it.** gno map iteration order is
+unspecified, so a realm that ranges over a built-in map to build its `Render`
+can emit a different page on every call — a **consensus bug**, not a cosmetic
+one. This type gives back a deterministic order without requiring the keys to be
+sortable.
+
+Semantics worth knowing, each with a test:
+
+- **Updating keeps position.** Insertion order means *first* insertion, not last
+  write.
+- **Re-inserting after a delete goes last** — it is a new insertion.
+- `Keys` returns a copy, so a caller cannot reorder the map through it.
+
+Backed by a built-in map for O(1) `Get` plus a slice holding the order. `Delete`
+is **O(n)**: closing the gap in that slice is what preserves order, and that
+trade is stated rather than hidden. `MaxKeys` (4096) bounds growth; a full map
+refuses new keys but still accepts updates to existing ones.
+
+**Live demo:** [`r/moul/x/daily/orderedmapdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/orderedmapdemo/v1)
+· render it at [`/r/moul/x/daily/orderedmapdemo/v1`](https://gno.land/r/moul/x/daily/orderedmapdemo/v1).
