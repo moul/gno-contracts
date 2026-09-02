@@ -1,0 +1,36 @@
+# `gno.land/p/moul/x/daily/disjointset/v1`
+
+**Union-find (disjoint-set forest)** — `New`, `Find`, `Union`, `Connected`,
+`Size`, `Groups`, `Partition`, `MaxN`.
+
+Tracks a partition of `[0, n)` into disjoint groups and answers "same group?" in
+near-constant time.
+
+```go
+import "gno.land/p/moul/x/daily/disjointset/v1"
+
+d := disjointset.New(10)
+d.Union(0, 1)
+d.Union(1, 3)
+d.Connected(0, 3)   // true
+d.Groups()          // 8
+d.Partition()       // [[0 1 3] [2] [4] ...]
+```
+
+**Both optimisations, because they only work together:** path compression
+flattens the tree on every `Find`, union by rank keeps the shallower tree under
+the deeper one. With both, operations are O(α(n)) — inverse Ackermann,
+effectively constant. With neither, a chain of unions degrades to O(n) per
+query, which on chain is the difference between a cheap call and running out of
+gas. `Find` compresses **iteratively**: a deep chain would otherwise risk the
+call stack.
+
+`Partition` returns groups sorted ascending and ordered by their smallest
+member, so the result is **identical regardless of the order unions were
+applied** — that determinism is what makes it safe to put in a `Render`.
+
+Out-of-range indices return `-1`/`false`/`0` rather than panicking, and are
+connected to nothing — not even to themselves.
+
+**Live demo:** [`r/moul/x/daily/disjointsetdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/disjointsetdemo/v1)
+· render it at [`/r/moul/x/daily/disjointsetdemo/v1`](https://gno.land/r/moul/x/daily/disjointsetdemo/v1).
