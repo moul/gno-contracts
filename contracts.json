@@ -1636,10 +1636,82 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/crc32/v1",
+      "dir": "p/moul/x/daily/crc32/v1",
+      "kind": "p",
+      "name": "x/daily/crc32",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/disjointset/v1",
       "dir": "p/moul/x/daily/disjointset/v1",
       "kind": "p",
       "name": "x/daily/disjointset",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/fraction/v1",
+      "dir": "p/moul/x/daily/fraction/v1",
+      "kind": "p",
+      "name": "x/daily/fraction",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/humanize/v1",
+      "dir": "p/moul/x/daily/humanize/v1",
+      "kind": "p",
+      "name": "x/daily/humanize",
       "version": "v1",
       "description": "",
       "deps": [],
@@ -1959,6 +2031,30 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/soundex/v1",
+      "dir": "p/moul/x/daily/soundex/v1",
+      "kind": "p",
+      "name": "x/daily/soundex",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
@@ -3520,6 +3616,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/crc32demo/v1",
+      "dir": "r/moul/x/daily/crc32demo/v1",
+      "kind": "r",
+      "name": "x/daily/crc32demo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/crc32/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/crowdfund/v1",
       "dir": "r/moul/x/daily/crowdfund/v1",
       "kind": "r",
@@ -3935,6 +4057,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/fractiondemo/v1",
+      "dir": "r/moul/x/daily/fractiondemo/v1",
+      "kind": "r",
+      "name": "x/daily/fractiondemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/fraction/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/governor/v1",
       "dir": "r/moul/x/daily/governor/v1",
       "kind": "r",
@@ -4073,6 +4221,32 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/humanizedemo/v1",
+      "dir": "r/moul/x/daily/humanizedemo/v1",
+      "kind": "r",
+      "name": "x/daily/humanizedemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/humanize/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
@@ -5247,6 +5421,32 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/soundexdemo/v1",
+      "dir": "r/moul/x/daily/soundexdemo/v1",
+      "kind": "r",
+      "name": "x/daily/soundexdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/soundex/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
