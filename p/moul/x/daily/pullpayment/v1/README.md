@@ -1,0 +1,42 @@
+# `gno.land/p/moul/x/daily/pullpayment/v1`
+
+**Pull-payment escrow ledger** — `New`, `Credit`, `CreditMany`, `Withdraw`,
+`Forfeit`, `Balance`, `TotalOwed`, `TotalWithdrawn`, `Payees`, `Iterate`,
+`Consistent`, `MaxPayees`.
+
+```go
+import "gno.land/p/moul/x/daily/pullpayment/v1"
+
+l := pullpayment.New()
+l.CreditMany([]string{"alice", "bob"}, []int64{500, 300})
+l.TotalOwed()          // 800 — what the realm must keep in reserve
+
+amt, err := l.Withdraw("bob")   // 300; the balance is ALREADY zeroed
+// ...the caller transfers `amt` only now
+```
+
+The classic Solidity answer to reentrancy: never push value to an address,
+credit it and let the recipient withdraw. A push hands control to the recipient
+in the middle of your state transition, and a hostile recipient re-enters before
+you have finished updating.
+
+This package is the **bookkeeping half only** — it moves no coins. The realm
+holding the funds transfers *after* calling `Withdraw`, which is exactly the
+ordering the pattern demands: checks, effects, **then** interactions. The balance
+is already deleted when control leaves, so a reentrant `Withdraw` returns
+`ErrNothing` and `TotalWithdrawn` is not double-counted. That property has its own
+test.
+
+Other guarantees, each tested:
+
+- **`CreditMany` is all-or-nothing.** A batch with one bad entry applies none of
+  itself — a ledger half-agreeing with the funds it guards is worse than a
+  rejected call.
+- **Overflow is refused**, not wrapped, on both a single balance and the total.
+- `Consistent()` is exported: `TotalOwed` always equals the sum of the balances.
+
+`Payees` comes back **sorted**, never in map order, so a `Render` built from it
+cannot differ between nodes.
+
+**Live demo:** [`r/moul/x/daily/pullpaymentdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/pullpaymentdemo/v1)
+· render it at [`/r/moul/x/daily/pullpaymentdemo/v1`](https://gno.land/r/moul/x/daily/pullpaymentdemo/v1).
