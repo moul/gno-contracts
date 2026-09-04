@@ -31,7 +31,7 @@ VIEW := $(CURDIR)/.gnoroot-view
 PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -not -path '*/.*' -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps bump-deps test lint fmt gen manifest readme readmes check sync publish status report graph view clean upload
+.PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report graph view clean upload
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -54,7 +54,7 @@ deps: ## vendor MISSING external gno.land deps into vendor/ (reads real GNOROOT/
 bump-deps: ## re-vendor ALL external deps from GNOROOT/examples (bump the pinned snapshot)
 	$(TOOL) vendor -refresh
 
-test: toolcheck guard-examples view ## gno test every contract (deps resolved from committed vendor/)
+test: toolcheck guard-examples guard-render view ## gno test every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== test $$d =="; GNOROOT="$(VIEW)" $(GNO) test ./$$d; done
 
 # Prove the gno toolchain actually VALIDATES example tests. gno silently skips
@@ -88,6 +88,11 @@ toolcheck: view ## verify the gno toolchain validates example tests
 # silently (a test that asserts nothing).
 guard-examples: ## fail if any Example* test lacks an // Output: block
 	@python3 tools/guard_examples.py
+
+# A realm's Render is its whole public surface, and a Render whose output varies
+# is a consensus bug — so every realm must have a test that actually calls it.
+guard-render: ## fail if a realm declares Render but no test calls it
+	@python3 tools/guard_render.py
 
 lint: view ## gno lint every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
