@@ -1,2 +1,8 @@
 module = "gno.land/r/moul/bertydao/v1"
 gno = "0.9"
+
+# Archived: upstream (github.com/moul/berty-dao.gno) is an empty scaffold — its
+# only source file is a 17-byte `package bertydao` with no declarations. The
+# import was faithful; there is simply no realm here yet. Kept out of the active
+# set so it is neither catalogued nor published as an empty on-chain realm.
+ignore = true
