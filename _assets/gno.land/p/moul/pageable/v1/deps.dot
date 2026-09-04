@@ -1,0 +1,6 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/p/moul/pageable/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/pageable/v1" -> "gno.land/p/nt/ufmt";
+}
