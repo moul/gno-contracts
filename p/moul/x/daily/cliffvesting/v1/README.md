@@ -1,0 +1,40 @@
+# `gno.land/p/moul/x/daily/cliffvesting/v1`
+
+**Cliff-then-linear vesting calculator** — `New`, `NewLinear`, `Vested`,
+`Unvested`, `Claimable`, `PercentVested`, `CliffAmount`, `IsFullyVested`,
+`Duration`, `HasCliff`.
+
+```go
+import "gno.land/p/moul/x/daily/cliffvesting/v1"
+
+s, _ := cliffvesting.New(1200, 0, 3, 12) // total, start, cliff, end
+s.Vested(2)          // 0   — before the cliff
+s.Vested(3)          // 300 — the cliff releases the elapsed portion at once
+s.Vested(12)         // 1200
+s.Claimable(6, 300)  // 300 — vested minus already claimed
+```
+
+**Pure.** No state, no balances, no transfers. The arithmetic is the part that is
+easy to get subtly wrong and easy to test; custody belongs to the realm holding
+the coins.
+
+The cliff is a **step, not a ramp**: nothing vests before it, then the whole
+elapsed portion unlocks at once, and the rest accrues linearly.
+
+**All integer arithmetic** — no float ever reaches consensus state:
+
+- `total*elapsed/duration`, multiplying **first**. The reverse computes a
+  per-tick rate that truncates to zero whenever `total < duration`, so nothing
+  would ever vest. That is the classic vesting bug; it has its own test
+  (7 tokens over 1000 ticks).
+- Rounding is **down**, so a beneficiary is never paid more than they earned,
+  and the **final instalment collects the remainder**: 1000 over 3 periods is
+  `333 + 333 + 334`, and `Vested(end)` is exactly `total`, never `total-1`.
+- `Claimable` never returns negative, even if the caller's bookkeeping says more
+  was claimed than has vested.
+
+Times are `int64`, so the caller may use block heights or unix seconds — the unit
+only has to be consistent.
+
+**Live demo:** [`r/moul/x/daily/cliffvestingdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/cliffvestingdemo/v1)
+· render it at [`/r/moul/x/daily/cliffvestingdemo/v1`](https://gno.land/r/moul/x/daily/cliffvestingdemo/v1).
