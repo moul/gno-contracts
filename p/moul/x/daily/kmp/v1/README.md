@@ -1,0 +1,33 @@
+# `gno.land/p/moul/x/daily/kmp/v1`
+
+**Knuth–Morris–Pratt substring search** — `Index`, `Contains`, `FindAll`,
+`Count`, `Table`, `MaxPattern`.
+
+```go
+import "gno.land/p/moul/x/daily/kmp/v1"
+
+kmp.Index("mississippi", "issi")   // 1
+kmp.FindAll("mississippi", "issi") // [1 4] — overlapping
+kmp.Count("aaaa", "aa")            // 3
+kmp.Table("ababaa")                // [0 0 1 2 3 1]
+```
+
+The naive scan re-compares characters it already matched, so `"aaaaaaab"` inside
+`"aaaaaaaaaaaaaaab"` costs O(n·m). KMP precomputes a failure table and slides the
+pattern without ever moving the text cursor backwards: **O(n+m), with no bad
+case**. On chain that matters — a pathological input is an attack, not bad luck.
+
+Two things worth knowing, each with a test:
+
+- **`FindAll` reports overlapping matches.** `FindAll("aaaa", "aa")` is
+  `[0 1 2]`, not `[0 2]` — the honest reading of "every occurrence". A caller
+  wanting disjoint matches can filter; one wanting overlap could not recover it.
+- **Offsets are BYTE offsets**, not runes. gno strings are UTF-8, so `Index("éx",
+  "x")` is `2`. That matches `strings.Index`, and it is the right unit for
+  slicing.
+
+`Index` is pinned against `strings.Index` across a spread of inputs: same
+contract, different algorithm.
+
+**Live demo:** [`r/moul/x/daily/kmpdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/kmpdemo/v1)
+· render it at [`/r/moul/x/daily/kmpdemo/v1`](https://gno.land/r/moul/x/daily/kmpdemo/v1).
