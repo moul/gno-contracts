@@ -221,6 +221,13 @@ func ExampleRender() {
 }
 ```
 
+This is **enforced by CI**: `make guard-render` (`tools/guard_render.py`) fails
+when an `r/` package declares `func Render` and no test ever calls it. Coverage
+counts from a normal `*_test.gno` **or** a `*_filetest.gno`, and the call may be
+bare (`Render(`) or qualified (`home.Render(`). `ignore = true` packages are
+skipped. Five realms had shipped with a completely unexercised `Render` before
+the guard existed.
+
 Rules that make it actually run and verify:
 
 - The **`// Output:` block is required** — an example with no `// Output:` is
@@ -232,6 +239,13 @@ Rules that make it actually run and verify:
 - Cover the root plus a couple of argument paths (one `ExampleRender…` each).
 - Keep output **deterministic**: tests run at a fixed chain height, but don't
   render wall-clock/random values.
+- **Realm globals persist for the whole test binary, and examples run *after*
+  every `Test`.** So an `ExampleRender` sees the state the tests left behind, and
+  its pinned output silently depends on test ordering. Have the example **reset
+  the state it renders** first (call the realm's `Reset`, or assign the globals
+  back to their `init()` values from a helper — same package, so it's allowed).
+  Likewise don't hardcode a generated id: take it from the constructor's return
+  value, since it depends on how many objects earlier tests created.
 - Validated by `gno test` on a **master** gno (what CI builds). Older gno
   binaries silently skip examples, so verify with a freshly built master gno
   (`go build -o /tmp/gno ./gnovm/cmd/gno` in your gno checkout) — a plain `ok`

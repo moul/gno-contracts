@@ -49,7 +49,7 @@ jobs:
       # Example* is silently skipped (missing // Output:) — otherwise an
       # ExampleRender is a false-green test that asserts nothing.
       - name: Validate example tests are real
-        run: make toolcheck guard-examples
+        run: make toolcheck guard-examples guard-render
 
       - name: Lint
         run: make lint
