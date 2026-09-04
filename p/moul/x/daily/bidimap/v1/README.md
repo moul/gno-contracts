@@ -1,0 +1,36 @@
+# `gno.land/p/moul/x/daily/bidimap/v1`
+
+**Bidirectional map, unique both ways** — `New`, `Put`, `PutUnique`, `Get`,
+`GetKey`, `Has`, `HasValue`, `Delete`, `DeleteValue`, `Keys`, `Values`,
+`Iterate`, `Invert`, `Clone`, `Consistent`, `MaxPairs`.
+
+```go
+import "gno.land/p/moul/x/daily/bidimap/v1"
+
+m := bidimap.New()
+m.Put("alice", "admin")
+m.Get("alice")      // "admin", true
+m.GetKey("admin")   // "alice", true — O(1), not a scan
+```
+
+Both sides are unique, which is the interesting constraint: inserting a pair
+whose value already belongs to another key must do something deliberate rather
+than silently corrupt the reverse index.
+
+- **`Put` replaces**, and returns the pairs it displaced, so the caller sees what
+  it evicted rather than discovering it later.
+- **`PutUnique` refuses** instead, returning `false` and changing nothing.
+
+What is not on offer is a half-updated map. `Consistent()` is exported so callers
+and tests can assert the two indexes agree; it is true through the whole public
+API.
+
+One subtlety with `MaxPairs` (4096): a full map **still accepts** a `Put` that
+rebinds an existing key or steals an existing value, because that reuses a slot
+rather than growing the map. Only a pair new on *both* sides is refused.
+
+`Keys`/`Values` come back **sorted**, never in map order: gno map iteration order
+is unspecified, and a `Render` built from one can differ between nodes.
+
+**Live demo:** [`r/moul/x/daily/bidimapdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/bidimapdemo/v1)
+· render it at [`/r/moul/x/daily/bidimapdemo/v1`](https://gno.land/r/moul/x/daily/bidimapdemo/v1).
