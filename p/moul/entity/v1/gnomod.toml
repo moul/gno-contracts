@@ -1,0 +1,3 @@
+module = "gno.land/p/moul/entity/v1"
+gno = "0.9"
+ignore = true
