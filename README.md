@@ -176,7 +176,7 @@ make help        # list all targets
 | [`p/moul/xdao/v2`](p/moul/xdao/v2) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/xmath/v1`](p/moul/xmath/v1) 📦 💤 | — | — | — | — | — | — |
 | [`p/moul/xmath/v2`](p/moul/xmath/v2) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/xmath/v2) | — | — | — | — |
-| [`r/moul/bertydao/v1`](r/moul/bertydao/v1) 🏛️ | — | — | — | — | — | — |
+| [`r/moul/bertydao/v1`](r/moul/bertydao/v1) 🏛️ 💤 | — | — | — | — | — | — |
 | [`r/moul/config/v1`](r/moul/config/v1) 🏛️ 💤 | — | — | — | — | — | 1 |
 | [`r/moul/config/v2`](r/moul/config/v2) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/demo/args/v1`](r/moul/demo/args/v1) 🏛️ 💤 | — | — | — | — | — | — |
