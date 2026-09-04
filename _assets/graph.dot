@@ -62,7 +62,9 @@ digraph gnocontracts {
   "gno.land/p/moul/x/daily/base32/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/bidimap/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/bitset/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/cliffvesting/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/commitreveal/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/countminsketch/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/cowsay/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/crc32/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/disjointset/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -133,10 +135,12 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/bidimapdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/bitsetdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/blog/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/cliffvestingdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/coinflipduel/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/collatz/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/commitrevealdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/connect4/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/countminsketchdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/cowsaydemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/crc32demo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/crowdfund/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -319,10 +323,12 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/bidimapdemo/v1" -> "gno.land/p/moul/x/daily/bidimap/v1";
   "gno.land/r/moul/x/daily/bitsetdemo/v1" -> "gno.land/p/moul/x/daily/bitset/v1";
   "gno.land/r/moul/x/daily/blog/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/cliffvestingdemo/v1" -> "gno.land/p/moul/x/daily/cliffvesting/v1";
   "gno.land/r/moul/x/daily/coinflipduel/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/collatz/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/commitrevealdemo/v1" -> "gno.land/p/moul/x/daily/commitreveal/v1";
   "gno.land/r/moul/x/daily/connect4/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/countminsketchdemo/v1" -> "gno.land/p/moul/x/daily/countminsketch/v1";
   "gno.land/r/moul/x/daily/cowsaydemo/v1" -> "gno.land/p/moul/x/daily/cowsay/v1";
   "gno.land/r/moul/x/daily/crc32demo/v1" -> "gno.land/p/moul/x/daily/crc32/v1";
   "gno.land/r/moul/x/daily/crowdfund/v1" -> "gno.land/p/nt/avl/v0";

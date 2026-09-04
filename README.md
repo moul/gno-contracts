@@ -153,7 +153,9 @@ make help        # list all targets
 | [`p/moul/x/daily/base32/v1`](p/moul/x/daily/base32/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/bidimap/v1`](p/moul/x/daily/bidimap/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/bitset/v1`](p/moul/x/daily/bitset/v1) 📦 | — | — | — | — | — | — |
+| [`p/moul/x/daily/cliffvesting/v1`](p/moul/x/daily/cliffvesting/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/commitreveal/v1`](p/moul/x/daily/commitreveal/v1) 📦 | — | — | — | — | — | — |
+| [`p/moul/x/daily/countminsketch/v1`](p/moul/x/daily/countminsketch/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/cowsay/v1`](p/moul/x/daily/cowsay/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/x/daily/cowsay/v1) | — | — | — | — |
 | [`p/moul/x/daily/crc32/v1`](p/moul/x/daily/crc32/v1) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/disjointset/v1`](p/moul/x/daily/disjointset/v1) 📦 | — | — | — | — | — | — |
@@ -228,12 +230,14 @@ make help        # list all targets
 | [`r/moul/x/daily/bloomfilter/v1`](r/moul/x/daily/bloomfilter/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/bloomfilter/v1) | — | — | — | — |
 | [`r/moul/x/daily/bullscows/v1`](r/moul/x/daily/bullscows/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/bullscows/v1) | — | — | — | — |
 | [`r/moul/x/daily/calc/v1`](r/moul/x/daily/calc/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/calc/v1) | — | — | — | — |
+| [`r/moul/x/daily/cliffvestingdemo/v1`](r/moul/x/daily/cliffvestingdemo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/closestguess/v1`](r/moul/x/daily/closestguess/v1) 🏛️ | — | — | — | — | — | — |
 | [`r/moul/x/daily/coinflipduel/v1`](r/moul/x/daily/coinflipduel/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/coinflipduel/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/collatz/v1`](r/moul/x/daily/collatz/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/collatz/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/commitrevealdemo/v1`](r/moul/x/daily/commitrevealdemo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/connect4/v1`](r/moul/x/daily/connect4/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/connect4/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/counter/v1`](r/moul/x/daily/counter/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/counter/v1) | — | — | — | — |
+| [`r/moul/x/daily/countminsketchdemo/v1`](r/moul/x/daily/countminsketchdemo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/cowsaydemo/v1`](r/moul/x/daily/cowsaydemo/v1) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/cowsaydemo/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/crc32demo/v1`](r/moul/x/daily/crc32demo/v1) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/crowdfund/v1`](r/moul/x/daily/crowdfund/v1) 🏛️ 🚧 | — | — | — | — | — | 1 |

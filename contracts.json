@@ -1965,10 +1965,58 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/cliffvesting/v1",
+      "dir": "p/moul/x/daily/cliffvesting/v1",
+      "kind": "p",
+      "name": "x/daily/cliffvesting",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/commitreveal/v1",
       "dir": "p/moul/x/daily/commitreveal/v1",
       "kind": "p",
       "name": "x/daily/commitreveal",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/countminsketch/v1",
+      "dir": "p/moul/x/daily/countminsketch/v1",
+      "kind": "p",
+      "name": "x/daily/countminsketch",
       "version": "v1",
       "description": "",
       "deps": [],
@@ -4231,6 +4279,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/cliffvestingdemo/v1",
+      "dir": "r/moul/x/daily/cliffvestingdemo/v1",
+      "kind": "r",
+      "name": "x/daily/cliffvestingdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/cliffvesting/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/closestguess/v1",
       "dir": "r/moul/x/daily/closestguess/v1",
       "kind": "r",
@@ -4418,6 +4492,32 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/countminsketchdemo/v1",
+      "dir": "r/moul/x/daily/countminsketchdemo/v1",
+      "kind": "r",
+      "name": "x/daily/countminsketchdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/countminsketch/v1"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
