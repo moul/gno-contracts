@@ -1,0 +1,42 @@
+# `gno.land/p/moul/x/daily/flatmap/v1`
+
+**Sorted-vector map** — `New`, `Set`, `Get`, `Has`, `Delete`, `Keys`, `Values`,
+`At`, `Iterate`, `Range`, `Clone`, `Sorted`, `MaxEntries`.
+
+```go
+import "gno.land/p/moul/x/daily/flatmap/v1"
+
+f := flatmap.New()
+f.Set("delta", "4"); f.Set("alpha", "1")
+f.Keys()                  // ["alpha" "delta"] — sorted by construction
+f.At(0)                   // "alpha", "1", true — indexed access
+f.Range("a", "c", fn)     // lo inclusive, hi exclusive
+```
+
+The STL `flat_map` trade. Keys and values live in two parallel sorted slices
+instead of a hash table or a tree of nodes:
+
+| operation | cost |
+|---|---|
+| `Get` | O(log n) binary search over contiguous memory |
+| iteration | O(n), already ordered, nothing to sort |
+| `Set` in the middle | **O(n)** — the tail shifts |
+| `Set` at the end | O(1) amortised — the fast path |
+
+Cheap reads and cheap ordered iteration, paid for at write time. That trade is
+stated rather than hidden.
+
+On chain the ordering is the real draw: a built-in gno map iterates in an
+unspecified order, so a `Render` built from one can differ between nodes. A flat
+map is sorted by construction, so iteration is deterministic **without a sort on
+every read**.
+
+Sorted storage also buys two things a hash map cannot offer: `At(i)` positional
+access, and `Range(lo, hi)` as two binary searches and a walk — including when
+the bounds are not themselves keys.
+
+`Sorted()` is exported so callers can assert the invariant; it holds through the
+whole public API, including 200 worst-case head insertions.
+
+**Live demo:** [`r/moul/x/daily/flatmapdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/flatmapdemo/v1)
+· render it at [`/r/moul/x/daily/flatmapdemo/v1`](https://gno.land/r/moul/x/daily/flatmapdemo/v1).
