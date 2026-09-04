@@ -1,0 +1,37 @@
+# `gno.land/p/moul/x/daily/commitreveal/v1`
+
+**Commit–reveal scheme** — `Commit`, `MustCommit`, `Verify`, `Open`,
+`ValidCommitment`, `MinSaltLen`, `MaxValueLen`, `DigestLen`.
+
+```go
+import "gno.land/p/moul/x/daily/commitreveal/v1"
+
+c, _ := commitreveal.Commit("rock", "alice-secret-salt-1") // phase 1: publish c
+commitreveal.Open(c, "rock", "alice-secret-salt-1")        // phase 2: nil
+commitreveal.Open(c, "paper", "alice-secret-salt-1")       // ErrMismatch
+```
+
+A transaction is public before it executes, so a naive sealed-bid auction or
+simultaneous-move game lets whoever moves last read everyone else's move and win
+for free. Commit–reveal splits the action: publish `H(value ‖ salt)` first, open
+it later.
+
+**The salt is enforced, not advised.** Rock-paper-scissors has three possible
+moves, so an unsalted commitment has three possible hashes and is broken by
+trying all of them. `Commit` refuses a salt shorter than `MinSaltLen` (16), and
+`Verify` enforces the same floor — a short salt cannot be smuggled past it.
+
+Two details that are easy to get wrong, both tested:
+
+- **Length-prefixed hashing.** With plain concatenation `("ab","cd…")` and
+  `("abc","d…")` produce identical bytes, so one commitment could be opened two
+  different ways. The lengths are hashed in.
+- **Constant-time digest comparison.** A short-circuiting check leaks, through
+  timing, how many leading bytes of a guess were right — enough to reconstruct a
+  commitment byte by byte.
+
+This package computes and checks commitments. It stores nothing and knows nothing
+about phases or deadlines; the realm owns that.
+
+**Live demo:** [`r/moul/x/daily/commitrevealdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/commitrevealdemo/v1)
+· render it at [`/r/moul/x/daily/commitrevealdemo/v1`](https://gno.land/r/moul/x/daily/commitrevealdemo/v1).
