@@ -30,6 +30,8 @@
       "name": "addrset",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/addrset/v0",
+      "upstream_match": "gno",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
@@ -57,7 +59,6 @@
       "version": "v1",
       "description": "Set data structure for unique gno addresses.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/addrset",
       "deps": [
         "gno.land/p/nt/bptree/v0"
       ],
@@ -95,6 +96,8 @@
       "name": "authz",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/authz/v0",
+      "upstream_match": "diff",
       "deps": [
         "gno.land/p/moul/addrset/v0",
         "gno.land/p/moul/once/v0",
@@ -126,7 +129,6 @@
       "version": "v1",
       "description": "Flexible authorization control for privileged actions.",
       "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/authz",
       "deps": [
         "gno.land/p/moul/addrset/v1",
         "gno.land/p/moul/once/v0",
@@ -271,6 +273,8 @@
       "name": "dynreplacer",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/dynreplacer/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {
@@ -367,6 +371,8 @@
       "name": "fifo",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/fifo/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {
@@ -439,6 +445,8 @@
       "name": "helplink",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/helplink/v0",
+      "upstream_match": "gno",
       "deps": [
         "gno.land/p/moul/txlink/v0"
       ],
@@ -465,6 +473,8 @@
       "name": "md",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/md/v0",
+      "upstream_match": "gno",
       "deps": [
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
@@ -517,6 +527,8 @@
       "name": "mdtable",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/mdtable/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {
@@ -592,6 +604,8 @@
       "name": "once",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/once/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {
@@ -692,6 +706,8 @@
       "name": "realmpath",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/realmpath/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {
@@ -795,6 +811,8 @@
       "name": "txlink",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/txlink/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {
@@ -819,6 +837,8 @@
       "name": "typeutil",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/typeutil/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {
@@ -893,6 +913,8 @@
       "name": "ulist",
       "version": "v0",
       "description": "",
+      "upstream": "gno.land/p/moul/ulist/v0",
+      "upstream_match": "gno",
       "deps": [],
       "draft": false,
       "published": {

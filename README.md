@@ -95,40 +95,40 @@ make help        # list all targets
 
 | Package | sapphire | pearl | betanet | staging | Monorepo | Deps |
 |---|---|---|---|---|---|---|
-| [`p/moul/addrset/v0`](p/moul/addrset/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | — | [🗄️](https://pearl.testnets.gno.land/p/moul/addrset) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset) | 1 |
-| [`p/moul/authz/v0`](p/moul/authz/v0) 📦 | — | — | — | — | — | 5 |
-| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | — | [🗄️](https://pearl.testnets.gno.land/p/moul/authz) | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz) | 3 |
+| [`p/moul/addrset/v0`](p/moul/addrset/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset/v0) ≈ | 1 |
+| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | — | [🗄️](https://pearl.testnets.gno.land/p/moul/addrset/v1) | — | — | — | 1 |
+| [`p/moul/authz/v0`](p/moul/authz/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz/v0) ✂️ | 5 |
+| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | — | [🗄️](https://pearl.testnets.gno.land/p/moul/authz/v1) | — | — | — | 3 |
 | [`p/moul/collection/v0`](p/moul/collection/v0) 📦 | — | — | — | — | — | 3 |
 | [`p/moul/cow/v0`](p/moul/cow/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/debug/v0`](p/moul/debug/v0) 📦 | — | — | — | — | — | 4 |
 | [`p/moul/deque/v0`](p/moul/deque/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/dynreplacer/v0`](p/moul/dynreplacer/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/dynreplacer/v0`](p/moul/dynreplacer/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer/v0) ≈ | — |
 | [`p/moul/entity/v0`](p/moul/entity/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/entropy/v0`](p/moul/entropy/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/errs/v0`](p/moul/errs/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/fifo/v0`](p/moul/fifo/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/fifo/v0`](p/moul/fifo/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo/v0) ≈ | — |
 | [`p/moul/fp/v0`](p/moul/fp/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/greet/v0`](p/moul/greet/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/helplink/v0`](p/moul/helplink/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/md/v0`](p/moul/md/v0) 📦 | — | — | — | — | — | 1 |
+| [`p/moul/helplink/v0`](p/moul/helplink/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink/v0) ≈ | 1 |
+| [`p/moul/md/v0`](p/moul/md/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md/v0) ≈ | 1 |
 | [`p/moul/mdlist/v0`](p/moul/mdlist/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/mdtable/v0`](p/moul/mdtable/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/mdtable/v0`](p/moul/mdtable/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable/v0) ≈ | — |
 | [`p/moul/memo/v0`](p/moul/memo/v0) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/nestedpkg/v0`](p/moul/nestedpkg/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/once/v0`](p/moul/once/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/once/v0`](p/moul/once/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once/v0) ≈ | — |
 | [`p/moul/ownable/v0`](p/moul/ownable/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/pageable/v0`](p/moul/pageable/v0) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/printfdebugging/v0`](p/moul/printfdebugging/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/realmpath/v0`](p/moul/realmpath/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/realmpath/v0`](p/moul/realmpath/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath/v0) ≈ | — |
 | [`p/moul/safe/v0`](p/moul/safe/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/svg/v0`](p/moul/svg/v0) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/template/v0`](p/moul/template/v0) 📦 | — | — | — | — | — | 3 |
-| [`p/moul/txlink/v0`](p/moul/txlink/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/typeutil/v0`](p/moul/typeutil/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/txlink/v0`](p/moul/txlink/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink/v0) ≈ | — |
+| [`p/moul/typeutil/v0`](p/moul/typeutil/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil/v0) ≈ | — |
 | [`p/moul/udao/v0`](p/moul/udao/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/ulist/lplist/v0`](p/moul/ulist/lplist/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/ulist/v0`](p/moul/ulist/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/ulist/v0`](p/moul/ulist/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist/v0) ≈ | — |
 | [`p/moul/web25/v0`](p/moul/web25/v0) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/x/daily/b58/v0`](p/moul/x/daily/b58/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/base32/v0`](p/moul/x/daily/base32/v0) 📦 | — | — | — | — | — | — |
