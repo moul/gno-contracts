@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-04T15:05:05Z",
+  "status_checked_at": "2026-09-11T19:06:00Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -64,24 +64,21 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "pearl": {
           "uploaded": true,
-          "which": "both"
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "staging": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
@@ -138,24 +135,21 @@
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "pearl": {
           "uploaded": true,
-          "which": "both"
+          "which": "monorepo"
         },
         "portal-loop": {
           "uploaded": true,
           "which": "monorepo"
         },
         "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "staging": {
-          "uploaded": true,
-          "which": "monorepo"
+          "uploaded": false
         },
         "test6": {
           "uploaded": false
