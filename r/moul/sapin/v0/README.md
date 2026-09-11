@@ -8,8 +8,6 @@ ASCII Christmas-tree (« sapin ») renderer — `Sapin(size int) string` draws t
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
-Provenance: imported — see [https://github.com/moul/gno-contracts/pull/15](https://github.com/moul/gno-contracts/pull/15) for context and metadata.
-
 > ⚠️ **Disclaimer:** provided as-is, without warranty; not security-audited. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
 <!-- END GNOCONTRACTS FOOTER -->

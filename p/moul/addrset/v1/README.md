@@ -33,6 +33,8 @@ Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul
 
 ![gno.land/p/moul/addrset/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/p/moul/addrset/v1/deps.png)
 
+Provenance: imported — see [https://github.com/moul/gno-contracts/pull/2](https://github.com/moul/gno-contracts/pull/2) for context and metadata.
+
 > ⚠️ **Disclaimer:** provided as-is, without warranty; not security-audited. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
 <!-- END GNOCONTRACTS FOOTER -->

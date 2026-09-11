@@ -24,6 +24,32 @@
   "status_checked_at": "2026-09-04T15:05:05Z",
   "contracts": [
     {
+      "pkgpath": "gno.land/p/moul/addrset/v0",
+      "dir": "p/moul/addrset/v0",
+      "kind": "p",
+      "name": "addrset",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/addrset/v1",
       "dir": "p/moul/addrset/v1",
       "kind": "p",
@@ -33,7 +59,7 @@
       "source": "https://github.com/moul/gno-contracts/pull/2",
       "upstream": "gno.land/p/moul/addrset",
       "deps": [
-        "gno.land/p/nt/avl/v0"
+        "gno.land/p/nt/bptree/v0"
       ],
       "draft": false,
       "published": {
@@ -66,14 +92,18 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/addrset/v2",
-      "dir": "p/moul/addrset/v2",
+      "pkgpath": "gno.land/p/moul/authz/v0",
+      "dir": "p/moul/authz/v0",
       "kind": "p",
-      "name": "addrset",
-      "version": "v2",
+      "name": "authz",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/nt/bptree/v0"
+        "gno.land/p/moul/addrset/v0",
+        "gno.land/p/moul/once/v0",
+        "gno.land/p/nt/avl/rotree/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
       "published": {
@@ -81,16 +111,12 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
-          "uploaded": false
-        },
-        "topaz": {
           "uploaded": false
         }
       }
@@ -106,9 +132,7 @@
       "upstream": "gno.land/p/moul/authz",
       "deps": [
         "gno.land/p/moul/addrset/v1",
-        "gno.land/p/moul/once/v1",
-        "gno.land/p/nt/avl/v0",
-        "gno.land/p/nt/avl/v0/rotree",
+        "gno.land/p/moul/once/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
@@ -142,119 +166,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/authz/v2",
-      "dir": "p/moul/authz/v2",
-      "kind": "p",
-      "name": "authz",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/addrset/v2",
-        "gno.land/p/moul/once/v1",
-        "gno.land/p/nt/ufmt/v0"
-      ],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/collection/v1",
-      "dir": "p/moul/collection/v1",
+      "pkgpath": "gno.land/p/moul/collection/v0",
+      "dir": "p/moul/collection/v0",
       "kind": "p",
       "name": "collection",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/avl",
-        "gno.land/p/nt/seqid",
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/collection/v2",
-      "dir": "p/moul/collection/v2",
-      "kind": "p",
-      "name": "collection",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/avl/v0",
-        "gno.land/p/nt/seqid/v0",
-        "gno.land/p/nt/ufmt/v0"
-      ],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/collection/v3",
-      "dir": "p/moul/collection/v3",
-      "kind": "p",
-      "name": "collection",
-      "version": "v3",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/bptree/v0",
@@ -267,38 +183,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/cow/v1",
-      "dir": "p/moul/cow/v1",
-      "kind": "p",
-      "name": "cow",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -306,21 +190,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/cow/v2",
-      "dir": "p/moul/cow/v2",
+      "pkgpath": "gno.land/p/moul/cow/v0",
+      "dir": "p/moul/cow/v0",
       "kind": "p",
       "name": "cow",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -329,10 +207,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -340,65 +214,20 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/debug/v1",
-      "dir": "p/moul/debug/v1",
+      "pkgpath": "gno.land/p/moul/debug/v0",
+      "dir": "p/moul/debug/v0",
       "kind": "p",
       "name": "debug",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/md/v1",
-        "gno.land/p/moul/mdtable/v1",
-        "gno.land/p/moul/realmpath/v1",
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/debug/v2",
-      "dir": "p/moul/debug/v2",
-      "kind": "p",
-      "name": "debug",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/md/v1",
-        "gno.land/p/moul/mdtable/v1",
-        "gno.land/p/moul/realmpath/v1",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/mdtable/v0",
+        "gno.land/p/moul/realmpath/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
@@ -407,10 +236,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -418,55 +243,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/deque/v1",
-      "dir": "p/moul/deque/v1",
+      "pkgpath": "gno.land/p/moul/deque/v0",
+      "dir": "p/moul/deque/v0",
       "kind": "p",
       "name": "deque",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/deque/v2",
-      "dir": "p/moul/deque/v2",
-      "kind": "p",
-      "name": "deque",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -475,10 +260,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -486,85 +267,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/dynreplacer/v1",
-      "dir": "p/moul/dynreplacer/v1",
+      "pkgpath": "gno.land/p/moul/dynreplacer/v0",
+      "dir": "p/moul/dynreplacer/v0",
       "kind": "p",
       "name": "dynreplacer",
-      "version": "v1",
-      "description": "Simple template engine for dynamic content replacement.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/dynreplacer",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/entity/v1",
-      "dir": "p/moul/entity/v1",
-      "kind": "p",
-      "name": "entity",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/users"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/entity/v2",
-      "dir": "p/moul/entity/v2",
-      "kind": "p",
-      "name": "entity",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -584,11 +295,35 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/entropy/v1",
-      "dir": "p/moul/entropy/v1",
+      "pkgpath": "gno.land/p/moul/entity/v0",
+      "dir": "p/moul/entity/v0",
+      "kind": "p",
+      "name": "entity",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/entropy/v0",
+      "dir": "p/moul/entropy/v0",
       "kind": "p",
       "name": "entropy",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -597,10 +332,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -608,55 +339,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/errs/v1",
-      "dir": "p/moul/errs/v1",
+      "pkgpath": "gno.land/p/moul/errs/v0",
+      "dir": "p/moul/errs/v0",
       "kind": "p",
       "name": "errs",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/errs/v2",
-      "dir": "p/moul/errs/v2",
-      "kind": "p",
-      "name": "errs",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -665,10 +356,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -676,93 +363,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/fifo/v1",
-      "dir": "p/moul/fifo/v1",
+      "pkgpath": "gno.land/p/moul/fifo/v0",
+      "dir": "p/moul/fifo/v0",
       "kind": "p",
       "name": "fifo",
-      "version": "v1",
-      "description": "Fixed-size FIFO (first-in-first-out) list.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/fifo",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "both"
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/fp/v1",
-      "dir": "p/moul/fp/v1",
-      "kind": "p",
-      "name": "fp",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/fp/v2",
-      "dir": "p/moul/fp/v2",
-      "kind": "p",
-      "name": "fp",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -771,10 +380,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -782,22 +387,40 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/fp/v0",
+      "dir": "p/moul/fp/v0",
+      "kind": "p",
+      "name": "fp",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
           "uploaded": false
         },
-        "topaz": {
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/greet/v1",
-      "dir": "p/moul/greet/v1",
+      "pkgpath": "gno.land/p/moul/greet/v0",
+      "dir": "p/moul/greet/v0",
       "kind": "p",
       "name": "greet",
-      "version": "v1",
-      "description": "Canary pure package: greeting helper (demonstrates versioned cross-package resolution).",
+      "version": "v0",
+      "description": "",
       "deps": [],
       "draft": false,
       "published": {
@@ -805,10 +428,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -816,119 +435,51 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/helplink/v1",
-      "dir": "p/moul/helplink/v1",
+      "pkgpath": "gno.land/p/moul/helplink/v0",
+      "dir": "p/moul/helplink/v0",
       "kind": "p",
       "name": "helplink",
-      "version": "v1",
-      "description": "Helpers for building gnoweb help-page links.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/helplink",
+      "version": "v0",
+      "description": "",
       "deps": [
-        "gno.land/p/moul/txlink/v1"
+        "gno.land/p/moul/txlink/v0"
       ],
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "both"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
           "uploaded": false
         },
-        "topaz": {
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/md/v1",
-      "dir": "p/moul/md/v1",
+      "pkgpath": "gno.land/p/moul/md/v0",
+      "dir": "p/moul/md/v0",
       "kind": "p",
       "name": "md",
-      "version": "v1",
-      "description": "Helpers for generating Markdown content programmatically.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/md",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "both"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/mdlist/v1",
-      "dir": "p/moul/mdlist/v1",
-      "kind": "p",
-      "name": "mdlist",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/md/v1"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -936,24 +487,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/mdlist/v2",
-      "dir": "p/moul/mdlist/v2",
+      "pkgpath": "gno.land/p/moul/mdlist/v0",
+      "dir": "p/moul/mdlist/v0",
       "kind": "p",
       "name": "mdlist",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/md/v1"
+        "gno.land/p/moul/md/v0"
       ],
       "draft": false,
       "published": {
@@ -961,10 +506,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -972,76 +513,23 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/mdtable/v1",
-      "dir": "p/moul/mdtable/v1",
+      "pkgpath": "gno.land/p/moul/mdtable/v0",
+      "dir": "p/moul/mdtable/v0",
       "kind": "p",
       "name": "mdtable",
-      "version": "v1",
-      "description": "Build Markdown tables.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/mdtable",
+      "version": "v0",
+      "description": "",
       "deps": [],
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "both"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/memo/v1",
-      "dir": "p/moul/memo/v1",
-      "kind": "p",
-      "name": "memo",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/btree",
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -1049,58 +537,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/memo/v2",
-      "dir": "p/moul/memo/v2",
+      "pkgpath": "gno.land/p/moul/memo/v0",
+      "dir": "p/moul/memo/v0",
       "kind": "p",
       "name": "memo",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/avl/v0",
-        "gno.land/p/nt/ufmt/v0"
-      ],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/memo/v3",
-      "dir": "p/moul/memo/v3",
-      "kind": "p",
-      "name": "memo",
-      "version": "v3",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/bptree/v0",
@@ -1112,26 +557,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/nestedpkg/v1",
-      "dir": "p/moul/nestedpkg/v1",
+      "pkgpath": "gno.land/p/moul/nestedpkg/v0",
+      "dir": "p/moul/nestedpkg/v0",
       "kind": "p",
       "name": "nestedpkg",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1140,10 +581,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -1151,86 +588,39 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/once/v1",
-      "dir": "p/moul/once/v1",
+      "pkgpath": "gno.land/p/moul/once/v0",
+      "dir": "p/moul/once/v0",
       "kind": "p",
       "name": "once",
-      "version": "v1",
-      "description": "One-time execution patterns.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/once",
+      "version": "v0",
+      "description": "",
       "deps": [],
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "both"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
           "uploaded": false
         },
-        "topaz": {
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/ownable/v1",
-      "dir": "p/moul/ownable/v1",
+      "pkgpath": "gno.land/p/moul/ownable/v0",
+      "dir": "p/moul/ownable/v0",
       "kind": "p",
       "name": "ownable",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/ownable/v2",
-      "dir": "p/moul/ownable/v2",
-      "kind": "p",
-      "name": "ownable",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1250,38 +640,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/pageable/v1",
-      "dir": "p/moul/pageable/v1",
+      "pkgpath": "gno.land/p/moul/pageable/v0",
+      "dir": "p/moul/pageable/v0",
       "kind": "p",
       "name": "pageable",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/pageable/v2",
-      "dir": "p/moul/pageable/v2",
-      "kind": "p",
-      "name": "pageable",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/ufmt/v0"
@@ -1303,47 +666,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/printfdebugging/v1",
-      "dir": "p/moul/printfdebugging/v1",
+      "pkgpath": "gno.land/p/moul/printfdebugging/v0",
+      "dir": "p/moul/printfdebugging/v0",
       "kind": "p",
       "name": "printfdebugging",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/printfdebugging/v2",
-      "dir": "p/moul/printfdebugging/v2",
-      "kind": "p",
-      "name": "printfdebugging",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/ufmt/v0"
@@ -1354,10 +681,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -1365,88 +688,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/realmpath/v1",
-      "dir": "p/moul/realmpath/v1",
+      "pkgpath": "gno.land/p/moul/realmpath/v0",
+      "dir": "p/moul/realmpath/v0",
       "kind": "p",
       "name": "realmpath",
-      "version": "v1",
-      "description": "Render.path parsing and link generation.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/realmpath",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "both"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/safe/v1",
-      "dir": "p/moul/safe/v1",
-      "kind": "p",
-      "name": "safe",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/avl"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/safe/v2",
-      "dir": "p/moul/safe/v2",
-      "kind": "p",
-      "name": "safe",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1466,26 +716,19 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/svg/v1",
-      "dir": "p/moul/svg/v1",
+      "pkgpath": "gno.land/p/moul/safe/v0",
+      "dir": "p/moul/safe/v0",
       "kind": "p",
-      "name": "svg",
-      "version": "v1",
+      "name": "safe",
+      "version": "v0",
       "description": "",
-      "deps": [
-        "gno.land/p/nt/avl/v0",
-        "gno.land/p/nt/ufmt/v0"
-      ],
+      "deps": [],
       "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -1493,21 +736,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/svg/v2",
-      "dir": "p/moul/svg/v2",
+      "pkgpath": "gno.land/p/moul/svg/v0",
+      "dir": "p/moul/svg/v0",
       "kind": "p",
       "name": "svg",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/bptree/v0",
@@ -1519,38 +756,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/template/v1",
-      "dir": "p/moul/template/v1",
-      "kind": "p",
-      "name": "template",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/md/v1",
-        "gno.land/p/moul/typeutil/v1"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
           "uploaded": false
         },
         "sapphire": {
@@ -1562,15 +767,15 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/template/v2",
-      "dir": "p/moul/template/v2",
+      "pkgpath": "gno.land/p/moul/template/v0",
+      "dir": "p/moul/template/v0",
       "kind": "p",
       "name": "template",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/md/v1",
-        "gno.land/p/moul/typeutil/v1",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/typeutil/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
@@ -1590,115 +795,35 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/txlink/v1",
-      "dir": "p/moul/txlink/v1",
+      "pkgpath": "gno.land/p/moul/txlink/v0",
+      "dir": "p/moul/txlink/v0",
       "kind": "p",
       "name": "txlink",
-      "version": "v1",
-      "description": "Build transaction (maketx) links for realms.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/txlink",
+      "version": "v0",
+      "description": "",
       "deps": [],
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "both"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
           "uploaded": false
         },
-        "topaz": {
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/typeutil/v1",
-      "dir": "p/moul/typeutil/v1",
+      "pkgpath": "gno.land/p/moul/typeutil/v0",
+      "dir": "p/moul/typeutil/v0",
       "kind": "p",
       "name": "typeutil",
-      "version": "v1",
-      "description": "Type conversion utilities.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/typeutil",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/udao/v1",
-      "dir": "p/moul/udao/v1",
-      "kind": "p",
-      "name": "udao",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/udao/v2",
-      "dir": "p/moul/udao/v2",
-      "kind": "p",
-      "name": "udao",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1718,14 +843,38 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/ulist/lplist/v1",
-      "dir": "p/moul/ulist/lplist/v1",
+      "pkgpath": "gno.land/p/moul/udao/v0",
+      "dir": "p/moul/udao/v0",
+      "kind": "p",
+      "name": "udao",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "betanet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/ulist/lplist/v0",
+      "dir": "p/moul/ulist/lplist/v0",
       "kind": "p",
       "name": "ulist/lplist",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/ulist/v1"
+        "gno.land/p/moul/ulist/v0"
       ],
       "draft": false,
       "published": {
@@ -1733,10 +882,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -1744,74 +889,23 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/ulist/v1",
-      "dir": "p/moul/ulist/v1",
+      "pkgpath": "gno.land/p/moul/ulist/v0",
+      "dir": "p/moul/ulist/v0",
       "kind": "p",
       "name": "ulist",
-      "version": "v1",
-      "description": "Append-only list backed by a binary tree.",
-      "source": "https://github.com/moul/gno-contracts/pull/2",
-      "upstream": "gno.land/p/moul/ulist",
+      "version": "v0",
+      "description": "",
       "deps": [],
       "draft": false,
       "published": {
         "betanet": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": true,
-          "which": "monorepo"
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/web25/v1",
-      "dir": "p/moul/web25/v1",
-      "kind": "p",
-      "name": "web25",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/realmpath/v1"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
           "uploaded": false
         },
         "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -1819,24 +913,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/web25/v2",
-      "dir": "p/moul/web25/v2",
+      "pkgpath": "gno.land/p/moul/web25/v0",
+      "dir": "p/moul/web25/v0",
       "kind": "p",
       "name": "web25",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/realmpath/v1"
+        "gno.land/p/moul/realmpath/v0"
       ],
       "draft": false,
       "published": {
@@ -1844,10 +932,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -1855,21 +939,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/b58/v1",
-      "dir": "p/moul/x/daily/b58/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/b58/v0",
+      "dir": "p/moul/x/daily/b58/v0",
       "kind": "p",
       "name": "x/daily/b58",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1878,26 +956,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/base32/v1",
-      "dir": "p/moul/x/daily/base32/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/base32/v0",
+      "dir": "p/moul/x/daily/base32/v0",
       "kind": "p",
       "name": "x/daily/base32",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1917,11 +991,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/bidimap/v1",
-      "dir": "p/moul/x/daily/bidimap/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/bidimap/v0",
+      "dir": "p/moul/x/daily/bidimap/v0",
       "kind": "p",
       "name": "x/daily/bidimap",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1941,11 +1015,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/bitset/v1",
-      "dir": "p/moul/x/daily/bitset/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/bitset/v0",
+      "dir": "p/moul/x/daily/bitset/v0",
       "kind": "p",
       "name": "x/daily/bitset",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1965,11 +1039,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/cliffvesting/v1",
-      "dir": "p/moul/x/daily/cliffvesting/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/cliffvesting/v0",
+      "dir": "p/moul/x/daily/cliffvesting/v0",
       "kind": "p",
       "name": "x/daily/cliffvesting",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -1989,11 +1063,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/commitreveal/v1",
-      "dir": "p/moul/x/daily/commitreveal/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/commitreveal/v0",
+      "dir": "p/moul/x/daily/commitreveal/v0",
       "kind": "p",
       "name": "x/daily/commitreveal",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2013,11 +1087,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/countminsketch/v1",
-      "dir": "p/moul/x/daily/countminsketch/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/countminsketch/v0",
+      "dir": "p/moul/x/daily/countminsketch/v0",
       "kind": "p",
       "name": "x/daily/countminsketch",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2037,11 +1111,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/cowsay/v1",
-      "dir": "p/moul/x/daily/cowsay/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/cowsay/v0",
+      "dir": "p/moul/x/daily/cowsay/v0",
       "kind": "p",
       "name": "x/daily/cowsay",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2050,26 +1124,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/crc32/v1",
-      "dir": "p/moul/x/daily/crc32/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/crc32/v0",
+      "dir": "p/moul/x/daily/crc32/v0",
       "kind": "p",
       "name": "x/daily/crc32",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2089,11 +1159,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/disjointset/v1",
-      "dir": "p/moul/x/daily/disjointset/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/disjointset/v0",
+      "dir": "p/moul/x/daily/disjointset/v0",
       "kind": "p",
       "name": "x/daily/disjointset",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2113,11 +1183,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/flatmap/v1",
-      "dir": "p/moul/x/daily/flatmap/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/flatmap/v0",
+      "dir": "p/moul/x/daily/flatmap/v0",
       "kind": "p",
       "name": "x/daily/flatmap",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2137,11 +1207,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/fraction/v1",
-      "dir": "p/moul/x/daily/fraction/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/fraction/v0",
+      "dir": "p/moul/x/daily/fraction/v0",
       "kind": "p",
       "name": "x/daily/fraction",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2161,11 +1231,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/heap/v1",
-      "dir": "p/moul/x/daily/heap/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/heap/v0",
+      "dir": "p/moul/x/daily/heap/v0",
       "kind": "p",
       "name": "x/daily/heap",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2185,11 +1255,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/hexdump/v1",
-      "dir": "p/moul/x/daily/hexdump/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/hexdump/v0",
+      "dir": "p/moul/x/daily/hexdump/v0",
       "kind": "p",
       "name": "x/daily/hexdump",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2209,11 +1279,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/humanize/v1",
-      "dir": "p/moul/x/daily/humanize/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/humanize/v0",
+      "dir": "p/moul/x/daily/humanize/v0",
       "kind": "p",
       "name": "x/daily/humanize",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2233,11 +1303,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/kmp/v1",
-      "dir": "p/moul/x/daily/kmp/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/kmp/v0",
+      "dir": "p/moul/x/daily/kmp/v0",
       "kind": "p",
       "name": "x/daily/kmp",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2257,11 +1327,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/levenshtein/v1",
-      "dir": "p/moul/x/daily/levenshtein/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/levenshtein/v0",
+      "dir": "p/moul/x/daily/levenshtein/v0",
       "kind": "p",
       "name": "x/daily/levenshtein",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2270,26 +1340,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/luhn/v1",
-      "dir": "p/moul/x/daily/luhn/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/luhn/v0",
+      "dir": "p/moul/x/daily/luhn/v0",
       "kind": "p",
       "name": "x/daily/luhn",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2298,26 +1364,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/markov/v1",
-      "dir": "p/moul/x/daily/markov/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/markov/v0",
+      "dir": "p/moul/x/daily/markov/v0",
       "kind": "p",
       "name": "x/daily/markov",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -2328,26 +1390,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/multiset/v1",
-      "dir": "p/moul/x/daily/multiset/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/multiset/v0",
+      "dir": "p/moul/x/daily/multiset/v0",
       "kind": "p",
       "name": "x/daily/multiset",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2367,11 +1425,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/orderedmap/v1",
-      "dir": "p/moul/x/daily/orderedmap/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/orderedmap/v0",
+      "dir": "p/moul/x/daily/orderedmap/v0",
       "kind": "p",
       "name": "x/daily/orderedmap",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2391,11 +1449,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/piglatin/v1",
-      "dir": "p/moul/x/daily/piglatin/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/piglatin/v0",
+      "dir": "p/moul/x/daily/piglatin/v0",
       "kind": "p",
       "name": "x/daily/piglatin",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2404,26 +1462,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/pullpayment/v1",
-      "dir": "p/moul/x/daily/pullpayment/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/pullpayment/v0",
+      "dir": "p/moul/x/daily/pullpayment/v0",
       "kind": "p",
       "name": "x/daily/pullpayment",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2443,11 +1497,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/ratelimit/v1",
-      "dir": "p/moul/x/daily/ratelimit/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/ratelimit/v0",
+      "dir": "p/moul/x/daily/ratelimit/v0",
       "kind": "p",
       "name": "x/daily/ratelimit",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -2458,26 +1512,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/ringbuffer/v1",
-      "dir": "p/moul/x/daily/ringbuffer/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/ringbuffer/v0",
+      "dir": "p/moul/x/daily/ringbuffer/v0",
       "kind": "p",
       "name": "x/daily/ringbuffer",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2497,11 +1547,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/rle/v1",
-      "dir": "p/moul/x/daily/rle/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/rle/v0",
+      "dir": "p/moul/x/daily/rle/v0",
       "kind": "p",
       "name": "x/daily/rle",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2521,11 +1571,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/romannum/v1",
-      "dir": "p/moul/x/daily/romannum/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/romannum/v0",
+      "dir": "p/moul/x/daily/romannum/v0",
       "kind": "p",
       "name": "x/daily/romannum",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2534,26 +1584,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/rot13/v1",
-      "dir": "p/moul/x/daily/rot13/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/rot13/v0",
+      "dir": "p/moul/x/daily/rot13/v0",
       "kind": "p",
       "name": "x/daily/rot13",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2562,26 +1608,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/semver/v1",
-      "dir": "p/moul/x/daily/semver/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/semver/v0",
+      "dir": "p/moul/x/daily/semver/v0",
       "kind": "p",
       "name": "x/daily/semver",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2590,26 +1632,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/sieve/v1",
-      "dir": "p/moul/x/daily/sieve/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/sieve/v0",
+      "dir": "p/moul/x/daily/sieve/v0",
       "kind": "p",
       "name": "x/daily/sieve",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2618,26 +1656,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/soundex/v1",
-      "dir": "p/moul/x/daily/soundex/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/soundex/v0",
+      "dir": "p/moul/x/daily/soundex/v0",
       "kind": "p",
       "name": "x/daily/soundex",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2657,11 +1691,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/toposort/v1",
-      "dir": "p/moul/x/daily/toposort/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/toposort/v0",
+      "dir": "p/moul/x/daily/toposort/v0",
       "kind": "p",
       "name": "x/daily/toposort",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2670,8 +1704,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -2682,11 +1715,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/x/daily/trie/v1",
-      "dir": "p/moul/x/daily/trie/v1",
+      "pkgpath": "gno.land/p/moul/x/daily/trie/v0",
+      "dir": "p/moul/x/daily/trie/v0",
       "kind": "p",
       "name": "x/daily/trie",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2695,56 +1728,25 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/xdao/v1",
-      "dir": "p/moul/xdao/v1",
+      "pkgpath": "gno.land/p/moul/xdao/v0",
+      "dir": "p/moul/xdao/v0",
       "kind": "p",
       "name": "xdao",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/udao/v1"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/xdao/v2",
-      "dir": "p/moul/xdao/v2",
-      "kind": "p",
-      "name": "xdao",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/udao/v2"
+        "gno.land/p/moul/udao/v0"
       ],
       "draft": false,
       "published": {
@@ -2763,83 +1765,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/p/moul/xmath/v1",
-      "dir": "p/moul/xmath/v1",
+      "pkgpath": "gno.land/p/moul/xmath/v0",
+      "dir": "p/moul/xmath/v0",
       "kind": "p",
       "name": "xmath",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/p/moul/xmath/v2",
-      "dir": "p/moul/xmath/v2",
-      "kind": "p",
-      "name": "xmath",
-      "version": "v2",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/bertydao/v1",
-      "dir": "r/moul/bertydao/v1",
-      "kind": "r",
-      "name": "bertydao",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
       "published": {
         "betanet": {
           "uploaded": false
@@ -2856,41 +1789,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/config/v1",
-      "dir": "r/moul/config/v1",
+      "pkgpath": "gno.land/r/moul/config/v0",
+      "dir": "r/moul/config/v0",
       "kind": "r",
       "name": "config",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/authz"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/config/v2",
-      "dir": "r/moul/config/v2",
-      "kind": "r",
-      "name": "config",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/authz/v1"
+        "gno.land/p/moul/authz/v0"
       ],
       "draft": false,
       "published": {
@@ -2909,45 +1815,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/args/v1",
-      "dir": "r/moul/demo/args/v1",
+      "pkgpath": "gno.land/r/moul/demo/args/v0",
+      "dir": "r/moul/demo/args/v0",
       "kind": "r",
       "name": "demo/args",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/args/v2",
-      "dir": "r/moul/demo/args/v2",
-      "kind": "r",
-      "name": "demo/args",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -2956,43 +1828,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/cshijack/v1",
-      "dir": "r/moul/demo/cshijack/v1",
-      "kind": "r",
-      "name": "demo/cshijack",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/r/gc24/raffle"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
           "uploaded": false
         },
         "sapphire": {
@@ -3004,45 +1839,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/data/v1",
-      "dir": "r/moul/demo/data/v1",
+      "pkgpath": "gno.land/r/moul/demo/data/v0",
+      "dir": "r/moul/demo/data/v0",
       "kind": "r",
       "name": "demo/data",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/data/v2",
-      "dir": "r/moul/demo/data/v2",
-      "kind": "r",
-      "name": "demo/data",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -3051,10 +1852,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3062,24 +1859,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/gnoface/v1",
-      "dir": "r/moul/demo/gnoface/v1",
+      "pkgpath": "gno.land/r/moul/demo/gnoface/v0",
+      "dir": "r/moul/demo/gnoface/v0",
       "kind": "r",
       "name": "demo/gnoface",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/entropy/v1",
+        "gno.land/p/moul/entropy/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
@@ -3088,10 +1879,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3099,60 +1886,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/grc20/v1",
-      "dir": "r/moul/demo/grc20/v1",
+      "pkgpath": "gno.land/r/moul/demo/grc20/v0",
+      "dir": "r/moul/demo/grc20/v0",
       "kind": "r",
       "name": "demo/grc20",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/demo/grc/grc20"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/grc20/v2",
-      "dir": "r/moul/demo/grc20/v2",
-      "kind": "r",
-      "name": "demo/grc20",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/tokens/grc20"
+        "gno.land/p/nt/grc20/v0"
       ],
       "draft": false,
       "published": {
@@ -3160,10 +1905,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3171,55 +1912,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/hello/v1",
-      "dir": "r/moul/demo/hello/v1",
+      "pkgpath": "gno.land/r/moul/demo/hello/v0",
+      "dir": "r/moul/demo/hello/v0",
       "kind": "r",
       "name": "demo/hello",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/hello/v2",
-      "dir": "r/moul/demo/hello/v2",
-      "kind": "r",
-      "name": "demo/hello",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -3228,10 +1929,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3239,94 +1936,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/importdemo/v1",
-      "dir": "r/moul/demo/importdemo/v1",
+      "pkgpath": "gno.land/r/moul/demo/importdemo/v0",
+      "dir": "r/moul/demo/importdemo/v0",
       "kind": "r",
       "name": "demo/importdemo",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/avl",
-        "gno.land/p/demo/dom"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/importdemo/v2",
-      "dir": "r/moul/demo/importdemo/v2",
-      "kind": "r",
-      "name": "demo/importdemo",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/archive/dom"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/importdemo/v3",
-      "dir": "r/moul/demo/importdemo/v3",
-      "kind": "r",
-      "name": "demo/importdemo",
-      "version": "v3",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0",
@@ -3349,45 +1967,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/microposts/v1",
-      "dir": "r/moul/demo/microposts/v1",
+      "pkgpath": "gno.land/r/moul/demo/microposts/v0",
+      "dir": "r/moul/demo/microposts/v0",
       "kind": "r",
       "name": "demo/microposts",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/microposts/v2",
-      "dir": "r/moul/demo/microposts/v2",
-      "kind": "r",
-      "name": "demo/microposts",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -3396,10 +1980,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3407,21 +1987,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/millipede/v1",
-      "dir": "r/moul/demo/millipede/v1",
+      "pkgpath": "gno.land/r/moul/demo/millipede/v0",
+      "dir": "r/moul/demo/millipede/v0",
       "kind": "r",
       "name": "demo/millipede",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/ufmt/v0"
@@ -3432,10 +2006,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3443,55 +2013,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/render/v1",
-      "dir": "r/moul/demo/render/v1",
+      "pkgpath": "gno.land/r/moul/demo/render/v0",
+      "dir": "r/moul/demo/render/v0",
       "kind": "r",
       "name": "demo/render",
-      "version": "v1",
-      "description": "",
-      "deps": [],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/render/v2",
-      "dir": "r/moul/demo/render/v2",
-      "kind": "r",
-      "name": "demo/render",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -3500,10 +2030,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3511,61 +2037,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/vault/v1",
-      "dir": "r/moul/demo/vault/v1",
+      "pkgpath": "gno.land/r/moul/demo/vault/v0",
+      "dir": "r/moul/demo/vault/v0",
       "kind": "r",
       "name": "demo/vault",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/demo/grc/exts/vault",
-        "gno.land/p/demo/grc/grc20"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/vault/v2",
-      "dir": "r/moul/demo/vault/v2",
-      "kind": "r",
-      "name": "demo/vault",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/tokens/grc20"
+        "gno.land/p/nt/grc20/v0"
       ],
       "draft": false,
       "published": {
@@ -3573,10 +2056,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3584,58 +2063,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/demo/wikicoin/v1",
-      "dir": "r/moul/demo/wikicoin/v1",
+      "pkgpath": "gno.land/r/moul/demo/wikicoin/v0",
+      "dir": "r/moul/demo/wikicoin/v0",
       "kind": "r",
       "name": "demo/wikicoin",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/demo/avl",
-        "gno.land/p/demo/ufmt"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/demo/wikicoin/v2",
-      "dir": "r/moul/demo/wikicoin/v2",
-      "kind": "r",
-      "name": "demo/wikicoin",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0",
@@ -3647,10 +2083,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3658,21 +2090,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/gns/v1",
-      "dir": "r/moul/gns/v1",
+      "pkgpath": "gno.land/r/moul/gns/v0",
+      "dir": "r/moul/gns/v0",
       "kind": "r",
       "name": "gns",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0",
@@ -3684,10 +2110,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3695,64 +2117,20 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/hello/v1",
-      "dir": "r/moul/hello/v1",
+      "pkgpath": "gno.land/r/moul/hello/v0",
+      "dir": "r/moul/hello/v0",
       "kind": "r",
       "name": "hello",
-      "version": "v1",
-      "description": "Canary realm proving the end-to-end pipeline (imports p/moul/greet/v1).",
-      "deps": [
-        "gno.land/p/moul/greet/v1"
-      ],
-      "draft": false,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/home/v1",
-      "dir": "r/moul/home/v1",
-      "kind": "r",
-      "name": "home",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/r/leon/hof",
-        "gno.land/r/moul/config"
+        "gno.land/p/moul/greet/v0"
       ],
       "draft": false,
-      "ignored": true,
       "published": {
         "betanet": {
           "uploaded": false
@@ -3769,11 +2147,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/home/v2",
-      "dir": "r/moul/home/v2",
+      "pkgpath": "gno.land/r/moul/home/v0",
+      "dir": "r/moul/home/v0",
       "kind": "r",
       "name": "home",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -3793,47 +2171,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/outfmt/v1",
-      "dir": "r/moul/outfmt/v1",
+      "pkgpath": "gno.land/r/moul/outfmt/v0",
+      "dir": "r/moul/outfmt/v0",
       "kind": "r",
       "name": "outfmt",
-      "version": "v1",
-      "description": "",
-      "deps": [
-        "gno.land/p/nt/ufmt"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "portal-loop": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/outfmt/v2",
-      "dir": "r/moul/outfmt/v2",
-      "kind": "r",
-      "name": "outfmt",
-      "version": "v2",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/ufmt/v0"
@@ -3844,10 +2186,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3855,67 +2193,23 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/present/v1",
-      "dir": "r/moul/present/v1",
+      "pkgpath": "gno.land/r/moul/present/v0",
+      "dir": "r/moul/present/v0",
       "kind": "r",
       "name": "present",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/demo/avl/pager",
-        "gno.land/p/demo/ownable",
-        "gno.land/p/demo/seqid",
-        "gno.land/p/demo/ufmt",
-        "gno.land/p/moul/collection",
-        "gno.land/p/moul/md",
-        "gno.land/p/moul/mdtable",
-        "gno.land/p/moul/realmpath",
-        "gno.land/p/moul/txlink"
-      ],
-      "draft": false,
-      "ignored": true,
-      "published": {
-        "betanet": {
-          "uploaded": false
-        },
-        "pearl": {
-          "uploaded": false
-        },
-        "sapphire": {
-          "uploaded": false
-        },
-        "staging": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
-        }
-      }
-    },
-    {
-      "pkgpath": "gno.land/r/moul/present/v2",
-      "dir": "r/moul/present/v2",
-      "kind": "r",
-      "name": "present",
-      "version": "v2",
-      "description": "",
-      "deps": [
-        "gno.land/p/moul/md/v1",
-        "gno.land/p/moul/mdtable/v1",
-        "gno.land/p/moul/realmpath/v1",
-        "gno.land/p/moul/txlink/v1",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/mdtable/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/p/nt/avl/pager/v0",
         "gno.land/p/nt/avl/v0",
-        "gno.land/p/nt/avl/v0/pager",
         "gno.land/p/nt/ownable/v0",
         "gno.land/p/nt/seqid/v0",
         "gno.land/p/nt/ufmt/v0"
@@ -3926,28 +2220,23 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/sapin/v1",
-      "dir": "r/moul/sapin/v1",
+      "pkgpath": "gno.land/r/moul/sapin/v0",
+      "dir": "r/moul/sapin/v0",
       "kind": "r",
       "name": "sapin",
-      "version": "v1",
-      "description": "ASCII Christmas-tree (« sapin ») renderer.",
-      "source": "https://github.com/moul/gno-contracts/pull/15",
+      "version": "v0",
+      "description": "",
       "deps": [],
       "draft": false,
       "published": {
@@ -3955,10 +2244,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -3966,21 +2251,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/asciiart/v1",
-      "dir": "r/moul/x/daily/asciiart/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/asciiart/v0",
+      "dir": "r/moul/x/daily/asciiart/v0",
       "kind": "r",
       "name": "x/daily/asciiart",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -3991,8 +2270,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -4003,14 +2281,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/b58demo/v1",
-      "dir": "r/moul/x/daily/b58demo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/b58demo/v0",
+      "dir": "r/moul/x/daily/b58demo/v0",
       "kind": "r",
       "name": "x/daily/b58demo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/b58/v1"
+        "gno.land/p/moul/x/daily/b58/v0"
       ],
       "draft": false,
       "published": {
@@ -4018,26 +2296,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/ballot/v1",
-      "dir": "r/moul/x/daily/ballot/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/ballot/v0",
+      "dir": "r/moul/x/daily/ballot/v0",
       "kind": "r",
       "name": "x/daily/ballot",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4048,29 +2322,25 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/base32demo/v1",
-      "dir": "r/moul/x/daily/base32demo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/base32demo/v0",
+      "dir": "r/moul/x/daily/base32demo/v0",
       "kind": "r",
       "name": "x/daily/base32demo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/base32/v1"
+        "gno.land/p/moul/x/daily/base32/v0"
       ],
       "draft": false,
       "published": {
@@ -4089,14 +2359,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/bidimapdemo/v1",
-      "dir": "r/moul/x/daily/bidimapdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/bidimapdemo/v0",
+      "dir": "r/moul/x/daily/bidimapdemo/v0",
       "kind": "r",
       "name": "x/daily/bidimapdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/bidimap/v1"
+        "gno.land/p/moul/x/daily/bidimap/v0"
       ],
       "draft": false,
       "published": {
@@ -4115,14 +2385,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/bitsetdemo/v1",
-      "dir": "r/moul/x/daily/bitsetdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/bitsetdemo/v0",
+      "dir": "r/moul/x/daily/bitsetdemo/v0",
       "kind": "r",
       "name": "x/daily/bitsetdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/bitset/v1"
+        "gno.land/p/moul/x/daily/bitset/v0"
       ],
       "draft": false,
       "published": {
@@ -4141,11 +2411,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/blog/v1",
-      "dir": "r/moul/x/daily/blog/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/blog/v0",
+      "dir": "r/moul/x/daily/blog/v0",
       "kind": "r",
       "name": "x/daily/blog",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4156,10 +2426,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4167,21 +2433,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/bloomfilter/v1",
-      "dir": "r/moul/x/daily/bloomfilter/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/bloomfilter/v0",
+      "dir": "r/moul/x/daily/bloomfilter/v0",
       "kind": "r",
       "name": "x/daily/bloomfilter",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -4190,10 +2450,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4201,21 +2457,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/bullscows/v1",
-      "dir": "r/moul/x/daily/bullscows/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/bullscows/v0",
+      "dir": "r/moul/x/daily/bullscows/v0",
       "kind": "r",
       "name": "x/daily/bullscows",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -4224,10 +2474,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4235,21 +2481,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/calc/v1",
-      "dir": "r/moul/x/daily/calc/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/calc/v0",
+      "dir": "r/moul/x/daily/calc/v0",
       "kind": "r",
       "name": "x/daily/calc",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -4258,10 +2498,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4269,24 +2505,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/cliffvestingdemo/v1",
-      "dir": "r/moul/x/daily/cliffvestingdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/cliffvestingdemo/v0",
+      "dir": "r/moul/x/daily/cliffvestingdemo/v0",
       "kind": "r",
       "name": "x/daily/cliffvestingdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/cliffvesting/v1"
+        "gno.land/p/moul/x/daily/cliffvesting/v0"
       ],
       "draft": false,
       "published": {
@@ -4305,11 +2535,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/closestguess/v1",
-      "dir": "r/moul/x/daily/closestguess/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/closestguess/v0",
+      "dir": "r/moul/x/daily/closestguess/v0",
       "kind": "r",
       "name": "x/daily/closestguess",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -4329,11 +2559,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/coinflipduel/v1",
-      "dir": "r/moul/x/daily/coinflipduel/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/coinflipduel/v0",
+      "dir": "r/moul/x/daily/coinflipduel/v0",
       "kind": "r",
       "name": "x/daily/coinflipduel",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4344,10 +2574,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4355,21 +2581,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/collatz/v1",
-      "dir": "r/moul/x/daily/collatz/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/collatz/v0",
+      "dir": "r/moul/x/daily/collatz/v0",
       "kind": "r",
       "name": "x/daily/collatz",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4380,10 +2600,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4391,24 +2607,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/commitrevealdemo/v1",
-      "dir": "r/moul/x/daily/commitrevealdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/commitrevealdemo/v0",
+      "dir": "r/moul/x/daily/commitrevealdemo/v0",
       "kind": "r",
       "name": "x/daily/commitrevealdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/commitreveal/v1"
+        "gno.land/p/moul/x/daily/commitreveal/v0"
       ],
       "draft": false,
       "published": {
@@ -4427,11 +2637,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/connect4/v1",
-      "dir": "r/moul/x/daily/connect4/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/connect4/v0",
+      "dir": "r/moul/x/daily/connect4/v0",
       "kind": "r",
       "name": "x/daily/connect4",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4442,10 +2652,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4453,21 +2659,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/counter/v1",
-      "dir": "r/moul/x/daily/counter/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/counter/v0",
+      "dir": "r/moul/x/daily/counter/v0",
       "kind": "r",
       "name": "x/daily/counter",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -4476,10 +2676,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4487,24 +2683,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/countminsketchdemo/v1",
-      "dir": "r/moul/x/daily/countminsketchdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/countminsketchdemo/v0",
+      "dir": "r/moul/x/daily/countminsketchdemo/v0",
       "kind": "r",
       "name": "x/daily/countminsketchdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/countminsketch/v1"
+        "gno.land/p/moul/x/daily/countminsketch/v0"
       ],
       "draft": false,
       "published": {
@@ -4523,14 +2713,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/cowsaydemo/v1",
-      "dir": "r/moul/x/daily/cowsaydemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/cowsaydemo/v0",
+      "dir": "r/moul/x/daily/cowsaydemo/v0",
       "kind": "r",
       "name": "x/daily/cowsaydemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/cowsay/v1"
+        "gno.land/p/moul/x/daily/cowsay/v0"
       ],
       "draft": false,
       "published": {
@@ -4538,29 +2728,25 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/crc32demo/v1",
-      "dir": "r/moul/x/daily/crc32demo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/crc32demo/v0",
+      "dir": "r/moul/x/daily/crc32demo/v0",
       "kind": "r",
       "name": "x/daily/crc32demo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/crc32/v1"
+        "gno.land/p/moul/x/daily/crc32/v0"
       ],
       "draft": false,
       "published": {
@@ -4579,16 +2765,16 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/crowdfund/v1",
-      "dir": "r/moul/x/daily/crowdfund/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/crowdfund/v0",
+      "dir": "r/moul/x/daily/crowdfund/v0",
       "kind": "r",
       "name": "x/daily/crowdfund",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -4596,29 +2782,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/dice/v1",
-      "dir": "r/moul/x/daily/dice/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/dice/v0",
+      "dir": "r/moul/x/daily/dice/v0",
       "kind": "r",
       "name": "x/daily/dice",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4629,10 +2806,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4640,24 +2813,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/disjointsetdemo/v1",
-      "dir": "r/moul/x/daily/disjointsetdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/disjointsetdemo/v0",
+      "dir": "r/moul/x/daily/disjointsetdemo/v0",
       "kind": "r",
       "name": "x/daily/disjointsetdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/disjointset/v1"
+        "gno.land/p/moul/x/daily/disjointset/v0"
       ],
       "draft": false,
       "published": {
@@ -4676,11 +2843,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/dutchauction/v1",
-      "dir": "r/moul/x/daily/dutchauction/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/dutchauction/v0",
+      "dir": "r/moul/x/daily/dutchauction/v0",
       "kind": "r",
       "name": "x/daily/dutchauction",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4691,10 +2858,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4702,21 +2865,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/eggling/v1",
-      "dir": "r/moul/x/daily/eggling/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/eggling/v0",
+      "dir": "r/moul/x/daily/eggling/v0",
       "kind": "r",
       "name": "x/daily/eggling",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4727,10 +2884,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4738,21 +2891,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/eightball/v1",
-      "dir": "r/moul/x/daily/eightball/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/eightball/v0",
+      "dir": "r/moul/x/daily/eightball/v0",
       "kind": "r",
       "name": "x/daily/eightball",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -4761,10 +2908,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4772,26 +2915,20 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/englishauction/v1",
-      "dir": "r/moul/x/daily/englishauction/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/englishauction/v0",
+      "dir": "r/moul/x/daily/englishauction/v0",
       "kind": "r",
       "name": "x/daily/englishauction",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -4799,29 +2936,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/erc1155/v1",
-      "dir": "r/moul/x/daily/erc1155/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/erc1155/v0",
+      "dir": "r/moul/x/daily/erc1155/v0",
       "kind": "r",
       "name": "x/daily/erc1155",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4832,10 +2960,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4843,21 +2967,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/erc20/v1",
-      "dir": "r/moul/x/daily/erc20/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/erc20/v0",
+      "dir": "r/moul/x/daily/erc20/v0",
       "kind": "r",
       "name": "x/daily/erc20",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -4866,10 +2984,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4877,26 +2991,20 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/erc721/v1",
-      "dir": "r/moul/x/daily/erc721/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/erc721/v0",
+      "dir": "r/moul/x/daily/erc721/v0",
       "kind": "r",
       "name": "x/daily/erc721",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -4904,29 +3012,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/escrow/v1",
-      "dir": "r/moul/x/daily/escrow/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/escrow/v0",
+      "dir": "r/moul/x/daily/escrow/v0",
       "kind": "r",
       "name": "x/daily/escrow",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4937,10 +3036,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4948,21 +3043,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/faucet/v1",
-      "dir": "r/moul/x/daily/faucet/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/faucet/v0",
+      "dir": "r/moul/x/daily/faucet/v0",
       "kind": "r",
       "name": "x/daily/faucet",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -4973,10 +3062,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -4984,24 +3069,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/flatmapdemo/v1",
-      "dir": "r/moul/x/daily/flatmapdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/flatmapdemo/v0",
+      "dir": "r/moul/x/daily/flatmapdemo/v0",
       "kind": "r",
       "name": "x/daily/flatmapdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/flatmap/v1"
+        "gno.land/p/moul/x/daily/flatmap/v0"
       ],
       "draft": false,
       "published": {
@@ -5020,14 +3099,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/fractiondemo/v1",
-      "dir": "r/moul/x/daily/fractiondemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/fractiondemo/v0",
+      "dir": "r/moul/x/daily/fractiondemo/v0",
       "kind": "r",
       "name": "x/daily/fractiondemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/fraction/v1"
+        "gno.land/p/moul/x/daily/fraction/v0"
       ],
       "draft": false,
       "published": {
@@ -5046,16 +3125,16 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/governor/v1",
-      "dir": "r/moul/x/daily/governor/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/governor/v0",
+      "dir": "r/moul/x/daily/governor/v0",
       "kind": "r",
       "name": "x/daily/governor",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -5063,29 +3142,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/guestbook/v1",
-      "dir": "r/moul/x/daily/guestbook/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/guestbook/v0",
+      "dir": "r/moul/x/daily/guestbook/v0",
       "kind": "r",
       "name": "x/daily/guestbook",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5096,10 +3166,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5107,21 +3173,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/handles/v1",
-      "dir": "r/moul/x/daily/handles/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/handles/v0",
+      "dir": "r/moul/x/daily/handles/v0",
       "kind": "r",
       "name": "x/daily/handles",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5132,10 +3192,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5143,21 +3199,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/hangman/v1",
-      "dir": "r/moul/x/daily/hangman/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/hangman/v0",
+      "dir": "r/moul/x/daily/hangman/v0",
       "kind": "r",
       "name": "x/daily/hangman",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5168,10 +3218,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5179,24 +3225,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/heapdemo/v1",
-      "dir": "r/moul/x/daily/heapdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/heapdemo/v0",
+      "dir": "r/moul/x/daily/heapdemo/v0",
       "kind": "r",
       "name": "x/daily/heapdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/heap/v1"
+        "gno.land/p/moul/x/daily/heap/v0"
       ],
       "draft": false,
       "published": {
@@ -5215,14 +3255,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/hexdumpdemo/v1",
-      "dir": "r/moul/x/daily/hexdumpdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/hexdumpdemo/v0",
+      "dir": "r/moul/x/daily/hexdumpdemo/v0",
       "kind": "r",
       "name": "x/daily/hexdumpdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/hexdump/v1"
+        "gno.land/p/moul/x/daily/hexdump/v0"
       ],
       "draft": false,
       "published": {
@@ -5241,14 +3281,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/humanizedemo/v1",
-      "dir": "r/moul/x/daily/humanizedemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/humanizedemo/v0",
+      "dir": "r/moul/x/daily/humanizedemo/v0",
       "kind": "r",
       "name": "x/daily/humanizedemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/humanize/v1"
+        "gno.land/p/moul/x/daily/humanize/v0"
       ],
       "draft": false,
       "published": {
@@ -5267,11 +3307,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/kingofdice/v1",
-      "dir": "r/moul/x/daily/kingofdice/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/kingofdice/v0",
+      "dir": "r/moul/x/daily/kingofdice/v0",
       "kind": "r",
       "name": "x/daily/kingofdice",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5282,10 +3322,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5293,24 +3329,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/kmpdemo/v1",
-      "dir": "r/moul/x/daily/kmpdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/kmpdemo/v0",
+      "dir": "r/moul/x/daily/kmpdemo/v0",
       "kind": "r",
       "name": "x/daily/kmpdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/kmp/v1"
+        "gno.land/p/moul/x/daily/kmp/v0"
       ],
       "draft": false,
       "published": {
@@ -5329,11 +3359,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/kudos/v1",
-      "dir": "r/moul/x/daily/kudos/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/kudos/v0",
+      "dir": "r/moul/x/daily/kudos/v0",
       "kind": "r",
       "name": "x/daily/kudos",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5344,10 +3374,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5355,21 +3381,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/leaderboard/v1",
-      "dir": "r/moul/x/daily/leaderboard/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/leaderboard/v0",
+      "dir": "r/moul/x/daily/leaderboard/v0",
       "kind": "r",
       "name": "x/daily/leaderboard",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5380,10 +3400,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5391,24 +3407,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/levenshteindemo/v1",
-      "dir": "r/moul/x/daily/levenshteindemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/levenshteindemo/v0",
+      "dir": "r/moul/x/daily/levenshteindemo/v0",
       "kind": "r",
       "name": "x/daily/levenshteindemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/levenshtein/v1"
+        "gno.land/p/moul/x/daily/levenshtein/v0"
       ],
       "draft": false,
       "published": {
@@ -5416,26 +3426,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/life/v1",
-      "dir": "r/moul/x/daily/life/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/life/v0",
+      "dir": "r/moul/x/daily/life/v0",
       "kind": "r",
       "name": "x/daily/life",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -5444,10 +3450,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5455,21 +3457,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/linktree/v1",
-      "dir": "r/moul/x/daily/linktree/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/linktree/v0",
+      "dir": "r/moul/x/daily/linktree/v0",
       "kind": "r",
       "name": "x/daily/linktree",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5480,10 +3476,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5491,26 +3483,20 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/lottery/v1",
-      "dir": "r/moul/x/daily/lottery/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/lottery/v0",
+      "dir": "r/moul/x/daily/lottery/v0",
       "kind": "r",
       "name": "x/daily/lottery",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -5518,29 +3504,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/lru/v1",
-      "dir": "r/moul/x/daily/lru/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/lru/v0",
+      "dir": "r/moul/x/daily/lru/v0",
       "kind": "r",
       "name": "x/daily/lru",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -5549,10 +3526,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5560,24 +3533,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/luhndemo/v1",
-      "dir": "r/moul/x/daily/luhndemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/luhndemo/v0",
+      "dir": "r/moul/x/daily/luhndemo/v0",
       "kind": "r",
       "name": "x/daily/luhndemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/luhn/v1"
+        "gno.land/p/moul/x/daily/luhn/v0"
       ],
       "draft": false,
       "published": {
@@ -5585,29 +3552,25 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/markovdemo/v1",
-      "dir": "r/moul/x/daily/markovdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/markovdemo/v0",
+      "dir": "r/moul/x/daily/markovdemo/v0",
       "kind": "r",
       "name": "x/daily/markovdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/markov/v1"
+        "gno.land/p/moul/x/daily/markov/v0"
       ],
       "draft": false,
       "published": {
@@ -5615,26 +3578,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/memory/v1",
-      "dir": "r/moul/x/daily/memory/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/memory/v0",
+      "dir": "r/moul/x/daily/memory/v0",
       "kind": "r",
       "name": "x/daily/memory",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -5643,10 +3602,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5654,26 +3609,20 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/merkledrop/v1",
-      "dir": "r/moul/x/daily/merkledrop/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/merkledrop/v0",
+      "dir": "r/moul/x/daily/merkledrop/v0",
       "kind": "r",
       "name": "x/daily/merkledrop",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -5681,29 +3630,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/microblog/v1",
-      "dir": "r/moul/x/daily/microblog/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/microblog/v0",
+      "dir": "r/moul/x/daily/microblog/v0",
       "kind": "r",
       "name": "x/daily/microblog",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -5712,10 +3652,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5723,21 +3659,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/moodstone/v1",
-      "dir": "r/moul/x/daily/moodstone/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/moodstone/v0",
+      "dir": "r/moul/x/daily/moodstone/v0",
       "kind": "r",
       "name": "x/daily/moodstone",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -5746,10 +3676,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5757,24 +3683,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/multisetdemo/v1",
-      "dir": "r/moul/x/daily/multisetdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/multisetdemo/v0",
+      "dir": "r/moul/x/daily/multisetdemo/v0",
       "kind": "r",
       "name": "x/daily/multisetdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/multiset/v1"
+        "gno.land/p/moul/x/daily/multiset/v0"
       ],
       "draft": false,
       "published": {
@@ -5793,11 +3713,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/multisig/v1",
-      "dir": "r/moul/x/daily/multisig/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/multisig/v0",
+      "dir": "r/moul/x/daily/multisig/v0",
       "kind": "r",
       "name": "x/daily/multisig",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5808,10 +3728,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5819,21 +3735,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/numguess/v1",
-      "dir": "r/moul/x/daily/numguess/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/numguess/v0",
+      "dir": "r/moul/x/daily/numguess/v0",
       "kind": "r",
       "name": "x/daily/numguess",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5844,10 +3754,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5855,24 +3761,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/orderedmapdemo/v1",
-      "dir": "r/moul/x/daily/orderedmapdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/orderedmapdemo/v0",
+      "dir": "r/moul/x/daily/orderedmapdemo/v0",
       "kind": "r",
       "name": "x/daily/orderedmapdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/orderedmap/v1"
+        "gno.land/p/moul/x/daily/orderedmap/v0"
       ],
       "draft": false,
       "published": {
@@ -5891,14 +3791,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/piglatindemo/v1",
-      "dir": "r/moul/x/daily/piglatindemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/piglatindemo/v0",
+      "dir": "r/moul/x/daily/piglatindemo/v0",
       "kind": "r",
       "name": "x/daily/piglatindemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/piglatin/v1"
+        "gno.land/p/moul/x/daily/piglatin/v0"
       ],
       "draft": false,
       "published": {
@@ -5906,26 +3806,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/pixelcanvas/v1",
-      "dir": "r/moul/x/daily/pixelcanvas/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/pixelcanvas/v0",
+      "dir": "r/moul/x/daily/pixelcanvas/v0",
       "kind": "r",
       "name": "x/daily/pixelcanvas",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5936,8 +3832,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -5948,11 +3843,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/polls/v1",
-      "dir": "r/moul/x/daily/polls/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/polls/v0",
+      "dir": "r/moul/x/daily/polls/v0",
       "kind": "r",
       "name": "x/daily/polls",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -5963,10 +3858,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -5974,24 +3865,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/pullpaymentdemo/v1",
-      "dir": "r/moul/x/daily/pullpaymentdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/pullpaymentdemo/v0",
+      "dir": "r/moul/x/daily/pullpaymentdemo/v0",
       "kind": "r",
       "name": "x/daily/pullpaymentdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/pullpayment/v1"
+        "gno.land/p/moul/x/daily/pullpayment/v0"
       ],
       "draft": false,
       "published": {
@@ -6010,11 +3895,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/quizstreak/v1",
-      "dir": "r/moul/x/daily/quizstreak/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/quizstreak/v0",
+      "dir": "r/moul/x/daily/quizstreak/v0",
       "kind": "r",
       "name": "x/daily/quizstreak",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6025,8 +3910,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -6037,11 +3921,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/quotes/v1",
-      "dir": "r/moul/x/daily/quotes/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/quotes/v0",
+      "dir": "r/moul/x/daily/quotes/v0",
       "kind": "r",
       "name": "x/daily/quotes",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -6050,10 +3934,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6061,21 +3941,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/qvote/v1",
-      "dir": "r/moul/x/daily/qvote/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/qvote/v0",
+      "dir": "r/moul/x/daily/qvote/v0",
       "kind": "r",
       "name": "x/daily/qvote",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6097,14 +3971,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/ratelimitdemo/v1",
-      "dir": "r/moul/x/daily/ratelimitdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/ratelimitdemo/v0",
+      "dir": "r/moul/x/daily/ratelimitdemo/v0",
       "kind": "r",
       "name": "x/daily/ratelimitdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/ratelimit/v1"
+        "gno.land/p/moul/x/daily/ratelimit/v0"
       ],
       "draft": false,
       "published": {
@@ -6112,26 +3986,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/reactions/v1",
-      "dir": "r/moul/x/daily/reactions/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/reactions/v0",
+      "dir": "r/moul/x/daily/reactions/v0",
       "kind": "r",
       "name": "x/daily/reactions",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6142,10 +4012,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6153,24 +4019,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/ringbufferdemo/v1",
-      "dir": "r/moul/x/daily/ringbufferdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/ringbufferdemo/v0",
+      "dir": "r/moul/x/daily/ringbufferdemo/v0",
       "kind": "r",
       "name": "x/daily/ringbufferdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/ringbuffer/v1"
+        "gno.land/p/moul/x/daily/ringbuffer/v0"
       ],
       "draft": false,
       "published": {
@@ -6189,11 +4049,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/ringlog/v1",
-      "dir": "r/moul/x/daily/ringlog/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/ringlog/v0",
+      "dir": "r/moul/x/daily/ringlog/v0",
       "kind": "r",
       "name": "x/daily/ringlog",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -6202,10 +4062,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6213,24 +4069,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/rledemo/v1",
-      "dir": "r/moul/x/daily/rledemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/rledemo/v0",
+      "dir": "r/moul/x/daily/rledemo/v0",
       "kind": "r",
       "name": "x/daily/rledemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/rle/v1"
+        "gno.land/p/moul/x/daily/rle/v0"
       ],
       "draft": false,
       "published": {
@@ -6249,14 +4099,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/romannumdemo/v1",
-      "dir": "r/moul/x/daily/romannumdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/romannumdemo/v0",
+      "dir": "r/moul/x/daily/romannumdemo/v0",
       "kind": "r",
       "name": "x/daily/romannumdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/romannum/v1"
+        "gno.land/p/moul/x/daily/romannum/v0"
       ],
       "draft": false,
       "published": {
@@ -6264,29 +4114,25 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/rot13demo/v1",
-      "dir": "r/moul/x/daily/rot13demo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/rot13demo/v0",
+      "dir": "r/moul/x/daily/rot13demo/v0",
       "kind": "r",
       "name": "x/daily/rot13demo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/rot13/v1"
+        "gno.land/p/moul/x/daily/rot13/v0"
       ],
       "draft": false,
       "published": {
@@ -6294,26 +4140,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/rpgroom/v1",
-      "dir": "r/moul/x/daily/rpgroom/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/rpgroom/v0",
+      "dir": "r/moul/x/daily/rpgroom/v0",
       "kind": "r",
       "name": "x/daily/rpgroom",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0",
@@ -6325,26 +4167,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/rps/v1",
-      "dir": "r/moul/x/daily/rps/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/rps/v0",
+      "dir": "r/moul/x/daily/rps/v0",
       "kind": "r",
       "name": "x/daily/rps",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6355,10 +4193,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6366,21 +4200,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/rpsduel/v1",
-      "dir": "r/moul/x/daily/rpsduel/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/rpsduel/v0",
+      "dir": "r/moul/x/daily/rpsduel/v0",
       "kind": "r",
       "name": "x/daily/rpsduel",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6391,10 +4219,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6402,21 +4226,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/rpsmatch/v1",
-      "dir": "r/moul/x/daily/rpsmatch/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/rpsmatch/v0",
+      "dir": "r/moul/x/daily/rpsmatch/v0",
       "kind": "r",
       "name": "x/daily/rpsmatch",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6427,10 +4245,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6438,21 +4252,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/rpsoracle/v1",
-      "dir": "r/moul/x/daily/rpsoracle/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/rpsoracle/v0",
+      "dir": "r/moul/x/daily/rpsoracle/v0",
       "kind": "r",
       "name": "x/daily/rpsoracle",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6463,10 +4271,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6474,24 +4278,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/semverdemo/v1",
-      "dir": "r/moul/x/daily/semverdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/semverdemo/v0",
+      "dir": "r/moul/x/daily/semverdemo/v0",
       "kind": "r",
       "name": "x/daily/semverdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/semver/v1",
+        "gno.land/p/moul/x/daily/semver/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -6500,29 +4298,25 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/sievedemo/v1",
-      "dir": "r/moul/x/daily/sievedemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/sievedemo/v0",
+      "dir": "r/moul/x/daily/sievedemo/v0",
       "kind": "r",
       "name": "x/daily/sievedemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/sieve/v1"
+        "gno.land/p/moul/x/daily/sieve/v0"
       ],
       "draft": false,
       "published": {
@@ -6530,29 +4324,25 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/soundexdemo/v1",
-      "dir": "r/moul/x/daily/soundexdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/soundexdemo/v0",
+      "dir": "r/moul/x/daily/soundexdemo/v0",
       "kind": "r",
       "name": "x/daily/soundexdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/soundex/v1"
+        "gno.land/p/moul/x/daily/soundex/v0"
       ],
       "draft": false,
       "published": {
@@ -6571,11 +4361,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/splitter/v1",
-      "dir": "r/moul/x/daily/splitter/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/splitter/v0",
+      "dir": "r/moul/x/daily/splitter/v0",
       "kind": "r",
       "name": "x/daily/splitter",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6586,10 +4376,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6597,21 +4383,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/stack/v1",
-      "dir": "r/moul/x/daily/stack/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/stack/v0",
+      "dir": "r/moul/x/daily/stack/v0",
       "kind": "r",
       "name": "x/daily/stack",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -6620,10 +4400,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6631,26 +4407,20 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/staking/v1",
-      "dir": "r/moul/x/daily/staking/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/staking/v0",
+      "dir": "r/moul/x/daily/staking/v0",
       "kind": "r",
       "name": "x/daily/staking",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -6658,29 +4428,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/streak/v1",
-      "dir": "r/moul/x/daily/streak/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/streak/v0",
+      "dir": "r/moul/x/daily/streak/v0",
       "kind": "r",
       "name": "x/daily/streak",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6691,8 +4452,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -6703,11 +4463,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/streaks/v1",
-      "dir": "r/moul/x/daily/streaks/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/streaks/v0",
+      "dir": "r/moul/x/daily/streaks/v0",
       "kind": "r",
       "name": "x/daily/streaks",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6729,11 +4489,11 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/tamagotchi/v1",
-      "dir": "r/moul/x/daily/tamagotchi/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/tamagotchi/v0",
+      "dir": "r/moul/x/daily/tamagotchi/v0",
       "kind": "r",
       "name": "x/daily/tamagotchi",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6744,10 +4504,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6755,21 +4511,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/tictactoe/v1",
-      "dir": "r/moul/x/daily/tictactoe/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/tictactoe/v0",
+      "dir": "r/moul/x/daily/tictactoe/v0",
       "kind": "r",
       "name": "x/daily/tictactoe",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6780,10 +4530,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6791,21 +4537,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/timecapsule/v1",
-      "dir": "r/moul/x/daily/timecapsule/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/timecapsule/v0",
+      "dir": "r/moul/x/daily/timecapsule/v0",
       "kind": "r",
       "name": "x/daily/timecapsule",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0",
@@ -6817,10 +4557,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6828,27 +4564,21 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/timelock/v1",
-      "dir": "r/moul/x/daily/timelock/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/timelock/v0",
+      "dir": "r/moul/x/daily/timelock/v0",
       "kind": "r",
       "name": "x/daily/timelock",
-      "version": "v1",
-      "description": "Solidity→Gno port (experimental, MCP daily). See r/moul/x/daily.",
+      "version": "v0",
+      "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
-      "draft": true,
+      "draft": false,
       "published": {
         "betanet": {
           "uploaded": false
@@ -6856,29 +4586,20 @@
         "pearl": {
           "uploaded": false
         },
-        "portal-loop": {
-          "uploaded": false
-        },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/tipjar/v1",
-      "dir": "r/moul/x/daily/tipjar/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/tipjar/v0",
+      "dir": "r/moul/x/daily/tipjar/v0",
       "kind": "r",
       "name": "x/daily/tipjar",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6889,26 +4610,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/todos/v1",
-      "dir": "r/moul/x/daily/todos/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/todos/v0",
+      "dir": "r/moul/x/daily/todos/v0",
       "kind": "r",
       "name": "x/daily/todos",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -6919,10 +4636,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -6930,24 +4643,18 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/toposortdemo/v1",
-      "dir": "r/moul/x/daily/toposortdemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/toposortdemo/v0",
+      "dir": "r/moul/x/daily/toposortdemo/v0",
       "kind": "r",
       "name": "x/daily/toposortdemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/toposort/v1"
+        "gno.land/p/moul/x/daily/toposort/v0"
       ],
       "draft": false,
       "published": {
@@ -6955,8 +4662,7 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
@@ -6967,14 +4673,14 @@
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/triedemo/v1",
-      "dir": "r/moul/x/daily/triedemo/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/triedemo/v0",
+      "dir": "r/moul/x/daily/triedemo/v0",
       "kind": "r",
       "name": "x/daily/triedemo",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/x/daily/trie/v1"
+        "gno.land/p/moul/x/daily/trie/v0"
       ],
       "draft": false,
       "published": {
@@ -6982,26 +4688,22 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
+          "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
           "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/trivia/v1",
-      "dir": "r/moul/x/daily/trivia/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/trivia/v0",
+      "dir": "r/moul/x/daily/trivia/v0",
       "kind": "r",
       "name": "x/daily/trivia",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -7012,10 +4714,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -7023,21 +4721,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/urlshort/v1",
-      "dir": "r/moul/x/daily/urlshort/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/urlshort/v0",
+      "dir": "r/moul/x/daily/urlshort/v0",
       "kind": "r",
       "name": "x/daily/urlshort",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -7048,10 +4740,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -7059,21 +4747,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/vault/v1",
-      "dir": "r/moul/x/daily/vault/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/vault/v0",
+      "dir": "r/moul/x/daily/vault/v0",
       "kind": "r",
       "name": "x/daily/vault",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -7084,10 +4766,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -7095,21 +4773,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/vestoken/v1",
-      "dir": "r/moul/x/daily/vestoken/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/vestoken/v0",
+      "dir": "r/moul/x/daily/vestoken/v0",
       "kind": "r",
       "name": "x/daily/vestoken",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -7118,10 +4790,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -7129,21 +4797,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/wordle/v1",
-      "dir": "r/moul/x/daily/wordle/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/wordle/v0",
+      "dir": "r/moul/x/daily/wordle/v0",
       "kind": "r",
       "name": "x/daily/wordle",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [],
       "draft": false,
@@ -7152,10 +4814,6 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
@@ -7163,21 +4821,15 @@
         },
         "staging": {
           "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
-          "uploaded": false
         }
       }
     },
     {
-      "pkgpath": "gno.land/r/moul/x/daily/wrapped/v1",
-      "dir": "r/moul/x/daily/wrapped/v1",
+      "pkgpath": "gno.land/r/moul/x/daily/wrapped/v0",
+      "dir": "r/moul/x/daily/wrapped/v0",
       "kind": "r",
       "name": "x/daily/wrapped",
-      "version": "v1",
+      "version": "v0",
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
@@ -7188,22 +4840,12 @@
           "uploaded": false
         },
         "pearl": {
-          "uploaded": true,
-          "which": "v1"
-        },
-        "portal-loop": {
           "uploaded": false
         },
         "sapphire": {
           "uploaded": false
         },
         "staging": {
-          "uploaded": false
-        },
-        "test6": {
-          "uploaded": false
-        },
-        "topaz": {
           "uploaded": false
         }
       }
