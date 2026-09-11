@@ -42,6 +42,17 @@ jobs:
       - name: Install graphviz
         run: sudo apt-get update && sudo apt-get install -y graphviz
 
+      # `make gen` resolves each contract's monorepo counterpart against
+      # $GNOROOT/examples to fill the catalog's `upstream` / `upstream_match`
+      # fields (the README's `src` column and its 🟰/≈/〜/✂️ drift markers).
+      # Without it those fields can only be inherited from the previous run,
+      # which silently strands stale values across a renumber. Only examples/
+      # is read — `gen`/`graph` are pure Go, so there is no gno build here.
+      - name: Checkout gno (master) for $GNOROOT/examples
+        run: |
+          git clone --depth 1 https://github.com/gnolang/gno "$HOME/gno"
+          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
+
       # Regenerate on the LATEST main each attempt, then push. Never rebase the
       # generated files — publish-status writes the same contracts.json/README.md,
       # so a rebase conflicts and the push fails. On a rejected push, reset to

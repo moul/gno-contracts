@@ -45,12 +45,22 @@ func cmdManifest(root string) error {
 		}
 		// Mark monorepo-origin packages: since gnolang/gno#6162 every monorepo
 		// package is versioned, so the counterpart sits at OUR exact pkgpath.
-		// Sticky once set (so it survives runs without GNOROOT), refreshable
-		// when the monorepo copy is present.
-		if inMonorepo(c.PkgPath) {
-			c.Upstream = c.PkgPath
+		//
+		// Authoritative whenever $GNOROOT/examples can be read — INCLUDING the
+		// negative case. A merely-sticky value survives a renumber and strands
+		// the old package's upstream on whatever now occupies that pkgpath:
+		// p/moul/addrset/v2 became addrset/v1 and inherited the previous
+		// addrset/v1's upstream, so the catalog advertised a monorepo `src`
+		// link for a package the monorepo does not have. Only when the
+		// monorepo cannot be consulted do we keep what was stored.
+		if monorepoAvailable() {
+			if inMonorepo(c.PkgPath) {
+				c.Upstream = c.PkgPath
+			} else {
+				c.Upstream, c.UpstreamMatch = "", ""
+			}
 		}
-		// Classify how the versioned copy compares to the monorepo copy (needs
+		// Classify how our copy compares to the monorepo one (needs
 		// $GNOROOT/examples). Sticky: keep the stored value when unavailable.
 		if mm := classifyContractUpstream(root, &c); mm != "" {
 			c.UpstreamMatch = mm

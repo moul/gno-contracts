@@ -311,9 +311,21 @@ func isVersion(s string) bool {
 	return true
 }
 
-// inMonorepo reports whether the un-versioned pkgpath exists in the gnolang/gno
-// checkout at $GNOROOT (current master examples). Used to mark monorepo-origin
-// packages. Returns false when GNOROOT is unset or the path is absent.
+// monorepoAvailable reports whether $GNOROOT/examples can be consulted at all.
+// Callers need this to tell "this package has no monorepo counterpart" (a fact
+// worth recording) from "we cannot look right now" (keep whatever was stored).
+func monorepoAvailable() bool {
+	root := os.Getenv("GNOROOT")
+	if root == "" {
+		return false
+	}
+	return fileExists(filepath.Join(root, "examples", "gno.land"))
+}
+
+// inMonorepo reports whether the pkgpath exists in the gnolang/gno checkout at
+// $GNOROOT (current master examples). Since gnolang/gno#6162 every monorepo
+// package is versioned, so this is called with our exact pkgpath. Returns false
+// when GNOROOT is unset or the path is absent.
 func inMonorepo(upath string) bool {
 	root := os.Getenv("GNOROOT")
 	if root == "" || !strings.HasPrefix(upath, "gno.land/") {
