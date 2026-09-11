@@ -3,11 +3,20 @@
 This repository has a single, authoritative guide for agents: **[AGENTS.md](./AGENTS.md)**.
 Read it before doing anything. The essentials:
 
-- **Version everything; bump only on a compatibility change.** Contracts live at
-  `gno.land/{p,r}/moul/<name>/vN`. A **breaking change** — removing/renaming an
-  exported symbol, changing its signature/behavior, or a storage/data-structure
+- **Version everything, starting at `v0`; bump only on a compatibility change.**
+  Contracts live at `gno.land/{p,r}/moul/<name>/vN`, **version always last**
+  (`p/moul/ulist/lplist/v0`, never `p/moul/ulist/v0/lplist`). New contracts start
+  at `v0` — gno's "initial, unaudited". A **breaking change** — removing/renaming
+  an exported symbol, changing its signature/behavior, or a storage/data-structure
   swap (e.g. `avl`→`bptree`) ⇒ **new `vN`** dir. **Non-breaking** work (new
   functions, unit tests, comments, docs) stays in place in the same `vN`.
+- **The 12 mirrored `p/moul/*` are frozen.** `addrset` `authz` `dynreplacer`
+  `fifo` `helplink` `md` `mdtable` `once` `realmpath` `txlink` `typeutil` `ulist`
+  also live in `gnolang/gno` at the same `/v0` path and ship in gnoland1 genesis.
+  Our `v0` copies every `.gno` byte-for-byte — **never hand-edit it**, not even a
+  test or a comment; that is what makes `make sync` drift meaningful. `README.md`
+  is the one file we add. Changes go in a `v1` (only `addrset` and `authz` have
+  one today).
 - **Keep the repo autonomous.** Local `p/moul` ↔ `r/moul` imports resolve via
   `gnowork.toml`; external `gno.land/*` deps are vendored under `vendor/`
   (`make deps`). Don't rely on `$GNOROOT/examples` for anything but stdlibs.
