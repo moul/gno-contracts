@@ -26,7 +26,7 @@ They exist to:
 
 ## Layout
 
-Each realm lives at `r/moul/x/daily/<name>/v1/` (versioned to satisfy the repo's
+Each realm lives at `r/moul/x/daily/<name>/v0/` (versioned to satisfy the repo's
 `/vN` rule, even though these are throwaway experiments) with its `.gno` sources,
 tests, a `gnomod.toml`, and a short per-package README that links back here.
 

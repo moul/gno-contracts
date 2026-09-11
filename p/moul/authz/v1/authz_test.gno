@@ -372,26 +372,11 @@ func TestMemberAuthorityMultipleMembers(cur realm, t *testing.T) {
 	})
 	uassert.True(t, err != nil, "non-member should not be authorized")
 
-	// Test Tree() functionality
-	tree := auth.Tree()
-	uassert.True(t, tree.Size() == 2, "tree should have 2 members")
-
-	// Verify both members are in the tree
-	found := make(map[address]bool)
-	tree.Iterate("", "", func(key string, _ any) bool {
-		found[address(key)] = true
-		return false
-	})
-	uassert.True(t, found[alice], "alice should be in the tree")
-	uassert.True(t, found[bob], "bob should be in the tree")
-	uassert.False(t, found[carol], "carol should not be in the tree")
-
-	// Test read-only nature of the tree
-	defer func() {
-		r := recover()
-		uassert.True(t, r != nil, "modifying read-only tree should panic")
-	}()
-	tree.Set(string(carol), nil) // This should panic
+	// Verify membership via the public API (the v1 Tree() escape hatch was
+	// intentionally removed in v2, so the backing store never leaks).
+	uassert.True(t, auth.Has(alice), "alice should be a member")
+	uassert.True(t, auth.Has(bob), "bob should be a member")
+	uassert.False(t, auth.Has(carol), "carol should not be a member")
 }
 
 func TestAuthorizerCurrentNeverNil(cur realm, t *testing.T) {

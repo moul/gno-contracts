@@ -1,53 +1,40 @@
-// Package addrset provides a specialized set data structure for managing unique Gno addresses.
+// Package addrset provides a set of blockchain addresses, backed by a B+ tree.
 //
-// It is built on top of an AVL tree for efficient operations and maintains addresses in sorted order.
-// This package is particularly useful when you need to:
-//   - Track a collection of unique addresses (e.g., for whitelists, participants, etc.)
-//   - Efficiently check address membership
-//   - Support pagination when displaying addresses
+// It is the B+ tree successor to [gno.land/p/moul/addrset/v0] (which is backed
+// by an AVL tree): a bump to v1 because the backing data structure — and thus
+// the on-chain storage layout — changed. The exported API is the same as v0
+// (Add/Remove/Has/Size/IterateByOffset/ReverseIterateByOffset) EXCEPT that the
+// v0 `Tree() avl.ITree` escape hatch is intentionally removed, so the backing
+// store never leaks across realms.
 //
-// Example usage:
+// A B+ tree packs many entries per persisted node, so a stored address costs
+// roughly ~0.9 KB vs the AVL backing's ~2.0 KB (and inserts spend materially
+// less gas). Prefer v1 when the set is part of persisted realm state.
 //
-//	import (
-//	    "gno.land/p/moul/addrset/v1"
-//	)
+// Two behavioral differences from v0, both consequences of the in-place-
+// mutating B+ tree backing:
 //
-//	func MyHandler() {
-//	    // Create a new address set
-//	    var set addrset.Set
+//   - do NOT mutate the set (Add/Remove) from inside an iteration callback —
+//     the AVL backing's copy-on-write tolerated it, this one does not;
+//   - do NOT copy a non-zero Set by value — the copies would share live tree
+//     nodes while their roots and sizes diverge (v0's copies were independent
+//     snapshots).
 //
-//	    // Add some addresses
-//	    addr1 := address("g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5")
-//	    addr2 := address("g1sss5g0rkqr88k4u648yd5d3l9t4d8vvqwszqth")
+// Example:
 //
-//	    set.Add(addr1)  // returns true (newly added)
-//	    set.Add(addr2)  // returns true (newly added)
-//	    set.Add(addr1)  // returns false (already exists)
+//	var set addrset.Set // the zero value is an empty, usable set
 //
-//	    // Check membership
-//	    if set.Has(addr1) {
-//	        // addr1 is in the set
-//	    }
-//
-//	    // Get size
-//	    size := set.Size()  // returns 2
-//
-//	    // Iterate with pagination (10 items per page, starting at offset 0)
-//	    set.IterateByOffset(0, 10, func(addr address) bool {
-//	        // Process addr
-//	        return false  // continue iteration
-//	    })
-//
-//	    // Remove an address
-//	    set.Remove(addr1)  // returns true (was present)
-//	    set.Remove(addr1)  // returns false (not present)
-//	}
+//	set.Add(addr)    // true (newly added)
+//	set.Has(addr)    // true
+//	set.Remove(addr) // true (was present)
 package addrset
 
-import "gno.land/p/nt/avl/v0"
+import "gno.land/p/nt/bptree/v0"
 
+// Set stores a set of addresses in sorted order. The zero value is an empty,
+// usable set.
 type Set struct {
-	tree avl.Tree
+	tree bptree.BPTree
 }
 
 // Add inserts an address into the set.
@@ -73,23 +60,21 @@ func (s *Set) Size() int {
 	return s.tree.Size()
 }
 
-// IterateByOffset walks through addresses starting at the given offset.
-// The callback should return true to stop iteration.
+// IterateByOffset walks through addresses in sorted order, starting at the
+// given offset and visiting up to count addresses. The callback returns true
+// to stop iteration. The set must not be modified during iteration.
 func (s *Set) IterateByOffset(offset int, count int, cb func(addr address) bool) {
 	s.tree.IterateByOffset(offset, count, func(key string, _ any) bool {
 		return cb(address(key))
 	})
 }
 
-// ReverseIterateByOffset walks through addresses in reverse order starting at the given offset.
-// The callback should return true to stop iteration.
+// ReverseIterateByOffset walks through addresses in reverse (descending) order,
+// starting at the given offset (counted from the end) and visiting up to count
+// addresses. The callback returns true to stop iteration. The set must not be
+// modified during iteration.
 func (s *Set) ReverseIterateByOffset(offset int, count int, cb func(addr address) bool) {
 	s.tree.ReverseIterateByOffset(offset, count, func(key string, _ any) bool {
 		return cb(address(key))
 	})
-}
-
-// Tree returns the underlying AVL tree for advanced usage.
-func (s *Set) Tree() avl.ITree {
-	return &s.tree
 }
