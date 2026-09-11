@@ -8,10 +8,16 @@ import (
 	"strings"
 )
 
-// cmdSync reports drift between our versioned contracts and their (un-versioned)
-// counterparts in the gnolang/gno monorepo examples tree. It is how moul learns
-// that someone changed one of his contracts upstream, so it can be versioned or
-// bumped here. Read-only. Requires GNOROOT.
+// cmdSync reports drift between our contracts and their counterparts in the
+// gnolang/gno monorepo examples tree. It is how moul learns that someone changed
+// one of his contracts upstream, so he can cut a new version here. Read-only.
+// Requires GNOROOT.
+//
+// Since gnolang/gno#6162 every monorepo package carries its own version segment,
+// so a counterpart is found at the SAME pkgpath rather than at an un-versioned
+// one: our gno.land/p/moul/md/v0 mirrors examples' gno.land/p/moul/md/v0, and a
+// drift there is a genuine upstream change. Versions above the mirrored one are
+// ours alone and have no counterpart to compare against.
 func cmdSync(root string, args []string) error {
 	gnoroot := os.Getenv("GNOROOT")
 	if gnoroot == "" {
@@ -24,22 +30,34 @@ func cmdSync(root string, args []string) error {
 		return err
 	}
 
-	// Track which monorepo moul packages we have mirrored (by un-versioned path).
-	haveUpstream := map[string]bool{}
-	var inSync, drifted, newHere int
+	// Which of our contracts have an exact monorepo counterpart, and which
+	// package families we mirror at all (so a higher version of a mirrored
+	// package reads as "ours" rather than "unknown upstream").
+	upstreamDir := map[string]string{}
+	mirrored := map[string]bool{}
+	for _, c := range scanned {
+		dir := filepath.Join(examples, filepath.FromSlash(c.PkgPath))
+		if fileExists(dir) {
+			upstreamDir[c.PkgPath] = dir
+			mirrored[basePath(c.PkgPath)] = true
+		}
+	}
 
+	var inSync, drifted, ours, newHere int
 	fmt.Println("drift vs monorepo (", examples, "):")
 	for _, c := range scanned {
-		up := unversioned(c.PkgPath) // gno.land/r/moul/hello/v1 -> gno.land/r/moul/hello
-		haveUpstream[up] = true
-		srcDir := filepath.Join(examples, filepath.FromSlash(up))
-		ourDir := filepath.Join(root, filepath.FromSlash(c.Dir))
-		if !fileExists(srcDir) {
-			fmt.Printf("  [new]   %s — not in monorepo\n", c.PkgPath)
-			newHere++
+		srcDir, ok := upstreamDir[c.PkgPath]
+		if !ok {
+			if mirrored[basePath(c.PkgPath)] {
+				fmt.Printf("  [ours]  %s — our successor to the mirrored version\n", c.PkgPath)
+				ours++
+			} else {
+				fmt.Printf("  [new]   %s — not in monorepo\n", c.PkgPath)
+				newHere++
+			}
 			continue
 		}
-		diffs, err := diffGnoDirs(ourDir, srcDir)
+		diffs, err := diffGnoDirs(filepath.Join(root, filepath.FromSlash(c.Dir)), srcDir)
 		if err != nil {
 			return err
 		}
@@ -48,13 +66,13 @@ func cmdSync(root string, args []string) error {
 			continue
 		}
 		drifted++
-		fmt.Printf("  [drift] %s vs %s:\n", c.PkgPath, up)
+		fmt.Printf("  [drift] %s — upstream changed:\n", c.PkgPath)
 		for _, d := range diffs {
 			fmt.Printf("            %s\n", d)
 		}
 	}
 
-	// Monorepo moul packages we have not mirrored at all.
+	// Monorepo moul packages we do not carry at all.
 	for _, kind := range []string{"p", "r"} {
 		base := filepath.Join(examples, "gno.land", kind, "moul")
 		if !fileExists(base) {
@@ -62,18 +80,20 @@ func cmdSync(root string, args []string) error {
 		}
 		pkgs, _ := upstreamPackages(base, "gno.land/"+kind+"/moul")
 		for _, up := range pkgs {
-			if !haveUpstream[up] {
+			if _, have := upstreamDir[up]; !have {
 				fmt.Printf("  [miss]  %s — in monorepo, not imported here yet\n", up)
 			}
 		}
 	}
 
-	fmt.Printf("summary: %d in-sync, %d drifted, %d new-here\n", inSync, drifted, newHere)
+	fmt.Printf("summary: %d in-sync, %d drifted, %d ours, %d new-here\n",
+		inSync, drifted, ours, newHere)
 	return nil
 }
 
-// unversioned strips a trailing /vN element from a pkgpath.
-func unversioned(pkgpath string) string {
+// basePath strips a trailing /vN element from a pkgpath, yielding the version
+// family: gno.land/p/moul/md/v0 -> gno.land/p/moul/md.
+func basePath(pkgpath string) string {
 	i := strings.LastIndex(pkgpath, "/")
 	if i < 0 {
 		return pkgpath

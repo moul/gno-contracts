@@ -11,7 +11,7 @@ import (
 
 // assetsDir holds generated, committed artifacts, mirroring pkgpath:
 //
-//	_assets/gno.land/r/moul/hello/v1/deps.{dot,svg,png}
+//	_assets/gno.land/r/moul/hello/v0/deps.{dot,svg,png}
 //	_assets/graph.{dot,svg,png}            (whole-repo graph)
 const assetsDir = "_assets"
 
