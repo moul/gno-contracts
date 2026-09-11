@@ -18,7 +18,7 @@ func writeFile(t *testing.T, dir, name, body string) {
 
 func TestParseDepsExcludesTestsAndFiletests(t *testing.T) {
 	dir := t.TempDir()
-	writeFile(t, dir, "pkg.gno", "package p\nimport \"gno.land/p/moul/md/v1\"\n")
+	writeFile(t, dir, "pkg.gno", "package p\nimport \"gno.land/p/moul/md/v0\"\n")
 	writeFile(t, dir, "pkg_test.gno", "package p\nimport \"gno.land/p/nt/uassert/v0\"\n")
 	writeFile(t, dir, "z1_filetest.gno", "package main\nimport \"gno.land/p/moul/self/v1\"\n")
 
@@ -27,7 +27,7 @@ func TestParseDepsExcludesTestsAndFiletests(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if want := []string{"gno.land/p/moul/md/v1"}; !reflect.DeepEqual(deps, want) {
+	if want := []string{"gno.land/p/moul/md/v0"}; !reflect.DeepEqual(deps, want) {
 		t.Fatalf("parseDeps = %v, want %v", deps, want)
 	}
 
@@ -62,7 +62,7 @@ func TestIsVersion(t *testing.T) {
 
 func TestDeriveContractStripsSelfDep(t *testing.T) {
 	dir := t.TempDir()
-	writeFile(t, dir, "x.gno", "package x\nimport \"gno.land/p/moul/md/v1\"\n")
+	writeFile(t, dir, "x.gno", "package x\nimport \"gno.land/p/moul/md/v0\"\n")
 	// A filetest that self-imports must NOT produce a self-dependency.
 	writeFile(t, dir, "z_filetest.gno", "package main\nimport \"gno.land/p/moul/x/v1\"\n")
 
@@ -78,7 +78,7 @@ func TestDeriveContractStripsSelfDep(t *testing.T) {
 			t.Fatalf("self-dependency leaked into deps: %v", c.Deps)
 		}
 	}
-	if want := []string{"gno.land/p/moul/md/v1"}; !reflect.DeepEqual(c.Deps, want) {
+	if want := []string{"gno.land/p/moul/md/v0"}; !reflect.DeepEqual(c.Deps, want) {
 		t.Fatalf("deps = %v, want %v", c.Deps, want)
 	}
 }
@@ -134,13 +134,13 @@ func TestTopoOrderSelfDepTolerated(t *testing.T) {
 
 func TestParseImports(t *testing.T) {
 	dir := t.TempDir()
-	body := "package p\n\nimport (\n\t\"strings\"\n\t\"gno.land/p/moul/md/v1\"\n\talias \"gno.land/p/nt/avl/v0\"\n)\n\nimport \"gno.land/r/moul/hello/v1\"\n"
+	body := "package p\n\nimport (\n\t\"strings\"\n\t\"gno.land/p/moul/md/v0\"\n\talias \"gno.land/p/nt/avl/v0\"\n)\n\nimport \"gno.land/r/moul/hello/v0\"\n"
 	writeFile(t, dir, "p.gno", body)
 	imps, err := parseImports(filepath.Join(dir, "p.gno"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := map[string]bool{"strings": true, "gno.land/p/moul/md/v1": true, "gno.land/p/nt/avl/v0": true, "gno.land/r/moul/hello/v1": true}
+	want := map[string]bool{"strings": true, "gno.land/p/moul/md/v0": true, "gno.land/p/nt/avl/v0": true, "gno.land/r/moul/hello/v0": true}
 	if len(imps) != len(want) {
 		t.Fatalf("imports = %v", imps)
 	}
@@ -163,8 +163,8 @@ func TestParseImportsIgnoresComments(t *testing.T) {
 	}{
 		{
 			name: "block doc comment with example import",
-			body: "/*\nPackage svg …\n\nExample:\n\n\timport \"gno.land/p/moul/svg\"\n*/\npackage svg // import \"gno.land/p/moul/svg\"\n\nimport \"gno.land/p/moul/md/v1\"\n",
-			want: []string{"gno.land/p/moul/md/v1"},
+			body: "/*\nPackage svg …\n\nExample:\n\n\timport \"gno.land/p/moul/svg\"\n*/\npackage svg // import \"gno.land/p/moul/svg\"\n\nimport \"gno.land/p/moul/md/v0\"\n",
+			want: []string{"gno.land/p/moul/md/v0"},
 		},
 		{
 			name: "line-commented import",
@@ -173,8 +173,8 @@ func TestParseImportsIgnoresComments(t *testing.T) {
 		},
 		{
 			name: "commented entry inside an import group",
-			body: "package p\n\nimport (\n\t\"strings\"\n\t// \"gno.land/p/moul/ghost/v1\"\n\t\"gno.land/p/moul/md/v1\"\n)\n",
-			want: []string{"strings", "gno.land/p/moul/md/v1"},
+			body: "package p\n\nimport (\n\t\"strings\"\n\t// \"gno.land/p/moul/ghost/v1\"\n\t\"gno.land/p/moul/md/v0\"\n)\n",
+			want: []string{"strings", "gno.land/p/moul/md/v0"},
 		},
 		{
 			name: "inline block comment on the same line",

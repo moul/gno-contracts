@@ -43,11 +43,12 @@ func cmdManifest(root string) error {
 		} else {
 			added++
 		}
-		// Mark monorepo-origin packages: the un-versioned path exists in the
-		// gnolang/gno checkout. Sticky once set (so it survives runs without
-		// GNOROOT), refreshable when the monorepo copy is present.
-		if u := unversioned(c.PkgPath); u != c.PkgPath && inMonorepo(u) {
-			c.Upstream = u
+		// Mark monorepo-origin packages: since gnolang/gno#6162 every monorepo
+		// package is versioned, so the counterpart sits at OUR exact pkgpath.
+		// Sticky once set (so it survives runs without GNOROOT), refreshable
+		// when the monorepo copy is present.
+		if inMonorepo(c.PkgPath) {
+			c.Upstream = c.PkgPath
 		}
 		// Classify how the versioned copy compares to the monorepo copy (needs
 		// $GNOROOT/examples). Sticky: keep the stored value when unavailable.

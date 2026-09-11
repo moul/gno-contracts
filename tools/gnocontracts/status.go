@@ -42,16 +42,17 @@ func cmdStatus(root string, args []string) error {
 			if c.Draft {
 				continue
 			}
-			// Probe the versioned path and — for monorepo-origin packages that
-			// have no /vN on the genesis chains — the un-versioned path too.
-			v1 := queryUploaded(net.RPC, c.PkgPath)
-			mono := c.Upstream != "" && queryUploaded(net.RPC, c.Upstream)
+			// One probe is enough: since gnolang/gno#6162 a monorepo-origin
+			// package sits at OUR exact pkgpath, so a hit on a mirrored
+			// package is the genesis deployment and a hit on anything else
+			// was published from this repo.
+			uploaded := queryUploaded(net.RPC, c.PkgPath)
 			if c.Published == nil {
 				c.Published = map[string]Pub{}
 			}
 			pub := c.Published[net.Name]
-			pub.Uploaded = v1 || mono
-			pub.Which = whichFound(v1, mono)
+			pub.Uploaded = uploaded
+			pub.Which = whichFound(uploaded, c.Upstream != "")
 			c.Published[net.Name] = pub
 			if pub.Uploaded {
 				up++
@@ -74,16 +75,15 @@ func cmdStatus(root string, args []string) error {
 	return nil
 }
 
-// whichFound labels which path(s) resolved on chain.
-func whichFound(v1, mono bool) string {
+// whichFound labels where an on-chain package came from: a mirrored package is
+// deployed by the monorepo (genesis), anything else was published from here.
+func whichFound(uploaded, mirrored bool) string {
 	switch {
-	case v1 && mono:
-		return "both"
-	case v1:
-		return "v1"
-	case mono:
+	case !uploaded:
+		return ""
+	case mirrored:
 		return "monorepo"
 	default:
-		return ""
+		return "ours"
 	}
 }

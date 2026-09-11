@@ -87,7 +87,7 @@ func TestWebBaseAndPkgURL(t *testing.T) {
 		{
 			network{Name: "test6", RPC: "https://rpc.test6.testnets.gno.land:443"},
 			"https://test6.testnets.gno.land",
-			"gno.land/r/moul/x/daily/blog/v1", "https://test6.testnets.gno.land/r/moul/x/daily/blog/v1",
+			"gno.land/r/moul/x/daily/blog/v0", "https://test6.testnets.gno.land/r/moul/x/daily/blog/v0",
 		},
 		{
 			network{Name: "gnodev", RPC: "http://127.0.0.1:26657"},

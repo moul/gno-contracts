@@ -33,8 +33,8 @@ type Network struct {
 
 // Contract is one versioned package in the repository.
 type Contract struct {
-	PkgPath     string         `json:"pkgpath"`     // gno.land/r/moul/hello/v1
-	Dir         string         `json:"dir"`         // r/moul/hello/v1
+	PkgPath     string         `json:"pkgpath"`     // gno.land/r/moul/hello/v0
+	Dir         string         `json:"dir"`         // r/moul/hello/v0
 	Kind        string         `json:"kind"`        // "p" (pure) or "r" (realm)
 	Name        string         `json:"name"`        // hello (may contain slashes)
 	Version     string         `json:"version"`     // v1
@@ -255,7 +255,7 @@ func parseModuleIgnore(gnomodPath string) bool {
 }
 
 // deriveContract builds a Contract from a module path such as
-// "gno.land/r/moul/hello/v1" or "gno.land/p/moul/defi/amm/v2".
+// "gno.land/r/moul/hello/v0" or "gno.land/p/moul/defi/amm/v2".
 func deriveContract(module, dir, absDir string) (Contract, error) {
 	parts := strings.Split(module, "/")
 	// gno.land / (p|r) / moul / <name...> / vN

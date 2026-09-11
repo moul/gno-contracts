@@ -70,7 +70,7 @@ def matches(dir, selectors):
     return False
 
 
-def url_of(pkgpath):  # gno.land/r/moul/hello/v1 -> /r/moul/hello/v1
+def url_of(pkgpath):  # gno.land/r/moul/hello/v0 -> /r/moul/hello/v0
     return "/" + pkgpath.split("/", 1)[1]
 
 
@@ -93,7 +93,7 @@ def fetch(base, path):
 
 
 def rel_prefix(url_path):
-    # depth of the page dir: /r/moul/hello/v1 -> 4 segments -> ../../../../
+    # depth of the page dir: /r/moul/hello/v0 -> 4 segments -> ../../../../
     depth = len([p for p in url_path.strip("/").split("/") if p])
     return "../" * depth
 

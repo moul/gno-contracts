@@ -73,10 +73,19 @@ func renderTable(m *Manifest) string {
 		}
 		b.WriteString(" " + monorepoLink(c.Upstream, c.UpstreamMatch) + " | " + depBadge(c.Deps) + " |\n")
 	}
-	b.WriteString("\n_📦 pkg · 🏛️ realm · 🚧 draft · 💤 archived (`ignore = true` in gnomod, skipped by CI; kept for reference, superseded by a later version)._\n")
+	legend := "\n_📦 pkg · 🏛️ realm · 🚧 draft"
+	// The 💤 marker only earns a legend entry when something actually carries
+	// it; normally nothing does.
+	for _, c := range m.Contracts {
+		if c.Ignored {
+			legend += " · 💤 archived (`ignore = true` in gnomod, skipped by CI)"
+			break
+		}
+	}
+	b.WriteString(legend + "._\n")
 	b.WriteString("\n_Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._\n")
 	if m.StatusCheckedAt != "" {
-		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = /v1, 🗄️ = un-versioned monorepo path)._\n")
+		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._\n")
 	}
 	return b.String()
 }
@@ -90,8 +99,8 @@ func kindEmoji(kind string) string {
 	return "📦"
 }
 
-// monorepoLink renders a link to the un-versioned package in the gnolang/gno
-// monorepo, plus a marker for how our versioned copy compares to it.
+// monorepoLink renders a link to the counterpart package in the gnolang/gno
+// monorepo, plus a marker for how our copy compares to it.
 func monorepoLink(upstream, match string) string {
 	if upstream == "" {
 		return "—"

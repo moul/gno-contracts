@@ -32,6 +32,26 @@
 //	}
 //
 // See example_test.gno for more usage examples.
+//
+// # Backing store
+//
+// This is the B+ tree successor to [gno.land/p/moul/authz/v0] (which is
+// backed by an AVL tree via gno.land/p/moul/addrset/v0): a bump to v1
+// because the member store — and thus the on-chain storage layout —
+// changed to gno.land/p/moul/addrset/v1, itself backed by
+// gno.land/p/nt/bptree/v0. This is a storage/compatibility change; the
+// exported API is otherwise the same as v0, EXCEPT that the v0
+// MemberAuthority.Tree() escape hatch is intentionally removed so the
+// backing store never leaks across realms.
+//
+// Two behavioral caveats follow from the in-place-mutating B+ tree backing:
+//
+//   - do NOT mutate a MemberAuthority (AddMember/RemoveMember) from inside
+//     an iteration callback — the AVL backing's copy-on-write tolerated it,
+//     this one does not;
+//   - do NOT copy a non-zero MemberAuthority (or its members set) by value —
+//     the copies would share live tree nodes while their roots and sizes
+//     diverge (v0's copies were independent snapshots).
 package authz
 
 import (
@@ -40,9 +60,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/addrset/v1"
-	"gno.land/p/moul/once/v1"
-	"gno.land/p/nt/avl/v0"
-	"gno.land/p/nt/avl/v0/rotree"
+	"gno.land/p/moul/once/v0"
 	"gno.land/p/nt/ufmt/v0"
 )
 
@@ -260,8 +278,8 @@ func (a *MemberAuthority) Authorize(caller address, title string, action Privile
 
 func (a *MemberAuthority) String() string {
 	addrs := []string{}
-	a.members.Tree().Iterate("", "", func(key string, _ any) bool {
-		addrs = append(addrs, key)
+	a.members.IterateByOffset(0, a.members.Size(), func(addr address) bool {
+		addrs = append(addrs, string(addr))
 		return false
 	})
 	addrsStr := strings.Join(addrs, ",")
@@ -309,12 +327,6 @@ func (a *MemberAuthority) RemoveMember(_ int, rlm realm, addr address) error {
 		a.members.Remove(addr)
 		return nil
 	})
-}
-
-// Tree returns a read-only view of the members tree
-func (a *MemberAuthority) Tree() *rotree.ReadOnlyTree {
-	tree := a.members.Tree().(*avl.Tree)
-	return rotree.Wrap(tree, nil)
 }
 
 // Has checks if the given address is a member of the authority
