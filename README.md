@@ -96,9 +96,9 @@ make help        # list all targets
 | Package | sapphire | pearl | betanet | staging | Monorepo | Deps |
 |---|---|---|---|---|---|---|
 | [`p/moul/addrset/v0`](p/moul/addrset/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset/v0) ≈ | 1 |
-| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | — | [🗄️](https://pearl.testnets.gno.land/p/moul/addrset/v1) | — | — | — | 1 |
+| [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/addrset/v1) | — | — | — | 1 |
 | [`p/moul/authz/v0`](p/moul/authz/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz/v0) ✂️ | 5 |
-| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | — | [🗄️](https://pearl.testnets.gno.land/p/moul/authz/v1) | — | — | — | 3 |
+| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/authz/v1) | — | — | — | 3 |
 | [`p/moul/collection/v0`](p/moul/collection/v0) 📦 | — | — | — | — | — | 3 |
 | [`p/moul/cow/v0`](p/moul/cow/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/debug/v0`](p/moul/debug/v0) 📦 | — | — | — | — | — | 4 |
@@ -289,7 +289,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft._
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-11T19:06:00Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-11T21:23:35Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 

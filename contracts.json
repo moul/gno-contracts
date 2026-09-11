@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-11T19:06:00Z",
+  "status_checked_at": "2026-09-11T21:23:35Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -69,7 +69,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "ours"
         },
         "portal-loop": {
           "uploaded": true,
@@ -141,7 +141,7 @@
         },
         "pearl": {
           "uploaded": true,
-          "which": "monorepo"
+          "which": "ours"
         },
         "portal-loop": {
           "uploaded": true,
