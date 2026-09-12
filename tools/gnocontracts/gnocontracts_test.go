@@ -363,12 +363,20 @@ func TestManifestReconcilesNetworksAndKeepsPublished(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var names []string
+	// Compare against defaultNetworks() itself rather than a hardcoded list:
+	// the assertion is "manifest reconciles to the code-owned set", and
+	// restating the names here only means editing this test every time a
+	// chain is added or retired (it was still asserting betanet the day
+	// mainnet replaced it).
+	var names, want []string
 	for _, n := range m.Networks {
 		names = append(names, n.Name)
 	}
-	if strings.Join(names, ",") != "sapphire,pearl,betanet,staging" {
-		t.Fatalf("networks = %v, want the defaultNetworks() set", names)
+	for _, n := range defaultNetworks() {
+		want = append(want, n.Name)
+	}
+	if strings.Join(names, ",") != strings.Join(want, ",") {
+		t.Fatalf("networks = %v, want the defaultNetworks() set %v", names, want)
 	}
 	if len(m.Contracts) != 1 {
 		t.Fatalf("contracts = %d, want 1", len(m.Contracts))
