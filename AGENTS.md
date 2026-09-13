@@ -109,6 +109,25 @@ make publish NET=pearl CHECK=1      # …same, against the other testnet
 
 ### Networks
 
+**`mainnet` — chain-id `gnoland-1`**, launched 2026-09-12T15:00:00Z from the
+`chain/mainnet` tag (commit `9c8eb132e`). A fresh chain, not a hardfork of
+betanet. `rpc.gno.land` / gnoweb at `gno.land`. It **replaced** the old `betanet`
+row, which named the same endpoint with chain-id `gnoland1` — a different chain,
+so that row probed mainnet under the wrong label and would have signed publishes
+for a chain-id the node rejects.
+
+Two things make mainnet unlike the testnets:
+
+- **Publishing is not immediate.** The inert code-submission policy is on from
+  block 1: a post-genesis `MsgAddPackage` parks until the funded gpao approvals
+  oracle clears it. Budget for that; a publish that "succeeds" is queued, not live.
+- **Paths there are permanent.** The `moul` namespace is registered at genesis,
+  and nine of our mirrored `p/moul/*/v0` are already deployed as transitive deps
+  of the genesis set (`addrset` `authz` `fifo` `helplink` `md` `mdtable` `once`
+  `realmpath` `txlink`). Those nine are frozen upstream artifacts — never publish
+  over them; changes go in a `v1` here. `dynreplacer`, `typeutil` and `ulist` are
+  the three mirrors NOT at genesis.
+
 Two live testnets, both on gno `v1.0.0-rc.0` and interchangeable as publish
 targets — `sapphire` (`sapphire-1`) and `pearl` (`pearl-1`). Each exposes the
 same host pattern: `rpc.<net>.testnets.gno.land`, gnoweb at

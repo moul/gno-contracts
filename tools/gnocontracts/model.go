@@ -93,7 +93,13 @@ func defaultNetworks() []Network {
 		// publish targets rather than one superseding the other.
 		{Name: "sapphire", ChainID: "sapphire-1", RPC: "https://rpc.sapphire.testnets.gno.land:443"},
 		{Name: "pearl", ChainID: "pearl-1", RPC: "https://rpc.pearl.testnets.gno.land:443"},
-		{Name: "betanet", ChainID: "gnoland1", RPC: "https://rpc.gno.land:443"},
+		// gno.land mainnet, launched 2026-09-12T15:00:00Z (gnolang/gno tag
+		// `chain/mainnet`, commit 9c8eb132e). It REPLACES the old betanet entry:
+		// betanet was chain-id `gnoland1` and mainnet is `gnoland-1` — a
+		// different chain reusing the same rpc.gno.land endpoint, so the old
+		// row was probing mainnet while labelled betanet, and a publish would
+		// have signed for a chain-id the node rejects.
+		{Name: "mainnet", ChainID: "gnoland-1", RPC: "https://rpc.gno.land:443"},
 		{Name: "staging", ChainID: "staging", RPC: "https://rpc.staging.gno.land:443"},
 	}
 }
