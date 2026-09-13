@@ -27,10 +27,10 @@ publish everything.
   below, every per-package README (docs + repo link + disclaimer + embedded
   dependency graph), and the `_assets/` graphs are **regenerated after merge** by a
   bot, so PRs carry only source and never conflict on generated files.
-- **Dependency graphs** — per-package and a global graph of everything, in
-  [`_assets/`](./_assets).
+- **Dependency graphs** — per-package, a latest-version-only overview (embedded
+  below), and a full graph with every version, in [`_assets/`](./_assets).
 - **On-chain status** — the table shows where each contract is published
-  (✅ `/v1`, 📦 un-versioned monorepo path), refreshed by a scheduled job.
+  (✅ our versioned path, 🗄️ the monorepo's un-versioned copy), refreshed by a scheduled job.
 - **PR bots** — a sticky **analysis report** (new/updated packages, sizes, test
   counts, ⚠️/🔥 signals), automatic **path labels** (`p`/`r`/`meta`), and a
   **live realm preview** (below).
@@ -49,8 +49,8 @@ without checking out the branch. The preview is removed when the PR closes.
 ## Layout
 
 ```
-p/moul/<name>/v1/         pure packages          → gno.land/p/moul/<name>/v1
-r/moul/<name>/v1/         realms                 → gno.land/r/moul/<name>/v1
+p/moul/<name>/v0/         pure packages          → gno.land/p/moul/<name>/v0
+r/moul/<name>/v0/         realms                 → gno.land/r/moul/<name>/v0
 vendor/gno.land/...       vendored dependencies (committed, autonomous)
 tools/                    Go maintenance CLI (manifest, readme, vendor, sync, publish)
 contracts.json           the contract catalog (source of truth for the table below)
@@ -60,11 +60,17 @@ Makefile                 test / lint / deps / gen / sync / publish
 
 ### Versioning (mandatory)
 
-**Every** contract lives under an explicit version segment: `.../<name>/v1`,
-`/v2`, `/v3`, … There is no un-versioned contract. A breaking change ships as a
-new `vN` directory; the old version keeps working for existing callers. This is
-adopted from the very first commit so callers can always pin, and so drift from
-the (un-versioned) monorepo copies can be tracked and bumped deliberately.
+**Every** contract lives under an explicit version segment, starting at **`v0`**
+— gno's own convention for *initial, unaudited* ([gnolang/gno#5220](https://github.com/gnolang/gno/issues/5220))
+— then `/v1`, `/v2`, … There is no un-versioned contract, and **the version is
+always the LAST path element**: `p/moul/ulist/lplist/v0`, never
+`p/moul/ulist/v0/lplist`.
+
+A breaking change ships as a new `vN` directory and the old version keeps working
+for existing callers. Non-breaking work — new functions, tests, comments, docs —
+edits the same `vN` in place. This is adopted from the very first commit so
+callers can always pin, and so drift from the (un-versioned) monorepo copies can
+be tracked and bumped deliberately.
 
 ### Autonomy (vendored dependencies)
 
@@ -84,8 +90,8 @@ make test        # gno test every p/moul and r/moul package
 make lint        # gno lint every package
 make gen         # refresh contracts.json + the table below
 make sync        # report drift vs the monorepo (someone changed my contract?)
-make publish     # print dependency-ordered publish plan (-net/-check for status)
-make upload ARGS="-net portal-loop -key mykey -dry-run ./..."   # broadcast (gnopublish)
+make publish NET=mainnet CHECK=1   # dependency-ordered publish plan + on-chain status
+make upload ARGS="-net mainnet -key mykey -dry-run ./..."       # broadcast (gnopublish)
 make help        # list all targets
 ```
 
