@@ -299,10 +299,15 @@ status are hand-authored/queried and preserved across regenerations.
 
 ## Dependency graph
 
-Whole-repo dependency graph (generated into [`_assets/`](./_assets) by
-`make graph`; each package also has its own `_assets/<pkgpath>/deps.svg`):
+One node per package, pinned to its latest version — edges are re-pointed onto
+the surviving nodes, so a package that only an older version depended on still
+shows its link (generated into [`_assets/`](./_assets) by `make graph`):
 
-![dependency graph](./_assets/graph.svg)
+![dependency graph (latest versions)](./_assets/graph-latest.svg)
+
+The **full graph**, with every version as its own node, is at
+[`_assets/graph.svg`](./_assets/graph.svg). Each package also has its own
+`_assets/<pkgpath>/deps.svg`.
 
 ## Contributing / agents
 
