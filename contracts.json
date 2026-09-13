@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-13T21:01:14Z",
+  "status_checked_at": "2026-09-13T21:19:29Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -72,7 +72,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": true,
@@ -193,7 +194,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -220,7 +222,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -279,7 +282,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -308,7 +312,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -335,7 +340,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -362,7 +368,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -389,7 +396,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -446,7 +454,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -473,7 +482,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -566,7 +576,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
