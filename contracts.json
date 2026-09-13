@@ -11,8 +11,8 @@
       "rpc": "https://rpc.pearl.testnets.gno.land:443"
     },
     {
-      "name": "betanet",
-      "chain_id": "gnoland1",
+      "name": "mainnet",
+      "chain_id": "gnoland-1",
       "rpc": "https://rpc.gno.land:443"
     },
     {
@@ -40,6 +40,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -65,6 +68,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -97,7 +103,7 @@
       "version": "v0",
       "description": "",
       "upstream": "gno.land/p/moul/authz/v0",
-      "upstream_match": "diff",
+      "upstream_match": "gno",
       "deps": [
         "gno.land/p/moul/addrset/v0",
         "gno.land/p/moul/once/v0",
@@ -108,6 +114,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -137,6 +146,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -178,6 +190,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -200,6 +215,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -231,6 +249,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -253,6 +274,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -281,6 +305,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -303,6 +330,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -329,6 +359,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -351,6 +384,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -379,6 +415,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -403,6 +442,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -425,6 +467,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -455,6 +500,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -483,6 +531,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -509,6 +560,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -533,6 +587,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -562,6 +619,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -584,6 +644,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -612,6 +675,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -634,6 +700,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -662,6 +731,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -686,6 +758,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -714,6 +789,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -736,6 +814,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -763,6 +844,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -793,6 +877,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -817,6 +904,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -845,6 +935,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -867,6 +960,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -895,6 +991,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -919,6 +1018,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -947,6 +1049,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -969,6 +1074,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -995,6 +1103,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1017,6 +1128,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1043,6 +1157,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1065,6 +1182,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1091,6 +1211,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1113,6 +1236,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1139,6 +1265,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1161,6 +1290,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1187,6 +1319,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1209,6 +1344,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1235,6 +1373,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1257,6 +1398,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1283,6 +1427,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1305,6 +1452,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1331,6 +1481,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1355,6 +1508,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1377,6 +1533,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1405,6 +1564,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1427,6 +1589,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1453,6 +1618,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1477,6 +1645,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1499,6 +1670,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1527,6 +1701,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1549,6 +1726,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1575,6 +1755,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1597,6 +1780,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1623,6 +1809,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1645,6 +1834,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1671,6 +1863,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1693,6 +1888,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1719,6 +1917,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1741,6 +1942,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1769,6 +1973,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1791,6 +1998,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1819,6 +2029,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1843,6 +2056,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1865,6 +2081,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1894,6 +2113,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1920,6 +2142,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1942,6 +2167,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -1971,6 +2199,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -1993,6 +2224,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2021,6 +2255,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2043,6 +2280,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2069,6 +2309,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2098,6 +2341,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2123,6 +2369,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2151,6 +2400,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2173,6 +2425,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2199,6 +2454,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2235,6 +2493,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2257,6 +2518,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2285,6 +2549,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2309,6 +2576,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2337,6 +2607,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2361,6 +2634,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2389,6 +2665,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2413,6 +2692,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2441,6 +2723,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2463,6 +2748,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2489,6 +2777,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2511,6 +2802,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2539,6 +2833,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2561,6 +2858,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2589,6 +2889,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2613,6 +2916,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2641,6 +2947,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2667,6 +2976,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2689,6 +3001,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2717,6 +3032,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2741,6 +3059,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2769,6 +3090,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2793,6 +3117,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2821,6 +3148,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2845,6 +3175,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2873,6 +3206,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2899,6 +3235,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2921,6 +3260,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -2949,6 +3291,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2975,6 +3320,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -2997,6 +3345,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3025,6 +3376,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3049,6 +3403,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3077,6 +3434,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3101,6 +3461,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3129,6 +3492,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3153,6 +3519,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3181,6 +3550,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3205,6 +3577,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3233,6 +3608,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3257,6 +3635,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3285,6 +3666,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3309,6 +3693,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3337,6 +3724,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3361,6 +3751,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3389,6 +3782,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3413,6 +3809,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3441,6 +3840,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3463,6 +3865,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3491,6 +3896,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3517,6 +3925,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3539,6 +3950,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3567,6 +3981,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3593,6 +4010,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3615,6 +4035,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3643,6 +4066,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3667,6 +4093,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3689,6 +4118,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3717,6 +4149,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3741,6 +4176,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3769,6 +4207,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3793,6 +4234,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3821,6 +4265,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3845,6 +4292,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3873,6 +4323,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3897,6 +4350,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3925,6 +4381,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3947,6 +4406,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -3975,6 +4437,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -3999,6 +4464,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4027,6 +4495,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4053,6 +4524,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4075,6 +4549,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4103,6 +4580,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4129,6 +4609,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4153,6 +4636,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4182,6 +4668,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4206,6 +4695,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4234,6 +4726,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4260,6 +4755,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4284,6 +4782,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4313,6 +4814,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4337,6 +4841,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4365,6 +4872,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4391,6 +4901,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4413,6 +4926,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4441,6 +4957,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4465,6 +4984,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4493,6 +5015,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4519,6 +5044,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4543,6 +5071,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4572,6 +5103,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4597,6 +5131,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4625,6 +5162,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4649,6 +5189,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4677,6 +5220,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4701,6 +5247,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4729,6 +5278,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4753,6 +5305,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4781,6 +5336,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4803,6 +5361,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
@@ -4829,6 +5390,9 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
         "pearl": {
           "uploaded": false
         },
@@ -4853,6 +5417,9 @@
       "draft": false,
       "published": {
         "betanet": {
+          "uploaded": false
+        },
+        "mainnet": {
           "uploaded": false
         },
         "pearl": {
