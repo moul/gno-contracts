@@ -128,6 +128,25 @@ Two things make mainnet unlike the testnets:
   over them; changes go in a `v1` here. `dynreplacer`, `typeutil` and `ulist` are
   the three mirrors NOT at genesis.
 
+### Publishing: keep the client at the chain's revision
+
+`tools/gnopublish` builds against a **local gno checkout** — `go.mod` carries a
+`replace github.com/gnolang/gno => ../../../../gnoland/gno`, so it silently
+compiles against whatever revision that working tree happens to sit at. There is
+no version pin to warn you.
+
+When the chain is ahead of that checkout, the first symptom is an opaque amino
+error from the account query, e.g. mainnet adding `vesting` to `std.BaseAccount`:
+
+```
+error: query account g1…: unknown JSON field "vesting" for type std.BaseAccount
+```
+
+Fix: move that checkout to the revision the chain runs — for mainnet the
+`chain/mainnet` tag — and re-run. `gnopublish` now annotates this specific
+failure with that instruction, and performs the account query **before**
+prompting for the gnokey password, so a stale client costs nothing.
+
 Two live testnets, both on gno `v1.0.0-rc.0` and interchangeable as publish
 targets — `sapphire` (`sapphire-1`) and `pearl` (`pearl-1`). Each exposes the
 same host pattern: `rpc.<net>.testnets.gno.land`, gnoweb at
