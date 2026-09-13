@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-11T21:23:35Z",
+  "status_checked_at": "2026-09-13T20:56:58Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -41,7 +41,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -117,7 +118,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -416,7 +418,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -501,7 +504,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -532,7 +536,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -590,7 +595,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -676,7 +682,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -790,7 +797,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
@@ -907,7 +915,8 @@
           "uploaded": false
         },
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "monorepo"
         },
         "pearl": {
           "uploaded": false
