@@ -3,10 +3,10 @@
 A set of blockchain addresses, **backed by a B+ tree** (`gno.land/p/nt/bptree`).
 
 The B+ tree successor to [`p/moul/addrset/v0`](https://github.com/moul/gno-contracts/tree/main/p/moul/addrset/v0)
-(AVL-backed). **v2 because the backing data structure — and thus the on-chain
+(AVL-backed). **v1 because the backing data structure — and thus the on-chain
 storage layout — changed** (a compatibility change ⇒ new version). A B+ tree
 packs many entries per persisted node, so a stored address costs ~0.9 KB vs the
-AVL backing's ~2.0 KB, and inserts spend materially less gas — prefer v2 for
+AVL backing's ~2.0 KB, and inserts spend materially less gas — prefer v1 for
 persisted realm state.
 
 ```go
