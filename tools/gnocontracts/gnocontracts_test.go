@@ -391,3 +391,157 @@ func TestManifestReconcilesNetworksAndKeepsPublished(t *testing.T) {
 		}
 	}
 }
+
+func TestSplitVersion(t *testing.T) {
+	cases := []struct {
+		in   string
+		base string
+		n    int
+		ok   bool
+	}{
+		{"gno.land/p/moul/md/v0", "gno.land/p/moul/md", 0, true},
+		{"gno.land/p/moul/md/v12", "gno.land/p/moul/md", 12, true},
+		// The version is the LAST element, even for nested packages.
+		{"gno.land/p/moul/ulist/lplist/v0", "gno.land/p/moul/ulist/lplist", 0, true},
+		// Not versions.
+		{"gno.land/p/moul/md", "gno.land/p/moul/md", 0, false},
+		{"gno.land/p/moul/vault", "gno.land/p/moul/vault", 0, false},
+		{"gno.land/p/moul/v", "gno.land/p/moul/v", 0, false},
+		{"gno.land/p/moul/v1x", "gno.land/p/moul/v1x", 0, false},
+		{"nopath", "nopath", 0, false},
+	}
+	for _, c := range cases {
+		base, n, ok := splitVersion(c.in)
+		if base != c.base || n != c.n || ok != c.ok {
+			t.Errorf("splitVersion(%q) = (%q,%d,%v), want (%q,%d,%v)",
+				c.in, base, n, ok, c.base, c.n, c.ok)
+		}
+	}
+}
+
+// TestLatestOwnIsNumeric guards the v10 > v9 case a string sort gets wrong.
+func TestLatestOwnIsNumeric(t *testing.T) {
+	m := &Manifest{Contracts: []Contract{
+		{PkgPath: "gno.land/p/moul/a/v9"},
+		{PkgPath: "gno.land/p/moul/a/v10"},
+		{PkgPath: "gno.land/p/moul/a/v2"},
+	}}
+	got := latestOwn(m)["gno.land/p/moul/a"]
+	if got != "gno.land/p/moul/a/v10" {
+		t.Fatalf("latest = %q, want v10 (numeric compare, not lexical)", got)
+	}
+}
+
+// TestLatestDotRepointsEdges is the core behaviour: an edge into a superseded
+// version must survive, re-pointed at the latest, or the package would render
+// as dependency-less.
+func TestLatestDotRepointsEdges(t *testing.T) {
+	m := &Manifest{Contracts: []Contract{
+		{PkgPath: "gno.land/p/moul/lib/v0"},
+		{PkgPath: "gno.land/p/moul/lib/v1"},
+		{PkgPath: "gno.land/r/moul/app/v0", Deps: []string{"gno.land/p/moul/lib/v0"}},
+	}}
+	dot := latestDot(m)
+
+	if !strings.Contains(dot, `"gno.land/r/moul/app/v0" -> "gno.land/p/moul/lib/v1"`) {
+		t.Errorf("edge should be re-pointed to lib/v1, got:\n%s", dot)
+	}
+	if strings.Contains(dot, `"gno.land/p/moul/lib/v0"`) {
+		t.Errorf("superseded lib/v0 should not appear, got:\n%s", dot)
+	}
+}
+
+// TestLatestDotDropsSelfEdges: a v1 importing its own v0 collapses to a loop,
+// which is noise.
+func TestLatestDotDropsSelfEdges(t *testing.T) {
+	m := &Manifest{Contracts: []Contract{
+		{PkgPath: "gno.land/p/moul/lib/v0"},
+		{PkgPath: "gno.land/p/moul/lib/v1", Deps: []string{"gno.land/p/moul/lib/v0"}},
+	}}
+	dot := latestDot(m)
+	if strings.Contains(dot, "->") {
+		t.Errorf("a version importing its own predecessor must not render an edge, got:\n%s", dot)
+	}
+}
+
+// TestLatestDotDedupesEdges: two versions of the same package depending on the
+// same lib collapse to ONE package-level edge.
+func TestLatestDotDedupesEdges(t *testing.T) {
+	m := &Manifest{Contracts: []Contract{
+		{PkgPath: "gno.land/p/moul/lib/v0"},
+		{PkgPath: "gno.land/r/moul/app/v0", Deps: []string{"gno.land/p/moul/lib/v0"}},
+		{PkgPath: "gno.land/r/moul/app/v1", Deps: []string{"gno.land/p/moul/lib/v0"}},
+	}}
+	dot := latestDot(m)
+	if n := strings.Count(dot, "->"); n != 1 {
+		t.Errorf("want exactly 1 collapsed edge, got %d:\n%s", n, dot)
+	}
+}
+
+// TestLatestDotKeepsExternalVersions: we do not know an external package's full
+// version set, so folding its versions together would assert something false.
+func TestLatestDotKeepsExternalVersions(t *testing.T) {
+	m := &Manifest{Contracts: []Contract{
+		{PkgPath: "gno.land/r/moul/a/v0", Deps: []string{"gno.land/p/nt/avl/v0"}},
+		{PkgPath: "gno.land/r/moul/b/v0", Deps: []string{"gno.land/p/nt/avl/v1"}},
+	}}
+	dot := latestDot(m)
+	for _, want := range []string{"gno.land/p/nt/avl/v0", "gno.land/p/nt/avl/v1"} {
+		if !strings.Contains(dot, want) {
+			t.Errorf("external %s should be kept verbatim, got:\n%s", want, dot)
+		}
+	}
+}
+
+func TestLatestDotIsDeterministic(t *testing.T) {
+	m := &Manifest{Contracts: []Contract{
+		{PkgPath: "gno.land/r/moul/z/v0", Deps: []string{"gno.land/p/moul/b/v0", "gno.land/p/moul/a/v0"}},
+		{PkgPath: "gno.land/p/moul/a/v0"},
+		{PkgPath: "gno.land/p/moul/b/v0"},
+	}}
+	if latestDot(m) != latestDot(m) {
+		t.Fatal("latestDot must be deterministic")
+	}
+}
+
+// TestRenderGraphSectionIsIdempotent: regen runs on every merge, so a second
+// pass must not duplicate or drift the section.
+func TestRenderGraphSectionIsIdempotent(t *testing.T) {
+	in := "# Title\n\nintro\n\n## Dependency graph\n\nold body\n\n## Contributing\n\ntail\n"
+	once := renderGraphSection(in)
+	twice := renderGraphSection(once)
+	if once != twice {
+		t.Errorf("not idempotent:\n--- once ---\n%s\n--- twice ---\n%s", once, twice)
+	}
+	if !strings.Contains(once, "graph-latest.svg") {
+		t.Error("should embed the latest-only graph")
+	}
+	if !strings.Contains(once, "_assets/graph.svg") {
+		t.Error("should link the full graph")
+	}
+	if strings.Contains(once, "old body") {
+		t.Error("old body should be replaced")
+	}
+	if !strings.Contains(once, "## Contributing\n\ntail\n") {
+		t.Error("the following section must be preserved intact")
+	}
+}
+
+func TestRenderGraphSectionNoSection(t *testing.T) {
+	in := "# Title\n\nno graph section here\n"
+	if got := renderGraphSection(in); got != in {
+		t.Errorf("content without the heading must pass through unchanged, got:\n%s", got)
+	}
+}
+
+// TestRenderGraphSectionAtEOF covers the section being the last one.
+func TestRenderGraphSectionAtEOF(t *testing.T) {
+	in := "# Title\n\n## Dependency graph\n\nold\n"
+	got := renderGraphSection(in)
+	if !strings.Contains(got, "graph-latest.svg") {
+		t.Errorf("should still rewrite when the section ends the file, got:\n%s", got)
+	}
+	if got != renderGraphSection(got) {
+		t.Error("must be idempotent at EOF too")
+	}
+}

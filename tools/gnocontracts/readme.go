@@ -37,7 +37,42 @@ func cmdReadme(root string) error {
 	out.WriteString(renderTable(m))
 	out.WriteString("\n")
 	out.WriteString(content[j:])
-	return os.WriteFile(readmePath, []byte(out.String()), 0o644)
+	return os.WriteFile(readmePath, []byte(renderGraphSection(out.String())), 0o644)
+}
+
+const graphHeading = "## Dependency graph"
+
+// renderGraphSection rewrites the body of the "## Dependency graph" section so
+// the README embeds the LATEST-VERSION-ONLY graph, linking the full one rather
+// than inlining it.
+//
+// It is driven by the heading rather than marker comments so that the section
+// can be introduced without editing README.md in a PR — the `no-generated-files`
+// guard rejects any PR touching README.md, so this lands via `regen` on main.
+// Rewriting from the heading to the next `## ` is idempotent.
+func renderGraphSection(content string) string {
+	i := strings.Index(content, graphHeading)
+	if i < 0 {
+		return content // no such section; nothing to do
+	}
+	rest := content[i+len(graphHeading):]
+	// End at the next top-level section, or EOF.
+	end := len(content)
+	if k := strings.Index(rest, "\n## "); k >= 0 {
+		end = i + len(graphHeading) + k + 1
+	}
+	body := "\n\n" + strings.TrimSpace(`
+One node per package, pinned to its latest version — edges are re-pointed onto
+the surviving nodes, so a package that only an older version depended on still
+shows its link (generated into [`+"`_assets/`"+`](./_assets) by `+"`make graph`"+`):
+
+![dependency graph (latest versions)](./`+assetsDir+`/`+graphLatestBase+`.svg)
+
+The **full graph**, with every version as its own node, is at
+[`+"`_assets/graph.svg`"+`](./`+assetsDir+`/graph.svg). Each package also has its own
+`+"`_assets/<pkgpath>/deps.svg`"+`.
+`) + "\n\n"
+	return content[:i] + graphHeading + body + content[end:]
 }
 
 func renderTable(m *Manifest) string {
