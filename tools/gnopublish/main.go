@@ -216,17 +216,20 @@ func run() error {
 			return fmt.Errorf("aborted")
 		}
 	}
+	// Account number + starting sequence. Queried BEFORE prompting for the
+	// password: it is a read-only call that needs no signer, and it is the first
+	// thing to fail when this binary is older than the chain — no reason to make
+	// the user type a passphrase only to hit that.
+	acc, _, err := client.QueryAccount(addr)
+	if err != nil {
+		return fmt.Errorf("query account %s: %w", addr, staleClientHint(err))
+	}
+
 	pass, err := promptPassword(fmt.Sprintf("gnokey password for %q: ", *keyName))
 	if err != nil {
 		return err
 	}
 	client.Signer = &gnoclient.SignerFromKeybase{Keybase: kb, Account: *keyName, Password: pass, ChainID: net.ChainID}
-
-	// Account number + starting sequence.
-	acc, _, err := client.QueryAccount(addr)
-	if err != nil {
-		return fmt.Errorf("query account %s: %w", addr, err)
-	}
 
 	// Build one MsgAddPackage per package.
 	var maxDep std.Coins
@@ -809,4 +812,24 @@ flags:
 `)
 		fs.PrintDefaults()
 	}
+}
+
+// staleClientHint turns an amino decode failure into an actionable message.
+//
+// gnopublish is built against a LOCAL gno checkout (see the `replace` in
+// go.mod), so it silently compiles against whatever revision that working tree
+// happens to sit at. When the chain adds a field this binary's structs do not
+// know — mainnet adding `vesting` to std.BaseAccount is the case that bit us —
+// the only symptom is `unknown JSON field "..." for type ...`, which says
+// nothing about the real cause.
+func staleClientHint(err error) error {
+	if err == nil || !strings.Contains(err.Error(), "unknown JSON field") {
+		return err
+	}
+	return fmt.Errorf("%w\n\n"+
+		"This usually means gnopublish is OLDER than the chain: it decoded a reply\n"+
+		"containing a field its compiled structs do not have.\n"+
+		"gnopublish builds against the local gno checkout that tools/gnopublish/go.mod\n"+
+		"points at with a `replace` directive — update that checkout to the revision\n"+
+		"the chain runs (for mainnet, the `chain/mainnet` tag) and re-run", err)
 }
