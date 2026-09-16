@@ -83,6 +83,7 @@ func run() error {
 	deposit := fs.String("deposit", "", "max storage deposit (e.g. 1000000ugnot); empty = node default")
 	dryRun := fs.Bool("dry-run", false, "print the plan and exit without broadcasting")
 	yes := fs.Bool("yes", false, "skip the confirmation prompt")
+	noCache := fs.Bool("no-cache", false, "ignore and don't update the on-disk cache of packages confirmed on chain ("+cacheDir+"; `make clean` removes it)")
 	stopOnError := fs.Bool("stop-on-error", false, "individual mode: abort the whole run on the first failure (default: skip it and continue)")
 	fs.Usage = usage(fs)
 	if err := fs.Parse(os.Args[1:]); err != nil {
@@ -132,23 +133,49 @@ func run() error {
 	fmt.Printf("network: %s (%s)  rpc: %s\n", net.Name, net.ChainID, net.RPC)
 	fmt.Printf("selected %d package(s); %d skipped (draft/ignored)\n\n", len(ordered), len(skipped))
 
+	cache := loadCache(root, net, *noCache)
+	hits := 0
+
 	var todo []plan
 	fmt.Println("status (dependency order):")
 	for _, c := range ordered {
 		absDir := filepath.Join(root, filepath.FromSlash(c.Dir))
-		onchain := packageExists(client, c.PkgPath)
 		state := "up-to-date"
 		var reason string
+
+		entry, cachedOnChain := cache.onChain(c.PkgPath)
+		onchain := cachedOnChain || packageExists(client, c.PkgPath)
+		if onchain && !cachedOnChain {
+			cache.record(c.PkgPath, "")
+		}
+
 		switch {
 		case !onchain:
 			state, reason = "MISSING", "missing"
 		case *full:
-			same, derr := contentUpToDate(client, c.PkgPath, absDir)
-			if derr != nil {
-				state = "check-failed: " + derr.Error()
-			} else if !same {
-				state, reason = "OUT-OF-DATE", "out-of-date"
+			hash, herr := localHash(absDir, c.PkgPath)
+			switch {
+			case herr != nil:
+				state = "check-failed: " + herr.Error()
+			case cache.contentVerified(c.PkgPath, hash):
+				state = "up-to-date " + entry.describe(true)
+				hits++
+			default:
+				same, derr := contentUpToDate(client, c.PkgPath, absDir)
+				switch {
+				case derr != nil:
+					state = "check-failed: " + derr.Error()
+				case !same:
+					state, reason = "OUT-OF-DATE", "out-of-date"
+					cache.forgetHash(c.PkgPath)
+				default:
+					cache.record(c.PkgPath, hash)
+					state = "up-to-date (sha256:" + shortHash(hash) + ")"
+				}
 			}
+		case cachedOnChain:
+			state = "up-to-date " + entry.describe(true)
+			hits++
 		}
 		if reason != "" {
 			todo = append(todo, plan{c, reason})
@@ -157,6 +184,13 @@ func run() error {
 	}
 	for _, s := range skipped {
 		fmt.Printf("  %-48s skipped (%s)\n", s.PkgPath, skipReason(s))
+	}
+	if !*noCache {
+		if err := cache.save(); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: cache not saved: %v\n", err)
+		}
+		fmt.Printf("cache: %d/%d confirmed on chain from disk, not re-queried (%s; -no-cache or `make clean` to reset)\n",
+			hits, len(ordered), filepath.Join(cacheDir, filepath.Base(cache.path)))
 	}
 
 	if len(todo) == 0 {
@@ -170,7 +204,11 @@ func run() error {
 	// to surface as an opaque type-check failure deep into the run (p/archive/dom
 	// killed r/moul/demo/importdemo/v2 at 122/131). It is knowable up front, so
 	// say so before broadcasting anything.
-	if missing := missingExternalDeps(client, ordered, todo); len(missing) > 0 {
+	missing := missingExternalDeps(client, cache, ordered, todo)
+	if err := cache.save(); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: cache not saved: %v\n", err)
+	}
+	if len(missing) > 0 {
 		fmt.Printf("\n⚠️  %d external dependency(ies) are NOT on %s and are not published by this run:\n", len(missing), net.Name)
 		for _, d := range missing {
 			fmt.Printf("  ❌ %-46s needed by: %s\n", d.pkg, strings.Join(d.neededBy, ", "))
@@ -531,11 +569,15 @@ type extDep struct {
 // "External" means: not among the packages selected for this run. Those are the
 // only deps nobody is going to create — a dep we DO publish is handled by
 // topoOrder, which sequences it first.
-func missingExternalDeps(c *gnoclient.Client, ordered []contract, todo []plan) []extDep {
+func missingExternalDeps(c *gnoclient.Client, cache *chainCache, ordered []contract, todo []plan) []extDep {
 	var out []extDep
 	// One query per distinct dep, not per dependent.
 	for _, d := range externalDeps(ordered, todo) {
+		if _, ok := cache.onChain(d.pkg); ok {
+			continue
+		}
 		if packageExists(c, d.pkg) {
+			cache.record(d.pkg, "")
 			continue
 		}
 		out = append(out, d)

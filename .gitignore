@@ -19,3 +19,6 @@ tools/tools
 
 # NOTE: vendor/ is intentionally committed (autonomy). Do not ignore it.
 tools/gnopublish/gnopublish
+
+# gnopublish's cache of packages confirmed on chain (`make clean` removes it)
+/.cache/

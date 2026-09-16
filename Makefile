@@ -120,7 +120,7 @@ sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
 publish: ## dependency-ordered publish plan; NET=<net> CHECK=1 to query chain
 	$(TOOL) publish $(if $(NET),-net $(NET),) $(if $(CHECK),-check,)
 
-upload: ## broadcast packages to a network via gnopublish, e.g. ARGS="-net portal-loop -key mykey -dry-run ./..."
+upload: ## broadcast packages to a network via gnopublish, e.g. ARGS="-net mainnet -key mykey -dry-run ./..." (on-chain hits cached in .cache/)
 	cd tools/gnopublish && GOTOOLCHAIN=auto go run . $(ARGS)
 
 status: ## refresh on-chain upload status (all networks) + README; needs gnokey
@@ -132,5 +132,5 @@ report: ## analyze the PR diff (BASE=origin/main) into a Markdown report
 graph: ## generate per-package + global dependency graphs into _assets/ (needs graphviz for svg/png)
 	$(TOOL) graph
 
-clean: ## remove build artifacts and the GNOROOT view
-	rm -rf bin "$(VIEW)"
+clean: ## remove build artifacts, the GNOROOT view and the gnopublish on-chain cache
+	rm -rf bin "$(VIEW)" .cache
