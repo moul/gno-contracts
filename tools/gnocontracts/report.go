@@ -181,7 +181,17 @@ func packageDirOf(root, path string) string {
 	return ""
 }
 
-// countTests counts `func Test...` across *_test.gno in a package dir (at HEAD).
+// countTests counts test functions across *_test.gno in a package dir (at HEAD).
+//
+// `func Example...` counts too, and must: for a realm, AGENTS.md's preferred —
+// and `guard-render`'s canonical — way to exercise Render is an ExampleRender
+// with a pinned `// Output:` block, usually with no `func Test` at all. Counting
+// only Test left 36 realms reported as "has no tests" while guard-render was
+// green on them, which is the repo contradicting itself about its own rule.
+//
+// An Example without `// Output:` is silently skipped by gno and would be a
+// false green, but `guard-examples` fails the build on exactly that, so every
+// Example that reaches here is a real test.
 func countTests(root, dir string) int {
 	n := 0
 	entries, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(dir)))
@@ -194,7 +204,7 @@ func countTests(root, dir string) int {
 		}
 		b, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(dir), e.Name()))
 		for _, ln := range strings.Split(string(b), "\n") {
-			if strings.HasPrefix(ln, "func Test") {
+			if strings.HasPrefix(ln, "func Test") || strings.HasPrefix(ln, "func Example") {
 				n++
 			}
 		}
