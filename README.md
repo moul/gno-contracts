@@ -104,10 +104,10 @@ make help        # list all targets
 | [`p/moul/addrset/v0`](p/moul/addrset/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/addrset/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset/v0) ≈ | 1 |
 | [`p/moul/addrset/v1`](p/moul/addrset/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/addrset/v1) | [✅](https://gno.land/p/moul/addrset/v1) | — | — | 1 |
 | [`p/moul/authz/v0`](p/moul/authz/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/authz/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz/v0) ≈ | 5 |
-| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/authz/v1) | — | — | — | 3 |
+| [`p/moul/authz/v1`](p/moul/authz/v1) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/authz/v1) | [✅](https://gno.land/p/moul/authz/v1) | — | — | 3 |
 | [`p/moul/collection/v0`](p/moul/collection/v0) 📦 | — | — | [✅](https://gno.land/p/moul/collection/v0) | — | — | 3 |
 | [`p/moul/cow/v0`](p/moul/cow/v0) 📦 | — | — | [✅](https://gno.land/p/moul/cow/v0) | — | — | — |
-| [`p/moul/debug/v0`](p/moul/debug/v0) 📦 | — | — | — | — | — | 4 |
+| [`p/moul/debug/v0`](p/moul/debug/v0) 📦 | — | — | [✅](https://gno.land/p/moul/debug/v0) | — | — | 4 |
 | [`p/moul/deque/v0`](p/moul/deque/v0) 📦 | — | — | [✅](https://gno.land/p/moul/deque/v0) | — | — | — |
 | [`p/moul/dynreplacer/v0`](p/moul/dynreplacer/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/dynreplacer/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/dynreplacer/v0) ≈ | — |
 | [`p/moul/entity/v0`](p/moul/entity/v0) 📦 | — | — | [✅](https://gno.land/p/moul/entity/v0) | — | — | — |
@@ -120,57 +120,57 @@ make help        # list all targets
 | [`p/moul/md/v0`](p/moul/md/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/md/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md/v0) ≈ | 1 |
 | [`p/moul/mdlist/v0`](p/moul/mdlist/v0) 📦 | — | — | [✅](https://gno.land/p/moul/mdlist/v0) | — | — | 1 |
 | [`p/moul/mdtable/v0`](p/moul/mdtable/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/mdtable/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable/v0) ≈ | — |
-| [`p/moul/memo/v0`](p/moul/memo/v0) 📦 | — | — | — | — | — | 2 |
-| [`p/moul/nestedpkg/v0`](p/moul/nestedpkg/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/memo/v0`](p/moul/memo/v0) 📦 | — | — | [✅](https://gno.land/p/moul/memo/v0) | — | — | 2 |
+| [`p/moul/nestedpkg/v0`](p/moul/nestedpkg/v0) 📦 | — | — | [✅](https://gno.land/p/moul/nestedpkg/v0) | — | — | — |
 | [`p/moul/once/v0`](p/moul/once/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/once/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once/v0) ≈ | — |
-| [`p/moul/ownable/v0`](p/moul/ownable/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/pageable/v0`](p/moul/pageable/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/printfdebugging/v0`](p/moul/printfdebugging/v0) 📦 | — | — | — | — | — | 1 |
+| [`p/moul/ownable/v0`](p/moul/ownable/v0) 📦 | — | — | [✅](https://gno.land/p/moul/ownable/v0) | — | — | — |
+| [`p/moul/pageable/v0`](p/moul/pageable/v0) 📦 | — | — | [✅](https://gno.land/p/moul/pageable/v0) | — | — | 1 |
+| [`p/moul/printfdebugging/v0`](p/moul/printfdebugging/v0) 📦 | — | — | [✅](https://gno.land/p/moul/printfdebugging/v0) | — | — | 1 |
 | [`p/moul/realmpath/v0`](p/moul/realmpath/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/realmpath/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath/v0) ≈ | — |
-| [`p/moul/safe/v0`](p/moul/safe/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/svg/v0`](p/moul/svg/v0) 📦 | — | — | — | — | — | 2 |
-| [`p/moul/template/v0`](p/moul/template/v0) 📦 | — | — | — | — | — | 3 |
+| [`p/moul/safe/v0`](p/moul/safe/v0) 📦 | — | — | [✅](https://gno.land/p/moul/safe/v0) | — | — | — |
+| [`p/moul/svg/v0`](p/moul/svg/v0) 📦 | — | — | [✅](https://gno.land/p/moul/svg/v0) | — | — | 2 |
+| [`p/moul/template/v0`](p/moul/template/v0) 📦 | — | — | [✅](https://gno.land/p/moul/template/v0) | — | — | 3 |
 | [`p/moul/txlink/v0`](p/moul/txlink/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/txlink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink/v0) ≈ | — |
-| [`p/moul/typeutil/v0`](p/moul/typeutil/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil/v0) ≈ | — |
-| [`p/moul/udao/v0`](p/moul/udao/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/ulist/lplist/v0`](p/moul/ulist/lplist/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/ulist/v0`](p/moul/ulist/v0) 📦 | — | — | — | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist/v0) ≈ | — |
-| [`p/moul/web25/v0`](p/moul/web25/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/x/daily/b58/v0`](p/moul/x/daily/b58/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/base32/v0`](p/moul/x/daily/base32/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/bidimap/v0`](p/moul/x/daily/bidimap/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/bitset/v0`](p/moul/x/daily/bitset/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/cliffvesting/v0`](p/moul/x/daily/cliffvesting/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/commitreveal/v0`](p/moul/x/daily/commitreveal/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/countminsketch/v0`](p/moul/x/daily/countminsketch/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/cowsay/v0`](p/moul/x/daily/cowsay/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/crc32/v0`](p/moul/x/daily/crc32/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/disjointset/v0`](p/moul/x/daily/disjointset/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/flatmap/v0`](p/moul/x/daily/flatmap/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/fraction/v0`](p/moul/x/daily/fraction/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/heap/v0`](p/moul/x/daily/heap/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/hexdump/v0`](p/moul/x/daily/hexdump/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/humanize/v0`](p/moul/x/daily/humanize/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/kmp/v0`](p/moul/x/daily/kmp/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/levenshtein/v0`](p/moul/x/daily/levenshtein/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/luhn/v0`](p/moul/x/daily/luhn/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/markov/v0`](p/moul/x/daily/markov/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/x/daily/multiset/v0`](p/moul/x/daily/multiset/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/orderedmap/v0`](p/moul/x/daily/orderedmap/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/piglatin/v0`](p/moul/x/daily/piglatin/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/pullpayment/v0`](p/moul/x/daily/pullpayment/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/ratelimit/v0`](p/moul/x/daily/ratelimit/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/x/daily/ringbuffer/v0`](p/moul/x/daily/ringbuffer/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/rle/v0`](p/moul/x/daily/rle/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/romannum/v0`](p/moul/x/daily/romannum/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/rot13/v0`](p/moul/x/daily/rot13/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/semver/v0`](p/moul/x/daily/semver/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/sieve/v0`](p/moul/x/daily/sieve/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/soundex/v0`](p/moul/x/daily/soundex/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie/v0) 📦 | — | — | — | — | — | — |
-| [`p/moul/xdao/v0`](p/moul/xdao/v0) 📦 | — | — | — | — | — | 1 |
-| [`p/moul/xmath/v0`](p/moul/xmath/v0) 📦 | — | — | — | — | — | — |
+| [`p/moul/typeutil/v0`](p/moul/typeutil/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/typeutil/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil/v0) ≈ | — |
+| [`p/moul/udao/v0`](p/moul/udao/v0) 📦 | — | — | [✅](https://gno.land/p/moul/udao/v0) | — | — | — |
+| [`p/moul/ulist/lplist/v0`](p/moul/ulist/lplist/v0) 📦 | — | — | [✅](https://gno.land/p/moul/ulist/lplist/v0) | — | — | 1 |
+| [`p/moul/ulist/v0`](p/moul/ulist/v0) 📦 | — | — | [🗄️](https://gno.land/p/moul/ulist/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist/v0) ≈ | — |
+| [`p/moul/web25/v0`](p/moul/web25/v0) 📦 | — | — | [✅](https://gno.land/p/moul/web25/v0) | — | — | 1 |
+| [`p/moul/x/daily/b58/v0`](p/moul/x/daily/b58/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/b58/v0) | — | — | — |
+| [`p/moul/x/daily/base32/v0`](p/moul/x/daily/base32/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/base32/v0) | — | — | — |
+| [`p/moul/x/daily/bidimap/v0`](p/moul/x/daily/bidimap/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/bidimap/v0) | — | — | — |
+| [`p/moul/x/daily/bitset/v0`](p/moul/x/daily/bitset/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/bitset/v0) | — | — | — |
+| [`p/moul/x/daily/cliffvesting/v0`](p/moul/x/daily/cliffvesting/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/cliffvesting/v0) | — | — | — |
+| [`p/moul/x/daily/commitreveal/v0`](p/moul/x/daily/commitreveal/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/commitreveal/v0) | — | — | — |
+| [`p/moul/x/daily/countminsketch/v0`](p/moul/x/daily/countminsketch/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/countminsketch/v0) | — | — | — |
+| [`p/moul/x/daily/cowsay/v0`](p/moul/x/daily/cowsay/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/cowsay/v0) | — | — | — |
+| [`p/moul/x/daily/crc32/v0`](p/moul/x/daily/crc32/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/crc32/v0) | — | — | — |
+| [`p/moul/x/daily/disjointset/v0`](p/moul/x/daily/disjointset/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/disjointset/v0) | — | — | — |
+| [`p/moul/x/daily/flatmap/v0`](p/moul/x/daily/flatmap/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/flatmap/v0) | — | — | — |
+| [`p/moul/x/daily/fraction/v0`](p/moul/x/daily/fraction/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/fraction/v0) | — | — | — |
+| [`p/moul/x/daily/heap/v0`](p/moul/x/daily/heap/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/heap/v0) | — | — | — |
+| [`p/moul/x/daily/hexdump/v0`](p/moul/x/daily/hexdump/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/hexdump/v0) | — | — | — |
+| [`p/moul/x/daily/humanize/v0`](p/moul/x/daily/humanize/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/humanize/v0) | — | — | — |
+| [`p/moul/x/daily/kmp/v0`](p/moul/x/daily/kmp/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/kmp/v0) | — | — | — |
+| [`p/moul/x/daily/levenshtein/v0`](p/moul/x/daily/levenshtein/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/levenshtein/v0) | — | — | — |
+| [`p/moul/x/daily/luhn/v0`](p/moul/x/daily/luhn/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/luhn/v0) | — | — | — |
+| [`p/moul/x/daily/markov/v0`](p/moul/x/daily/markov/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/markov/v0) | — | — | 1 |
+| [`p/moul/x/daily/multiset/v0`](p/moul/x/daily/multiset/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/multiset/v0) | — | — | — |
+| [`p/moul/x/daily/orderedmap/v0`](p/moul/x/daily/orderedmap/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/orderedmap/v0) | — | — | — |
+| [`p/moul/x/daily/piglatin/v0`](p/moul/x/daily/piglatin/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/piglatin/v0) | — | — | — |
+| [`p/moul/x/daily/pullpayment/v0`](p/moul/x/daily/pullpayment/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/pullpayment/v0) | — | — | — |
+| [`p/moul/x/daily/ratelimit/v0`](p/moul/x/daily/ratelimit/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/ratelimit/v0) | — | — | 1 |
+| [`p/moul/x/daily/ringbuffer/v0`](p/moul/x/daily/ringbuffer/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/ringbuffer/v0) | — | — | — |
+| [`p/moul/x/daily/rle/v0`](p/moul/x/daily/rle/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/rle/v0) | — | — | — |
+| [`p/moul/x/daily/romannum/v0`](p/moul/x/daily/romannum/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/romannum/v0) | — | — | — |
+| [`p/moul/x/daily/rot13/v0`](p/moul/x/daily/rot13/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/rot13/v0) | — | — | — |
+| [`p/moul/x/daily/semver/v0`](p/moul/x/daily/semver/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/semver/v0) | — | — | — |
+| [`p/moul/x/daily/sieve/v0`](p/moul/x/daily/sieve/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/sieve/v0) | — | — | — |
+| [`p/moul/x/daily/soundex/v0`](p/moul/x/daily/soundex/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/soundex/v0) | — | — | — |
+| [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/toposort/v0) | — | — | — |
+| [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/trie/v0) | — | — | — |
+| [`p/moul/xdao/v0`](p/moul/xdao/v0) 📦 | — | — | [✅](https://gno.land/p/moul/xdao/v0) | — | — | 1 |
+| [`p/moul/xmath/v0`](p/moul/xmath/v0) 📦 | — | — | [✅](https://gno.land/p/moul/xmath/v0) | — | — | — |
 | [`r/moul/config/v0`](r/moul/config/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/demo/args/v0`](r/moul/demo/args/v0) 🏛️ | — | — | — | — | — | — |
 | [`r/moul/demo/data/v0`](r/moul/demo/data/v0) 🏛️ | — | — | — | — | — | — |
@@ -189,37 +189,37 @@ make help        # list all targets
 | [`r/moul/outfmt/v0`](r/moul/outfmt/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/present/v0`](r/moul/present/v0) 🏛️ | — | — | — | — | — | 9 |
 | [`r/moul/sapin/v0`](r/moul/sapin/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/asciiart/v0`](r/moul/x/daily/asciiart/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/b58demo/v0`](r/moul/x/daily/b58demo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/ballot/v0`](r/moul/x/daily/ballot/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/base32demo/v0`](r/moul/x/daily/base32demo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/bidimapdemo/v0`](r/moul/x/daily/bidimapdemo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/bitsetdemo/v0`](r/moul/x/daily/bitsetdemo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/blog/v0`](r/moul/x/daily/blog/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/bloomfilter/v0`](r/moul/x/daily/bloomfilter/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/bullscows/v0`](r/moul/x/daily/bullscows/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/calc/v0`](r/moul/x/daily/calc/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/cliffvestingdemo/v0`](r/moul/x/daily/cliffvestingdemo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/closestguess/v0`](r/moul/x/daily/closestguess/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/coinflipduel/v0`](r/moul/x/daily/coinflipduel/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/collatz/v0`](r/moul/x/daily/collatz/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/commitrevealdemo/v0`](r/moul/x/daily/commitrevealdemo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/connect4/v0`](r/moul/x/daily/connect4/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/counter/v0`](r/moul/x/daily/counter/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/countminsketchdemo/v0`](r/moul/x/daily/countminsketchdemo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/cowsaydemo/v0`](r/moul/x/daily/cowsaydemo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/crc32demo/v0`](r/moul/x/daily/crc32demo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/crowdfund/v0`](r/moul/x/daily/crowdfund/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/dice/v0`](r/moul/x/daily/dice/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/disjointsetdemo/v0`](r/moul/x/daily/disjointsetdemo/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/dutchauction/v0`](r/moul/x/daily/dutchauction/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/eggling/v0`](r/moul/x/daily/eggling/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/eightball/v0`](r/moul/x/daily/eightball/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/englishauction/v0`](r/moul/x/daily/englishauction/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/erc1155/v0`](r/moul/x/daily/erc1155/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/erc20/v0`](r/moul/x/daily/erc20/v0) 🏛️ | — | — | — | — | — | — |
-| [`r/moul/x/daily/erc721/v0`](r/moul/x/daily/erc721/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/escrow/v0`](r/moul/x/daily/escrow/v0) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/asciiart/v0`](r/moul/x/daily/asciiart/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/asciiart/v0) | — | — | 1 |
+| [`r/moul/x/daily/b58demo/v0`](r/moul/x/daily/b58demo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/b58demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/ballot/v0`](r/moul/x/daily/ballot/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/ballot/v0) | — | — | 1 |
+| [`r/moul/x/daily/base32demo/v0`](r/moul/x/daily/base32demo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/base32demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/bidimapdemo/v0`](r/moul/x/daily/bidimapdemo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/bidimapdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/bitsetdemo/v0`](r/moul/x/daily/bitsetdemo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/bitsetdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/blog/v0`](r/moul/x/daily/blog/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/blog/v0) | — | — | 1 |
+| [`r/moul/x/daily/bloomfilter/v0`](r/moul/x/daily/bloomfilter/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/bloomfilter/v0) | — | — | — |
+| [`r/moul/x/daily/bullscows/v0`](r/moul/x/daily/bullscows/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/bullscows/v0) | — | — | — |
+| [`r/moul/x/daily/calc/v0`](r/moul/x/daily/calc/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/calc/v0) | — | — | — |
+| [`r/moul/x/daily/cliffvestingdemo/v0`](r/moul/x/daily/cliffvestingdemo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/cliffvestingdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/closestguess/v0`](r/moul/x/daily/closestguess/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/closestguess/v0) | — | — | — |
+| [`r/moul/x/daily/coinflipduel/v0`](r/moul/x/daily/coinflipduel/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/coinflipduel/v0) | — | — | 1 |
+| [`r/moul/x/daily/collatz/v0`](r/moul/x/daily/collatz/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/collatz/v0) | — | — | 1 |
+| [`r/moul/x/daily/commitrevealdemo/v0`](r/moul/x/daily/commitrevealdemo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/commitrevealdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/connect4/v0`](r/moul/x/daily/connect4/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/connect4/v0) | — | — | 1 |
+| [`r/moul/x/daily/counter/v0`](r/moul/x/daily/counter/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/counter/v0) | — | — | — |
+| [`r/moul/x/daily/countminsketchdemo/v0`](r/moul/x/daily/countminsketchdemo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/countminsketchdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/cowsaydemo/v0`](r/moul/x/daily/cowsaydemo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/cowsaydemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/crc32demo/v0`](r/moul/x/daily/crc32demo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/crc32demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/crowdfund/v0`](r/moul/x/daily/crowdfund/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/crowdfund/v0) | — | — | 1 |
+| [`r/moul/x/daily/dice/v0`](r/moul/x/daily/dice/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/dice/v0) | — | — | 1 |
+| [`r/moul/x/daily/disjointsetdemo/v0`](r/moul/x/daily/disjointsetdemo/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/disjointsetdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/dutchauction/v0`](r/moul/x/daily/dutchauction/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/dutchauction/v0) | — | — | 1 |
+| [`r/moul/x/daily/eggling/v0`](r/moul/x/daily/eggling/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/eggling/v0) | — | — | 1 |
+| [`r/moul/x/daily/eightball/v0`](r/moul/x/daily/eightball/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/eightball/v0) | — | — | — |
+| [`r/moul/x/daily/englishauction/v0`](r/moul/x/daily/englishauction/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/englishauction/v0) | — | — | 1 |
+| [`r/moul/x/daily/erc1155/v0`](r/moul/x/daily/erc1155/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/erc1155/v0) | — | — | 1 |
+| [`r/moul/x/daily/erc20/v0`](r/moul/x/daily/erc20/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/erc20/v0) | — | — | — |
+| [`r/moul/x/daily/erc721/v0`](r/moul/x/daily/erc721/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/erc721/v0) | — | — | 1 |
+| [`r/moul/x/daily/escrow/v0`](r/moul/x/daily/escrow/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/escrow/v0) | — | — | 1 |
 | [`r/moul/x/daily/faucet/v0`](r/moul/x/daily/faucet/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/flatmapdemo/v0`](r/moul/x/daily/flatmapdemo/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/fractiondemo/v0`](r/moul/x/daily/fractiondemo/v0) 🏛️ | — | — | — | — | — | 1 |
@@ -265,8 +265,8 @@ make help        # list all targets
 | [`r/moul/x/daily/rot13demo/v0`](r/moul/x/daily/rot13demo/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/rpgroom/v0`](r/moul/x/daily/rpgroom/v0) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/daily/rps/v0`](r/moul/x/daily/rps/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/rpsduel/v0`](r/moul/x/daily/rpsduel/v0) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/x/daily/rpsmatch/v0`](r/moul/x/daily/rpsmatch/v0) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/rpsduel/v0`](r/moul/x/daily/rpsduel/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/rpsduel/v0) | — | — | 1 |
+| [`r/moul/x/daily/rpsmatch/v0`](r/moul/x/daily/rpsmatch/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/rpsmatch/v0) | — | — | 1 |
 | [`r/moul/x/daily/rpsoracle/v0`](r/moul/x/daily/rpsoracle/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/semverdemo/v0`](r/moul/x/daily/semverdemo/v0) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/daily/sievedemo/v0`](r/moul/x/daily/sievedemo/v0) 🏛️ | — | — | — | — | — | 1 |
@@ -295,7 +295,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft._
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-13T21:31:10Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-16T12:21:57Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
