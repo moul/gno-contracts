@@ -1,0 +1,43 @@
+# `gno.land/p/moul/x/daily/sparkline/v0`
+
+**Sparklines: a numeric series as one line of block characters** — `Ints`,
+`Scaled`, `Level`, `Bounds`, `Levels`, `Steps`.
+
+```go
+import "gno.land/p/moul/x/daily/sparkline/v0"
+
+sparkline.Ints([]int{3, 5, 9, 14, 12, 18, 25, 21, 16, 11, 7, 4})
+// ▁▁▂▄▃▅█▆▅▃▂▁   scaled between the series' own min and max
+
+sparkline.Scaled(pct, 0, 100)   // fixed window; outliers clamp to the ends
+```
+
+A realm's `Render` returns markdown, so a trend normally means an image, a chart
+library, or client-side code — none of which a realm has. Eight block runes and
+one line of text do the job, and `gnoweb` needs nothing to display them.
+
+**Everything is integer math, deliberately.** Render output has to be
+byte-identical on every validating node, and floating point is the usual way
+that quietly stops being true. Scaling is integer division with floor rounding.
+
+Three behaviours worth knowing before you use it:
+
+- **A flat series renders mid-ramp** (`▅▅▅▅`), not along the floor. A series
+  sitting unchanged at 1000 has no shape, but drawing it at the bottom would
+  claim it was *zero* — a different thing, and a wrong one.
+- **`Scaled` clamps instead of failing.** A window is chosen for readability
+  (`0..100` for a percentage), and one outlier should not be able to flatten the
+  rest of the picture or break the `Render` that drew it.
+- **Rounding is floor**, so only a value at the maximum itself reaches `█`. The
+  peak of a series is always visually distinct.
+
+`Level` is total: every input maps into `[0, Steps)`, including the extremes
+where the scaling arithmetic would otherwise wrap. That matters because `Scaled`
+indexes the ramp with it — an out-of-range result would panic the calling realm,
+so it is tested against `minInt`/`maxInt` windows directly.
+
+Rendering is `O(len(values))`. A realm should slice its series to a window
+rather than sparking an unbounded, user-grown slice.
+
+**Live demo:** [`r/moul/x/daily/sparklinedemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/sparklinedemo/v0)
+· render it at [`/r/moul/x/daily/sparklinedemo/v0`](https://gno.land/r/moul/x/daily/sparklinedemo/v0).
