@@ -55,6 +55,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/daily/semver/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/sieve/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/soundex/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/sparkline/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/toposort/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/trie/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/xdao/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -146,6 +147,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/semverdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/sievedemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/soundexdemo/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/sparklinedemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/splitter/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/staking/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/streak/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -286,6 +288,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/semverdemo/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/sievedemo/v0" -> "gno.land/p/moul/x/daily/sieve/v0";
   "gno.land/r/moul/x/daily/soundexdemo/v0" -> "gno.land/p/moul/x/daily/soundex/v0";
+  "gno.land/r/moul/x/daily/sparklinedemo/v0" -> "gno.land/p/moul/x/daily/sparkline/v0";
   "gno.land/r/moul/x/daily/splitter/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/staking/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/streak/v0" -> "gno.land/p/nt/avl/v0";

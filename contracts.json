@@ -1971,6 +1971,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/sparkline/v0",
+      "dir": "p/moul/x/daily/sparkline/v0",
+      "kind": "p",
+      "name": "x/daily/sparkline",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/toposort/v0",
       "dir": "p/moul/x/daily/toposort/v0",
       "kind": "p",
@@ -4975,6 +4999,32 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/sparklinedemo/v0",
+      "dir": "r/moul/x/daily/sparklinedemo/v0",
+      "kind": "r",
+      "name": "x/daily/sparklinedemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/sparkline/v0"
+      ],
+      "draft": false,
+      "published": {
         "mainnet": {
           "uploaded": false
         },

@@ -167,6 +167,7 @@ make help        # list all targets
 | [`p/moul/x/daily/semver/v0`](p/moul/x/daily/semver/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/semver/v0) | — | — | — |
 | [`p/moul/x/daily/sieve/v0`](p/moul/x/daily/sieve/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/sieve/v0) | — | — | — |
 | [`p/moul/x/daily/soundex/v0`](p/moul/x/daily/soundex/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/soundex/v0) | — | — | — |
+| [`p/moul/x/daily/sparkline/v0`](p/moul/x/daily/sparkline/v0) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/toposort/v0) | — | — | — |
 | [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/trie/v0) | — | — | — |
 | [`p/moul/xdao/v0`](p/moul/xdao/v0) 📦 | — | — | [✅](https://gno.land/p/moul/xdao/v0) | — | — | 1 |
@@ -271,6 +272,7 @@ make help        # list all targets
 | [`r/moul/x/daily/semverdemo/v0`](r/moul/x/daily/semverdemo/v0) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/daily/sievedemo/v0`](r/moul/x/daily/sievedemo/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/soundexdemo/v0`](r/moul/x/daily/soundexdemo/v0) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/x/daily/sparklinedemo/v0`](r/moul/x/daily/sparklinedemo/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/splitter/v0`](r/moul/x/daily/splitter/v0) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/x/daily/stack/v0`](r/moul/x/daily/stack/v0) 🏛️ | — | — | — | — | — | — |
 | [`r/moul/x/daily/staking/v0`](r/moul/x/daily/staking/v0) 🏛️ | — | — | — | — | — | 1 |
