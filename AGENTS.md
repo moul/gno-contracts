@@ -89,6 +89,13 @@ The ones that have actually bitten this repo:
   keys: unpadded numeric keys sort `"0","1","10","11","2"`, so anything keyed
   that way silently loses insertion order past nine entries. Pad by hand (see
   `padIdx` in `r/moul/demo/importdemo/v0`).
+- **`uassert.AbortsContains` takes a `func()`, not a `func(realm)`.** With the
+  `func(realm)` form the helper does its own `cross(rlm)` first, which consumes
+  the pending `testing.SetRealm`, so the abort under test runs with the realm
+  itself as caller and every authorization assertion fails with `unauthorized`
+  instead of the error you meant to pin. Use a no-arg closure that crosses with
+  the outer `cur`, as `r/moul/x/wesh/v0` and `r/moul/forge/v0` do:
+  `uassert.AbortsContains(t, cur, "stale ref", func() { SetRef(cross(cur), …) })`.
 
 When a new divergence costs a red CI, add it here: this file is pulled by the
 daily build agent before every generation, so a line here stops the next repeat.
