@@ -52,7 +52,9 @@ into a write against that realm; writes only ever reach a memfs tree this realm
 created for you. A crossing write method would mint *this* realm's frame for the
 callee, which is the confused-deputy shape `r/gov/dao`'s `Executor` relies on
 deliberately and `p/nt/grc20`'s `Teller` refuses deliberately. It is out of
-scope for v0 and the three filetests here pin the boundary.
+scope for v0, and three abort tests pin the boundary: a second realm cannot
+take over a `/srv` name, a write to a mounted tree fails with `read-only file
+server`, and a command line that fails part way aborts the whole call.
 
 `/srv` names are first come, first served, with the posting realm recorded and
 the only one allowed to unpost. Squatting is possible and accepted for an

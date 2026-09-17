@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/uassert/v0"
 
 	ninep "gno.land/p/moul/x/plan9/ninep/v0"
 	synfs "gno.land/p/moul/x/plan9/synfs/v0"
@@ -152,6 +153,53 @@ func mustRun(t *testing.T, key, line string) string {
 		t.Fatalf("%s: %v", line, err)
 	}
 	return out
+}
+
+// --- the boundary. Three properties the suite would be unsafe without. -------
+
+// A /srv name belongs to the realm that posted it: first come, first served,
+// and then locked.
+func TestPostRejectsASecondOwner(cur realm, t *testing.T) {
+	services.Remove("taken")
+	Post(cross(cur), "taken", probe("taken", "first"))
+	defer services.Remove("taken")
+
+	testing.SetRealm(testing.NewCodeRealm("gno.land/r/other/thing/v0"))
+	uassert.AbortsWithMessage(t, cur,
+		"post: taken is already posted by gno.land/r/moul/x/plan9/ns/v0",
+		func() { Post(cross(cur), "taken", probe("taken", "second")) })
+}
+
+// Grafting another realm's tree into your namespace gives you reads and
+// nothing else. ninep.File has no mutating method, so there is no route from a
+// mount to a write against the realm that posted it.
+func TestMountedTreesAreReadOnly(cur realm, t *testing.T) {
+	services.Remove("probe")
+	Post(cross(cur), "probe", probe("probe", "read me"))
+	defer services.Remove("probe")
+
+	frank := testutils.TestAddress("frank")
+	spaces.Remove(frank.String())
+	defer spaces.Remove(frank.String())
+
+	testing.SetRealm(testing.NewUserRealm(frank))
+	Exec(cross(cur), "bind /srv/probe /dev")
+	uassert.Equal(t, "read me", mustRun(t, frank.String(), "cat /dev/value"))
+	uassert.AbortsWithMessage(t, cur, "echo: read-only file server",
+		func() { Exec(cross(cur), "echo nope > /dev/value") })
+}
+
+// A command line stops at the first error and the error leaves the realm as an
+// abort, so a half-applied Exec reverts with its transaction instead of
+// leaving a namespace nobody asked for.
+func TestExecAbortsAtTheFirstError(cur realm, t *testing.T) {
+	grace := testutils.TestAddress("grace")
+	spaces.Remove(grace.String())
+	defer spaces.Remove(grace.String())
+
+	testing.SetRealm(testing.NewUserRealm(grace))
+	uassert.AbortsWithMessage(t, cur, "cat: file does not exist",
+		func() { Exec(cross(cur), "echo ok > /tmp/a; cat /absent; echo never > /tmp/b") })
 }
 
 func TestRenderUnknownCommand(t *testing.T) {
