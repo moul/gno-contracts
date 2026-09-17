@@ -97,8 +97,13 @@ guard-render: ## fail if a realm declares Render but no test calls it
 lint: view ## gno lint every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
 
-fmt: ## gno fmt every contract in place
-	@set -e; for d in $(PKG_DIRS); do $(GNO) fmt -w ./$$d || true; done
+# Like lint/test, fmt resolves against the stdlib-only view. Without it the gno
+# binary falls back to its built-in GNOROOT, which on a machine that does not
+# have that exact checkout fails with `unable to load .../gnovm/stdlibs` for
+# every package. The old `|| true` swallowed that, so `make fmt` reformatted
+# nothing and said so to nobody.
+fmt: view ## gno fmt every contract in place
+	@set -e; for d in $(PKG_DIRS); do GNOROOT="$(VIEW)" $(GNO) fmt -w ./$$d; done
 
 manifest: ## refresh contracts.json from the contract trees
 	$(TOOL) manifest
