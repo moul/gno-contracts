@@ -15,6 +15,16 @@ var (
 	eve   = testutils.TestAddress("eve")   // stranger
 )
 
+// Repo ids used by the crossing tests. The realm only lets an address create
+// under a namespace it owns, and no user name is registered in a unit test, so
+// these are all address namespaces.
+var (
+	demoID    = alice.String() + "/demo"
+	heightsID = alice.String() + "/heights"
+	rolesID   = alice.String() + "/roles"
+	ghostID   = alice.String() + "/ghost"
+)
+
 func oid(c string) string { return strings.Repeat(c, 40) }
 
 // reset restores realm state to empty. Realm globals persist for the whole test
@@ -23,7 +33,9 @@ func oid(c string) string { return strings.Repeat(c, 40) }
 func reset() { f = fg.New() }
 
 // seedFixture builds one deterministic repo straight through the library: no
-// chain context needed, which is what lets an Example use it.
+// chain context needed, which is what lets an Example use it. It can use a name
+// namespace because namespace ownership is a realm rule (it needs a chain to
+// resolve a name); the library validates the shape and nothing more.
 func seedFixture() {
 	reset()
 	r, err := f.CreateRepo(alice, 100, "moul/forge", "an on chain software forge", "")

@@ -20,10 +20,16 @@ package forge
 import (
 	"chain"
 	"chain/runtime"
+	"errors"
 	"strings"
 
 	fg "gno.land/p/moul/forge/v0"
+	"gno.land/r/sys/users"
 )
+
+// errForeignNamespace is the one rule this realm adds on top of the library:
+// a namespace is yours or it is not.
+var errForeignNamespace = errors.New("forge: namespace is not yours")
 
 var f = fg.New()
 
@@ -47,6 +53,34 @@ func repo(id string) *fg.Repo {
 		panic(fg.ErrRepoNotFound)
 	}
 	return r
+}
+
+// requireNamespace enforces the ownership rule. Two namespaces exist and they
+// cannot collide, since an address is 40 characters and a name caps at 39:
+//
+//   - an address namespace ("g1.../forge") belongs to that account, always, with
+//     nothing to register and nothing to lose;
+//   - a name namespace ("moul/forge") belongs to whoever holds that name in
+//     r/sys/users, including through a rename, since the lookup resolves aliases
+//     to the same record.
+//
+// A realm caller passes the same way a user does, which is what makes a
+// DAO-owned repo possible: the DAO's address is its namespace.
+func requireNamespace(a address, id string) {
+	ns, _, ok := fg.SplitRepoID(id)
+	if !ok {
+		panic(fg.ErrInvalidRepoID)
+	}
+	if fg.AddressNamespace(ns) {
+		if ns != a.String() {
+			panic(errForeignNamespace)
+		}
+		return
+	}
+	data, _ := users.ResolveName(ns)
+	if data.IsDeleted() || data.Addr() != a {
+		panic(errForeignNamespace)
+	}
 }
 
 func must(err error) {
@@ -79,8 +113,12 @@ func splitList(s string) []string {
 
 // CreateRepo registers "<namespace>/<name>" with the caller as owner.
 // defaultRef may be empty for refs/heads/main.
+//
+// The namespace must be one the caller owns: an r/sys/users name registered to
+// their address, or their own bech32 address. Nobody squats anybody.
 func CreateRepo(cur realm, id, description, defaultRef string) {
 	a := caller(cur)
+	requireNamespace(a, id)
 	_, err := f.CreateRepo(a, height(), id, description, defaultRef)
 	must(err)
 	chain.Emit("RepoCreated", "repo", id, "owner", a.String())
@@ -90,6 +128,7 @@ func CreateRepo(cur realm, id, description, defaultRef string) {
 // refs into the fork's log so the lineage records exactly what was forked.
 func Fork(cur realm, srcID, newID string) {
 	a := caller(cur)
+	requireNamespace(a, newID)
 	_, err := f.Fork(a, height(), srcID, newID)
 	must(err)
 	chain.Emit("RepoForked", "repo", newID, "parent", srcID, "owner", a.String())

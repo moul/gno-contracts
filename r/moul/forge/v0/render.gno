@@ -301,6 +301,13 @@ The chain has no objects, so it cannot check that a new tip descends from the
 old one. It does not pretend to. Ordering, attribution and policy are on chain;
 ancestry is verified by a client that has the repo.
 
+## Namespaces
+
+A repo id is "namespace/name". A namespace is either a name you hold in
+r/sys/users or your own address, so "g1.../forge" works with nothing registered
+and "moul/forge" needs the name. Nobody can claim a namespace they do not own,
+and a realm passes the same test a user does, by its address.
+
 ## Roles
 
 reader < writer < maintainer < admin < owner. Writers move refs, maintainers

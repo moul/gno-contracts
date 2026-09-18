@@ -163,6 +163,11 @@ func (r *Repo) ForceSetRef(actor address, height int64, name, newOID, note strin
 
 // DeleteRef removes a ref by compare-and-swap. The ref disappears from the
 // current state; the log keeps every object it ever pointed at.
+//
+// Maintainer-only for an economic reason as much as a safety one: on gno.land
+// the storage-deposit refund goes to whoever frees the bytes, not to whoever
+// paid for them (`receiver := caller` in the vm keeper's deposit path, gno
+// master 2026-09-19), so an open delete path pays for vandalism.
 func (r *Repo) DeleteRef(actor address, height int64, name, expectedOID, note string) (*LogEntry, error) {
 	if r.Archived {
 		return nil, ErrRepoArchived
