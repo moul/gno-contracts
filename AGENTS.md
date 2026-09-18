@@ -81,6 +81,23 @@ Makefile                task entrypoints
 
 - `GNOROOT` must point at a `gnolang/gno` checkout (provides the gno binary's
   stdlibs). CI builds gno from `master`; locally, set it to your checkout.
+- **The `gno` binary must be built from the SAME checkout `GNOROOT` names, and
+  that checkout must be at least as new as `vendor/`.** Three revisions have to
+  agree and nothing checks that they do. A binary older than the checkout fails
+  with `function pubKeyAddress does not have a body but is not natively defined`;
+  a checkout older than `vendor/` fails with `name SplitPkgSubPath not declared`
+  from inside a vendored package. Neither message names the real problem. As of
+  2026-09-19 the primary checkout `~/p/gh/gnolang/gno` sits on a feature branch
+  behind master and `~/go/bin/gno` is older still, so a green run means building
+  a matching binary from a master-tracking worktree and pointing both at it:
+
+  ```sh
+  cd <master-worktree> && go build -o /tmp/gnobin/gno ./gnovm/cmd/gno
+  cd - && make test GNO=/tmp/gnobin/gno GNOROOT=<master-worktree>
+  ```
+
+  Verified 2026-09-19: 198 packages, 0 failures, with
+  `GNOROOT=~/p/gh/gnolang/gno-merkleutil`.
 - The gno version convention is `gno = "0.9"` in every `gnomod.toml`, built
   against gno **master** (the sapphire-era API: `chain`, `chain/runtime`,
   `chain/banker`, `gno.land/p/nt/avl/v0`, …). State-mutating exported realm
