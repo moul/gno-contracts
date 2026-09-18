@@ -1,0 +1,34 @@
+# `gno.land/r/moul/x/grc20faucet/v0`
+
+**Two free GRC20 tokens, RED and BLUE, so experiments have something to run on.**
+Worthless by construction, unlimited, and shared.
+
+```
+maketx call -pkgpath gno.land/r/moul/x/grc20faucet/v0 -func Claim
+```
+
+100.0000 of each per claim (4 decimals), once every 100 blocks per account.
+
+| token | symbol | registry key |
+|---|---|---|
+| Red Token | `RED` | `gno.land/r/moul/x/grc20faucet/v0.RED` |
+| Blue Token | `BLUE` | `gno.land/r/moul/x/grc20faucet/v0.BLUE` |
+
+Both are registered in [`r/nt/grc20reg`](https://gno.land/r/nt/grc20reg/v0), which
+is the point: another realm can find and move them by key without importing this
+one. Everything else here is the ordinary GRC20 surface, with the symbol as the
+first argument:
+
+```
+-func Transfer     -args RED  -args <to>      -args 250000
+-func Approve      -args BLUE -args <spender> -args 250000
+-func TransferFrom -args RED  -args <from> -args <to> -args 250000
+```
+
+`Approve` is the interesting one. It is what lets a realm such as
+[`r/moul/x/grc20wrapdemo`](https://gno.land/r/moul/x/grc20wrapdemo/v0) pull your
+tokens into escrow, and until you call it that realm has no authority over your
+balance at all.
+
+Two tokens rather than one because the interesting patterns start at two: a
+meta-token over a pair needs a pair.
