@@ -13,6 +13,13 @@ enough to audit in a sitting.
 Design study, prior-art survey and the full security argument:
 [moul/gno-contracts#135](https://github.com/moul/gno-contracts/issues/135).
 
+> **There is a [`v1`](../v1) too.** Identical market maker, but a liquidity
+> position is a real GRC20 token instead of a row in a private ledger, so it can
+> be transferred, approved and read by other realms. It costs a one-off ~29% on
+> pool creation, ~5% on liquidity operations, and **nothing on swaps**. Use v0
+> when positions never need to leave the address that opened them; the
+> [v1 README](../v1/README.md) has the measured side-by-side.
+
 ## API
 
 ```go
