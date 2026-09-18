@@ -96,5 +96,16 @@ r.MergeChange(bob, height, c.ID, oid, merged, "merge change 0")
 Every stored string is bounded (see the `Max*` constants) because an unbounded
 field is an unbounded deposit. Ref names are a `refs/`-rooted subset of
 git-check-ref-format; object ids are 40 or 64 lowercase hex characters; repo ids
-are `<namespace>/<name>` lowercase slugs, flat and first-come-first-served at
-this layer.
+are `<namespace>/<name>`, where the name is a lowercase slug and the namespace is
+either a slug (a claimed user name) or a bech32 address. The two shapes cannot
+collide: an address is 40 characters and a slug caps at 39.
+
+This package validates the **shape** of a namespace and nothing else. Whether a
+caller may claim one is an ownership question that needs a chain, so it lives in
+the realm: a name must be held in `r/sys/users`, an address must be the caller's
+own.
+
+One economic rule shows up in the API: deleting is privileged. On gno.land the
+storage-deposit refund goes to whoever frees the bytes, not to whoever paid for
+them, so an open delete path pays for vandalism. `DeleteRef` needs
+`RoleMaintainer`, and issues, comments and reviews have no delete at all.

@@ -87,16 +87,52 @@ func refByteOK(c byte) bool {
 	return true
 }
 
-// ValidRepoID reports whether s is "<namespace>/<name>", each side a lowercase
-// slug. Namespaces are flat and first-come-first-served at this layer; a realm
-// may bind them to an on-chain user registry on top (see the realm's README).
+// ValidRepoID reports whether s is "<namespace>/<name>". The name is always a
+// lowercase slug; the namespace is either a slug (a claimed user name) or a
+// bech32 address (the caller's own). The two shapes cannot collide: an address
+// is 40 characters and a slug caps at MaxRepoPartLen, which is 39.
+//
+// This layer validates the SHAPE only. Whether the caller may claim a given
+// namespace is an ownership question that needs a chain, so it belongs to the
+// realm (see the realm's README).
 func ValidRepoID(s string) bool {
-	i := strings.Index(s, "/")
-	if i < 0 || strings.Count(s, "/") != 1 {
+	ns, name, ok := SplitRepoID(s)
+	if !ok {
 		return false
 	}
-	return validSlug(s[:i]) && validSlug(s[i+1:])
+	return (validSlug(ns) || AddressNamespace(ns)) && validSlug(name)
 }
+
+// SplitRepoID splits "<namespace>/<name>" into its two halves. It does not
+// validate either half; ok is false only when the id is not two slash-separated
+// non-empty parts.
+func SplitRepoID(s string) (ns, name string, ok bool) {
+	i := strings.Index(s, "/")
+	if i <= 0 || i == len(s)-1 || strings.Count(s, "/") != 1 {
+		return "", "", false
+	}
+	return s[:i], s[i+1:], true
+}
+
+// AddressNamespace reports whether ns is shaped like a gno bech32 address, the
+// namespace every account owns without registering anything. The realm still
+// checks that it is the CALLER's address; this only says which of the two
+// ownership rules applies.
+func AddressNamespace(ns string) bool {
+	if len(ns) != 40 || !strings.HasPrefix(ns, "g1") {
+		return false
+	}
+	for i := 2; i < len(ns); i++ {
+		if !strings.ContainsRune(bech32Charset, rune(ns[i])) {
+			return false
+		}
+	}
+	return true
+}
+
+// bech32Charset is bech32's data alphabet: lowercase alphanumerics minus the
+// four characters it drops to avoid transcription errors (1, b, i, o).
+const bech32Charset = "023456789acdefghjklmnpqrstuvwxyz"
 
 // validSlug: 1..MaxRepoPartLen chars, [a-z0-9] at both ends, [a-z0-9-_.] inside,
 // no "..", no "--". Mixed case is rejected rather than folded: two ids that

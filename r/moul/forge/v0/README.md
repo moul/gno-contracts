@@ -65,6 +65,21 @@ gnokey query vm/qeval -data 'gno.land/r/moul/forge/v0.LogHead("moul/forge")' -re
 it. Pin it in a release note or a package manifest and the repo's whole history
 becomes falsifiable by anyone who can read the chain.
 
+## Namespaces
+
+A repo id is `<namespace>/<name>`. The namespace is either a name the caller
+holds in `r/sys/users` or the caller's own bech32 address, checked on every
+`CreateRepo` and `Fork`:
+
+- `g1.../forge` works for any account with nothing to register and nothing to
+  lose, including a realm, whose address is its namespace. That is what makes a
+  DAO-owned repo work.
+- `moul/forge` requires the `moul` name to resolve to the caller, renames
+  included, since the registry resolves aliases to the same record.
+
+Nobody can claim a namespace they do not own, so there is no squatting to
+arbitrate and no reservation list to maintain.
+
 ## Roles
 
 `reader < writer < maintainer < admin < owner`. Writers move refs, maintainers

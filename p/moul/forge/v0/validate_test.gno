@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
@@ -86,6 +87,44 @@ func TestValidRepoID(t *testing.T) {
 	}
 	for _, tc := range cases {
 		uassert.Equal(t, tc.want, ValidRepoID(tc.in), tc.name)
+	}
+}
+
+func TestAddressNamespace(t *testing.T) {
+	addr := testutils.TestAddress("alice").String()
+	cases := []struct {
+		name string
+		in   string
+		want bool
+	}{
+		{"a real address", addr, true},
+		{"wrong prefix", "x1" + addr[2:], false},
+		{"too short", addr[:39], false},
+		{"too long", addr + "a", false},
+		{"bech32 drops b i o 1", "g1" + strings.Repeat("b", 38), false},
+		{"uppercase", "G1" + addr[2:], false},
+		{"a slug is not an address", "moul", false},
+	}
+	for _, tc := range cases {
+		uassert.Equal(t, tc.want, AddressNamespace(tc.in), tc.name)
+	}
+
+	// An address namespace is a valid repo id, and it cannot collide with a
+	// claimed name: 40 characters is past the slug cap.
+	uassert.True(t, ValidRepoID(addr+"/forge"))
+	uassert.False(t, ValidRepoID(strings.Repeat("a", 40)+"/forge"))
+	uassert.False(t, ValidRepoID(addr+"/"+addr), "the name half is always a slug")
+}
+
+func TestSplitRepoID(t *testing.T) {
+	ns, name, ok := SplitRepoID("moul/forge")
+	uassert.True(t, ok)
+	uassert.Equal(t, "moul", ns)
+	uassert.Equal(t, "forge", name)
+
+	for _, bad := range []string{"", "moul", "/forge", "moul/", "a/b/c"} {
+		_, _, ok := SplitRepoID(bad)
+		uassert.False(t, ok, bad)
 	}
 }
 
