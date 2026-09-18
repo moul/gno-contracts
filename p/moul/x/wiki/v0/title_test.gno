@@ -19,8 +19,8 @@ func TestParseTitle(t *testing.T) {
 		{"underscores become spaces", "Gno_land", NSMain, "Gno land", nil},
 		{"whitespace collapses", "  Gno   land  ", NSMain, "Gno land", nil},
 		{"first letter is upper-cased", "gno land", NSMain, "Gno land", nil},
-		{"namespace prefix", "Talk:Gno land", NSTalk, "Talk:Gno land", nil},
-		{"namespace prefix is case-insensitive", "talk:gno_land", NSTalk, "Talk:Gno land", nil},
+		{"namespace prefix", "Help:Gno land", NSHelp, "Help:Gno land", nil},
+		{"namespace prefix is case-insensitive", "help:gno_land", NSHelp, "Help:Gno land", nil},
 		{"category", "Category:Chains", NSCategory, "Category:Chains", nil},
 		{"unknown prefix stays in the name", "Foo:Bar", NSMain, "Foo:Bar", nil},
 		{"unicode letters are allowed", "Élysée", NSMain, "Élysée", nil},
@@ -28,7 +28,7 @@ func TestParseTitle(t *testing.T) {
 		{"zero-width characters are stripped", "Gno​land", NSMain, "Gnoland", nil},
 		{"empty", "", NSMain, "", ErrEmptyTitle},
 		{"whitespace only", "   ", NSMain, "", ErrEmptyTitle},
-		{"namespace with no name", "Talk:", NSMain, "", ErrEmptyTitle},
+		{"namespace with no name", "Help:", NSMain, "", ErrEmptyTitle},
 		{"slash is rejected", "Gno/land", NSMain, "", ErrTitleChar},
 		{"pipe is rejected", "Gno|land", NSMain, "", ErrTitleChar},
 		{"markdown star is rejected", "Gno*land", NSMain, "", ErrTitleChar},
@@ -63,14 +63,14 @@ func TestTitleKeyOrdersByNamespace(t *testing.T) {
 	// namespaces, which is why the code is a fixed-width string rather than
 	// a ufmt-formatted number.
 	uassert.Equal(t, "00:Gno land", MustParseTitle("Gno land").Key())
-	uassert.Equal(t, "01:Gno land", MustParseTitle("Talk:Gno land").Key())
-	uassert.True(t, MustParseTitle("Gno land").Key() < MustParseTitle("Talk:Alpha").Key(),
-		"every main-namespace key must sort before every Talk key")
+	uassert.Equal(t, "01:Gno land", MustParseTitle("User:Gno land").Key())
+	uassert.True(t, MustParseTitle("Gno land").Key() < MustParseTitle("User:Alpha").Key(),
+		"every main-namespace key must sort before every User key")
 }
 
 func TestTitleSlug(t *testing.T) {
 	uassert.Equal(t, "Gno_land", MustParseTitle("Gno land").Slug())
-	uassert.Equal(t, "Talk:Gno_land", MustParseTitle("Talk:Gno land").Slug())
+	uassert.Equal(t, "User:Gno_land", MustParseTitle("User:Gno land").Slug())
 	uassert.Equal(t, "Mercury_(planet)", MustParseTitle("Mercury (planet)").Slug())
 }
 

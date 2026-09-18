@@ -303,16 +303,16 @@ func TestTitlesWalkOneNamespace(t *testing.T) {
 	w := New(3, DefaultMaxBody)
 	edit(t, w, 1, alice, "Beta", "b\n", "")
 	edit(t, w, 2, alice, "Alpha", "a\n", "")
-	edit(t, w, 3, alice, "Talk:Alpha", "t\n", "")
+	edit(t, w, 3, alice, "Help:Alpha", "t\n", "")
 
 	main := w.Titles(NSMain.Prefix(), 0, 10)
 	uassert.Equal(t, 2, len(main))
 	uassert.Equal(t, "Alpha", main[0].String())
 	uassert.Equal(t, "Beta", main[1].String())
 
-	talk := w.Titles(NSTalk.Prefix(), 0, 10)
-	uassert.Equal(t, 1, len(talk))
-	uassert.Equal(t, "Talk:Alpha", talk[0].String())
+	help := w.Titles(NSHelp.Prefix(), 0, 10)
+	uassert.Equal(t, 1, len(help))
+	uassert.Equal(t, "Help:Alpha", help[0].String())
 
 	uassert.Equal(t, 1, len(w.Titles(NSMain.Prefix(), 1, 10)), "offset skips")
 }

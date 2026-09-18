@@ -1,14 +1,14 @@
-# `gno.land/p/moul/wiki/v0`
+# `gno.land/p/moul/x/wiki/v0`
 
 A Wikipedia-shaped wiki engine: namespaced titles, an append-only revision
 chain, wikilinks with backlinks, categories, redirects, protection levels,
-line diffs, and markdown rendering.
+per-page discussion threads, line diffs, and markdown rendering.
 
 Pure: no realm globals, no chain imports. Every mutating call takes the author
 address, the wall clock and the block height from its caller, so the engine is
 unit-testable off-chain and the realm keeps all the authority.
 
-Live demo: [`gno.land/r/moul/wiki/v0`](../../../../r/moul/wiki/v0).
+Live demo: [`gno.land/r/moul/x/wiki/v0`](../../../../../r/moul/x/wiki/v0).
 
 ## The storage model
 
@@ -36,6 +36,28 @@ and both failures are explicit (`ErrBodyEvicted`) rather than silent.
 `Purge` evicts every body of a page at once and returns the bytes released. It
 is the lever for content that must stop being served out of realm state; it
 cannot and does not remove the transactions that wrote it.
+
+## Who gets the deposit back
+
+Not who paid it. Verified in `processStorageDeposit`
+(`gno.land/pkg/sdk/vm/keeper.go`, gno master, 2026-09-19):
+
+- A write sends the **caller's** ugnot to a per-realm deposit address and adds
+  to two realm-wide pools, `rlm.Deposit` and `rlm.Storage`. There is no
+  per-depositor accounting.
+- A release refunds `rlm.Deposit * released / rlm.Storage` (big-integer,
+  truncating, so dust accrues in the pool) to the **caller of the transaction
+  that frees the bytes**, at the realm's blended rate.
+- If ugnot is a restricted denom at the time, the refund goes to
+  `params.StorageFeeCollector` instead, not to any user.
+
+For a wiki that inverts a comfortable assumption. Adding bytes costs the adder,
+but **removing bytes pays the remover**. Replacing a long article with a short
+one evicts an old body in the same transaction, so deletion can be profitable,
+and reverting the damage costs the good actor who reverts it. That asymmetry is
+why `Blank`, `Purge` and `HideComment` are steward-gated, and why the realm
+keeps a ban list, protection levels and an optional cooldown rather than
+relying on the deposit alone.
 
 ## Rendering untrusted markdown
 
@@ -85,7 +107,21 @@ body against itself plus one line costs 691M gas, and the article render of a
 Everything else follows gno's determinism rules: no map iteration anywhere in a
 render path, `avl` for every ordered index, and namespace keys padded by hand
 because `ufmt` has no width flags (`ufmt.Sprintf("%02d", 7)` silently returns
-`"7"`, which would sort `Talk` between two main-namespace pages).
+`"7"`, which would sort `User` between two main-namespace pages).
+
+## Discussion
+
+Discussion is an append-only comment store attached to a page, not a `Talk:`
+article. A talk page is an article, so whoever edits last can rewrite what
+someone else said, and moderating one bad message means editing the whole page.
+A comment store gives each message its own author, timestamp and moderation:
+`HideComment` clears one body and releases its bytes while the message stays in
+the thread, marked as removed.
+
+Replies nest exactly one level (`MaxReplyDepth`). Deeper nesting needs
+recursive rendering with no natural bound, which is the shape a query gas
+ceiling punishes hardest. Comments are sanitized like article bodies but are
+not a wikilink slot: brackets in a comment stay literal.
 
 ## Wiki syntax
 
@@ -102,7 +138,8 @@ immediately knows who was already pointing at it.
 
 ## Known limits
 
-- `Page.Revision(id)` is a linear scan of the page's history.
+- `Page.Revision(id)` is a linear scan of the page's history, and so is
+  comment lookup within a thread.
 - Redirects are followed one hop; chains are not resolved.
 - Templates and transclusion are not implemented.
 - There is no full-text search, and there cannot be a cheap one on chain.

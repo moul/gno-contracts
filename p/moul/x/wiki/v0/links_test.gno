@@ -64,7 +64,7 @@ func TestRedirectTarget(t *testing.T) {
 	cases := []struct{ in, want string }{
 		{"#REDIRECT [[Gno land]]\n", "Gno land"},
 		{"#redirect [[gno_land]]", "Gno land"},
-		{"  #REDIRECT   [[Talk:Gno land]]  \nrest", "Talk:Gno land"},
+		{"  #REDIRECT   [[User:Gno land]]  \nrest", "User:Gno land"},
 		{"not a redirect [[Gno land]]", ""},
 		{"#REDIRECT no link", ""},
 		{"#REDIRECT [[bad|title]]", "Bad"},
@@ -78,7 +78,7 @@ func TestRedirectTarget(t *testing.T) {
 
 func TestRewriteLinks(t *testing.T) {
 	c := Ctx{
-		Base:   "/r/moul/wiki/v0",
+		Base:   "/r/moul/x/wiki/v0",
 		Exists: func(tt Title) bool { return tt.Name == "Gno land" },
 	}
 
@@ -86,22 +86,22 @@ func TestRewriteLinks(t *testing.T) {
 		"[[Category:Chains]]\n")
 	got := RewriteLinks(c, body)
 
-	uassert.True(t, contains(got, "[Gno land](/r/moul/wiki/v0:Gno_land)"), "existing page links plainly")
-	uassert.True(t, contains(got, "[Missing page](/r/moul/wiki/v0:Missing_page) ⁺"), "a redlink is marked")
-	uassert.True(t, contains(got, "[the chain](/r/moul/wiki/v0:Gno_land)"), "labels are honored")
+	uassert.True(t, contains(got, "[Gno land](/r/moul/x/wiki/v0:Gno_land)"), "existing page links plainly")
+	uassert.True(t, contains(got, "[Missing page](/r/moul/x/wiki/v0:Missing_page) ⁺"), "a redlink is marked")
+	uassert.True(t, contains(got, "[the chain](/r/moul/x/wiki/v0:Gno_land)"), "labels are honored")
 	uassert.False(t, contains(got, "Category:Chains"), "category declarations leave the flow")
 }
 
 func TestRewriteLinksEscapesURLs(t *testing.T) {
-	c := Ctx{Base: "/r/moul/wiki/v0"}
+	c := Ctx{Base: "/r/moul/x/wiki/v0"}
 	got := RewriteLinks(c, sanitize.BlockRich("[[Mercury (planet)]]\n"))
 	// An unescaped ")" would terminate the markdown destination early and
 	// leave "planet))" as visible text.
-	uassert.True(t, contains(got, "(/r/moul/wiki/v0:Mercury_%28planet%29)"), got)
+	uassert.True(t, contains(got, "(/r/moul/x/wiki/v0:Mercury_%28planet%29)"), got)
 }
 
 func TestRewriteLinksLeavesNonTitlesAlone(t *testing.T) {
-	c := Ctx{Base: "/r/moul/wiki/v0"}
+	c := Ctx{Base: "/r/moul/x/wiki/v0"}
 	// "[[ ]]" has no usable target, and "[[a/b]]" is not a legal title: both
 	// must render as the literal text the author typed, never as a link.
 	got := RewriteLinks(c, sanitize.BlockRich("[[a/b]]\n"))

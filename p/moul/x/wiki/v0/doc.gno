@@ -5,7 +5,7 @@
 // It is pure: no realm globals, no chain imports. Every call takes the context
 // it needs (author address, wall clock, block height) from the caller, so the
 // whole engine is unit-testable off-chain. The live demo realm is
-// gno.land/r/moul/wiki/v0.
+// gno.land/r/moul/x/wiki/v0.
 //
 // # Storage model
 //

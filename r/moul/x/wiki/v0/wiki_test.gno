@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/moul/wiki/v0"
+	"gno.land/p/moul/x/wiki/v0"
 	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
 )
@@ -23,7 +23,7 @@ var (
 // against the realm's own path. A wrong basePath produces a page whose links
 // all 404, and nothing else would catch it.
 func TestBasePathMatchesTheRealm(t *testing.T) {
-	uassert.True(t, strings.HasSuffix(basePath, "/r/moul/wiki/v0"), basePath)
+	uassert.True(t, strings.HasSuffix(basePath, "/r/moul/x/wiki/v0"), basePath)
 	out := Render("Gno_land")
 	uassert.True(t, strings.Contains(out, "("+basePath+":Tendermint2)"), out)
 }
@@ -50,6 +50,7 @@ func TestRenderRoutes(t *testing.T) {
 		{"Gno_land/nope", "404"},
 		{"Gno_land/rev/999", "404"},
 		{"Category:Chains", "Pages in this category"},
+		{"Gno_land/talk", "# Discussion: Gno land"},
 	}
 	for _, c := range cases {
 		out := Render(c.path)
@@ -220,4 +221,68 @@ func first80(s string) string {
 		return s[:80]
 	}
 	return s
+}
+
+func TestCommentOnALockedPage(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Edit(cross(cur), "Locked talk", "body\n", "")
+
+	testing.SetRealm(testing.NewUserRealm(steward))
+	Protect(cross(cur), "Locked talk", "locked")
+
+	// Locking an article is how a steward stops an edit war; the discussion
+	// is where that war is supposed to move, so it stays open.
+	testing.SetRealm(testing.NewUserRealm(alice))
+	uassert.AbortsContains(t, cur, "caller is not owner", func() {
+		Edit(cross(cur), "Locked talk", "sneaky\n", "")
+	})
+	testing.SetRealm(testing.NewUserRealm(alice))
+	id := Comment(cross(cur), "Locked talk", "I disagree, and here is why.\n", 0)
+	uassert.True(t, id > 0)
+	uassert.True(t, strings.Contains(Render("Locked_talk/talk"), "I disagree"))
+}
+
+func TestCommentRepliesAndModeration(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Edit(cross(cur), "Talk target", "body\n", "")
+	root := Comment(cross(cur), "Talk target", "First.\n", 0)
+
+	testing.SetRealm(testing.NewUserRealm(bob))
+	Comment(cross(cur), "Talk target", "Replying.\n", root)
+
+	out := Render("Talk_target/talk")
+	uassert.True(t, strings.Contains(out, "First."))
+	uassert.True(t, strings.Contains(out, "Replying."))
+
+	testing.SetRealm(testing.NewUserRealm(steward))
+	released := HideComment(cross(cur), "Talk target", root)
+	uassert.True(t, released > 0, "hiding a message releases its bytes")
+	out = Render("Talk_target/talk")
+	uassert.True(t, strings.Contains(out, "removed by a steward"))
+	uassert.False(t, strings.Contains(out, "First."))
+}
+
+func TestBannedAddressCannotComment(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Edit(cross(cur), "Ban talk", "body\n", "")
+
+	testing.SetRealm(testing.NewUserRealm(steward))
+	Ban(cross(cur), bob)
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "banned", func() {
+		Comment(cross(cur), "Ban talk", "spam\n", 0)
+	})
+	testing.SetRealm(testing.NewUserRealm(steward))
+	Unban(cross(cur), bob)
+}
+
+func TestHideCommentIsStewardOnly(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Edit(cross(cur), "Mod talk", "body\n", "")
+	id := Comment(cross(cur), "Mod talk", "hello\n", 0)
+
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "caller is not owner", func() {
+		HideComment(cross(cur), "Mod talk", id)
+	})
 }

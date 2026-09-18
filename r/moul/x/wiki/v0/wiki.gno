@@ -1,7 +1,7 @@
 // Package wiki is an open, on-chain encyclopedia: anyone can create and edit
 // a page, every edit is a signed revision, and the whole history is public.
 //
-// It is a thin realm over gno.land/p/moul/wiki/v0. The library owns content
+// It is a thin realm over gno.land/p/moul/x/wiki/v0. The library owns content
 // (titles, revisions, wikilinks, categories, diffs, rendering); this realm
 // owns authority (who may edit what) and the chain wiring (block height, block
 // time, the calling address, transaction links).
@@ -20,7 +20,7 @@ import (
 	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/realmpath/v0"
 	"gno.land/p/moul/txlink/v0"
-	"gno.land/p/moul/wiki/v0"
+	"gno.land/p/moul/x/wiki/v0"
 	"gno.land/p/nt/avl/v0"
 	"gno.land/p/nt/ownable/v0"
 	"gno.land/p/nt/ufmt/v0"
@@ -29,7 +29,7 @@ import (
 // basePath is this realm's render path. It is a constant rather than a lookup
 // so link building stays a pure string operation, and it is asserted against
 // the real path by TestBasePathMatchesTheRealm.
-const basePath = "/r/moul/wiki/v0"
+const basePath = "/r/moul/x/wiki/v0"
 
 // steward is the address that starts out able to protect, move, blank and
 // purge pages. Ownable makes it transferable, so the wiki can be handed to a
@@ -44,10 +44,17 @@ var (
 	editors addrset.Set
 	banned  addrset.Set
 
-	// cooldown is the minimum number of blocks between two edits by the same
-	// address, 0 to disable. The storage deposit is the wiki's real anti-spam
-	// mechanism (a vandal funds every byte they add); this is the cheap guard
-	// against a script hammering one block.
+	// cooldown is the minimum number of blocks between two writes by the same
+	// address, 0 to disable.
+	//
+	// The storage deposit makes ADDING bytes cost the adder, but it does not
+	// make removing them cost anything: the chain refunds released storage to
+	// the caller of the transaction that frees it, at the realm's blended
+	// deposit rate, not to whoever originally paid (processStorageDeposit in
+	// gno.land/pkg/sdk/vm/keeper.go). So replacing a long article with a short
+	// one can pay the editor who does it. Blank and Purge are steward-gated
+	// for that reason, and this cooldown plus the ban list and the protection
+	// levels are what is left for ordinary edits. See #140 Q2.
 	cooldown  int64
 	lastEdit  avl.Tree // address -> the height of that address's last edit
 	editCount int
@@ -81,6 +88,35 @@ func Revert(cur realm, title string, rev int, summary string) int {
 	}
 	noteEdit(caller)
 	return int(r.ID)
+}
+
+// Comment appends a message to a page's discussion and returns its id. Pass
+// replyTo = 0 for a new thread, or the id of a top-level message to reply to.
+//
+// Commenting deliberately ignores the page's protection level: locking an
+// article is how a steward stops an edit war, and the discussion is where that
+// war is supposed to move. A banned address still cannot comment, and the
+// cooldown still applies.
+func Comment(cur realm, title, body string, replyTo int) int {
+	caller := cur.Previous().Address()
+	assertNotBanned(caller)
+	c, err := site.Comment(caller, time.Now(), runtime.ChainHeight(), title, body, uint64(replyTo))
+	if err != nil {
+		panic(err)
+	}
+	noteEdit(caller)
+	return int(c.ID)
+}
+
+// HideComment clears one message's body and returns the bytes released. The
+// message stays in the thread, marked as removed.
+func HideComment(cur realm, title string, id int) int {
+	Ownable.AssertOwnedBy(cur.Previous().Address())
+	n, err := site.HideComment(title, uint64(id))
+	if err != nil {
+		panic(err)
+	}
+	return n
 }
 
 // Protect sets a page's edit gate: "open", "semi" or "locked".
@@ -153,8 +189,9 @@ func SetCooldown(cur realm, blocks int) {
 	cooldown = int64(blocks)
 }
 
-// assertMayEdit is the whole authority model of this wiki, in one function.
-func assertMayEdit(caller address, title string) {
+// assertNotBanned is the floor every write shares: the ban list and the
+// per-address cooldown.
+func assertNotBanned(caller address) {
 	if banned.Has(caller) {
 		panic("this address is banned from editing")
 	}
@@ -165,6 +202,11 @@ func assertMayEdit(caller address, title string) {
 			}
 		}
 	}
+}
+
+// assertMayEdit is the whole authority model of this wiki, in one function.
+func assertMayEdit(caller address, title string) {
+	assertNotBanned(caller)
 
 	p, err := site.Page(title)
 	if err != nil {
@@ -200,6 +242,7 @@ func ctx() wiki.Ctx {
 //	Title/raw                 the current source, with its hash
 //	Title/rev/<id>            one stored revision
 //	Title/diff?from=&to=      a line diff between two revisions
+//	Title/talk[?offset=]      the page's discussion
 //	Category:Name             a category page and its members
 //	Special:AllPages[?ns=]    the page index for a namespace
 //	Special:Categories        every category with at least one member
@@ -264,6 +307,10 @@ func Render(path string) string {
 		}
 		return wiki.RenderRevision(c, p, r)
 
+	case "talk":
+		offset := intParam(req.Query.Get("offset"), 0)
+		return wiki.RenderTalk(c, site, p, offset, 20, txlink.Call)
+
 	case "diff":
 		from := p.Revision(uint64(intParam(req.Query.Get("from"), 0)))
 		to := p.Revision(uint64(intParam(req.Query.Get("to"), 0)))
@@ -297,6 +344,7 @@ func renderSpecial(c wiki.Ctx, name string, req *realmpath.Request) string {
 			ufmt.Sprintf("editors on the semi-protected list: %d", editors.Size()),
 			ufmt.Sprintf("banned addresses: %d", banned.Size()),
 			ufmt.Sprintf("edit cooldown: %d blocks", cooldown),
+			ufmt.Sprintf("max comment length: %d bytes", wiki.MaxCommentLen),
 			"steward: `" + Ownable.Owner().String() + "`",
 		})
 	}
@@ -354,6 +402,9 @@ func seed() {
 				"such link live.\n" +
 				"- `[[Category:Name]]` puts the page in a category instead of rendering inline.\n\n" +
 				"A page whose first line is `#REDIRECT [[Target]]` redirects.\n\n" +
+				"Every page has a discussion thread at `<Title>/talk`, written with " +
+				"`Comment(title, body, replyTo)`. It stays open even when the article " +
+				"itself is locked, because that is where a disagreement should go.\n\n" +
 				"Your transaction locks a storage deposit for the bytes you add, and releases " +
 				"it when they are removed, so the wiki charges the author of a page rather " +
 				"than its readers.\n\n[[Category:Help]]\n",

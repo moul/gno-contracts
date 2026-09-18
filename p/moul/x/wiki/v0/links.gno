@@ -100,7 +100,7 @@ func redirectTarget(body string) string {
 // which titles exist. Its function fields are read during a single Render call
 // and never stored, so no closure is ever persisted.
 type Ctx struct {
-	Base   string            // realm path prefix, e.g. "/r/moul/wiki/v0"
+	Base   string            // realm path prefix, e.g. "/r/moul/x/wiki/v0"
 	Exists func(Title) bool // nil treats every title as existing
 }
 

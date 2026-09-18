@@ -13,9 +13,12 @@ import (
 // its own listing.
 type Namespace uint8
 
+// There is deliberately no Talk namespace. Discussion is not an article with
+// a prefix: it is an append-only thread attached to a page, which threads
+// properly, moderates per message, and cannot be silently rewritten by whoever
+// edits last. See talk.gno.
 const (
 	NSMain     Namespace = iota // articles
-	NSTalk                      // discussion attached to an article
 	NSUser                      // per-address pages
 	NSCategory                  // category descriptions; membership is an index
 	NSTemplate                  // reusable fragments
@@ -32,12 +35,11 @@ var namespaces = [...]struct {
 	code   string // fixed-width avl key prefix
 }{
 	NSMain:     {"", "00"},
-	NSTalk:     {"Talk", "01"},
-	NSUser:     {"User", "02"},
-	NSCategory: {"Category", "03"},
-	NSTemplate: {"Template", "04"},
-	NSHelp:     {"Help", "05"},
-	NSSpecial:  {"Special", "06"},
+	NSUser:     {"User", "01"},
+	NSCategory: {"Category", "02"},
+	NSTemplate: {"Template", "03"},
+	NSHelp:     {"Help", "04"},
+	NSSpecial:  {"Special", "05"},
 }
 
 // Title is a normalized (namespace, name) pair. The zero Title is invalid;

@@ -26,6 +26,13 @@ type DiffLine struct {
 // in full through the raw view, so nothing is hidden by the degradation.
 const DiffMaxLines = 80
 
+// TODO(#140 Q5): decide whether diffing belongs on chain at all. Both options
+// are still open: keep this bounded server-side diff, or drop it and let
+// clients diff two /raw responses themselves, which costs the chain nothing
+// and removes DiffMaxLines entirely. Keeping it for now because a diff a
+// reader can reach from a plain URL is most of what makes a history readable,
+// and 691M gas at the body cap leaves room. Revisit if MaxBody ever rises.
+
 // DiffLines compares two bodies line by line.
 //
 // exact reports whether the result is a real line diff. When it is false the

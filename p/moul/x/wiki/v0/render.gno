@@ -29,7 +29,7 @@ func RenderArticle(c Ctx, w *Wiki, p *Page, act Action) string {
 		out.WriteString(md.Paragraph("_This page has no revisions._"))
 		return out.String()
 	}
-	out.WriteString(articleMeta(c, p, act))
+	out.WriteString(articleMeta(c, w, p, act))
 
 	if p.Blanked {
 		out.WriteString(md.Blockquote("This page was blanked. Its history is still on chain: " +
@@ -57,7 +57,7 @@ func RenderArticle(c Ctx, w *Wiki, p *Page, act Action) string {
 	return out.String()
 }
 
-func articleMeta(c Ctx, p *Page, act Action) string {
+func articleMeta(c Ctx, w *Wiki, p *Page, act Action) string {
 	h := p.head
 	parts := []string{
 		ufmt.Sprintf("rev %d", h.ID),
@@ -77,9 +77,10 @@ func articleMeta(c Ctx, p *Page, act Action) string {
 	if act != nil {
 		nav = append(nav, md.Link("edit", act("Edit", "title", p.Title.String())))
 	}
-	if p.Title.NS == NSMain {
-		nav = append(nav, md.Link("talk", c.URL(Title{NS: NSTalk, Name: p.Title.Name})))
-	}
+	// The count sits outside the link text on purpose: md.Link sanitizes its
+	// label, so parentheses inside it would render as "\(1\)".
+	nav = append(nav, md.Link("discussion", c.Sub(p.Title, "talk"))+
+		ufmt.Sprintf(" (%d)", w.NumComments(p.Title)))
 	return md.Paragraph(line + "\n\n" + strings.Join(nav, " · "))
 }
 
@@ -105,7 +106,7 @@ func articleFooter(c Ctx, w *Wiki, p *Page) string {
 		return false
 	})
 	out.WriteString(md.Paragraph(ufmt.Sprintf(
-		"%s · %d bytes held on chain · %s of storage deposit · %s link here",
+		"%s · %d bytes of text held on chain · %s of storage deposit · %s link here",
 		plural(p.NumRevisions(), "revision", "revisions"),
 		held, formatGNOT(held*DepositPerByte),
 		plural(len(w.Backlinks(p.Title)), "page", "pages"))))
@@ -352,11 +353,62 @@ func RenderStats(c Ctx, w *Wiki) string {
 	rows := []string{
 		ufmt.Sprintf("pages: %d", s.Pages),
 		ufmt.Sprintf("revisions: %d", s.Revisions),
+		ufmt.Sprintf("comments: %d", s.Comments),
 		ufmt.Sprintf("body bytes on chain: %d", s.BytesHeld),
 		ufmt.Sprintf("storage deposit locked by bodies: %s", formatGNOT(s.BytesHeld*DepositPerByte)),
 		ufmt.Sprintf("bodies kept per page: %d", s.Retention),
 	}
 	return md.H1("Wiki stats") + md.BulletList(rows)
+}
+
+// RenderTalk renders a page's discussion: top-level messages oldest first,
+// each with its replies.
+func RenderTalk(c Ctx, w *Wiki, p *Page, offset, count int, act Action) string {
+	var out strings.Builder
+	out.WriteString(md.H1("Discussion: " + p.Title.String()))
+
+	nav := []string{md.Link("← back to the article", c.URL(p.Title))}
+	if act != nil {
+		nav = append(nav, md.Link("add a message", act("Comment", "title", p.Title.String(), "replyTo", "0")))
+	}
+	out.WriteString(md.Paragraph(strings.Join(nav, " · ")))
+
+	threads := w.Comments(p.Title, offset, count)
+	if len(threads) == 0 {
+		out.WriteString(md.Paragraph("_No messages yet._"))
+		return out.String()
+	}
+
+	items := []string{}
+	for _, th := range threads {
+		item := commentLine(c, th.Root, act, p.Title)
+		for _, r := range th.Replies {
+			item += "\n" + md.Nested(commentLine(c, r, nil, p.Title), "  - ")
+		}
+		items = append(items, item)
+	}
+	out.WriteString(md.BulletList(items))
+
+	total := w.NumComments(p.Title)
+	if offset+len(threads) < total {
+		out.WriteString(md.Paragraph(md.Link("older →",
+			c.Sub(p.Title, "talk")+"?offset="+ufmt.Sprintf("%d", offset+count))))
+	}
+	return out.String()
+}
+
+func commentLine(c Ctx, cm *Comment, act Action, t Title) string {
+	head := ufmt.Sprintf("**#%d** · %s · %s",
+		cm.ID, cm.Time.Format("2006-01-02 15:04"), shortAddr(cm.Author))
+	if cm.Hidden {
+		return head + "\n\n_This message was removed by a steward._"
+	}
+	body := sanitize.Block(cm.Body)
+	if act != nil {
+		body += "\n\n" + md.Link("reply", act("Comment",
+			"title", t.String(), "replyTo", ufmt.Sprintf("%d", cm.ID)))
+	}
+	return head + body
 }
 
 func titleList(c Ctx, titles []Title) string {

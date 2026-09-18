@@ -46,7 +46,7 @@ func TestWorstCaseRendersStayWithinTheQueryBudget(t *testing.T) {
 	p, err := w.Page("Big")
 	uassert.NoError(t, err)
 
-	c := Ctx{Base: "/r/moul/wiki/v0", Exists: w.Exists}
+	c := Ctx{Base: "/r/moul/x/wiki/v0", Exists: w.Exists}
 	uassert.True(t, len(RenderArticle(c, w, p, nil)) > len(body), "the article must render in full")
 
 	now, h = at(2)

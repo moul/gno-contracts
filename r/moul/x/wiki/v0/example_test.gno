@@ -20,6 +20,6 @@ func ExampleRender() {
 	}
 	// Output:
 	// # Tendermint2
-	// Tendermint2 is the consensus engine under [Gno land](/r/moul/wiki/v0:Gno_land).
-	// **Categories:** [Chains](/r/moul/wiki/v0:Category:Chains)
+	// Tendermint2 is the consensus engine under [Gno land](/r/moul/x/wiki/v0:Gno_land).
+	// **Categories:** [Chains](/r/moul/x/wiki/v0:Category:Chains)
 }

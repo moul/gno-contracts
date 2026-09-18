@@ -41,15 +41,18 @@ type Wiki struct {
 	pages     *avl.Tree // Title.Key() -> *Page
 	backlinks *avl.Tree // target Title.Key() -> *avl.Tree (source key -> Title)
 	cats      *avl.Tree // category Title.Key() -> *avl.Tree (member key -> Title)
+	talk      *avl.Tree // Title.Key() -> *ulist.List of *Comment (see talk.gno)
 	recent    *fifo.List
 
-	nextRev   uint64
+	nextRev     uint64
+	nextComment uint64
 	retention int
 	maxBody   int
 
-	numPages  int // pages with at least one revision and not blanked
-	numRevs   int
-	bytesHeld int // sum of retained body sizes, the realm's visible rent
+	numPages    int // pages with at least one revision and not blanked
+	numRevs     int
+	numComments int
+	bytesHeld   int // retained body and comment bytes, the realm's visible rent
 }
 
 // New returns an empty wiki. A retention or maxBody below 1 falls back to the
@@ -65,6 +68,7 @@ func New(retention, maxBody int) *Wiki {
 		pages:     avl.NewTree(),
 		backlinks: avl.NewTree(),
 		cats:      avl.NewTree(),
+		talk:      avl.NewTree(),
 		recent:    fifo.New(DefaultRecent),
 		retention: retention,
 		maxBody:   maxBody,
@@ -75,7 +79,8 @@ func New(retention, maxBody int) *Wiki {
 type Stats struct {
 	Pages     int
 	Revisions int
-	BytesHeld int // bytes of article text currently on chain
+	Comments  int
+	BytesHeld int // bytes of article text and comments currently on chain
 	Retention int
 }
 
@@ -84,6 +89,7 @@ func (w *Wiki) Stats() Stats {
 	return Stats{
 		Pages:     w.numPages,
 		Revisions: w.numRevs,
+		Comments:  w.numComments,
 		BytesHeld: w.bytesHeld,
 		Retention: w.retention,
 	}
