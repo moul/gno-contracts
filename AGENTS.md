@@ -90,6 +90,20 @@ The ones that have actually bitten this repo:
   that way silently loses insertion order past nine entries. Pad by hand (see
   `padIdx` in `r/moul/demo/importdemo/v0`).
 
+- **`recover()` cannot catch a panic from a crossing call.** A panic raised
+  across `cross(cur)` is a realm *abort*, and a `defer`/`recover()` in the
+  caller never fires: the test just dies with `unexpected panic: <message>`.
+  This holds even when the test is in the realm's own package. Assert a refusal
+  with `uassert.AbortsWithMessage(t, cur, "msg", func() { F(cross(cur), …) })`
+  (or `AbortsContains`) from `gno.land/p/nt/uassert/v0`, which is also the form
+  this file ranks above a filetest. Check it is not a silent pass by breaking
+  the expected message once and watching it fail.
+- **A filetest's `// PKGPATH:` must end in a path element literally named
+  `main`.** `gno.land/r/moul/x/plan9/nstest` fails to build with
+  `package name "main" does not match path element "nstest"`; `…/plan9/main`
+  works. Anything `println`ed before an abort is dropped, so an aborting
+  filetest gets an `// Error:` block and no `// Output:` block at all.
+
 When a new divergence costs a red CI, add it here: this file is pulled by the
 daily build agent before every generation, so a line here stops the next repeat.
 
