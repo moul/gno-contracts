@@ -112,12 +112,23 @@ type Entry struct {
 // one as a package-level var without an initializer. [New] exists for the
 // pointer form.
 type Store struct {
-	tree avl.Tree
-	last seqid.ID
+	tree  avl.Tree
+	last  seqid.ID
+	label string
 }
 
 // New returns an empty store.
 func New() *Store { return &Store{} }
+
+// Named is [New] with a noun for what the store holds, used in the panic
+// [Store.MustGet] raises: store.Named("game") makes it "game #7 not found"
+// instead of "store: no entry #7".
+//
+// It exists so porting a realm to this package does not have to trade its own
+// error wording for one shared implementation. The realms being replaced here
+// panic "game not found", "proposal not found", "capsule not found"; the label
+// keeps that and adds the id they all omitted.
+func Named(label string) *Store { return &Store{label: label} }
 
 // Add stores v under the next ID and returns it.
 //
@@ -154,15 +165,23 @@ func (s *Store) Get(id ID) (any, bool) {
 
 // MustGet returns the value at id, or panics.
 //
-// This is the "get or panic" the realms wrote eighteen times, with one message
-// instead of eighteen. The panic reads "store: no entry #7", so an operator
-// seeing it in a failed transaction learns which entry was missing.
+// This is the "get or panic" the realms wrote eighteen times, with one
+// implementation instead of eighteen. The panic names the id, which none of
+// them did: "store: no entry #7", or "game #7 not found" for a store built
+// with [Named].
 func (s *Store) MustGet(id ID) any {
 	v, ok := s.Get(id)
 	if !ok {
-		panic("store: no entry #" + id.String())
+		panic(s.missing(id))
 	}
 	return v
+}
+
+func (s *Store) missing(id ID) string {
+	if s.label == "" {
+		return "store: no entry #" + id.String()
+	}
+	return s.label + " #" + id.String() + " not found"
 }
 
 // Has reports whether id is present.

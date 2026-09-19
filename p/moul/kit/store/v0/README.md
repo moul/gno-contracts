@@ -54,14 +54,14 @@ exactly one file in the repo.
 ```go
 import "gno.land/p/moul/kit/store/v0"
 
-var games store.Store                       // the zero value is an empty store
+var games = store.Named("game")             // or `var games store.Store`
 
 func NewGame(cur realm) int64 {
     return int64(games.Add(&Game{Board: empty, X: caller()}))
 }
 
 func Move(cur realm, gameID int64, cell int) {
-    g := games.MustGet(store.ID(gameID)).(*Game)   // panics "store: no entry #7"
+    g := games.MustGet(store.ID(gameID)).(*Game)   // panics "game #7 not found"
     ...
 }
 
@@ -78,10 +78,11 @@ func Render(path string) string {
 | | |
 |---|---|
 | `New()` | a new empty store; the zero `Store` works too |
+| `Named("game")` | the same, with a noun for the `MustGet` panic |
 | `Add(v) ID` | store under the next ID |
 | `Set(id, v) bool` | write at an explicit ID, reports a replacement |
 | `Get(id) (any, bool)` | value and presence, so a stored `nil` is not "absent" |
-| `MustGet(id) any` | or panic `store: no entry #7` |
+| `MustGet(id) any` | or panic `store: no entry #7`, or `game #7 not found` when named |
 | `Has(id)`, `Remove(id)`, `Len()`, `LastID()` | |
 | `Each(fn)`, `EachReverse(fn)` | every entry, ascending / descending |
 | `EachUntil(fn) bool`, `EachReverseUntil(fn) bool` | stop when `fn` returns true |
