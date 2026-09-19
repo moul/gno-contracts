@@ -170,6 +170,7 @@ make help        # list all targets
 | [`p/moul/x/daily/sparkline/v0`](p/moul/x/daily/sparkline/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/sparkline/v0) | — | — | — |
 | [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/toposort/v0) | — | — | — |
 | [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie/v0) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/trie/v0) | — | — | — |
+| [`p/moul/x/wiki/v0`](p/moul/x/wiki/v0) 📦 | — | — | — | — | — | 6 |
 | [`p/moul/xdao/v0`](p/moul/xdao/v0) 📦 | — | — | [✅](https://gno.land/p/moul/xdao/v0) | — | — | 1 |
 | [`p/moul/xmath/v0`](p/moul/xmath/v0) 📦 | — | — | [✅](https://gno.land/p/moul/xmath/v0) | — | — | — |
 | [`r/moul/config/v0`](r/moul/config/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
@@ -292,6 +293,7 @@ make help        # list all targets
 | [`r/moul/x/daily/vestoken/v0`](r/moul/x/daily/vestoken/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/vestoken/v0) | — | — | — |
 | [`r/moul/x/daily/wordle/v0`](r/moul/x/daily/wordle/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wordle/v0) | — | — | — |
 | [`r/moul/x/daily/wrapped/v0`](r/moul/x/daily/wrapped/v0) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wrapped/v0) | — | — | 1 |
+| [`r/moul/x/wiki/v0`](r/moul/x/wiki/v0) 🏛️ | — | — | — | — | — | 8 |
 
 _📦 pkg · 🏛️ realm · 🚧 draft._
 
