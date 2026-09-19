@@ -1,7 +1,9 @@
 # build artifacts — never commit a compiled binary (use `go tool gnocontracts`)
 /bin/
 /gnocontracts
+/gnopm
 /tools/gnocontracts/gnocontracts
+/tools/gnopm/gnopm
 tools/tools
 
 # gno toolchain checkout used by CI / local dev
@@ -9,6 +11,13 @@ tools/tools
 
 # ephemeral stdlib-only GNOROOT view built by `make view` (empty examples/)
 /.gnoroot-view/
+
+# gnopm's assembly of package versions that no longer exist in the working
+# tree, rebuilt from gnomod.lock by `gnopm install`. Tool output, never
+# committed: a checked-in .gnopm/ would put a second copy of old versions back
+# in the tree, which is the exact problem gnopm removes.
+# NOTE: gnomod.lock itself IS committed, it is source, like Cargo.lock.
+/.gnopm/
 
 # gno caches occasionally dropped in-tree
 **/.gno/

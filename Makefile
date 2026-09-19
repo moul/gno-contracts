@@ -15,8 +15,9 @@
 # The maintenance CLI is a `go tool` (declared in go.mod), invoked as
 # `go tool gnocontracts <cmd>` — no binary is ever built into the tree.
 
-GNO  ?= gno
-TOOL ?= go tool gnocontracts
+GNO          ?= gno
+GNOCONTRACTS ?= go tool gnocontracts
+GNOPM        ?= go tool gnopm
 
 # Ephemeral stdlib-only view of the toolchain (empty examples/ → vendor wins).
 VIEW := $(CURDIR)/.gnoroot-view
@@ -31,7 +32,7 @@ VIEW := $(CURDIR)/.gnoroot-view
 PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -not -path '*/.*' -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report graph view clean upload
+.PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report graph view clean upload verify
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -44,17 +45,43 @@ view: ## (re)build the stdlib-only GNOROOT view used by lint/test
 		[ "$$b" = examples ] || ln -sfn "$$e" "$(VIEW)/$$b"; \
 	done
 
+# ---------------------------------------------------------------- gnopm ----
+#
+# A package's version lives in its gnomod.toml `module` line, not in its
+# directory name. gnomod.lock records, per module path, where that version's
+# source actually is; versions that no longer have a directory are rebuilt
+# from git history into .gnopm/.
+#
+# gnopm is the interface, not these targets: `gnopm status`, `gnopm sync`,
+# `gnopm bump <pkg>`. They are here only for the two things Make genuinely
+# needs, a prerequisite and a CI gate.
+#
+# gnomod.lock is SOURCE, not a generated artifact: unlike contracts.json it is
+# committed by the author of the change, because a change that bumps a version
+# has to carry the pin that keeps the old version resolvable, or CI cannot
+# build the packages that still import it. It only changes when a package is
+# added, removed or bumped, never on an ordinary source edit.
+
+verify: ## fail if gnomod.lock is stale or a pinned version no longer reproduces
+	$(GNOPM) verify
+
+# Everything gno-invoking depends on this: `gnopm sync` regenerates the lock if
+# the tree moved and materializes any version that is pinned but missing. It is
+# idempotent and silent when there is nothing to do, so the dependency is free.
+.gnopm/.stamp: gnomod.lock
+	$(GNOPM) sync
+
 deps: ## vendor MISSING external gno.land deps into vendor/ (reads real GNOROOT/examples)
-	$(TOOL) vendor
+	$(GNOCONTRACTS) vendor
 
 # `deps` only fetches what's absent, so vendor/ stays pinned — and silently
 # drifts from the monorepo. This re-copies every dep from the current
 # GNOROOT/examples: the deliberate "bump gno" step. Review the diff, then
 # `make lint test` against a matching gno build before committing.
 bump-deps: ## re-vendor ALL external deps from GNOROOT/examples (bump the pinned snapshot)
-	$(TOOL) vendor -refresh
+	$(GNOCONTRACTS) vendor -refresh
 
-test: toolcheck guard-examples guard-render view ## gno test every contract (deps resolved from committed vendor/)
+test: toolcheck guard-examples guard-render view .gnopm/.stamp ## gno test every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== test $$d =="; GNOROOT="$(VIEW)" $(GNO) test ./$$d; done
 
 # Prove the gno toolchain actually VALIDATES example tests. gno silently skips
@@ -71,7 +98,7 @@ test: toolcheck guard-examples guard-render view ## gno test every contract (dep
 # toolchain this target exists to catch.
 TOOLCHECK_DIR := p/moul/.toolcheck
 
-toolcheck: view ## verify the gno toolchain validates example tests
+toolcheck: view .gnopm/.stamp ## verify the gno toolchain validates example tests
 	@rm -rf "$(TOOLCHECK_DIR)"; mkdir -p "$(TOOLCHECK_DIR)"; \
 	trap 'rm -rf "$(TOOLCHECK_DIR)"' EXIT; \
 	printf 'module = "gno.land/p/moul/toolcheck/v1"\ngno = "0.9"\n' > "$(TOOLCHECK_DIR)/gnomod.toml"; \
@@ -94,7 +121,7 @@ guard-examples: ## fail if any Example* test lacks an // Output: block
 guard-render: ## fail if a realm declares Render but no test calls it
 	@python3 tools/guard_render.py
 
-lint: view ## gno lint every contract (deps resolved from committed vendor/)
+lint: view .gnopm/.stamp ## gno lint every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
 
 # Like lint/test, fmt resolves against the stdlib-only view. Without it the gno
@@ -102,40 +129,40 @@ lint: view ## gno lint every contract (deps resolved from committed vendor/)
 # have that exact checkout fails with `unable to load .../gnovm/stdlibs` for
 # every package. The old `|| true` swallowed that, so `make fmt` reformatted
 # nothing and said so to nobody.
-fmt: view ## gno fmt every contract in place
+fmt: view .gnopm/.stamp ## gno fmt every contract in place
 	@set -e; for d in $(PKG_DIRS); do GNOROOT="$(VIEW)" $(GNO) fmt -w ./$$d; done
 
 manifest: ## refresh contracts.json from the contract trees
-	$(TOOL) manifest
+	$(GNOCONTRACTS) manifest
 
 readme: ## regenerate the README contracts table
-	$(TOOL) readme
+	$(GNOCONTRACTS) readme
 
 readmes: ## ensure every package has a README (repo link + disclaimer)
-	$(TOOL) readmes
+	$(GNOCONTRACTS) readmes
 
 gen: manifest readme readmes ## manifest + README table + per-package READMEs
 
 check: ## fail if contracts.json / README table are stale (CI guard)
-	$(TOOL) check
+	$(GNOCONTRACTS) check
 
 sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
-	$(TOOL) sync
+	$(GNOCONTRACTS) sync
 
 publish: ## dependency-ordered publish plan; NET=<net> CHECK=1 to query chain
-	$(TOOL) publish $(if $(NET),-net $(NET),) $(if $(CHECK),-check,)
+	$(GNOCONTRACTS) publish $(if $(NET),-net $(NET),) $(if $(CHECK),-check,)
 
 upload: ## broadcast packages to a network via gnopublish, e.g. ARGS="-net mainnet -key mykey -dry-run ./..." (on-chain hits cached in .cache/)
 	cd tools/gnopublish && GOTOOLCHAIN=auto go run . $(ARGS)
 
 status: ## refresh on-chain upload status (all networks) + README; needs gnokey
-	$(TOOL) status $(if $(NET),-net $(NET),)
+	$(GNOCONTRACTS) status $(if $(NET),-net $(NET),)
 
 report: ## analyze the PR diff (BASE=origin/main) into a Markdown report
-	$(TOOL) report $(if $(BASE),-base $(BASE),)
+	$(GNOCONTRACTS) report $(if $(BASE),-base $(BASE),)
 
 graph: ## generate per-package + global dependency graphs into _assets/ (needs graphviz for svg/png)
-	$(TOOL) graph
+	$(GNOCONTRACTS) graph
 
-clean: ## remove build artifacts, the GNOROOT view and the gnopublish on-chain cache
-	rm -rf bin "$(VIEW)" .cache
+clean: ## remove build artifacts, the GNOROOT view, the gnopm assembly and the gnopublish on-chain cache
+	rm -rf bin "$(VIEW)" .cache .gnopm
