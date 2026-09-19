@@ -91,6 +91,53 @@ func TestDeriveContractRejectsUnversioned(t *testing.T) {
 	}
 }
 
+// The one documented break in rule 1: gnoweb serves gno.land/u/<username> by
+// rendering /r/<username>/home at exactly that path, with no version
+// resolution, so r/moul/home cannot carry a /vN and still be reachable. The
+// tool has to model that or the whole catalog fails to scan. Version comes back
+// empty; Name is the last segment; and the rejection above must still hold for
+// every path NOT on the list, which is the half worth pinning.
+func TestDeriveContractAllowsListedUnversioned(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, dir, "home.gno", "package home\nimport \"gno.land/p/moul/dynreplacer/v0\"\n")
+
+	c, err := deriveContract("gno.land/r/moul/home", "r/moul/home", dir)
+	if err != nil {
+		t.Fatalf("deriveContract(r/moul/home): %v", err)
+	}
+	if c.Kind != "r" || c.Name != "home" || c.Version != "" {
+		t.Fatalf("derived = %+v, want kind=r name=home version=\"\"", c)
+	}
+	if want := []string{"gno.land/p/moul/dynreplacer/v0"}; !reflect.DeepEqual(c.Deps, want) {
+		t.Fatalf("deps = %v, want %v", c.Deps, want)
+	}
+
+	// The exemption is per exact path, not a pattern: a sibling that merely
+	// looks similar is still rejected.
+	if _, err := deriveContract("gno.land/r/moul/home2", "r/moul/home2", dir); err == nil {
+		t.Fatal("r/moul/home2 is not on the list and must still be rejected")
+	}
+}
+
+// An unversioned pkgpath must not be mangled by the version-aware helpers: it
+// is its own family, and it stays a node of its own in the collapsed graph.
+func TestUnversionedPathSurvivesVersionHelpers(t *testing.T) {
+	const p = "gno.land/r/moul/home"
+	if base, n, ok := splitVersion(p); ok {
+		t.Fatalf("splitVersion(%q) = (%q, %d, true), want ok=false", p, base, n)
+	}
+	if got := basePath(p); got != p {
+		t.Fatalf("basePath(%q) = %q, want it unchanged", p, got)
+	}
+	m := &Manifest{Contracts: []Contract{
+		{PkgPath: p, Kind: "r", Name: "home"},
+		{PkgPath: "gno.land/p/moul/md/v0", Kind: "p", Name: "md", Version: "v0"},
+	}}
+	if _, found := latestOwn(m)[p]; found {
+		t.Fatalf("latestOwn folded %q into a version family", p)
+	}
+}
+
 func TestTopoOrderDepsFirst(t *testing.T) {
 	cs := []Contract{
 		{PkgPath: "a", Deps: []string{"b"}},
