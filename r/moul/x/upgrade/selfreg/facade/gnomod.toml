@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/upgrade/selfreg/facade/v0"
+gno = "0.9"
+# public: every implementation realm imports it to register itself from init
