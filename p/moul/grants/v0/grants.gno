@@ -66,6 +66,9 @@ var (
 	ErrBadAddress    = errors.New("grants: invalid address")
 	ErrIsMember      = errors.New("grants: already a board member")
 	ErrLastMember    = errors.New("grants: the last member cannot be removed")
+	ErrNothingSent   = errors.New("grants: a donation must be a positive amount")
+	ErrUnderfunded   = errors.New("grants: the treasury cannot cover this tranche")
+	ErrBadSpec       = errors.New("grants: milestones must read \"title:amount,title:amount\"")
 )
 
 // Limits every input is checked against. Exported so a UI can pre-validate.
