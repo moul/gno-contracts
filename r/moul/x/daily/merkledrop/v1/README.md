@@ -1,0 +1,86 @@
+# merkledrop v1
+
+A Merkle-gated airdrop that actually moves GNOT.
+
+Successor to [`v0`](../v0), which the daily pipeline generated and which is deployed on
+mainnet. v0 works, but it is a demonstration rather than a drop, and its proof scheme is safe
+by accident. Built on [`p/moul/x/merkle/v0`](../../../../../../p/moul/x/merkle/v0).
+
+## What changed, and why
+
+**1. Domain-separated leaves.** v0 hashed leaves bare and combined nodes commutatively, the
+OpenZeppelin scheme: `leaf = sha256(addr|amount)`, `node = sha256(min||max)`. Without a
+leaf/inner tag an inner-node hash is also a valid leaf hash, so anyone able to present a
+64-byte leaf preimage can prove membership of a leaf that was never committed.
+
+v0 is **not** exploitable, but only by arithmetic: an inner preimage is exactly 64 bytes, and
+a v0 leaf preimage is at most 40 (bech32 address) + 1 + 20 (`uint64` has at most 20 digits) =
+61 bytes. 61 < 64, so no collision is reachable. Widen the amount, change the address form, add
+a field, and the forgery goes live with no visible diff at the call site. That is not a
+property to rely on. v1 tags leaves `0x00` and inner nodes `0x01`, so the two preimage spaces
+cannot overlap at any length.
+
+**2. Proofs bound to a position.** v0's proof was a bare sibling list of any length, folded
+until it ran out. v1's proof carries its index and the total leaf count; the verifier rebuilds
+the tree shape from them, so a proof cannot be replayed at another index and one of the wrong
+length is rejected rather than folded. Depth is capped at `merkle.MaxDepth`, so an untrusted
+caller does not choose the length of the loop.
+
+**3. A settable root and a closing height.** v0's root is a `const`: the drop can never be
+re-rooted, extended or ended. v1's owner sets root, leaf count and an optional closing height,
+and can sweep the remainder once it closes.
+
+**4. Real coins.** v0 keeps a `uint64` ledger and moves nothing. Its README says so, but it
+sits on mainnet reading like an airdrop. v1 sends ugnot from the realm's own address through
+the banker, and **refuses a claim it cannot pay** rather than marking it claimed:
+`TestUnderfundedDropDoesNotBurnAnAllocation` pins that an underfunded drop does not consume
+an allocation.
+
+## Leaf encoding
+
+The whole interface to an off-chain generator:
+
+```
+leaf = "gno.land/r/moul/x/daily/merkledrop/v1|<index>|<address>|<amount>"
+tree = Tendermint simple tree, leaf tagged 0x00, inner tagged 0x01
+```
+
+The pkgpath is in the preimage, so a proof for this drop cannot be replayed against another
+realm using the same shape. Reproduce the tree with `p/moul/x/merkle/v0`, or with any Tendermint
+implementation.
+
+## Using it
+
+```
+SetDrop(rootHex, totalLeaves, closesAtHeight)   // owner only; 0 = never closes
+Verify(index, addr, amount, proof)              // free check before spending gas
+Claim(index, amount, proof)                     // pays out
+Sweep()                                         // owner, after the drop closes
+```
+
+Fund the drop by sending ugnot to `Address()`, the realm's own package address.
+
+## The seeded example drop
+
+Deployed with four example allocations so the drop can be exercised without a generator, and
+so the page is not empty. A **live** drop commits only a root and stores no allocation list:
+that is the whole point of a Merkle drop. `SetDrop` clears the seeded list.
+
+Root: `6964baa99da23b9d8c76774c6f1122b250040e29c1d75823dda15c043dc65755`
+
+`DemoProof(index)` hands out the proof for a seeded allocation, and
+`/r/moul/x/daily/merkledrop/v1:proof/<index>` renders it with its leaf.
+
+## Who the claimer is
+
+The claimer is `PreviousRealm().Address()`, the **immediate** caller. Called directly by a
+user that is the user; called through another realm it is that **realm**.
+
+That is not a hole: the leaf binds the address and the proof must match the claimer, so an
+intermediary can only claim an allocation granted to the intermediary itself. It does mean a
+wrapper realm cannot claim on a user's behalf, which is deliberate.
+
+## Note on v0
+
+v0's README lists an allocation for `g1manfred47kzduec920z88wfr64ylksmdcedar8`. moul's actual
+address is `...cedlf5`. v1 uses the real one.
