@@ -61,6 +61,19 @@ func TestMustGetPanicsNamingTheEntry(cur realm, t *testing.T) {
 	uassert.NotPanics(t, cur, func() { s.MustGet(ID(1)) })
 }
 
+// A labelled store keeps the realm's own wording, so porting one does not
+// trade "game not found" for a generic message.
+func TestNamedStoreUsesItsLabelInThePanic(cur realm, t *testing.T) {
+	s := Named("game")
+	s.Add("only")
+	uassert.PanicsWithMessage(t, cur, "game #7 not found", func() { s.MustGet(ID(7)) })
+	uassert.NotPanics(t, cur, func() { s.MustGet(ID(1)) })
+
+	// The label changes nothing else.
+	uassert.Equal(t, uint64(1), uint64(s.LastID()))
+	uassert.Equal(t, 1, s.Len())
+}
+
 func TestSetReplacesInPlace(t *testing.T) {
 	s := New()
 	id := s.Add("before")
