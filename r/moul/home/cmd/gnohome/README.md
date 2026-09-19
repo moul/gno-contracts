@@ -1,0 +1,73 @@
+# gnohome
+
+The local half of [`r/moul/home`](../../README.md): write markdown in
+`content/`, see the page before anyone else does, push only what changed.
+
+Standard library only: no `gnoclient`, no cgo, no second `go.mod`. It reads the
+chain over plain JSON-RPC `abci_query` and **prints** `gnokey` commands instead
+of signing them, so it holds no key and can broadcast nothing by accident.
+
+## The loop
+
+```sh
+$EDITOR r/moul/home/content/bio.md
+
+go run ./r/moul/home/cmd/gnohome preview   # exactly what the realm will render
+go run ./r/moul/home/cmd/gnohome status    # what differs from the chain
+go run ./r/moul/home/cmd/gnohome tx        # the commands to fix that
+```
+
+`tx` writes to stdout, so review then pipe: `… tx | sh`.
+
+## Commands
+
+| command | what it does |
+| --- | --- |
+| `slots` | the local slots: name, bytes, hash, path |
+| `preview` | render the page locally; `-out FILE` to write it |
+| `status` | diff `content/` against the chain manifest, one query, no bodies |
+| `tx` | print `gnokey maketx call` for each outdated slot |
+
+Shared flags: `-content` `-realm` `-remote` `-chainid` `-key` `-owner`.
+`preview` adds `-out` `-height` `-rev`; `tx` adds `-inline` `-all` `-prune`
+`-gas-wanted` `-gas-fee` `-max-deposit`. `gnohome <cmd> -h` lists them.
+
+`-content` defaults to `<repo>/r/moul/home/content`, found by walking up to
+`gnowork.toml`, so the commands above work from anywhere in the repo.
+
+## How a slot maps to a file
+
+`content/<slug>.md` → the slot `<slug>`. `layout.md` is the page template.
+Sub-directories and non-`.md` files are ignored; an invalid or reserved slug is
+an error, not a surprise on chain.
+
+## The one subtle part: `"$(/bin/cat …)"`
+
+`tx` emits the body as `-args "$(/bin/cat '<abs path>')"` rather than inlining a
+few kilobytes of markdown into your terminal. Two details make that safe:
+
+- **Trailing newlines are stripped locally, and nothing else is.** Command
+  substitution eats trailing newlines, so a body that kept one would hash
+  differently on chain than `status` compared, and the slot would report as
+  outdated forever. Trailing *spaces* are kept, because `cat` keeps them.
+  Carriage returns are refused at load time for the same reason.
+- **`/bin/cat`, not `cat`.** A shadowed or broken `cat` on `PATH` makes the
+  substitution expand to nothing, and the command would then silently set the
+  slot to the empty string. The absolute path is deliberate.
+
+Use `-inline` to embed the literal instead (shell-quoted, apostrophes included).
+
+## After a redeploy
+
+Re-adding the package resets realm state: `init()` runs again and the slot tree
+is empty. Push everything back without consulting the chain:
+
+```sh
+go run ./r/moul/home/cmd/gnohome tx -all | sh
+```
+
+## Bodies too large for one transaction
+
+`tx` warns past 60 KiB. The realm's `Append` is the escape hatch: `Set` the first
+chunk, `Append` the rest. `gnohome` does not chunk automatically, because splitting is a
+judgement call about where a body can be cut.
