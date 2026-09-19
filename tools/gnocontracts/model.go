@@ -339,23 +339,54 @@ func parseModuleIgnore(gnomodPath string) bool {
 	return false
 }
 
+// unversionedContracts lists the module paths exempt from rule 1 of AGENTS.md
+// ("every contract path ends in an explicit /vN"). The exemption is only ever
+// granted where an EXTERNAL CONSUMER hard-codes the path, so the bare path is
+// an interface and not a naming choice:
+//
+//   - gno.land/r/moul/home: gnoweb serves gno.land/u/<username> by calling
+//     Render("") on the realm at exactly /r/<username>/home, with no version
+//     resolution, so /r/moul/home/v0 would never be found. It versions inside
+//     instead: content in mutable storage, private = true in gnomod.toml so the
+//     code can be replaced in place.
+//
+// Such a contract has an empty Version. Both version-aware helpers already cope:
+// splitVersion reports ok=false (so latestOwn skips it, correctly: an
+// unversioned path is its own family) and basePath returns the path unchanged.
+//
+// Do not add an entry without that external consumer.
+var unversionedContracts = map[string]bool{
+	"gno.land/r/moul/home": true,
+}
+
 // deriveContract builds a Contract from a module path such as
 // "gno.land/r/moul/hello/v0" or "gno.land/p/moul/defi/amm/v2".
 func deriveContract(module, dir, absDir string) (Contract, error) {
 	parts := strings.Split(module, "/")
-	// gno.land / (p|r) / moul / <name...> / vN
-	if len(parts) < 5 || parts[0] != "gno.land" || parts[2] != "moul" {
+	// gno.land / (p|r) / moul / <name...> / vN, the trailing vN being optional
+	// only for the documented exceptions above.
+	unversioned := unversionedContracts[module]
+	minParts := 5
+	if unversioned {
+		minParts = 4
+	}
+	if len(parts) < minParts || parts[0] != "gno.land" || parts[2] != "moul" {
 		return Contract{}, fmt.Errorf("unexpected module path %q (want gno.land/{p,r}/moul/<name>/vN)", module)
 	}
 	kind := parts[1]
 	if kind != "p" && kind != "r" {
 		return Contract{}, fmt.Errorf("unexpected kind %q in %q", kind, module)
 	}
-	version := parts[len(parts)-1]
-	if !isVersion(version) {
-		return Contract{}, fmt.Errorf("module %q is not versioned (expected trailing /vN)", module)
+	var version, name string
+	if unversioned {
+		name = strings.Join(parts[3:], "/")
+	} else {
+		version = parts[len(parts)-1]
+		if !isVersion(version) {
+			return Contract{}, fmt.Errorf("module %q is not versioned (expected trailing /vN)", module)
+		}
+		name = strings.Join(parts[3:len(parts)-1], "/")
 	}
-	name := strings.Join(parts[3:len(parts)-1], "/")
 	deps, err := parseDeps(absDir)
 	if err != nil {
 		return Contract{}, err
