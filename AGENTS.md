@@ -10,8 +10,16 @@ before making changes.
 1. **Everything is versioned, starting at `v0`; bump only on a compatibility
    change.** Every contract path ends in an explicit version segment —
    `gno.land/{p,r}/moul/<name>/v0` (then `v1`, `v2`, …). There is *no*
-   un-versioned contract, ever, and **the version is always the LAST path
-   element**: `p/moul/ulist/lplist/v0`, never `p/moul/ulist/v0/lplist`.
+   un-versioned contract **except where an external consumer dictates the path**
+   (see below), and **the version is always the LAST path element**:
+   `p/moul/ulist/lplist/v0`, never `p/moul/ulist/v0/lplist`.
+   - **The one exception: `r/moul/home`.** gnoweb renders `gno.land/u/<username>`
+     by calling `Render("")` on the realm at the exact path `/r/<username>/home`
+     and does no version resolution, so `r/moul/home/v0` would never be found.
+     The bare path is an interface with gnoweb, not a naming choice. Such a realm
+     versions *inside* instead: content in mutable storage, `private = true` in
+     `gnomod.toml` so the code can be replaced in place. Do not generalise this:
+     it needs an external consumer that hard-codes the path.
    - **`v0` is the first version of any path**, per gno's own convention
      (gnolang/gno#5220): *initial, unaudited*. New contracts start there.
    - **Bump to a new `vN` directory** for a **compatibility / breaking change**:
@@ -219,6 +227,34 @@ nothing reusable to extract.
 > how to structure a contract, record it **here** (and in `CLAUDE.md`) so the
 > next contract follows it from the start — the contract-building agent rereads
 > these files each time.
+
+### Go companions (`<contract>/cmd/<name>/`)
+
+A contract that is **driven from a laptop** (content pushed from local files, a
+generated payload, a state dump to inspect) ships a small Go program next to it,
+at `<contract-dir>/cmd/<name>/`. Not under `tools/`: `tools/` holds repo-wide
+maintenance, a companion is part of one contract and moves with it.
+
+Rules, so a companion stays small and safe:
+
+- **Standard library only.** No `gnoclient`, no cgo, no second `go.mod`. Read the
+  chain over plain JSON-RPC `abci_query`; that is ~60 lines and it keeps the
+  companion inside the root module, so `go build ./...` and `go vet ./...` cover
+  it. (`tools/gnopublish` is the counter-example: it links the full gno client
+  stack and therefore had to become a separate module.)
+- **Print transactions, do not sign them.** Emit `gnokey maketx …` commands for
+  the user to review and paste. A companion holds no key and broadcasts nothing,
+  so it can never surprise anyone. Name moul's key `moul` in what it emits.
+- **Mirror, and say so.** Anything duplicated from the realm (slug rules,
+  reserved names, a default template) carries a comment naming the `.gno` file it
+  mirrors, and a Go test pinning the two to the same behaviour.
+- **Table-driven tests, no network.** The chain-facing code is one function that
+  returns a string; test the parsing, not the transport.
+- The gno toolchain ignores it: `ReadMemPackage` skips sub-directories, so
+  `cmd/` never reaches the chain, and `PKG_DIRS` only finds directories holding a
+  `gnomod.toml`.
+
+Worked example: `r/moul/home/cmd/gnohome`.
 
 ## The maintenance CLI (`tools/gnocontracts`)
 

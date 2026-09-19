@@ -10,6 +10,14 @@ Read it before doing anything. The essentials:
   an exported symbol, changing its signature/behavior, or a storage/data-structure
   swap (e.g. `avl`→`bptree`) ⇒ **new `vN`** dir. **Non-breaking** work (new
   functions, unit tests, comments, docs) stays in place in the same `vN`.
+  **One exception: `r/moul/home`**, unversioned because gnoweb hard-codes
+  `/r/<username>/home` for `gno.land/u/<username>` and does no version
+  resolution. It versions inside instead (mutable content + `private = true`).
+  Do not generalise without an external consumer that hard-codes the path.
+- **A contract driven from a laptop ships a Go companion at
+  `<contract>/cmd/<name>/`**: standard library only, inside the root module, and
+  it **prints `gnokey maketx` commands rather than signing anything**. Not under
+  `tools/`, which is repo-wide maintenance. Example: `r/moul/home/cmd/gnohome`.
 - **The 12 mirrored `p/moul/*` are frozen.** `addrset` `authz` `dynreplacer`
   `fifo` `helplink` `md` `mdtable` `once` `realmpath` `txlink` `typeutil` `ulist`
   also live in `gnolang/gno` at the same `/v0` path and ship in gnoland1 genesis.
