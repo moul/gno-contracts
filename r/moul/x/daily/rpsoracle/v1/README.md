@@ -42,17 +42,13 @@ gnokey query vm/qrender \
 
 Written against the sapphire (gno 0.9) stdlib split (`chain`, `chain/runtime`,
 `gno.land/p/nt/avl/v0`, `gno.land/p/nt/testutils/v0`), following the same
-crossing-function (`cur realm`) and `avl.Tree`-backed state patterns already
-verified on this chain by the `rpsmatch` realm in this repo. The `gno` binary
-on `PATH` here has its compiled-in `GNOROOT` pointing at a now-deleted
-directory (`/private/tmp/gnoswap-review/gno`), and no Go toolchain is
-available in this environment to rebuild a chain-matched binary per
-`references/toolchain.md`, so `gno test` could not be run this time. The code
-was instead reviewed by hand against the exact working patterns in
-`rpsmatch` (same imports, same `cur.IsCurrent()` / `cur.Previous().Address()`
-guard, same `avl.Tree` get-or-create, same `chain.Emit` call shape) and
-against Go's array-indexing-by-named-integer-type rule for the `Move`-keyed
-`Counts` array.
+crossing-function (`cur realm`) and `avl.Tree`-backed state patterns as the
+`rpsmatch` realm in this repo.
+
+v0's README noted that `gno test` could not be run when it was written, because
+the `gno` on `PATH` embedded a `GNOROOT` pointing at a deleted directory. That
+no longer applies: **v1 is tested**, with `gno` built from `origin/master`, and
+it passes `make test` and `make lint` alongside the rest of the repo.
 
 ## What changed in v1
 
