@@ -27,10 +27,30 @@ go run ./r/moul/home/cmd/gnohome tx        # the commands to fix that
 | `preview` | render the page locally; `-out FILE` to write it |
 | `status` | diff `content/` against the chain manifest, one query, no bodies |
 | `tx` | print `gnokey maketx call` for each outdated slot |
+| `packages` | print the `packages` slot, generated from `contracts.json` |
 
 Shared flags: `-content` `-realm` `-remote` `-chainid` `-key` `-owner`.
 `preview` adds `-out` `-height` `-rev`; `tx` adds `-inline` `-all` `-prune`
-`-gas-wanted` `-gas-fee` `-max-deposit`. `gnohome <cmd> -h` lists them.
+`-gas-wanted` `-gas-fee` `-max-deposit`; `packages` adds `-catalog` `-network`.
+`gnohome <cmd> -h` lists them.
+
+### `packages` is the one generated slot
+
+Every other slot is prose somebody wrote. `packages` is a claim about what is
+deployed, so writing it by hand guarantees it goes stale the next time a
+contract lands. It reads `contracts.json`, keeps the highest version of each
+family **that is actually uploaded to the target network** (so a `v1` that only
+reached pearl does not get advertised on mainnet), and prints the counts plus
+the libraries and realms by name. `x/daily` is counted rather than listed:
+there are more of those than of everything else together.
+
+```sh
+go run ./r/moul/home/cmd/gnohome packages > r/moul/home/content/packages.md
+go run ./r/moul/home/cmd/gnohome status    # then push it like any other slot
+```
+
+Output is deterministic for a given catalog, so regenerating without a catalog
+change leaves `status` quiet instead of proposing a no-op transaction.
 
 `-content` defaults to `<repo>/r/moul/home/content`, found by walking up to
 `gnowork.toml`, so the commands above work from anywhere in the repo.

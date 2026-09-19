@@ -211,3 +211,135 @@ func write(t *testing.T, dir, name, body string) {
 		t.Fatal(err)
 	}
 }
+
+// testCatalog is a miniature contracts.json exercising every branch of the
+// packages generator: a two-version family, a family whose latest version is
+// NOT deployed, a nested name, a name that collides on its last segment, an
+// x/daily entry of each kind, and a contract on no network at all.
+func testCatalog() *catalog {
+	entry := func(path, kind, name, version string, nets ...string) catalogEntry {
+		e := catalogEntry{PkgPath: path, Kind: kind, Name: name, Version: version}
+		e.Published = map[string]struct {
+			Uploaded bool `json:"uploaded"`
+		}{}
+		for _, n := range nets {
+			e.Published[n] = struct {
+				Uploaded bool `json:"uploaded"`
+			}{Uploaded: true}
+		}
+		return e
+	}
+	return &catalog{Contracts: []catalogEntry{
+		entry("gno.land/p/moul/addrset/v0", "p", "addrset", "v0", "mainnet"),
+		entry("gno.land/p/moul/addrset/v1", "p", "addrset", "v1", "mainnet"),
+		// v10 must beat v9: a string sort gets this backwards.
+		entry("gno.land/p/moul/md/v9", "p", "md", "v9", "mainnet"),
+		entry("gno.land/p/moul/md/v10", "p", "md", "v10", "mainnet"),
+		// The newest version is only on pearl, so mainnet must show v0.
+		entry("gno.land/p/moul/svg/v0", "p", "svg", "v0", "mainnet"),
+		entry("gno.land/p/moul/svg/v1", "p", "svg", "v1", "pearl"),
+		entry("gno.land/p/moul/ulist/lplist/v0", "p", "ulist/lplist", "v0", "mainnet"),
+		entry("gno.land/r/moul/hello/v0", "r", "hello", "v0", "mainnet"),
+		entry("gno.land/r/moul/demo/hello/v0", "r", "demo/hello", "v0", "mainnet"),
+		entry("gno.land/p/moul/x/daily/b58/v0", "p", "x/daily/b58", "v0", "mainnet"),
+		entry("gno.land/r/moul/x/daily/counter/v0", "r", "x/daily/counter", "v0", "mainnet"),
+		entry("gno.land/r/moul/x/daily/wordle/v0", "r", "x/daily/wordle", "v0", "mainnet"),
+		// Deployed nowhere: must not be counted or listed.
+		entry("gno.land/r/moul/unreleased/v0", "r", "unreleased", "v0"),
+	}}
+}
+
+func TestLatestOnNetworkPicksHighestDeployedVersion(t *testing.T) {
+	got := map[string]string{}
+	for _, e := range latestOnNetwork(testCatalog(), "mainnet") {
+		got[e.Kind+"/"+e.Name] = e.Version
+	}
+	want := map[string]string{
+		"p/addrset":         "v1",
+		"p/md":              "v10", // numeric, not lexical: v10 > v9
+		"p/svg":             "v0",  // v1 is on pearl only
+		"p/ulist/lplist":    "v0",
+		"r/hello":           "v0",
+		"r/demo/hello":      "v0",
+		"p/x/daily/b58":     "v0",
+		"r/x/daily/counter": "v0",
+		"r/x/daily/wordle":  "v0",
+	}
+	if len(got) != len(want) {
+		t.Fatalf("got %d families %v, want %d", len(got), got, len(want))
+	}
+	for k, v := range want {
+		if got[k] != v {
+			t.Errorf("%s = %q, want %q", k, got[k], v)
+		}
+	}
+}
+
+func TestRenderPackagesCountsAndLabels(t *testing.T) {
+	body := renderPackages(testCatalog(), "mainnet")
+
+	// 4 libraries (addrset, md, svg, ulist/lplist) + 2 realms (hello,
+	// demo/hello) + 3 experiments = 9, with the undeployed one excluded.
+	for _, want := range []string{
+		"9 packages of mine are live on mainnet",
+		"**Libraries** (4):",
+		"**Realms** (2):",
+		// One experiment library, so the noun is singular.
+		"**Daily experiments** (3): one package a day, 1 library and 2 realms",
+		"[addrset](/p/moul/addrset/v1)",
+		"[ulist/lplist](/p/moul/ulist/lplist/v0)",
+		// The two hellos must stay distinguishable.
+		"[hello](/r/moul/hello/v0)",
+		"[demo/hello](/r/moul/demo/hello/v0)",
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("missing %q in:\n%s", want, body)
+		}
+	}
+	for _, unwanted := range []string{"unreleased", "x/daily/counter", "/p/moul/md/v9"} {
+		if strings.Contains(body, unwanted) {
+			t.Errorf("unexpected %q in:\n%s", unwanted, body)
+		}
+	}
+	if strings.HasSuffix(body, "\n") {
+		t.Error("body must not end in a newline: normalize() would strip it and the hashes would disagree")
+	}
+}
+
+// The generated slot is pushed on chain, so two runs over an unchanged catalog
+// have to produce identical bytes. Map iteration order is the hazard.
+func TestRenderPackagesIsDeterministic(t *testing.T) {
+	first := renderPackages(testCatalog(), "mainnet")
+	for i := 0; i < 20; i++ {
+		if got := renderPackages(testCatalog(), "mainnet"); got != first {
+			t.Fatalf("run %d differs:\n%s\n---\n%s", i, first, got)
+		}
+	}
+}
+
+func TestVersionNum(t *testing.T) {
+	cases := map[string]int{"v0": 0, "v1": 1, "v10": 10, "": -1, "v": -1, "vx": -1, "1": -1}
+	for in, want := range cases {
+		if got := versionNum(in); got != want {
+			t.Errorf("versionNum(%q) = %d, want %d", in, got, want)
+		}
+	}
+}
+
+func TestLoadCatalogRejectsGarbage(t *testing.T) {
+	dir := t.TempDir()
+	empty := filepath.Join(dir, "empty.json")
+	if err := os.WriteFile(empty, []byte(`{"contracts":[]}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := loadCatalog(empty); err == nil {
+		t.Error("an empty catalog must be an error, not a silently blank slot")
+	}
+	bad := filepath.Join(dir, "bad.json")
+	if err := os.WriteFile(bad, []byte(`{`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := loadCatalog(bad); err == nil {
+		t.Error("malformed JSON must be an error")
+	}
+}

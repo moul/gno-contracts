@@ -7,6 +7,7 @@
 //	gnohome preview   render the page locally, the way the realm would
 //	gnohome status    diff local content/ against what is on chain
 //	gnohome tx        print the gnokey commands for exactly what is outdated
+//	gnohome packages  regenerate the packages slot from contracts.json
 //
 // It has no dependencies beyond the Go standard library: the chain is read
 // over plain JSON-RPC abci_query, and writes are emitted as gnokey commands
@@ -63,15 +64,17 @@ func run(args []string, out *os.File) error {
 
 	// Per-command flags.
 	var (
-		previewOut string
-		height     int64
-		rev        int
-		inline     bool
-		all        bool
-		prune      bool
-		gasWanted  int64
-		gasFee     string
-		maxDeposit string
+		previewOut  string
+		height      int64
+		rev         int
+		inline      bool
+		all         bool
+		prune       bool
+		gasWanted   int64
+		gasFee      string
+		maxDeposit  string
+		catalogFile string
+		network     string
 	)
 	switch cmd {
 	case "preview":
@@ -85,8 +88,30 @@ func run(args []string, out *os.File) error {
 		fs.Int64Var(&gasWanted, "gas-wanted", 0, "gas-wanted override (default: sized from the body)")
 		fs.StringVar(&gasFee, "gas-fee", "1000000ugnot", "gas-fee for the emitted commands")
 		fs.StringVar(&maxDeposit, "max-deposit", "", "max storage deposit for the emitted commands")
+	case "packages":
+		fs.StringVar(&catalogFile, "catalog", "", "path to contracts.json (default: <repo>/contracts.json)")
+		fs.StringVar(&network, "network", "mainnet", "which network's deployment status to report")
 	}
 	if err := fs.Parse(rest); err != nil {
+		return err
+	}
+
+	// packages GENERATES a slot body, so it runs before the content directory
+	// is resolved and without loading any slot: it must work on a checkout
+	// where content/ is empty or absent.
+	if cmd == "packages" {
+		if catalogFile == "" {
+			path, err := catalogPath()
+			if err != nil {
+				return err
+			}
+			catalogFile = path
+		}
+		c, err := loadCatalog(catalogFile)
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(out, renderPackages(c, network))
 		return err
 	}
 
@@ -167,6 +192,7 @@ commands:
   preview   render the page locally, the way the realm would
   status    diff local content/ against what is on chain
   tx        print the gnokey commands for exactly what is outdated
+  packages  regenerate the packages slot from contracts.json, to stdout
 
 Run "gnohome <command> -h" for the flags of one command.
 `)
