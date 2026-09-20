@@ -49,6 +49,10 @@ func deversion(e *env, dryRun bool) error {
 
 	if dryRun {
 		for _, m := range moves {
+			if m.Replaces != "" {
+				fmt.Fprintf(w, "up   %s -> %s   (%s, replacing the version already there)\n", m.From, m.To, m.Module)
+				continue
+			}
 			fmt.Fprintf(w, "mv   %s -> %s   (%s)\n", m.From, m.To, m.Module)
 		}
 		for _, d := range drops {
@@ -105,6 +109,20 @@ func deversion(e *env, dryRun bool) error {
 		return err
 	}
 	for i, m := range moves {
+		if m.Replaces != "" {
+			// Drop the outgoing version's files. Its content is already
+			// pinned by the freeze above, so nothing is lost; leaving them
+			// would merge two versions into one directory.
+			old, err := gitTrackedIn(root, m.Replaces)
+			if err != nil {
+				return err
+			}
+			for _, f := range old {
+				if _, err := git(root, "rm", "-q", "--", path.Join(m.Replaces, f)); err != nil {
+					return err
+				}
+			}
+		}
 		files := moveFiles[i]
 		for _, f := range files {
 			src := path.Join(m.From, f)
@@ -154,7 +172,14 @@ func deversion(e *env, dryRun bool) error {
 	return nil
 }
 
-type move struct{ From, To, Module string }
+type move struct {
+	From, To, Module string
+	// Replaces is the package already sitting at To, when this move is an
+	// upgrade rather than a migration: the branch added pkg/vN+1 as a
+	// directory while pkg/ already holds vN. Its files are removed first, and
+	// the version it held has already been pinned by the freeze.
+	Replaces string
+}
 type drop struct{ Dir, Module string }
 
 // planDeversion decides what moves where, and refuses rather than guesses.
@@ -165,6 +190,10 @@ func planDeversion(pkgs []Package) ([]move, []drop, error) {
 		n   int
 	}
 	byTarget := map[string][]cand{}
+	atDir := map[string]Package{}
+	for _, p := range pkgs {
+		atDir[p.Dir] = p
+	}
 	var moves []move
 	var drops []drop
 	for _, p := range pkgs {
@@ -196,7 +225,20 @@ func planDeversion(pkgs []Package) ([]move, []drop, error) {
 		// Highest version wins the unversioned directory: it is the one being
 		// developed, and the one a bump will edit next.
 		sort.Slice(cands, func(i, j int) bool { return cands[i].n > cands[j].n })
-		moves = append(moves, move{From: cands[0].pkg.Dir, To: target, Module: cands[0].pkg.Module})
+		m := move{From: cands[0].pkg.Dir, To: target, Module: cands[0].pkg.Module}
+		// Is there already a package at the destination? That happens when a
+		// branch bumps an existing package the old way, by copying it to
+		// pkg/vN+1 while pkg/ still holds vN. It is an upgrade, not a
+		// collision, and the author plainly meant a bump.
+		if cur, ok := atDir[target]; ok {
+			_, curN, curOK := splitVersion(cur.Module)
+			if !curOK || curN >= cands[0].n {
+				return nil, nil, fmt.Errorf("%s declares %s and %s declares %s: the directory would have to hold both, "+
+					"and the newer one is not newer", target, cur.Module, cands[0].pkg.Dir, cands[0].pkg.Module)
+			}
+			m.Replaces = target
+		}
+		moves = append(moves, m)
 		for _, c := range cands[1:] {
 			drops = append(drops, drop{Dir: c.pkg.Dir, Module: c.pkg.Module})
 		}
@@ -211,6 +253,19 @@ func planDeversion(pkgs []Package) ([]move, []drop, error) {
 func checkCollisions(root string, moves []move, files [][]string) error {
 	claimed := map[string]string{}
 	for i, m := range moves {
+		// An upgrade legitimately lands on the outgoing version's own files;
+		// they are removed first. Only files it does NOT own are a conflict.
+		var replaced map[string]bool
+		if m.Replaces != "" {
+			replaced = map[string]bool{}
+			own, err := gitTrackedIn(root, m.Replaces)
+			if err != nil {
+				return err
+			}
+			for _, f := range own {
+				replaced[path.Join(m.Replaces, f)] = true
+			}
+		}
 		for _, f := range files[i] {
 			dst := path.Join(m.To, f)
 			if prev, dup := claimed[dst]; dup {
@@ -220,6 +275,9 @@ func checkCollisions(root string, moves []move, files [][]string) error {
 			// Anything already at the destination that is not the source
 			// itself is a genuine conflict: a sibling package directory, or a
 			// stray file left at the unversioned path.
+			if replaced[dst] {
+				continue
+			}
 			abs := filepath.Join(root, filepath.FromSlash(dst))
 			if _, err := os.Stat(abs); err == nil {
 				return fmt.Errorf("collision: %s already exists, %s cannot move there", dst, path.Join(m.From, f))
