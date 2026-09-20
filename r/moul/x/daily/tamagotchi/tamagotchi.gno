@@ -11,6 +11,7 @@ import (
 
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -237,17 +238,9 @@ func bar(v int) string {
 	return out
 }
 
-func shortAddr(a address) string {
-	s := a.String()
-	if len(s) > 12 {
-		return s[:8] + "…" + s[len(s)-4:]
-	}
-	return s
-}
-
 func renderCard(p *pet, height int64) string {
 	hunger, happiness, energy, alive := project(p, height)
-	out := "## " + p.name + " — owned by `" + shortAddr(p.owner) + "`\n\n"
+	out := "## " + p.name + " — owned by " + ui.Addr(p.owner) + "\n\n"
 	if !alive {
 		out += "💀 **Deceased.** Owner can `Hatch(name)` a new pet.\n\n"
 		return out
@@ -296,7 +289,7 @@ func Render(path string) string {
 		if !alive {
 			status = "💀 dead"
 		}
-		out += "| " + p.name + " | `" + shortAddr(p.owner) + "` | " + status +
+		out += "| " + p.name + " | " + ui.Addr(p.owner) + " | " + status +
 			" | " + strconv.Itoa(p.feeds) + " | " + strconv.Itoa(p.plays) +
 			" | " + strconv.Itoa(p.deaths) + " |\n"
 	}

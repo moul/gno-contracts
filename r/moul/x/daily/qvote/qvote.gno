@@ -16,6 +16,7 @@ import (
 	"chain"
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -193,21 +194,6 @@ func ClosePoll(cur realm, pollID string) string {
 	return "poll #" + pollID + " closed"
 }
 
-// escapeInline neutralizes markdown-active characters in untrusted text
-// before it's embedded inline in Render output.
-func escapeInline(s string) string {
-	r := strings.NewReplacer(
-		"\\", "\\\\",
-		"`", "\\`",
-		"*", "\\*",
-		"_", "\\_",
-		"[", "\\[",
-		"]", "\\]",
-		"|", "\\|",
-	)
-	return r.Replace(s)
-}
-
 func leadingOption(p *poll) (string, int64) {
 	best := -1
 	var bestVotes int64 = -1
@@ -241,9 +227,9 @@ func renderHome() string {
 			status = "closed"
 		}
 		lead, votes := leadingOption(p)
-		line := "- #" + p.ID + " (" + status + "): " + escapeInline(p.Question)
+		line := "- #" + p.ID + " (" + status + "): " + ui.Inline(p.Question)
 		if lead != "" {
-			line += " -- leading: \"" + escapeInline(lead) + "\" (" + strconv.FormatInt(votes, 10) + ")"
+			line += " -- leading: \"" + ui.Inline(lead) + "\" (" + strconv.FormatInt(votes, 10) + ")"
 		}
 		b.WriteString(line + "\n")
 		return false
@@ -266,11 +252,11 @@ func renderHome() string {
 func renderPoll(id string) string {
 	p, ok := polls.Get(id).(*poll)
 	if !ok {
-		return "# Poll #" + escapeInline(id) + "\n\nNo such poll.\n"
+		return "# Poll #" + ui.Inline(id) + "\n\nNo such poll.\n"
 	}
 
 	var b strings.Builder
-	b.WriteString("# Poll #" + p.ID + ": " + escapeInline(p.Question) + "\n\n")
+	b.WriteString("# Poll #" + p.ID + ": " + ui.Inline(p.Question) + "\n\n")
 	status := "open"
 	if p.Closed {
 		status = "closed"
@@ -284,7 +270,7 @@ func renderPoll(id string) string {
 		total += v
 	}
 	for i, opt := range p.Options {
-		b.WriteString(strconv.Itoa(i) + ". " + escapeInline(opt) + " -- " +
+		b.WriteString(strconv.Itoa(i) + ". " + ui.Inline(opt) + " -- " +
 			strconv.FormatInt(p.Tally[i], 10) + " vote(s)\n")
 	}
 	b.WriteString("\nTotal votes cast: " + strconv.FormatInt(total, 10) + "\n")
@@ -293,10 +279,10 @@ func renderPoll(id string) string {
 }
 
 func renderVoter(pollID, rawAddr string) string {
-	safeAddr := escapeInline(strings.TrimSpace(rawAddr))
+	safeAddr := ui.Inline(strings.TrimSpace(rawAddr))
 	p, ok := polls.Get(pollID).(*poll)
 	if !ok {
-		return "# Poll #" + escapeInline(pollID) + "\n\nNo such poll.\n"
+		return "# Poll #" + ui.Inline(pollID) + "\n\nNo such poll.\n"
 	}
 
 	var b strings.Builder
@@ -314,7 +300,7 @@ func renderVoter(pollID, rawAddr string) string {
 		if state.Votes[i] == 0 {
 			continue
 		}
-		b.WriteString("- " + escapeInline(opt) + ": " + strconv.FormatInt(state.Votes[i], 10) + " vote(s)\n")
+		b.WriteString("- " + ui.Inline(opt) + ": " + strconv.FormatInt(state.Votes[i], 10) + " vote(s)\n")
 	}
 
 	return b.String()

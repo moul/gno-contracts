@@ -8,6 +8,8 @@ import (
 	"chain/runtime/unsafe"
 	"strconv"
 	"strings"
+
+	"gno.land/p/moul/kit/ui/v0"
 )
 
 // The 20 classic Magic 8-Ball answers.
@@ -97,7 +99,7 @@ func Render(path string) string {
 		b.WriteString("| ")
 		b.WriteString(strconv.Itoa(i + 1))
 		b.WriteString(" | ")
-		b.WriteString(shortAddr(e.asker))
+		b.WriteString(ui.AddrOf(e.asker))
 		b.WriteString(" | ")
 		b.WriteString(e.question)
 		b.WriteString(" | ")
@@ -107,11 +109,4 @@ func Render(path string) string {
 		b.WriteString(" |\n")
 	}
 	return b.String()
-}
-
-func shortAddr(a string) string {
-	if len(a) <= 13 {
-		return a
-	}
-	return a[:8] + "…" + a[len(a)-4:]
 }

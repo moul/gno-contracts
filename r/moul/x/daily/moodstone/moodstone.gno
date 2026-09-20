@@ -5,6 +5,8 @@ import (
 	"chain/runtime/unsafe"
 	"strconv"
 	"strings"
+
+	"gno.land/p/moul/kit/ui/v0"
 )
 
 // Entry holds a single mood log.
@@ -46,14 +48,6 @@ func emoji(mood string) string {
 		return "😐"
 	}
 	return "❓"
-}
-
-func shortAddr(addr address) string {
-	s := addr.String()
-	if len(s) <= 12 {
-		return s
-	}
-	return s[:6] + "…" + s[len(s)-4:]
 }
 
 func bar(count, total int) string {
@@ -162,7 +156,7 @@ func Render(path string) string {
 			if e.Note != "" {
 				line += ": *" + e.Note + "*"
 			}
-			line += " — `" + shortAddr(e.Author) + "` at block " +
+			line += " — " + ui.Addr(e.Author) + " at block " +
 				strconv.FormatInt(e.Block, 10)
 			out += line + "\n"
 		}

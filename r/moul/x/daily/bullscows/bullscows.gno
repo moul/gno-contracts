@@ -9,6 +9,8 @@ import (
 	"chain/runtime"
 	"strconv"
 	"strings"
+
+	"gno.land/p/moul/kit/ui/v0"
 )
 
 const (
@@ -199,7 +201,7 @@ func Render(path string) string {
 		sb.WriteString("| player | guess | bulls | cows |\n|---|---|---|---|\n")
 		for i := len(history) - 1; i >= 0; i-- {
 			h := history[i]
-			sb.WriteString("| " + shortAddr(h.player) + " | " + h.guess + " | " +
+			sb.WriteString("| " + ui.AddrOf(h.player) + " | " + h.guess + " | " +
 				strconv.Itoa(h.bulls) + " | " + strconv.Itoa(h.cows) + " |\n")
 		}
 		sb.WriteString("\n")
@@ -211,17 +213,10 @@ func Render(path string) string {
 	} else {
 		sb.WriteString("| rank | player | attempts | round |\n|---|---|---|---|\n")
 		for i, r := range records {
-			sb.WriteString("| " + strconv.Itoa(i+1) + " | " + shortAddr(r.player) + " | " +
+			sb.WriteString("| " + strconv.Itoa(i+1) + " | " + ui.AddrOf(r.player) + " | " +
 				strconv.Itoa(r.attempts) + " | " + strconv.Itoa(r.round) + " |\n")
 		}
 	}
 
 	return sb.String()
-}
-
-func shortAddr(a string) string {
-	if len(a) <= 12 {
-		return a
-	}
-	return a[:6] + "…" + a[len(a)-4:]
 }
