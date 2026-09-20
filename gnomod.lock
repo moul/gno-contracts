@@ -67,7 +67,7 @@ source = { dir = "p/moul/fp" }
 
 [[module]]
 module = "gno.land/p/moul/grants/v0"
-source = { dir = "p/moul/grants/v0" }
+source = { dir = "p/moul/grants" }
 
 [[module]]
 module = "gno.land/p/moul/greet/v0"
@@ -355,7 +355,7 @@ source = { dir = "r/moul/gns" }
 
 [[module]]
 module = "gno.land/r/moul/grant/v0"
-source = { dir = "r/moul/grant/v0" }
+source = { dir = "r/moul/grant" }
 
 [[module]]
 module = "gno.land/r/moul/hello/v0"
