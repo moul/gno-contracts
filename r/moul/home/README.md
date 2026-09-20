@@ -45,14 +45,48 @@ its own `:slug:` placeholder.
 (headings, order, what appears at all) changes without touching the code:
 
 ```
+<gno-columns>
+![Manfred Touron](https://avatars.githubusercontent.com/u/94029?s=400)
+<gno-columns-sep />
 # Manfred Touron
 
 :bio:
+
+:social:
+</gno-columns>
 
 ## Packages
 
 :packages:
 ```
+
+`<gno-columns>` / `<gno-columns-sep />` are gnoweb's own extension, not HTML:
+raw HTML is not rendered, these are parsed. Adding a section is a **content**
+change, never a code one: the renderer registers one placeholder per slot by
+iterating the tree, so writing `content/social.md` and referencing `:social:`
+is the whole of it.
+
+### Images: two gates, and neither is the one you expect
+
+An image in a slot passes **gnoweb's validator** and then the **CSP the site is
+served behind**. They block different things, and only the second is a domain
+list:
+
+- gnoweb's `AllowSvgDataImage` (`gno.land/pkg/gnoweb/render_config.go`, wired in
+  `markdown/ext_imgvalidator.go`)
+  rejects every `data:` URI that is not `image/svg+xml`, and blanks the `src`
+  rather than dropping the tag. Ordinary `https://` URLs are not checked at all.
+- The live `content-security-policy` header on gno.land pins `img-src` to
+  `'self' data:` plus a fixed host list: `*.githubusercontent.com`,
+  `*.github.io`, `github.com`, `imgur.com`, `*.imgur.com`, `assets.gnoteam.com`,
+  `sa.gno.services`, `gnolang.github.io`, `ipfs.io`, `cloudflare-ipfs.com`
+  (read 2026-09-19). Anything else is silently not painted by the browser, with
+  the HTML looking perfectly fine.
+
+So a GitHub avatar needs no hosting of its own:
+`https://avatars.githubusercontent.com/u/94029?s=400` matches
+`*.githubusercontent.com` and renders as-is. Verified by running this exact
+page through gnoweb's real goldmark pipeline, not by reading the policy.
 
 Six placeholders are computed from chain state rather than stored, and are
 refused as slot names so nothing can shadow them: `:owner:` `:realm:`
@@ -182,12 +216,12 @@ go run ./r/moul/home/cmd/gnohome tx -all | sh
 
 `gnokey maketx addpkg` uploads with `MPUserAll`, so every `.gno`, `.toml` and
 `.md` in the package directory travels, test files and this README included:
-**26,837 bytes** across six files. `cmd/` and `content/` are sub-directories and
+**28,470 bytes** across six files. `cmd/` and `content/` are sub-directories and
 are skipped.
 
 - **`-gas-wanted 60000000`.** Ten successful mainnet `add_package` transactions
   above h160000 cost **1,014 to 1,781 gas per uploaded byte** (median 1,393). At
-  the top of that range this package needs ~47.8M, so the 40M this file used to
+  the top of that range this package needs ~50.7M, so the 40M this file used to
   suggest was under the worst case. 60M is a ceiling, and a ceiling is not
   charged.
 - **`-gas-fee 600000ugnot`.** The fee requirement is the `gas_fee / gas_wanted`
@@ -199,7 +233,7 @@ are skipped.
   was worth fixing.
 - **`-max-deposit 10000000ugnot`.** Omitting it is not opting out: it falls back
   to `vm:p:default_deposit`, **100 GNOT of ceiling per message**. Storage locks
-  100ugnot per byte, so the source alone is 2.68 GNOT and realm state is extra.
+  100ugnot per byte, so the source alone is 2.85 GNOT and realm state is extra.
   10 GNOT is a deliberate ceiling with room. Unlike `gas_fee` this one is
   refundable, and only the measured byte delta is ever locked.
 

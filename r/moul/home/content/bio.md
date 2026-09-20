@@ -6,5 +6,5 @@ This page is one of those contracts. Its text lives in an on-chain key-value
 store and the layout is itself an entry in it, so changing how this page looks
 is a transaction, not a redeploy.
 
-Elsewhere: [@moul](https://github.com/moul) on GitHub, and
-[Berty](https://berty.tech), peer-to-peer messaging that works without servers.
+Before this, [Berty](https://berty.tech): peer-to-peer messaging that works
+with no servers at all.
