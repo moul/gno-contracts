@@ -74,6 +74,10 @@ module = "gno.land/p/moul/helplink/v0"
 source = { dir = "p/moul/helplink" }
 
 [[module]]
+module = "gno.land/p/moul/kit/ui/v0"
+source = { dir = "p/moul/kit/ui/v0" }
+
+[[module]]
 module = "gno.land/p/moul/md/v0"
 source = { dir = "p/moul/md" }
 
@@ -374,6 +378,10 @@ module = "gno.land/r/moul/x/daily/asciiart/v0"
 source = { dir = "r/moul/x/daily/asciiart" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/asciiart/v1"
+source = { dir = "r/moul/x/daily/asciiart/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/b58demo/v0"
 source = { dir = "r/moul/x/daily/b58demo" }
 
@@ -406,6 +414,10 @@ module = "gno.land/r/moul/x/daily/bullscows/v0"
 source = { dir = "r/moul/x/daily/bullscows" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/bullscows/v1"
+source = { dir = "r/moul/x/daily/bullscows/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/calc/v0"
 source = { dir = "r/moul/x/daily/calc" }
 
@@ -418,8 +430,16 @@ module = "gno.land/r/moul/x/daily/closestguess/v0"
 source = { dir = "r/moul/x/daily/closestguess" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/closestguess/v1"
+source = { dir = "r/moul/x/daily/closestguess/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/coinflipduel/v0"
 source = { dir = "r/moul/x/daily/coinflipduel" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/coinflipduel/v1"
+source = { dir = "r/moul/x/daily/coinflipduel/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/collatz/v0"
@@ -430,8 +450,16 @@ module = "gno.land/r/moul/x/daily/commitrevealdemo/v0"
 source = { dir = "r/moul/x/daily/commitrevealdemo" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/commitrevealdemo/v1"
+source = { dir = "r/moul/x/daily/commitrevealdemo/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/connect4/v0"
 source = { dir = "r/moul/x/daily/connect4" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/connect4/v1"
+source = { dir = "r/moul/x/daily/connect4/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/counter/v0"
@@ -470,8 +498,16 @@ module = "gno.land/r/moul/x/daily/eggling/v0"
 source = { dir = "r/moul/x/daily/eggling" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/eggling/v1"
+source = { dir = "r/moul/x/daily/eggling/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/eightball/v0"
 source = { dir = "r/moul/x/daily/eightball" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/eightball/v1"
+source = { dir = "r/moul/x/daily/eightball/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/englishauction/v0"
@@ -494,6 +530,10 @@ module = "gno.land/r/moul/x/daily/escrow/v0"
 source = { dir = "r/moul/x/daily/escrow" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/escrow/v1"
+source = { dir = "r/moul/x/daily/escrow/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/faucet/v0"
 source = { dir = "r/moul/x/daily/faucet" }
 
@@ -514,8 +554,16 @@ module = "gno.land/r/moul/x/daily/guestbook/v0"
 source = { dir = "r/moul/x/daily/guestbook" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/guestbook/v1"
+source = { dir = "r/moul/x/daily/guestbook/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/handles/v0"
 source = { dir = "r/moul/x/daily/handles" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/handles/v1"
+source = { dir = "r/moul/x/daily/handles/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/hangman/v0"
@@ -538,6 +586,10 @@ module = "gno.land/r/moul/x/daily/kingofdice/v0"
 source = { dir = "r/moul/x/daily/kingofdice" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/kingofdice/v1"
+source = { dir = "r/moul/x/daily/kingofdice/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/kmpdemo/v0"
 source = { dir = "r/moul/x/daily/kmpdemo" }
 
@@ -548,6 +600,10 @@ source = { dir = "r/moul/x/daily/kudos" }
 [[module]]
 module = "gno.land/r/moul/x/daily/leaderboard/v0"
 source = { dir = "r/moul/x/daily/leaderboard" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/leaderboard/v1"
+source = { dir = "r/moul/x/daily/leaderboard/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/levenshteindemo/v0"
@@ -590,8 +646,16 @@ module = "gno.land/r/moul/x/daily/microblog/v0"
 source = { dir = "r/moul/x/daily/microblog" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/microblog/v1"
+source = { dir = "r/moul/x/daily/microblog/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/moodstone/v0"
 source = { dir = "r/moul/x/daily/moodstone" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/moodstone/v1"
+source = { dir = "r/moul/x/daily/moodstone/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/multisetdemo/v0"
@@ -638,6 +702,10 @@ module = "gno.land/r/moul/x/daily/qvote/v0"
 source = { dir = "r/moul/x/daily/qvote" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/qvote/v1"
+source = { dir = "r/moul/x/daily/qvote/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/ratelimitdemo/v0"
 source = { dir = "r/moul/x/daily/ratelimitdemo" }
 
@@ -674,16 +742,32 @@ module = "gno.land/r/moul/x/daily/rps/v0"
 source = { dir = "r/moul/x/daily/rps" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/rps/v1"
+source = { dir = "r/moul/x/daily/rps/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/rpsduel/v0"
 source = { dir = "r/moul/x/daily/rpsduel" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/rpsduel/v1"
+source = { dir = "r/moul/x/daily/rpsduel/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/rpsmatch/v0"
 source = { dir = "r/moul/x/daily/rpsmatch" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/rpsmatch/v1"
+source = { dir = "r/moul/x/daily/rpsmatch/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/rpsoracle/v0"
 source = { dir = "r/moul/x/daily/rpsoracle" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/rpsoracle/v1"
+source = { dir = "r/moul/x/daily/rpsoracle/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/semverdemo/v0"
@@ -722,8 +806,16 @@ module = "gno.land/r/moul/x/daily/streaks/v0"
 source = { dir = "r/moul/x/daily/streaks" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/streaks/v1"
+source = { dir = "r/moul/x/daily/streaks/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/tamagotchi/v0"
 source = { dir = "r/moul/x/daily/tamagotchi" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/tamagotchi/v1"
+source = { dir = "r/moul/x/daily/tamagotchi/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/tictactoe/v0"
@@ -742,8 +834,16 @@ module = "gno.land/r/moul/x/daily/tipjar/v0"
 source = { dir = "r/moul/x/daily/tipjar" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/tipjar/v1"
+source = { dir = "r/moul/x/daily/tipjar/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/todos/v0"
 source = { dir = "r/moul/x/daily/todos" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/todos/v1"
+source = { dir = "r/moul/x/daily/todos/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/toposortdemo/v0"
@@ -760,6 +860,10 @@ source = { dir = "r/moul/x/daily/trivia" }
 [[module]]
 module = "gno.land/r/moul/x/daily/urlshort/v0"
 source = { dir = "r/moul/x/daily/urlshort" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/urlshort/v1"
+source = { dir = "r/moul/x/daily/urlshort/v1" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/vault/v0"
