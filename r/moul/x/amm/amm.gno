@@ -28,6 +28,23 @@
 // product. Later deposits mint min(A-side, B-side) with floor division on
 // both, so an off-ratio deposit always rounds against the depositor.
 //
+// # v1 vs v0: LP shares are a real GRC20 token
+//
+// v0 tracks LP positions in a private avl ledger: smallest possible, but a
+// position can only be held by the address that opened it and is invisible to
+// every other contract. v1 mints one GRC20 token per pool instead, holds its
+// PrivateLedger, and registers it with grc20reg. A position is then an
+// ordinary fungible token: transferable, approvable, usable as collateral,
+// and readable by any realm that knows the registry key.
+//
+// The cost is honest and measurable. Pool creation now also mints a token and
+// writes a registry entry. Positions gain an allowance surface, and with it
+// the classic GRC20 approve race. And because MsgCall cannot pass a realm
+// argument, this realm has to re-export Transfer/Approve/TransferFrom/
+// Allowance wrappers over the LP token for signing users, four functions that
+// v0 does not need at all. Another REALM can skip them and move its own LP
+// balance through grc20reg directly.
+//
 // All amounts are int64, as GRC20 mandates, and there is no 256-bit type in
 // reach. Pricing therefore runs through a 128-bit mulDiv (math/bits), and
 // every reserve is capped at maxReserve so that the plain int64 parts of the
@@ -46,6 +63,7 @@ import (
 
 	"gno.land/p/nt/avl/v0"
 	"gno.land/p/nt/grc20/v0"
+	"gno.land/p/nt/seqid/v0"
 	"gno.land/p/nt/ufmt/v0"
 	"gno.land/r/nt/grc20reg/v0"
 )
@@ -74,16 +92,25 @@ const (
 // pool is one token pair. keyA < keyB always holds: the pair is canonicalised
 // on the way in, so (X,Y) and (Y,X) address the same pool.
 type pool struct {
-	keyA, keyB  string
-	tokA, tokB  *grc20.Token
-	resA, resB  int64
-	totalShares int64
-	shares      *avl.Tree // address string -> int64
+	keyA, keyB string
+	tokA, tokB *grc20.Token
+	resA, resB int64
+
+	// lp is this pool's LP token: total supply is the share supply and a
+	// holder's balance is their position. lpLedger is the minting authority
+	// and MUST NOT leak out of this file. lpKey is lp's grc20reg key.
+	lp       *grc20.Token
+	lpLedger *grc20.PrivateLedger
+	lpKey    string
 }
 
 // pools maps the pool id "keyA~keyB" -> *pool. "~" cannot occur in a
 // grc20reg key, and unlike "|" it does not break a markdown table cell.
 var pools avl.Tree
+
+// lpSeq numbers the LP tokens. It is never reset, so a symbol is never reused
+// and grc20reg's one-token-per-realm-and-symbol rule is never tripped.
+var lpSeq seqid.ID
 
 //
 // Writes.
@@ -113,18 +140,12 @@ func AddLiquidity(cur realm, keyA, keyB string, maxA, maxB int64) int64 {
 
 	p := getPool(a, b)
 	if p == nil {
-		p = &pool{
-			keyA:   a,
-			keyB:   b,
-			tokA:   grc20reg.MustGet(a),
-			tokB:   grc20reg.MustGet(b),
-			shares: avl.NewTree(),
-		}
+		p = newPool(0, cur, a, b)
 		pools.Set(poolID(a, b), p)
 	}
 
 	var minted int64
-	if p.totalShares == 0 {
+	if p.lp.TotalSupply() == 0 {
 		// First position: the depositor sets the price and the share unit is
 		// token A at seed time. No sqrt, no MINIMUM_LIQUIDITY burn.
 		minted = amtA
@@ -140,9 +161,10 @@ func AddLiquidity(cur realm, keyA, keyB string, maxA, maxB int64) int64 {
 		if amtA <= 0 || amtB <= 0 {
 			panic("amm: deposit too small for the current ratio")
 		}
+		supply := p.lp.TotalSupply()
 		minted = min64(
-			mulDiv(amtA, p.totalShares, p.resA),
-			mulDiv(amtB, p.totalShares, p.resB),
+			mulDiv(amtA, supply, p.resA),
+			mulDiv(amtB, supply, p.resB),
 		)
 	}
 	if minted <= 0 {
@@ -159,8 +181,9 @@ func AddLiquidity(cur realm, keyA, keyB string, maxA, maxB int64) int64 {
 
 	p.resA += amtA
 	p.resB += amtB
-	p.totalShares += minted
-	setShares(p, provider, sharesOf(p, provider)+minted)
+	if err := p.lpLedger.Mint(provider, minted); err != nil {
+		panic("amm: cannot mint LP shares: " + err.Error())
+	}
 
 	chain.Emit("AddLiquidity",
 		"pool", poolID(p.keyA, p.keyB),
@@ -186,17 +209,17 @@ func RemoveLiquidity(cur realm, keyA, keyB string, shares int64) (int64, int64) 
 	p := mustPool(a, b)
 
 	owner := cur.Previous().Address()
-	held := sharesOf(p, owner)
-	if held < shares {
+	if p.lp.BalanceOf(owner) < shares {
 		panic("amm: insufficient shares")
 	}
 
+	supply := p.lp.TotalSupply()
 	var amtA, amtB int64
-	if shares == p.totalShares {
+	if shares == supply {
 		amtA, amtB = p.resA, p.resB
 	} else {
-		amtA = mulDiv(shares, p.resA, p.totalShares)
-		amtB = mulDiv(shares, p.resB, p.totalShares)
+		amtA = mulDiv(shares, p.resA, supply)
+		amtB = mulDiv(shares, p.resB, supply)
 	}
 	if amtA <= 0 || amtB <= 0 {
 		panic("amm: burn would return nothing on one side")
@@ -204,8 +227,9 @@ func RemoveLiquidity(cur realm, keyA, keyB string, shares int64) (int64, int64) 
 
 	p.resA -= amtA
 	p.resB -= amtB
-	p.totalShares -= shares
-	setShares(p, owner, held-shares)
+	if err := p.lpLedger.Burn(owner, shares); err != nil {
+		panic("amm: cannot burn LP shares: " + err.Error())
+	}
 
 	push(0, cur, p.tokA, owner, amtA)
 	push(0, cur, p.tokB, owner, amtB)
@@ -282,6 +306,41 @@ func Swap(cur realm, keyIn, keyOut string, amountIn, minOut int64) int64 {
 	return out
 }
 
+// TransferLP moves amount of the caller's LP position to `to`.
+//
+// The LP token lives in this realm, so a signing user cannot reach it through
+// the token's own entry points the way they would for any other GRC20: there
+// are none. These four wrappers are that entry point. A REALM holding LP does
+// not need them and can go through grc20reg instead:
+//
+//	grc20reg.Transfer(0, cur, amm.LPToken(keyA, keyB), to, n)
+func TransferLP(cur realm, keyA, keyB string, to address, amount int64) {
+	a, b, _ := canon(keyA, keyB)
+	lpCheck(mustPool(a, b).lpLedger.CallerTeller().Transfer(0, cur, to, amount))
+}
+
+// ApproveLP lets spender move up to amount of the caller's LP position.
+//
+// Same approve race as any GRC20: an allowance changed from a non-zero value
+// can be spent at both the old and the new one if the holder is unlucky with
+// ordering. Set it to 0 first when lowering it.
+func ApproveLP(cur realm, keyA, keyB string, spender address, amount int64) {
+	a, b, _ := canon(keyA, keyB)
+	lpCheck(mustPool(a, b).lpLedger.CallerTeller().Approve(0, cur, spender, amount))
+}
+
+// TransferFromLP spends an allowance the owner granted to the caller.
+func TransferFromLP(cur realm, keyA, keyB string, from, to address, amount int64) {
+	a, b, _ := canon(keyA, keyB)
+	lpCheck(mustPool(a, b).lpLedger.CallerTeller().TransferFrom(0, cur, from, to, amount))
+}
+
+func lpCheck(err error) {
+	if err != nil {
+		panic("amm: LP token: " + err.Error())
+	}
+}
+
 //
 // Reads.
 //
@@ -329,16 +388,29 @@ func Reserves(keyA, keyB string) (int64, int64) {
 	return p.resA, p.resB
 }
 
-// SharesOf returns owner's LP shares in the pool.
+// SharesOf returns owner's LP shares, i.e. their LP token balance.
 func SharesOf(keyA, keyB string, owner address) int64 {
 	a, b, _ := canon(keyA, keyB)
-	return sharesOf(mustPool(a, b), owner)
+	return mustPool(a, b).lp.BalanceOf(owner)
 }
 
-// TotalShares returns the pool's total LP share supply.
+// TotalShares returns the pool's LP token total supply.
 func TotalShares(keyA, keyB string) int64 {
 	a, b, _ := canon(keyA, keyB)
-	return mustPool(a, b).totalShares
+	return mustPool(a, b).lp.TotalSupply()
+}
+
+// LPToken returns the grc20reg key of the pool's LP token. Hand it to any
+// realm that should read or move these positions without importing this one.
+func LPToken(keyA, keyB string) string {
+	a, b, _ := canon(keyA, keyB)
+	return mustPool(a, b).lpKey
+}
+
+// AllowanceLP reports how much of owner's LP position spender may move.
+func AllowanceLP(keyA, keyB string, owner, spender address) int64 {
+	a, b, _ := canon(keyA, keyB)
+	return mustPool(a, b).lp.Allowance(owner, spender)
 }
 
 // PoolCount returns how many pools exist.
@@ -356,24 +428,25 @@ func Render(path string) string {
 		out := "# " + p.tokA.GetSymbol() + " / " + p.tokB.GetSymbol() + "\n\n"
 		out += "- **" + p.tokA.GetSymbol() + "** reserve: " + itoa(p.resA) + " (`" + p.keyA + "`)\n"
 		out += "- **" + p.tokB.GetSymbol() + "** reserve: " + itoa(p.resB) + " (`" + p.keyB + "`)\n"
-		out += "- **LP shares**: " + itoa(p.totalShares) + " across " + strconv.Itoa(p.shares.Size()) + " provider(s)\n"
+		out += "- **LP token**: `" + p.lpKey + "` (" + p.lp.GetSymbol() + ")\n"
+		out += "- **LP shares**: " + itoa(p.lp.TotalSupply()) + " across " + strconv.Itoa(p.lp.KnownAccounts()) + " holder(s)\n"
 		return out
 	}
 
 	out := "# Minimal AMM\n\n"
-	out += "Constant product (`x*y=k`) with a 30 bps fee kept by the pool. Reserves are stored, never read from balances, so sending tokens here directly does nothing and they cannot be recovered.\n\n"
+	out += "Constant product (`x*y=k`) with a 30 bps fee kept by the pool. Every position is a transferable GRC20 LP token. Reserves are stored, never read from balances, so sending tokens here directly does nothing and they cannot be recovered.\n\n"
 	if pools.Size() == 0 {
 		out += "_No pools yet. Call `AddLiquidity` with two `grc20reg` keys to open one._\n"
 		return out
 	}
-	out += "| pool | reserves | LP shares | providers |\n"
-	out += "|---|---|---|---|\n"
+	out += "| pool | reserves | LP token | supply | holders |\n"
+	out += "|---|---|---|---|---|\n"
 	pools.Iterate("", "", func(key string, value any) bool {
 		p := value.(*pool)
-		out += ufmt.Sprintf("| [%s/%s](/r/moul/x/amm/v0:%s) | %d %s / %d %s | %d | %d |\n",
+		out += ufmt.Sprintf("| [%s/%s](/r/moul/x/amm/v1:%s) | %d %s / %d %s | %s | %d | %d |\n",
 			p.tokA.GetSymbol(), p.tokB.GetSymbol(), key,
 			p.resA, p.tokA.GetSymbol(), p.resB, p.tokB.GetSymbol(),
-			p.totalShares, p.shares.Size())
+			p.lp.GetSymbol(), p.lp.TotalSupply(), p.lp.KnownAccounts())
 		return false
 	})
 	return out
@@ -398,6 +471,32 @@ func canon(first, second string) (a, b string, flipped bool) {
 	return first, second, false
 }
 
+// newPool resolves both tokens, mints this pool's LP token and registers it.
+//
+// Non-crossing (`_ int, rlm realm`): grc20.NewToken binds the token's
+// origRealm to rlm.PkgPath() under an IsCurrent assertion, and grc20reg
+// keys off the registering caller, so rlm has to stay AddLiquidity's own
+// live frame rather than a fresh one.
+//
+// The LP unit is token A at seed time, so the LP token mirrors token A's
+// decimals. The symbol is LP<n> because grc20 caps a symbol at 11 chars,
+// which "LP-" plus two 11-char symbols would blow past; the human-readable
+// pair lives in the name instead.
+func newPool(_ int, rlm realm, a, b string) *pool {
+	tokA, tokB := grc20reg.MustGet(a), grc20reg.MustGet(b)
+	id := lpSeq.Next()
+	lp, ledger := grc20.NewToken(
+		"AMM LP "+tokA.GetSymbol()+"/"+tokB.GetSymbol(),
+		"LP"+strconv.FormatUint(uint64(id), 10),
+		tokA.GetDecimals(),
+		id,
+		rlm,
+	)
+	p := &pool{keyA: a, keyB: b, tokA: tokA, tokB: tokB, lp: lp, lpLedger: ledger}
+	p.lpKey = grc20reg.Register(cross(rlm), lp, "")
+	return p
+}
+
 // poolID is the storage and render key for a canonicalised pair.
 func poolID(a, b string) string { return a + "~" + b }
 
@@ -415,22 +514,6 @@ func mustPool(a, b string) *pool {
 		panic("amm: no such pool: " + poolID(a, b))
 	}
 	return p
-}
-
-func sharesOf(p *pool, owner address) int64 {
-	v := p.shares.Get(owner.String())
-	if v == nil {
-		return 0
-	}
-	return v.(int64)
-}
-
-func setShares(p *pool, owner address, n int64) {
-	if n == 0 {
-		p.shares.Remove(owner.String())
-		return
-	}
-	p.shares.Set(owner.String(), n)
 }
 
 // pull moves amount of tok from `from` into this realm, spending the

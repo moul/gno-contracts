@@ -1,136 +1,122 @@
-# amm: a minimal constant-product AMM, in one file
+# amm v1: the same AMM, with LP positions as real GRC20 tokens
 
-A whole automated market maker for GRC20 pairs in a single `.gno` file: many
-pools in one realm, `x*y=k` with a 30 bps fee that stays with the liquidity
-providers, and nothing else.
+Same constant-product market maker as [`v0`](../v0), same pricing, same
+reserves, same guards. One thing changes: a liquidity position is a **GRC20
+token**, minted per pool and registered with
+[`r/nt/grc20reg`](https://gno.land/r/nt/grc20reg/v0), instead of a row in a
+private avl ledger.
 
-It exists to be **read**. Uniswap V2 is the reference every on-chain AMM is
-measured against, and most of its moving parts are consequences of one early
-decision rather than of the market-making itself. This realm re-derives the
-same product after making that decision differently, and the result is short
-enough to audit in a sitting.
+The two exist side by side on purpose. v0 is the smallest thing that works; v1
+is what it costs to make positions first-class. The numbers are below, measured
+rather than asserted.
 
-Design study, prior-art survey and the full security argument:
-[moul/gno-contracts#135](https://github.com/moul/gno-contracts/issues/135).
+Design study: [moul/gno-contracts#135](https://github.com/moul/gno-contracts/issues/135).
 
-> **There is a [`v1`](../v1) too.** Identical market maker, but a liquidity
-> position is a real GRC20 token instead of a row in a private ledger, so it can
-> be transferred, approved and read by other realms. It costs a one-off ~29% on
-> pool creation, ~5% on liquidity operations, and **nothing on swaps**. Use v0
-> when positions never need to leave the address that opened them; the
-> [v1 README](../v1/README.md) has the measured side-by-side.
+## What changes
 
-## API
+`v0/amm_test.gno` runs unmodified against v1 (only the pkgpath string differs),
+so nothing about pricing, reserves, rounding or the guards moved. What moved is
+where a share lives:
+
+| | v0 | v1 |
+|---|---|---|
+| a position is | a row in a private `avl.Tree` | a balance on a registered GRC20 |
+| transferable | no | yes |
+| approvable / usable as collateral | no | yes |
+| readable by another realm | no | yes, via `grc20reg.Get(key)` |
+| the realm must expose | nothing extra | 4 wrappers + `LPToken` |
+| pool creation also does | nothing | mint a token, write a registry entry |
+| allowance race surface | none | the standard GRC20 one |
+
+## Cost, measured
+
+Four identical operations, one `--- GAS:` figure each, from the same
+`gas_test.gno` present verbatim in both versions. Fixture funding is measured
+separately so it does not pollute the comparison:
+
+| operation | v0 | v1 | delta |
+|---|---|---|---|
+| seed (create pool + first deposit) | 1 716 207 | 2 213 407 | **+497 200 (+29.0%)** |
+| swap | 1 459 531 | 1 459 531 | **0 (+0.0%)** |
+| join (second provider) | 1 731 048 | 1 789 306 | +58 258 (+3.4%) |
+| exit (full burn) | 1 433 236 | 1 518 298 | +85 062 (+5.9%) |
+
+| | v0 | v1 |
+|---|---|---|
+| `amm.gno`, total lines | 506 | 589 |
+| `amm.gno`, code lines | 333 | 359 |
+| exported functions | 10 | 15 |
+
+The shape of that is the interesting part. **Swapping is unaffected to the
+gas unit**, because the hot path never touches share accounting: it reads two
+reserves, prices, moves two token balances, writes two reserves. The whole
+premium is paid where positions are created and destroyed. Pool creation
+carries it almost entirely, once, as a fixed setup cost: minting the LP token
+and registering it. Per-provider operations pay 3 to 6 percent.
+
+Read the other way: **transferable LP positions cost a one-off ~0.5M gas per
+pool and ~5% on liquidity operations, and nothing at all on trading.**
+
+## What v1 adds to the API
 
 ```go
-// writes (crossing; the caller must Approve this realm first)
-AddLiquidity(cur realm, keyA, keyB string, maxA, maxB int64) int64          // -> shares minted
-RemoveLiquidity(cur realm, keyA, keyB string, shares int64) (int64, int64)  // -> amounts returned
-Swap(cur realm, keyIn, keyOut string, amountIn, minOut int64) int64         // -> amount out
-
-// reads
-AmountOut(amountIn, reserveIn, reserveOut int64) int64   // pure pricing, quotable off-chain
-Quote(keyIn, keyOut string, amountIn int64) int64        // against live reserves
-Reserves(keyA, keyB string) (int64, int64)
-SharesOf(keyA, keyB string, owner address) int64
-TotalShares(keyA, keyB string) int64
-PoolCount() int
-Render(path string) string
+LPToken(keyA, keyB string) string                 // the pool's LP token registry key
+AllowanceLP(keyA, keyB string, owner, spender address) int64
+TransferLP(cur realm, keyA, keyB string, to address, amount int64)
+ApproveLP(cur realm, keyA, keyB string, spender address, amount int64)
+TransferFromLP(cur realm, keyA, keyB string, from, to address, amount int64)
 ```
 
-Tokens are named by their [`r/nt/grc20reg`](https://gno.land/r/nt/grc20reg/v0)
-key (`<realm path>.<SYMBOL>`), because `maketx call` cannot pass a
-`*grc20.Token`. The pair order never matters: `(X,Y)` and `(Y,X)` are the same
-pool, and returned amounts always follow the order you passed.
+The four wrappers exist because the LP token lives *in this realm*: a signing
+user has no token realm of its own to call, the way they would for any other
+GRC20. A **realm** holding LP does not need them and can move its own balance
+through the registry:
 
-There is no `CreatePool`. A pool starts existing when someone deposits into it.
-
-## Using it
-
-Both tokens must be approved for this realm's address first, on the token's own
-realm:
-
-```sh
-# 1. let the AMM take your tokens
-gnokey maketx call -pkgpath gno.land/r/<ns>/<tokenA> -func Approve \
-  -args g1<amm-realm-address> -args 1000000 ...
-
-# 2. open (or top up) the pool
-gnokey maketx call -pkgpath gno.land/r/moul/x/amm/v0 -func AddLiquidity \
-  -args "gno.land/r/<ns>/<tokenA>.AAA" -args "gno.land/r/<ns>/<tokenB>.BBB" \
-  -args 1000000 -args 4000000 ...
-
-# 3. swap, with a real slippage bound
-gnokey maketx call -pkgpath gno.land/r/moul/x/amm/v0 -func Swap \
-  -args "gno.land/r/<ns>/<tokenA>.AAA" -args "gno.land/r/<ns>/<tokenB>.BBB" \
-  -args 100000 -args 360000 ...
-
-# 4. take your liquidity back
-gnokey maketx call -pkgpath gno.land/r/moul/x/amm/v0 -func RemoveLiquidity \
-  -args "gno.land/r/<ns>/<tokenA>.AAA" -args "gno.land/r/<ns>/<tokenB>.BBB" \
-  -args 500000 ...
+```go
+grc20reg.Transfer(0, cur, amm.LPToken(keyA, keyB), to, n)
 ```
 
-Worked example, the one the tests pin:
+`ApproveLP` carries the usual GRC20 approve race: an allowance lowered from a
+non-zero value can be spent at both the old and the new figure under unlucky
+ordering. Set it to 0 first.
 
-```
-seed A=1 000 000 B=4 000 000        -> 1 000 000 shares
-swap 100 000 A                      -> 362 644 B out
-reserves A=1 100 000 B=3 637 356    k grows by the fee, 4.0000e12 -> 4.0011e12
-burn 500 000 shares                 -> 550 000 A + 1 818 678 B
-```
+Everything else (`AddLiquidity`, `RemoveLiquidity`, `Swap`, `AmountOut`,
+`Quote`, `Reserves`, `SharesOf`, `TotalShares`, `PoolCount`, `Render`) keeps
+the v0 signature and the v0 behaviour. `SharesOf` and `TotalShares` are now
+just `lp.BalanceOf` and `lp.TotalSupply`.
 
-## Three decisions worth knowing about
+## LP token naming
 
-**Reserves are stored, never read from `BalanceOf`.** This is the one that pays
-for itself. Uniswap V2 infers the swap input from `balanceOf(this) - reserve`,
-which is why it needs `MINIMUM_LIQUIDITY`, `skim` and `sync`, and why the
-first-depositor share-inflation attack exists at all. Here a direct token
-transfer to the realm address moves no reserve, no price and no share value, so
-none of that machinery is needed. The price: **tokens sent directly to this
-realm are permanently stuck.** There is no `skim`, deliberately, because a
-`skim` would hand the lever back.
+One token per pool, symbol `LP<n>` from a never-reset counter, name
+`AMM LP <symA>/<symB>`, decimals mirroring token A (the LP unit is token A at
+seed time). The symbol is a counter and not the pair because `grc20` caps a
+symbol at 11 characters, which `LP-` plus two 11-character symbols would blow
+straight past; the readable pair goes in the name, which allows 64.
 
-**The first deposit mints `shares = amountA`, with no `sqrt`.** The geometric
-mean is cosmetic; every later operation uses only ratios of shares to reserves.
-Dropping it removes an integer square root over a 128-bit product. Later
-deposits mint `min(A-side, B-side)` with floor division on both, so an
-off-ratio deposit is always rounded against the depositor and never dilutes the
-existing providers.
+Never resetting the counter is what keeps `grc20reg`'s
+one-token-per-realm-and-symbol rule satisfiable forever: a drained pool keeps
+its LP token and identity, and reseeding reuses it rather than minting a
+second token under a symbol already taken.
 
-**All arithmetic is `int64`, so pricing runs through a 128-bit `mulDiv`.** There
-is no 256-bit type in reach, and `amountIn * 997 * reserveOut` leaves `int64`
-almost immediately. `math/bits` supplies the wide multiply and divide; the
-remaining plain-`int64` step, `reserveIn*1000 + amountIn*997`, is made safe by a
-single rule enforced on both deposits and swaps:
+## Which one to use
 
-> every reserve, and every post-swap reserve, stays at or below
-> `maxReserve = MaxInt64/1000 = 9 223 372 036 854 775`
+**v0** if positions never need to leave the address that opened them: a
+personal pool, a closed system, or anywhere the extra 5 exported functions and
+the allowance surface are pure liability.
 
-**Consequence: this AMM is unusable with 18-decimal tokens.** Max whole tokens
-per reserve, by token decimals:
+**v1** if anything else in the ecosystem should be able to see, hold, price or
+lend against a position. That is the normal expectation for an AMM, and it is
+why Uniswap V2 pairs are ERC20s.
 
-| decimals | 0 | 6 | 8 | 9 | 12 | 18 |
-|---|---|---|---|---|---|---|
-| max whole tokens per reserve | 9.2e15 | 9 223 372 036 | 92 233 720 | 9 223 372 | 9 223 | **0** |
-
-Six to nine decimals is the practical band. That is `int64` GRC20 meeting a
-1000x fee denominator, not a quirk of this contract.
+Everything under [`v0`'s README](../v0/README.md) about reserves being stored
+rather than read from balances, the missing `sqrt`, the `int64` ceiling and the
+decimals table applies here unchanged.
 
 ## Warnings
 
-- **Not an oracle.** The reserve ratio is a spot price any trader can move
-  inside one transaction. Nothing should price off this realm.
-- **`minOut` is your only slippage protection**, and it is mandatory for a
-  reason. Passing `0` means accepting any price at all.
-- **A pool is only as honest as its two tokens.** A token realm can mint to
-  itself at will; that is a property of GRC20, not something an AMM can check.
-  The blast radius of a bad token is exactly the pools that contain it.
-- **Not audited.** This is a reference implementation, not a venue.
-
-## Deliberately absent
-
-TWAP or any oracle surface, flash swaps, multi-hop routing, LP shares as a
-transferable GRC20, a native GNOT leg (it would need
-`cur.Previous().IsUserCall()`, which makes the realm uncallable by other
-contracts), protocol fees, governance, and `skim`/`sync`.
+- **Not an oracle**, **`minOut` is your only slippage protection**, **a pool is
+  only as honest as its two tokens**, **not audited**. Same as v0, same
+  reasons, see [`v0`'s README](../v0/README.md).
+- **The LP `PrivateLedger` never leaves this realm.** It is the minting
+  authority; exporting it, even indirectly, would let anyone mint positions
+  against real reserves.

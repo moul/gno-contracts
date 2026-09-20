@@ -26,7 +26,7 @@ func init(cur realm) {
 	keyBBB = grc20reg.Register(cross(cur), tokBBB, "")
 }
 
-func self() address { return chain.PackageAddress("gno.land/r/moul/x/amm/v0") }
+func self() address { return chain.PackageAddress("gno.land/r/moul/x/amm/v1") }
 
 // fund mints both tokens to addr and approves this realm to spend them.
 func fund(addr address, amount int64) {
