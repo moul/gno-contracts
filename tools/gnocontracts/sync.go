@@ -57,7 +57,7 @@ func cmdSync(root string, args []string) error {
 			}
 			continue
 		}
-		diffs, err := diffGnoDirs(filepath.Join(root, filepath.FromSlash(c.Dir)), srcDir)
+		diffs, err := diffGnoDirs(filepath.Join(root, filepath.FromSlash(c.srcDir())), srcDir)
 		if err != nil {
 			return err
 		}
@@ -171,7 +171,7 @@ func classifyContractUpstream(root string, c *Contract) string {
 	if !ok {
 		return ""
 	}
-	return classifyUpstream(filepath.Join(root, filepath.FromSlash(c.Dir)), upDir)
+	return classifyUpstream(filepath.Join(root, filepath.FromSlash(c.srcDir())), upDir)
 }
 
 // classifyUpstream compares a versioned contract dir against its un-versioned

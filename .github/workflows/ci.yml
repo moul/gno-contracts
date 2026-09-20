@@ -11,8 +11,15 @@ jobs:
   contracts:
     runs-on: ubuntu-latest
     steps:
+      # Full history, not the default shallow clone: gnomod.lock pins
+      # superseded versions to the commits that still hold them, and
+      # `gnopm sync` reads them back with `git archive`. A depth-1
+      # checkout has none of those commits, so every pinned version would
+      # fail to materialize.
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -33,6 +40,19 @@ jobs:
 
       - name: gno version
         run: gno version
+
+      # gnomod.lock is SOURCE, not a generated artifact: a PR that adds,
+      # removes or bumps a package carries its lock entry, because the pin is
+      # what keeps the version it replaced resolvable for everything that
+      # still imports it. This proves the lock still describes the tree and
+      # that every pinned version still reproduces byte-for-byte from history.
+      - name: Verify gnomod.lock
+        run: go tool gnopm verify
+
+      # Materialize the versions that no longer have a directory, so lint and
+      # test can build them and so packages importing them resolve.
+      - name: Materialize pinned versions
+        run: go tool gnopm sync
 
       - name: Vet tools
         run: go vet ./tools/...

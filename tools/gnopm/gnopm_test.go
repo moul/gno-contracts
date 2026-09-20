@@ -844,3 +844,61 @@ func TestCommentsAreNotLoadBearing(t *testing.T) {
 		t.Fatal("verify accepted a lock pointing at the wrong directory")
 	}
 }
+
+// TestDeversionLeavesNoEmptyDirectory: git does not track directories, so an
+// emptied version directory is invisible to `git status` while `ls` still
+// shows it. A package with a subdirectory (filetests/, say) used to leave one
+// behind, because a single Remove fails on "directory not empty" and the error
+// was ignored.
+func TestDeversionLeavesNoEmptyDirectory(t *testing.T) {
+	root := newRepo(t)
+	addPkg(t, root, "p/moul/authz/v0", "gno.land/p/moul/authz/v0", "package authz\n")
+	addPkg(t, root, "p/moul/authz/v1", "gno.land/p/moul/authz/v1", "package authz\n")
+	write(t, filepath.Join(root, "p/moul/authz/v1/filetests/z_shape_filetest.gno"), "package main\n")
+	write(t, filepath.Join(root, "p/moul/authz/v1/deep/deeper/note.gno"), "package deep\n")
+	commit(t, root, "seed")
+
+	if err := deversion(testEnv(root, &bytes.Buffer{}), false); err != nil {
+		t.Fatal(err)
+	}
+	for _, gone := range []string{"p/moul/authz/v0", "p/moul/authz/v1"} {
+		if _, err := os.Stat(filepath.Join(root, gone)); !os.IsNotExist(err) {
+			t.Errorf("%s still exists after the migration", gone)
+		}
+	}
+	// And the nested files came with it.
+	for _, want := range []string{
+		"p/moul/authz/filetests/z_shape_filetest.gno",
+		"p/moul/authz/deep/deeper/note.gno",
+	} {
+		if _, err := os.Stat(filepath.Join(root, want)); err != nil {
+			t.Errorf("%s did not move: %v", want, err)
+		}
+	}
+}
+
+// TestRemoveEmptyTreeSpareStrayFiles: the prune must never destroy an
+// untracked file somebody left behind. Somebody's scratch file is worth more
+// than a tidy tree.
+func TestRemoveEmptyTreeSparesStrayFiles(t *testing.T) {
+	dir := t.TempDir()
+	write(t, filepath.Join(dir, "v0", "sub", "scratch.txt"), "do not delete me\n")
+	if err := removeEmptyTree(filepath.Join(dir, "v0")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "v0", "sub", "scratch.txt")); err != nil {
+		t.Fatalf("the stray file was destroyed: %v", err)
+	}
+
+	// With nothing but empty directories, it goes.
+	empty := filepath.Join(dir, "v1", "a", "b")
+	if err := os.MkdirAll(empty, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := removeEmptyTree(filepath.Join(dir, "v1")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "v1")); !os.IsNotExist(err) {
+		t.Error("an entirely empty tree was not removed")
+	}
+}

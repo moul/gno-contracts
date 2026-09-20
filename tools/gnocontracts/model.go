@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/moul/gno-contracts/tools/gnopm/pkg/gnomodlock"
 )
 
 // manifestFile is the source of truth for the contract catalog, relative to the
@@ -33,12 +35,12 @@ type Network struct {
 
 // Contract is one versioned package in the repository.
 type Contract struct {
-	PkgPath     string         `json:"pkgpath"`     // gno.land/r/moul/hello/v0
-	Dir         string         `json:"dir"`         // r/moul/hello/v0
-	Kind        string         `json:"kind"`        // "p" (pure) or "r" (realm)
-	Name        string         `json:"name"`        // hello (may contain slashes)
-	Version     string         `json:"version"`     // v1
-	Description string         `json:"description"` // hand-authored; preserved across scans
+	PkgPath     string `json:"pkgpath"`     // gno.land/r/moul/hello/v0
+	Dir         string `json:"dir"`         // r/moul/hello/v0
+	Kind        string `json:"kind"`        // "p" (pure) or "r" (realm)
+	Name        string `json:"name"`        // hello (may contain slashes)
+	Version     string `json:"version"`     // v1
+	Description string `json:"description"` // hand-authored; preserved across scans
 	// Source is the provenance of an imported package: ideally the gno-contracts
 	// PR that added it, or the origin repo. Hand-authored; preserved; rendered
 	// into the package README.
@@ -53,9 +55,24 @@ type Contract struct {
 	// "gno-notest" (.gno identical once test files are skipped), or "diff"
 	// (production .gno differ). Computed by manifest when the monorepo is
 	// available ($GNOROOT/examples); sticky otherwise.
-	UpstreamMatch string `json:"upstream_match,omitempty"`
-	Deps  []string `json:"deps"`  // gno.land/* imports (non-test)
-	Draft bool     `json:"draft"` // work-in-progress, excluded from publish
+	UpstreamMatch string   `json:"upstream_match,omitempty"`
+	Deps          []string `json:"deps"`  // gno.land/* imports (non-test)
+	Draft         bool     `json:"draft"` // work-in-progress, excluded from publish
+	// Superseded marks a version that no longer has a directory in the working
+	// tree: it was superseded by a later one and now lives only in git
+	// history, pinned by gnomod.lock and materialized under .gnopm/ by
+	// `gnopm install`.
+	//
+	// It stays in the catalog because it is still deployed, packages in the
+	// tree still import it, and dropping it would silently discard its
+	// on-chain publish status. Everything that reads a contract's files on
+	// disk has to check this: a superseded contract's Dir is where the code
+	// WAS, at Commit, not where it is now.
+	Superseded bool `json:"superseded,omitempty"`
+	// Commit is the object name that still holds this version's source. Set
+	// only when Superseded, and what makes Dir meaningful: together they are a
+	// permalink to the code.
+	Commit string `json:"commit,omitempty"`
 	// Ignored mirrors `ignore = true` in the package's gnomod.toml: the gno
 	// toolchain (lint/test/publish) skips it, so it is neither green nor red in
 	// CI. Used for archived originals that don't build on current master and are
@@ -174,7 +191,14 @@ func (m *Manifest) byPkgPath() map[string]*Contract {
 }
 
 // scanContracts walks p/moul and r/moul under root and returns a Contract for
-// every directory containing a gnomod.toml.
+// every directory containing a gnomod.toml, plus one for every version that
+// gnomod.lock pins to history rather than to a directory.
+//
+// The second half is what keeps the catalog honest after the de-versioning
+// migration. A package's version lives in its gnomod.toml module line, so
+// bumping it no longer creates a directory; the version it replaced simply
+// stops having one. Without this, a bump would quietly delete a deployed
+// contract from the catalog along with its publish status.
 func scanContracts(root string) ([]Contract, error) {
 	var out []Contract
 	for _, base := range []string{"p/moul", "r/moul"} {
@@ -217,8 +241,63 @@ func scanContracts(root string) ([]Contract, error) {
 			return nil, err
 		}
 	}
+	archived, err := scanSuperseded(root, out)
+	if err != nil {
+		return nil, err
+	}
+	return append(out, archived...), nil
+}
+
+// scanSuperseded builds a Contract for every module gnomod.lock pins to a commit
+// instead of to a directory.
+//
+// Tolerant of a missing assembly: it returns what it can read and leaves the
+// rest to unmaterialized(). Erroring here would mean a plain `go test ./...`
+// in a fresh clone fails before `gnopm sync` has ever run, which is a bad
+// trade for an invariant that only `manifest` actually depends on.
+func scanSuperseded(root string, live []Contract) ([]Contract, error) {
+	lock, err := gnomodlock.Read(root)
+	if err != nil {
+		return nil, err
+	}
+	inTree := make(map[string]bool, len(live))
+	for _, c := range live {
+		inTree[c.PkgPath] = true
+	}
+	var out []Contract
+	for _, e := range lock.Modules {
+		if e.Source.InTree() || inTree[e.Module] {
+			continue
+		}
+		absDir := filepath.Join(root, filepath.FromSlash(assemblyDir), filepath.FromSlash(e.Module))
+		if !fileExists(filepath.Join(absDir, "gnomod.toml")) {
+			continue
+		}
+		c, err := deriveContract(e.Module, e.Source.Dir, absDir)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", e.Module, err)
+		}
+		c.Superseded = true
+		c.Commit = e.Source.Commit
+		c.Ignored = parseModuleIgnore(filepath.Join(absDir, "gnomod.toml"))
+		out = append(out, c)
+	}
 	return out, nil
 }
+
+// srcDir is where this contract's files can be read right now, relative to
+// the repository root. For a live contract that is its directory; for a
+// superseded one it is gnopm's materialized copy, which only exists after
+// `gnopm install`.
+func (c Contract) srcDir() string {
+	if c.Superseded {
+		return filepath.ToSlash(filepath.Join(assemblyDir, filepath.FromSlash(c.PkgPath)))
+	}
+	return c.Dir
+}
+
+// assemblyDir mirrors gnopm's: versions materialized out of git history.
+const assemblyDir = ".gnopm"
 
 // parseModule extracts the module path from a gnomod.toml file.
 func parseModule(gnomodPath string) (string, error) {
@@ -470,4 +549,28 @@ func importPath(s string) (string, bool) {
 		return "", false
 	}
 	return s[i+1 : i+1+j], true
+}
+
+// unmaterialized lists the module paths gnomod.lock pins to history but which
+// are not present in the assembly, so a caller that cannot tolerate an
+// incomplete answer can refuse instead of quietly producing one.
+//
+// The catalog is exactly such a caller: a superseded version dropping out of
+// contracts.json takes its on-chain publish status with it.
+func unmaterialized(root string) ([]string, error) {
+	lock, err := gnomodlock.Read(root)
+	if err != nil {
+		return nil, err
+	}
+	var missing []string
+	for _, e := range lock.Modules {
+		if e.Source.InTree() {
+			continue
+		}
+		p := filepath.Join(root, filepath.FromSlash(assemblyDir), filepath.FromSlash(e.Module), "gnomod.toml")
+		if !fileExists(p) {
+			missing = append(missing, e.Module)
+		}
+	}
+	return missing, nil
 }

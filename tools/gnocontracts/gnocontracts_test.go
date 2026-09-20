@@ -282,7 +282,10 @@ func TestCanonicalImportCommentsMatchModulePath(t *testing.T) {
 	}
 	checked := 0
 	for _, c := range contracts {
-		dir := filepath.Join(root, filepath.FromSlash(c.Dir))
+		// srcDir, not Dir: a superseded version has no directory any more,
+		// and its files are read out of gnopm's materialized copy. The
+		// invariant applies to it just the same.
+		dir := filepath.Join(root, filepath.FromSlash(c.srcDir()))
 		entries, err := os.ReadDir(dir)
 		if err != nil {
 			t.Fatal(err)

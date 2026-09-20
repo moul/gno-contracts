@@ -53,6 +53,11 @@ jobs:
           git clone --depth 1 https://github.com/gnolang/gno "$HOME/gno"
           echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
 
+      # `gnopm sync` first: the catalog lists versions that no longer have
+      # a directory (superseded by a later one, pinned in gnomod.lock), and it
+      # reads their deps out of the materialized copy. Without it `make gen`
+      # refuses rather than silently dropping them.
+      #
       # Regenerate on the LATEST main each attempt, then push. Never rebase the
       # generated files — publish-status writes the same contracts.json/README.md,
       # so a rebase conflicts and the push fails. On a rejected push, reset to
@@ -64,6 +69,7 @@ jobs:
           for attempt in 1 2 3 4 5; do
             git fetch --quiet origin main
             git reset --quiet --hard origin/main
+            go tool gnopm sync
             make gen
             make graph
             git add -A

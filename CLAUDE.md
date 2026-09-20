@@ -8,15 +8,30 @@ Read it before doing anything. The essentials:
   (`p/moul/ulist/lplist/v0`, never `p/moul/ulist/v0/lplist`). New contracts start
   at `v0` — gno's "initial, unaudited". A **breaking change** — removing/renaming
   an exported symbol, changing its signature/behavior, or a storage/data-structure
-  swap (e.g. `avl`→`bptree`) ⇒ **new `vN`** dir. **Non-breaking** work (new
-  functions, unit tests, comments, docs) stays in place in the same `vN`.
+  swap (e.g. `avl`→`bptree`) ⇒ **bump**. **Non-breaking** work (new
+  functions, unit tests, comments, docs) edits the current version in place.
+- **The version is in `gnomod.toml`, NOT in the directory name.** `p/moul/md/`
+  declaring `module = "gno.land/p/moul/md/v1"` publishes to `.../md/v1`. Never
+  create a `vN` directory and never copy a package to bump it: run
+  **`gnopm bump <name>`**, which rewrites the one line and pins the outgoing
+  version in `gnomod.lock`. Then edit the files in place, so the diff a
+  reviewer sees is the actual compatibility change.
+- **`gnomod.lock` is source, and a PR carries it.** Unlike `contracts.json` it
+  is not regenerated on `main`: a bump has to ship the pin that keeps the old
+  version resolvable, or CI cannot build what still imports it. Run
+  `gnopm sync` after adding or removing a package; `gnopm status` to see
+  where things stand. Superseded versions have no directory; `sync` rebuilds
+  them into the gitignored `.gnopm/`, and they are still linted and tested
+  from there.
+  See [`tools/gnopm`](./tools/gnopm).
 - **The 12 mirrored `p/moul/*` are frozen.** `addrset` `authz` `dynreplacer`
   `fifo` `helplink` `md` `mdtable` `once` `realmpath` `txlink` `typeutil` `ulist`
   also live in `gnolang/gno` at the same `/v0` path and ship in gnoland1 genesis.
   Our `v0` copies every `.gno` byte-for-byte — **never hand-edit it**, not even a
   test or a comment; that is what makes `make sync` drift meaningful. `README.md`
   is the one file we add. Changes go in a `v1` (only `addrset` and `authz` have
-  one today).
+  one today, and their `v0` now lives in `gnomod.lock` rather than in a
+  directory, which `make sync` follows on its own).
 - **Keep the repo autonomous.** Local `p/moul` ↔ `r/moul` imports resolve via
   `gnowork.toml`; external `gno.land/*` deps are vendored under `vendor/`
   (`make deps`). Don't rely on `$GNOROOT/examples` for anything but stdlibs.

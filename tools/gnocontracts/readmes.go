@@ -29,6 +29,12 @@ func cmdReadmes(root string) error {
 	}
 	created, updated := 0, 0
 	for _, c := range m.Contracts {
+		// A superseded version's files live in git history, not in the tree.
+		// Writing a README for it would either fail or, worse, recreate the
+		// directory the migration removed.
+		if c.Superseded {
+			continue
+		}
 		p := filepath.Join(root, filepath.FromSlash(c.Dir), "README.md")
 		footer := pkgFooter(c)
 
