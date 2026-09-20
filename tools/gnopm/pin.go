@@ -6,10 +6,6 @@ import (
 	"strings"
 )
 
-// baseRefs are tried in order to find the branch a pin has to be reachable
-// from. First one that resolves wins.
-var baseRefs = []string{"origin/main", "origin/master", "main", "master"}
-
 // pinTarget is the commit a version gets recorded at, and how it was chosen.
 type pinTarget struct {
 	Commit string
@@ -42,7 +38,10 @@ func choosePin(root, dir, wantHash string, w io.Writer) (pinTarget, error) {
 	if err != nil {
 		return pinTarget{}, err
 	}
-	for _, ref := range baseRefs {
+	for _, ref := range []string{pinBaseRef(root)} {
+		if ref == "" {
+			break
+		}
 		commit, err := gitResolve(root, ref)
 		if err != nil {
 			continue

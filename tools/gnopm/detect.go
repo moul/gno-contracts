@@ -51,6 +51,26 @@ func upstreamRef(root, explicit string) string {
 	return ""
 }
 
+// pinBaseRef is the ref a new pin should prefer to point at.
+//
+// Not the same question as upstreamRef, and conflating them broke a test that
+// was right to break. upstreamRef answers "will this commit survive the
+// merge", which is meaningless without a remote, so it declines to guess. This
+// answers "what is the most stable commit that holds this content", and in a
+// repository with no remote the local default branch is a perfectly good
+// answer: it is still the thing other branches are cut from.
+func pinBaseRef(root string) string {
+	if r := upstreamRef(root, ""); r != "" {
+		return r
+	}
+	for _, r := range []string{"main", "master"} {
+		if refExists(root, r) {
+			return r
+		}
+	}
+	return ""
+}
+
 func refExists(root, ref string) bool {
 	_, err := gitResolve(root, ref)
 	return err == nil

@@ -86,11 +86,14 @@ func freezeLock(root string, old *Lock, pkgs []Package, w io.Writer) (*Lock, err
 	// already holds exactly this content, because the branch has not touched
 	// these packages. Resolving that here turns 193 per-package probes into
 	// a single one.
-	base, baseRef := "", ""
-	for _, ref := range baseRefs {
-		if c, err := gitResolve(root, ref); err == nil {
-			base, baseRef = c, ref
-			break
+	// The same detection verify uses, not a private list. They disagreed
+	// once: freeze hardcoded origin/main while verify honoured
+	// GITHUB_BASE_REF, so on a stacked pull request freeze pinned to the
+	// branch and verify then rejected its own tool's output.
+	base, baseRef := "", pinBaseRef(root)
+	if baseRef != "" {
+		if c, err := gitResolve(root, baseRef); err == nil {
+			base = c
 		}
 	}
 	atBase := map[string]string{}
