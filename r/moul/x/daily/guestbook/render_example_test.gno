@@ -6,5 +6,5 @@ func ExampleRender() {
 	// Output:
 	// # Guestbook
 	//
-	// _No one has signed yet. Be the first!_
+	// *No one has signed yet. Be the first!*
 }

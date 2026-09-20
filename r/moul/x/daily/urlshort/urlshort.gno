@@ -12,6 +12,7 @@ import (
 	"chain"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -147,19 +148,11 @@ func renderIndex() string {
 	aliases.Iterate("", "", func(key string, value interface{}) bool {
 		e := value.(*entry)
 		b.WriteString("| [" + key + "](/" + key + ") | <" + e.url + "> | " +
-			short(e.owner.String()) + " | " + itoa(e.clicks) + " |\n")
+			ui.Addr(e.owner) + " | " + itoa(e.clicks) + " |\n")
 		return false
 	})
 	b.WriteString("\nTotal aliases: " + itoa(aliases.Size()) + "\n")
 	return b.String()
-}
-
-// short truncates a long address for the index table.
-func short(s string) string {
-	if len(s) <= 12 {
-		return s
-	}
-	return s[:6] + "…" + s[len(s)-4:]
 }
 
 // itoa converts a non-negative int to its decimal string without importing

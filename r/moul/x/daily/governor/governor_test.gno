@@ -3,6 +3,7 @@ package governor
 import (
 	"testing"
 
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
@@ -61,10 +62,13 @@ func TestBar(t *testing.T) {
 	uassert.Equal(t, "", bar(1, 2, 0), "zero width")
 }
 
+// v0 asserted that its own idKey() padded to width 12. That rule held only
+// below the width: idKey(10^12) is 13 characters and sorts before
+// idKey(10^12-1), so the proposal list would have rendered out of order from
+// that id on. The store key has no width to outgrow.
 func TestIDKey(t *testing.T) {
-	// keys are zero-padded so lexical order matches numeric order
-	uassert.Equal(t, "000000000001", idKey(1), "id 1")
-	uassert.Equal(t, "000000000042", idKey(42), "id 42")
-	uassert.True(t, idKey(2) < idKey(10), "2 sorts before 10")
-	uassert.True(t, idKey(9) < idKey(100), "9 sorts before 100")
+	uassert.True(t, store.ID(2).Key() < store.ID(10).Key(), "2 sorts before 10")
+	uassert.True(t, store.ID(9).Key() < store.ID(100).Key(), "9 sorts before 100")
+	uassert.True(t, store.ID(999999999999).Key() < store.ID(1000000000000).Key(),
+		"and it keeps holding one past v0's width-12 ceiling")
 }

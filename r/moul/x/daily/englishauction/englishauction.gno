@@ -14,12 +14,13 @@ import (
 	"chain/runtime"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
-// Auction is a single ascending-bid auction.
+// Auction is a single ascending-bid auction. It carries no ID field: the id
+// belongs to the store, which hands it back on lookup and iteration.
 type Auction struct {
-	ID            int64
 	Seller        address
 	Item          string
 	EndHeight     int64
@@ -29,23 +30,18 @@ type Auction struct {
 }
 
 var (
-	auctions avl.Tree // key(id) -> *Auction
-	pending  avl.Tree // "<id>:<addr>" -> uint64 refundable amount
-	nextID   int64    = 1
+	// auctions assigns the auction ids. v0 kept its own nextID plus a key()
+	// that zero-padded to width 12, which stopped ordering Render past 10^12.
+	auctions = store.Named("englishauction: auction")
+
+	pending avl.Tree // "<id>:<addr>" -> uint64 refundable amount
 )
 
-// key formats an id into a zero-padded, lexicographically-sortable string.
-func key(id int64) string {
-	s := strconv.FormatInt(id, 10)
-	for len(s) < 12 {
-		s = "0" + s
-	}
-	return s
-}
-
-// pendKey formats the refund key for a given auction id and bidder.
+// pendKey formats the refund key for a given auction id and bidder. It uses
+// the decimal id rather than the store key: pending is only ever point-read,
+// never iterated, so it needs a readable key and not an ordered one.
 func pendKey(id int64, bidder address) string {
-	return key(id) + ":" + bidder.String()
+	return strconv.FormatInt(id, 10) + ":" + bidder.String()
 }
 
 // Start opens a new auction for `item` running for `durationBlocks` blocks from
@@ -58,16 +54,12 @@ func Start(cur realm, item string, durationBlocks int64) int64 {
 		panic("englishauction: duration must be > 0 blocks")
 	}
 	seller := unsafe.PreviousRealm().Address()
-	id := nextID
-	nextID++
-
 	a := &Auction{
-		ID:        id,
 		Seller:    seller,
 		Item:      item,
 		EndHeight: runtime.ChainHeight() + durationBlocks,
 	}
-	auctions.Set(key(id), a)
+	id := int64(auctions.Add(a))
 
 	chain.Emit("Start",
 		"id", strconv.FormatInt(id, 10),
@@ -149,13 +141,11 @@ func End(cur realm, id int64) {
 
 // --- read-only helpers (safe from tests and Render) ---
 
-// mustGet returns the auction for `id`, panicking if it does not exist.
+// mustGet returns the auction for `id`, panicking if it does not exist. The
+// store's label puts the id in the message, which v0's fixed string
+// ("englishauction: no such auction") left out.
 func mustGet(id int64) *Auction {
-	v := auctions.Get(key(id))
-	if v == nil {
-		panic("englishauction: no such auction")
-	}
-	return v.(*Auction)
+	return auctions.MustGet(store.ID(id)).(*Auction)
 }
 
 // pendingOf returns the refundable amount owed to `bidder` for auction `id`.
@@ -187,7 +177,7 @@ func Render(path string) string {
 	out += "Ascending-bid auctions. Start one, outbid others, and End it after "
 	out += "its block deadline to award the item to the top bidder.\n\n"
 
-	if auctions.Size() == 0 {
+	if auctions.Len() == 0 {
 		out += "_No auctions yet. Call `Start` to open one._\n"
 		return out
 	}
@@ -197,7 +187,7 @@ func Render(path string) string {
 	out += "| ID | Item | Highest Bid | Bidder | Status | Winner |\n"
 	out += "|---:|------|------------:|--------|--------|--------|\n"
 
-	auctions.Iterate("", "", func(_ string, v interface{}) bool {
+	auctions.Each(func(id store.ID, v any) {
 		a := v.(*Auction)
 
 		bidStr := "—"
@@ -223,9 +213,8 @@ func Render(path string) string {
 			status = strconv.FormatInt(blocksLeft(a, height), 10) + " blocks left"
 		}
 
-		out += "| " + strconv.FormatInt(a.ID, 10) + " | " + a.Item + " | " +
+		out += "| " + id.String() + " | " + a.Item + " | " +
 			bidStr + " | " + bidderStr + " | " + status + " | " + winner + " |\n"
-		return false
 	})
 	return out
 }

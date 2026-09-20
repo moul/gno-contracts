@@ -9,22 +9,25 @@ import (
 	"chain"
 	"chain/runtime"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/markdown/sanitize/v0"
 )
 
+// capsule carries no id field: the id belongs to the store, which hands it
+// back on lookup and iteration.
 type capsule struct {
-	id           int64
 	author       address
 	message      string
 	createdAt    int64
 	unlockHeight int64
 }
 
-var (
-	capsules avl.Tree // key: zero-padded id -> *capsule
-	nextID   int64
-)
+// capsules assigns the capsule ids. v0 kept its own nextID plus an idKey()
+// that called strings.Repeat WITHOUT the length guard the other realms had, so
+// at the 10^12th capsule it did not mis-sort, it panicked: Repeat rejects a
+// negative count, and the realm would have stopped accepting Leave calls. The
+// store key is 8 fixed bytes with no width to outgrow.
+var capsules = store.Named("capsule")
 
 const (
 	maxDelayBlocks int64 = 1_000_000
@@ -50,28 +53,19 @@ func Leave(cur realm, message string, delayBlocks int64) int64 {
 	}
 
 	now := runtime.ChainHeight()
-	id := nextID
-	nextID++
-
 	c := &capsule{
-		id:           id,
 		author:       cur.Previous().Address(),
 		message:      message,
 		createdAt:    now,
 		unlockHeight: now + delayBlocks,
 	}
-	capsules.Set(idKey(id), c)
+	id := capsules.Add(c)
 
 	chain.Emit("CapsuleSealed",
-		"id", strconv.FormatInt(id, 10),
+		"id", id.String(),
 		"unlockHeight", strconv.FormatInt(c.unlockHeight, 10),
 	)
-	return id
-}
-
-func idKey(id int64) string {
-	s := strconv.FormatInt(id, 10)
-	return strings.Repeat("0", 12-len(s)) + s
+	return int64(id)
 }
 
 func Render(path string) string {
@@ -92,13 +86,12 @@ func renderHome() string {
 
 	revealed := 0
 	sealed := 0
-	capsules.Iterate("", "", func(_ string, value any) bool {
+	capsules.Each(func(_ store.ID, value any) {
 		if value.(*capsule).unlockHeight <= now {
 			revealed++
 		} else {
 			sealed++
 		}
-		return false
 	})
 
 	var out strings.Builder
@@ -116,12 +109,11 @@ func renderHome() string {
 		return out.String()
 	}
 
-	capsules.Iterate("", "", func(_ string, value any) bool {
+	capsules.Each(func(id store.ID, value any) {
 		c := value.(*capsule)
 		if c.unlockHeight <= now {
-			out.WriteString(renderEntry(c))
+			out.WriteString(renderEntry(id, c))
 		}
-		return false
 	})
 	return out.String()
 }
@@ -133,16 +125,15 @@ func renderSealed() string {
 	out.WriteString("# Sealed Capsules\n\n")
 
 	found := false
-	capsules.Iterate("", "", func(_ string, value any) bool {
+	capsules.Each(func(id store.ID, value any) {
 		c := value.(*capsule)
 		if c.unlockHeight > now {
 			found = true
-			out.WriteString("- capsule [#" + strconv.FormatInt(c.id, 10) + "](capsule/" +
-				strconv.FormatInt(c.id, 10) + ") by `" + c.author.String() +
+			out.WriteString("- capsule [#" + id.String() + "](capsule/" +
+				id.String() + ") by `" + c.author.String() +
 				"` — unlocks at block " + strconv.FormatInt(c.unlockHeight, 10) +
 				" (" + strconv.FormatInt(c.unlockHeight-now, 10) + " blocks left)\n")
 		}
-		return false
 	})
 	if !found {
 		out.WriteString("_No sealed capsules right now._\n")
@@ -151,19 +142,19 @@ func renderSealed() string {
 }
 
 func renderCapsule(idStr string) string {
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
+	id, ok := store.ParseID(idStr)
+	if !ok {
 		return "> [!WARNING]\n> Invalid capsule id\n"
 	}
-	v := capsules.Get(idKey(id))
-	if v == nil {
+	v, ok := capsules.Get(id)
+	if !ok {
 		return "> [!WARNING]\n> Capsule not found\n"
 	}
 	c := v.(*capsule)
 	now := runtime.ChainHeight()
 
 	var out strings.Builder
-	out.WriteString("# Capsule #" + strconv.FormatInt(c.id, 10) + "\n\n")
+	out.WriteString("# Capsule #" + id.String() + "\n\n")
 	out.WriteString("Sealed by `" + c.author.String() + "` at block " + strconv.FormatInt(c.createdAt, 10) + ".\n\n")
 
 	if c.unlockHeight > now {
@@ -177,8 +168,8 @@ func renderCapsule(idStr string) string {
 	return out.String()
 }
 
-func renderEntry(c *capsule) string {
-	return "- **#" + strconv.FormatInt(c.id, 10) + "** by `" + c.author.String() +
+func renderEntry(id store.ID, c *capsule) string {
+	return "- **#" + id.String() + "** by `" + c.author.String() +
 		"` (sealed at block " + strconv.FormatInt(c.createdAt, 10) +
 		", opened at block " + strconv.FormatInt(c.unlockHeight, 10) + "):\n  > " +
 		sanitize.InlineText(c.message) + "\n\n"

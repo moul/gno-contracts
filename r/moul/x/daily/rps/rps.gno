@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -199,7 +200,7 @@ func Render(path string) string {
 		b.WriteString("|---|---|---|---|---|---|\n")
 		players.Iterate("", "", func(key string, v interface{}) bool {
 			t := v.(*tally)
-			b.WriteString("| " + shortAddr(key))
+			b.WriteString("| " + ui.AddrOf(key))
 			b.WriteString(" | " + strconv.Itoa(t.wins))
 			b.WriteString(" | " + strconv.Itoa(t.losses))
 			b.WriteString(" | " + strconv.Itoa(t.draws))
@@ -225,7 +226,7 @@ func Render(path string) string {
 		for i := len(rounds) - 1; i >= start; i-- {
 			r := rounds[i]
 			b.WriteString("| " + strconv.FormatInt(r.height, 10))
-			b.WriteString(" | " + shortAddr(r.player.String()))
+			b.WriteString(" | " + ui.Addr(r.player))
 			b.WriteString(" | " + moveNames[r.player_m])
 			b.WriteString(" | " + moveNames[r.house_m])
 			b.WriteString(" | " + outcomeName(r.outcome) + " |\n")
@@ -233,12 +234,4 @@ func Render(path string) string {
 	}
 
 	return b.String()
-}
-
-// shortAddr abbreviates an address string for display.
-func shortAddr(a string) string {
-	if len(a) <= 12 {
-		return a
-	}
-	return a[:8] + "…" + a[len(a)-4:]
 }
