@@ -116,9 +116,18 @@ func deversion(e *env, dryRun bool) error {
 				return err
 			}
 		}
-		// The version directory is empty now; git drops it on its own, but an
-		// untracked leftover would keep it alive and confuse the next scan.
-		os.Remove(filepath.Join(root, filepath.FromSlash(m.From)))
+		// The version directory holds no tracked files now. git does not track
+		// directories, so it will not clean this up: the empty tree would sit
+		// there untracked and invisible to `git status`, while `ls` still
+		// shows a v1/ that is supposed to be gone.
+		//
+		// Recursive, not a single Remove: a package with a subdirectory
+		// (filetests/, say) leaves an empty subdirectory inside the empty
+		// version directory, and one Remove would fail on "directory not
+		// empty" and be silently ignored.
+		if err := removeEmptyTree(filepath.Join(root, filepath.FromSlash(m.From))); err != nil {
+			return err
+		}
 	}
 	for _, d := range drops {
 		if _, err := git(root, "rm", "-r", "-q", d.Dir); err != nil {
@@ -216,6 +225,40 @@ func checkCollisions(root string, moves []move, files [][]string) error {
 				return fmt.Errorf("collision: %s already exists, %s cannot move there", dst, path.Join(m.From, f))
 			}
 		}
+	}
+	return nil
+}
+
+// removeEmptyTree deletes dir if nothing but empty directories is left under
+// it, and does nothing at all otherwise.
+//
+// Deliberately conservative: it never removes a file, so a stray untracked
+// file anywhere under the directory stops the whole prune rather than being
+// destroyed. Somebody's uncommitted scratch file is worth more than a tidy
+// tree.
+func removeEmptyTree(dir string) error {
+	entries, err := os.ReadDir(dir)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	for _, e := range entries {
+		if !e.IsDir() {
+			return nil // a real file lives here; leave everything alone
+		}
+		if err := removeEmptyTree(filepath.Join(dir, e.Name())); err != nil {
+			return err
+		}
+	}
+	// Re-read: the children may or may not have gone.
+	entries, err = os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	if len(entries) == 0 {
+		return os.Remove(dir)
 	}
 	return nil
 }
