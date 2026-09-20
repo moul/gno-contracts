@@ -183,7 +183,14 @@ func cmdLock(e *env) error {
 
 func cmdBump(e *env, fs *flag.FlagSet, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("which package? try `gnopm ls -q` to see them, then `gnopm bump <package>`")
+		// No argument: if you are standing in a package, that is the one you
+		// meant. Asking would be asking a question gnopm can answer.
+		pkg, err := packageAtCwd(e.root)
+		if err != nil {
+			return err
+		}
+		args = []string{pkg}
+		e.logf("bumping %s (from the current directory)\n", pkg)
 	}
 	if len(args) > 1 {
 		return fmt.Errorf("bump takes one package, got %d", len(args))
@@ -215,4 +222,98 @@ func (e *env) writeJSON(v any) error {
 	enc := json.NewEncoder(e.out)
 	enc.SetIndent("", "  ")
 	return enc.Encode(v)
+}
+
+// cmdVersion reports what this binary is, the way every other tool does.
+// Its absence was a paper cut: `gnopm version` suggested `gnopm verify`.
+func cmdVersion(e *env) error {
+	v, rev, dirty := buildVersion()
+	if e.json {
+		return e.writeJSON(map[string]any{"version": v, "revision": rev, "dirty": dirty})
+	}
+	line := "gnopm " + v
+	if rev != "" {
+		line += " (" + rev
+		if dirty {
+			line += ", dirty"
+		}
+		line += ")"
+	}
+	e.printf("%s\n", line)
+	return nil
+}
+
+// cmdEnv prints what gnopm worked out about this machine and this workspace.
+//
+// Everything here is detected rather than configured, so this is also the
+// answer to "why did it do that": if a command surprises you, env shows the
+// inputs it surprised you with.
+func cmdEnv(e *env) error {
+	lock := filepath.Join(e.root, lockFile)
+	if _, err := os.Stat(lock); err != nil {
+		lock = "(none yet)"
+	}
+	upstream := upstreamRef(e.root, "")
+	if upstream == "" {
+		upstream = "(none detected)"
+	}
+	vals := [][2]string{
+		{"GNOPM_ROOT", e.root},
+		{"GNOPM_LOCK", lock},
+		{"GNOPM_ASSEMBLY", filepath.Join(e.root, assemblyDir)},
+		{"GNOPM_UPSTREAM", upstream},
+		{"GNOHOME", gnoHome()},
+	}
+	if e.json {
+		m := map[string]any{}
+		for _, kv := range vals {
+			m[kv[0]] = kv[1]
+		}
+		return e.writeJSON(m)
+	}
+	for _, kv := range vals {
+		e.printf("%s=%q\n", kv[0], kv[1])
+	}
+	return nil
+}
+
+// gnoHome mirrors the gno toolchain's own home, because gnopm should cache
+// beside it rather than inventing a second directory nobody knows about.
+func gnoHome() string {
+	if h := os.Getenv("GNOHOME"); h != "" {
+		return h
+	}
+	if c, err := os.UserConfigDir(); err == nil {
+		return filepath.Join(c, "gno")
+	}
+	return ""
+}
+
+// packageAtCwd finds the package the working directory is inside.
+//
+// Nearest enclosing directory with a gnomod.toml, so it works from a package's
+// own subdirectory (filetests/, say) too.
+func packageAtCwd(root string) (string, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	wd, err = filepath.Abs(wd)
+	if err != nil {
+		return "", err
+	}
+	for d := wd; strings.HasPrefix(d, root); d = filepath.Dir(d) {
+		if _, err := os.Stat(filepath.Join(d, "gnomod.toml")); err == nil {
+			rel, err := filepath.Rel(root, d)
+			if err != nil {
+				return "", err
+			}
+			return filepath.ToSlash(rel), nil
+		}
+		if d == root {
+			break
+		}
+	}
+	return "", fmt.Errorf("no package here, and none given. cd into one, or name it: `gnopm bump <package>`\n" +
+		"  `gnopm ls -q` lists them")
 }

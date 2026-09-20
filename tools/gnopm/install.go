@@ -246,7 +246,9 @@ func verifyWith(e *env, upstream string) error {
 	if bad > 0 {
 		return fmt.Errorf("%d locked version(s) do not reproduce from history", bad)
 	}
-	if upstream != "" {
+	// Detected, not demanded. An explicit -upstream still wins.
+	upstream = upstreamRef(root, upstream)
+	if upstream != "" && !onUpstream(root, upstream) {
 		ref, err := gitResolve(root, upstream)
 		if err != nil {
 			fmt.Fprintf(w, "  skipping the upstream check: %v\n", err)

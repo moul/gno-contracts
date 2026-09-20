@@ -5,9 +5,36 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/debug"
 	"sort"
 	"strings"
 )
+
+// buildVersion reports the module version and VCS revision stamped into the
+// binary by the Go toolchain.
+func buildVersion() (version, revision string, dirty bool) {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "(unknown)", "", false
+	}
+	version = info.Main.Version
+	if version == "" || version == "(devel)" {
+		version = "devel"
+	}
+	for _, s := range info.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			if len(s.Value) > 12 {
+				revision = s.Value[:12]
+			} else {
+				revision = s.Value
+			}
+		case "vcs.modified":
+			dirty = s.Value == "true"
+		}
+	}
+	return version, revision, dirty
+}
 
 // env is what every command gets: where the workspace is, where to write data,
 // and where to write everything that is not data.
@@ -127,6 +154,45 @@ Needs full git history. A shallow clone has none of the pinned commits.
 			},
 		},
 		{
+			name:  "tidy",
+			short: "drop pinned versions nothing imports that never shipped",
+			long: `Removes a lock entry when BOTH are true: nothing in the workspace
+imports that version, and the commit it is pinned to never reached the
+default branch.
+
+Both, not either. A version nobody here imports may still be deployed
+and imported by somebody else, so "unused" alone is not permission to
+forget it. A version pinned to a commit that never reached the default
+branch, though, never existed for anyone outside the branch that made
+it.
+
+That is the normal end state of a branch that adds v0 and then bumps to
+v1 before either has landed: the intermediate version is an editing
+artefact, not a release.
+
+  -n   print what would go and change nothing`,
+			flags: func(fs *flag.FlagSet) {
+				fs.Bool("n", false, "print what would go and change nothing")
+			},
+			run: func(e *env, fs *flag.FlagSet, args []string) error { return tidy(e, flagBool(fs, "n")) },
+		},
+		{
+			name:  "env",
+			short: "show what gnopm worked out about this workspace",
+			long: `Everything gnopm detected rather than was told: the workspace root,
+the lock, the assembly, the upstream ref verify checks against, and the
+gno home it caches beside.
+
+If a command surprises you, this shows the inputs it surprised you
+with.`,
+			run: func(e *env, fs *flag.FlagSet, args []string) error { return cmdEnv(e) },
+		},
+		{
+			name:  "version",
+			short: "print the gnopm version",
+			run:   func(e *env, fs *flag.FlagSet, args []string) error { return cmdVersion(e) },
+		},
+		{
 			name:  "deversion",
 			short: "one-time migration: lift every pkg/vN directory up to pkg",
 			long: `For a repository that still keeps each version in its own directory.
@@ -236,6 +302,9 @@ func hoistGlobals(args []string) (name string, rest []string, err error) {
 		}
 		if a == "-h" || a == "--help" {
 			return "help", args[i+1:], nil
+		}
+		if a == "-v" || a == "--version" {
+			return "version", nil, nil
 		}
 		opt := strings.TrimLeft(a, "-")
 		if strings.Contains(opt, "=") {
