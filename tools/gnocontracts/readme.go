@@ -95,12 +95,22 @@ func renderTable(m *Manifest) string {
 		// Package column: path without the gno.land/ prefix, linked to the
 		// contract's folder in this repo. Kind emoji after (outside the backtick).
 		label := strings.TrimPrefix(c.PkgPath, "gno.land/")
-		name := "[`" + label + "`](" + c.Dir + ") " + kindEmoji(c.Kind)
+		// A live contract links to its folder. A superseded one has no folder
+		// any more, so it links to the code at the commit that still holds it:
+		// the version is gone from the tree, not from the repository.
+		target := c.Dir
+		if c.Superseded {
+			target = repoURL + "/tree/" + c.Commit + "/" + c.Dir
+		}
+		name := "[`" + label + "`](" + target + ") " + kindEmoji(c.Kind)
 		if c.Draft {
 			name += " 🚧"
 		}
 		if c.Ignored {
 			name += " 💤"
+		}
+		if c.Superseded {
+			name += " 🧊"
 		}
 		b.WriteString("| " + name + " |")
 		for _, n := range m.Networks {
@@ -114,6 +124,15 @@ func renderTable(m *Manifest) string {
 	for _, c := range m.Contracts {
 		if c.Ignored {
 			legend += " · 💤 archived (`ignore = true` in gnomod, skipped by CI)"
+			break
+		}
+	}
+	// 🧊 is a different thing from 💤: a superseded version is not ignored, it
+	// simply has no directory any more. It is still built and tested, out of
+	// the copy gnopm materializes from git history.
+	for _, c := range m.Contracts {
+		if c.Superseded {
+			legend += " · 🧊 superseded (no directory; pinned in `gnomod.lock`, still built)"
 			break
 		}
 	}

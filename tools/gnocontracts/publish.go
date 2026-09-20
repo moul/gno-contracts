@@ -71,6 +71,10 @@ func cmdPublish(root string, args []string) error {
 		status := ""
 		if c.Draft {
 			status = " [draft — skipped]"
+		} else if c.Superseded {
+			// No directory to publish from: it is already on chain and is
+			// kept resolvable from the lock, not republishable from the tree.
+			status = " [superseded — already published, no source dir]"
 		} else if network != nil {
 			if m.byPkgPath()[c.PkgPath].Published[network.Name].Uploaded {
 				status = " [already on " + network.Name + "]"

@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
+// plural renders ", and N more" for a list we only name the head of.
+func plural(n int) string {
+	if n <= 1 {
+		return ""
+	}
+	return fmt.Sprintf(", and %d more", n-1)
+}
+
 // cmdManifest scans the contract trees and reconciles contracts.json in place:
 // new packages are added, existing ones have their derived fields (dir, kind,
 // name, version, deps) refreshed, and removed packages are dropped. Hand-
@@ -20,6 +28,15 @@ func cmdManifest(root string) error {
 	// and this is what carries that edit into the catalog via `regen`.
 	m.Networks = defaultNetworks()
 
+	// Refuse rather than silently drop a superseded version: it would take
+	// its on-chain publish status out of the catalog with it, and the catalog
+	// is regenerated automatically, so nobody would be watching.
+	if missing, err := unmaterialized(root); err != nil {
+		return err
+	} else if len(missing) > 0 {
+		return fmt.Errorf("%d version(s) pinned in the lock are not materialized (%s%s). Run `gnopm sync` first",
+			len(missing), missing[0], plural(len(missing)))
+	}
 	scanned, err := scanContracts(root)
 	if err != nil {
 		return err

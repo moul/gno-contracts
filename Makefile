@@ -31,6 +31,18 @@ VIEW := $(CURDIR)/.gnoroot-view
 # package that lint/test tries to build.
 PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -not -path '*/.*' -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
+# Versions that no longer live in the working tree, materialized under .gnopm/
+# by `gnopm sync`. They are linted and tested too: they are deployed on
+# chain, packages in the tree still import them, and "does this still build on
+# current gno master" is exactly the drift signal this repo exists to produce.
+# Dropping them from CI when their directory went away would have quietly
+# reduced coverage as a side effect of a directory move.
+#
+# Recursively expanded (`=`, not `:=`) on purpose: .gnopm/ is built by the
+# .gnopm/.stamp prerequisite, which runs AFTER the Makefile is parsed. A `:=`
+# here would evaluate to nothing on a fresh clone and silently skip them.
+OLD_PKG_DIRS = $(shell for d in $$(find .gnopm -name gnomod.toml -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
+
 .DEFAULT_GOAL := help
 .PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report graph view clean upload verify
 
@@ -82,7 +94,7 @@ bump-deps: ## re-vendor ALL external deps from GNOROOT/examples (bump the pinned
 	$(GNOCONTRACTS) vendor -refresh
 
 test: toolcheck guard-examples guard-render view .gnopm/.stamp ## gno test every contract (deps resolved from committed vendor/)
-	@set -e; for d in $(PKG_DIRS); do echo "== test $$d =="; GNOROOT="$(VIEW)" $(GNO) test ./$$d; done
+	@set -e; for d in $(PKG_DIRS) $(OLD_PKG_DIRS); do echo "== test $$d =="; GNOROOT="$(VIEW)" $(GNO) test ./$$d; done
 
 # Prove the gno toolchain actually VALIDATES example tests. gno silently skips
 # Example funcs on toolchains that lack the feature, turning every ExampleRender
@@ -122,13 +134,15 @@ guard-render: ## fail if a realm declares Render but no test calls it
 	@python3 tools/guard_render.py
 
 lint: view .gnopm/.stamp ## gno lint every contract (deps resolved from committed vendor/)
-	@set -e; for d in $(PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
+	@set -e; for d in $(PKG_DIRS) $(OLD_PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
 
 # Like lint/test, fmt resolves against the stdlib-only view. Without it the gno
 # binary falls back to its built-in GNOROOT, which on a machine that does not
 # have that exact checkout fails with `unable to load .../gnovm/stdlibs` for
 # every package. The old `|| true` swallowed that, so `make fmt` reformatted
 # nothing and said so to nobody.
+# Only PKG_DIRS: a materialized old version is a read-only copy of history,
+# and reformatting it would make `gnopm verify` fail against its recorded hash.
 fmt: view .gnopm/.stamp ## gno fmt every contract in place
 	@set -e; for d in $(PKG_DIRS); do GNOROOT="$(VIEW)" $(GNO) fmt -w ./$$d; done
 

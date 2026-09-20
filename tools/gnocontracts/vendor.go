@@ -88,7 +88,7 @@ func cmdVendor(root string, args []string) error {
 		if c.Ignored {
 			continue
 		}
-		deps, err := parseDepsMode(filepath.Join(root, filepath.FromSlash(c.Dir)), true)
+		deps, err := parseDepsMode(filepath.Join(root, filepath.FromSlash(c.srcDir())), true)
 		if err != nil {
 			return err
 		}
