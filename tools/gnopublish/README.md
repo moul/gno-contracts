@@ -79,6 +79,7 @@ prompted once, with no echo.
 Repo-relative, default `./...`:
 
 - `./...` — every package
-- `./p/moul/hello` — the `hello` package (all its versions)
-- `./p/moul/hello/v1` — one exact version
+- `./p/moul/hello` — the `hello` package. Its directory carries no version:
+  the version is in its `gnomod.toml`, and superseded ones live under `.gnopm/`
+- `./.gnopm/gno.land/p/moul/hello/v0` — a superseded version, as rebuilt by `gnopm sync`
 - `./r/moul/...` — everything under `r/moul`

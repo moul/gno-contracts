@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/semverdemo/v0`
 
-Live demo of the [`p/moul/x/daily/semver`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/semver/v0)
+Live demo of the [`p/moul/x/daily/semver`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/semver)
 Semantic Versioning library.
 
 Holds the realm state the pure library deliberately does not — a "submitted

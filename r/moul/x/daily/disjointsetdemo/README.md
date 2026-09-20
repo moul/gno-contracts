@@ -6,7 +6,7 @@
 
 Applies a fixed list of merges to `[0, 10)` and renders the resulting partition.
 
-Demo of the [`p/moul/x/daily/disjointset`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/disjointset/v0)
+Demo of the [`p/moul/x/daily/disjointset`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/disjointset)
 library — every `Union`/`Find` comes from the package; this realm holds no
 union-find logic. Stateless, so `Render` is fully deterministic.
 

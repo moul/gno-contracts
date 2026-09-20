@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/sievedemo/v0`
 
-Interactive gnoweb **demo of the [`p/moul/x/daily/sieve`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/sieve/v0)
+Interactive gnoweb **demo of the [`p/moul/x/daily/sieve`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/sieve)
 Sieve of Eratosthenes library** — it renders the count of primes up to `MaxN`,
 the first 100 primes, and a "primes up to n" grid. It has no sieve logic of its own.
 

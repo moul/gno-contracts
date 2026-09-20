@@ -3,7 +3,7 @@
 An open, on-chain encyclopedia. Anyone can create or edit a page, every edit is
 a signed revision, and the whole history is public and tamper-evident.
 
-A thin realm over [`p/moul/x/wiki/v0`](../../../../../p/moul/x/wiki/v0): the library
+A thin realm over [`p/moul/x/wiki/v0`](../../../../../p/moul/x/wiki): the library
 owns content (titles, revisions, wikilinks, categories, diffs, rendering), this
 realm owns **authority** (who may write what) and the chain wiring (block
 height, block time, the calling address, transaction links). There is no policy

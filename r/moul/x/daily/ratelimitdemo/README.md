@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/ratelimitdemo/v0`
 
-Live demo of the [`p/moul/x/daily/ratelimit`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/ratelimit/v0)
+Live demo of the [`p/moul/x/daily/ratelimit`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/ratelimit)
 token-bucket rate limiter.
 
 Holds one package-level `ratelimit.Limiter` (0.5 tokens/block, capacity 5) and

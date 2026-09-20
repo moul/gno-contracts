@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/pullpaymentdemo/v0`
 
-**Live demo of [`p/moul/x/daily/pullpayment`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/pullpayment/v0).**
+**Live demo of [`p/moul/x/daily/pullpayment`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/pullpayment).**
 
 A thin, stateless realm: it holds no state of its own and contains none of the
 library's logic — `Render` just exercises the package and shows the result.

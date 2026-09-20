@@ -12,7 +12,7 @@ Crockford allows.
 /r/moul/x/daily/base32demo/v0:hello   → encode your own text both ways
 ```
 
-Demo of the [`p/moul/x/daily/base32`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/base32/v0)
+Demo of the [`p/moul/x/daily/base32`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/base32)
 library — no codec logic lives here. Stateless, so `Render` is deterministic.
 
 The input column is the RFC 4648 §10 vector set at every partial-group length,

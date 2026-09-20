@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/commitrevealdemo/v0`
 
-**Live demo of [`p/moul/x/daily/commitreveal`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/commitreveal/v0).**
+**Live demo of [`p/moul/x/daily/commitreveal`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/commitreveal).**
 
 A thin, stateless realm: it holds no state of its own and contains none of the
 library's logic — `Render` just exercises the package and shows the result.

@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/sparklinedemo/v0`
 
-A gnoweb demo of the [`p/moul/x/daily/sparkline`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/sparkline/v0)
+A gnoweb demo of the [`p/moul/x/daily/sparkline`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/sparkline)
 library: it sparks a handful of fixed series and shows the three behaviours
 worth knowing before putting one in a realm — a flat series rendering mid-ramp,
 a fixed window clamping its outliers, and floor rounding keeping the peak

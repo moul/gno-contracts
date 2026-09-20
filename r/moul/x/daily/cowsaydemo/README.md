@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/cowsaydemo/v0`
 
-Interactive gnoweb **demo of the [`p/moul/x/daily/cowsay`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/cowsay/v0)
+Interactive gnoweb **demo of the [`p/moul/x/daily/cowsay`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/cowsay)
 library** — it makes the classic ASCII cow say whatever you put in the path. It
 has no rendering logic of its own.
 

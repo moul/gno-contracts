@@ -1,9 +1,9 @@
 # `gno.land/p/moul/authz/v1`
 
 Flexible authorization control for privileged actions, **backed by a B+ tree**
-(`gno.land/p/nt/bptree` via [`p/moul/addrset/v1`](https://github.com/moul/gno-contracts/tree/main/p/moul/addrset/v1)).
+(`gno.land/p/nt/bptree` via [`p/moul/addrset/v1`](https://github.com/moul/gno-contracts/tree/main/p/moul/addrset)).
 
-The B+ tree successor to [`p/moul/authz/v0`](https://github.com/moul/gno-contracts/tree/main/p/moul/authz/v0)
+The B+ tree successor to [`p/moul/authz/v0`](https://github.com/moul/gno-contracts/tree/3d07a5b2cc02d7c3769caff0c17d884ac033bcfe/p/moul/authz/v0)
 (AVL-backed, via `p/moul/addrset/v0`). **v1 because the member store — and thus
 the on-chain storage layout — changed** (a compatibility change ⇒ new version).
 The exported API matches v0, except the `MemberAuthority.Tree()` escape hatch is
