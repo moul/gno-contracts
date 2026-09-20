@@ -7,7 +7,7 @@
 Inserts four keys out of alphabetical order, then shows that the order survives
 an update and changes correctly after a delete-and-re-add.
 
-Demo of the [`p/moul/x/daily/orderedmap`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/orderedmap/v0)
+Demo of the [`p/moul/x/daily/orderedmap`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/orderedmap)
 library — no map logic lives here. Stateless, so `Render` is deterministic,
 which is exactly the property the library exists to provide.
 

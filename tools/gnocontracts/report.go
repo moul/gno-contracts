@@ -160,6 +160,13 @@ func cmdReport(root string, args []string) error {
 		}
 		b.WriteString("\n")
 	}
+	if lines := lockReport(root, *base); len(lines) > 0 {
+		b.WriteString("### Versions and `gnomod.lock`\n")
+		for _, l := range lines {
+			b.WriteString("- " + l + "\n")
+		}
+		b.WriteString("\n")
+	}
 	b.WriteString("_🤖 auto-generated; checks grow over time._\n")
 
 	fmt.Print(b.String())
@@ -238,4 +245,9 @@ func gitOut(root string, args ...string) string {
 		return ""
 	}
 	return string(out)
+}
+
+// gitOK runs a git command for its exit status only.
+func gitOK(root string, args ...string) bool {
+	return exec.Command("git", append([]string{"-C", root}, args...)...).Run() == nil
 }

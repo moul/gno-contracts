@@ -7,7 +7,7 @@
 Sieves the primes under 100 into a bit set and shows the set algebra on two
 small sets, rendered as a table.
 
-Demo of the [`p/moul/x/daily/bitset`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/bitset/v0)
+Demo of the [`p/moul/x/daily/bitset`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/bitset)
 library — storage, popcount and every set operation come from the package; this
 realm does no bit-twiddling of its own. Stateless and read-only, so `Render` is
 fully deterministic.

@@ -7,7 +7,7 @@
 Put a number in the path and the realm tells you whether its Luhn check digit is
 right — and if not, what it should have been.
 
-Demo of the [`p/moul/x/daily/luhn`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/luhn/v0)
+Demo of the [`p/moul/x/daily/luhn`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/luhn)
 library — validation, the check digit and the separator handling all come from
 the package; this realm holds no checksum logic of its own. Read-only and
 stateless, so `Render` is fully deterministic.

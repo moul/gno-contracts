@@ -12,7 +12,7 @@ completely.
 /r/moul/x/daily/crc32demo/v0:abc    → checksum your own text
 ```
 
-Demo of the [`p/moul/x/daily/crc32`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/crc32/v0)
+Demo of the [`p/moul/x/daily/crc32`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/crc32)
 library — no checksum logic lives here. Stateless, so `Render` is deterministic.
 
 The table includes `123456789` → `cbf43926`, the standard CRC-32 check value,

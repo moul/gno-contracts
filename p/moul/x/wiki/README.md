@@ -8,7 +8,7 @@ Pure: no realm globals, no chain imports. Every mutating call takes the author
 address, the wall clock and the block height from its caller, so the engine is
 unit-testable off-chain and the realm keeps all the authority.
 
-Live demo: [`gno.land/r/moul/x/wiki/v0`](../../../../../r/moul/x/wiki/v0).
+Live demo: [`gno.land/r/moul/x/wiki/v0`](../../../../../r/moul/x/wiki).
 
 ## The storage model
 

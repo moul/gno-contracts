@@ -7,7 +7,7 @@
 A gnoweb autocomplete box: type a prefix in the URL and the realm lists every
 dictionary word that completes it, in lexicographic order.
 
-Demo of the [`p/moul/x/daily/trie`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/trie/v0)
+Demo of the [`p/moul/x/daily/trie`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/trie)
 library — the tree, the ordering and the result cap all come from the package;
 this realm holds no trie logic of its own. The dictionary is a fixed 55-word
 list of gno/Go vocabulary, so the realm has no mutable state and `Render` is

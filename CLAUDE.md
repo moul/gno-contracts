@@ -5,7 +5,9 @@ Read it before doing anything. The essentials:
 
 - **Version everything, starting at `v0`; bump only on a compatibility change.**
   Contracts live at `gno.land/{p,r}/moul/<name>/vN`, **version always last**
-  (`p/moul/ulist/lplist/v0`, never `p/moul/ulist/v0/lplist`). New contracts start
+  (`gno.land/p/moul/ulist/lplist/v0`, never `.../ulist/v0/lplist`), in the
+  PACKAGE path; the directory is `p/moul/ulist/lplist` and carries no version.
+  New contracts start
   at `v0` — gno's "initial, unaudited". A **breaking change** — removing/renaming
   an exported symbol, changing its signature/behavior, or a storage/data-structure
   swap (e.g. `avl`→`bptree`) ⇒ **bump**. **Non-breaking** work (new

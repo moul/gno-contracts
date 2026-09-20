@@ -2,7 +2,7 @@
 
 A set of blockchain addresses, **backed by a B+ tree** (`gno.land/p/nt/bptree`).
 
-The B+ tree successor to [`p/moul/addrset/v0`](https://github.com/moul/gno-contracts/tree/main/p/moul/addrset/v0)
+The B+ tree successor to [`p/moul/addrset/v0`](https://github.com/moul/gno-contracts/tree/3d07a5b2cc02d7c3769caff0c17d884ac033bcfe/p/moul/addrset/v0)
 (AVL-backed). **v1 because the backing data structure — and thus the on-chain
 storage layout — changed** (a compatibility change ⇒ new version). A B+ tree
 packs many entries per persisted node, so a stored address costs ~0.9 KB vs the

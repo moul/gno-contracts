@@ -7,7 +7,7 @@
 Shows a small build graph resolved into a safe install order — and a
 deliberately broken one, to show how a cycle is reported.
 
-Demo of the [`p/moul/x/daily/toposort`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/toposort/v0)
+Demo of the [`p/moul/x/daily/toposort`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/toposort)
 library — the graph, the ordering and the cycle detection all come from the
 package; this realm holds no logic of its own. Stateless and read-only, so
 `Render` is fully deterministic.

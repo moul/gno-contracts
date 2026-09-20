@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/romannumdemo/v0`
 
-Interactive gnoweb **demo of the [`p/moul/x/daily/romannum`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/romannum/v0)
+Interactive gnoweb **demo of the [`p/moul/x/daily/romannum`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/romannum)
 Roman-numeral library** — it renders a table of worked examples and interactive
 integer→Roman and Roman→integer conversions. It has no conversion logic of its own.
 

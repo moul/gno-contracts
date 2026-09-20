@@ -12,7 +12,7 @@ clusters are visible.
 /r/moul/x/daily/soundexdemo/v0:Ashcroft   → one name's key
 ```
 
-Demo of the [`p/moul/x/daily/soundex`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/soundex/v0)
+Demo of the [`p/moul/x/daily/soundex`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/soundex)
 library — no phonetic logic lives here. Stateless, so `Render` is deterministic:
 names are grouped in **first-seen order**, never by iterating a map.
 

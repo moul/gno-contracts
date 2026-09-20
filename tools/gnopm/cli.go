@@ -113,8 +113,18 @@ re-reads every pinned version out of git history and re-hashes it, so a
 rewritten or garbage-collected commit is caught rather than discovered
 much later by somebody whose build stopped working.
 
-Needs full git history. A shallow clone has none of the pinned commits.`,
-			run: func(e *env, fs *flag.FlagSet, args []string) error { return verify(e) },
+Needs full git history. A shallow clone has none of the pinned commits.
+
+  -upstream <ref>  additionally require every pinned commit to be reachable
+                   from <ref>. A pin to a commit that exists only on this
+                   branch dies when the branch is squash-merged, so CI runs
+                   this with -upstream origin/main.`,
+			flags: func(fs *flag.FlagSet) {
+				fs.String("upstream", "", "also require every pin to be reachable from this ref (for CI on a pull request)")
+			},
+			run: func(e *env, fs *flag.FlagSet, args []string) error {
+				return verifyWith(e, fs.Lookup("upstream").Value.String())
+			},
 		},
 		{
 			name:  "deversion",

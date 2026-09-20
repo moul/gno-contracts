@@ -902,3 +902,66 @@ func TestRemoveEmptyTreeSparesStrayFiles(t *testing.T) {
 		t.Error("an entirely empty tree was not removed")
 	}
 }
+
+// TestVerifyUpstreamCatchesAStrandedPin.
+//
+// Bumping a package you already edited on the branch pins the outgoing version
+// to a branch commit, because that is the only place its content exists. That
+// is correct locally and fatal at merge time: a squash discards the commit and
+// the version becomes unrecoverable. CI passes -upstream so the author finds
+// out while it is still cheap to fix.
+func TestVerifyUpstreamCatchesAStrandedPin(t *testing.T) {
+	root := newRepo(t)
+	addPkg(t, root, "p/moul/md", "gno.land/p/moul/md/v0", "package md\n\nfunc A() {}\n")
+	commit(t, root, "seed")
+	mustRun(t, root, "sync")
+	commit(t, root, "lock")
+	gitCmd(t, root, "branch", "-f", "upstream", "HEAD")
+
+	// The mistake: edit the published version, then bump it.
+	gitCmd(t, root, "checkout", "-q", "-b", "feature")
+	write(t, filepath.Join(root, "p/moul/md/md.gno"), "package md\n\nfunc A() {}\nfunc B() {}\n")
+	commit(t, root, "edit md on the branch")
+	if err := bump(testEnv(root, &bytes.Buffer{}), "md", 0, false); err != nil {
+		t.Fatal(err)
+	}
+	commit(t, root, "bump")
+
+	// Plain verify is happy: the pin resolves right now.
+	if err := verify(testEnv(root, &bytes.Buffer{})); err != nil {
+		t.Fatalf("plain verify should pass, the pin resolves today: %v", err)
+	}
+	// With -upstream it is caught, and the message says what to do instead.
+	err := verifyWith(testEnv(root, &bytes.Buffer{}), "upstream")
+	if err == nil {
+		t.Fatal("verify -upstream passed on a pin that will not survive the merge")
+	}
+	for _, want := range []string{"not on upstream", "gno.land/p/moul/md/v0", "bump BEFORE editing"} {
+		if !strings.Contains(err.Error(), want) {
+			t.Errorf("error does not mention %q: %v", want, err)
+		}
+	}
+}
+
+// TestVerifyUpstreamPassesForTheDocumentedFlow: bump first, then edit. The
+// outgoing version is pinned to a commit that is already upstream, so nothing
+// is stranded.
+func TestVerifyUpstreamPassesForTheDocumentedFlow(t *testing.T) {
+	root := newRepo(t)
+	addPkg(t, root, "p/moul/md", "gno.land/p/moul/md/v0", "package md\n\nfunc A() {}\n")
+	commit(t, root, "seed")
+	mustRun(t, root, "sync")
+	commit(t, root, "lock")
+	gitCmd(t, root, "branch", "-f", "upstream", "HEAD")
+
+	gitCmd(t, root, "checkout", "-q", "-b", "feature")
+	if err := bump(testEnv(root, &bytes.Buffer{}), "md", 0, false); err != nil {
+		t.Fatal(err)
+	}
+	write(t, filepath.Join(root, "p/moul/md/md.gno"), "package md\n\nfunc A() {}\nfunc B() {}\n")
+	commit(t, root, "bump md to v1, then edit")
+
+	if err := verifyWith(testEnv(root, &bytes.Buffer{}), "upstream"); err != nil {
+		t.Fatalf("the documented flow must pass the upstream check: %v", err)
+	}
+}

@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/piglatindemo/v0`
 
-Interactive gnoweb **demo of the [`p/moul/x/daily/piglatin`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/piglatin/v0)
+Interactive gnoweb **demo of the [`p/moul/x/daily/piglatin`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/piglatin)
 Pig Latin library** — it renders the rules, a gallery of worked examples, and a
 live sentence translator. It has no translation logic of its own.
 

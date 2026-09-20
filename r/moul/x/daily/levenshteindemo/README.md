@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/levenshteindemo/v0`
 
-Interactive gnoweb **demo of the [`p/moul/x/daily/levenshtein`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/levenshtein/v0)
+Interactive gnoweb **demo of the [`p/moul/x/daily/levenshtein`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/levenshtein)
 edit-distance library** — it renders an explanation, worked examples, and a
 distance calculator with the full dynamic-programming table. It has no distance
 logic of its own.

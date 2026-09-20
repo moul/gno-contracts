@@ -46,8 +46,19 @@ jobs:
       # what keeps the version it replaced resolvable for everything that
       # still imports it. This proves the lock still describes the tree and
       # that every pinned version still reproduces byte-for-byte from history.
+      # On a pull request, also require every pinned commit to be reachable
+      # from the base branch. A pin to a commit that exists only on the PR's
+      # own branch is fine until the branch is squash-merged, at which point
+      # the commit is unreachable and the version it held stops resolving for
+      # good. Catching it here is cheap; catching it after the merge is not.
       - name: Verify gnomod.lock
-        run: go tool gnopm verify
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch --quiet origin "${{ github.base_ref }}"
+            go tool gnopm verify -upstream "origin/${{ github.base_ref }}"
+          else
+            go tool gnopm verify
+          fi
 
       # Materialize the versions that no longer have a directory, so lint and
       # test can build them and so packages importing them resolve.

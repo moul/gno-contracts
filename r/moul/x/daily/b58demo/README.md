@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/b58demo/v0`
 
-Interactive gnoweb **demo of the [`p/moul/x/daily/b58`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/b58/v0)
+Interactive gnoweb **demo of the [`p/moul/x/daily/b58`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/b58)
 Base58 library** — it renders the alphabet, a gallery of worked examples, and a
 hex → Base58 round-tripper. It has no codec logic of its own.
 

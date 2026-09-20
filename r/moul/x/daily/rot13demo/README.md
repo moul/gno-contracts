@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/rot13demo/v0`
 
-Interactive gnoweb **demo of the [`p/moul/x/daily/rot13`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/rot13/v0)
+Interactive gnoweb **demo of the [`p/moul/x/daily/rot13`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/rot13)
 ROT13 / Caesar library** — it renders an explanation, a worked ROT13 example,
 and path-driven ROT13 and Caesar transforms. It has no cipher logic of its own.
 

@@ -11,7 +11,7 @@ Encodes a few samples, round-trips them, and reports the size ratio.
 /r/moul/x/daily/rledemo/v0:aaabbc   → encode your own text
 ```
 
-Demo of the [`p/moul/x/daily/rle`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/rle/v0)
+Demo of the [`p/moul/x/daily/rle`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/rle)
 library — no codec logic lives here. Stateless, so `Render` is deterministic.
 
 The samples are chosen to show **both** outcomes: `aaaaaaaaaabbbbbbbbbb`

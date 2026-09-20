@@ -7,7 +7,7 @@
 Pushes six entries into a buffer of capacity four and renders, step by step,
 what survived and what each overflowing push evicted.
 
-Demo of the [`p/moul/x/daily/ringbuffer`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/ringbuffer/v0)
+Demo of the [`p/moul/x/daily/ringbuffer`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/ringbuffer)
 library — this realm holds no buffer logic of its own. Stateless, so `Render`
 is fully deterministic.
 

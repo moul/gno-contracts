@@ -11,7 +11,9 @@ before making changes.
    change.** Every contract path ends in an explicit version segment —
    `gno.land/{p,r}/moul/<name>/v0` (then `v1`, `v2`, …). There is *no*
    un-versioned contract, ever, and **the version is always the LAST path
-   element**: `p/moul/ulist/lplist/v0`, never `p/moul/ulist/v0/lplist`.
+   element**: `gno.land/p/moul/ulist/lplist/v0`, never
+   `gno.land/p/moul/ulist/v0/lplist`. That is the PACKAGE path; the directory
+   is `p/moul/ulist/lplist` and carries no version at all.
    - **`v0` is the first version of any path**, per gno's own convention
      (gnolang/gno#5220): *initial, unaudited*. New contracts start there.
    - **The version lives in `gnomod.toml`, not in the directory name.**
@@ -374,7 +376,7 @@ two-or-more blank lines in a row (a lot of markdown `Render`s) will never match.
 When that happens, don't use an example — assert the output in a normal `Test`
 with `uassert.Equal(t, expected, got)` using a raw-string literal (backticks),
 which preserves blank lines exactly, stays in-package, and needs no `fmt`. Worked
-example: `p/moul/mdlist/v0` `TestEntriesRendering`.
+example: `p/moul/mdlist` `TestEntriesRendering`.
 
 Order of preference: **example test** → **`Test` + `uassert.Equal`** (blank-line
 or panic/error outputs) → **filetest** (`filetests/*_filetest.gno`, auto-populated

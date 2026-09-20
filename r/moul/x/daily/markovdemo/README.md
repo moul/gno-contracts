@@ -1,6 +1,6 @@
 # `gno.land/r/moul/x/daily/markovdemo/v0`
 
-Live demo of the [`p/moul/x/daily/markov`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/markov/v0)
+Live demo of the [`p/moul/x/daily/markov`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/markov)
 Markov-chain text generator.
 
 Holds one package-level `markov.Chain` as the on-chain corpus and wires it to the
