@@ -14,15 +14,29 @@ before making changes.
    element**: `p/moul/ulist/lplist/v0`, never `p/moul/ulist/v0/lplist`.
    - **`v0` is the first version of any path**, per gno's own convention
      (gnolang/gno#5220): *initial, unaudited*. New contracts start there.
-   - **Bump to a new `vN` directory** for a **compatibility / breaking change**:
-     removing, renaming, or changing the signature or on-chain behavior of an
-     existing exported symbol, or changing storage layout / the backing data
-     structure (e.g. swapping `avl` → `bptree`). Never make such a change in
-     place on a published version.
-   - **Edit in place (same `vN`)** for everything **non-breaking**: adding new
+   - **The version lives in `gnomod.toml`, not in the directory name.**
+     `p/moul/md/` declaring `module = "gno.land/p/moul/md/v1"` publishes to
+     `gno.land/p/moul/md/v1`. The gno toolchain resolves a workspace import
+     from the module line and ignores the directory path.
+   - **Bump** with `gnopm bump <name>` for a **compatibility /
+     breaking change**: removing, renaming, or changing the signature or
+     on-chain behavior of an existing exported symbol, or changing storage
+     layout / the backing data structure (e.g. swapping `avl` → `bptree`).
+     Never make such a change in place on a published version, and **never
+     create a `vN` directory or copy a package to bump it**: the copy is
+     invisible to git, so the review diff of the change that most needs
+     reviewing is a pile of added files with no content diff.
+     `bump` rewrites the one line and pins the outgoing version in
+     `gnomod.lock`; you then edit the files in place and git diffs them.
+   - **Edit in place** for everything **non-breaking**: adding new
      exported functions, unit tests, comments, README/docs. (Test files and
      READMEs are not part of the deployed package, so they never change its
      on-chain hash; adding a function is backward-compatible.)
+   - **A superseded version has no directory.** It is pinned in `gnomod.lock`
+     to the commit that still holds it, rebuilt into the gitignored `.gnopm/`
+     by `gnopm sync` (which `make lint`/`make test` do for you), and it is
+     still linted, tested and listed in the catalog. Anything importing
+     `.../md/v0` keeps resolving. See [`tools/gnopm`](./tools/gnopm).
    - **Mirrored `v0`s are frozen.** For the twelve packages that also live in
      `gnolang/gno` examples (see *Drift & monorepo relationship*), every `.gno`
      file and the `gnomod.toml` are a **byte-for-byte copy** of the monorepo's
@@ -46,14 +60,19 @@ before making changes.
 ## Repository map
 
 ```
-p/moul/<name>/vN/       pure package   → gno.land/p/moul/<name>/vN
-r/moul/<name>/vN/       realm          → gno.land/r/moul/<name>/vN
+p/moul/<name>/          pure package   → gno.land/p/moul/<name>/vN
+r/moul/<name>/          realm          → gno.land/r/moul/<name>/vN
+                        (vN comes from gnomod.toml, not from the path)
 vendor/gno.land/...     vendored external deps (committed)
 tools/gnocontracts/     Go maintenance CLI, run via `go tool gnocontracts` (see below)
+tools/gnopm/            versions, gnomod.lock and the .gnopm/ assembly
+tools/internal/gnomod/  the gnomod.lock format, shared by both tools
 contracts.json          catalog: source of truth for the README table + publish
+gnomod.lock             where each version's source is (SOURCE, a PR carries it)
 gnowork.toml            empty workspace marker (enables local resolution)
+.gnopm/                 superseded versions, rebuilt from history (gitignored)
 Makefile                task entrypoints
-.github/workflows/ci.yml  builds gno master, then test/lint/check
+.github/workflows/ci.yml  builds gno master, verifies the lock, then test/lint/check
 ```
 
 ## Toolchain & environment
@@ -176,7 +195,8 @@ can't work, the `no-generated-files` guard rejects PRs that touch it.
 
 ## Adding a contract
 
-1. Create `p/moul/<name>/v0/` or `r/moul/<name>/v0/` with a `gnomod.toml`:
+1. Create `p/moul/<name>/` or `r/moul/<name>/` (**no `/v0` in the directory**)
+   with a `gnomod.toml`:
    ```toml
    module = "gno.land/{p|r}/moul/<name>/v0"
    gno = "0.9"
@@ -185,12 +205,35 @@ can't work, the `no-generated-files` guard rejects PRs that touch it.
    `v1` are successors to a `v0` the monorepo owns.
 2. Add sources + tests. Prefer table-driven tests; realms should have a `Render`.
 3. If it imports an external `gno.land/*` package, run `make deps` to vendor it.
-4. `make lint test` until green.
-5. **Commit only the new source files** (the contract directory). Do **not** run
-   `make gen` and do **not** stage `contracts.json`, `README.md`, or `_assets/` —
-   the `regen` workflow generates those on `main` after merge. (You can run
-   `make gen` locally to preview the catalog, but revert it before committing.)
+4. `gnopm sync` to add it to `gnomod.lock`, then `make lint test` until green.
+5. **Commit the new source files** (the contract directory) **and
+   `gnomod.lock`**. The lock is source, not a generated artifact: CI checks it
+   with `make verify`. Do **not** run `make gen` and do **not** stage
+   `contracts.json`, `README.md`, or `_assets/` — the `regen` workflow
+   generates those on `main` after merge. (You can run `make gen` locally to
+   preview the catalog, but revert it before committing.)
 6. Commit + open the PR.
+
+## Bumping a contract
+
+```
+gnopm bump <name>      # rewrites the module line, pins the old version
+# ...edit the files in place...
+make lint test
+```
+
+`<name>` is a directory, a module path, or any unambiguous part of one, so
+`p/moul/md`, `gno.land/p/moul/md/v0` and `md` all work. `gnopm status` says
+where things stand, `gnopm sync` fixes whatever is out of date.
+
+Commit the source edit **and** `gnomod.lock` together. The directory never
+moves and nothing is copied, so the diff is the compatibility change itself.
+
+`bump` refuses to run when the package has uncommitted changes: it records the
+commit that still holds the outgoing version, and a dirty directory would make
+that record a lie. It also pins to a commit already on `origin/main` where it
+can, because this repository squash-merges and a pin to a feature branch's HEAD
+would dangle the moment the PR lands.
 
 ### Libraries vs. demos — split reusable logic into `p/` + `r/`
 

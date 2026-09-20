@@ -15,9 +15,12 @@ publish everything.
 ## Features
 
 - **Mandatory versioning** — every contract is `.../<name>/vN`; breaking changes
-  ship as a new `vN`, never an in-place edit. Originals that no longer build on
-  master are kept as `ignore = true` (archived, 💤, skipped by CI) beside a ported
-  `vN+1`.
+  ship as a new `vN`, never an in-place edit. The version lives in the package's
+  `gnomod.toml`, **not** in its directory name, so a bump is a one-line change
+  plus the real content diff instead of a directory copy git cannot pair. The
+  version it replaces is pinned in [`gnomod.lock`](./gnomod.lock) and rebuilt
+  from history on demand (see [`gnopm`](./tools/gnopm)). Originals that no longer
+  build on master are kept as `ignore = true` (archived, 💤, skipped by CI).
 - **Autonomous builds** — external `gno.land/*` deps are vendored; only the gno
   stdlibs come from the toolchain. One clone builds offline, independent of
   monorepo drift.
@@ -49,28 +52,52 @@ without checking out the branch. The preview is removed when the PR closes.
 ## Layout
 
 ```
-p/moul/<name>/v0/         pure packages          → gno.land/p/moul/<name>/v0
-r/moul/<name>/v0/         realms                 → gno.land/r/moul/<name>/v0
+p/moul/<name>/            pure packages          → gno.land/p/moul/<name>/vN
+r/moul/<name>/            realms                 → gno.land/r/moul/<name>/vN
 vendor/gno.land/...       vendored dependencies (committed, autonomous)
 tools/                    Go maintenance CLI (manifest, readme, vendor, sync, publish)
 contracts.json           the contract catalog (source of truth for the table below)
+gnomod.lock              where every version's source is (committed, hand-owned)
 gnowork.toml             gno workspace marker (enables local package resolution)
+.gnopm/                   superseded versions, rebuilt from history (gitignored)
 Makefile                 test / lint / deps / gen / sync / publish
 ```
 
+The directory does **not** carry the version; the `module` line in its
+`gnomod.toml` does. `p/moul/md/` declaring `module = "gno.land/p/moul/md/v1"`
+publishes to `gno.land/p/moul/md/v1`. The gno toolchain resolves a workspace
+import from that line and ignores the directory name entirely.
+
 ### Versioning (mandatory)
 
-**Every** contract lives under an explicit version segment, starting at **`v0`**
+**Every** contract has an explicit version segment in its **package path**,
+starting at **`v0`**
 — gno's own convention for *initial, unaudited* ([gnolang/gno#5220](https://github.com/gnolang/gno/issues/5220))
 — then `/v1`, `/v2`, … There is no un-versioned contract, and **the version is
-always the LAST path element**: `p/moul/ulist/lplist/v0`, never
-`p/moul/ulist/v0/lplist`.
+always the LAST path element**: `gno.land/p/moul/ulist/lplist/v0`, never
+`gno.land/p/moul/ulist/v0/lplist`.
 
-A breaking change ships as a new `vN` directory and the old version keeps working
-for existing callers. Non-breaking work — new functions, tests, comments, docs —
-edits the same `vN` in place. This is adopted from the very first commit so
-callers can always pin, and so drift from the (un-versioned) monorepo copies can
-be tracked and bumped deliberately.
+That version is declared in the package's `gnomod.toml`, not in its directory
+name:
+
+```
+p/moul/md/gnomod.toml     module = "gno.land/p/moul/md/v1"
+p/moul/md/md.gno          edited in place, git diffs it properly
+```
+
+A breaking change is a **bump**, `gnopm bump md`: one line in
+`gnomod.toml`, and then the real edit. The version it replaces keeps working for
+existing callers, pinned in [`gnomod.lock`](./gnomod.lock) to the commit that
+still holds it and rebuilt into `.gnopm/` on demand, so anything still importing
+`.../md/v0` resolves, lints and tests exactly as before. Non-breaking work — new
+functions, tests, comments, docs — edits the current version in place.
+
+This used to be a directory copy: `p/moul/md/v0` to `p/moul/md/v1`, files and
+all. git pairs nothing across a copy, so the review diff of a version bump was a
+pile of added files with no content diff at all: precisely backwards, since a
+bump is by definition the change that most needs reviewing. One port of 25
+realms landed as +11,103 / −0 across 112 files. See
+[`tools/gnopm`](./tools/gnopm) for the format and the reasoning.
 
 ### Autonomy (vendored dependencies)
 
