@@ -287,7 +287,7 @@ source = { dir = "p/moul/x/daily/trie" }
 
 [[module]]
 module = "gno.land/p/moul/x/wesh/v0"
-source = { dir = "p/moul/x/wesh/v0" }
+source = { dir = "p/moul/x/wesh" }
 
 [[module]]
 module = "gno.land/p/moul/x/wiki/v0"
@@ -783,7 +783,7 @@ source = { dir = "r/moul/x/daily/wrapped" }
 
 [[module]]
 module = "gno.land/r/moul/x/wesh/v0"
-source = { dir = "r/moul/x/wesh/v0" }
+source = { dir = "r/moul/x/wesh" }
 
 [[module]]
 module = "gno.land/r/moul/x/wiki/v0"
