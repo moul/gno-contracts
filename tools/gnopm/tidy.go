@@ -9,7 +9,36 @@ import (
 	"strings"
 )
 
-var importRe = regexp.MustCompile(`"(gno\.land/[^"]+)"`)
+// importsOf returns the gno.land paths a file actually imports.
+//
+// Parsed from the import declarations, not matched anywhere in the file. A
+// naive search for quoted gno.land strings also catches things like
+// chain.PackageAddress("gno.land/r/moul/x/amm/v0"), a realm naming itself,
+// which made tidy believe every package imported itself and therefore that
+// nothing was ever droppable.
+func importsOf(src []byte) []string {
+	var out []string
+	s := string(src)
+	for _, m := range importBlockRe.FindAllStringSubmatch(s, -1) {
+		for _, q := range quotedRe.FindAllStringSubmatch(m[1], -1) {
+			if strings.HasPrefix(q[1], "gno.land/") {
+				out = append(out, q[1])
+			}
+		}
+	}
+	for _, m := range importLineRe.FindAllStringSubmatch(s, -1) {
+		if strings.HasPrefix(m[1], "gno.land/") {
+			out = append(out, m[1])
+		}
+	}
+	return out
+}
+
+var (
+	importBlockRe = regexp.MustCompile(`(?s)\bimport\s*\((.*?)\)`)
+	importLineRe  = regexp.MustCompile(`(?m)^\s*import\s+(?:[\w.]+\s+)?"([^"]+)"`)
+	quotedRe      = regexp.MustCompile(`"([^"]+)"`)
+)
 
 // workspaceImports returns every gno.land path imported by anything gnopm can
 // see: the working tree and the materialized assembly both count, because a
@@ -35,8 +64,15 @@ func workspaceImports(root string) (map[string]bool, error) {
 			if err != nil {
 				return err
 			}
-			for _, m := range importRe.FindAllSubmatch(b, -1) {
-				out[string(m[1])] = true
+			self := ""
+			if mod, _, err := readGnomod(filepath.Join(filepath.Dir(p), "gnomod.toml")); err == nil {
+				self = mod
+			}
+			for _, imp := range importsOf(b) {
+				if imp == self {
+					continue // a package naming itself is not a dependency
+				}
+				out[imp] = true
 			}
 			return nil
 		})
