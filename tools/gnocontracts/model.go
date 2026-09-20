@@ -96,7 +96,7 @@ type Pub struct {
 // defaultNetworks is the AUTHORITATIVE set of chains we track upload status
 // against; `manifest` reconciles contracts.json against it on every run (see
 // cmdManifest). Editing contracts.json by hand does not work — it is generated
-// on main and the `no-generated-files` guard rejects PRs that touch it — so
+// on main and the `guard-generated` CI step rejects PRs that touch it — so
 // adding or retiring a network means editing this list.
 //
 // Retiring a network only drops its README column and stops it being probed;

@@ -1,0 +1,93 @@
+name: main
+
+# The single writer of everything generated on `main`.
+#
+# This used to be two workflows, `regen` and `publish-status`, both triggered by
+# every push to main and both committing the same two files (contracts.json,
+# README.md). Each carried a retry loop whose comment explained that it existed
+# because the other one raced it. One workflow, one concurrency group, one
+# commit: the race is gone by construction rather than retried around.
+#
+# What it regenerates:
+#   contracts.json        the catalog (adds/removes contracts, marks ignored)
+#   README.md             the contracts table, including on-chain status columns
+#   per-package READMEs    repo link, disclaimer, embedded deps graph
+#   _assets/**            per-package and global dependency graphs
+#
+# Idempotent: a run that changes nothing commits nothing. Commits pushed here
+# use GITHUB_TOKEN, which by design does not re-trigger workflows, and carry
+# [skip ci] as well.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 * * * *" # hourly self-heal, and the on-chain status refresh
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: main
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0 # gnopm materializes pinned versions out of history
+
+      # gnokey for the on-chain status probes; GNOROOT/examples so `gen` can
+      # resolve each contract's monorepo counterpart (the README's `src` column
+      # and its drift markers). Without it those fields can only be inherited
+      # from the previous run, which silently strands stale values.
+      - uses: ./.github/actions/setup-gno
+        with:
+          binaries: gno gnokey
+
+      - name: Install graphviz
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq graphviz
+
+      # Regenerate on the LATEST main each attempt, then push. Never rebase:
+      # the generated files conflict with themselves, and a conflicted rebase
+      # fails the push silently. On a rejected push, reset to fresh main and
+      # regenerate — the output is a function of the tree and the chain, so
+      # replaying is always safe.
+      - name: Regenerate and push
+        run: |
+          set -euo pipefail
+          git config user.name "Manfred Touron"
+          git config user.email "94029+moul@users.noreply.github.com"
+          for attempt in 1 2 3 4 5; do
+            git fetch --quiet origin main
+            git reset --quiet --hard origin/main
+
+            # Versions that no longer have a directory are pinned in
+            # gnomod.lock; `gen` reads their deps out of the materialized copy.
+            go tool gnopm sync
+            make gen
+            make graph
+            # Best effort, and deliberately last: it refreshes the README table
+            # with what is actually on chain. A chain being unreachable must not
+            # cost the catalog regeneration (and no longer rewrites every
+            # package as unpublished — see tools/gnocontracts/status.go).
+            make status || echo "::warning::on-chain status refresh failed; catalog still regenerated"
+
+            git add -A
+            if git diff --cached --quiet; then
+              echo "nothing to regenerate"
+              exit 0
+            fi
+            git commit -q -m "chore: regenerate catalog, graphs and on-chain status [skip ci]"
+            if git push -q origin HEAD:main; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "push rejected (main moved); regenerating on latest — attempt $attempt"
+            sleep $((RANDOM % 5 + 2))
+          done
+          echo "::error::could not push after 5 attempts"
+          exit 1

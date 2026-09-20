@@ -1,0 +1,137 @@
+name: pr
+
+# Everything the bot does to a pull request, in one workflow and ONE comment.
+#
+# This replaces three workflows (pr-report, pr-label, pr-preview) that each
+# checked out the repo, each answered a version of "which packages does this
+# diff touch" in its own shell, and two of which posted their own sticky
+# comment. `gnocontracts pr` answers it once, in Go, and the comment it renders
+# folds everything that is not a headline.
+#
+# Two jobs on purpose: `report` is seconds and owns the comment, `preview` is
+# minutes (it builds gnodev) and owns gh-pages. The preview URL is a per-pull-
+# request constant, so the comment can link it before the build exists — a new
+# push shows the previous render until the new one lands, and nobody waits on
+# CI to see something.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: write # the preview pushes to gh-pages
+  pull-requests: write # labels and the sticky comment
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # A fork PR gets a read-only token and no preview, so it gets no preview link
+  # either: a dead link is worse than none.
+  SAME_REPO: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+  PAGES_URL: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('https://{0}.github.io/{1}/pr-{2}/', github.repository_owner, github.event.repository.name, github.event.pull_request.number) || '' }}
+
+jobs:
+  report:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+      BASE: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the analysis is a diff against the base
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Analyze the pull request
+        run: |
+          git fetch --quiet origin "$BASE" --depth=100
+          go tool gnocontracts pr \
+            -base "origin/$BASE" \
+            -preview-url "$PAGES_URL" \
+            -out /tmp/pr-comment.md \
+            -labels-out /tmp/pr-labels.txt \
+            -selectors-out /tmp/pr-selectors.txt
+          echo "--- comment ---"; cat /tmp/pr-comment.md
+
+      # The tool emits the whole reconciliation (add what applies, remove what
+      # no longer does) so the label set has one owner: tools/gnocontracts/pr.go.
+      - name: Reconcile path labels
+        if: env.SAME_REPO == 'true'
+        run: xargs -a /tmp/pr-labels.txt gh pr edit "$PR" -R "$REPO"
+
+      # One comment. Any extra bot comment is deleted, which is also how a pull
+      # request opened before this change converges: both legacy markers
+      # (gnocontracts-pr-report, gnocontracts-pr-preview) contain the substring
+      # matched here.
+      - name: Upsert the single sticky comment
+        if: env.SAME_REPO == 'true'
+        run: |
+          set -euo pipefail
+          ids=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                  --jq '.[] | select(.user.type == "Bot") | select(.body | contains("gnocontracts-pr")) | .id')
+          keep=$(echo "$ids" | head -1)
+          if [ -z "$keep" ]; then
+            gh api "repos/$REPO/issues/$PR/comments" -F body=@/tmp/pr-comment.md >/dev/null
+            echo "created the comment"
+            exit 0
+          fi
+          gh api -X PATCH "repos/$REPO/issues/comments/$keep" -F body=@/tmp/pr-comment.md >/dev/null
+          echo "updated comment $keep"
+          for id in $(echo "$ids" | tail -n +2); do
+            gh api -X DELETE "repos/$REPO/issues/comments/$id" >/dev/null
+            echo "deleted duplicate bot comment $id"
+          done
+
+  preview:
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Determine the realms this PR changed
+        id: realms
+        run: |
+          git fetch --quiet origin "${{ github.base_ref }}" --depth=100
+          go tool gnocontracts pr -base "origin/${{ github.base_ref }}" \
+            -out /dev/null -selectors-out /tmp/pr-selectors.txt
+          echo "selectors=$(tr '\n' ' ' < /tmp/pr-selectors.txt)" >> "$GITHUB_OUTPUT"
+          echo "changed realm selectors: $(cat /tmp/pr-selectors.txt)"
+
+      - uses: ./.github/actions/setup-gno
+        if: steps.realms.outputs.selectors != ''
+        with:
+          binaries: gnodev
+
+      - name: Render the preview
+        if: steps.realms.outputs.selectors != ''
+        run: go tool gnocontracts preview -out _preview ${{ steps.realms.outputs.selectors }}
+
+      - uses: ./.github/actions/gh-pages-sync
+        if: steps.realms.outputs.selectors != ''
+        with:
+          subdir: pr-${{ github.event.pull_request.number }}
+          source: _preview
+          message: "preview: PR #${{ github.event.pull_request.number }}"
+
+  cleanup:
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/gh-pages-sync
+        with:
+          subdir: pr-${{ github.event.pull_request.number }}
+          message: "preview: remove PR #${{ github.event.pull_request.number }}"

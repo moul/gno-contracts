@@ -54,10 +54,11 @@ before making changes.
 3. **The catalog is generated on `main`, not in PRs.** `contracts.json`, the
    README table, per-package README footers, and `_assets/` graphs are all
    produced by the tools. **A PR carries only package SOURCE** — never run
-   `make gen` or commit those generated files in a branch/PR. The `regen`
-   workflow regenerates and commits them on `main` after every merge, and the
-   `publish-status` workflow refreshes on-chain status; committing them in a PR
-   only creates conflicts. (CI does **not** run `make check`.)
+   `make gen` or commit those generated files in a branch/PR. The `main`
+   workflow regenerates them, refreshes on-chain status and commits the lot on
+   `main` after every merge (and hourly); committing them in a PR only creates
+   conflicts. (CI does **not** run `make check`, but it does reject a PR that
+   carries a generated file: `gnocontracts guard-generated`.)
 
 ## Repository map
 
@@ -74,7 +75,8 @@ gnomod.lock             where each version's source is (SOURCE, a PR carries it)
 gnowork.toml            empty workspace marker (enables local resolution)
 .gnopm/                 superseded versions, rebuilt from history (gitignored)
 Makefile                task entrypoints
-.github/workflows/ci.yml  builds gno master, verifies the lock, then test/lint/check
+.github/workflows/    ci (the gate), pr (one bot comment + preview), main (regen)
+.github/actions/      setup-gno, gh-pages-sync — shared by those workflows
 ```
 
 ## Toolchain & environment
@@ -136,7 +138,7 @@ make test      # gno test every contract
 make lint      # gno lint every contract
 make deps      # vendor external gno.land deps into vendor/
 make gen       # refresh contracts.json + README table  (bot runs this on main; local preview only)
-make check     # verify the catalog is not stale (used by the regen bot, NOT PR CI)
+make check     # verify the catalog is not stale (used by the main regen bot, NOT PR CI)
 make sync      # report drift vs the gnolang/gno monorepo
 make publish NET=sapphire CHECK=1   # dependency-ordered publish plan + on-chain status
 make publish NET=pearl CHECK=1      # …same, against the other testnet
@@ -192,8 +194,8 @@ the grant and the per-address window — the bare root has no index route and
 
 The network list is **code-owned**: edit `defaultNetworks()` in
 `tools/gnocontracts/model.go`. `manifest` reconciles `contracts.json` against
-it, so the change lands via the `regen` workflow — hand-editing the catalog
-can't work, the `no-generated-files` guard rejects PRs that touch it.
+it, so the change lands via the `main` workflow — hand-editing the catalog
+can't work, the `guard-generated` CI step rejects PRs that touch it.
 
 ## Adding a contract
 
@@ -211,8 +213,8 @@ can't work, the `no-generated-files` guard rejects PRs that touch it.
 5. **Commit the new source files** (the contract directory) **and
    `gnomod.lock`**. The lock is source, not a generated artifact: CI checks it
    with `make verify`. Do **not** run `make gen` and do **not** stage
-   `contracts.json`, `README.md`, or `_assets/` — the `regen` workflow
-   generates those on `main` after merge. (You can run `make gen` locally to
+   `contracts.json`, `README.md`, or `_assets/` — the `main` workflow
+   generates those after merge. (You can run `make gen` locally to
    preview the catalog, but revert it before committing.)
 6. Commit + open the PR.
 
@@ -281,6 +283,16 @@ driven by the Makefile. Subcommands:
   report drift / ours / new-here / monorepo-only.
 - `publish` — topologically order contracts by dependency; with `-net`/`-check`,
   query the chain (`gnokey query vm/qfile`) and record upload status.
+- `status` — refresh that status for every network at once. A chain that does
+  not answer is SKIPPED, not recorded as hosting nothing (see below).
+- `pr` — everything CI needs about a pull request, from one diff: the sticky
+  comment body, the `gh pr edit` label arguments, the realms to preview.
+- `preview` — boot gnodev on the selected realms and extract a self-contained
+  static gnoweb tree (`make preview ARGS="./r/moul/home"`, then serve
+  `_preview/`). What the `pr` workflow publishes to `gh-pages/pr-<N>/`.
+- `guard-examples`, `guard-render`, `guard-generated` — the CI guards. They read
+  `.gno` with `go/scanner`, so `// Output:` inside a string literal and an
+  identifier like `printRender` no longer fool them (both did, as regexps).
 
 ## Drift & monorepo relationship
 
@@ -337,7 +349,7 @@ func ExampleRender() {
 }
 ```
 
-This is **enforced by CI**: `make guard-render` (`tools/guard_render.py`) fails
+This is **enforced by CI**: `make guard-render` (`gnocontracts guard-render`) fails
 when an `r/` package declares `func Render` and no test ever calls it. Coverage
 counts from a normal `*_test.gno` **or** a `*_filetest.gno`, and the call may be
 bare (`Render(`) or qualified (`home.Render(`). `ignore = true` packages are
@@ -399,7 +411,7 @@ Each package/realm directory ships a standalone `README.md` that:
 A PR includes the **hand-authored top** of each new package's README (the
 explanation above the footer marker). The generated footer, the root README
 table, and the catalog are all produced on `main`: `make readmes` creates/
-refreshes footers and `make gen` runs it, invoked by the `regen` workflow after
+refreshes footers and `make gen` runs it, invoked by the `main` workflow after
 merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
 (the long form); the per-package minimal disclaimer links to it.
 
@@ -408,4 +420,41 @@ merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
 PR CI checks only **source**: `gno lint` + `gno test` pass for every contract,
 and committed `vendor/` matches `make deps`. It does **not** run `make check` —
 `contracts.json`, the README table, per-package footers and `_assets/` are
-regenerated and committed on `main` by the `regen` / `publish-status` workflows.
+regenerated and committed on `main` by the `main` workflow.
+
+### The four workflows
+
+| workflow | when | what it owns |
+|---|---|---|
+| `ci` | push to main, every PR | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make toolcheck guard-examples guard-render lint test` |
+| `pr` | every PR event | **one** sticky comment, the path labels, and the gh-pages preview at `pr-<N>/` |
+| `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, package README footers, `_assets/`, and on-chain status |
+| `gnopublish-ci` | PRs touching `tools/gnopublish/**` | that module only; it links the whole gno client stack and must not slow every PR |
+
+Two composite actions carry what they share: `.github/actions/setup-gno` (clone
+gno master outside the workspace, build the requested binaries, cached on the
+upstream SHA, Go version from `go.mod`) and `.github/actions/gh-pages-sync`
+(rewrite one `pr-<N>/` subfolder and push, retrying when a parallel PR moved the
+branch).
+
+**One bot comment per PR**, marker `<!-- gnocontracts-pr -->`, rendered by
+`gnocontracts pr`. It fits in three lines: counts, risk signals, preview link.
+Everything per-package is inside a `<details>`. When adding a check, add a
+*count* to the signal line or a *chip* to a table row, never a new bullet per
+package: that is what made the old comment 45 lines long.
+
+### On-chain status and unreachable chains
+
+`make status` (and `publish -check`) probe every network with
+`gnokey query vm/qfile`. A query to a chain that is **down** fails exactly like
+a query for a package that was **never published**, and conflating the two used
+to write "not uploaded" for all 193 packages of any network that happened to be
+unreachable. So:
+
+- each network is probed once with an HTTP `/status` call first, and a network
+  that does not answer is skipped, keeping its last known values;
+- a per-package query that fails for a transport reason leaves that entry alone;
+- only a clean "not found" answer records an absence.
+
+A skipped network keeps stale data rather than wrong data. The run says which
+ones it skipped, and the `main` workflow logs a warning instead of failing.
