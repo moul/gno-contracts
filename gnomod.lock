@@ -286,6 +286,14 @@ module = "gno.land/p/moul/x/daily/trie/v0"
 source = { dir = "p/moul/x/daily/trie" }
 
 [[module]]
+module = "gno.land/p/moul/x/framelab/v0"
+source = { dir = "p/moul/x/framelab/v0" }
+
+[[module]]
+module = "gno.land/p/moul/x/pair/v0"
+source = { dir = "p/moul/x/pair/v0" }
+
+[[module]]
 module = "gno.land/p/moul/x/wiki/v0"
 source = { dir = "p/moul/x/wiki" }
 
@@ -776,6 +784,26 @@ source = { dir = "r/moul/x/daily/wordle" }
 [[module]]
 module = "gno.land/r/moul/x/daily/wrapped/v0"
 source = { dir = "r/moul/x/daily/wrapped" }
+
+[[module]]
+module = "gno.land/r/moul/x/framelab/probe/v0"
+source = { dir = "r/moul/x/framelab/probe/v0" }
+
+[[module]]
+module = "gno.land/r/moul/x/pairreg/v0"
+source = { dir = "r/moul/x/pairreg/v0" }
+
+[[module]]
+module = "gno.land/r/moul/x/pairs/aaa/v0"
+source = { dir = "r/moul/x/pairs/aaa/v0" }
+
+[[module]]
+module = "gno.land/r/moul/x/pairs/aaabbb/v0"
+source = { dir = "r/moul/x/pairs/aaabbb/v0" }
+
+[[module]]
+module = "gno.land/r/moul/x/pairs/bbb/v0"
+source = { dir = "r/moul/x/pairs/bbb/v0" }
 
 [[module]]
 module = "gno.land/r/moul/x/wiki/v0"
