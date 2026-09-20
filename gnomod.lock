@@ -370,6 +370,10 @@ module = "gno.land/r/moul/sapin/v0"
 source = { dir = "r/moul/sapin" }
 
 [[module]]
+module = "gno.land/r/moul/x/amm/v0"
+source = { dir = "r/moul/x/amm/v0" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/asciiart/v0"
 source = { dir = "r/moul/x/daily/asciiart" }
 
