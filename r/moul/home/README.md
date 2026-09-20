@@ -18,7 +18,35 @@ path *is* the interface with gnoweb.
 Versioning moves inside instead: content lives in slots (below), and the code can
 be replaced in place because the package is `private`.
 
+This is also why `gnopm bump` refuses this package: it looks for a trailing
+`/vN` on the module line to increment and there is none. The module line stays
+bare, `gnopm status` and `gnopm verify` accept it, and only `bump` is off the
+table. A compatibility change here is a redeploy of the same path, not a new
+version.
+
+### What it replaces: `gno.land/r/moul/home/v0`
+
+This directory used to hold a different realm: a hand-maintained dashboard with
+a todo list, a status string and a meme URL, its state mutable only by the admin
+and its *shape* only by redeploying. It never reached any network
+(`contracts.json` had it `uploaded: false` everywhere), so nothing on chain is
+being replaced, only the source.
+
+That version is not deleted, it is **pinned to history** in `gnomod.lock` the way
+`AGENTS.md` prescribes for a superseded version:
+
+```toml
+[[module]]
+module = "gno.land/r/moul/home/v0"
+source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/home" }
+```
+
+So it keeps resolving for anything that imports it, `gnopm sync` materializes it
+under `.gnopm/`, and it is still linted and tested from there. Read the code at
+[`r/moul/home` @ 4f2df83][v0], the last commit where this directory held it.
+
 [handler]: https://github.com/gnolang/gno/blob/master/gno.land/pkg/gnoweb/handler_http.go
+[v0]: https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/home
 
 ## Slots
 
@@ -216,12 +244,12 @@ go run ./r/moul/home/cmd/gnohome tx -all | sh
 
 `gnokey maketx addpkg` uploads with `MPUserAll`, so every `.gno`, `.toml` and
 `.md` in the package directory travels, test files and this README included:
-**28,470 bytes** across six files. `cmd/` and `content/` are sub-directories and
+**29,797 bytes** across six files. `cmd/` and `content/` are sub-directories and
 are skipped.
 
 - **`-gas-wanted 60000000`.** Ten successful mainnet `add_package` transactions
   above h160000 cost **1,014 to 1,781 gas per uploaded byte** (median 1,393). At
-  the top of that range this package needs ~50.7M, so the 40M this file used to
+  the top of that range this package needs ~53.1M, so the 40M this file used to
   suggest was under the worst case. 60M is a ceiling, and a ceiling is not
   charged.
 - **`-gas-fee 600000ugnot`.** The fee requirement is the `gas_fee / gas_wanted`
@@ -233,7 +261,7 @@ are skipped.
   was worth fixing.
 - **`-max-deposit 10000000ugnot`.** Omitting it is not opting out: it falls back
   to `vm:p:default_deposit`, **100 GNOT of ceiling per message**. Storage locks
-  100ugnot per byte, so the source alone is 2.85 GNOT and realm state is extra.
+  100ugnot per byte, so the source alone is 2.98 GNOT and realm state is extra.
   10 GNOT is a deliberate ceiling with room. Unlike `gas_fee` this one is
   refundable, and only the measured byte delta is ever locked.
 

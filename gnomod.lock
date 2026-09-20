@@ -354,8 +354,13 @@ module = "gno.land/r/moul/hello/v0"
 source = { dir = "r/moul/hello" }
 
 [[module]]
-module = "gno.land/r/moul/home/v0"
+module = "gno.land/r/moul/home"
 source = { dir = "r/moul/home" }
+
+[[module]]
+module = "gno.land/r/moul/home/v0"
+source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/home" }
+hash = "h1:b/9gcLANRaR35M4PjRP0jBI9K8CGs2yRwmMEhU+rdQQ="
 
 [[module]]
 module = "gno.land/r/moul/outfmt/v0"
