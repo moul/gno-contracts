@@ -93,7 +93,7 @@ deps: ## vendor MISSING external gno.land deps into vendor/ (reads real GNOROOT/
 bump-deps: ## re-vendor ALL external deps from GNOROOT/examples (bump the pinned snapshot)
 	$(GNOCONTRACTS) vendor -refresh
 
-test: toolcheck guard-examples guard-render view .gnopm/.stamp ## gno test every contract (deps resolved from committed vendor/)
+test: toolcheck guard-examples guard-render guard-readmes view .gnopm/.stamp ## gno test every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS) $(OLD_PKG_DIRS); do echo "== test $$d =="; GNOROOT="$(VIEW)" $(GNO) test ./$$d; done
 
 # Prove the gno toolchain actually VALIDATES example tests. gno silently skips
@@ -133,6 +133,11 @@ guard-examples: ## fail if any Example* test lacks an // Output: block
 guard-render: ## fail if a realm declares Render but no test calls it
 	@python3 tools/guard_render.py
 
+# A placeholder README is worse than none: the package looks documented, so the
+# real text never gets written. A missing README is allowed; a bad one is not.
+guard-readmes: ## fail if a package ships a README that documents nothing
+	@python3 tools/guard_readmes.py $(if $(LIST),--list,)
+
 lint: view .gnopm/.stamp ## gno lint every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS) $(OLD_PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
 
@@ -152,7 +157,7 @@ manifest: ## refresh contracts.json from the contract trees
 readme: ## regenerate the README contracts table
 	$(GNOCONTRACTS) readme
 
-readmes: ## ensure every package has a README (repo link + disclaimer)
+readmes: ## refresh the generated footer of every package README
 	$(GNOCONTRACTS) readmes
 
 gen: manifest readme readmes ## manifest + README table + per-package READMEs

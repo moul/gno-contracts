@@ -382,26 +382,46 @@ Order of preference: **example test** → **`Test` + `uassert.Equal`** (blank-li
 or panic/error outputs) → **filetest** (`filetests/*_filetest.gno`, auto-populated
 by `-update-golden-tests`; last resort, e.g. a package `main`/entrypoint).
 
-## Every package MUST have a README
+## A package README must say something, or not exist
 
-Each package/realm directory ships a standalone `README.md` that:
+The rule is **not** "every package has a README". It is: **a README that exists
+must say something true and useful.** A placeholder is worse than nothing,
+because the package then looks documented and the real text never gets written.
+This repo shipped 28 READMEs whose entire content was
+`_TODO: describe this package._` plus boilerplate, and every one of them was a
+click that taught the reader nothing.
 
-1. **Explains the package** — what it is, what it does, minimal API/usage. This
-   is hand-authored, ABOVE the generated footer marker.
-2. **Links back to the repo** and **carries the disclaimer** — this lives in a
-   generated managed block (between the `<!-- BEGIN/END GNOCONTRACTS FOOTER -->`
-   markers). Do not hand-edit inside it; run `make readmes`.
-3. **Experimental (`/x/`) packages** get the stronger disclaimer automatically:
-   "Highly experimental — potentially vibe-coded", linking to
-   [`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
-   treated as experimental/AI-assisted and not for production use.
+So, in order of preference:
 
-A PR includes the **hand-authored top** of each new package's README (the
-explanation above the footer marker). The generated footer, the root README
-table, and the catalog are all produced on `main`: `make readmes` creates/
-refreshes footers and `make gen` runs it, invoked by the `regen` workflow after
-merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
-(the long form); the per-package minimal disclaimer links to it.
+1. **A good README.** What the package is, what it does, the minimal API, and
+   the thing a reader cannot get from the source: why it exists, what it is
+   *not* for, what is broken or unimplemented, which trap it avoids. If the
+   package is an unimplemented API sketch, say so in the first line.
+2. **A minimal accurate one.** One sentence that says what the package does is
+   a perfectly good README. Several here are exactly that.
+3. **No README at all.** Legal. `make guard-readmes LIST=1` lists these, which
+   is the honest state: undocumented, and visibly so.
+
+Never a placeholder. `make guard-readmes` (part of `make test` and of PR CI)
+fails on TODO / TBD / FIXME / WIP / "coming soon" in the hand-authored region,
+on a README that is nothing but its title plus the footer, and on a body under
+20 characters.
+
+Everything hand-authored goes **above** the generated footer marker. The footer
+(`<!-- BEGIN/END GNOCONTRACTS FOOTER -->`) carries the repo link, the dependency
+graph, the provenance line and the disclaimer; do not hand-edit inside it, run
+`make readmes`. **Experimental (`/x/`) packages** get the stronger disclaimer
+automatically: "Highly experimental — potentially vibe-coded", linking to
+[`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
+treated as experimental/AI-assisted and not for production use.
+
+A PR includes the **hand-authored top** of each new package's README. The
+generated footer, the root README table, and the catalog are all produced on
+`main`: `make readmes` refreshes footers and `make gen` runs it, invoked by the
+`regen` workflow after merge, not in a PR. `make readmes` will **not** create a
+README for a package that has no description in the catalog; write one by hand
+instead. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md) (the long
+form); the per-package minimal disclaimer links to it.
 
 ## CI invariants (must stay green)
 
