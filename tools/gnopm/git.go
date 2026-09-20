@@ -81,16 +81,60 @@ func gitTrackedIn(root, dir string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return relativizeZ(s, dir), nil
+	return ownFiles(relativizeZ(s, dir)), nil
 }
 
-// gitFilesAtCommit lists the files under dir as of commit, relative to dir.
+// gitFilesAtCommit lists the files that belong to the package at dir as of
+// commit, relative to dir.
+//
+// "Belong to" excludes anything under a nested package. Package directories
+// nest: after de-versioning, p/moul/ulist contains p/moul/ulist/lplist, which
+// is its own package with its own gnomod.toml. A recursive listing hands back
+// lplist's files too, and hashing ulist with lplist's files in the set is
+// wrong twice over: the hash changes when a different package changes, and the
+// extraction routes those files to lplist's destination so they are not even
+// there to read.
+//
+// This could not happen before the migration, because a version directory
+// never contained another package. It is the first bug that the new layout
+// created rather than removed.
 func gitFilesAtCommit(root, commit, dir string) ([]string, error) {
 	s, err := git(root, "ls-tree", "-r", "-z", "--name-only", commit, "--", dir)
 	if err != nil {
 		return nil, err
 	}
-	return relativizeZ(s, dir), nil
+	return ownFiles(relativizeZ(s, dir)), nil
+}
+
+// ownFiles drops the paths that belong to a package nested inside this one.
+//
+// A nested package is any subdirectory carrying its own gnomod.toml, which is
+// the same rule the workspace scan uses, so the two can never disagree about
+// where one package ends and the next begins.
+func ownFiles(names []string) []string {
+	var nested []string
+	for _, n := range names {
+		if i := strings.LastIndex(n, "/gnomod.toml"); i > 0 && i == len(n)-len("/gnomod.toml") {
+			nested = append(nested, n[:i]+"/")
+		}
+	}
+	if len(nested) == 0 {
+		return names
+	}
+	out := names[:0:0]
+	for _, n := range names {
+		own := true
+		for _, pre := range nested {
+			if strings.HasPrefix(n, pre) {
+				own = false
+				break
+			}
+		}
+		if own {
+			out = append(out, n)
+		}
+	}
+	return out
 }
 
 // relativizeZ turns NUL-separated repo-relative paths into names relative to

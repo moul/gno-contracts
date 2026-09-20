@@ -965,3 +965,62 @@ func TestVerifyUpstreamPassesForTheDocumentedFlow(t *testing.T) {
 		t.Fatalf("the documented flow must pass the upstream check: %v", err)
 	}
 }
+
+// TestNestedPackagesAreNotSwallowed.
+//
+// After de-versioning, package directories nest: p/moul/ulist contains
+// p/moul/ulist/lplist, a package in its own right. A recursive git listing
+// hands back the nested package's files too, and hashing the outer package
+// with them in the set is wrong twice: the hash moves when a different package
+// changes, and the extraction routes those files to the nested package's
+// destination, so they are not even present to read. The second failure is how
+// this was found, as `open .../lplist/README.md: no such file or directory`.
+//
+// This could not happen before the migration, because a version directory
+// never contained another package.
+func TestNestedPackagesAreNotSwallowed(t *testing.T) {
+	root := newRepo(t)
+	addPkg(t, root, "p/moul/ulist", "gno.land/p/moul/ulist/v0", "package ulist\n")
+	addPkg(t, root, "p/moul/ulist/lplist", "gno.land/p/moul/ulist/lplist/v0", "package lplist\n")
+	write(t, filepath.Join(root, "p/moul/ulist/lplist/README.md"), "nested\n")
+	commit(t, root, "seed")
+
+	files, err := gitFilesAtCommit(root, "HEAD", "p/moul/ulist")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range files {
+		if strings.HasPrefix(f, "lplist/") {
+			t.Fatalf("ulist's file set contains the nested package's %s", f)
+		}
+	}
+
+	// The end-to-end symptom: freeze used to fail outright here.
+	pkgs, err := scanPackages(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	old, err := readLock(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := freezeLock(root, old, pkgs, io.Discard); err != nil {
+		t.Fatalf("freeze failed on a nested package: %v", err)
+	}
+
+	// And the hashes have to be independent: editing the nested package must
+	// not change the outer package's hash.
+	before, err := hashAtCommit(root, "HEAD", "p/moul/ulist")
+	if err != nil {
+		t.Fatal(err)
+	}
+	write(t, filepath.Join(root, "p/moul/ulist/lplist/lplist.gno"), "package lplist // changed\n")
+	commit(t, root, "edit the nested package")
+	after, err := hashAtCommit(root, "HEAD", "p/moul/ulist")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if before != after {
+		t.Fatal("editing the nested package changed the outer package's hash")
+	}
+}
