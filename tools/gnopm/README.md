@@ -237,6 +237,23 @@ touched the directory. If neither matches, the version genuinely exists nowhere
 but this branch; `HEAD` is then the only honest answer and gnopm says so, with
 what to do about it.
 
+There is one case the fallback cannot save: **editing a published version and
+then bumping it.** The outgoing version's content then exists only on your
+branch, so the pin has to point there, and the squash discards it. The fix is
+to bump *before* editing, which is the documented order anyway, and
+`verify -upstream <ref>` catches it if you did not:
+
+```
+$ gnopm verify -upstream origin/main
+gnopm: 1 version(s) are pinned to a commit that is not on origin/main: gno.land/p/moul/md/v0
+  A squash or rebase merge discards this branch's commits, so those versions would stop
+  resolving the moment it lands, with nothing left to recover them from.
+  Fix: bump BEFORE editing a package, so the outgoing version is pinned to a commit that is
+  already upstream. If nothing imports the stranded version, drop its entry instead.
+```
+
+CI runs that on every pull request.
+
 **CI must check out full history.** A shallow clone has none of the pinned
 commits, so every materialization fails. With `actions/checkout` that means
 `fetch-depth: 0`.
@@ -249,6 +266,11 @@ commits, so every materialization fails. With `actions/checkout` that means
    in the tree is missing from the lock, and no `{ dir }` entry points at a
    directory that does not declare it.
 3. Every version pinned to history still reproduces its recorded hash.
+
+With `-upstream <ref>` it also requires every pinned commit to be reachable
+from `<ref>`. That one is for pull requests rather than for everyday use: a pin
+to a commit that exists only on the current branch is a normal intermediate
+state locally, and a defect the moment it is merged.
 
 It deliberately does **not** check "the lock is byte-identical to what `sync`
 would write". That is simpler, but it fails during the one window where the lock

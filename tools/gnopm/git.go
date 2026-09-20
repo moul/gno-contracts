@@ -229,3 +229,9 @@ func matchDest(name string, dests map[string]string) (src, rel string, ok bool) 
 	}
 	return best, strings.TrimPrefix(name, best+"/"), true
 }
+
+// gitIsAncestor reports whether commit is reachable from ref.
+func gitIsAncestor(root, commit, ref string) bool {
+	_, err := git(root, "merge-base", "--is-ancestor", commit, ref)
+	return err == nil
+}

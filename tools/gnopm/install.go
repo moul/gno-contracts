@@ -188,7 +188,18 @@ func pruneAssembly(asm string, want []LockEntry) (int, error) {
 // packages that are still in their directories, precisely so the directories
 // can then move. A guard with a documented exception is a guard with a hole,
 // so the rule is consistency rather than identity.
-func verify(e *env) error {
+func verify(e *env) error { return verifyWith(e, "") }
+
+// verifyWith is verify, optionally also requiring every pinned commit to be
+// reachable from upstream.
+//
+// That extra check belongs to pull requests, not to the default. A pin to a
+// commit that exists only on the current branch is correct right up until the
+// branch is squash-merged, at which point the commit is unreachable and the
+// version it held stops resolving forever. Locally that is a normal
+// intermediate state; on a pull request it is a defect with a known remedy, so
+// CI passes -upstream and catches it while it is still cheap.
+func verifyWith(e *env, upstream string) error {
 	root, w := e.root, e.errw
 	raw, err := os.ReadFile(filepath.Join(root, lockFile))
 	if os.IsNotExist(err) {
@@ -234,6 +245,27 @@ func verify(e *env) error {
 	}
 	if bad > 0 {
 		return fmt.Errorf("%d locked version(s) do not reproduce from history", bad)
+	}
+	if upstream != "" {
+		ref, err := gitResolve(root, upstream)
+		if err != nil {
+			fmt.Fprintf(w, "  skipping the upstream check: %v\n", err)
+		} else {
+			var stranded []string
+			for _, en := range pinned {
+				if !gitIsAncestor(root, en.Source.Commit, ref) {
+					stranded = append(stranded, en.Module)
+				}
+			}
+			if len(stranded) > 0 {
+				return fmt.Errorf("%d version(s) are pinned to a commit that is not on %s: %s\n"+
+					"  A squash or rebase merge discards this branch's commits, so those versions would stop\n"+
+					"  resolving the moment it lands, with nothing left to recover them from.\n"+
+					"  Fix: bump BEFORE editing a package, so the outgoing version is pinned to a commit that is\n"+
+					"  already upstream. If nothing imports the stranded version, drop its entry instead.",
+					len(stranded), upstream, strings.Join(stranded, ", "))
+			}
+		}
 	}
 	fmt.Fprintf(w, "gnopm: ok, %d modules locked (%d in tree, %d pinned to history)\n",
 		len(lock.Modules), len(pkgs), len(pinned))
