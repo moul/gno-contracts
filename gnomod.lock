@@ -286,6 +286,14 @@ module = "gno.land/p/moul/x/daily/trie/v0"
 source = { dir = "p/moul/x/daily/trie" }
 
 [[module]]
+module = "gno.land/p/moul/x/merkle/v0"
+source = { dir = "p/moul/x/merkle/v0" }
+
+[[module]]
+module = "gno.land/p/moul/x/mmr/v0"
+source = { dir = "p/moul/x/mmr/v0" }
+
+[[module]]
 module = "gno.land/p/moul/x/wiki/v0"
 source = { dir = "p/moul/x/wiki" }
 
@@ -586,6 +594,10 @@ module = "gno.land/r/moul/x/daily/merkledrop/v0"
 source = { dir = "r/moul/x/daily/merkledrop" }
 
 [[module]]
+module = "gno.land/r/moul/x/daily/merkledrop/v1"
+source = { dir = "r/moul/x/daily/merkledrop/v1" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/microblog/v0"
 source = { dir = "r/moul/x/daily/microblog" }
 
@@ -776,6 +788,10 @@ source = { dir = "r/moul/x/daily/wordle" }
 [[module]]
 module = "gno.land/r/moul/x/daily/wrapped/v0"
 source = { dir = "r/moul/x/daily/wrapped" }
+
+[[module]]
+module = "gno.land/r/moul/x/provable/v0"
+source = { dir = "r/moul/x/provable/v0" }
 
 [[module]]
 module = "gno.land/r/moul/x/wiki/v0"
