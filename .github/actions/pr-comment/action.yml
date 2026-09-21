@@ -1,0 +1,45 @@
+name: Upsert the sticky pull request comment
+description: >
+  One comment per pull request, edited in place. Any extra bot comment carrying
+  the marker is deleted, which is also how a pull request opened before the
+  workflows were consolidated converges on its next push.
+
+inputs:
+  body-file:
+    description: file holding the rendered comment
+    required: true
+  pr:
+    description: pull request number
+    required: true
+  repo:
+    description: owner/name
+    required: true
+  token:
+    description: token with pull-requests write
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        BODY_FILE: ${{ inputs.body-file }}
+        PR: ${{ inputs.pr }}
+        REPO: ${{ inputs.repo }}
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        ids=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                --jq '.[] | select(.user.type == "Bot") | select(.body | contains("gnocontracts-pr")) | .id')
+        keep=$(echo "$ids" | head -1)
+        if [ -z "$keep" ]; then
+          gh api "repos/$REPO/issues/$PR/comments" -F body=@"$BODY_FILE" >/dev/null
+          echo "created the comment"
+          exit 0
+        fi
+        gh api -X PATCH "repos/$REPO/issues/comments/$keep" -F body=@"$BODY_FILE" >/dev/null
+        echo "updated comment $keep"
+        for id in $(echo "$ids" | tail -n +2); do
+          gh api -X DELETE "repos/$REPO/issues/comments/$id" >/dev/null
+          echo "deleted duplicate bot comment $id"
+        done

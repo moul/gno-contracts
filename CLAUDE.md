@@ -38,9 +38,10 @@ Read it before doing anything. The essentials:
   `gnowork.toml`; external `gno.land/*` deps are vendored under `vendor/`
   (`make deps`). Don't rely on `$GNOROOT/examples` for anything but stdlibs.
 - **PRs carry only source.** `contracts.json`, the README table, per-package
-  README footers and `_assets/` are generated **on `main`** by the `regen`
+  README footers and `_assets/` are generated **on `main`** by the `main`
   workflow after merge — never run `make gen` or commit those files in a PR
-  (it only causes conflicts). CI runs no `make check`.
+  (it only causes conflicts, and CI's `guard-generated` step rejects it). CI
+  runs no `make check`.
 - **A README must say something, or not exist.** Not "every package has a
   README": a placeholder is worse than none, because the package then looks
   documented. Write a good one; failing that, one accurate sentence; failing

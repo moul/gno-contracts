@@ -11,6 +11,10 @@
 //	sync       report drift between our versioned contracts and the monorepo
 //	publish    topologically order contracts and (optionally) check on-chain
 //	           upload status per network
+//	pr         everything CI needs to know about a pull request: the sticky
+//	           comment body, the path labels, the realms to preview
+//	preview    render realms with gnodev into a self-contained static tree
+//	guard-*    the CI guards (examples, render, readmes, generated artifacts)
 //
 // It is invoked from the repository root, typically via the Makefile
 // (`go run ./tools <cmd>`).
@@ -55,8 +59,18 @@ func main() {
 		err = cmdPublish(root, args)
 	case "status":
 		err = cmdStatus(root, args)
-	case "report":
-		err = cmdReport(root, args)
+	case "pr":
+		err = cmdPR(root, args)
+	case "guard-examples":
+		err = cmdGuardExamples(root)
+	case "guard-render":
+		err = cmdGuardRender(root)
+	case "guard-readmes":
+		err = cmdGuardReadmes(root, args)
+	case "guard-generated":
+		err = cmdGuardGenerated(root, args)
+	case "preview":
+		err = cmdPreview(root, args)
 	case "graph":
 		err = cmdGraph(root)
 	case "help", "-h", "--help":
@@ -87,7 +101,13 @@ commands:
   sync       report drift vs the gnolang/gno monorepo (needs GNOROOT)
   publish    order contracts by dependency; -net <name> [-check] for status
   status     refresh on-chain upload status for all networks + README
-  report     analyze the PR diff (base...HEAD) → Markdown report for the PR bot
+  pr         analyze the PR diff (base...HEAD) → the sticky comment body, the
+             path labels, and the realm selectors to preview
+  preview    render the selected realms with gnodev into a static tree
+  guard-examples   fail if an Example* test pins no // Output: block
+  guard-render     fail if a realm declares Render that no test calls
+  guard-readmes    fail if a package ships a README that documents nothing
+  guard-generated  fail if a PR modifies generated artifacts
   graph      write per-package + global dependency graphs into _assets/
 `)
 }
