@@ -102,7 +102,7 @@ func TestRender(cur realm, t *testing.T) {
 		t.Fatalf("render not newest-first:\n%s", out)
 	}
 	// Author short form present.
-	if !strings.Contains(out, "(g1") {
+	if !strings.Contains(out, "(`g1") {
 		t.Fatalf("render missing author short address:\n%s", out)
 	}
 }

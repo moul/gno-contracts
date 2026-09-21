@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -249,19 +250,11 @@ func renderList() string {
 			status = "🟡 to move"
 		}
 		sb.WriteString("| [" + strconv.FormatInt(g.ID, 10) + "](/r:" + strconv.FormatInt(g.ID, 10) + ") | " +
-			short(g.Red) + " | " + short(g.Yellow) + " | " + status + " |\n")
+			ui.Addr(g.Red) + " | " + ui.Addr(g.Yellow) + " | " + status + " |\n")
 		return false
 	})
 	sb.WriteString("\nOpen a game by its id (e.g. path `1`).\n")
 	return sb.String()
-}
-
-func short(a address) string {
-	s := a.String()
-	if len(s) <= 12 {
-		return "`" + s + "`"
-	}
-	return "`" + s[:8] + "…" + s[len(s)-4:] + "`"
 }
 
 func renderGame(g *Game) string {

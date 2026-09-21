@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -87,15 +88,6 @@ func idKey(id int) string {
 	return strings.Repeat("0", width-len(s)) + s
 }
 
-// shortAddr renders an address as "g1abc…" (first 6 chars + ellipsis).
-func shortAddr(a address) string {
-	s := a.String()
-	if len(s) <= 6 {
-		return s
-	}
-	return s[:6] + "…"
-}
-
 // counts returns the number of open and done items.
 func counts() (open, done int) {
 	items.Iterate("", "", func(_ string, v interface{}) bool {
@@ -136,7 +128,7 @@ func Render(path string) string {
 			mark = "x"
 		}
 		line := "- [" + mark + "] #" + strconv.Itoa(it.id) + " " +
-			it.text + " (" + shortAddr(it.author) + ")"
+			it.text + " (" + ui.Addr(it.author) + ")"
 		lines = append(lines, line)
 		return false
 	})

@@ -11,6 +11,7 @@ import (
 
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -107,20 +108,6 @@ func snapshot() []*player {
 	return out
 }
 
-// medal returns the emoji for a given zero-based rank, or "" past the podium.
-func medal(rank int) string {
-	switch rank {
-	case 0:
-		return "🥇"
-	case 1:
-		return "🥈"
-	case 2:
-		return "🥉"
-	default:
-		return ""
-	}
-}
-
 // Render produces the Markdown leaderboard. It is NOT a crossing function
 // (read-only view, no cur realm parameter).
 func Render(path string) string {
@@ -136,7 +123,7 @@ func Render(path string) string {
 	out += "| Rank | Player | Points |\n"
 	out += "| ---: | :--- | ---: |\n"
 	for i, p := range ranked {
-		rankCell := medal(i)
+		rankCell := ui.Podium(i)
 		if rankCell == "" {
 			rankCell = strconv.Itoa(i + 1)
 		}

@@ -4,6 +4,12 @@
 // function. Every entry records the caller's address, the message, and the
 // block height at which it was signed. Render lists all entries newest-first
 // as a Markdown table.
+//
+// v1 renders through [p/moul/kit/ui](/p/moul/kit/ui/v0) instead of the
+// hand-rolled shortAddr and escapeCell helpers v0 carried. The escaping is the
+// substantive change: v0 replaced four characters, while ui.Cell also strips
+// bidi and zero-width characters, which a message can otherwise use to reorder
+// how the rest of the row reads.
 package guestbook
 
 import (
@@ -13,6 +19,7 @@ import (
 	"chain"
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -82,38 +89,24 @@ func Count() int {
 
 // Render lists every entry newest-first as a Markdown table plus a total count.
 func Render(path string) string {
-	var b strings.Builder
-
-	b.WriteString("# Guestbook\n\n")
-
 	if count == 0 {
-		b.WriteString("_No one has signed yet. Be the first!_\n")
-		return b.String()
+		return "# Guestbook\n\n" + ui.Empty("No one has signed yet. Be the first!")
 	}
 
-	b.WriteString("**Total signatures:** ")
-	b.WriteString(strconv.Itoa(count))
-	b.WriteString("\n\n")
-
-	b.WriteString("| # | Who | Message | Height |\n")
-	b.WriteString("|---|-----|---------|--------|\n")
-
+	t := ui.NewTable("#", "Who", "Message", "Height")
 	// avl iterates ascending by key; ReverseIterate gives newest-first.
 	entries.ReverseIterate("", "", func(_ string, v any) bool {
 		e := v.(*Entry)
-		b.WriteString("| ")
-		b.WriteString(strconv.Itoa(e.ID))
-		b.WriteString(" | ")
-		b.WriteString(shortAddr(e.Author))
-		b.WriteString(" | ")
-		b.WriteString(escapeCell(e.Message))
-		b.WriteString(" | ")
-		b.WriteString(strconv.FormatInt(e.Height, 10))
-		b.WriteString(" |\n")
+		t.Row(
+			strconv.Itoa(e.ID),
+			ui.AddrOf(e.Author),
+			ui.Cell(e.Message),
+			strconv.FormatInt(e.Height, 10),
+		)
 		return false
 	})
 
-	return b.String()
+	return "# Guestbook\n\n**Total signatures:** " + strconv.Itoa(count) + "\n\n" + t.String()
 }
 
 // seqKey renders a sequence number as a fixed-width, zero-padded string so
@@ -125,22 +118,4 @@ func seqKey(n int) string {
 		return s
 	}
 	return strings.Repeat("0", width-len(s)) + s
-}
-
-// shortAddr abbreviates a bech32 address for compact display.
-func shortAddr(addr string) string {
-	if len(addr) <= 12 {
-		return addr
-	}
-	return addr[:8] + "…" + addr[len(addr)-4:]
-}
-
-// escapeCell neutralizes characters that would break a Markdown table cell.
-func escapeCell(s string) string {
-	s = strings.ReplaceAll(s, "\\", "\\\\")
-	s = strings.ReplaceAll(s, "|", "\\|")
-	s = strings.ReplaceAll(s, "\r\n", " ")
-	s = strings.ReplaceAll(s, "\n", " ")
-	s = strings.ReplaceAll(s, "\r", " ")
-	return s
 }

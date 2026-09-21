@@ -12,6 +12,7 @@ import (
 	"chain"
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -169,21 +170,6 @@ func Generate(cur realm, pattern string, size int) string {
 	return art
 }
 
-// escapeInline neutralizes markdown-active characters in untrusted text
-// before it's embedded inline in Render output.
-func escapeInline(s string) string {
-	r := strings.NewReplacer(
-		"\\", "\\\\",
-		"`", "\\`",
-		"*", "\\*",
-		"_", "\\_",
-		"[", "\\[",
-		"]", "\\]",
-		"|", "\\|",
-	)
-	return r.Replace(s)
-}
-
 func renderHome() string {
 	var b strings.Builder
 	b.WriteString("# ASCII Art Generator\n\n")
@@ -222,7 +208,7 @@ func renderHome() string {
 }
 
 func renderPiece(idStr string) string {
-	safe := escapeInline(idStr)
+	safe := ui.Inline(idStr)
 	n, err := strconv.Atoi(idStr)
 	if err != nil || n < 1 {
 		return "# Piece " + safe + "\n\nNo such piece.\n"

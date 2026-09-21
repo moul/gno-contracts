@@ -42,12 +42,12 @@ func TestAddEntryAppendsAndCounts(t *testing.T) {
 func TestRenderNewestFirst(t *testing.T) {
 	resetState()
 
-	addEntry("g1alice", "AAA-oldest", 1)
-	addEntry("g1alice", "BBB-newest", 2)
+	addEntry("g1alice", "AAA oldest", 1)
+	addEntry("g1alice", "BBB newest", 2)
 
 	out := Render("")
-	iNew := strings.Index(out, "BBB-newest")
-	iOld := strings.Index(out, "AAA-oldest")
+	iNew := strings.Index(out, "BBB newest")
+	iOld := strings.Index(out, "AAA oldest")
 	if iNew < 0 || iOld < 0 {
 		t.Fatalf("both messages must appear; got:\n%s", out)
 	}
@@ -76,18 +76,19 @@ func TestEmptyMessagePanics(t *testing.T) {
 	addEntry("g1alice", "   ", 1)
 }
 
-func TestEscapeCell(t *testing.T) {
-	cases := []struct {
-		in, want string
-	}{
-		{"plain", "plain"},
-		{"a|b", "a\\|b"},
-		{"line1\nline2", "line1 line2"},
+// A message must not be able to break out of its table cell. The escaping now
+// lives in ui.Cell, so this asserts the realm's rendered output rather than a
+// local helper.
+func TestRenderEscapesMessage(t *testing.T) {
+	resetState()
+	defer resetState()
+	addEntry("g1manfred47kzduec920z88wfr64ylksmdcedlf5", "a|b", 1)
+	out := Render("")
+	if strings.Contains(out, "| a|b |") {
+		t.Errorf("an unescaped pipe would open a column:\n%s", out)
 	}
-	for _, tc := range cases {
-		if got := escapeCell(tc.in); got != tc.want {
-			t.Errorf("escapeCell(%q) = %q, want %q", tc.in, got, tc.want)
-		}
+	if !strings.Contains(out, `a\|b`) {
+		t.Errorf("message should appear escaped:\n%s", out)
 	}
 }
 
