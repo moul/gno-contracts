@@ -1,0 +1,170 @@
+name: Publish a preview
+description: >
+  Rewrite (or delete) one subfolder of the previews site and push, retrying when
+  a parallel job moved the branch. The site lives in a separate repository,
+  moul/gno-contracts-previews, reached over a write-enabled deploy key. Can also
+  evict the previews of pull requests that are no longer open.
+
+inputs:
+  subdir:
+    description: the subfolder to rewrite, e.g. main or pr-42; empty for an evict-only pass
+    required: false
+    default: ""
+  source:
+    description: directory to copy into it; empty means delete the subfolder
+    required: false
+    default: ""
+  message:
+    description: commit message
+    required: true
+  deploy-key:
+    description: private half of the previews repository's write deploy key
+    required: true
+  prune-closed:
+    description: also delete pr-<N>/ for every pull request that is not open
+    required: false
+    default: "false"
+  token:
+    description: token used to read pull request state, required by prune-closed
+    required: false
+    default: ""
+  repo:
+    description: the previews repository
+    required: false
+    default: moul/gno-contracts-previews
+  source-repo:
+    description: the repository the pull request numbers belong to
+    required: false
+    default: moul/gno-contracts
+  max-mb:
+    description: refuse to publish a subfolder larger than this
+    required: false
+    default: "250"
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        SUBDIR: ${{ inputs.subdir }}
+        SOURCE: ${{ inputs.source }}
+        MESSAGE: ${{ inputs.message }}
+        DEPLOY_KEY: ${{ inputs.deploy-key }}
+        PRUNE_CLOSED: ${{ inputs.prune-closed }}
+        GH_TOKEN: ${{ inputs.token }}
+        REPO: ${{ inputs.repo }}
+        SOURCE_REPO: ${{ inputs.source-repo }}
+        MAX_MB: ${{ inputs.max-mb }}
+      run: |
+        set -euo pipefail
+
+        if [ -z "${DEPLOY_KEY:-}" ]; then
+          echo "::error::PREVIEWS_DEPLOY_KEY is not set, so the preview cannot be published"
+          exit 1
+        fi
+        if [ -n "$SOURCE" ] && { [ ! -d "$SOURCE" ] || [ -z "$(ls -A "$SOURCE" 2>/dev/null)" ]; }; then
+          echo "nothing rendered in $SOURCE, skipping"
+          exit 0
+        fi
+
+        # A .git inside the payload makes `git add` record the whole subfolder as
+        # a gitlink (mode 160000), which GitHub Pages reports as a build error,
+        # freezing publication for every other preview too. Same for the gnodev
+        # home and its logs: working files, not site content.
+        if [ -n "$SOURCE" ]; then
+          rm -rf "$SOURCE"/.git "$SOURCE"/.gnodev-* "$SOURCE"/gnodev.log "$SOURCE"/gnodev-base.log
+          mb=$(du -sm "$SOURCE" | cut -f1)
+          if [ "$mb" -gt "$MAX_MB" ]; then
+            echo "::error::$SOURCE is ${mb} MB, over the ${MAX_MB} MB cap, refusing to publish"
+            exit 1
+          fi
+          echo "publishing ${mb} MB to $SUBDIR/"
+        fi
+
+        key=$(mktemp)
+        printf '%s\n' "$DEPLOY_KEY" > "$key"
+        chmod 600 "$key"
+        trap 'rm -f "$key"' EXIT
+        export GIT_SSH_COMMAND="ssh -i $key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+
+        work="$RUNNER_TEMP/previews"
+        for attempt in 1 2 3 4 5; do
+          rm -rf "$work"
+          git clone --quiet --depth=1 --branch gh-pages "git@github.com:$REPO.git" "$work"
+          # The commit the mutation is based on. The push below refuses to land
+          # if the branch moved since, which is how two previews publishing at
+          # the same time stay correct without a lock.
+          was=$(git -C "$work" rev-parse HEAD)
+
+          if [ -n "$SUBDIR" ]; then
+            rm -rf "${work:?}/$SUBDIR"
+            if [ -n "$SOURCE" ]; then
+              mkdir -p "$work/$SUBDIR"
+              cp -r "$SOURCE/." "$work/$SUBDIR/"
+            fi
+          fi
+
+          # Previews of pull requests that are no longer open. The close event
+          # normally removes its own, so this only catches what a failed or
+          # never-run cleanup left behind, and previews that predate it.
+          if [ "$PRUNE_CLOSED" = "true" ]; then
+            for d in "$work"/pr-*; do
+              [ -d "$d" ] || continue
+              n=$(basename "$d"); n=${n#pr-}
+              state=$(gh pr view "$n" -R "$SOURCE_REPO" --json state --jq .state 2>/dev/null || echo UNKNOWN)
+              if [ "$state" != "OPEN" ] && [ "$state" != "UNKNOWN" ]; then
+                echo "evicting pr-$n ($state)"
+                rm -rf "$d"
+              fi
+            done
+          fi
+
+          : > "$work/.nojekyll"
+
+          # The root index is derived from what is actually on the branch, so an
+          # evicted preview stops being listed without anyone saying so.
+          {
+            echo '<!doctype html>'
+            echo '<meta charset="utf-8">'
+            echo '<meta name="robots" content="noindex, nofollow">'
+            echo '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            echo '<title>gno-contracts previews</title>'
+            echo '<style>body{font-family:system-ui,sans-serif;max-width:44rem;margin:3rem auto;padding:0 1.2rem;line-height:1.6}'
+            echo 'a{color:#0b5;text-decoration:none}a:hover{text-decoration:underline}li{margin:.2rem 0}'
+            echo '@media (prefers-color-scheme:dark){body{background:#111;color:#eee}}</style>'
+            echo '<h1>gno-contracts previews</h1>'
+            echo '<p>Static gnoweb snapshots of <a href="https://github.com/moul/gno-contracts">moul/gno-contracts</a>.'
+            echo 'Each one is a fresh local chain that has only ever run <code>init()</code>:'
+            echo 'no signer, no transactions, no faucet.</p>'
+            echo '<ul>'
+            if [ -d "$work/main" ]; then
+              echo '<li><a href="main/"><b>main</b></a>, every package on the default branch</li>'
+            fi
+            for d in "$work"/pr-*; do
+              [ -d "$d" ] || continue
+              n=$(basename "$d"); n=${n#pr-}
+              echo "<li><a href=\"pr-$n/\">PR #$n</a>, <a href=\"https://github.com/$SOURCE_REPO/pull/$n\">the pull request</a></li>"
+            done
+            echo '</ul>'
+          } > "$work/index.html"
+
+          # Rewritten as a single orphan commit every time: the site is
+          # regenerated wholesale, so keeping its history would grow this
+          # repository by the size of the snapshot on every push to main.
+          git -C "$work" checkout --quiet --orphan publish
+          git -C "$work" add -A
+          if [ "$(git -C "$work" write-tree)" = "$(git -C "$work" rev-parse "$was^{tree}")" ]; then
+            echo "the site already matches, nothing to push"
+            exit 0
+          fi
+          git -C "$work" -c user.name="Manfred Touron" -c user.email="94029+moul@users.noreply.github.com" \
+            -c commit.gpgsign=false commit --quiet -m "$MESSAGE"
+          if git -C "$work" push --quiet --force-with-lease=gh-pages:"$was" origin publish:gh-pages; then
+            echo "published on attempt $attempt"
+            exit 0
+          fi
+          echo "push rejected (the branch moved), replaying on the latest, attempt $attempt"
+          sleep $((RANDOM % 5 + 2))
+        done
+        echo "::error::could not publish after 5 attempts"
+        exit 1
