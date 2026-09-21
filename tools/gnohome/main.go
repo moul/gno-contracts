@@ -8,6 +8,7 @@
 //	gnohome status    diff local content/ against what is on chain
 //	gnohome tx        print the gnokey commands for exactly what is outdated
 //	gnohome packages  regenerate the packages slot from contracts.json
+//	gnohome deploy    preflight the realm against the chain, then the commands
 //
 // It has no dependencies beyond the Go standard library: the chain is read
 // over plain JSON-RPC abci_query, and writes are emitted as gnokey commands
@@ -75,6 +76,7 @@ func run(args []string, out *os.File) error {
 		maxDeposit  string
 		catalogFile string
 		network     string
+		pkgDir      string
 	)
 	switch cmd {
 	case "preview":
@@ -86,11 +88,13 @@ func run(args []string, out *os.File) error {
 		fs.BoolVar(&all, "all", false, "emit a command for every slot, not only the outdated ones")
 		fs.BoolVar(&prune, "prune", false, "also emit Delete for slots on chain with no local file")
 		fs.Int64Var(&gasWanted, "gas-wanted", 0, "gas-wanted override (default: sized from the body)")
-		fs.StringVar(&gasFee, "gas-fee", "1000000ugnot", "gas-fee for the emitted commands")
+		fs.StringVar(&gasFee, "gas-fee", "", "gas-fee override (default: sized from -gas-wanted at ten times the accepted floor)")
 		fs.StringVar(&maxDeposit, "max-deposit", "", "max storage deposit for the emitted commands")
 	case "packages":
 		fs.StringVar(&catalogFile, "catalog", "", "path to contracts.json (default: <repo>/contracts.json)")
 		fs.StringVar(&network, "network", "mainnet", "which network's deployment status to report")
+	case "deploy":
+		fs.StringVar(&pkgDir, "pkgdir", "", "the package directory to upload (default: <repo>/r/moul/home)")
 	}
 	if err := fs.Parse(rest); err != nil {
 		return err
@@ -129,6 +133,11 @@ func run(args []string, out *os.File) error {
 	}
 
 	switch cmd {
+	case "deploy":
+		if pkgDir == "" {
+			pkgDir = filepath.Dir(cfg.contentDir)
+		}
+		return printDeploy(out, cfg, pkgDir, local)
 	case "slots":
 		return printSlots(out, local)
 	case "preview":
@@ -193,6 +202,7 @@ commands:
   status    diff local content/ against what is on chain
   tx        print the gnokey commands for exactly what is outdated
   packages  regenerate the packages slot from contracts.json, to stdout
+  deploy    preflight the realm against the chain, then print the commands
 
 Run "gnohome <command> -h" for the flags of one command.
 `)

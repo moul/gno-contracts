@@ -77,14 +77,30 @@ type rpcResponse struct {
 // qeval evaluates a pure expression on the chain and returns the string it
 // produced. The VM answers with an amino-printed value, `("…" string)`, so
 // the quoted payload is unwrapped here.
+// qeval evaluates a gno expression and unwraps the `("…" string)` envelope
+// that vm/qeval alone puts around its result. Every other ABCI path returns
+// raw bytes, so unwrapping belongs here and not in abciQuery: applying it to
+// vm/qfile or vm/qinertpaths turns a perfectly good answer into an error, and
+// a caller reading that error as "absent" reports live packages as missing.
 func qeval(remote, expr string) (string, error) {
+	raw, err := abciQuery(remote, "vm/qeval", expr)
+	if err != nil {
+		return "", err
+	}
+	return unwrapString(raw)
+}
+
+// abciQuery is the one network call this tool makes: a JSON-RPC abci_query,
+// standard library only, no gnoclient. `path` is the ABCI path (vm/qeval,
+// vm/qfile, vm/qinertpaths) and `data` its argument.
+func abciQuery(remote, path, data string) (string, error) {
 	body, err := json.Marshal(map[string]any{
 		"jsonrpc": "2.0",
 		"id":      1,
 		"method":  "abci_query",
 		"params": map[string]any{
-			"path":   "vm/qeval",
-			"data":   base64.StdEncoding.EncodeToString([]byte(expr)),
+			"path":   path,
+			"data":   base64.StdEncoding.EncodeToString([]byte(data)),
 			"height": "0",
 			"prove":  false,
 		},
@@ -115,7 +131,7 @@ func qeval(remote, expr string) (string, error) {
 		// banner, so the message after "- " is what a reader wants.
 		return "", fmt.Errorf("%s: %s", e.Type, firstTrace(out.Result.Response.ResponseBase.Log))
 	}
-	return unwrapString(string(out.Result.Response.ResponseBase.Data))
+	return string(out.Result.Response.ResponseBase.Data), nil
 }
 
 // firstTrace pulls the human-readable cause out of an ABCI error log.

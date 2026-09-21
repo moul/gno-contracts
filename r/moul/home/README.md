@@ -193,77 +193,54 @@ enabled the four most recent parked packages after 1 to 4 blocks, 3.3 to 13.2
 seconds. It can still refuse, and a refusal is easy to miss, so check rather than
 assume.
 
-### 1. Dry-run
+### The whole plan, from the tool
 
-`-simulate only` signs locally and asks the node for the real `GasUsed` without
-broadcasting. Code-bearing messages cannot be simulated unsigned, so this is the
-only honest estimate available.
-
-```sh
-gnokey maketx addpkg \
-  -pkgdir r/moul/home \
-  -pkgpath gno.land/r/moul/home \
-  -gas-fee 600000ugnot -gas-wanted 60000000 \
-  -max-deposit 10000000ugnot \
-  -broadcast -simulate only \
-  -chainid gnoland-1 -remote https://rpc.gno.land:443 \
-  moul
-```
-
-### 2. Broadcast
-
-Same line with `-simulate test`, after sizing `-gas-wanted` down from the
-`GasUsed` the dry-run reported.
+`gnohome deploy` does the preflight and prints every command in order. It is
+read-only: it checks whether the package is live, parked or absent, that each
+non-test dependency is already on chain, measures the payload, sizes gas and
+fee, and then emits the dry run, the broadcast, the parked-or-live check and
+the content push. It signs nothing.
 
 ```sh
-gnokey maketx addpkg \
-  -pkgdir r/moul/home \
-  -pkgpath gno.land/r/moul/home \
-  -gas-fee 600000ugnot -gas-wanted 60000000 \
-  -max-deposit 10000000ugnot \
-  -broadcast -chainid gnoland-1 -remote https://rpc.gno.land:443 \
-  moul
+go -C tools tool gnohome deploy
 ```
 
-### 3. Confirm it went live, not just parked
+Run that rather than copying commands from here: the numbers below are a
+snapshot and the tool recomputes them from the files as they are.
 
-```sh
-curl -s 'https://rpc.gno.land/abci_query?path=%22vm%2Fqinertpaths%22&data=0x' \
-  | jq -r '.result.response.ResponseBase.Data' | base64 -d | grep moul/home
-```
+### How it sizes them
 
-Still listed means still parked. Gone (and `vm/qrender` answering) means enabled.
+Deliberately no byte count here. This README **is part of the payload**, so any
+figure quoted in it invalidates itself the moment the file is edited. The tool
+reads the real numbers off the files; what follows is only the method, so a
+reader can judge it.
 
-### 4. Push the content
+**What travels.** `gnokey maketx addpkg` uploads with `MPUserAll`
+(`gno.land/pkg/keyscli/addpkg.go`), so every `.gno`, `.toml` and `.md` in the
+package directory goes on chain, **test files and this README included**.
+Sub-directories are skipped, which is why `content/` never ships. The README is
+usually the single largest file, and you pay gas and storage on it.
 
-```sh
-go -C tools tool gnohome tx -all | sh
-```
+**`-gas-wanted`, at 1,800 gas per uploaded byte.** Ten successful mainnet
+`add_package` transactions above h160000 cost **1,014 to 1,781 gas/byte**
+(median 1,393, measured 2026-09-19). The spread is the package's own `init()`
+work, which a byte count cannot see, so size from the top of the range. It is a
+ceiling and a ceiling is not charged.
 
-### Where those numbers come from
+**`-gas-fee`, at ten times the accepted floor.** What the mempool enforces is
+the `gas_fee / gas_wanted` **ratio**, not the absolute
+(`EnsureSufficientMempoolFees`), so raising the ceiling raises the required fee
+and headroom is not free. The lowest ratio accepted on mainnet is
+**0.001 ugnot/gas**; comparable `add_package` transactions paid 0.001 to
+0.00125. The tool offers 0.01. **`gas_fee` is deducted in full as offered and
+never refunded**, so over-offering is a real cost and not insurance: the flat
+`1000000ugnot` this tooling used to emit for a slot write was about ninety times
+the floor.
 
-`gnokey maketx addpkg` uploads with `MPUserAll`, so every `.gno`, `.toml` and
-`.md` in the package directory travels, test files and this README included:
-**29,824 bytes** across six files. `content/` is a sub-directory, so it is
-skipped, as is `tools/gnohome`, which no longer lives here at all.
-
-- **`-gas-wanted 60000000`.** Ten successful mainnet `add_package` transactions
-  above h160000 cost **1,014 to 1,781 gas per uploaded byte** (median 1,393). At
-  the top of that range this package needs ~53.1M, so the 40M this file used to
-  suggest was under the worst case. 60M is a ceiling, and a ceiling is not
-  charged.
-- **`-gas-fee 600000ugnot`.** The fee requirement is the `gas_fee / gas_wanted`
-  **ratio**, and the ratio is what the mempool enforces, so headroom is not free.
-  The lowest accepted ratio on mainnet is 0.001 ugnot/gas and comparable
-  `add_package` transactions paid 0.001 to 0.00125. 600000/60000000 = 0.01, ten
-  times the floor. **`gas_fee` is deducted in full and never refunded**, which is
-  why the previous 1000000ugnot at 40M gas (0.025, twenty-five times the floor)
-  was worth fixing.
-- **`-max-deposit 10000000ugnot`.** Omitting it is not opting out: it falls back
-  to `vm:p:default_deposit`, **100 GNOT of ceiling per message**. Storage locks
-  100ugnot per byte, so the source alone is 2.98 GNOT and realm state is extra.
-  10 GNOT is a deliberate ceiling with room. Unlike `gas_fee` this one is
-  refundable, and only the measured byte delta is ever locked.
+**`-max-deposit`, an explicit ceiling.** Omitting it is not opting out: it falls
+back to `vm:p:default_deposit`, **100 GNOT of ceiling per message**. Storage
+locks 100ugnot per byte. Unlike the gas fee this one is **refundable** and only
+the measured byte delta is ever locked, so headroom here costs nothing.
 
 Re-measure before a later redeploy: gas is a function of the code, and both the
 gas price and the submission policy are chain parameters.

@@ -127,7 +127,16 @@ func command(cfg config, c change, opt txOptions) string {
 	for _, a := range args {
 		b.WriteString("  -args " + a + " \\\n")
 	}
-	b.WriteString("  -gas-fee " + opt.gasFee + " \\\n")
+	// The fee tracks the ceiling, because the mempool enforces the
+	// fee/gas_wanted RATIO and not the absolute (EnsureSufficientMempoolFees).
+	// An explicit -gas-fee still wins. The flat 1000000ugnot this used to
+	// default to was ~92x the accepted floor on a slot write, and gas_fee is
+	// deducted in full and never refunded.
+	fee := opt.gasFee
+	if fee == "" {
+		fee = feeFor(gas)
+	}
+	b.WriteString("  -gas-fee " + fee + " \\\n")
 	b.WriteString("  -gas-wanted " + strconv.FormatInt(gas, 10) + " \\\n")
 	if opt.maxDeposit != "" {
 		b.WriteString("  -max-deposit " + opt.maxDeposit + " \\\n")
