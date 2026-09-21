@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/moul/gno-contracts/tools/gnopm/pkg/gnomodlock"
+	"moul.io/gnopm/pkg/gnomodlock"
 )
 
 // lockReport summarizes what a pull request does to gnomod.lock, for the

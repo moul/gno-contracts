@@ -1,0 +1,200 @@
+name: pr
+
+# Everything the bot does to a pull request, in one workflow and ONE comment.
+#
+# This replaces three workflows (pr-report, pr-label, pr-preview) that each
+# checked out the repo, each answered a version of "which packages does this
+# diff touch" in its own shell, and two of which posted their own sticky
+# comment. `gnocontracts pr` answers it once, in Go, and the comment it renders
+# folds everything that is not a headline.
+#
+# Two jobs on purpose: `report` is seconds and owns the comment, `preview` is
+# minutes (it builds gnodev and boots a chain) and owns the published snapshot.
+# The preview URL is a per-pull-request constant, so the comment can link it
+# before the build exists — a new push shows the previous render until the new
+# one lands, and nobody waits on CI to see something. When the render finishes,
+# the preview job rewrites that same comment with the detail: the before/after
+# pictures and a link per package.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  pull-requests: write # labels and the sticky comment
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # A fork pull request gets no secrets, so it cannot publish and gets no
+  # preview link either: a dead link is worse than none.
+  SAME_REPO: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+  PAGES_URL: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('https://moul.github.io/gno-contracts-previews/pr-{0}/', github.event.pull_request.number) || '' }}
+
+jobs:
+  report:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+      BASE: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the analysis is a diff against the base
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+
+      - name: Analyze the pull request
+        run: |
+          git fetch --quiet origin "$BASE" --depth=100
+          go -C tools tool gnocontracts pr \
+            -base "origin/$BASE" \
+            -preview-url "$PAGES_URL" \
+            -out /tmp/pr-comment.md \
+            -labels-out /tmp/pr-labels.txt \
+            -selectors-out /tmp/pr-selectors.txt
+          echo "--- comment ---"; cat /tmp/pr-comment.md
+
+      # The tool emits the whole reconciliation (add what applies, remove what
+      # no longer does) so the label set has one owner: tools/gnocontracts/pr.go.
+      - name: Reconcile path labels
+        if: env.SAME_REPO == 'true'
+        run: xargs -a /tmp/pr-labels.txt gh pr edit "$PR" -R "$REPO"
+
+      - uses: ./.github/actions/pr-comment
+        if: env.SAME_REPO == 'true'
+        with:
+          body-file: /tmp/pr-comment.md
+          pr: ${{ github.event.pull_request.number }}
+          repo: ${{ github.repository }}
+          token: ${{ github.token }}
+
+  preview:
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BASE: ${{ github.base_ref }}
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # gnopm materializes pinned versions out of history
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+
+      - name: Collect the changed paths
+        run: |
+          set -euo pipefail
+          git fetch --quiet origin "$BASE" --depth=100
+          merge_base=$(git merge-base "origin/$BASE" HEAD)
+          git diff --name-only "$merge_base" HEAD > /tmp/changed.txt
+          echo "changed files: $(wc -l < /tmp/changed.txt)"
+          echo "MERGE_BASE=$merge_base" >> "$GITHUB_ENV"
+
+      # Decide before paying for a gnodev build. A diff of test files, READMEs
+      # outside a package, or CI config previews nothing, and a preview job that
+      # renders nothing must also say nothing.
+      - name: Plan the preview
+        id: plan
+        run: |
+          set -euo pipefail
+          go -C tools tool gnocontracts preview -plan-only -changed /tmp/changed.txt -out /tmp/plan
+          if [ "$(jq -r '.paths | length' /tmp/plan/preview.json)" = "0" ]; then
+            echo "nothing to preview"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./.github/actions/setup-gno
+        if: steps.plan.outputs.skip != 'true'
+        with:
+          binaries: gnodev
+
+      # The merge base as a second worktree, so each changed package can be
+      # shown as it renders today next to how this branch renders it. Both
+      # passes run the head's gnodev against the head's assets, so the pair
+      # differs by the package change alone.
+      # Only the merge-base tree: `make preview` below builds the view and syncs
+      # this one itself.
+      - name: Check out the merge base
+        if: steps.plan.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          git worktree add --detach "$RUNNER_TEMP/base" "$MERGE_BASE"
+          # gnopm's own -C, not `go -C`: `go -C` sets the working directory of
+          # the go command and the tool inherits it, so `cd base && go -C tools
+          # tool gnopm sync` silently re-syncs the HEAD tree and leaves the base
+          # one without its materialized versions.
+          go -C tools tool gnopm -C "$RUNNER_TEMP/base" sync \
+            || echo "::warning::the merge base did not sync, before/after may be incomplete"
+
+      # `make preview`, not the tool directly: the target builds the stdlib-only
+      # GNOROOT view from the real GNOROOT and only then points the renderer at
+      # it, which is the pair that is easy to get wrong (see main.yml). gnodev
+      # comes from PATH, where setup-gno put it.
+      - name: Render the preview
+        if: steps.plan.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          make preview ARGS="-changed /tmp/changed.txt -base-root $RUNNER_TEMP/base -base-url ${{ env.PAGES_URL }} -pr $PR"
+          rm -rf _preview/gnodev.log _preview/gnodev-base.log _preview/.gnodev-*
+          du -sh _preview
+
+      # The render step deletes the logs on success and no later step runs on
+      # failure, so without this a gnodev that never came up leaves nothing to
+      # read but "not ready".
+      - name: Show the gnodev log
+        if: failure()
+        run: |
+          for f in _preview/gnodev.log _preview/gnodev-base.log; do
+            [ -f "$f" ] || continue
+            echo "::group::$f"; tail -100 "$f"; echo "::endgroup::"
+          done
+
+      - uses: ./.github/actions/previews-sync
+        if: steps.plan.outputs.skip != 'true'
+        with:
+          subdir: pr-${{ github.event.pull_request.number }}
+          source: _preview
+          message: "preview: PR #${{ github.event.pull_request.number }}"
+          deploy-key: ${{ secrets.PREVIEWS_DEPLOY_KEY }}
+
+      # Now that the snapshot exists, render the same comment again with the
+      # preview section filled in. Same marker, same comment: `gnocontracts pr`
+      # stays its only author.
+      - name: Fold the preview into the comment
+        if: steps.plan.outputs.skip != 'true'
+        run: |
+          go -C tools tool gnocontracts pr \
+            -base "origin/$BASE" \
+            -preview-url "${{ env.PAGES_URL }}" \
+            -preview-detail _preview/preview.md \
+            -out /tmp/pr-comment.md
+
+      - uses: ./.github/actions/pr-comment
+        if: steps.plan.outputs.skip != 'true'
+        with:
+          body-file: /tmp/pr-comment.md
+          pr: ${{ github.event.pull_request.number }}
+          repo: ${{ github.repository }}
+          token: ${{ github.token }}
+
+  cleanup:
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/previews-sync
+        with:
+          subdir: pr-${{ github.event.pull_request.number }}
+          message: "preview: remove PR #${{ github.event.pull_request.number }}"
+          deploy-key: ${{ secrets.PREVIEWS_DEPLOY_KEY }}
