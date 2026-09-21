@@ -32,7 +32,7 @@
 // gnomod.toml declares private = true, which lets the creator re-add the
 // package at this path. That redeploy re-runs init() and RESETS everything
 // here, so the markdown under content/ is the source of truth and
-// cmd/gnohome pushes the slots back afterwards. The intended path is that this
+// tools/gnohome pushes the slots back afterwards. The intended path is that this
 // never happens: slots cover content, and the layout slot covers presentation.
 package home
 
@@ -161,7 +161,7 @@ func Revision() int {
 //
 //	<slug>\t<rev>\t<len>\t<sha256 of body, hex>
 //
-// It is the diff surface cmd/gnohome queries with vm/qeval: one read tells it
+// It is the diff surface tools/gnohome queries with vm/qeval: one read tells it
 // exactly which local file is out of date, without downloading any body.
 func Manifest() string {
 	var b strings.Builder

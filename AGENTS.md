@@ -283,17 +283,29 @@ nothing reusable to extract.
 ### Go companions (`<contract>/cmd/<name>/`)
 
 A contract that is **driven from a laptop** (content pushed from local files, a
-generated payload, a state dump to inspect) ships a small Go program next to it,
-at `<contract-dir>/cmd/<name>/`. Not under `tools/`: `tools/` holds repo-wide
-maintenance, a companion is part of one contract and moves with it.
+generated payload, a state dump to inspect) ships a small Go program. It goes at
+**`tools/<name>/`**, registered in the `tool` block of `tools/go.mod`, and is run
+as `go -C tools tool <name>`.
+
+Next to the contract, at `<contract-dir>/cmd/<name>/`, would read better and is
+**not possible**: there is no Go module at the repository root and there cannot
+be one. The root holds `vendor/gno.land`, and Go treats a `vendor/` in a module
+root as Go vendoring, refusing to build and deleting what it did not put there
+(see the comment at the top of `tools/go.mod`). So the only Go module that
+covers ordinary packages is `tools/`, and anything outside it is built by
+nothing: `go vet` and `go test` refuse it with *"directory prefix ... does not
+contain main module"*, and CI, which runs `go -C tools vet ./...` and
+`go -C tools test ./...`, never sees it. A companion placed beside its contract
+is silently untested, which is how `gnohome` spent one PR orphaned.
 
 Rules, so a companion stays small and safe:
 
-- **Standard library only.** No `gnoclient`, no cgo, no second `go.mod`. Read the
+- **Standard library only.** No `gnoclient`, no cgo, no third `go.mod`. Read the
   chain over plain JSON-RPC `abci_query`; that is ~60 lines and it keeps the
-  companion inside the root module, so `go build ./...` and `go vet ./...` cover
-  it. (`tools/gnopublish` is the counter-example: it links the full gno client
-  stack and therefore had to become a separate module.)
+  companion inside the `tools` module, so `go -C tools vet ./...` and
+  `go -C tools test ./...` cover it. (`tools/gnopublish` is the counter-example:
+  it links the full gno client stack and therefore had to become a separate
+  module.)
 - **Print transactions, do not sign them.** Emit `gnokey maketx …` commands for
   the user to review and paste. A companion holds no key and broadcasts nothing,
   so it can never surprise anyone. Name moul's key `moul` in what it emits.
@@ -302,11 +314,11 @@ Rules, so a companion stays small and safe:
   mirrors, and a Go test pinning the two to the same behaviour.
 - **Table-driven tests, no network.** The chain-facing code is one function that
   returns a string; test the parsing, not the transport.
-- The gno toolchain ignores it: `ReadMemPackage` skips sub-directories, so
-  `cmd/` never reaches the chain, and `PKG_DIRS` only finds directories holding a
-  `gnomod.toml`.
+- The gno toolchain ignores it: `PKG_DIRS` only finds directories holding a
+  `gnomod.toml`, and `tools/` has none. **Cross-link it** from the contract's own
+  README, since it no longer sits in the same directory.
 
-Worked example: `r/moul/home/cmd/gnohome`.
+Worked example: `tools/gnohome`, which drives `r/moul/home`.
 
 ## The maintenance CLI (`tools/gnocontracts`)
 

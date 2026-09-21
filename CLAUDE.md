@@ -32,10 +32,12 @@ Read it before doing anything. The essentials:
   them into the gitignored `.gnopm/`, and they are still linted and tested
   from there.
   See [`tools/gnopm`](./tools/gnopm).
-- **A contract driven from a laptop ships a Go companion at
-  `<contract>/cmd/<name>/`**: standard library only, inside the root module, and
-  it **prints `gnokey maketx` commands rather than signing anything**. Not under
-  `tools/`, which is repo-wide maintenance. Example: `r/moul/home/cmd/gnohome`.
+- **A contract driven from a laptop ships a Go companion at `tools/<name>/`**,
+  in the `tool` block of `tools/go.mod`, run as `go -C tools tool <name>`:
+  standard library only, and it **prints `gnokey maketx` commands rather than
+  signing anything**. It cannot live beside the contract: the repo root holds
+  `vendor/gno.land` so it can never be a Go module, and anything outside
+  `tools/` is built and tested by nothing. Example: `tools/gnohome`.
 - **The 12 mirrored `p/moul/*` are frozen.** `addrset` `authz` `dynreplacer`
   `fifo` `helplink` `md` `mdtable` `once` `realmpath` `txlink` `typeutil` `ulist`
   also live in `gnolang/gno` at the same `/v0` path and ship in gnoland1 genesis.

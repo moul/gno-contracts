@@ -156,25 +156,25 @@ slot covers presentation, so the code should not need to change.
 
 ## Local workflow
 
-`cmd/gnohome` is the local half: it builds the slots from `content/*.md`, renders
+`tools/gnohome` is the local half: it builds the slots from `content/*.md`, renders
 the page offline exactly as the realm would, diffs against the chain, and prints
 the `gnokey` commands for what is outdated, nothing else.
 
 ```sh
-go run ./r/moul/home/cmd/gnohome preview   # see the page before anyone else does
-go run ./r/moul/home/cmd/gnohome status    # what differs from the chain
-go run ./r/moul/home/cmd/gnohome tx        # the commands to fix that
+go -C tools tool gnohome preview   # see the page before anyone else does
+go -C tools tool gnohome status    # what differs from the chain
+go -C tools tool gnohome tx        # the commands to fix that
 ```
 
 The `packages` slot is generated, not written: it is a claim about what is
 deployed, and `contracts.json` already tracks that per network.
 
 ```sh
-go run ./r/moul/home/cmd/gnohome packages > r/moul/home/content/packages.md
+go -C tools tool gnohome packages > r/moul/home/content/packages.md
 ```
 
 
-See [`cmd/gnohome/README.md`](./cmd/gnohome/README.md).
+See [`tools/gnohome/README.md`](../../../tools/gnohome/README.md).
 
 ## First deploy
 
@@ -237,15 +237,15 @@ Still listed means still parked. Gone (and `vm/qrender` answering) means enabled
 ### 4. Push the content
 
 ```sh
-go run ./r/moul/home/cmd/gnohome tx -all | sh
+go -C tools tool gnohome tx -all | sh
 ```
 
 ### Where those numbers come from
 
 `gnokey maketx addpkg` uploads with `MPUserAll`, so every `.gno`, `.toml` and
 `.md` in the package directory travels, test files and this README included:
-**29,797 bytes** across six files. `cmd/` and `content/` are sub-directories and
-are skipped.
+**29,824 bytes** across six files. `content/` is a sub-directory, so it is
+skipped, as is `tools/gnohome`, which no longer lives here at all.
 
 - **`-gas-wanted 60000000`.** Ten successful mainnet `add_package` transactions
   above h160000 cost **1,014 to 1,781 gas per uploaded byte** (median 1,393). At

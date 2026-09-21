@@ -12,9 +12,9 @@ of signing them, so it holds no key and can broadcast nothing by accident.
 ```sh
 $EDITOR r/moul/home/content/bio.md
 
-go run ./r/moul/home/cmd/gnohome preview   # exactly what the realm will render
-go run ./r/moul/home/cmd/gnohome status    # what differs from the chain
-go run ./r/moul/home/cmd/gnohome tx        # the commands to fix that
+go -C tools tool gnohome preview   # exactly what the realm will render
+go -C tools tool gnohome status    # what differs from the chain
+go -C tools tool gnohome tx        # the commands to fix that
 ```
 
 `tx` writes to stdout, so review then pipe: `… tx | sh`.
@@ -45,8 +45,8 @@ the libraries and realms by name. `x/daily` is counted rather than listed:
 there are more of those than of everything else together.
 
 ```sh
-go run ./r/moul/home/cmd/gnohome packages > r/moul/home/content/packages.md
-go run ./r/moul/home/cmd/gnohome status    # then push it like any other slot
+go -C tools tool gnohome packages > r/moul/home/content/packages.md
+go -C tools tool gnohome status    # then push it like any other slot
 ```
 
 Output is deterministic for a given catalog, so regenerating without a catalog
@@ -83,7 +83,7 @@ Re-adding the package resets realm state: `init()` runs again and the slot tree
 is empty. Push everything back without consulting the chain:
 
 ```sh
-go run ./r/moul/home/cmd/gnohome tx -all | sh
+go -C tools tool gnohome tx -all | sh
 ```
 
 ## Bodies too large for one transaction
