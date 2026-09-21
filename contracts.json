@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-21T16:36:59Z",
+  "status_checked_at": "2026-09-21T16:49:10Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2558,6 +2558,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/home",
+      "dir": "r/moul/home",
+      "kind": "r",
+      "name": "home",
+      "version": "",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/dynreplacer/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/home/v0",
       "dir": "r/moul/home",
       "kind": "r",
@@ -2566,6 +2594,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
