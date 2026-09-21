@@ -123,12 +123,12 @@ jobs:
       # shown as it renders today next to how this branch renders it. Both
       # passes run the head's gnodev against the head's assets, so the pair
       # differs by the package change alone.
-      - name: Prepare the trees
+      # Only the merge-base tree: `make preview` below builds the view and syncs
+      # this one itself.
+      - name: Check out the merge base
         if: steps.plan.outputs.skip != 'true'
         run: |
           set -euo pipefail
-          go -C tools tool gnopm sync
-          make view
           git worktree add --detach "$RUNNER_TEMP/base" "$MERGE_BASE"
           # gnopm's own -C, not `go -C`: `go -C` sets the working directory of
           # the go command and the tool inherits it, so `cd base && go -C tools
@@ -137,21 +137,15 @@ jobs:
           go -C tools tool gnopm -C "$RUNNER_TEMP/base" sync \
             || echo "::warning::the merge base did not sync, before/after may be incomplete"
 
+      # `make preview`, not the tool directly: the target builds the stdlib-only
+      # GNOROOT view from the real GNOROOT and only then points the renderer at
+      # it, which is the pair that is easy to get wrong (see main.yml). gnodev
+      # comes from PATH, where setup-gno put it.
       - name: Render the preview
         if: steps.plan.outputs.skip != 'true'
-        env:
-          # The stdlib-only view `make view` builds, so gno.land/* dependencies
-          # resolve from committed vendor/ exactly as they do for lint and test.
-          # gnodev itself comes from PATH, where setup-gno put it.
-          GNOROOT: ${{ github.workspace }}/.gnoroot-view
         run: |
           set -euo pipefail
-          go -C tools tool gnocontracts preview \
-            -changed /tmp/changed.txt \
-            -base-root "$RUNNER_TEMP/base" \
-            -out _preview \
-            -base-url "${{ env.PAGES_URL }}" \
-            -pr "$PR"
+          make preview ARGS="-changed /tmp/changed.txt -base-root $RUNNER_TEMP/base -base-url ${{ env.PAGES_URL }} -pr $PR"
           rm -rf _preview/gnodev.log _preview/gnodev-base.log _preview/.gnodev-*
           du -sh _preview
 
