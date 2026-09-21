@@ -383,7 +383,7 @@ source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/x/
 hash = "h1:p+Z37biqtOpHWR9va0M2Ymb/e5sYZGd3/W4E3t9lJHQ="
 
 [[module]]
-module = "gno.land/r/moul/x/daily/asciiart/v2"
+module = "gno.land/r/moul/x/daily/asciiart/v1"
 source = { dir = "r/moul/x/daily/asciiart" }
 
 [[module]]
@@ -473,7 +473,7 @@ source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/x/
 hash = "h1:sc7U6FbWcoThccOIlXQSEyp3/SK+k9DkjIkWa+8Ni44="
 
 [[module]]
-module = "gno.land/r/moul/x/daily/connect4/v2"
+module = "gno.land/r/moul/x/daily/connect4/v1"
 source = { dir = "r/moul/x/daily/connect4" }
 
 [[module]]
@@ -593,7 +593,7 @@ source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/x/
 hash = "h1:UdwCW0cZNYhzzTRw83TkhIksKMplxUwJtYHp1R/KQEE="
 
 [[module]]
-module = "gno.land/r/moul/x/daily/guestbook/v2"
+module = "gno.land/r/moul/x/daily/guestbook/v1"
 source = { dir = "r/moul/x/daily/guestbook" }
 
 [[module]]
@@ -910,7 +910,7 @@ source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/x/
 hash = "h1:54voOdkE80mn3XSXjsKQC6r/uqAh5K/HEAupLHUXMAM="
 
 [[module]]
-module = "gno.land/r/moul/x/daily/todos/v2"
+module = "gno.land/r/moul/x/daily/todos/v1"
 source = { dir = "r/moul/x/daily/todos" }
 
 [[module]]
