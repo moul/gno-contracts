@@ -54,10 +54,11 @@ before making changes.
 3. **The catalog is generated on `main`, not in PRs.** `contracts.json`, the
    README table, per-package README footers, and `_assets/` graphs are all
    produced by the tools. **A PR carries only package SOURCE** — never run
-   `make gen` or commit those generated files in a branch/PR. The `regen`
-   workflow regenerates and commits them on `main` after every merge, and the
-   `publish-status` workflow refreshes on-chain status; committing them in a PR
-   only creates conflicts. (CI does **not** run `make check`.)
+   `make gen` or commit those generated files in a branch/PR. The `main`
+   workflow regenerates them, refreshes on-chain status and commits the lot on
+   `main` after every merge (and hourly); committing them in a PR only creates
+   conflicts. (CI does **not** run `make check`, but it does reject a PR that
+   carries a generated file: `gnocontracts guard-generated`.)
 
 ## Repository map
 
@@ -74,7 +75,8 @@ gnomod.lock             where each version's source is (SOURCE, a PR carries it)
 gnowork.toml            empty workspace marker (enables local resolution)
 .gnopm/                 superseded versions, rebuilt from history (gitignored)
 Makefile                task entrypoints
-.github/workflows/ci.yml  builds gno master, verifies the lock, then test/lint/check
+.github/workflows/    ci (the gate), pr (one bot comment + preview), main (regen)
+.github/actions/      setup-gno, previews-sync, pr-comment — shared by those workflows
 ```
 
 ## Toolchain & environment
@@ -143,7 +145,7 @@ make test      # gno test every contract
 make lint      # gno lint every contract
 make deps      # vendor external gno.land deps into vendor/
 make gen       # refresh contracts.json + README table  (bot runs this on main; local preview only)
-make check     # verify the catalog is not stale (used by the regen bot, NOT PR CI)
+make check     # verify the catalog is not stale (used by the main regen bot, NOT PR CI)
 make sync      # report drift vs the gnolang/gno monorepo
 make publish NET=sapphire CHECK=1   # dependency-ordered publish plan + on-chain status
 make publish NET=pearl CHECK=1      # …same, against the other testnet
@@ -199,8 +201,8 @@ the grant and the per-address window — the bare root has no index route and
 
 The network list is **code-owned**: edit `defaultNetworks()` in
 `tools/gnocontracts/model.go`. `manifest` reconciles `contracts.json` against
-it, so the change lands via the `regen` workflow — hand-editing the catalog
-can't work, the `no-generated-files` guard rejects PRs that touch it.
+it, so the change lands via the `main` workflow — hand-editing the catalog
+can't work, the `guard-generated` CI step rejects PRs that touch it.
 
 ## Adding a contract
 
@@ -218,8 +220,8 @@ can't work, the `no-generated-files` guard rejects PRs that touch it.
 5. **Commit the new source files** (the contract directory) **and
    `gnomod.lock`**. The lock is source, not a generated artifact: CI checks it
    with `make verify`. Do **not** run `make gen` and do **not** stage
-   `contracts.json`, `README.md`, or `_assets/` — the `regen` workflow
-   generates those on `main` after merge. (You can run `make gen` locally to
+   `contracts.json`, `README.md`, or `_assets/` — the `main` workflow
+   generates those after merge. (You can run `make gen` locally to
    preview the catalog, but revert it before committing.)
 6. Commit + open the PR.
 
@@ -288,6 +290,17 @@ driven by the Makefile. Subcommands:
   report drift / ours / new-here / monorepo-only.
 - `publish` — topologically order contracts by dependency; with `-net`/`-check`,
   query the chain (`gnokey query vm/qfile`) and record upload status.
+- `status` — refresh that status for every network at once. A chain that does
+  not answer is SKIPPED, not recorded as hosting nothing (see below).
+- `pr` — everything CI needs about a pull request, from one diff: the sticky
+  comment body, the `gh pr edit` label arguments, the realms to preview.
+- `preview` — boot gnodev on the workspace and crawl the resulting gnoweb into
+  a self-contained static tree. `-all` renders every package (`make site`); a
+  `-changed` file list renders what a pull request touched plus every package
+  that imports it (`make preview`). See *Previews* below.
+- `guard-examples`, `guard-render`, `guard-generated` — the CI guards. They read
+  `.gno` with `go/scanner`, so `// Output:` inside a string literal and an
+  identifier like `printRender` no longer fool them (both did, as regexps).
 
 ## Drift & monorepo relationship
 
@@ -344,7 +357,7 @@ func ExampleRender() {
 }
 ```
 
-This is **enforced by CI**: `make guard-render` (`tools/guard_render.py`) fails
+This is **enforced by CI**: `make guard-render` (`gnocontracts guard-render`) fails
 when an `r/` package declares `func Render` and no test ever calls it. Coverage
 counts from a normal `*_test.gno` **or** a `*_filetest.gno`, and the call may be
 bare (`Render(`) or qualified (`home.Render(`). `ignore = true` packages are
@@ -406,7 +419,7 @@ Each package/realm directory ships a standalone `README.md` that:
 A PR includes the **hand-authored top** of each new package's README (the
 explanation above the footer marker). The generated footer, the root README
 table, and the catalog are all produced on `main`: `make readmes` creates/
-refreshes footers and `make gen` runs it, invoked by the `regen` workflow after
+refreshes footers and `make gen` runs it, invoked by the `main` workflow after
 merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
 (the long form); the per-package minimal disclaimer links to it.
 
@@ -415,4 +428,89 @@ merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
 PR CI checks only **source**: `gno lint` + `gno test` pass for every contract,
 and committed `vendor/` matches `make deps`. It does **not** run `make check` —
 `contracts.json`, the README table, per-package footers and `_assets/` are
-regenerated and committed on `main` by the `regen` / `publish-status` workflows.
+regenerated and committed on `main` by the `main` workflow.
+
+### The four workflows
+
+| workflow | when | what it owns |
+|---|---|---|
+| `ci` | push to main, every PR | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make toolcheck guard-examples guard-render lint test` |
+| `pr` | every PR event | **one** sticky comment, the path labels, and the published preview at `pr-<N>/` |
+| `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, package README footers, `_assets/`, and on-chain status |
+| `gnopublish-ci` | PRs touching `tools/gnopublish/**` | that module only; it links the whole gno client stack and must not slow every PR |
+
+Three composite actions carry what they share: `.github/actions/setup-gno`
+(clone gno master outside the workspace, build the requested binaries, cached on
+the upstream SHA, Go version from `tools/go.mod`), `.github/actions/previews-sync`
+(rewrite one subfolder of the previews site and push, retrying when a parallel
+job moved the branch) and `.github/actions/pr-comment` (upsert the one sticky
+comment and delete any duplicate).
+
+### Previews
+
+Every package is browsable as gnoweb renders it, without a checkout:
+
+| URL | What | Rebuilt |
+|---|---|---|
+| <https://moul.github.io/gno-contracts-previews/main/> | every package on `main` | every push to `main` |
+| `…/pr-<N>/` | what pull request N changed, plus every package that imports it | every push to the PR |
+
+Both come from `gnocontracts preview`, which boots **one** gnodev on the whole
+workspace and crawls it. Three things about that are load-bearing:
+
+1. **gnodev is given every package, not just the ones being rendered.** A package
+   here is versioned in its `gnomod.toml`, not in its directory path, so gnodev
+   cannot find `gno.land/p/moul/authz/v0` by walking to `p/moul/authz/v0`. Lazy
+   loading makes the whole workspace cost the same as one package: 193 packages,
+   node ready in 9s.
+2. **`GNOROOT` is the stdlib-only view**, the same one `lint` and `test` use, so a
+   preview resolves dependencies out of committed `vendor/` rather than out of
+   whatever the gno checkout happens to hold.
+3. **A changed pure package previews its dependents.** The reverse-import walk is
+   transitive: touching `p/moul/md` renders every realm that renders markdown. The
+   previous preview rendered nothing at all for a diff that touched no `r/`.
+
+Bounds, because a realm may link as many pages as it likes: at most 25 packages on
+a pull request (changed ones are never dropped, and the comment says how many
+were), 10 render-argument pages per package, and never a `$state`, `$help&func=`,
+`$download` or `:args$source` page. Without the argument budget one realm
+(`romannumdemo`, one page per numeral) produced 4,065 of 5,437 pages and 220 MB of
+323 MB on its own.
+
+Every page is `noindex, nofollow`: each is a near-duplicate of a real gno.land
+page, and gnoweb's own layout asks to be indexed.
+
+The site lives in **[moul/gno-contracts-previews](https://github.com/moul/gno-contracts-previews)**,
+not in this repository's `gh-pages`: the main snapshot is 103 MB rewritten on every
+push, and this repository is one everybody clones. That branch is rewritten as a
+single orphan commit each time, so the previews repository only ever holds the site
+as it is now. Publishing needs the `PREVIEWS_DEPLOY_KEY` secret, the private half of
+a write deploy key on that repository; a fork has no secrets, so it renders nothing
+and is linked to nothing.
+
+Locally: `make preview ARGS="./r/moul/home"` or `make site`, then serve the result
+(`python3 -m http.server -d _site`). A previews link is always safe to click and
+never a live chain: no signer, no transactions, no faucet, and every package shows
+the state right after `init()`.
+
+**One bot comment per PR**, marker `<!-- gnocontracts-pr -->`, rendered by
+`gnocontracts pr`. It fits in three lines: counts, risk signals, preview link.
+Everything per-package is inside a `<details>`. When adding a check, add a
+*count* to the signal line or a *chip* to a table row, never a new bullet per
+package: that is what made the old comment 45 lines long.
+
+### On-chain status and unreachable chains
+
+`make status` (and `publish -check`) probe every network with
+`gnokey query vm/qfile`. A query to a chain that is **down** fails exactly like
+a query for a package that was **never published**, and conflating the two used
+to write "not uploaded" for all 193 packages of any network that happened to be
+unreachable. So:
+
+- each network is probed once with an HTTP `/status` call first, and a network
+  that does not answer is skipped, keeping its last known values;
+- a per-package query that fails for a transport reason leaves that entry alone;
+- only a clean "not found" answer records an absence.
+
+A skipped network keeps stale data rather than wrong data. The run says which
+ones it skipped, and the `main` workflow logs a warning instead of failing.
