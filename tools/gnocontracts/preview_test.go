@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -30,122 +29,6 @@ func TestMatchesSelector(t *testing.T) {
 	}
 }
 
-func TestRelPrefixAndCSSRel(t *testing.T) {
-	if got, want := relPrefix("/r/moul/hello/v0"), "../../../../"; got != want {
-		t.Errorf("relPrefix = %q, want %q", got, want)
-	}
-	if got, want := relPrefix("/r/moul"), "../../"; got != want {
-		t.Errorf("relPrefix = %q, want %q", got, want)
-	}
-	// A stylesheet at /public/main.css sits in public/, so /public/x is just x.
-	if got := cssRel("/public/main.css"); got != "" {
-		t.Errorf("cssRel(/public/main.css) = %q, want \"\"", got)
-	}
-	// One directory deeper, it has to climb back out.
-	if got, want := cssRel("/public/css/main.css"), "../"; got != want {
-		t.Errorf("cssRel(/public/css/main.css) = %q, want %q", got, want)
-	}
-}
-
-func TestRewritePageMakesAppPathsRelative(t *testing.T) {
-	html := `<link href="/public/main.css"><a href="/r/moul/other/v0">x</a>` +
-		`<a href="/p/moul/md/v0">y</a><link rel="icon" href="/favicon.ico">` +
-		`<a href="https://example.org/r/keep/absolute">z</a>`
-	got := rewritePage(html, "../../../../")
-	for _, want := range []string{
-		`href="../../../../public/main.css"`,
-		`href="../../../../r/moul/other/v0"`,
-		`href="../../../../p/moul/md/v0"`,
-		`href="../../../../favicon.ico"`,
-		`href="https://example.org/r/keep/absolute"`, // an external URL is left alone
-	} {
-		if !strings.Contains(got, want) {
-			t.Errorf("rewritePage missing %q in:\n%s", want, got)
-		}
-	}
-}
-
-func TestPreviewRealmsSkipsArchivedAndPurePackages(t *testing.T) {
-	root := fixture(t, map[string]string{
-		"r/moul/live/gnomod.toml": "module = \"gno.land/r/moul/live/v1\"\ngno = \"0.9\"\n",
-		"r/moul/old/gnomod.toml":  "module = \"gno.land/r/moul/old/v0\"\nignore = true\n",
-		"p/moul/lib/gnomod.toml":  "module = \"gno.land/p/moul/lib/v0\"\n",
-	})
-	got, err := previewRealms(root, []string{"./..."})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(got) != 1 || got[0].pkgPath != "gno.land/r/moul/live/v1" {
-		t.Fatalf("previewRealms = %+v, want just the live realm", got)
-	}
-	// The URL carries the version even though the directory no longer does.
-	if want := "/r/moul/live/v1"; got[0].urlPath() != want {
-		t.Fatalf("urlPath = %q, want %q", got[0].urlPath(), want)
-	}
-}
-
-// renderPreview against a stub gnoweb: the whole crawl, rewrite and layout,
-// without a gno toolchain.
-func TestRenderPreviewWritesASelfContainedTree(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/r/moul/hello/v0", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html><link href="/public/css/main.css"><img src="/public/logo.png"><a href="/r/moul/other/v0">o</a></html>`))
-	})
-	mux.HandleFunc("/public/css/main.css", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`@font-face{src:url(/public/fonts/f.woff2)}body{background:url(/public/bg.png)}`))
-	})
-	mux.HandleFunc("/public/logo.png", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("PNG")) })
-	mux.HandleFunc("/public/fonts/f.woff2", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("WOFF")) })
-	mux.HandleFunc("/public/bg.png", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("BG")) })
-	srv := httptest.NewServer(mux)
-	defer srv.Close()
-
-	out := t.TempDir()
-	realms := []previewRealm{{pkgPath: "gno.land/r/moul/hello/v0", dir: "r/moul/hello"}}
-	if err := renderPreview(srv.URL, out, realms); err != nil {
-		t.Fatal(err)
-	}
-
-	page := readTestFile(t, filepath.Join(out, "r/moul/hello/v0/index.html"))
-	if !strings.Contains(page, `href="../../../../public/css/main.css"`) {
-		t.Errorf("page keeps an absolute asset path:\n%s", page)
-	}
-	if !strings.Contains(page, `href="../../../../r/moul/other/v0"`) {
-		t.Errorf("page keeps an absolute realm link:\n%s", page)
-	}
-
-	// The CSS was followed for its url()s, and rewritten relative to itself.
-	css := readTestFile(t, filepath.Join(out, "public/css/main.css"))
-	if !strings.Contains(css, "url(../fonts/f.woff2)") || !strings.Contains(css, "url(../bg.png)") {
-		t.Errorf("css not rewritten relative to its own directory:\n%s", css)
-	}
-	for _, asset := range []string{"public/logo.png", "public/fonts/f.woff2", "public/bg.png"} {
-		if !fileExists(filepath.Join(out, asset)) {
-			t.Errorf("asset %s not fetched (transitive url() not followed?)", asset)
-		}
-	}
-
-	index := readTestFile(t, filepath.Join(out, "index.html"))
-	if !strings.Contains(index, `href="r/moul/hello/v0/index.html"`) {
-		t.Errorf("index does not link the realm:\n%s", index)
-	}
-}
-
-// A realm that 404s is reported and skipped, not fatal: one broken realm must
-// not cost the preview of every other one.
-func TestRenderPreviewSurvivesAMissingRealm(t *testing.T) {
-	srv := httptest.NewServer(http.NotFoundHandler())
-	defer srv.Close()
-	out := t.TempDir()
-	err := renderPreview(srv.URL, out, []previewRealm{{pkgPath: "gno.land/r/moul/gone/v0", dir: "r/moul/gone"}})
-	if err != nil {
-		t.Fatalf("a 404 realm was fatal: %v", err)
-	}
-	if !fileExists(filepath.Join(out, "index.html")) {
-		t.Error("no index written")
-	}
-}
-
 func readTestFile(t *testing.T, path string) string {
 	t.Helper()
 	b, err := os.ReadFile(path)
@@ -153,16 +36,6 @@ func readTestFile(t *testing.T, path string) string {
 		t.Fatal(err)
 	}
 	return string(b)
-}
-
-func TestPreviewIndexListsEveryRealm(t *testing.T) {
-	got := previewIndex([]previewRealm{
-		{pkgPath: "gno.land/r/moul/a/v0"},
-		{pkgPath: "gno.land/r/moul/b/v1"},
-	})
-	if n := strings.Count(got, "<li>"); n != 2 {
-		t.Fatalf("index has %d entries, want 2:\n%s", n, got)
-	}
 }
 
 func TestEnvOr(t *testing.T) {

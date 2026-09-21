@@ -76,7 +76,7 @@ gnowork.toml            empty workspace marker (enables local resolution)
 .gnopm/                 superseded versions, rebuilt from history (gitignored)
 Makefile                task entrypoints
 .github/workflows/    ci (the gate), pr (one bot comment + preview), main (regen)
-.github/actions/      setup-gno, gh-pages-sync — shared by those workflows
+.github/actions/      setup-gno, previews-sync, pr-comment — shared by those workflows
 ```
 
 ## Toolchain & environment
@@ -287,9 +287,10 @@ driven by the Makefile. Subcommands:
   not answer is SKIPPED, not recorded as hosting nothing (see below).
 - `pr` — everything CI needs about a pull request, from one diff: the sticky
   comment body, the `gh pr edit` label arguments, the realms to preview.
-- `preview` — boot gnodev on the selected realms and extract a self-contained
-  static gnoweb tree (`make preview ARGS="./r/moul/home"`, then serve
-  `_preview/`). What the `pr` workflow publishes to `gh-pages/pr-<N>/`.
+- `preview` — boot gnodev on the workspace and crawl the resulting gnoweb into
+  a self-contained static tree. `-all` renders every package (`make site`); a
+  `-changed` file list renders what a pull request touched plus every package
+  that imports it (`make preview`). See *Previews* below.
 - `guard-examples`, `guard-render`, `guard-generated` — the CI guards. They read
   `.gno` with `go/scanner`, so `// Output:` inside a string literal and an
   identifier like `printRender` no longer fool them (both did, as regexps).
@@ -427,15 +428,63 @@ regenerated and committed on `main` by the `main` workflow.
 | workflow | when | what it owns |
 |---|---|---|
 | `ci` | push to main, every PR | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make toolcheck guard-examples guard-render lint test` |
-| `pr` | every PR event | **one** sticky comment, the path labels, and the gh-pages preview at `pr-<N>/` |
+| `pr` | every PR event | **one** sticky comment, the path labels, and the published preview at `pr-<N>/` |
 | `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, package README footers, `_assets/`, and on-chain status |
 | `gnopublish-ci` | PRs touching `tools/gnopublish/**` | that module only; it links the whole gno client stack and must not slow every PR |
 
-Two composite actions carry what they share: `.github/actions/setup-gno` (clone
-gno master outside the workspace, build the requested binaries, cached on the
-upstream SHA, Go version from `go.mod`) and `.github/actions/gh-pages-sync`
-(rewrite one `pr-<N>/` subfolder and push, retrying when a parallel PR moved the
-branch).
+Three composite actions carry what they share: `.github/actions/setup-gno`
+(clone gno master outside the workspace, build the requested binaries, cached on
+the upstream SHA, Go version from `tools/go.mod`), `.github/actions/previews-sync`
+(rewrite one subfolder of the previews site and push, retrying when a parallel
+job moved the branch) and `.github/actions/pr-comment` (upsert the one sticky
+comment and delete any duplicate).
+
+### Previews
+
+Every package is browsable as gnoweb renders it, without a checkout:
+
+| URL | What | Rebuilt |
+|---|---|---|
+| <https://moul.github.io/gno-contracts-previews/main/> | every package on `main` | every push to `main` |
+| `…/pr-<N>/` | what pull request N changed, plus every package that imports it | every push to the PR |
+
+Both come from `gnocontracts preview`, which boots **one** gnodev on the whole
+workspace and crawls it. Three things about that are load-bearing:
+
+1. **gnodev is given every package, not just the ones being rendered.** A package
+   here is versioned in its `gnomod.toml`, not in its directory path, so gnodev
+   cannot find `gno.land/p/moul/authz/v0` by walking to `p/moul/authz/v0`. Lazy
+   loading makes the whole workspace cost the same as one package: 193 packages,
+   node ready in 9s.
+2. **`GNOROOT` is the stdlib-only view**, the same one `lint` and `test` use, so a
+   preview resolves dependencies out of committed `vendor/` rather than out of
+   whatever the gno checkout happens to hold.
+3. **A changed pure package previews its dependents.** The reverse-import walk is
+   transitive: touching `p/moul/md` renders every realm that renders markdown. The
+   previous preview rendered nothing at all for a diff that touched no `r/`.
+
+Bounds, because a realm may link as many pages as it likes: at most 25 packages on
+a pull request (changed ones are never dropped, and the comment says how many
+were), 10 render-argument pages per package, and never a `$state`, `$help&func=`,
+`$download` or `:args$source` page. Without the argument budget one realm
+(`romannumdemo`, one page per numeral) produced 4,065 of 5,437 pages and 220 MB of
+323 MB on its own.
+
+Every page is `noindex, nofollow`: each is a near-duplicate of a real gno.land
+page, and gnoweb's own layout asks to be indexed.
+
+The site lives in **[moul/gno-contracts-previews](https://github.com/moul/gno-contracts-previews)**,
+not in this repository's `gh-pages`: the main snapshot is 103 MB rewritten on every
+push, and this repository is one everybody clones. That branch is rewritten as a
+single orphan commit each time, so the previews repository only ever holds the site
+as it is now. Publishing needs the `PREVIEWS_DEPLOY_KEY` secret, the private half of
+a write deploy key on that repository; a fork has no secrets, so it renders nothing
+and is linked to nothing.
+
+Locally: `make preview ARGS="./r/moul/home"` or `make site`, then serve the result
+(`python3 -m http.server -d _site`). A previews link is always safe to click and
+never a live chain: no signer, no transactions, no faucet, and every package shows
+the state right after `init()`.
 
 **One bot comment per PR**, marker `<!-- gnocontracts-pr -->`, rendered by
 `gnocontracts pr`. It fits in three lines: counts, risk signals, preview link.

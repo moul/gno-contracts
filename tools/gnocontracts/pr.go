@@ -94,16 +94,24 @@ func cmdPR(root string, args []string) error {
 	out := fs.String("out", "", "write the comment body here (default: stdout)")
 	labelsOut := fs.String("labels-out", "", "write the `gh pr edit` label arguments here")
 	selectorsOut := fs.String("selectors-out", "", "write the changed realm selectors here, one per line")
+	previewDetail := fs.String("preview-detail", "", "markdown fragment written by `preview`, folded under the preview link")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
+
+	// Relative paths are repo-root relative, not process relative: CI invokes
+	// this as `go -C tools tool gnocontracts`, which runs the tool in tools/.
+	// A bare `_preview/preview.md` read from there is simply missing, and a
+	// missing detail file is indistinguishable from "the preview has not been
+	// rendered yet" — so the comment silently lost its preview section.
+	*previewDetail = underRoot(root, *previewDetail)
 
 	a, err := analyzePR(root, *base)
 	if err != nil {
 		return err
 	}
 
-	body := renderPRComment(root, a, *base, *previewURL)
+	body := renderPRComment(root, a, *base, *previewURL, readPreviewDetail(*previewDetail))
 	if *out == "" {
 		fmt.Print(body)
 	} else if err := os.WriteFile(*out, []byte(body), 0o644); err != nil {
@@ -281,7 +289,7 @@ func flagsFor(root string, p *pkgAgg, c *Contract) []prFlag {
 // every list folds. A 13-package pull request used to render 45 lines, a dozen
 // of which said the same thing about a dozen packages. This renders three,
 // whatever the size of the diff.
-func renderPRComment(root string, a *prAnalysis, base, previewURL string) string {
+func renderPRComment(root string, a *prAnalysis, base, previewURL, previewDetail string) string {
 	var b strings.Builder
 	b.WriteString(prMarker + "\n")
 
@@ -305,9 +313,22 @@ func renderPRComment(root string, a *prAnalysis, base, previewURL string) string
 		b.WriteString(sig + "\n")
 	}
 
-	if previewURL != "" && len(a.selectors) > 0 {
-		b.WriteString(fmt.Sprintf("🖼️ **[Preview](%s)** · %d realm%s · _stable link, updates a minute or two after each push_\n",
-			previewURL, len(a.selectors), pluralS(len(a.selectors))))
+	// The preview covers more than the changed realms — a changed pure package
+	// pulls in every realm that imports it — so a diff with no changed realm at
+	// all can still produce one. Hence the detail, when present, is enough on
+	// its own to justify the link.
+	if previewURL != "" && (len(a.selectors) > 0 || previewDetail != "") {
+		if n := len(a.selectors); n > 0 {
+			b.WriteString(fmt.Sprintf("🖼️ **[Preview](%s)** · %d realm%s · _stable link, updates a minute or two after each push_\n",
+				previewURL, n, pluralS(n)))
+		} else {
+			b.WriteString(fmt.Sprintf("🖼️ **[Preview](%s)** · _stable link, updates a minute or two after each push_\n", previewURL))
+		}
+		// Rendered once the snapshot exists: the comment is written first
+		// without it, then rewritten by the preview job with it.
+		if previewDetail != "" {
+			b.WriteString("\n" + previewDetail + "\n")
+		}
 	}
 
 	if table := packageTable(a, previewURL); table != "" {
