@@ -105,9 +105,25 @@ func feeFor(gasWanted int64) string {
 // purpose: unused gas is not charged, a too-low estimate costs a failed
 // transaction. Override with -gas-wanted.
 func gasFor(bodyLen int) int64 {
+	// Measured, not guessed. The five-slot batch broadcast at height 221309
+	// (tx LUriTCSqzEamFR4lPZqvxw32uaac7y6y38Vzp8eQuhk=) used 6,133,836 gas
+	// for 3,204 bytes of body across five Set calls: ~1.23M per call. The
+	// previous floor of 10M per call over-estimated that batch by 9.2x.
+	//
+	// Over-estimating is not free, which is why this was worth fixing: the
+	// mempool enforces the fee/gas_wanted RATIO, so a ceiling nine times too
+	// high makes the fee nine times too high, and gas_fee is deducted in full
+	// and never refunded. That batch paid 564,080ugnot where ~173,060 would
+	// have done.
+	//
+	// Still ~2.8x the measured usage, deliberately: one sample is one sample,
+	// and running out of gas loses the whole fee and gets nothing, so the
+	// asymmetry favours headroom. A Set is not a code-bearing message, so
+	// .app/simulate can size it exactly without a signature; doing that
+	// instead of estimating is the real fix.
 	const (
-		floor   = 10_000_000
-		perByte = 2_000
+		floor   = 2_500_000
+		perByte = 1_500
 	)
 	g := int64(floor) + int64(bodyLen)*perByte
 	return g

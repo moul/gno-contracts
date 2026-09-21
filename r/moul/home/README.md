@@ -210,6 +210,7 @@ Then the content, once the realm answers:
 
 ```sh
 go -C tools tool gnohome tx -all -batch /tmp/home.tx.json
+sh /tmp/home.tx.sh
 ```
 
 That writes one transaction holding every slot and prints the `gnokey sign`

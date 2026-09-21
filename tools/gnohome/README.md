@@ -56,8 +56,12 @@ one signature:
 
 ```sh
 go -C tools tool gnohome tx -all -batch /tmp/home.tx.json
-# then the two commands it prints: gnokey sign, gnokey broadcast
+sh /tmp/home.tx.sh    # signs, then broadcasts, written next to the document
 ```
+
+The two commands are also printed, chained with `&&`. That is not cosmetic:
+`gnokey broadcast` does **not** refuse an unsigned document locally, it sends
+it and lets the chain answer `no signers`. Signing has to gate the broadcast.
 
 It reads the account number and sequence off the chain and puts them in the
 `sign` command for you. **The signature is bound to chain-id, account number
