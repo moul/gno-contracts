@@ -27,7 +27,7 @@ four answers to one question.
 
 This package does **not** re-export markdown primitives. Headings, bold, lists,
 code blocks and links already have an owner in
-[`p/moul/md`](../../../md/v0); import that alongside. What lives here is only
+[`p/moul/md`](https://github.com/moul/gno-contracts/tree/main/p/moul/md); import that alongside. What lives here is only
 what had no owner and was therefore copy-pasted.
 
 ```go
@@ -70,14 +70,14 @@ Table cells and `Action` titles are **markdown, not plain text**.
   **not** be escaped again.
 
 `Table` renders the GFM table itself rather than delegating to
-[`p/moul/mdtable`](../../../mdtable/v0), which unconditionally rewrites `|` to
+[`p/moul/mdtable`](https://github.com/moul/gno-contracts/tree/main/p/moul/mdtable), which unconditionally rewrites `|` to
 `&#124;` in every cell. Stacked on `Cell`, which already emits the GFM escape
 `\|`, that double-escapes into a stray backslash (`a\&#124;b`, found while
 porting `guestbook`). One escaping stage is the only way to get this right, and
 it has to be the stage that knows whether the text is user input.
 
 `Action` also escapes its title, which
-[`p/moul/helplink`](../../../helplink/v0) does not (it carries an `// XXX:
+[`p/moul/helplink`](https://github.com/moul/gno-contracts/tree/main/p/moul/helplink) does not (it carries an `// XXX:
 escape title` where this would go).
 
 ## Design rule

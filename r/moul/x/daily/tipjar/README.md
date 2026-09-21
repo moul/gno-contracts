@@ -10,8 +10,8 @@ Built for gno 0.9.
 
 ## What changed in v1
 
-Identical behaviour to [`v0`](../v0) apart from rendering, which now goes
-through [`p/moul/kit/ui`](../../../../../../p/moul/kit/ui/v0) instead of the local `medal` helper.
+Identical behaviour to [`v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/tipjar) apart from rendering, which now goes
+through [`p/moul/kit/ui`](/p/moul/kit/ui/v0) instead of the local `medal` helper.
 
 **One podium.** `ui.Podium` replaces the medal switch three realms each had a copy of. Same output.
 

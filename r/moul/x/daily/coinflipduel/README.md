@@ -38,8 +38,8 @@ API notes this realm follows (`chain`, `chain/runtime`, `gno.land/p/nt/avl/v0`).
 
 ## What changed in v1
 
-Identical behaviour to [`v0`](../v0) apart from rendering, which now goes
-through [`p/moul/kit/ui`](../../../../../../p/moul/kit/ui/v0) instead of the local `escapeInline` helper.
+Identical behaviour to [`v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/coinflipduel) apart from rendering, which now goes
+through [`p/moul/kit/ui`](/p/moul/kit/ui/v0) instead of the local `escapeInline` helper.
 
 **Real escaping.** The local helper replaced a handful of markdown metacharacters. `ui.Inline` and `ui.Cell` delegate to [`p/nt/markdown/sanitize`](/p/nt/markdown/sanitize/v0), which also strips bidi and zero-width characters and folds newlines, so user text cannot reorder or escape the line it sits on.
 
