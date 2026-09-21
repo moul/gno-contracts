@@ -147,6 +147,11 @@ source = { dir = "p/moul/ulist/lplist" }
 
 [[module]]
 module = "gno.land/p/moul/ulist/v0"
+source = { commit = "f6d0693f5161db423c042a4fe7c78057593cff80", dir = "p/moul/ulist" }
+hash = "h1:kFOZ7r9kTntk29On36HzopI+PlNwGQs7LUB3xl4zaek="
+
+[[module]]
+module = "gno.land/p/moul/ulist/v1"
 source = { dir = "p/moul/ulist" }
 
 [[module]]
@@ -290,6 +295,10 @@ module = "gno.land/p/moul/x/daily/trie/v0"
 source = { dir = "p/moul/x/daily/trie" }
 
 [[module]]
+module = "gno.land/p/moul/x/storagecost/v0"
+source = { dir = "p/moul/x/storagecost" }
+
+[[module]]
 module = "gno.land/p/moul/x/wiki/v0"
 source = { dir = "p/moul/x/wiki" }
 
@@ -358,8 +367,13 @@ module = "gno.land/r/moul/hello/v0"
 source = { dir = "r/moul/hello" }
 
 [[module]]
-module = "gno.land/r/moul/home/v0"
+module = "gno.land/r/moul/home"
 source = { dir = "r/moul/home" }
+
+[[module]]
+module = "gno.land/r/moul/home/v0"
+source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/home" }
+hash = "h1:b/9gcLANRaR35M4PjRP0jBI9K8CGs2yRwmMEhU+rdQQ="
 
 [[module]]
 module = "gno.land/r/moul/outfmt/v0"
@@ -905,6 +919,10 @@ source = { dir = "r/moul/x/daily/wordle" }
 [[module]]
 module = "gno.land/r/moul/x/daily/wrapped/v0"
 source = { dir = "r/moul/x/daily/wrapped" }
+
+[[module]]
+module = "gno.land/r/moul/x/reaper/v0"
+source = { dir = "r/moul/x/reaper" }
 
 [[module]]
 module = "gno.land/r/moul/x/wiki/v0"

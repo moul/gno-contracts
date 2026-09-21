@@ -5,6 +5,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/authz/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/collection/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/debug/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/dynreplacer/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/entropy/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/fifo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/greet/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -23,7 +24,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/typeutil/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/udao/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/ulist/lplist/v0" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/p/moul/ulist/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/b58/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/base32/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -59,6 +60,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/daily/sparkline/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/toposort/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/trie/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/storagecost/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/wiki/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/xdao/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/nt/avl/pager/v0";
@@ -79,6 +81,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/demo/wikicoin/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/gns/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/hello/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/home" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/outfmt/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/present/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/asciiart/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -166,6 +169,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/urlshort/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/vault/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/wrapped/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/reaper/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/wiki/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/addrset/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/addrset/v1" -> "gno.land/p/nt/bptree/v0";
@@ -193,13 +197,14 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/template/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/p/moul/template/v0" -> "gno.land/p/moul/typeutil/v0";
   "gno.land/p/moul/template/v0" -> "gno.land/p/nt/ufmt/v0";
-  "gno.land/p/moul/ulist/lplist/v0" -> "gno.land/p/moul/ulist/v0";
+  "gno.land/p/moul/ulist/lplist/v0" -> "gno.land/p/moul/ulist/v1";
   "gno.land/p/moul/web25/v0" -> "gno.land/p/moul/realmpath/v0";
   "gno.land/p/moul/x/daily/markov/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/x/daily/ratelimit/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/p/moul/x/storagecost/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/moul/fifo/v0";
   "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/moul/md/v0";
-  "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/moul/ulist/v0";
+  "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/moul/ulist/v1";
   "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/nt/markdown/sanitize/v0";
   "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/nt/ufmt/v0";
@@ -217,6 +222,8 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/gns/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/gns/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/hello/v0" -> "gno.land/p/moul/greet/v0";
+  "gno.land/r/moul/home" -> "gno.land/p/moul/dynreplacer/v0";
+  "gno.land/r/moul/home" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/outfmt/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/moul/mdtable/v0";
@@ -316,6 +323,11 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/urlshort/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/vault/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/wrapped/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/reaper/v0" -> "gno.land/p/moul/md/v0";
+  "gno.land/r/moul/x/reaper/v0" -> "gno.land/p/moul/txlink/v0";
+  "gno.land/r/moul/x/reaper/v0" -> "gno.land/p/moul/ulist/v1";
+  "gno.land/r/moul/x/reaper/v0" -> "gno.land/p/moul/x/storagecost/v0";
+  "gno.land/r/moul/x/reaper/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/wiki/v0" -> "gno.land/p/moul/addrset/v1";
   "gno.land/r/moul/x/wiki/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/wiki/v0" -> "gno.land/p/moul/realmpath/v0";
