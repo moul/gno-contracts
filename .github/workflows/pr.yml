@@ -130,8 +130,12 @@ jobs:
           go -C tools tool gnopm sync
           make view
           git worktree add --detach "$RUNNER_TEMP/base" "$MERGE_BASE"
-          ( cd "$RUNNER_TEMP/base" && go -C "$GITHUB_WORKSPACE/tools" tool gnopm sync ) \
-            || echo "::warning::the merge base did not sync; before/after may be incomplete"
+          # gnopm's own -C, not `go -C`: `go -C` sets the working directory of
+          # the go command and the tool inherits it, so `cd base && go -C tools
+          # tool gnopm sync` silently re-syncs the HEAD tree and leaves the base
+          # one without its materialized versions.
+          go -C tools tool gnopm -C "$RUNNER_TEMP/base" sync \
+            || echo "::warning::the merge base did not sync, before/after may be incomplete"
 
       - name: Render the preview
         if: steps.plan.outputs.skip != 'true'
