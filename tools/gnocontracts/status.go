@@ -29,14 +29,24 @@ func cmdStatus(root string, args []string) error {
 		return err
 	}
 
-	nets, checks := 0, 0
+	nets, checks, skipped := 0, 0, 0
 	for i := range m.Networks {
 		net := m.Networks[i]
 		if *only != "" && net.Name != *only {
 			continue
 		}
+		// Ask the chain whether it is there at all, once, before probing 193
+		// packages against it. A query to a chain that is down fails exactly
+		// like a query for a package that was never published, and writing
+		// that difference away is how sapphire came to be recorded as
+		// hosting none of these packages while it was simply unreachable.
+		if !netReachable(net.RPC) {
+			skipped++
+			fmt.Printf("  %-12s UNREACHABLE — keeping the last known status\n", net.Name)
+			continue
+		}
 		nets++
-		up := 0
+		up, unknown := 0, 0
 		for j := range m.Contracts {
 			c := &m.Contracts[j]
 			if c.Draft {
@@ -46,21 +56,30 @@ func cmdStatus(root string, args []string) error {
 			// package sits at OUR exact pkgpath, so a hit on a mirrored
 			// package is the genesis deployment and a hit on anything else
 			// was published from this repo.
-			uploaded := queryUploaded(net.RPC, c.PkgPath)
-			if c.Published == nil {
-				c.Published = map[string]Pub{}
-			}
-			pub := c.Published[net.Name]
-			pub.Uploaded = uploaded
-			pub.Which = whichFound(uploaded, c.Upstream != "")
-			c.Published[net.Name] = pub
-			if pub.Uploaded {
+			switch queryUploaded(net.RPC, c.PkgPath) {
+			case probeUnknown:
+				// The chain answered for others but not for this one. Leave
+				// the recorded value as it was; do not invent an absence.
+				unknown++
+				continue
+			case probePresent:
 				up++
+				c.setPublished(net.Name, true)
+			case probeAbsent:
+				c.setPublished(net.Name, false)
 			}
 			checks++
 		}
-		fmt.Printf("  %-12s %d uploaded / %d contracts\n", net.Name, up, len(m.Contracts))
+		note := ""
+		if unknown > 0 {
+			note = fmt.Sprintf("  (%d unanswered, left as they were)", unknown)
+		}
+		fmt.Printf("  %-12s %d uploaded / %d contracts%s\n", net.Name, up, len(m.Contracts), note)
 	}
+	if nets == 0 && skipped > 0 {
+		return fmt.Errorf("no network answered (%d unreachable): nothing to refresh", skipped)
+	}
+
 	// One timestamp for the whole run, so per-contract entries only change when
 	// their actual on-chain status changes (no churn on unchanged catalogs).
 	m.StatusCheckedAt = time.Now().UTC().Format(time.RFC3339)
@@ -71,19 +90,26 @@ func cmdStatus(root string, args []string) error {
 	if err := cmdReadme(root); err != nil {
 		return err
 	}
-	fmt.Printf("status: %d checks across %d network(s); contracts.json + README updated\n", checks, nets)
+	fmt.Printf("status: %d checks across %d reachable network(s), %d skipped; contracts.json + README updated\n", checks, nets, skipped)
 	return nil
 }
 
-// whichFound labels where an on-chain package came from: a mirrored package is
-// deployed by the monorepo (genesis), anything else was published from here.
-func whichFound(uploaded, mirrored bool) string {
+// setPublished records a probe result for one network, labelling where an
+// on-chain package came from: a mirrored package is deployed by the monorepo
+// (genesis), anything else was published from here.
+func (c *Contract) setPublished(net string, uploaded bool) {
+	if c.Published == nil {
+		c.Published = map[string]Pub{}
+	}
+	pub := c.Published[net]
+	pub.Uploaded = uploaded
 	switch {
 	case !uploaded:
-		return ""
-	case mirrored:
-		return "monorepo"
+		pub.Which = ""
+	case c.Upstream != "":
+		pub.Which = "monorepo"
 	default:
-		return "ours"
+		pub.Which = "ours"
 	}
+	c.Published[net] = pub
 }

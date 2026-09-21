@@ -1,12 +1,12 @@
 name: CI
 
+# The gate: the guards, then lint and test for every contract against a gno
+# built from master.
 on:
   push:
     branches: [main]
   pull_request:
 
-# Build the gno toolchain from gnolang/gno master, then test/lint every contract
-# and verify the generated catalog is up to date.
 jobs:
   contracts:
     runs-on: ubuntu-latest
@@ -21,22 +21,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version-file: tools/go.mod
 
-      # Clone the gno toolchain OUTSIDE the repo workspace. If it lived inside
-      # (e.g. ./.gno), the gnowork.toml workspace would discover its bundled
-      # examples/ + pkg/mod packages and they would shadow our committed
-      # vendor/, breaking reproducible resolution.
-      - name: Checkout & build gno (master), outside the workspace
+      # First, and before the toolchain build: a pull request carrying a
+      # generated file is rejected in seconds rather than after nine minutes.
+      # contracts.json and _assets/ are rewritten on main by the `main`
+      # workflow, so committing them here only creates a conflict with the next
+      # regeneration. README.md is the exception — part generated, part prose —
+      # and only its generated regions are compared, so a PR may still fix a
+      # stale paragraph.
+      - name: Guard the generated artifacts
+        if: github.event_name == 'pull_request'
         run: |
-          git clone --depth 1 https://github.com/gnolang/gno "$HOME/gno"
-          mkdir -p "$HOME/.local/bin"
-          (cd "$HOME/gno" && go build -o "$HOME/.local/bin/gno" ./gnovm/cmd/gno)
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
+          go -C tools tool gnocontracts guard-generated \
+            -base "${{ github.event.pull_request.base.sha }}" \
+            -head "${{ github.event.pull_request.head.sha }}"
+
+      - uses: ./.github/actions/setup-gno
+        with:
+          binaries: gno
 
       - name: gno version
         run: gno version
@@ -89,7 +94,7 @@ jobs:
       - name: Test
         run: make test
 
-      # NOTE: no `make check` here. PRs carry only package SOURCE — the generated
-      # catalog (contracts.json), README table, and _assets/ graphs are NOT
-      # expected to be fresh in a PR. They are regenerated on `main` after merge
-      # by the `regen` workflow, so PRs never conflict on generated files.
+      # NOTE: no `make check` here. PRs carry only package SOURCE — the
+      # generated catalog (contracts.json), README table, and _assets/ graphs
+      # are NOT expected to be fresh in a PR. They are regenerated on `main`
+      # after merge by the `main` workflow, so PRs never conflict on them.
