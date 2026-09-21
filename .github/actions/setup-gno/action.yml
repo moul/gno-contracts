@@ -1,0 +1,70 @@
+name: Set up gno
+description: >
+  Build the gno toolchain from gnolang/gno master, outside the workspace, and
+  export GNOROOT. Five workflows used to carry their own copy of this, with the
+  Go version drifting between them.
+
+inputs:
+  binaries:
+    description: which binaries to build, space separated (gno, gnokey, gnodev)
+    required: false
+    default: gno
+
+runs:
+  using: composite
+  steps:
+    # The Go version lives in go.mod and nowhere else.
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: tools/go.mod
+
+    # The build is keyed on the upstream commit, so a run only pays for it when
+    # gno master has actually moved. Resolving the SHA first is what makes the
+    # cache key honest; `master` alone would serve a stale binary forever.
+    - id: upstream
+      shell: bash
+      run: echo "sha=$(git ls-remote https://github.com/gnolang/gno HEAD | cut -f1)" >> "$GITHUB_OUTPUT"
+
+    - id: cache
+      uses: actions/cache@v4
+      with:
+        # A dedicated directory, not ~/.local/bin: that one already holds
+        # runner-image tooling, and caching it would both capture and shadow
+        # things that have nothing to do with gno.
+        path: ~/gno-bin
+        key: gno-bin-${{ runner.os }}-${{ steps.upstream.outputs.sha }}-${{ inputs.binaries }}
+
+    # The clone happens either way: GNOROOT is a source tree, not a binary.
+    # lint/test read the stdlibs out of it, `regen` reads examples/ to resolve
+    # each contract's monorepo counterpart, and gnopublish repoints its replace
+    # at it. It must live OUTSIDE the repo workspace: inside (say ./.gno), the
+    # gnowork.toml workspace would discover the toolchain's bundled examples/
+    # and pkg/mod packages and they would shadow our committed vendor/,
+    # breaking reproducible resolution.
+    - shell: bash
+      env:
+        BINARIES: ${{ inputs.binaries }}
+        CACHED: ${{ steps.cache.outputs.cache-hit }}
+      run: |
+        set -euo pipefail
+        git clone --quiet --depth 1 https://github.com/gnolang/gno "$HOME/gno"
+        echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
+        echo "$HOME/gno-bin" >> "$GITHUB_PATH"
+        mkdir -p "$HOME/gno-bin"
+        if [ "$CACHED" = "true" ]; then
+          echo "gno binaries restored from cache ($BINARIES)"
+          exit 0
+        fi
+        for b in $BINARIES; do
+          # gnodev lives in contribs/, which is its OWN Go module: it has to be
+          # built from inside that directory, not as a package path of the root
+          # module.
+          case "$b" in
+            gno)    dir="$HOME/gno";                pkg=./gnovm/cmd/gno ;;
+            gnokey) dir="$HOME/gno";                pkg=./gno.land/cmd/gnokey ;;
+            gnodev) dir="$HOME/gno/contribs/gnodev"; pkg=. ;;
+            *) echo "::error::unknown gno binary '$b'"; exit 1 ;;
+          esac
+          echo "building $b"
+          ( cd "$dir" && GOTOOLCHAIN=auto go build -o "$HOME/gno-bin/$b" "$pkg" )
+        done
