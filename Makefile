@@ -16,8 +16,8 @@
 # `go tool gnocontracts <cmd>` — no binary is ever built into the tree.
 
 GNO          ?= gno
-GNOCONTRACTS ?= go tool gnocontracts
-GNOPM        ?= go tool gnopm
+GNOCONTRACTS ?= go -C tools tool gnocontracts
+GNOPM        ?= go -C tools tool gnopm
 
 # Ephemeral stdlib-only view of the toolchain (empty examples/ → vendor wins).
 VIEW := $(CURDIR)/.gnoroot-view
@@ -44,7 +44,7 @@ PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -not -path 
 OLD_PKG_DIRS = $(shell for d in $$(find .gnopm -name gnomod.toml -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report graph view clean upload verify
+.PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report preview site graph view clean upload verify
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -126,12 +126,12 @@ toolcheck: view .gnopm/.stamp ## verify the gno toolchain validates example test
 # Every gno Example* test must pin an `// Output:` block, else gno skips it
 # silently (a test that asserts nothing).
 guard-examples: ## fail if any Example* test lacks an // Output: block
-	@python3 tools/guard_examples.py
+	@$(GNOCONTRACTS) guard-examples
 
 # A realm's Render is its whole public surface, and a Render whose output varies
 # is a consensus bug — so every realm must have a test that actually calls it.
 guard-render: ## fail if a realm declares Render but no test calls it
-	@python3 tools/guard_render.py
+	@$(GNOCONTRACTS) guard-render
 
 lint: view .gnopm/.stamp ## gno lint every contract (deps resolved from committed vendor/)
 	@set -e; for d in $(PKG_DIRS) $(OLD_PKG_DIRS); do echo "== lint $$d =="; GNOROOT="$(VIEW)" $(GNO) lint ./$$d; done
@@ -172,11 +172,23 @@ upload: ## broadcast packages to a network via gnopublish, e.g. ARGS="-net mainn
 status: ## refresh on-chain upload status (all networks) + README; needs gnokey
 	$(GNOCONTRACTS) status $(if $(NET),-net $(NET),)
 
-report: ## analyze the PR diff (BASE=origin/main) into a Markdown report
-	$(GNOCONTRACTS) report $(if $(BASE),-base $(BASE),)
+# `@`-prefixed: the recipe's stdout IS the comment body that CI posts, so an
+# echoed `go tool gnocontracts …` line would land at the top of every PR comment
+# (it did, on every pull request, until this `@`).
+report: ## analyze the PR diff (BASE=origin/main) into the PR comment body
+	@$(GNOCONTRACTS) pr $(if $(BASE),-base $(BASE),)
+
+# Both previews need a gnodev on PATH and the same stdlib-only view lint/test
+# use, so gno.land/* resolves from committed vendor/ rather than from whatever
+# the GNOROOT checkout holds.
+preview: view .gnopm/.stamp ## render the packages ARGS selects, e.g. ARGS="./r/moul/home"; serve _preview/
+	GNOROOT="$(VIEW)" $(GNOCONTRACTS) preview -out _preview $(ARGS)
+
+site: view .gnopm/.stamp ## render EVERY package, what the main workflow publishes; serve _site/
+	GNOROOT="$(VIEW)" $(GNOCONTRACTS) preview -all -out _site
 
 graph: ## generate per-package + global dependency graphs into _assets/ (needs graphviz for svg/png)
 	$(GNOCONTRACTS) graph
 
-clean: ## remove build artifacts, the GNOROOT view, the gnopm assembly and the gnopublish on-chain cache
-	rm -rf bin "$(VIEW)" .cache .gnopm
+clean: ## remove build artifacts, the GNOROOT view, the gnopm assembly, the previews and the gnopublish on-chain cache
+	rm -rf bin "$(VIEW)" .cache .gnopm _preview _site
