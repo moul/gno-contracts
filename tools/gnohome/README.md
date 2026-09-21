@@ -17,7 +17,16 @@ go -C tools tool gnohome status    # what differs from the chain
 go -C tools tool gnohome tx        # the commands to fix that
 ```
 
-`tx` writes to stdout, so review then pipe: `… tx | sh`.
+`tx` writes to stdout. **Do not pipe it into `sh`**: `gnokey` reads the
+passphrase from stdin, and the pipe takes stdin away, so every prompt fails
+with `inappropriate ioctl for device`. Save it, read it, run it:
+
+```sh
+go -C tools tool gnohome tx > /tmp/slots.sh
+sh /tmp/slots.sh
+```
+
+Better still, use `-batch` and sign once. See below.
 
 ## Commands
 
@@ -33,6 +42,31 @@ Shared flags: `-content` `-realm` `-remote` `-chainid` `-key` `-owner`.
 `preview` adds `-out` `-height` `-rev`; `tx` adds `-inline` `-all` `-prune`
 `-gas-wanted` `-gas-fee` `-max-deposit`; `packages` adds `-catalog` `-network`.
 `gnohome <cmd> -h` lists them.
+
+### `-batch`: one transaction, one signature
+
+`tx` emits one command per outdated slot, which is one passphrase prompt per
+slot and, worse, **not atomic**: a failure halfway leaves the page assembled
+from a mix of old and new slots, with the layout pointing at a placeholder
+that was never written.
+
+A tm2 transaction carries a *list* of messages (`std.Tx.Msgs`), and `gnokey
+sign` signs the document rather than the message. So the whole update can be
+one signature:
+
+```sh
+go -C tools tool gnohome tx -all -batch /tmp/home.tx.json
+# then the two commands it prints: gnokey sign, gnokey broadcast
+```
+
+It reads the account number and sequence off the chain and puts them in the
+`sign` command for you. **The signature is bound to chain-id, account number
+and sequence**, so broadcast before that account signs anything else, or the
+document is void.
+
+This path also removes the `"$(/bin/cat …)"` problem entirely: in a document
+the body is a literal JSON string, so there is no shell to quote for, nothing
+eats the trailing newline, and `ARG_MAX` stops being a ceiling on slot size.
 
 ### Deploying is not here
 
@@ -93,7 +127,7 @@ Re-adding the package resets realm state: `init()` runs again and the slot tree
 is empty. Push everything back without consulting the chain:
 
 ```sh
-go -C tools tool gnohome tx -all | sh
+go -C tools tool gnohome tx -all -batch /tmp/home.tx.json
 ```
 
 ## Bodies too large for one transaction

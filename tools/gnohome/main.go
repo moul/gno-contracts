@@ -76,6 +76,7 @@ func run(args []string, out *os.File) error {
 		gasWanted   int64
 		gasFee      string
 		maxDeposit  string
+		batchOut    string
 		catalogFile string
 		network     string
 	)
@@ -91,6 +92,7 @@ func run(args []string, out *os.File) error {
 		fs.Int64Var(&gasWanted, "gas-wanted", 0, "gas-wanted override (default: sized from the body)")
 		fs.StringVar(&gasFee, "gas-fee", "", "gas-fee override (default: sized from -gas-wanted at ten times the accepted floor)")
 		fs.StringVar(&maxDeposit, "max-deposit", "", "max storage deposit for the emitted commands")
+		fs.StringVar(&batchOut, "batch", "", "write ONE transaction holding every change to this file, to sign once")
 	case "packages":
 		fs.StringVar(&catalogFile, "catalog", "", "path to contracts.json (default: <repo>/contracts.json)")
 		fs.StringVar(&network, "network", "mainnet", "which network's deployment status to report")
@@ -172,6 +174,12 @@ func run(args []string, out *os.File) error {
 			d = diff(local, remote)
 		}
 		warnOversize(out, local)
+		if batchOut != "" {
+			return printBatch(out, cfg, d, txOptions{
+				inline: inline, prune: prune, gasWanted: gasWanted,
+				gasFee: gasFee, maxDeposit: maxDeposit,
+			}, batchOut)
+		}
 		return printTx(out, cfg, d, txOptions{
 			inline:     inline,
 			prune:      prune,
@@ -195,6 +203,7 @@ commands:
   preview   render the page locally, the way the realm would
   status    diff local content/ against what is on chain
   tx        print the gnokey commands for exactly what is outdated
+            -batch FILE writes ONE transaction instead, to sign once
   packages  regenerate the packages slot from contracts.json, to stdout
 
 Deploying the realm is "gnopm publish", not a command here.
