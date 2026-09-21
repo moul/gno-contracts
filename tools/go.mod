@@ -16,5 +16,6 @@ require moul.io/gnopm v0.1.1
 
 tool (
 	github.com/moul/gno-contracts/tools/gnocontracts
+	github.com/moul/gno-contracts/tools/gnohome
 	moul.io/gnopm
 )

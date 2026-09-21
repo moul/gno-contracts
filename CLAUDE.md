@@ -18,6 +18,12 @@ Read it before doing anything. The essentials:
   **`gnopm bump <name>`**, which rewrites the one line and pins the outgoing
   version in `gnomod.lock`. Then edit the files in place, so the diff a
   reviewer sees is the actual compatibility change.
+  **One exception: `r/moul/home` carries no version at all**, because gnoweb
+  builds `/r/<username>/home` by concatenation for `gno.land/u/<username>` and
+  resolves no version, so any `/vN` publishes where `/u/moul` will never look.
+  `gnopm bump` refuses it for want of a `/vN`. It versions inside instead
+  (mutable content + `private = true`). Do not generalise without an external
+  consumer that hard-codes the path.
 - **`gnomod.lock` is source, and a PR carries it.** Unlike `contracts.json` it
   is not regenerated on `main`: a bump has to ship the pin that keeps the old
   version resolvable, or CI cannot build what still imports it. Run
@@ -26,6 +32,12 @@ Read it before doing anything. The essentials:
   them into the gitignored `.gnopm/`, and they are still linted and tested
   from there.
   See [`tools/gnopm`](./tools/gnopm).
+- **A contract driven from a laptop ships a Go companion at `tools/<name>/`**,
+  in the `tool` block of `tools/go.mod`, run as `go -C tools tool <name>`:
+  standard library only, and it **prints `gnokey maketx` commands rather than
+  signing anything**. It cannot live beside the contract: the repo root holds
+  `vendor/gno.land` so it can never be a Go module, and anything outside
+  `tools/` is built and tested by nothing. Example: `tools/gnohome`.
 - **The 12 mirrored `p/moul/*` are frozen.** `addrset` `authz` `dynreplacer`
   `fifo` `helplink` `md` `mdtable` `once` `realmpath` `txlink` `typeutil` `ulist`
   also live in `gnolang/gno` at the same `/v0` path and ship in gnoland1 genesis.

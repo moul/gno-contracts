@@ -10,10 +10,23 @@ before making changes.
 1. **Everything is versioned, starting at `v0`; bump only on a compatibility
    change.** Every contract path ends in an explicit version segment —
    `gno.land/{p,r}/moul/<name>/v0` (then `v1`, `v2`, …). There is *no*
-   un-versioned contract, ever, and **the version is always the LAST path
-   element**: `gno.land/p/moul/ulist/lplist/v0`, never
+   un-versioned contract **except where an external consumer dictates the path**
+   (see below), and **the version is always the LAST path element**:
+   `gno.land/p/moul/ulist/lplist/v0`, never
    `gno.land/p/moul/ulist/v0/lplist`. That is the PACKAGE path; the directory
    is `p/moul/ulist/lplist` and carries no version at all.
+   - **The one exception: `r/moul/home`, which has no version at all.** gnoweb
+     serves `gno.land/u/<username>` by calling `Render("")` on the realm at the
+     exact path `/r/<username>/home`
+     (`gno.land/pkg/gnoweb/handler_http.go`, `GetUserView`: the path is built by
+     string concatenation and there is no version resolution anywhere in the
+     lookup). So a module line of `gno.land/r/moul/home/v0` publishes to a path
+     `/u/moul` will never read. The bare module line is an interface with
+     gnoweb, not a naming choice, and it is why `gnopm bump` refuses this
+     package: there is no `/vN` to increment. It versions *inside* instead:
+     content in mutable storage, `private = true` in `gnomod.toml` so the code
+     can be replaced in place. Do not generalise this: it needs an external
+     consumer that hard-codes the path.
    - **`v0` is the first version of any path**, per gno's own convention
      (gnolang/gno#5220): *initial, unaudited*. New contracts start there.
    - **The version lives in `gnomod.toml`, not in the directory name.**
@@ -266,6 +279,46 @@ nothing reusable to extract.
 > how to structure a contract, record it **here** (and in `CLAUDE.md`) so the
 > next contract follows it from the start — the contract-building agent rereads
 > these files each time.
+
+### Go companions (`<contract>/cmd/<name>/`)
+
+A contract that is **driven from a laptop** (content pushed from local files, a
+generated payload, a state dump to inspect) ships a small Go program. It goes at
+**`tools/<name>/`**, registered in the `tool` block of `tools/go.mod`, and is run
+as `go -C tools tool <name>`.
+
+Next to the contract, at `<contract-dir>/cmd/<name>/`, would read better and is
+**not possible**: there is no Go module at the repository root and there cannot
+be one. The root holds `vendor/gno.land`, and Go treats a `vendor/` in a module
+root as Go vendoring, refusing to build and deleting what it did not put there
+(see the comment at the top of `tools/go.mod`). So the only Go module that
+covers ordinary packages is `tools/`, and anything outside it is built by
+nothing: `go vet` and `go test` refuse it with *"directory prefix ... does not
+contain main module"*, and CI, which runs `go -C tools vet ./...` and
+`go -C tools test ./...`, never sees it. A companion placed beside its contract
+is silently untested, which is how `gnohome` spent one PR orphaned.
+
+Rules, so a companion stays small and safe:
+
+- **Standard library only.** No `gnoclient`, no cgo, no third `go.mod`. Read the
+  chain over plain JSON-RPC `abci_query`; that is ~60 lines and it keeps the
+  companion inside the `tools` module, so `go -C tools vet ./...` and
+  `go -C tools test ./...` cover it. (`tools/gnopublish` is the counter-example:
+  it links the full gno client stack and therefore had to become a separate
+  module.)
+- **Print transactions, do not sign them.** Emit `gnokey maketx …` commands for
+  the user to review and paste. A companion holds no key and broadcasts nothing,
+  so it can never surprise anyone. Name moul's key `moul` in what it emits.
+- **Mirror, and say so.** Anything duplicated from the realm (slug rules,
+  reserved names, a default template) carries a comment naming the `.gno` file it
+  mirrors, and a Go test pinning the two to the same behaviour.
+- **Table-driven tests, no network.** The chain-facing code is one function that
+  returns a string; test the parsing, not the transport.
+- The gno toolchain ignores it: `PKG_DIRS` only finds directories holding a
+  `gnomod.toml`, and `tools/` has none. **Cross-link it** from the contract's own
+  README, since it no longer sits in the same directory.
+
+Worked example: `tools/gnohome`, which drives `r/moul/home`.
 
 ## The maintenance CLI (`tools/gnocontracts`)
 
