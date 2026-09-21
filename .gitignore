@@ -31,3 +31,8 @@ tools/gnopublish/gnopublish
 
 # gnopublish's cache of packages confirmed on chain (`make clean` removes it)
 /.cache/
+
+# static gnoweb snapshots built by `make preview` / `make site` and by CI.
+# Published to moul/gno-contracts-previews, never committed here.
+/_preview/
+/_site/
