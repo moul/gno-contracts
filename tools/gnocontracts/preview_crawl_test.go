@@ -66,7 +66,7 @@ func TestURLToFileNeverTraversesOrCollides(t *testing.T) {
 }
 
 func TestInScopeSkipsWhatEnumeratesRatherThanDescribes(t *testing.T) {
-	c := &Crawler{Paths: []string{"gno.land/r/moul/hello/v0"}, ArgBudget: 10}
+	c := &Crawler{Paths: []string{"gno.land/r/moul/hello/v0"}}
 	in := []string{
 		"/r/moul/hello/v0",
 		"/r/moul/hello/v0$source",
@@ -152,7 +152,7 @@ func TestCrawlerWritesASelfContainedTree(t *testing.T) {
 	os.WriteFile(filepath.Join(assets, "js", "index.js"), []byte(`import("/public/js/controller-x.js")`), 0o644)
 
 	out := t.TempDir()
-	c := &Crawler{Base: srv.URL, Paths: []string{"gno.land/r/moul/hello/v0"}, Live: "https://gno.land", ArgBudget: 10}
+	c := &Crawler{Base: srv.URL, Paths: []string{"gno.land/r/moul/hello/v0"}, Live: "https://gno.land"}
 	if err := c.Run(); err != nil {
 		t.Fatal(err)
 	}
@@ -342,6 +342,12 @@ func TestRenderArgumentsAreCappedPerPackage(t *testing.T) {
 	// The package's own render page is never an argument page, so it is free.
 	if !c.charge("/r/moul/x/daily/romannumdemo/v0") {
 		t.Fatal("the render page itself was charged as an argument page")
+	}
+	// And a zero budget is no cap at all, like MaxPages, so a Crawler nobody
+	// configured behaves as if the budget did not exist.
+	free := &Crawler{Paths: c.Paths}
+	if !free.charge("/r/moul/x/daily/romannumdemo/v0:1") || !free.charge("/r/moul/x/daily/romannumdemo/v0:2") {
+		t.Fatal("a zero ArgBudget dropped argument pages instead of meaning no cap")
 	}
 }
 

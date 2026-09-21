@@ -85,6 +85,10 @@ type Crawler struct {
 	// argument per numeral and produced 4,065 of the snapshot's 5,437 pages and
 	// 220 MB of its 323 MB, by itself. A sample shows what the argument view
 	// renders; the enumeration is the realm's job, not the preview's.
+	//
+	// 0 means no cap, like MaxPages: a Crawler nobody configured must behave as
+	// if the budget did not exist. Reading 0 as "no argument pages" is the
+	// obvious interpretation and the wrong one.
 	ArgBudget int
 
 	fileBudget map[string]int
@@ -227,7 +231,7 @@ func (c *Crawler) inScope(p string) bool {
 	if pkg == "" {
 		return false
 	}
-	if args != "" && c.argBudget[pkg] >= c.ArgBudget {
+	if args != "" && c.ArgBudget > 0 && c.argBudget[pkg] >= c.ArgBudget {
 		return false
 	}
 	for _, part := range strings.Split(query, "&") {
@@ -273,7 +277,7 @@ func (c *Crawler) charge(u string) bool {
 	if pkg == "" {
 		return true // a directory page: not attributable to one package
 	}
-	if args != "" {
+	if args != "" && c.ArgBudget > 0 {
 		if c.argBudget == nil {
 			c.argBudget = map[string]int{}
 		}
