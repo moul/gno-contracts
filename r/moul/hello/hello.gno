@@ -2,6 +2,9 @@
 // resolution of a versioned local dependency, gno test, gno lint, and CI)
 // works from the very first commit. It has no external dependencies. Remove it
 // once real realms land.
+//
+// It also doubles as the preview smoke test: it is the smallest realm whose
+// render is worth a screenshot.
 package hello
 
 import (
