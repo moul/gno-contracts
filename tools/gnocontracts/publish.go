@@ -4,6 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
+	"net/http"
 	"os/exec"
 	"sort"
 	"strings"
@@ -52,18 +54,26 @@ func cmdPublish(root string, args []string) error {
 		if _, err := exec.LookPath("gnokey"); err != nil {
 			return fmt.Errorf("-check needs gnokey in PATH")
 		}
+		if !netReachable(network.RPC) {
+			return fmt.Errorf("%s (%s) is not answering: refusing to record every package as absent", network.Name, network.RPC)
+		}
 		byPath := m.byPkgPath()
+		known := 0
 		for _, c := range ordered {
 			up := queryUploaded(network.RPC, c.PkgPath)
+			if up == probeUnknown {
+				continue // leave the last known value alone
+			}
+			known++
 			pc := byPath[c.PkgPath]
 			pub := pc.Published[network.Name]
-			pub.Uploaded = up
+			pub.Uploaded = up == probePresent
 			pc.Published[network.Name] = pub
 		}
 		if err := m.save(root); err != nil {
 			return err
 		}
-		fmt.Printf("checked %d contracts on %s\n", len(ordered), network.Name)
+		fmt.Printf("checked %d contracts on %s (%d answered)\n", len(ordered), network.Name, known)
 	}
 
 	fmt.Println("publish order (dependencies first):")
@@ -152,21 +162,81 @@ func topoOrder(contracts []Contract) ([]Contract, error) {
 	return order, nil
 }
 
-// queryUploaded reports whether pkgpath resolves on the given RPC, using
-// `gnokey query vm/qfile`. A successful, non-empty response means the package
-// exists on chain.
-func queryUploaded(rpc, pkgpath string) bool {
+// probe is the answer to "is this package on this chain": present, absent, or
+// no answer at all.
+type probe int
+
+const (
+	probeAbsent probe = iota
+	probePresent
+	probeUnknown
+)
+
+// transportErrors are the substrings that mean the chain never answered, as
+// opposed to answering "no such package". Everything that is not a clean
+// answer is unknown: reporting an unreachable chain as "not published" is how
+// 193 packages were recorded absent from sapphire while sapphire was simply
+// down.
+var transportErrors = []string{
+	"connection refused", "no such host", "i/o timeout", "timeout", "deadline exceeded",
+	"connection reset", "eof", "tls", "network is unreachable", "bad gateway",
+	"service unavailable", "no route to host", "context canceled",
+}
+
+// absentAnswers are the substrings that mean the chain answered, and the answer
+// was no.
+var absentAnswers = []string{"not found", "unknown request", "invalid package", "could not read file"}
+
+// queryUploaded asks whether pkgpath resolves on the given RPC, via
+// `gnokey query vm/qfile`.
+func queryUploaded(rpc, pkgpath string) probe {
 	// Bound each query so an unreachable/slow RPC can't stall the job.
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "gnokey", "query", "vm/qfile", "--data", pkgpath, "--remote", rpc)
 	out, err := cmd.CombinedOutput()
+	s := strings.ToLower(string(out))
+	if err != nil {
+		if ctx.Err() != nil || containsAny(s, transportErrors) {
+			return probeUnknown
+		}
+		if containsAny(s, absentAnswers) {
+			return probeAbsent
+		}
+		return probeUnknown // an error we cannot classify is not evidence of absence
+	}
+	if containsAny(s, absentAnswers) {
+		return probeAbsent
+	}
+	if strings.TrimSpace(string(out)) == "" {
+		return probeUnknown
+	}
+	return probePresent
+}
+
+// netReachable reports whether an RPC endpoint is answering at all, before any
+// package is probed against it. One HTTP call decides for the whole network
+// what no amount of per-package guessing can: a chain that is down and a
+// package that was never published look identical from a single query.
+func netReachable(rpc string) bool {
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Get(strings.TrimSuffix(rpc, "/") + "/status")
 	if err != nil {
 		return false
 	}
-	s := strings.ToLower(string(out))
-	if strings.Contains(s, "not found") || strings.Contains(s, "unknown") || strings.Contains(s, "error") {
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
 		return false
 	}
-	return strings.TrimSpace(string(out)) != ""
+	b, err := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	return err == nil && strings.Contains(string(b), "\"result\"")
+}
+
+func containsAny(s string, subs []string) bool {
+	for _, sub := range subs {
+		if strings.Contains(s, sub) {
+			return true
+		}
+	}
+	return false
 }

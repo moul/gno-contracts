@@ -99,4 +99,11 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/gnolang/gno => ../../../../gnoland/gno
+// A local checkout, because this tool links the gno client stack and tracks
+// gno master rather than a release. The path is relative to this file, so it
+// assumes gno-contracts and gnolang/gno are cloned side by side under the same
+// <org>/<repo> parent; use a go.work if your layout differs. CI repoints it at
+// a fresh clone on every run.
+// It pointed at a `gnoland/gno` checkout that no longer exists until 2026-09-20,
+// so `go run ./tools/gnopublish` (make upload) could not build at all.
+replace github.com/gnolang/gno => ../../../../gnolang/gno

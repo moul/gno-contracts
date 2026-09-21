@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
-	"github.com/moul/gno-contracts/tools/gnopm/pkg/gnomodlock"
+	"moul.io/gnopm/pkg/gnomodlock"
 )
 
 // manifestFile is the source of truth for the contract catalog, relative to the
@@ -96,7 +97,7 @@ type Pub struct {
 // defaultNetworks is the AUTHORITATIVE set of chains we track upload status
 // against; `manifest` reconciles contracts.json against it on every run (see
 // cmdManifest). Editing contracts.json by hand does not work — it is generated
-// on main and the `no-generated-files` guard rejects PRs that touch it — so
+// on main and the `guard-generated` CI step rejects PRs that touch it — so
 // adding or retiring a network means editing this list.
 //
 // Retiring a network only drops its README column and stops it being probed;
@@ -298,6 +299,11 @@ func (c Contract) srcDir() string {
 
 // assemblyDir mirrors gnopm's: versions materialized out of git history.
 const assemblyDir = ".gnopm"
+
+// moduleRe matches the `module = "gno.land/…"` line of a gnomod.toml. The
+// version lives there, not in the directory path, so this is the only
+// authoritative answer to "what package is this directory".
+var moduleRe = regexp.MustCompile(`(?m)^[[:space:]]*module[[:space:]]*=[[:space:]]*"([^"]+)"`)
 
 // parseModule extracts the module path from a gnomod.toml file.
 func parseModule(gnomodPath string) (string, error) {

@@ -33,10 +33,12 @@ publish everything.
 - **Dependency graphs** — per-package, a latest-version-only overview (embedded
   below), and a full graph with every version, in [`_assets/`](./_assets).
 - **On-chain status** — the table shows where each contract is published
-  (✅ our versioned path, 🗄️ the monorepo's un-versioned copy), refreshed by a scheduled job.
-- **PR bots** — a sticky **analysis report** (new/updated packages, sizes, test
-  counts, ⚠️/🔥 signals), automatic **path labels** (`p`/`r`/`meta`), and a
-  **live realm preview** (below).
+  (✅ our versioned path, 🗄️ the monorepo's un-versioned copy), refreshed hourly.
+  A chain that is unreachable is skipped rather than recorded as hosting nothing.
+- **One PR bot, one comment** — a single sticky comment: counts, sizes, test
+  counts and ⚠️/🔥 signals on three lines, everything per-package folded away.
+  It also reconciles the path labels (`p`/`r`/`meta`) and links the **live realm
+  preview** (below).
 - **Publishing** — [`gnopublish`](./tools/gnopublish) queries a network for what's
   missing, orders by dependency, and broadcasts (one tx per package or merged),
   asking your gnokey password once.
@@ -45,9 +47,9 @@ publish everything.
 
 When a PR touches a realm, a bot renders it with **gnodev → static gnoweb** and
 publishes a browsable snapshot to `https://moul.github.io/gno-contracts/pr-<N>/`,
-linked from a sticky PR comment — so reviewers can *see* the rendered output
-without checking out the branch. The preview is removed when the PR closes.
-(See [`tools/gnopreview`](./tools/gnopreview).)
+linked from the PR comment — so reviewers can *see* the rendered output without
+checking out the branch. The preview is removed when the PR closes. Locally:
+`make preview ARGS="./r/moul/..."`, then serve `_preview/`.
 
 ## Layout
 
@@ -326,7 +328,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-20T09:08:21Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-21T13:37:22Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
