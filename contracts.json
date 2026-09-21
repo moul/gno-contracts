@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-21T13:37:22Z",
+  "status_checked_at": "2026-09-21T18:41:40Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -1053,6 +1053,8 @@
       "upstream_match": "gno",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "f6d0693f5161db423c042a4fe7c78057593cff80",
       "published": {
         "betanet": {
           "uploaded": false
@@ -1063,6 +1065,31 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/ulist/v1",
+      "dir": "p/moul/ulist",
+      "kind": "p",
+      "name": "ulist",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -2056,6 +2083,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/storagecost/v0",
+      "dir": "p/moul/x/storagecost",
+      "kind": "p",
+      "name": "x/storagecost",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/wiki/v0",
       "dir": "p/moul/x/wiki",
       "kind": "p",
@@ -2558,6 +2611,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/home",
+      "dir": "r/moul/home",
+      "kind": "r",
+      "name": "home",
+      "version": "",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/dynreplacer/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/home/v0",
       "dir": "r/moul/home",
       "kind": "r",
@@ -2566,6 +2647,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5694,6 +5777,36 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/reaper/v0",
+      "dir": "r/moul/x/reaper",
+      "kind": "r",
+      "name": "x/reaper",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/p/moul/ulist/v1",
+        "gno.land/p/moul/x/storagecost/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false

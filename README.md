@@ -163,7 +163,8 @@ make help        # list all targets
 | [`p/moul/typeutil/v0`](p/moul/typeutil) 📦 | — | — | [🗄️](https://gno.land/p/moul/typeutil/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil/v0) ≈ | — |
 | [`p/moul/udao/v0`](p/moul/udao) 📦 | — | — | [✅](https://gno.land/p/moul/udao/v0) | — | — | — |
 | [`p/moul/ulist/lplist/v0`](p/moul/ulist/lplist) 📦 | — | — | [✅](https://gno.land/p/moul/ulist/lplist/v0) | — | — | 1 |
-| [`p/moul/ulist/v0`](p/moul/ulist) 📦 | — | — | [🗄️](https://gno.land/p/moul/ulist/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist/v0) ≈ | — |
+| [`p/moul/ulist/v0`](https://github.com/moul/gno-contracts/tree/f6d0693f5161db423c042a4fe7c78057593cff80/p/moul/ulist) 📦 🧊 | — | — | [🗄️](https://gno.land/p/moul/ulist/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist/v0) ≈ | — |
+| [`p/moul/ulist/v1`](p/moul/ulist) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/ulist/v1) | — | — | — | — |
 | [`p/moul/web25/v0`](p/moul/web25) 📦 | — | — | [✅](https://gno.land/p/moul/web25/v0) | — | — | 1 |
 | [`p/moul/x/daily/b58/v0`](p/moul/x/daily/b58) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/b58/v0) | — | — | — |
 | [`p/moul/x/daily/base32/v0`](p/moul/x/daily/base32) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/base32/v0) | — | — | — |
@@ -199,6 +200,7 @@ make help        # list all targets
 | [`p/moul/x/daily/sparkline/v0`](p/moul/x/daily/sparkline) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/sparkline/v0) | — | — | — |
 | [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/toposort/v0) | — | — | — |
 | [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/trie/v0) | — | — | — |
+| [`p/moul/x/storagecost/v0`](p/moul/x/storagecost) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/x/wiki/v0`](p/moul/x/wiki) 📦 | — | — | — | — | — | 6 |
 | [`p/moul/xdao/v0`](p/moul/xdao) 📦 | — | — | [✅](https://gno.land/p/moul/xdao/v0) | — | — | 1 |
 | [`p/moul/xmath/v0`](p/moul/xmath) 📦 | — | — | [✅](https://gno.land/p/moul/xmath/v0) | — | — | — |
@@ -216,7 +218,8 @@ make help        # list all targets
 | [`r/moul/demo/wikicoin/v0`](r/moul/demo/wikicoin) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/wikicoin/v0) | — | — | 2 |
 | [`r/moul/gns/v0`](r/moul/gns) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/hello/v0`](r/moul/hello) 🏛️ | — | — | [✅](https://gno.land/r/moul/hello/v0) | — | — | 1 |
-| [`r/moul/home/v0`](r/moul/home) 🏛️ | — | — | — | — | — | — |
+| [`r/moul/home`](r/moul/home) 🏛️ | — | — | [✅](https://gno.land/r/moul/home) | — | — | 2 |
+| [`r/moul/home/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/home) 🏛️ 🧊 | — | — | — | — | — | — |
 | [`r/moul/outfmt/v0`](r/moul/outfmt) 🏛️ | — | — | [✅](https://gno.land/r/moul/outfmt/v0) | — | — | 1 |
 | [`r/moul/present/v0`](r/moul/present) 🏛️ | — | — | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
 | [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | — | — | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
@@ -322,13 +325,14 @@ make help        # list all targets
 | [`r/moul/x/daily/vestoken/v0`](r/moul/x/daily/vestoken) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/vestoken/v0) | — | — | — |
 | [`r/moul/x/daily/wordle/v0`](r/moul/x/daily/wordle) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wordle/v0) | — | — | — |
 | [`r/moul/x/daily/wrapped/v0`](r/moul/x/daily/wrapped) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wrapped/v0) | — | — | 1 |
+| [`r/moul/x/reaper/v0`](r/moul/x/reaper) 🏛️ | — | — | — | — | — | 5 |
 | [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | — | — | — | — | — | 8 |
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinned in `gnomod.lock`, still built)._
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-21T13:37:22Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-21T18:41:40Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
