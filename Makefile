@@ -44,7 +44,7 @@ PKG_DIRS := $(shell for d in $$(find p/moul r/moul -name gnomod.toml -not -path 
 OLD_PKG_DIRS = $(shell for d in $$(find .gnopm -name gnomod.toml -exec dirname {} \; 2>/dev/null); do grep -qE '^[[:space:]]*ignore[[:space:]]*=[[:space:]]*true' "$$d/gnomod.toml" || echo "$$d"; done | sort)
 
 .DEFAULT_GOAL := help
-.PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report preview graph view clean upload verify
+.PHONY: help deps bump-deps test guard-examples guard-render lint fmt gen manifest readme readmes check sync publish status report preview site graph view clean upload verify
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^[a-zA-Z_-]+:.*?## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -178,11 +178,17 @@ status: ## refresh on-chain upload status (all networks) + README; needs gnokey
 report: ## analyze the PR diff (BASE=origin/main) into the PR comment body
 	@$(GNOCONTRACTS) pr $(if $(BASE),-base $(BASE),)
 
-preview: ## render realms with gnodev into a static tree, e.g. ARGS="./r/moul/home"
-	$(GNOCONTRACTS) preview -out _preview $(ARGS)
+# Both previews need a gnodev on PATH and the same stdlib-only view lint/test
+# use, so gno.land/* resolves from committed vendor/ rather than from whatever
+# the GNOROOT checkout holds.
+preview: view .gnopm/.stamp ## render the packages ARGS selects, e.g. ARGS="./r/moul/home"; serve _preview/
+	GNOROOT="$(VIEW)" $(GNOCONTRACTS) preview -out _preview $(ARGS)
+
+site: view .gnopm/.stamp ## render EVERY package, what the main workflow publishes; serve _site/
+	GNOROOT="$(VIEW)" $(GNOCONTRACTS) preview -all -out _site
 
 graph: ## generate per-package + global dependency graphs into _assets/ (needs graphviz for svg/png)
 	$(GNOCONTRACTS) graph
 
-clean: ## remove build artifacts, the GNOROOT view, the gnopm assembly, the preview and the gnopublish on-chain cache
-	rm -rf bin "$(VIEW)" .cache .gnopm _preview
+clean: ## remove build artifacts, the GNOROOT view, the gnopm assembly, the previews and the gnopublish on-chain cache
+	rm -rf bin "$(VIEW)" .cache .gnopm _preview _site
