@@ -23,7 +23,7 @@ func cmdManifest(root string) error {
 	}
 	// Networks are code-owned, not data-owned: reconcile them from
 	// defaultNetworks() on every run. contracts.json is generated on main and
-	// PRs may not touch it (no-generated-files guard), so a hand edit here could
+	// PRs may not touch it (guard-generated CI step), so a hand edit here could
 	// never land — the only way to add or retire a chain is defaultNetworks(),
 	// and this is what carries that edit into the catalog via `regen`.
 	m.Networks = defaultNetworks()
