@@ -42,8 +42,8 @@ gnokey query vm/qeval \
 
 ## What changed in v1
 
-Identical behaviour to [`v0`](../v0) apart from rendering, which now goes
-through [`p/moul/kit/ui`](../../../../../../p/moul/kit/ui/v0) instead of the local `shortAddr` helper.
+Identical behaviour to [`v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/moodstone) apart from rendering, which now goes
+through [`p/moul/kit/ui`](/p/moul/kit/ui/v0) instead of the local `shortAddr` helper.
 
 **One address format.** Eleven realms carried their own `shortAddr` with four different truncation rules, so the same account rendered differently depending on which realm you opened. `ui.Addr` is that decision made once: 8 leading characters, an ellipsis, 4 trailing, in backticks.
 

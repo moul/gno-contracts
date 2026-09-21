@@ -55,7 +55,7 @@ whose order is numeric for every `uint64`, so there is no width left to outgrow.
 Ids stay plain integers and the rendered output is byte-identical: `v0`'s
 `render_test.gno` is carried over unchanged and still passes. This is a storage
 change, which under this repo's versioning rule is a compatibility change, hence
-a new version rather than an edit in place. [`v0`](../v0) stays live and
+a new version rather than an edit in place. [`v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/tictactoe) stays live and
 untouched.
 
 One message did change: a `Move` against a missing game now panics
