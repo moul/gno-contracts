@@ -47,12 +47,12 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: tools/go.mod
 
       - name: Analyze the pull request
         run: |
           git fetch --quiet origin "$BASE" --depth=100
-          go tool gnocontracts pr \
+          go -C tools tool gnocontracts pr \
             -base "origin/$BASE" \
             -preview-url "$PAGES_URL" \
             -out /tmp/pr-comment.md \
@@ -99,13 +99,13 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: tools/go.mod
 
       - name: Determine the realms this PR changed
         id: realms
         run: |
           git fetch --quiet origin "${{ github.base_ref }}" --depth=100
-          go tool gnocontracts pr -base "origin/${{ github.base_ref }}" \
+          go -C tools tool gnocontracts pr -base "origin/${{ github.base_ref }}" \
             -out /dev/null -selectors-out /tmp/pr-selectors.txt
           echo "selectors=$(tr '\n' ' ' < /tmp/pr-selectors.txt)" >> "$GITHUB_OUTPUT"
           echo "changed realm selectors: $(cat /tmp/pr-selectors.txt)"
@@ -117,7 +117,7 @@ jobs:
 
       - name: Render the preview
         if: steps.realms.outputs.selectors != ''
-        run: go tool gnocontracts preview -out _preview ${{ steps.realms.outputs.selectors }}
+        run: go -C tools tool gnocontracts preview -out _preview ${{ steps.realms.outputs.selectors }}
 
       - uses: ./.github/actions/gh-pages-sync
         if: steps.realms.outputs.selectors != ''

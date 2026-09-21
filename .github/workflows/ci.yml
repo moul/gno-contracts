@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: tools/go.mod
 
       # First, and before the toolchain build: a pull request carrying a
       # generated file is rejected in seconds rather than after nine minutes.
@@ -35,7 +35,7 @@ jobs:
       - name: Guard the generated artifacts
         if: github.event_name == 'pull_request'
         run: |
-          go tool gnocontracts guard-generated \
+          go -C tools tool gnocontracts guard-generated \
             -base "${{ github.event.pull_request.base.sha }}" \
             -head "${{ github.event.pull_request.head.sha }}"
 
@@ -56,25 +56,26 @@ jobs:
       # own branch is fine until the branch is squash-merged, at which point
       # the commit is unreachable and the version it held stops resolving for
       # good. Catching it here is cheap; catching it after the merge is not.
+      # gnopm works out the upstream ref itself: GITHUB_BASE_REF on a pull
+      # request, otherwise origin/HEAD. On a pull request it therefore also
+      # requires every pinned commit to be reachable from the base branch,
+      # because a pin to a commit that exists only on this branch dies when
+      # the branch is squash-merged.
       - name: Verify gnomod.lock
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            git fetch --quiet origin "${{ github.base_ref }}"
-            go tool gnopm verify -upstream "origin/${{ github.base_ref }}"
-          else
-            go tool gnopm verify
-          fi
+          git fetch --quiet origin "${{ github.base_ref || github.ref_name }}" || true
+          go -C tools tool gnopm verify
 
       # Materialize the versions that no longer have a directory, so lint and
       # test can build them and so packages importing them resolve.
       - name: Materialize pinned versions
-        run: go tool gnopm sync
+        run: go -C tools tool gnopm sync
 
       - name: Vet tools
-        run: go vet ./tools/...
+        run: go -C tools vet ./...
 
       - name: Test tools
-        run: go test ./tools/...
+        run: go -C tools test ./...
 
       # Committed vendor/ is the pinned, authoritative source of gno.land/*
       # dependencies. We do NOT re-vendor from live master here (that would

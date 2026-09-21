@@ -16,7 +16,7 @@ runs:
     # The Go version lives in go.mod and nowhere else.
     - uses: actions/setup-go@v5
       with:
-        go-version-file: go.mod
+        go-version-file: tools/go.mod
 
     # The build is keyed on the upstream commit, so a run only pays for it when
     # gno master has actually moved. Resolving the SHA first is what makes the

@@ -67,7 +67,7 @@ jobs:
 
             # Versions that no longer have a directory are pinned in
             # gnomod.lock; `gen` reads their deps out of the materialized copy.
-            go tool gnopm sync
+            go -C tools tool gnopm sync
             make gen
             make graph
             # Best effort, and deliberately last: it refreshes the README table

@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/moul/gno-contracts/tools/gnopm/pkg/gnomodlock"
+	"moul.io/gnopm/pkg/gnomodlock"
 )
 
 // manifestFile is the source of truth for the contract catalog, relative to the

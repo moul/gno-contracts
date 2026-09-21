@@ -16,8 +16,8 @@
 # `go tool gnocontracts <cmd>` — no binary is ever built into the tree.
 
 GNO          ?= gno
-GNOCONTRACTS ?= go tool gnocontracts
-GNOPM        ?= go tool gnopm
+GNOCONTRACTS ?= go -C tools tool gnocontracts
+GNOPM        ?= go -C tools tool gnopm
 
 # Ephemeral stdlib-only view of the toolchain (empty examples/ → vendor wins).
 VIEW := $(CURDIR)/.gnoroot-view
