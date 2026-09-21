@@ -13,7 +13,7 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 )
 
 // maxSize bounds every pattern's size parameter so a single Generate call
@@ -23,8 +23,9 @@ const maxSize = 32
 // galleryPageSize caps how many pieces Render shows on the home page.
 const galleryPageSize = 8
 
+// piece carries no ID field: the id belongs to the store, which hands it back
+// on lookup and iteration.
 type piece struct {
-	ID        string
 	Pattern   string
 	Size      int
 	Author    address
@@ -32,10 +33,11 @@ type piece struct {
 	Art       string
 }
 
-var (
-	gallery avl.Tree // zero-padded ID -> *piece
-	nextID  int
-)
+// gallery assigns the piece ids. v1 kept its own nextID plus a padID() that
+// zero-padded to width 6, the narrowest ceiling in this repo: at the millionth
+// piece the padding stops and the gallery starts rendering out of order. The
+// store key is 8 fixed bytes with no width to outgrow.
+var gallery = store.Named("piece")
 
 // RenderDiamond draws a filled diamond of half-width n (2n-1 rows total),
 // each row's stars centered and padded with spaces.
@@ -134,16 +136,6 @@ func renderPattern(pattern string, size int) string {
 	}
 }
 
-// padID zero-pads an ID so avl.Tree's key-ordered iteration matches numeric
-// order.
-func padID(n int) string {
-	s := strconv.Itoa(n)
-	for len(s) < 6 {
-		s = "0" + s
-	}
-	return s
-}
-
 // Generate renders a pattern, adds it to the on-chain gallery, and returns
 // the rendered art.
 func Generate(cur realm, pattern string, size int) string {
@@ -152,20 +144,16 @@ func Generate(cur realm, pattern string, size int) string {
 	}
 	art := renderPattern(pattern, size)
 
-	nextID++
-	id := strconv.Itoa(nextID)
 	author := cur.Previous().Address()
-	p := &piece{
-		ID:        id,
+	id := gallery.Add(&piece{
 		Pattern:   pattern,
 		Size:      size,
 		Author:    author,
 		CreatedAt: runtime.ChainHeight(),
 		Art:       art,
-	}
-	gallery.Set(padID(nextID), p)
+	})
 
-	chain.Emit("ArtGenerated", "id", id, "pattern", pattern, "author", author.String())
+	chain.Emit("ArtGenerated", "id", id.String(), "pattern", pattern, "author", author.String())
 
 	return art
 }
@@ -186,41 +174,37 @@ func renderHome() string {
 	b.WriteString("Call `Generate(pattern, size)`. View a piece at this realm's path " +
 		"plus its ID (e.g. `.../asciiart:3`).\n\n")
 
-	b.WriteString("## Gallery (total: " + strconv.Itoa(nextID) + ")\n\n")
-	if nextID == 0 {
+	b.WriteString("## Gallery (total: " + gallery.LastID().String() + ")\n\n")
+	if gallery.Len() == 0 {
 		b.WriteString("_nothing generated yet -- be the first_\n")
 		return b.String()
 	}
 
-	shown := 0
-	gallery.ReverseIterate("", "", func(key string, value interface{}) bool {
-		if shown >= galleryPageSize {
-			return true
-		}
-		p := value.(*piece)
-		b.WriteString("### #" + p.ID + " -- " + p.Pattern + " (size " + strconv.Itoa(p.Size) + ")\n\n")
+	// The newest page, straight from the store: no counter, and only that
+	// window is walked.
+	for _, e := range gallery.PageReverse(1, galleryPageSize) {
+		p := e.Value.(*piece)
+		b.WriteString("### #" + e.ID.String() + " -- " + p.Pattern + " (size " + strconv.Itoa(p.Size) + ")\n\n")
 		b.WriteString("by `" + p.Author.String() + "` at block " + strconv.Itoa(int(p.CreatedAt)) + "\n\n")
 		b.WriteString("```\n" + p.Art + "\n```\n\n")
-		shown++
-		return false
-	})
+	}
 	return b.String()
 }
 
 func renderPiece(idStr string) string {
 	safe := ui.Inline(idStr)
-	n, err := strconv.Atoi(idStr)
-	if err != nil || n < 1 {
+	id, ok := store.ParseID(idStr)
+	if !ok {
 		return "# Piece " + safe + "\n\nNo such piece.\n"
 	}
-	v := gallery.Get(padID(n))
-	if v == nil {
+	v, ok := gallery.Get(id)
+	if !ok {
 		return "# Piece #" + safe + "\n\nNo such piece.\n"
 	}
 	p := v.(*piece)
 
 	var b strings.Builder
-	b.WriteString("# Piece #" + p.ID + "\n\n")
+	b.WriteString("# Piece #" + id.String() + "\n\n")
 	b.WriteString("- Pattern: " + p.Pattern + "\n")
 	b.WriteString("- Size: " + strconv.Itoa(p.Size) + "\n")
 	b.WriteString("- Author: `" + p.Author.String() + "`\n")

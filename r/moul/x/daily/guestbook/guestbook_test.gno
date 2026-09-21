@@ -4,14 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 )
 
 // resetState clears package globals between tests (globals persist across
 // test functions in the same package binary).
 func resetState() {
-	entries = avl.NewTree()
-	count = 0
+	entries = store.Named("guestbook: entry")
 }
 
 func TestAddEntryAppendsAndCounts(t *testing.T) {
@@ -92,8 +91,15 @@ func TestRenderEscapesMessage(t *testing.T) {
 	}
 }
 
+// v1 asserted that its own seqKey() ordered numerically. That held only below
+// its width of 16: seqKey(10^16) is 17 characters and sorts before
+// seqKey(10^16-1). The store key is 8 bytes for every id, so there is no
+// ceiling to reach.
 func TestSeqKeyOrders(t *testing.T) {
-	if a, b := seqKey(2), seqKey(10); !(a < b) {
-		t.Errorf("seqKey(2)=%q should sort before seqKey(10)=%q", a, b)
+	if a, b := store.ID(2).Key(), store.ID(10).Key(); !(a < b) {
+		t.Error("id 2 should sort before id 10")
+	}
+	if a, b := store.ID(9999999999999999).Key(), store.ID(10000000000000000).Key(); !(a < b) {
+		t.Error("ordering should survive one past v1's width-16 ceiling")
 	}
 }

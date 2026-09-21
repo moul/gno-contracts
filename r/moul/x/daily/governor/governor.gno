@@ -12,6 +12,7 @@ import (
 	"chain/runtime"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -33,9 +34,9 @@ const (
 	StateExecuted  = "Executed"
 )
 
-// Proposal is a single governance proposal.
+// Proposal is a single governance proposal. It carries no ID field: the id
+// belongs to the store, which hands it back on lookup and iteration.
 type Proposal struct {
-	ID             int64
 	Proposer       address
 	Description    string
 	SnapshotHeight int64
@@ -47,11 +48,10 @@ type Proposal struct {
 	votes          *avl.Tree // voter address (string) -> support (int)
 }
 
-var (
-	proposals  = avl.NewTree() // id (zero-padded string) -> *Proposal
-	nextID     = int64(1)
-	totalCount int64
-)
+// proposals assigns the proposal ids. v0 kept its own nextID plus an idKey()
+// that zero-padded to width 12, which stopped ordering Render past 10^12, and
+// its own totalCount, which the store's LastID already answers.
+var proposals = store.Named("governor: proposal")
 
 // Propose opens a new proposal and returns its id. The snapshot height and
 // deadline are recorded from the current chain height.
@@ -61,19 +61,14 @@ func Propose(cur realm, description string) int64 {
 	}
 	proposer := unsafe.PreviousRealm().Address()
 	h := runtime.ChainHeight()
-	id := nextID
-	nextID++
-	totalCount++
-
 	p := &Proposal{
-		ID:             id,
 		Proposer:       proposer,
 		Description:    description,
 		SnapshotHeight: h,
 		Deadline:       h + votingPeriod,
 		votes:          avl.NewTree(),
 	}
-	proposals.Set(idKey(id), p)
+	id := int64(proposals.Add(p))
 
 	chain.Emit(
 		"ProposalCreated",
@@ -150,22 +145,7 @@ func computeState(p *Proposal, h int64) string {
 }
 
 func mustGet(id int64) *Proposal {
-	key := idKey(id)
-	if !proposals.Has(key) {
-		panic("governor: unknown proposal " + strconv.FormatInt(id, 10))
-	}
-	return proposals.Get(key).(*Proposal)
-}
-
-// idKey returns a zero-padded, lexicographically-sortable key for an id so the
-// avl tree iterates proposals in numeric order.
-func idKey(id int64) string {
-	s := strconv.FormatInt(id, 10)
-	const width = 12
-	if len(s) >= width {
-		return s
-	}
-	return strings.Repeat("0", width-len(s)) + s
+	return proposals.MustGet(store.ID(id)).(*Proposal)
 }
 
 // bar renders a proportional ▓░ progress bar of fixed width.
@@ -193,20 +173,20 @@ func Render(path string) string {
 	h := runtime.ChainHeight()
 	b.WriteString("Current chain height: **" + strconv.FormatInt(h, 10) + "**\n\n")
 
-	if totalCount == 0 {
+	if proposals.Len() == 0 {
 		b.WriteString("_No proposals yet. Call `Propose` to create one._\n")
 		return b.String()
 	}
 
-	b.WriteString("Total proposals: **" + strconv.FormatInt(totalCount, 10) + "**\n\n")
+	b.WriteString("Total proposals: **" + proposals.LastID().String() + "**\n\n")
 
-	proposals.Iterate("", "", func(_ string, v interface{}) bool {
+	proposals.Each(func(id store.ID, v any) {
 		p := v.(*Proposal)
 		state := computeState(p, h)
 		total := p.For + p.Against + p.Abstain
 
 		b.WriteString("---\n\n")
-		b.WriteString("## #" + strconv.FormatInt(p.ID, 10) + " · " + state + "\n\n")
+		b.WriteString("## #" + id.String() + " · " + state + "\n\n")
 		b.WriteString("> " + p.Description + "\n\n")
 		b.WriteString("- Proposer: `" + p.Proposer.String() + "`\n")
 		b.WriteString("- Snapshot height: " + strconv.FormatInt(p.SnapshotHeight, 10) + "\n")
@@ -221,8 +201,6 @@ func Render(path string) string {
 		b.WriteString("| For | " + strconv.FormatInt(p.For, 10) + " | `" + bar(p.For, total, 20) + "` |\n")
 		b.WriteString("| Against | " + strconv.FormatInt(p.Against, 10) + " | `" + bar(p.Against, total, 20) + "` |\n")
 		b.WriteString("| Abstain | " + strconv.FormatInt(p.Abstain, 10) + " | `" + bar(p.Abstain, total, 20) + "` |\n\n")
-
-		return false
 	})
 
 	return b.String()
