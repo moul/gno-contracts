@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go/scanner"
 	"go/token"
@@ -258,4 +259,117 @@ func failf(headline string, items []string, hint string) error {
 		b.WriteString("\n" + hint + "\n")
 	}
 	return fmt.Errorf("%s", strings.TrimRight(b.String(), "\n"))
+}
+
+// minReadmeBody is the shortest body that can carry a sentence. The shortest
+// legitimate README in the repo is "Build Markdown tables." (22 characters),
+// so 20 is the floor.
+const minReadmeBody = 20
+
+// readmePlaceholderRe matches a line that is an apology rather than a
+// description: the markdown noise a stub is usually wrapped in (emphasis,
+// quote, bullet), then the word that admits nothing was written.
+var readmePlaceholderRe = regexp.MustCompile(`(?im)^[_*>[:space:]-]*` +
+	`(todo|tbd|fixme|xxx|wip|coming soon|to be (written|documented)|` +
+	`no description|describe this package)\b.*$`)
+
+// readmeTitleRe matches the leading `# <pkgpath>` title of a README.
+var readmeTitleRe = regexp.MustCompile(`(?m)\A#[[:space:]]+.*$`)
+
+// readmeBody returns the hand-authored region of a README: everything above the
+// generated footer, with the title line removed. What is left is what the
+// author actually wrote about the package.
+func readmeBody(text string) string {
+	if i := strings.Index(text, pkgFooterBegin); i >= 0 {
+		text = text[:i]
+	}
+	return strings.TrimSpace(readmeTitleRe.ReplaceAllString(strings.TrimSpace(text), ""))
+}
+
+// cmdGuardReadmes fails if a package ships a README that documents nothing.
+//
+// The rule is NOT "every package has a README". It is: a README that exists
+// must say something true and useful. A placeholder is worse than no README,
+// because the package then looks documented, so nobody writes the real text and
+// a reader pays a click to learn the author had nothing to say. 28 packages
+// shipped in exactly that state, because `make readmes` used to seed a TODO
+// stub for every package it could not describe.
+//
+// A MISSING README is therefore legal, and only reported (-list prints them).
+// The checks run over the hand-authored region only: no placeholder text, more
+// than just the title, and at least minReadmeBody characters of it. Archived
+// packages (`ignore = true`) are skipped, as everywhere else.
+//
+//	go tool gnocontracts guard-readmes [-list]
+func cmdGuardReadmes(root string, args []string) error {
+	fs := flag.NewFlagSet("guard-readmes", flag.ExitOnError)
+	list := fs.Bool("list", false, "also list the packages that have no README at all")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	var bad, missing []string
+	total := 0
+	for _, tree := range []string{"p/moul", "r/moul"} {
+		base := filepath.Join(root, filepath.FromSlash(tree))
+		if !fileExists(base) {
+			continue
+		}
+		err := filepath.WalkDir(base, func(path string, d os.DirEntry, err error) error {
+			if err != nil || d.IsDir() || d.Name() != "gnomod.toml" {
+				return err
+			}
+			ignored, err := moduleIgnored(path)
+			if err != nil || ignored {
+				return err
+			}
+			dir := filepath.Dir(path)
+			rel, _ := filepath.Rel(root, dir)
+			rel = filepath.ToSlash(rel)
+			total++
+
+			b, err := os.ReadFile(filepath.Join(dir, "README.md"))
+			if os.IsNotExist(err) {
+				missing = append(missing, rel)
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+			body := readmeBody(string(b))
+			switch {
+			case body == "":
+				bad = append(bad, rel+"/README.md: nothing above the generated footer but the title")
+			case readmePlaceholderRe.MatchString(body):
+				m := strings.TrimSpace(readmePlaceholderRe.FindString(body))
+				bad = append(bad, fmt.Sprintf("%s/README.md: placeholder text: %q", rel, m))
+			case len(body) < minReadmeBody:
+				bad = append(bad, fmt.Sprintf("%s/README.md: body is %d characters, under the %d minimum",
+					rel, len(body), minReadmeBody))
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	if *list && len(missing) > 0 {
+		sort.Strings(missing)
+		fmt.Printf("guard-readmes: %d package(s) with no README (allowed, not a failure):\n", len(missing))
+		for _, p := range missing {
+			fmt.Println("  -", p)
+		}
+		fmt.Println()
+	}
+	if len(bad) > 0 {
+		sort.Strings(bad)
+		return failf("guard-readmes FAIL — README(s) that document nothing", bad,
+			"Write what the package actually does (one accurate sentence is enough),\n"+
+				"or `git rm` the README. A placeholder is not an option: it makes the\n"+
+				"package look documented and nobody ever comes back to it.")
+	}
+	fmt.Printf("guard-readmes: every README says something (%d documented, %d package(s) with none)\n",
+		total-len(missing), len(missing))
+	return nil
 }
