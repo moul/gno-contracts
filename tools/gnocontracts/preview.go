@@ -92,6 +92,19 @@ func cmdPreview(root string, args []string) error {
 		return err
 	}
 
+	// Relative paths are resolved against the repository root, like `graph`'s
+	// _assets/ and unlike the process working directory. `go -C tools tool
+	// gnocontracts` (how the Makefile and CI invoke this) runs the tool IN
+	// tools/, so an -out of `_preview` would otherwise land in tools/_preview,
+	// which is neither gitignored nor where anyone looks for it.
+	*out = underRoot(root, *out)
+	if *changed != "" {
+		*changed = underRoot(root, *changed)
+	}
+	if *baseRoot != "" {
+		*baseRoot = underRoot(root, *baseRoot)
+	}
+
 	contracts, err := scanContracts(root)
 	if err != nil {
 		return err
@@ -485,6 +498,15 @@ func gnowebAssets() (string, error) {
 		return "", fmt.Errorf("%s: gnoweb assets not found under GNOROOT", p)
 	}
 	return p, nil
+}
+
+// underRoot resolves a path the caller gave relative to the repository root.
+// An absolute path, and the "-" that means stdin, are left alone.
+func underRoot(root, p string) string {
+	if p == "" || p == "-" || filepath.IsAbs(p) {
+		return p
+	}
+	return filepath.Join(root, filepath.FromSlash(p))
 }
 
 func readPathList(p string) ([]string, error) {

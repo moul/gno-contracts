@@ -344,3 +344,22 @@ func TestRenderArgumentsAreCappedPerPackage(t *testing.T) {
 		t.Fatal("the render page itself was charged as an argument page")
 	}
 }
+
+// The Makefile and CI both invoke this as `go -C tools tool gnocontracts`,
+// which runs the tool IN tools/. A path resolved against the process working
+// directory therefore lands one level too deep: the CI render wrote six pages
+// and a screenshot into tools/_preview and the next step could not find them.
+func TestRelativePathsResolveAgainstTheRepositoryRoot(t *testing.T) {
+	if got, want := underRoot("/repo", "_preview"), filepath.Join("/repo", "_preview"); got != want {
+		t.Fatalf("underRoot = %q, want %q", got, want)
+	}
+	if got := underRoot("/repo", "/tmp/changed.txt"); got != "/tmp/changed.txt" {
+		t.Fatalf("an absolute path was rewritten: %q", got)
+	}
+	if got := underRoot("/repo", "-"); got != "-" {
+		t.Fatalf("stdin was rewritten: %q", got)
+	}
+	if got := underRoot("/repo", ""); got != "" {
+		t.Fatalf("an unset flag was rewritten: %q", got)
+	}
+}
