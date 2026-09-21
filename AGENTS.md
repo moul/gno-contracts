@@ -501,7 +501,7 @@ regenerated and committed on `main` by the `main` workflow.
 | workflow | when | what it owns |
 |---|---|---|
 | `ci` | push to main, every PR | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make toolcheck guard-examples guard-render lint test` |
-| `pr` | every PR event | **one** sticky comment, the path labels, and the published preview at `pr-<N>/` |
+| `pr` | PR opened / pushed / reopened | **one** sticky comment, the path labels, and the published preview at `pr-<N>/` |
 | `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, package README footers, `_assets/`, and on-chain status |
 | `gnopublish-ci` | PRs touching `tools/gnopublish/**` | that module only; it links the whole gno client stack and must not slow every PR |
 
@@ -553,6 +553,15 @@ single orphan commit each time, so the previews repository only ever holds the s
 as it is now. Publishing needs the `PREVIEWS_DEPLOY_KEY` secret, the private half of
 a write deploy key on that repository; a fork has no secrets, so it renders nothing
 and is linked to nothing.
+
+**A preview outlives its pull request by 21 days.** Nothing is deleted when a pull request
+closes: the sticky comment embeds the before/after screenshots *by URL*, so evicting on the
+close event leaves every merged pull request with a comment full of broken images (it did,
+until 2026-09-21). The hourly `main` run is the only thing that ever shrinks the site: it drops
+previews whose pull request closed more than `grace-days` ago, and if the site is still over
+`max-total-mb` (700) it gives up the closed ones early, oldest first. **A preview of an open
+pull request is never evicted**, whatever the budget says; if only those are left, the run warns
+instead.
 
 Locally: `make preview ARGS="./r/moul/home"` or `make site`, then serve the result
 (`python3 -m http.server -d _site`). A previews link is always safe to click and
