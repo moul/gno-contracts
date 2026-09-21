@@ -91,3 +91,66 @@ jobs:
           done
           echo "::error::could not push after 5 attempts"
           exit 1
+
+  # The browsable snapshot of everything on main:
+  # https://moul.github.io/gno-contracts-previews/main/
+  #
+  # Independent of `regen`, and deliberately not on the hourly schedule: the
+  # snapshot is a function of the tree alone, so it only needs rebuilding when
+  # the tree moves. Measured 2026-09-21: 193 packages, 1,415 pages, 103 MB,
+  # 73s of render after the gnodev build.
+  preview:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0 # gnopm materializes pinned versions out of history
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+
+      - uses: ./.github/actions/setup-gno
+        with:
+          binaries: gnodev
+
+      - name: Render every package
+        env:
+          # The stdlib-only view `make view` builds, so gno.land/* dependencies
+          # resolve from committed vendor/ exactly as they do for lint and test.
+          GNOROOT: ${{ github.workspace }}/.gnoroot-view
+        run: |
+          set -euo pipefail
+          go -C tools tool gnopm sync
+          make view
+          go -C tools tool gnocontracts preview -all -out _site
+          rm -rf _site/gnodev.log _site/.gnodev-*
+          du -sh _site
+
+      - name: Show the gnodev log
+        if: failure()
+        run: |
+          [ -f _site/gnodev.log ] && { echo "::group::gnodev.log"; tail -100 _site/gnodev.log; echo "::endgroup::"; } || true
+
+      - uses: ./.github/actions/previews-sync
+        with:
+          subdir: main
+          source: _site
+          message: "preview: main at ${{ github.sha }}"
+          deploy-key: ${{ secrets.PREVIEWS_DEPLOY_KEY }}
+
+  # Previews of pull requests that closed without their cleanup running. Hourly,
+  # because the site has a 1 GB budget and nothing else ever shrinks it.
+  evict:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/previews-sync
+        with:
+          message: "preview: evict closed pull requests"
+          prune-closed: "true"
+          token: ${{ github.token }}
+          deploy-key: ${{ secrets.PREVIEWS_DEPLOY_KEY }}

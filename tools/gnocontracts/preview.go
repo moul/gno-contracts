@@ -1,204 +1,518 @@
 package main
 
+// Static gnoweb previews of this repository.
+//
+// Two questions, one renderer:
+//
+//	gnocontracts preview -all -out _site               # every package, for main
+//	gnocontracts preview -changed changed.txt -out _p  # what a pull request touched
+//
+// It boots gnodev on the whole workspace, crawls the resulting gnoweb into a
+// self-contained static tree (see preview_crawl.go), and writes preview.json
+// plus a comment fragment next to it.
+//
+// gnodev is given EVERY package in the workspace, not just the ones being
+// crawled, because a package here is versioned in gnomod.toml rather than in
+// its directory path: gnodev cannot find gno.land/p/moul/authz/v0 by walking to
+// p/moul/authz/v0, and lazy loading makes the whole workspace cost the same as
+// one package (measured 2026-09-21: 193 packages, node ready in 9s).
+
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
+	"syscall"
 	"time"
 )
 
-// Static preview of this repo's realms.
-//
-// Boots gnodev on the selected realm directories, fetches each realm's gnoweb
-// page plus every /public/ asset it references (recursively through CSS),
-// rewrites the absolute /public/, /r/ and /p/ URLs to relative ones, and writes
-// a self-contained static tree — so it can be dropped into a GitHub Pages
-// subfolder (pr-<N>/) and browsed offline.
-//
-//	go tool gnocontracts preview -out _preview ./r/moul/hello/v0
-//
-// Selectors are repo-relative like the rest of the tooling: `./...` (the
-// default), `./r/moul/hello/v0`, `./r/moul/...`.
-
-var (
-	assetRe   = regexp.MustCompile(`(?:href|src)="(/public/[^"?]*)`)
-	cssURLRe  = regexp.MustCompile(`url\((/public/[^)"']*)`)
-	appPathRe = regexp.MustCompile(`="/(r|p)/`)
-	moduleRe  = regexp.MustCompile(`(?m)^[[:space:]]*module[[:space:]]*=[[:space:]]*"([^"]+)"`)
+const (
+	// defaultLive is where a link that leaves the snapshot goes.
+	defaultLive = "https://gno.land"
+	// prMaxPkgs caps a pull-request preview. Changed packages are never
+	// dropped; dependents are, and the comment says how many.
+	prMaxPkgs = 25
+	// prMaxPages backstops the crawl of a pull-request preview, siteMaxPages
+	// the whole repository (measured: ~1.1k pages for 193 packages).
+	prMaxPages   = 400
+	siteMaxPages = 3000
+	// defaultArgBudget caps render-argument pages per package: the one axis a
+	// realm can enumerate without bound. See Crawler.ArgBudget.
+	defaultArgBudget = 10
 )
 
-type previewRealm struct {
-	pkgPath string // gno.land/r/moul/hello/v0
-	dir     string // r/moul/hello/v0
+// previewPlan is what the preview job decided to do, written to preview.json so
+// the workflow and the pull request comment read the same answer.
+type previewPlan struct {
+	Mode string `json:"mode"` // "site" or "pr"
+	// Changed are packages whose own sources the pull request touched.
+	Changed []string `json:"changed,omitempty"`
+	// Dependents are packages pulled in because they (transitively) import a
+	// changed package.
+	Dependents []string `json:"dependents,omitempty"`
+	// Paths is what actually gets crawled, changed packages first.
+	Paths []string `json:"paths"`
+	// Dropped counts packages left out by the cap — never silently.
+	Dropped int `json:"dropped,omitempty"`
+	// ChangedFiles maps a package to the base names of its files the pull
+	// request touched. Per-file $source pages are rendered only for these.
+	ChangedFiles map[string][]string `json:"changed_files,omitempty"`
+	// New are packages this pull request adds, asserted from the merge-base
+	// tree rather than inferred from a missing render.
+	New   []string   `json:"new,omitempty"`
+	Pairs []shotPair `json:"pairs,omitempty"`
+	Pages int        `json:"pages"`
 }
 
-// urlPath is the realm's path on gnoweb: gno.land/r/moul/hello/v0 → /r/moul/hello/v0.
-func (r previewRealm) urlPath() string {
-	_, rest, _ := strings.Cut(r.pkgPath, "/")
-	return "/" + rest
-}
+func (p *previewPlan) empty() bool { return len(p.Paths) == 0 }
 
 func cmdPreview(root string, args []string) error {
 	fs := flag.NewFlagSet("preview", flag.ContinueOnError)
 	out := fs.String("out", "_preview", "output directory")
-	port := fs.Int("port", 8899, "port to run gnodev on")
+	all := fs.Bool("all", false, "preview every package in the workspace (the main snapshot)")
+	changed := fs.String("changed", "", "file holding the paths a pull request changed, one per line (- for stdin)")
+	baseRoot := fs.String("base-root", "", "checkout of the merge base; enables before/after screenshots")
+	baseURL := fs.String("base-url", "", "public URL the snapshot will be served from (for the comment)")
+	pr := fs.String("pr", "", "pull request number (for the comment)")
+	planOnly := fs.Bool("plan-only", false, "write preview.json and stop, without booting gnodev")
+	live := fs.String("live", defaultLive, "origin used for links the snapshot does not contain")
+	maxPkgs := fs.Int("max-pkgs", prMaxPkgs, "cap on previewed packages; 0 for no cap")
+	maxPages := fs.Int("max-pages", 0, "cap on crawled pages; 0 picks the default for the mode")
+	maxArgs := fs.Int("max-args", defaultArgBudget, "cap on render-argument pages per package")
+	port := fs.Int("port", 8899, "port gnodev serves gnoweb on")
 	gnodev := fs.String("gnodev", envOr("GNODEV", "gnodev"), "gnodev binary")
-	timeout := fs.Duration("timeout", 2*time.Minute, "how long to wait for gnodev to serve the first realm")
+	chrome := fs.String("chrome", "", "Chrome/Chromium binary for screenshots (default: autodetect)")
+	timeout := fs.Duration("timeout", 5*time.Minute, "how long to wait for gnodev to come up")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
-	selectors := fs.Args()
-	if len(selectors) == 0 {
-		selectors = []string{"./..."}
-	}
 
-	realms, err := previewRealms(root, selectors)
+	contracts, err := scanContracts(root)
 	if err != nil {
 		return err
 	}
-	if len(realms) == 0 {
-		fmt.Printf("no previewable realms match %v\n", selectors)
-		return nil
-	}
-	fmt.Printf("previewing %d realm(s)\n", len(realms))
-
-	dirs := make([]string, 0, len(realms))
-	for _, r := range realms {
-		dirs = append(dirs, filepath.Join(root, filepath.FromSlash(r.dir)))
-	}
-	base := fmt.Sprintf("http://127.0.0.1:%d", *port)
-	log, err := os.Create(filepath.Join(os.TempDir(), "gnocontracts-preview-gnodev.log"))
+	plan, err := buildPreviewPlan(contracts, *all, *changed, fs.Args(), *maxPkgs)
 	if err != nil {
 		return err
 	}
-	defer log.Close()
-
-	cmd := exec.Command(*gnodev, append([]string{
-		"local", "-no-watch", "-web-listener", fmt.Sprintf("127.0.0.1:%d", *port), "-C", root,
-	}, dirs...)...)
-	cmd.Stdout, cmd.Stderr = log, log
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("start gnodev: %w", err)
-	}
-	defer func() {
-		_ = cmd.Process.Kill()
-		_ = cmd.Wait()
-	}()
-
-	if !waitReady(base+realms[0].urlPath(), *timeout) {
-		return fmt.Errorf("gnodev did not become ready within %s (see %s)", *timeout, log.Name())
-	}
-	return renderPreview(base, *out, realms)
-}
-
-// renderPreview fetches every realm page and asset and writes the static tree.
-func renderPreview(base, out string, realms []previewRealm) error {
-	if err := os.MkdirAll(out, 0o755); err != nil {
+	if err := os.MkdirAll(*out, 0o755); err != nil {
 		return err
 	}
-	var rendered []previewRealm
-	queue := map[string]bool{}
-
-	for _, r := range realms {
-		up := r.urlPath()
-		body, err := fetch(base + up)
-		if err != nil {
-			fmt.Printf("  ! %s: %v\n", up, err)
-			continue
+	// An empty plan writes preview.json and nothing else: a pull request that
+	// touches no package gets no comment fragment, which is what makes the
+	// workflow skip in silence rather than post an empty section.
+	if plan.empty() || *planOnly {
+		if plan.empty() {
+			fmt.Println("nothing to preview")
+		} else {
+			fmt.Printf("would preview %d package(s) in %s mode\n", len(plan.Paths), plan.Mode)
 		}
-		html := string(body)
-		for _, m := range assetRe.FindAllStringSubmatch(html, -1) {
-			queue[m[1]] = true
+		return writePreviewJSON(*out, plan)
+	}
+	if *maxPages == 0 {
+		*maxPages = prMaxPages
+		if plan.Mode == "site" {
+			*maxPages = siteMaxPages
 		}
-		if err := writeFileUnder(out, path.Join(strings.Trim(up, "/"), "index.html"),
-			[]byte(rewritePage(html, relPrefix(up)))); err != nil {
-			return err
-		}
-		rendered = append(rendered, r)
-		fmt.Printf("  ✓ %s\n", up)
 	}
 
-	// Assets, recursing through CSS for @font-face url()s.
-	seen := map[string]bool{}
-	for len(queue) > 0 {
-		var asset string
-		for a := range queue {
-			asset = a
-			break
-		}
-		delete(queue, asset)
-		key, _, _ := strings.Cut(asset, "?")
-		if seen[key] {
-			continue
-		}
-		seen[key] = true
-
-		body, err := fetch(base + asset)
-		if err != nil {
-			fmt.Printf("  ! asset %s: %v\n", asset, err)
-			continue
-		}
-		if strings.HasSuffix(key, ".css") {
-			text := string(body)
-			for _, m := range cssURLRe.FindAllStringSubmatch(text, -1) {
-				if k, _, _ := strings.Cut(m[1], "?"); !seen[k] {
-					queue[m[1]] = true
-				}
-			}
-			body = []byte(strings.ReplaceAll(text, "/public/", cssRel(key)))
-		}
-		if err := writeFileUnder(out, strings.Trim(key, "/"), body); err != nil {
-			return err
-		}
-	}
-	fmt.Printf("  %d asset(s)\n", len(seen))
-
-	if err := os.WriteFile(filepath.Join(out, "index.html"), []byte(previewIndex(rendered)), 0o644); err != nil {
+	fmt.Printf("previewing %d package(s) in %s mode\n", len(plan.Paths), plan.Mode)
+	dirs, err := workspacePkgDirs(root)
+	if err != nil {
 		return err
 	}
-	fmt.Printf("done -> %s/index.html\n", out)
+	stop, died, err := startGnodev(*gnodev, root, dirs, *out, *port, "gnodev.log")
+	if err != nil {
+		return err
+	}
+	defer stop()
+
+	c := &Crawler{
+		Base:         fmt.Sprintf("http://127.0.0.1:%d", *port),
+		Paths:        plan.Paths,
+		MaxPages:     *maxPages,
+		Live:         strings.TrimSuffix(*live, "/"),
+		ChangedFiles: plan.ChangedFiles,
+		FileBudget:   0,
+		ArgBudget:    *maxArgs,
+	}
+	if plan.Mode == "site" {
+		// 209 non-test .gno files in the whole repository: every one of them is
+		// affordable, and on the main snapshot every one of them is the point.
+		c.FileBudget = unlimitedFiles
+	}
+	if err := waitServing(c.Base, gnowebPath(plan.Paths[0]), *timeout, died); err != nil {
+		return err
+	}
+	if err := c.Run(); err != nil {
+		return err
+	}
+	assets, err := gnowebAssets()
+	if err != nil {
+		return err
+	}
+	if err := c.Write(*out, assets); err != nil {
+		return err
+	}
+	plan.Pages = c.Pages()
+	if err := writeOut(filepath.Join(*out, "index.html"), previewIndex(plan, c, *pr)); err != nil {
+		return err
+	}
+
+	if len(plan.Changed) > 0 {
+		base, newPkgs := renderBase(*gnodev, *baseRoot, *out, plan, c, *port, *live, *timeout)
+		for p := range newPkgs {
+			plan.New = append(plan.New, p)
+		}
+		sort.Strings(plan.New)
+		plan.Pairs = screenshotPairs(*out, c, base, plan.Changed, newPkgs, *chrome)
+	}
+	if err := writePreviewJSON(*out, plan); err != nil {
+		return err
+	}
+	if *baseURL != "" {
+		if err := writeOut(filepath.Join(*out, "preview.md"), previewComment(plan, *baseURL)); err != nil {
+			return err
+		}
+	}
+	fmt.Printf("done: %d page(s), %d before/after pair(s) -> %s\n", plan.Pages, len(plan.Pairs), *out)
 	return nil
 }
 
-// previewRealms finds the realms to render by scanning the filesystem, NOT
-// contracts.json: a realm added by a source-only pull request is not in the
-// catalog yet (the catalog is regenerated on main after merge) and would
-// otherwise never be previewed. Archived realms are skipped.
-func previewRealms(root string, selectors []string) ([]previewRealm, error) {
-	var out []previewRealm
-	rroot := filepath.Join(root, "r")
-	if !fileExists(rroot) {
+// buildPreviewPlan decides which packages to crawl.
+//
+// Selectors and -changed are both pull-request shaped; -all (or no argument at
+// all) is the whole-repository snapshot.
+func buildPreviewPlan(contracts []Contract, all bool, changedFile string, selectors []string, maxPkgs int) (*previewPlan, error) {
+	live := make([]Contract, 0, len(contracts))
+	for _, c := range contracts {
+		if c.Ignored {
+			continue // archived: it does not build, and gnodev would not load it
+		}
+		live = append(live, c)
+	}
+
+	if all || (changedFile == "" && len(selectors) == 0) {
+		plan := &previewPlan{Mode: "site"}
+		for _, c := range live {
+			plan.Paths = append(plan.Paths, c.PkgPath)
+		}
+		sort.Strings(plan.Paths)
+		return plan, nil
+	}
+
+	plan := &previewPlan{Mode: "pr", ChangedFiles: map[string][]string{}}
+	changedSet := map[string]bool{}
+	if changedFile != "" {
+		paths, err := readPathList(changedFile)
+		if err != nil {
+			return nil, err
+		}
+		for pkg, files := range changedPackages(live, paths) {
+			changedSet[pkg] = true
+			if len(files) > 0 {
+				plan.ChangedFiles[pkg] = files
+			}
+		}
+	}
+	for _, c := range live {
+		if matchesSelector(c.Dir, selectors) {
+			changedSet[c.PkgPath] = true
+		}
+	}
+
+	// A changed pure package is worth looking at itself (its source view), and
+	// it also changes every realm that imports it.
+	dependents := reverseDeps(live, changedSet)
+
+	byPath := map[string]Contract{}
+	for _, c := range live {
+		byPath[c.PkgPath] = c
+	}
+	// Realms before pure packages within each group: a reviewer looks at what
+	// renders first, and the cap should spend itself there.
+	order := func(paths []string) []string {
+		var realms, pure []string
+		for _, p := range paths {
+			if byPath[p].Kind == "r" {
+				realms = append(realms, p)
+			} else {
+				pure = append(pure, p)
+			}
+		}
+		sort.Strings(realms)
+		sort.Strings(pure)
+		return append(realms, pure...)
+	}
+	plan.Changed = order(sortedStrings(changedSet))
+	plan.Dependents = order(sortedStrings(dependents))
+
+	plan.Paths = append(append([]string{}, plan.Changed...), plan.Dependents...)
+	if maxPkgs > 0 && len(plan.Paths) > maxPkgs {
+		plan.Dropped = len(plan.Paths) - maxPkgs
+		plan.Paths = plan.Paths[:maxPkgs]
+	}
+	return plan, nil
+}
+
+// changedPackages maps the paths a pull request touched onto the packages they
+// belong to, and to the file names inside them.
+//
+// Test files are excluded: they cannot change what a package renders, and a
+// preview that reacts to them spends a gnodev build on nothing.
+func changedPackages(contracts []Contract, paths []string) map[string][]string {
+	out := map[string][]string{}
+	for _, p := range paths {
+		p = filepath.ToSlash(p)
+		if isTestGno(p) || strings.Contains(p, "/filetests/") {
+			continue
+		}
+		best := ""
+		var bestPkg string
+		for _, c := range contracts {
+			if c.Superseded {
+				continue // its directory is a historical path, not a live one
+			}
+			if p == c.Dir || strings.HasPrefix(p, c.Dir+"/") {
+				if len(c.Dir) > len(best) {
+					best, bestPkg = c.Dir, c.PkgPath
+				}
+			}
+		}
+		if bestPkg == "" {
+			continue
+		}
+		if _, ok := out[bestPkg]; !ok {
+			out[bestPkg] = nil
+		}
+		if strings.HasSuffix(p, ".gno") {
+			out[bestPkg] = append(out[bestPkg], path.Base(p))
+		}
+	}
+	return out
+}
+
+// reverseDeps walks the import graph backwards from the changed set and returns
+// everything that reaches it, excluding the changed packages themselves.
+func reverseDeps(contracts []Contract, changed map[string]bool) map[string]bool {
+	importers := map[string][]string{}
+	for _, c := range contracts {
+		for _, d := range c.Deps {
+			importers[d] = append(importers[d], c.PkgPath)
+		}
+	}
+	out := map[string]bool{}
+	queue := sortedStrings(changed)
+	for len(queue) > 0 {
+		p := queue[0]
+		queue = queue[1:]
+		for _, imp := range importers[p] {
+			if changed[imp] || out[imp] {
+				continue
+			}
+			out[imp] = true
+			queue = append(queue, imp)
+		}
+	}
+	return out
+}
+
+// workspacePkgDirs is every directory gnodev should load: the packages in the
+// tree, plus the superseded versions `gnopm sync` materialized under .gnopm/.
+// Archived (`ignore = true`) packages are left out; they do not build.
+func workspacePkgDirs(root string) ([]string, error) {
+	contracts, err := scanContracts(root)
+	if err != nil {
+		return nil, err
+	}
+	var dirs []string
+	for _, c := range contracts {
+		if c.Ignored {
+			continue
+		}
+		dir := c.Dir
+		if c.Superseded {
+			dir = path.Join(assemblyDir, c.PkgPath)
+		}
+		abs := filepath.Join(root, filepath.FromSlash(dir))
+		if !fileExists(filepath.Join(abs, "gnomod.toml")) {
+			// A superseded version nobody ran `gnopm sync` for. Everything that
+			// imports it will fail to load; say so once, here, rather than as
+			// an unexplained 500 on some other package's page.
+			fmt.Fprintf(os.Stderr, "  ! %s is not materialized (run `gnopm sync`) — skipping\n", c.PkgPath)
+			continue
+		}
+		dirs = append(dirs, abs)
+	}
+	sort.Strings(dirs)
+	return dirs, nil
+}
+
+// startGnodev boots gnodev on the workspace. GNOROOT comes from the environment
+// and should be the stdlib-only view the Makefile builds (`make view`), so
+// gno.land/* dependencies resolve from committed vendor/ exactly as they do for
+// lint and test, rather than from whatever the monorepo checkout happens to
+// hold.
+func startGnodev(bin, root string, dirs []string, out string, port int, logName string) (func(), <-chan error, error) {
+	args := []string{
+		"local", "-no-watch",
+		"-web-listener", fmt.Sprintf("127.0.0.1:%d", port),
+		// The RPC listener and the keybase both default to fixed locations, so
+		// the before/after passes — which run one after the other but leave
+		// state behind — would collide on them. Derive both from the web port.
+		"-node-rpc-listener", fmt.Sprintf("tcp://127.0.0.1:%d", port+10000),
+		"-home", filepath.Join(out, fmt.Sprintf(".gnodev-%d", port)),
+		"-C", root,
+	}
+	args = append(args, dirs...)
+	log, err := os.Create(filepath.Join(out, logName))
+	if err != nil {
+		return nil, nil, err
+	}
+	cmd := exec.Command(bin, args...)
+	cmd.Stdout, cmd.Stderr = log, log
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	if err := cmd.Start(); err != nil {
+		log.Close()
+		return nil, nil, fmt.Errorf("start gnodev: %w", err)
+	}
+	// Nothing else watches this process. Without the channel, a gnodev that
+	// dies on startup (a port already taken, a package that will not load)
+	// costs the full readiness timeout and reports "not ready", which says
+	// nothing about why.
+	died := make(chan error, 1)
+	waited := make(chan struct{})
+	go func() {
+		died <- cmd.Wait()
+		close(waited)
+	}()
+	return func() {
+		_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM) // gnodev spawns a node
+		<-waited
+		log.Close()
+	}, died, nil
+}
+
+// renderBase renders the changed packages a second time from the merge-base
+// checkout, into <out>/_before/. It reuses the head's gnodev binary and the
+// head's assets on purpose: the pair must differ by the package change alone,
+// not by whatever else moved on main. Returns nil when there is no base
+// checkout, when every changed package is new, or when the pass fails — a
+// missing "before" costs the comment one image, not the preview.
+func renderBase(gnodev, baseRoot, out string, plan *previewPlan, head *Crawler, port int, live string, timeout time.Duration) (*Crawler, map[string]bool) {
+	if baseRoot == "" {
 		return nil, nil
 	}
-	err := filepath.WalkDir(rroot, func(p string, d os.DirEntry, err error) error {
-		if err != nil || d.IsDir() || d.Name() != "gnomod.toml" {
-			return err
+	newPkgs := map[string]bool{}
+	var paths []string
+	for _, p := range plan.Changed {
+		if _, err := os.Stat(filepath.Join(baseRoot, "gnowork.toml")); err != nil {
+			return nil, nil
 		}
-		b, err := os.ReadFile(p)
-		if err != nil {
-			return err
+		dir, err := packageDirIn(baseRoot, p)
+		if err != nil || dir == "" {
+			newPkgs[p] = true // genuinely added by this pull request
+			continue
 		}
-		m := moduleRe.FindSubmatch(b)
-		if m == nil || ignoreRe.Match(b) || !strings.Contains(string(m[1]), "/r/") {
-			return nil
+		paths = append(paths, p)
+	}
+	if len(paths) == 0 {
+		return nil, newPkgs
+	}
+	dirs, err := workspacePkgDirs(baseRoot)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "  ! base render:", err)
+		return nil, newPkgs
+	}
+	basePort := port + 1
+	stop, died, err := startGnodev(gnodev, baseRoot, dirs, out, basePort, "gnodev-base.log")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "  ! base render:", err)
+		return nil, newPkgs
+	}
+	defer stop()
+
+	base := &Crawler{
+		Base:       fmt.Sprintf("http://127.0.0.1:%d", basePort),
+		Paths:      paths,
+		MaxPages:   len(paths),
+		Live:       strings.TrimSuffix(live, "/"),
+		RenderOnly: true,
+		Prefix:     beforeDir,
+	}
+	for _, step := range []func() error{
+		func() error { return waitServing(base.Base, gnowebPath(paths[0]), timeout, died) },
+		base.Run,
+		func() error { return base.Write(out, "") },
+	} {
+		if err := step(); err != nil {
+			fmt.Fprintln(os.Stderr, "  ! base render:", err)
+			return nil, newPkgs
 		}
-		rel, _ := filepath.Rel(root, filepath.Dir(p))
-		rel = filepath.ToSlash(rel)
-		if matchesSelector(rel, selectors) {
-			out = append(out, previewRealm{pkgPath: string(m[1]), dir: rel})
+	}
+	return base, newPkgs
+}
+
+// packageDirIn finds where a package path lives in another checkout, by module
+// line rather than by directory: a bump moves gno.land/p/moul/md/v1 from
+// p/moul/md/v1 to p/moul/md without either path telling you so.
+func packageDirIn(root, pkgPath string) (string, error) {
+	contracts, err := scanContracts(root)
+	if err != nil {
+		return "", err
+	}
+	for _, c := range contracts {
+		if c.PkgPath == pkgPath && !c.Superseded {
+			return c.Dir, nil
 		}
-		return nil
-	})
-	sort.Slice(out, func(i, j int) bool { return out[i].pkgPath < out[j].pkgPath })
-	return out, err
+	}
+	return "", nil
+}
+
+// gnowebAssets locates gnoweb's public/ tree inside GNOROOT.
+func gnowebAssets() (string, error) {
+	gnoroot := os.Getenv("GNOROOT")
+	if gnoroot == "" {
+		return "", fmt.Errorf("GNOROOT is not set (it must point at a gnolang/gno checkout, or the stdlib-only view `make view` builds)")
+	}
+	p := filepath.Join(gnoroot, "gno.land", "pkg", "gnoweb", "public")
+	if !fileExists(p) {
+		return "", fmt.Errorf("%s: gnoweb assets not found under GNOROOT", p)
+	}
+	return p, nil
+}
+
+func readPathList(p string) ([]string, error) {
+	var b []byte
+	var err error
+	if p == "-" {
+		b, err = os.ReadFile("/dev/stdin")
+	} else {
+		b, err = os.ReadFile(p)
+	}
+	if err != nil {
+		return nil, err
+	}
+	var out []string
+	for _, l := range strings.Split(string(b), "\n") {
+		if l = strings.TrimSpace(l); l != "" {
+			out = append(out, l)
+		}
+	}
+	return out, nil
+}
+
+func writePreviewJSON(out string, plan *previewPlan) error {
+	b, err := json.MarshalIndent(plan, "", "  ")
+	if err != nil {
+		return err
+	}
+	return writeOut(filepath.Join(out, "preview.json"), string(b)+"\n")
 }
 
 // matchesSelector applies the `./...`, `./dir/...`, `./dir` forms.
@@ -218,87 +532,4 @@ func matchesSelector(dir string, selectors []string) bool {
 		}
 	}
 	return false
-}
-
-// rewritePage turns gnoweb's absolute app paths into paths relative to the page
-// being written, so the tree browses from a file:// URL or a Pages subfolder.
-func rewritePage(html, rel string) string {
-	html = strings.ReplaceAll(html, `="/public/`, `="`+rel+`public/`)
-	html = appPathRe.ReplaceAllString(html, `="`+rel+`$1/`)
-	return strings.ReplaceAll(html, `="/favicon`, `="`+rel+`favicon`)
-}
-
-// relPrefix is the ../ chain back to the tree root from a page's directory:
-// /r/moul/hello/v0 is four segments deep, so ../../../../.
-func relPrefix(urlPath string) string {
-	return strings.Repeat("../", len(strings.Split(strings.Trim(urlPath, "/"), "/")))
-}
-
-// cssRel rewrites /public/… references inside a stylesheet to be relative to
-// that stylesheet's own directory.
-func cssRel(cssKey string) string {
-	parts := strings.Split(strings.Trim(cssKey, "/"), "/")
-	depth := len(parts) - 1 // directories above the file, `public` included
-	if depth > 1 {
-		return strings.Repeat("../", depth-1)
-	}
-	return ""
-}
-
-func previewIndex(realms []previewRealm) string {
-	var rows strings.Builder
-	for _, r := range realms {
-		rows.WriteString(fmt.Sprintf("    <li><a href=%q><code>%s</code></a></li>\n",
-			strings.Trim(r.urlPath(), "/")+"/index.html", r.pkgPath))
-	}
-	return fmt.Sprintf(`<!doctype html>
-<meta charset="utf-8">
-<title>gno-contracts — realm preview</title>
-<style>body{font-family:system-ui,sans-serif;max-width:48rem;margin:3rem auto;padding:0 1rem}
-code{background:#f3f3f3;padding:.1em .3em;border-radius:3px}li{margin:.3em 0}</style>
-<h1>Realm preview</h1>
-<p>%d realm(s), rendered with gnodev/gnoweb. This is a static snapshot;
-interactive actions and cross-realm nav that leave these pages won't work.</p>
-<ul>
-%s</ul>
-`, len(realms), rows.String())
-}
-
-func writeFileUnder(out, rel string, body []byte) error {
-	dst := filepath.Join(out, filepath.FromSlash(rel))
-	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-		return err
-	}
-	return os.WriteFile(dst, body, 0o644)
-}
-
-func fetch(url string) ([]byte, error) {
-	client := &http.Client{Timeout: 15 * time.Second}
-	resp, err := client.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s", resp.Status)
-	}
-	return io.ReadAll(resp.Body)
-}
-
-func waitReady(url string, timeout time.Duration) bool {
-	deadline := time.Now().Add(timeout)
-	for time.Now().Before(deadline) {
-		if _, err := fetch(url); err == nil {
-			return true
-		}
-		time.Sleep(2 * time.Second)
-	}
-	return false
-}
-
-func envOr(key, def string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return def
 }

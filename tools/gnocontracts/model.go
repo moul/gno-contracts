@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -298,6 +299,11 @@ func (c Contract) srcDir() string {
 
 // assemblyDir mirrors gnopm's: versions materialized out of git history.
 const assemblyDir = ".gnopm"
+
+// moduleRe matches the `module = "gno.land/…"` line of a gnomod.toml. The
+// version lives there, not in the directory path, so this is the only
+// authoritative answer to "what package is this directory".
+var moduleRe = regexp.MustCompile(`(?m)^[[:space:]]*module[[:space:]]*=[[:space:]]*"([^"]+)"`)
 
 // parseModule extracts the module path from a gnomod.toml file.
 func parseModule(gnomodPath string) (string, error) {
