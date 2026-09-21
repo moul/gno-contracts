@@ -99,6 +99,13 @@ func cmdPR(root string, args []string) error {
 		return err
 	}
 
+	// Relative paths are repo-root relative, not process relative: CI invokes
+	// this as `go -C tools tool gnocontracts`, which runs the tool in tools/.
+	// A bare `_preview/preview.md` read from there is simply missing, and a
+	// missing detail file is indistinguishable from "the preview has not been
+	// rendered yet" — so the comment silently lost its preview section.
+	*previewDetail = underRoot(root, *previewDetail)
+
 	a, err := analyzePR(root, *base)
 	if err != nil {
 		return err

@@ -363,3 +363,19 @@ func TestRelativePathsResolveAgainstTheRepositoryRoot(t *testing.T) {
 		t.Fatalf("an unset flag was rewritten: %q", got)
 	}
 }
+
+// The detail file is optional, so a path that does not resolve looks exactly
+// like "no preview yet". That is why it goes through underRoot: read from
+// tools/, `_preview/preview.md` is always missing and the comment silently
+// loses its preview section, which is what happened on PR #185.
+func TestPreviewDetailIsReadFromTheRepositoryRoot(t *testing.T) {
+	root := t.TempDir()
+	os.MkdirAll(filepath.Join(root, "_preview"), 0o755)
+	os.WriteFile(filepath.Join(root, "_preview", "preview.md"), []byte("- [`x`](u)\n"), 0o644)
+	if got := readPreviewDetail(underRoot(root, "_preview/preview.md")); got != "- [`x`](u)" {
+		t.Fatalf("detail = %q, want the file contents", got)
+	}
+	if got := readPreviewDetail(""); got != "" {
+		t.Fatalf("an unset flag read something: %q", got)
+	}
+}
