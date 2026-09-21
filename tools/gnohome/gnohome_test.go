@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -370,5 +371,78 @@ func TestFeeForTracksTheCeiling(t *testing.T) {
 	}
 	if ratio := float64(fee) / float64(gas); ratio < 0.009 || ratio > 0.011 {
 		t.Errorf("ratio %.4f ugnot/gas, want ~0.01", ratio)
+	}
+}
+
+// One transaction carrying every change, so the whole page updates on one
+// signature. Unit tests could not see the two things that matter here, so
+// they are asserted against the shape gnokey actually emitted: the message
+// type string and the field names. Both were captured from
+// `gnokey maketx call -broadcast=false`, and a two-message merge of that
+// output was signed successfully before this was written.
+func TestBuildBatchIsOneTxForEveryChange(t *testing.T) {
+	cfg := config{realm: "gno.land/r/moul/home", owner: "g1owner", key: "moul"}
+	changes := []change{
+		{kind: kindMissing, slug: "bio", slot: slotFile{slug: "bio", body: "hello\nworld"}},
+		{kind: kindOutdated, slug: "now", slot: slotFile{slug: "now", body: "x"}},
+		{kind: kindExtra, slug: "gone"},
+	}
+	doc, gas, err := buildBatch(cfg, changes, txOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(doc.Msg) != 3 {
+		t.Fatalf("got %d messages, want one per change", len(doc.Msg))
+	}
+	var msgs []callMsg
+	for _, raw := range doc.Msg {
+		var m callMsg
+		if err := json.Unmarshal(raw, &m); err != nil {
+			t.Fatal(err)
+		}
+		msgs = append(msgs, m)
+	}
+	if msgs[0].Type != "/vm.m_call" {
+		t.Errorf("type = %q, want /vm.m_call", msgs[0].Type)
+	}
+	if msgs[0].Caller != "g1owner" || msgs[0].PkgPath != "gno.land/r/moul/home" {
+		t.Errorf("msg = %+v", msgs[0])
+	}
+	// The body travels verbatim: no shell, so the newline that command
+	// substitution would have eaten is still there. That is the whole reason
+	// this path is safer than the one-command-per-slot path.
+	if got := msgs[0].Args; len(got) != 2 || got[0] != "bio" || got[1] != "hello\nworld" {
+		t.Errorf("args = %q, want the slug and the body byte for byte", got)
+	}
+	// A slot on chain with no local file is a Delete, and carries no body.
+	if msgs[2].Func != "Delete" {
+		t.Errorf("extra slot func = %q, want Delete", msgs[2].Func)
+	}
+	if len(msgs[2].Args) != 1 {
+		t.Errorf("Delete args = %q, want just the slug", msgs[2].Args)
+	}
+	// Gas is the sum: the chain meters the transaction, not the message.
+	want := gasFor(len("hello\nworld")) + gasFor(len("x")) + gasFor(0)
+	if gas != want {
+		t.Errorf("gas = %d, want the sum %d", gas, want)
+	}
+	if doc.Fee.GasWanted != strconv.FormatInt(gas, 10) {
+		t.Errorf("fee.gas_wanted = %q, want %d", doc.Fee.GasWanted, gas)
+	}
+	if doc.Fee.GasFee != feeFor(gas) {
+		t.Errorf("fee.gas_fee = %q, want %q", doc.Fee.GasFee, feeFor(gas))
+	}
+	if doc.Signatures != nil {
+		t.Error("a document gnopm writes must be unsigned")
+	}
+}
+
+func TestBuildBatchOnNoChangesIsNoDocument(t *testing.T) {
+	doc, _, err := buildBatch(config{}, nil, txOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if doc != nil {
+		t.Error("no changes must produce no document, not an empty transaction")
 	}
 }

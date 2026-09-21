@@ -203,14 +203,20 @@ It never signs.
 
 ```sh
 gnopm publish -key moul moul/home     # read the report, read the script
-gnopm publish -key moul moul/home | sh
+gnopm publish -key moul moul/home > /tmp/deploy.sh && sh /tmp/deploy.sh
 ```
 
 Then the content, once the realm answers:
 
 ```sh
-go -C tools tool gnohome tx -all | sh
+go -C tools tool gnohome tx -all -batch /tmp/home.tx.json
 ```
+
+That writes one transaction holding every slot and prints the `gnokey sign`
+and `gnokey broadcast` to run: one passphrase instead of one per slot, and
+atomic. **Never pipe these into `sh`**: `gnokey` reads the passphrase from
+stdin and a pipe takes stdin away, so the prompt fails with
+`inappropriate ioctl for device`.
 
 Run those rather than copying commands from here: anything written down goes
 stale, and the tools recompute from the files as they are.
