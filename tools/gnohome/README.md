@@ -28,44 +28,21 @@ go -C tools tool gnohome tx        # the commands to fix that
 | `status` | diff `content/` against the chain manifest, one query, no bodies |
 | `tx` | print `gnokey maketx call` for each outdated slot |
 | `packages` | print the `packages` slot, generated from `contracts.json` |
-| `deploy` | preflight the realm against the chain, then print the whole command list |
 
 Shared flags: `-content` `-realm` `-remote` `-chainid` `-key` `-owner`.
 `preview` adds `-out` `-height` `-rev`; `tx` adds `-inline` `-all` `-prune`
 `-gas-wanted` `-gas-fee` `-max-deposit`; `packages` adds `-catalog` `-network`.
 `gnohome <cmd> -h` lists them.
 
-### `deploy`: the preflight, then commands you can read
+### Deploying is not here
 
-`gnopm` versions packages, it does not publish them, and `tools/gnopublish`
-signs transactions itself. Neither answers *"tell me what is missing, size it,
-and hand me commands I can read before anything is signed"*, which is the only
-shape that works when the signer is moul's master key and no agent session may
-touch `vm/add_package`.
+Publishing the realm is [`gnopm publish`](https://github.com/moul/gnopm), which
+does it for any package in any workspace: chain discovered from the package
+path, live/parked/absent reported as three states, dependency ordering, gas and
+fee sized from the payload, and `gnokey` commands emitted rather than signed.
+A per-contract tool would have reinvented all of it once per contract.
 
-`deploy` is read-only. It reports, in one pass:
-
-- whether the package is **live**, **parked** or **absent**. Those are three
-  different states and the usual explorers show two: `gnoland-1` runs
-  `code_submission_policy = "inert"`, so `MsgAddPackage` parks the bytes and
-  returns `success: true` without making anything live. `vm/qinertpaths` is the
-  only read that sees a parked path.
-- whether every **non-test** import is already on chain, and stops if not. Test
-  imports travel with the package but the VM never runs them, so they do not
-  gate a deploy.
-- the **payload**, the same bytes the message carries (`.gno` including tests,
-  `.toml`, `.md`, no sub-directories), biggest file first, because the README is
-  usually the largest thing being paid for.
-- **gas** at 1,800/byte, the top of the 1,014 to 1,781 range measured over ten
-  successful mainnet `add_package` transactions, and a **fee** at ten times the
-  accepted floor.
-
-Then it prints the dry run, the broadcast, the parked-or-live check, and the
-content push, in that order. It signs nothing and broadcasts nothing.
-
-```sh
-go -C tools tool gnohome deploy
-```
+This tool owns only what is specific to this realm: its slots.
 
 ### `packages` is the one generated slot
 

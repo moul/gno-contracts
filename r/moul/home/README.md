@@ -193,20 +193,27 @@ enabled the four most recent parked packages after 1 to 4 blocks, 3.3 to 13.2
 seconds. It can still refuse, and a refusal is easy to miss, so check rather than
 assume.
 
-### The whole plan, from the tool
+### The whole plan, from gnopm
 
-`gnohome deploy` does the preflight and prints every command in order. It is
-read-only: it checks whether the package is live, parked or absent, that each
-non-test dependency is already on chain, measures the payload, sizes gas and
-fee, and then emits the dry run, the broadcast, the parked-or-live check and
-the content push. It signs nothing.
+Deploying is not special to this realm, so it is not this realm's tool that
+does it. `gnopm publish` reads the chain, reports whether the package is live,
+parked or absent, checks that every non-test dependency is already up, sizes
+gas, fee and deposit from the real payload, and writes the `gnokey` commands.
+It never signs.
 
 ```sh
-go -C tools tool gnohome deploy
+gnopm publish -key moul moul/home     # read the report, read the script
+gnopm publish -key moul moul/home | sh
 ```
 
-Run that rather than copying commands from here: the numbers below are a
-snapshot and the tool recomputes them from the files as they are.
+Then the content, once the realm answers:
+
+```sh
+go -C tools tool gnohome tx -all | sh
+```
+
+Run those rather than copying commands from here: anything written down goes
+stale, and the tools recompute from the files as they are.
 
 ### How it sizes them
 

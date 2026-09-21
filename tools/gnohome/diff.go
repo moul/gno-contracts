@@ -79,6 +79,27 @@ type txOptions struct {
 	maxDeposit string
 }
 
+// feeRatioMicro is the fee offered per unit of gas, in millionths of a ugnot:
+// 10_000 = 0.01 ugnot/gas. What the mempool enforces is the fee/gas_wanted
+// RATIO, not the absolute (EnsureSufficientMempoolFees), so raising the
+// ceiling raises the required fee. The lowest ratio accepted on gno.land
+// mainnet is 0.001 ugnot/gas, so this is ten times the floor. gas_fee is
+// deducted in full as offered and never refunded, unlike max_deposit, so
+// over-offering is a real cost: the flat 1000000ugnot this tool used to emit
+// was about ninety times the floor on a slot write.
+//
+// Kept in step with gnopm's FeeFor, which sizes a deploy the same way.
+const feeRatioMicro = 10_000
+
+// feeFor sizes the gas fee from the ceiling it accompanies, never zero.
+func feeFor(gasWanted int64) string {
+	fee := gasWanted * feeRatioMicro / 1_000_000
+	if fee < 1 {
+		fee = 1
+	}
+	return strconv.FormatInt(fee, 10) + "ugnot"
+}
+
 // gasFor sizes gas-wanted from the body. The floor covers the call itself; the
 // per-byte term covers writing the body into the realm's tree. Generous on
 // purpose: unused gas is not charged, a too-low estimate costs a failed

@@ -8,7 +8,9 @@
 //	gnohome status    diff local content/ against what is on chain
 //	gnohome tx        print the gnokey commands for exactly what is outdated
 //	gnohome packages  regenerate the packages slot from contracts.json
-//	gnohome deploy    preflight the realm against the chain, then the commands
+//
+// Deploying the realm is NOT here: that is `gnopm publish`, which does it for
+// any package in any workspace rather than once per contract.
 //
 // It has no dependencies beyond the Go standard library: the chain is read
 // over plain JSON-RPC abci_query, and writes are emitted as gnokey commands
@@ -76,7 +78,6 @@ func run(args []string, out *os.File) error {
 		maxDeposit  string
 		catalogFile string
 		network     string
-		pkgDir      string
 	)
 	switch cmd {
 	case "preview":
@@ -93,8 +94,6 @@ func run(args []string, out *os.File) error {
 	case "packages":
 		fs.StringVar(&catalogFile, "catalog", "", "path to contracts.json (default: <repo>/contracts.json)")
 		fs.StringVar(&network, "network", "mainnet", "which network's deployment status to report")
-	case "deploy":
-		fs.StringVar(&pkgDir, "pkgdir", "", "the package directory to upload (default: <repo>/r/moul/home)")
 	}
 	if err := fs.Parse(rest); err != nil {
 		return err
@@ -133,11 +132,6 @@ func run(args []string, out *os.File) error {
 	}
 
 	switch cmd {
-	case "deploy":
-		if pkgDir == "" {
-			pkgDir = filepath.Dir(cfg.contentDir)
-		}
-		return printDeploy(out, cfg, pkgDir, local)
 	case "slots":
 		return printSlots(out, local)
 	case "preview":
@@ -202,7 +196,8 @@ commands:
   status    diff local content/ against what is on chain
   tx        print the gnokey commands for exactly what is outdated
   packages  regenerate the packages slot from contracts.json, to stdout
-  deploy    preflight the realm against the chain, then print the commands
+
+Deploying the realm is "gnopm publish", not a command here.
 
 Run "gnohome <command> -h" for the flags of one command.
 `)

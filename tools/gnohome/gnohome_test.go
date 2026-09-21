@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -371,87 +370,5 @@ func TestFeeForTracksTheCeiling(t *testing.T) {
 	}
 	if ratio := float64(fee) / float64(gas); ratio < 0.009 || ratio > 0.011 {
 		t.Errorf("ratio %.4f ugnot/gas, want ~0.01", ratio)
-	}
-}
-
-// payload must count exactly what MsgAddPackage carries: .gno (tests
-// included), .toml and .md at the top level, and nothing from a sub-directory.
-// Miscounting it mis-sizes both gas and the storage deposit.
-func TestPayloadMatchesWhatAddpkgUploads(t *testing.T) {
-	dir := t.TempDir()
-	write(t, dir, "home.gno", "package home\n")      // 13
-	write(t, dir, "home_test.gno", "package home\n") // 13, tests DO travel
-	write(t, dir, "README.md", "hi\n")               // 3, and so does the README
-	write(t, dir, "gnomod.toml", "module = \"x\"\n") // 13
-	write(t, dir, "Makefile", "all:\n")              // excluded: extension
-	write(t, dir, ".hidden.md", "x\n")               // excluded: dot-file
-	sub := filepath.Join(dir, "content")
-	if err := os.MkdirAll(sub, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	write(t, sub, "bio.md", "a very long body that must not be counted\n")
-
-	files, total, err := payload(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(files) != 4 {
-		var names []string
-		for _, f := range files {
-			names = append(names, f.name)
-		}
-		t.Fatalf("payload = %v, want the 4 uploadable files", names)
-	}
-	// bodies 13+13+3+13 = 42, names 8+13+9+11 = 41
-	if want := 83; total != want {
-		t.Errorf("total = %d, want %d (bodies plus names)", total, want)
-	}
-	// Sorted biggest first, so the report leads with what costs most.
-	for i := 1; i < len(files); i++ {
-		if files[i-1].size < files[i].size {
-			t.Errorf("not sorted by size: %v", files)
-		}
-	}
-}
-
-// Only non-test imports gate a deploy: a test-only import travels with the
-// package but the VM never runs it, so requiring it on chain would block a
-// perfectly valid upload.
-func TestProductionImportsIgnoresTestsAndSelf(t *testing.T) {
-	dir := t.TempDir()
-	write(t, dir, "home.gno",
-		"package home\nimport (\n\t\"gno.land/p/moul/dynreplacer/v0\"\n\t\"gno.land/p/nt/avl/v0\"\n)\n")
-	write(t, dir, "home_test.gno",
-		"package home\nimport \"gno.land/p/nt/uassert/v0\"\n")
-	write(t, dir, "render.gno",
-		"package home\n// mentions gno.land/r/moul/home in prose\nimport \"gno.land/r/moul/home\"\n")
-
-	got, err := productionImports(dir, "gno.land/r/moul/home")
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := []string{"gno.land/p/moul/dynreplacer/v0", "gno.land/p/nt/avl/v0"}
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("productionImports = %v, want %v (no uassert, no self)", got, want)
-	}
-}
-
-// Omitting -max-deposit is not opting out: it falls back to
-// vm:p:default_deposit, 100 GNOT of ceiling per message. The ceiling is
-// refundable and only the measured delta is locked, so headroom is free, but it
-// must still cover the source bytes with room for realm state.
-func TestDepositCeilingCoversTheSourceWithHeadroom(t *testing.T) {
-	const gas = 53_683_200 // r/moul/home, 29,824 bytes at 1800 gas/byte
-	got := depositCeiling(gas)
-	srcLock := int64(29_824) * 100 // 2,982,400 ugnot
-	if got <= srcLock {
-		t.Errorf("ceiling %d does not cover the source lock %d", got, srcLock)
-	}
-	if got%1_000_000 != 0 {
-		t.Errorf("ceiling %d is not a whole number of GNOT", got)
-	}
-	// A tiny package still gets a usable floor rather than a few ugnot.
-	if min := depositCeiling(1000); min < 5_000_000 {
-		t.Errorf("floor = %d, want at least 5 GNOT", min)
 	}
 }
