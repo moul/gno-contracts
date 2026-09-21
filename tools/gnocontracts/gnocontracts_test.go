@@ -339,7 +339,7 @@ func TestDefaultNetworksAreWellFormed(t *testing.T) {
 
 // manifest reconciles the catalog's network list from defaultNetworks(), which
 // is the ONLY way a network change can land (contracts.json is generated on
-// main and the no-generated-files guard rejects PRs that touch it). Retiring a
+// main and the guard-generated CI step rejects PRs that touch it). Retiring a
 // network must not drop the historical per-contract `published` entries.
 func TestManifestReconcilesNetworksAndKeepsPublished(t *testing.T) {
 	root := t.TempDir()
