@@ -145,6 +145,7 @@ make help        # list all targets
 | [`p/moul/errs/v0`](p/moul/errs) 📦 | — | — | [✅](https://gno.land/p/moul/errs/v0) | — | — | — |
 | [`p/moul/fifo/v0`](p/moul/fifo) 📦 | — | — | [🗄️](https://gno.land/p/moul/fifo/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo/v0) ≈ | — |
 | [`p/moul/fp/v0`](p/moul/fp) 📦 | — | — | [✅](https://gno.land/p/moul/fp/v0) | — | — | — |
+| [`p/moul/grants/v0`](p/moul/grants) 📦 | — | — | — | — | — | 3 |
 | [`p/moul/greet/v0`](p/moul/greet) 📦 | — | — | [✅](https://gno.land/p/moul/greet/v0) | — | — | — |
 | [`p/moul/helplink/v0`](p/moul/helplink) 📦 | — | — | [🗄️](https://gno.land/p/moul/helplink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink/v0) ≈ | 1 |
 | [`p/moul/kit/store/v0`](p/moul/kit/store) 📦 | — | — | — | — | — | 2 |
@@ -220,6 +221,7 @@ make help        # list all targets
 | [`r/moul/demo/vault/v0`](r/moul/demo/vault) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/vault/v0) | — | — | 1 |
 | [`r/moul/demo/wikicoin/v0`](r/moul/demo/wikicoin) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/wikicoin/v0) | — | — | 2 |
 | [`r/moul/gns/v0`](r/moul/gns) 🏛️ | — | — | — | — | — | 2 |
+| [`r/moul/grant/v0`](r/moul/grant) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/hello/v0`](r/moul/hello) 🏛️ | — | — | [✅](https://gno.land/r/moul/hello/v0) | — | — | 1 |
 | [`r/moul/home`](r/moul/home) 🏛️ | — | — | [✅](https://gno.land/r/moul/home) | — | — | 2 |
 | [`r/moul/home/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/home) 🏛️ 🧊 | — | — | — | — | — | — |
@@ -369,7 +371,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T13:07:32Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T13:21:34Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
