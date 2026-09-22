@@ -55,11 +55,15 @@ func renderPage() string {
 	// Computed from chain state. Registered first; assertWritableSlug keeps a
 	// slot from ever taking one of these names, so nothing shadows them.
 	r.RegisterCallback(":owner:", func() string { return admin.String() })
-	r.RegisterCallback(":realm:", func() string { return "gno.land/r/moul/home" })
+	r.RegisterCallback(":realm:", func() string { return realmPath })
 	r.RegisterCallback(":chainid:", func() string { return runtime.ChainID() })
 	r.RegisterCallback(":height:", func() string { return strconv.FormatInt(runtime.ChainHeight(), 10) })
 	r.RegisterCallback(":rev:", func() string { return strconv.Itoa(rev) })
 	r.RegisterCallback(":slots:", func() string { return slotLinks() })
+
+	// The explorer links, which are computed the same way but come from
+	// another realm's configuration. See scan.gno.
+	registerScanCallbacks(r)
 
 	// One callback per slot. The closure captures s, which is re-bound on each
 	// iteration, so every callback sees its own slot.

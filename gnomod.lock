@@ -102,6 +102,10 @@ module = "gno.land/p/moul/memo/v0"
 source = { dir = "p/moul/memo" }
 
 [[module]]
+module = "gno.land/p/moul/mygnoscan/v0"
+source = { dir = "p/moul/mygnoscan" }
+
+[[module]]
 module = "gno.land/p/moul/nestedpkg/v0"
 source = { dir = "p/moul/nestedpkg" }
 
@@ -348,6 +352,11 @@ source = { dir = "p/moul/xmath" }
 
 [[module]]
 module = "gno.land/r/moul/config/v0"
+source = { commit = "bd1ff5de0053958282ac81f08ed8bfcb2081982c", dir = "r/moul/config" }
+hash = "h1:3f7yxl/XvHWA/hpCW64nDPHNdh0GhWhn0OAn4WqyktE="
+
+[[module]]
+module = "gno.land/r/moul/config/v1"
 source = { dir = "r/moul/config" }
 
 [[module]]

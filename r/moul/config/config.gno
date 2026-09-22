@@ -1,3 +1,27 @@
+// Package config is the one realm moul's other realms read their settings
+// from: a key/value store plus the manager list that decides who may write it.
+//
+// # Why a realm and not a constant
+//
+// A value shared by several contracts, hardcoded in each, is changed by
+// redeploying each. On mainnet a public realm cannot even be redeployed at its
+// own path, so "changing it" means a new version and a new path for every
+// consumer. Here it is a transaction.
+//
+// # Bump rarely, and never for a new setting
+//
+// This realm IS public and versioned, so its path moves on every bump and
+// every importer keeps reading the old version until it is itself redeployed.
+// That makes a bump expensive, which is exactly why the settings API is
+// generic: a new setting is a new KEY, and a key costs one transaction. Only a
+// change to the shape of this realm (a new function, a changed signature) is
+// worth a version.
+//
+// # Governance
+//
+// init seeds the authority with the deploying EOA. Everything that writes goes
+// through Authorizer, so transferring authority to a DAO transfers the
+// settings with it: there is no address hardcoded on the write path.
 package config
 
 import (

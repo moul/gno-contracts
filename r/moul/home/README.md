@@ -116,9 +116,23 @@ So a GitHub avatar needs no hosting of its own:
 `*.githubusercontent.com` and renders as-is. Verified by running this exact
 page through gnoweb's real goldmark pipeline, not by reading the policy.
 
-Six placeholders are computed from chain state rather than stored, and are
-refused as slot names so nothing can shadow them: `:owner:` `:realm:`
-`:chainid:` `:height:` `:rev:` `:slots:`.
+Eleven placeholders are computed at render time rather than stored, and are
+refused as slot names so nothing can shadow them.
+
+Six come straight from chain state: `:owner:` `:realm:` `:chainid:` `:height:`
+`:rev:` `:slots:`.
+
+Five are explorer links, built by [`p/moul/mygnoscan`](../../../p/moul/mygnoscan)
+(`scan.gno`): `:scan:` is the explorer base URL as plain text, `:scan.realm:`
+`:scan.me:` `:scan.block:` are markdown links to this realm, to the owner's
+account and to the block being rendered, and `:scan.links:` is the three of
+them on one line.
+
+Which explorer they point at is read from
+[`r/moul/config`](../../../r/moul/config), not hardcoded here, so moving every
+one of moul's realms to a different instance is one transaction against that
+realm rather than a redeploy of each. With nothing configured, they fall back
+to `mygnoscan.DefaultBase`, which is what a fresh chain renders.
 
 Three properties worth knowing:
 

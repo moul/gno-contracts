@@ -53,6 +53,12 @@ const admin = address("g1manfred47kzduec920z88wfr64ylksmdcedlf5")
 // layoutSlug names the slot used as the page template.
 const layoutSlug = "layout"
 
+// realmPath is this realm's own path. Written out rather than read from
+// unsafe.CurrentRealm() because it is also the interface with gnoweb (see the
+// package doc): the constant is the thing that must not drift, so it is stated
+// once and every other use points here.
+const realmPath = "gno.land/r/moul/home"
+
 // maxSlugLen bounds a slug so an index row stays readable and a key stays cheap.
 const maxSlugLen = 64
 
@@ -70,7 +76,13 @@ type slot struct {
 // reservedSlugs are placeholder names computed at render time from chain state.
 // A slot may not take one, because it would shadow the computed value and make
 // the page depend on callback registration order.
-var reservedSlugs = []string{"chainid", "height", "owner", "realm", "rev", "slots"}
+//
+// The scan.* half comes from scan.gno's scanPlaceholders, so adding an explorer
+// placeholder there reserves it here and cannot be forgotten.
+var reservedSlugs = append(
+	[]string{"chainid", "height", "owner", "realm", "rev", "slots"},
+	scanPlaceholders...,
+)
 
 func assertAdmin(cur realm) {
 	if cur.Previous().Address() != admin {

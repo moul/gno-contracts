@@ -56,10 +56,14 @@ func TestLoadSlotsRejectsCarriageReturns(t *testing.T) {
 }
 
 func TestLoadSlotsRejectsReservedNames(t *testing.T) {
-	dir := t.TempDir()
-	write(t, dir, "height.md", "boom")
-	if _, err := loadSlots(dir); err == nil || !strings.Contains(err.Error(), "reserved") {
-		t.Fatalf("loadSlots error = %v, want a 'reserved' error", err)
+	// One from each half of the mirror: a chain-state placeholder and an
+	// explorer one, so dropping either group out of reservedSlugs fails here.
+	for _, name := range []string{"height.md", "scan.realm.md"} {
+		dir := t.TempDir()
+		write(t, dir, name, "boom")
+		if _, err := loadSlots(dir); err == nil || !strings.Contains(err.Error(), "reserved") {
+			t.Fatalf("loadSlots(%s) error = %v, want a 'reserved' error", name, err)
+		}
 	}
 }
 

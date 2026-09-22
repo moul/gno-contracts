@@ -1,11 +1,74 @@
 # `gno.land/r/moul/config`
 
-The manager list for moul's realms: one place that answers "may this address
-administer my contracts", so the other realms do not each carry their own
-whitelist.
+moul's settings, plus the manager list that decides who may change them. One
+realm the others read, so a value that several contracts share lives in one
+place and moving it is a transaction rather than a redeploy of each.
 
-It is a thin realm around [`p/moul/authz`](../../../p/moul/authz). All state is
-the single `Authorizer`.
+## Settings
+
+```go
+func Set(cur realm, key, value string)   // manager only; aborts otherwise
+func Unset(cur realm, key string)        // manager only; aborts on a missing key
+func Get(key string) string              // "" when unset
+func GetOr(key, fallback string) string  // what a consumer should call
+func Has(key string) bool
+func Keys() []string
+func Size() int
+func SettingsRevision() int
+func Manifest() string                   // the whole config in one qeval read
+```
+
+A key is 1 to 64 bytes of `[a-z0-9._-]`, dot-namespaced by convention
+(`mygnoscan.url`). A value is capped at 1024 bytes: this realm holds settings,
+not content, and storage is paid for and never refunded. Every write emits a
+`ConfigSet` / `ConfigUnset` event, so the history of a setting is readable from
+an indexer without a call per key.
+
+**The generic API is the point.** A new setting is a new key, which is a
+transaction. Only a change to the *shape* of this realm needs a version bump,
+and a bump is expensive here: the path changes, so every realm importing the
+old one keeps reading the old one until it is itself redeployed. Reach for a
+key before reaching for a typed accessor.
+
+### Why the settings functions abort instead of returning an error
+
+The manager functions below return `error`. A returned error from a realm call
+leaves the transaction **successful**: the caller sees a green receipt and
+walks away believing the write landed, while every realm reading that key keeps
+serving the old value. For a configuration realm that is the one outcome worth
+ruling out, so `Set` and `Unset` abort. The manager functions predate that
+reasoning and are frozen on chain at `v0`; the new surface does not inherit it.
+
+## The explorer accessors
+
+```go
+func MygnoscanURL() string                  // the configured base, or the package default
+func Scanner() mygnoscan.Scanner            // a configured link builder
+func MygnoscanFor(pkgPath string) string    // a realm's explorer page
+func MygnoscanFooter(pkgPath string) string // the markdown line for a Render
+```
+
+This is the worked example of the whole idea. A realm renders
+`config.MygnoscanFooter("gno.land/r/moul/mything")` in its footer; moul points
+every one of them at a different explorer with:
+
+```sh
+gnokey maketx call -pkgpath gno.land/r/moul/config/v1 -func Set   -args mygnoscan.url -args https://scan.example.com   -gas-fee 1000000ugnot -gas-wanted 20000000   -broadcast -chainid gnoland-1 -remote https://rpc.gno.land:443 moul
+```
+
+Keys: `mygnoscan.url` (base URL) and `mygnoscan.network` (overrides the
+`?network=` id, for an instance that names the chain differently; normally
+unset, and the chain-id decides). Unset, readers fall back to
+[`p/moul/mygnoscan`](../../../p/moul/mygnoscan)'s `DefaultBase`, so a realm
+importing this one still renders correctly on a chain where nothing was ever
+configured.
+
+`MygnoscanFor` takes the path explicitly and there is no zero-argument version.
+`p/moul/mygnoscan` *can* name the calling realm by stack-walking, but the stack
+seen from inside this realm has this realm on it, so such a helper would
+confidently return `gno.land/r/moul/config` for every caller.
+
+## Managers
 
 ```go
 func AddManager(cur realm, addr address) error
@@ -15,14 +78,19 @@ func ListManagers(cur realm) []address
 func HasManager(cur realm, addr address) bool
 ```
 
-`init` refuses to run unless the caller is an EOA (`cur.Previous().IsUserCall()`)
-and seeds the authority with that address. `AddManager` and `RemoveManager`
-only work while the authority is a `MemberAuthority`; once
-`TransferManagement` hands control to something else (a DAO, a contract), they
-return an error rather than silently bypassing the new authority.
+A thin layer over [`p/moul/authz`](../../../p/moul/authz). `init` refuses to
+run unless the caller is an EOA (`cur.Previous().IsUserCall()`) and seeds the
+authority with that address; that address is then the only one that can write a
+setting until it adds another.
 
-Consumers should call `HasManager` and gate on the result. It is a read, so it
-costs nothing beyond the cross-realm call.
+`AddManager` and `RemoveManager` only work while the authority is a
+`MemberAuthority`. Once `TransferManagement` hands control to something else (a
+DAO, a contract), they return an error rather than silently bypassing the new
+authority, and `Set` follows the new authority from that moment on: it asks the
+`Authorizer`, not a member list.
+
+The realm governs itself. There is no address hardcoded in the settings path,
+so handing this realm to a DAO hands it the settings too.
 
 <!-- BEGIN GNOCONTRACTS FOOTER (generated by `make readmes`; do not edit below) -->
 
