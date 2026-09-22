@@ -385,3 +385,39 @@ func TestPreviewDetailIsReadFromTheRepositoryRoot(t *testing.T) {
 		t.Fatalf("an unset flag read something: %q", got)
 	}
 }
+
+// A superseded version is pinned by hash to a commit in this repository's
+// history: nobody can change what it renders, so previewing it reviews
+// nothing, and it renders whatever was true at that commit. One of them still
+// carries a local path in its README that main stopped shipping long ago, and
+// rendering it published that path to a public site.
+//
+// It still has to LOAD, because packages in the tree import it. Only the crawl
+// skips it.
+func TestSupersededVersionsAreLoadedButNeverCrawled(t *testing.T) {
+	contracts := append(previewFixture(), Contract{
+		PkgPath: "gno.land/r/moul/old/v0", Dir: "r/moul/old", Kind: "r", Superseded: true,
+		Commit: "4f2df83869b80470eb81c48a82fdbe82256b8113",
+	})
+	plan, err := buildPreviewPlan(contracts, true, "", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if contains(plan.Paths, "gno.land/r/moul/old/v0") {
+		t.Fatalf("a history-pinned version was crawled: %v", plan.Paths)
+	}
+	// And it is not dragged in as a dependent either.
+	dep := append(previewFixture(), Contract{
+		PkgPath: "gno.land/r/moul/old/v0", Dir: "r/moul/old", Kind: "r", Superseded: true,
+		Deps: []string{"gno.land/p/moul/md/v1"},
+	})
+	changed := filepath.Join(t.TempDir(), "changed.txt")
+	os.WriteFile(changed, []byte("p/moul/md/md.gno\n"), 0o644)
+	plan, err = buildPreviewPlan(dep, false, changed, nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if contains(plan.Paths, "gno.land/r/moul/old/v0") {
+		t.Fatalf("a history-pinned version was pulled in as a dependent: %v", plan.Paths)
+	}
+}
