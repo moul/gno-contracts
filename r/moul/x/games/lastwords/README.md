@@ -1,0 +1,58 @@
+# `gno.land/r/moul/x/games/lastwords/v0`
+
+**One string, on chain, forever.** Pay more than the last writer paid and the
+slot is yours. When the clock runs out, whatever is in it stays there
+permanently.
+
+```
+Price("famous last words")   # what it costs right now, in ugnot
+Write("famous last words")   # send that much with the call
+Settle()                     # after the clock runs out, anyone may call it
+Withdraw()                   # sweep what you are owed
+```
+
+The artefact at the end is the point: this is a bidding war over an epitaph, not
+over a prize. It is also the smallest thing that exercises the two libraries
+under it, which is why it exists.
+
+**The last writer does not take the pot.** They take the slot, which is what they
+were bidding for. The pot goes to everyone *else* who wrote, pro rata to what
+each paid. Winner-takes-all makes the second-to-last writer the mark, everybody
+can see that, and so nobody joins.
+
+**Half of every payment is credited to the writer it displaces**, immediately and
+whatever happens afterwards. A zero-sum game minus gas gives a second player no
+reason to exist; being overwritten early has to be survivable.
+
+**The clock terminates.** Each write pushes the deadline a fifth of the way
+toward a hard end fixed when the slot opened, and never past it, and never to
+less than 300 blocks from now. The last stretch stays long enough for a
+transaction to land in, so the slot is won by paying rather than by being
+unreachable.
+
+**Nothing is ever pushed.** Dividends and settlement shares are credited to a
+ledger and swept by `Withdraw`. A realm that pays inside a loop over its roster
+is a gas bomb, and the more successful the game gets the more certain it is to
+brick.
+
+Three things worth knowing before writing:
+
+- **The message is capped at 280 bytes and priced per byte**, because the message
+  *is* the storage cost and an uncapped one is an unbounded write at a constant
+  price.
+- **`Price` is a query, and an underpaying write is refused, not refunded.** Read
+  it in the same breath as you send.
+- **`Settle` is permissionless.** Leaving settlement to an interested party is
+  how a pot stays unclaimed.
+
+The realm is the wiring; the parts are libraries:
+[`p/moul/x/games/clock`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/games/clock)
+owns the deadline and its guards,
+[`p/moul/x/games/prorata`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/games/prorata)
+owns the split, and
+[`p/moul/x/daily/pullpayment`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/pullpayment)
+owns the credit ledger.
+
+The stored message is caller-typed text rendered as markdown on a page that
+cannot be edited afterwards, so it goes through `ui.Inline` before it is shown
+and a newline is refused at write time.
