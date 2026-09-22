@@ -16,7 +16,8 @@
 //	preview    render realms with gnodev into a self-contained static tree
 //	gno        lint / test / fmt every contract against a stdlib-only GNOROOT
 //	upload     the gnokey script for what a network is missing
-//	guard-*    the CI guards (examples, render, readmes, generated artifacts)
+//	guard-*    the CI guards (examples, render, readmes, private, generated
+//	           artifacts)
 //
 // It is invoked from the repository root, typically via the Makefile
 // (`go run ./tools <cmd>`).
@@ -69,6 +70,8 @@ func main() {
 		err = cmdGuardRender(root)
 	case "guard-readmes":
 		err = cmdGuardReadmes(root, args)
+	case "guard-private":
+		err = cmdGuardPrivate(root)
 	case "guard-generated":
 		err = cmdGuardGenerated(root, args)
 	case "preview":
@@ -116,6 +119,7 @@ commands:
   guard-examples   fail if an Example* test pins no // Output: block
   guard-render     fail if a realm declares Render that no test calls
   guard-readmes    fail if a package ships a README that documents nothing
+  guard-private    fail if a realm never answered the private question
   guard-generated  fail if a PR modifies generated artifacts
   graph      write per-package + global dependency graphs into _assets/
 `)
