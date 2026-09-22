@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-22T12:25:35Z",
+  "status_checked_at": "2026-09-22T12:53:45Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -6836,10 +6836,42 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "72317f0ab9702651dfd50da24b9cc1599399e6a1",
       "published": {
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/reaper/v1",
+      "dir": "r/moul/x/reaper",
+      "kind": "r",
+      "name": "x/reaper",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/ulist/v1",
+        "gno.land/p/moul/x/storagecost/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false

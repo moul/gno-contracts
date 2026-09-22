@@ -171,7 +171,42 @@ sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
 publish: ## dependency-ordered publish plan; NET=<net> CHECK=1 to query chain
 	$(GNOCONTRACTS) publish $(if $(NET),-net $(NET),) $(if $(CHECK),-check,)
 
-upload: ## broadcast packages to a network via gnopublish, e.g. ARGS="-net mainnet -key mykey -dry-run ./..." (on-chain hits cached in .cache/)
+# The publish script is written to a file and RUN FROM THAT FILE, never piped.
+# gnokey reads its passphrase with term.ReadPassword on fd 0
+# (tm2/pkg/commands/utils.go), so the `gnopm publish | sh` form gnopm's own help
+# suggests hands gnokey a pipe as stdin and the prompt fails. `sh <file>` leaves
+# stdin the terminal.
+PUBLISH_SCRIPT := .cache/publish.sh
+
+# Resolving NET happens INSIDE the recipe, not in a $(shell), because a $(shell)
+# that fails cannot stop make: an unknown network name would expand to nothing
+# and gnopm, which discovers the chain from the package path, would quietly
+# build a MAINNET broadcast script instead. Here a bad name exits non-zero and
+# `set -e` takes the target down with it.
+upload: ## publish what is missing, via gnopm: writes a reviewable script. NET=<net> KEY=<key> PKG=<substring>; YES=1 to run it
+	@mkdir -p $(dir $(PUBLISH_SCRIPT))
+	@# Drop any previous script FIRST. A run that fails after this point must not
+	@# leave one behind: `sh .cache/publish.sh` would then broadcast a stale plan,
+	@# possibly at a different network than the one just asked for.
+	@rm -f $(PUBLISH_SCRIPT)
+	@set -e; \
+	net_args=""; \
+	if [ -n "$(NET)" ]; then \
+	  net_args=$$(python3 -c 'import json, sys;\
+ns = json.load(open("contracts.json"))["networks"];\
+m = [n for n in ns if n["name"] == sys.argv[1]];\
+sys.exit("unknown NET=%s; have: %s" % (sys.argv[1], ", ".join(n["name"] for n in ns))) if not m else print("-rpc %s -chainid %s" % (m[0]["rpc"], m[0]["chain_id"]))' "$(NET)"); \
+	fi; \
+	$(GNOPM) publish $$net_args $(if $(KEY),-key $(KEY),) $(PKG) > $(PUBLISH_SCRIPT); \
+	if [ ! -s $(PUBLISH_SCRIPT) ]; then rm -f $(PUBLISH_SCRIPT); exit 0; fi; \
+	if [ -n "$(YES)" ]; then \
+	  echo "== running $(PUBLISH_SCRIPT) =="; sh $(PUBLISH_SCRIPT); \
+	else \
+	  cat $(PUBLISH_SCRIPT); \
+	  echo; echo "== reviewed? then: make upload$(if $(NET), NET=$(NET),) YES=1  (or: sh $(PUBLISH_SCRIPT)) =="; \
+	fi
+
+upload-sim: ## the same broadcast through gnopublish, whose gas comes from a real simulation rather than gnopm's flat per-byte estimate; ARGS="-net mainnet -key mykey -dry-run ./..."
 	cd tools/gnopublish && GOTOOLCHAIN=auto go run . $(ARGS)
 
 status: ## refresh on-chain upload status (all networks) + README; needs gnokey
@@ -195,5 +230,5 @@ site: view .gnopm/.stamp ## render EVERY package, what the main workflow publish
 graph: ## generate per-package + global dependency graphs into _assets/ (needs graphviz for svg/png)
 	$(GNOCONTRACTS) graph
 
-clean: ## remove build artifacts, the GNOROOT view, the gnopm assembly, the previews and the gnopublish on-chain cache
+clean: ## remove build artifacts, the GNOROOT view, the gnopm assembly, the previews, the publish script and the gnopublish on-chain cache
 	rm -rf bin "$(VIEW)" .cache .gnopm _preview _site
