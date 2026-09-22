@@ -178,7 +178,39 @@ Two things make mainnet unlike the testnets:
   over them; changes go in a `v1` here. `dynreplacer`, `typeutil` and `ulist` are
   the three mirrors NOT at genesis.
 
-### Publishing: keep the client at the chain's revision
+### Publishing: `make upload` emits a script, it does not sign
+
+`make upload` runs `gnopm publish`, which reports what is live, parked or absent
+on the target chain and writes dependency-ordered `gnokey maketx addpkg`
+commands to `.cache/publish.sh`. Read it, then `make upload … YES=1`. gnopm never
+signs and never broadcasts, so nothing leaves the machine until you run the
+script.
+
+Three things about that target that are deliberate, and each of which bit during
+the swap:
+
+- **The script is run from a file, never piped.** gnokey reads its passphrase
+  with `term.ReadPassword` on **fd 0** (`tm2/pkg/commands/utils.go`), so the
+  `gnopm publish | sh` form gnopm's own help suggests gives gnokey a pipe as
+  stdin and the prompt fails. `sh <file>` leaves stdin the terminal.
+- **`NET=` is resolved inside the recipe, not in a `$(shell)`.** gnopm discovers
+  the chain from the package path, so `gno.land/...` means **mainnet** unless
+  told otherwise. A `$(shell)` that fails cannot stop make, so a typo'd network
+  name expanded to nothing and produced a mainnet broadcast script. It now exits
+  non-zero and names the networks it knows.
+- **A failed run leaves no script.** `.cache/publish.sh` is deleted before
+  anything can fail, so `sh .cache/publish.sh` can never replay a stale plan
+  aimed at a different chain.
+
+gnopm sizes gas at a flat 1800 gas/byte and the fee at 0.01 ugnot/gas. Measured
+mainnet `addpkg` history is 1,014 to 1,781 gas/byte, so that is a ceiling just
+above the observed maximum, and a ceiling is not charged. `make upload-sim` is
+the old `gnopublish` path, kept because it sizes gas from a **real simulation**
+rather than an estimate, and because it can merge every package into one
+transaction. Reach for it when a package's `init()` work makes the flat estimate
+wrong.
+
+### gnopublish (`make upload-sim`): keep the client at the chain's revision
 
 `tools/gnopublish` builds against a **local gno checkout** — `go.mod` carries a
 `replace github.com/gnolang/gno => ../../../../gnoland/gno`, so it silently
@@ -197,8 +229,11 @@ Fix: move that checkout to the revision the chain runs — for mainnet the
 failure with that instruction, and performs the account query **before**
 prompting for the gnokey password, so a stale client costs nothing.
 
-Two live testnets, both on gno `v1.0.0-rc.0` and interchangeable as publish
-targets — `sapphire` (`sapphire-1`) and `pearl` (`pearl-1`). Each exposes the
+Two testnets are configured, `sapphire` (`sapphire-1`) and `pearl` (`pearl-1`),
+both on gno `v1.0.0-rc.0`. They were interchangeable; **on 2026-09-22
+`rpc.sapphire.testnets.gno.land` had no DNS record at all** while pearl resolved
+and served, so treat pearl as the default testnet and re-check sapphire before
+sending anything to it. Each exposes the
 same host pattern: `rpc.<net>.testnets.gno.land`, gnoweb at
 `<net>.testnets.gno.land`, and an agent faucet at
 `faucet-agent.<net>.testnets.gno.land` (`/fund` is POST-only; `/limits` reports
