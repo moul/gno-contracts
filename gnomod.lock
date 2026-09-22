@@ -966,6 +966,11 @@ source = { dir = "r/moul/x/daily/wrapped" }
 
 [[module]]
 module = "gno.land/r/moul/x/reaper/v0"
+source = { commit = "72317f0ab9702651dfd50da24b9cc1599399e6a1", dir = "r/moul/x/reaper" }
+hash = "h1:xg0zO8jrplmDs08h8bapn//8jlz1uOWZpvUyqXHt8Zk="
+
+[[module]]
+module = "gno.land/r/moul/x/reaper/v1"
 source = { dir = "r/moul/x/reaper" }
 
 [[module]]

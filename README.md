@@ -39,9 +39,9 @@ publish everything.
   counts and ⚠️/🔥 signals on three lines, everything per-package folded away.
   It also reconciles the path labels (`p`/`r`/`meta`) and links the **live realm
   preview** (below).
-- **Publishing** — [`gnopublish`](./tools/gnopublish) queries a network for what's
-  missing, orders by dependency, and broadcasts (one tx per package or merged),
-  asking your gnokey password once.
+- **Publishing** (`make upload`) asks `gnopm` what's missing on a network, orders
+  it by dependency, and writes a `gnokey` script you read before running. It
+  never signs on your behalf; `YES=1` runs the script you just read.
 
 ### 🖼️ Realm previews on every PR
 
@@ -120,7 +120,8 @@ make lint        # gno lint every package
 make gen         # refresh contracts.json + the table below
 make sync        # report drift vs the monorepo (someone changed my contract?)
 make publish NET=mainnet CHECK=1   # dependency-ordered publish plan + on-chain status
-make upload ARGS="-net mainnet -key mykey -dry-run ./..."       # broadcast (gnopublish)
+make upload NET=pearl PKG=kit/store          # write the publish script; read it
+make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 make help        # list all targets
 ```
 
@@ -360,14 +361,15 @@ make help        # list all targets
 | [`r/moul/x/daily/vestoken/v0`](r/moul/x/daily/vestoken) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/vestoken/v0) | — | — | — |
 | [`r/moul/x/daily/wordle/v0`](r/moul/x/daily/wordle) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wordle/v0) | — | — | — |
 | [`r/moul/x/daily/wrapped/v0`](r/moul/x/daily/wrapped) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wrapped/v0) | — | — | 1 |
-| [`r/moul/x/reaper/v0`](r/moul/x/reaper) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
+| [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
+| [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | — | — | — | — | 5 |
 | [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | — | — | — | — | — | 8 |
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinned in `gnomod.lock`, still built)._
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T12:25:35Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T12:47:22Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
