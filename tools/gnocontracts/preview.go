@@ -207,6 +207,18 @@ func buildPreviewPlan(contracts []Contract, all bool, changedFile string, select
 		if c.Ignored {
 			continue // archived: it does not build, and gnodev would not load it
 		}
+		// A superseded version is pinned by hash to a commit in this
+		// repository's history. Nobody can change what it renders, so a
+		// preview of it reviews nothing; and it renders whatever was true at
+		// that commit, including things fixed since. One of them still carries
+		// a local path in its README that main stopped shipping long ago, and
+		// rendering it gave that a public URL it never had.
+		//
+		// They are still handed to gnodev by workspacePkgDirs: packages in the
+		// tree import them, so they have to load. They are just not crawled.
+		if c.Superseded {
+			continue
+		}
 		live = append(live, c)
 	}
 
