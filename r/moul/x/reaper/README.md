@@ -88,6 +88,33 @@ refund against 0.005 GNOT of gas. The 50-byte break-even is the mechanism
 working rather than failing. A bounty that paid out below its own cost would be
 paying bots to churn.
 
+### What it has actually paid, on mainnet
+
+One `Reap` and one `Compact` have run on `gnoland-1`, at heights 228101 and
+228113 on 2026-09-21. The chain's own numbers, not the realm's estimate:
+
+| height | call | bytes freed | refunded | gas used |
+|---|---|---|---|---|
+| 228101 | `Reap(100)` | 3,945 | 0.3945 GNOT | 5,732,152 |
+| 228113 | `Compact()` | 2,568 | 0.2568 GNOT | 4,684,883 |
+
+At the floor gas price those two transactions cost 0.005732 and 0.004685 GNOT,
+so the refund was **69x** and **55x** the cost of collecting it. The compaction
+row is the one to notice: a second transaction, over notes that had already
+been deleted, returned 65% as much again as the deletion itself.
+
+Both were signed by the account that posted the notes, so what mainnet has
+demonstrated so far is the accounting and not yet the stranger. The refund goes
+to whoever signs, either way, which is exactly why the stranger case pays.
+
+**The gas fee is flat, and sizing it is the reaper's whole job.** tm2 deducts
+the declared `-gas-fee` in full in the ante handler and never refunds the
+unused part, so a reap costs what you ask for and not what you spend. Both
+transactions above asked for 1,000,000,000 gas and paid 1 GNOT to do 5.7 and
+4.7 million gas of work, which turned a 69x win into a loss. Size `-gas-wanted`
+to the batch and set `-gas-fee` at the floor price, which is what `Bounty`
+already assumes.
+
 The same queries run in CI. [`example_test.gno`](./example_test.gno) pins each
 one, and it pins *only* queries for a reason worth knowing: an example function
 takes no arguments, so it never receives a `cur realm` and can never `Post`,
