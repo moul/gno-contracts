@@ -66,7 +66,7 @@ func TestURLToFileNeverTraversesOrCollides(t *testing.T) {
 }
 
 func TestInScopeSkipsWhatEnumeratesRatherThanDescribes(t *testing.T) {
-	c := &Crawler{Paths: []string{"gno.land/r/moul/hello/v0"}, ArgBudget: 10}
+	c := &Crawler{Paths: []string{"gno.land/r/moul/hello/v0"}}
 	in := []string{
 		"/r/moul/hello/v0",
 		"/r/moul/hello/v0$source",
@@ -152,7 +152,7 @@ func TestCrawlerWritesASelfContainedTree(t *testing.T) {
 	os.WriteFile(filepath.Join(assets, "js", "index.js"), []byte(`import("/public/js/controller-x.js")`), 0o644)
 
 	out := t.TempDir()
-	c := &Crawler{Base: srv.URL, Paths: []string{"gno.land/r/moul/hello/v0"}, Live: "https://gno.land", ArgBudget: 10}
+	c := &Crawler{Base: srv.URL, Paths: []string{"gno.land/r/moul/hello/v0"}, Live: "https://gno.land"}
 	if err := c.Run(); err != nil {
 		t.Fatal(err)
 	}
@@ -343,6 +343,12 @@ func TestRenderArgumentsAreCappedPerPackage(t *testing.T) {
 	if !c.charge("/r/moul/x/daily/romannumdemo/v0") {
 		t.Fatal("the render page itself was charged as an argument page")
 	}
+	// And a zero budget is no cap at all, like MaxPages, so a Crawler nobody
+	// configured behaves as if the budget did not exist.
+	free := &Crawler{Paths: c.Paths}
+	if !free.charge("/r/moul/x/daily/romannumdemo/v0:1") || !free.charge("/r/moul/x/daily/romannumdemo/v0:2") {
+		t.Fatal("a zero ArgBudget dropped argument pages instead of meaning no cap")
+	}
 }
 
 // The Makefile and CI both invoke this as `go -C tools tool gnocontracts`,
@@ -377,5 +383,41 @@ func TestPreviewDetailIsReadFromTheRepositoryRoot(t *testing.T) {
 	}
 	if got := readPreviewDetail(""); got != "" {
 		t.Fatalf("an unset flag read something: %q", got)
+	}
+}
+
+// A superseded version is pinned by hash to a commit in this repository's
+// history: nobody can change what it renders, so previewing it reviews
+// nothing, and it renders whatever was true at that commit. One of them still
+// carries a local path in its README that main stopped shipping long ago, and
+// rendering it published that path to a public site.
+//
+// It still has to LOAD, because packages in the tree import it. Only the crawl
+// skips it.
+func TestSupersededVersionsAreLoadedButNeverCrawled(t *testing.T) {
+	contracts := append(previewFixture(), Contract{
+		PkgPath: "gno.land/r/moul/old/v0", Dir: "r/moul/old", Kind: "r", Superseded: true,
+		Commit: "4f2df83869b80470eb81c48a82fdbe82256b8113",
+	})
+	plan, err := buildPreviewPlan(contracts, true, "", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if contains(plan.Paths, "gno.land/r/moul/old/v0") {
+		t.Fatalf("a history-pinned version was crawled: %v", plan.Paths)
+	}
+	// And it is not dragged in as a dependent either.
+	dep := append(previewFixture(), Contract{
+		PkgPath: "gno.land/r/moul/old/v0", Dir: "r/moul/old", Kind: "r", Superseded: true,
+		Deps: []string{"gno.land/p/moul/md/v1"},
+	})
+	changed := filepath.Join(t.TempDir(), "changed.txt")
+	os.WriteFile(changed, []byte("p/moul/md/md.gno\n"), 0o644)
+	plan, err = buildPreviewPlan(dep, false, changed, nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if contains(plan.Paths, "gno.land/r/moul/old/v0") {
+		t.Fatalf("a history-pinned version was pulled in as a dependent: %v", plan.Paths)
 	}
 }

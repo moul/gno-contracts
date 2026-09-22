@@ -7,7 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/kit/store/v0"
 )
 
 const (
@@ -24,8 +25,9 @@ const (
 
 // Game holds the full state of one Connect Four match.
 // board is indexed board[row][col]; row 0 is the BOTTOM row.
+// It carries no ID field: the id belongs to the store, which hands it back on
+// lookup and iteration.
 type Game struct {
-	ID       int64
 	Red      address // 🔴 creator, moves first
 	Yellow   address // 🟡 opponent
 	Board    [rows][cols]int
@@ -35,19 +37,9 @@ type Game struct {
 	Finished bool
 }
 
-var (
-	games  = avl.NewTree() // id (zero-padded string) -> *Game
-	nextID int64
-)
-
-func idKey(id int64) string {
-	// zero-pad so avl iteration order matches numeric order for Render lists
-	s := strconv.FormatInt(id, 10)
-	for len(s) < 12 {
-		s = "0" + s
-	}
-	return s
-}
+// games assigns the game ids. v1 kept its own nextID plus an idKey() that
+// zero-padded to width 12, which stopped ordering the Render list past 10^12.
+var games = store.Named("game")
 
 // NewGame creates a match between the caller (🔴) and opponent (🟡).
 // Returns the new game id.
@@ -59,25 +51,22 @@ func NewGame(cur realm, opponent address) int64 {
 	if opponent.String() == "" {
 		panic("opponent address is empty")
 	}
-	nextID++
-	g := &Game{
-		ID:     nextID,
+	id := games.Add(&Game{
 		Red:    caller,
 		Yellow: opponent,
 		Turn:   red,
-	}
-	games.Set(idKey(g.ID), g)
+	})
 	chain.Emit("GameCreated",
-		"id", strconv.FormatInt(g.ID, 10),
+		"id", id.String(),
 		"red", caller.String(),
 		"yellow", opponent.String(),
 	)
-	return g.ID
+	return int64(id)
 }
 
 func getGame(id int64) (*Game, error) {
-	v := games.Get(idKey(id))
-	if v == nil {
+	v, ok := games.Get(store.ID(id))
+	if !ok {
 		return nil, errors.New("game not found: " + strconv.FormatInt(id, 10))
 	}
 	return v.(*Game), nil
@@ -129,13 +118,13 @@ func Drop(cur realm, gameID int64, column int) {
 		g.Winner = mover
 		g.Finished = true
 		chain.Emit("GameWon",
-			"id", strconv.FormatInt(g.ID, 10),
+			"id", strconv.FormatInt(gameID, 10),
 			"winner", caller.String(),
 		)
 	} else if full(&g.Board) {
 		g.Draw = true
 		g.Finished = true
-		chain.Emit("GameDraw", "id", strconv.FormatInt(g.ID, 10))
+		chain.Emit("GameDraw", "id", strconv.FormatInt(gameID, 10))
 	} else {
 		if g.Turn == red {
 			g.Turn = yel
@@ -143,13 +132,12 @@ func Drop(cur realm, gameID int64, column int) {
 			g.Turn = red
 		}
 		chain.Emit("DiscDropped",
-			"id", strconv.FormatInt(g.ID, 10),
+			"id", strconv.FormatInt(gameID, 10),
 			"col", strconv.Itoa(column),
 			"player", caller.String(),
 		)
 	}
 
-	games.Set(idKey(g.ID), g)
 }
 
 func full(b *[rows][cols]int) bool {
@@ -211,29 +199,29 @@ func Render(path string) string {
 	if path == "" {
 		return renderList()
 	}
-	id, err := strconv.ParseInt(path, 10, 64)
-	if err != nil {
+	id, ok := store.ParseID(path)
+	if !ok {
 		return "# Connect Four\n\nInvalid game id: `" + path + "`\n"
 	}
-	g, err := getGame(id)
+	g, err := getGame(int64(id))
 	if err != nil {
 		return "# Connect Four\n\n" + err.Error() + "\n"
 	}
-	return renderGame(g)
+	return renderGame(id, g)
 }
 
 func renderList() string {
 	var sb strings.Builder
 	sb.WriteString("# Connect Four\n\n")
 	sb.WriteString("Two-player Connect Four on a 7×6 board. 🔴 is the game creator, 🟡 the opponent.\n\n")
-	if games.Size() == 0 {
+	if games.Len() == 0 {
 		sb.WriteString("_No games yet. Call `NewGame(opponent)` to start one._\n")
 		return sb.String()
 	}
 	sb.WriteString("## Games\n\n")
 	sb.WriteString("| ID | 🔴 Red | 🟡 Yellow | Status |\n")
 	sb.WriteString("|----|--------|-----------|--------|\n")
-	games.Iterate("", "", func(_ string, v any) bool {
+	games.Each(func(id store.ID, v any) {
 		g := v.(*Game)
 		status := ""
 		switch {
@@ -248,25 +236,16 @@ func renderList() string {
 		default:
 			status = "🟡 to move"
 		}
-		sb.WriteString("| [" + strconv.FormatInt(g.ID, 10) + "](/r:" + strconv.FormatInt(g.ID, 10) + ") | " +
-			short(g.Red) + " | " + short(g.Yellow) + " | " + status + " |\n")
-		return false
+		sb.WriteString("| [" + id.String() + "](/r:" + id.String() + ") | " +
+			ui.Addr(g.Red) + " | " + ui.Addr(g.Yellow) + " | " + status + " |\n")
 	})
 	sb.WriteString("\nOpen a game by its id (e.g. path `1`).\n")
 	return sb.String()
 }
 
-func short(a address) string {
-	s := a.String()
-	if len(s) <= 12 {
-		return "`" + s + "`"
-	}
-	return "`" + s[:8] + "…" + s[len(s)-4:] + "`"
-}
-
-func renderGame(g *Game) string {
+func renderGame(id store.ID, g *Game) string {
 	var sb strings.Builder
-	sb.WriteString("# Connect Four — Game " + strconv.FormatInt(g.ID, 10) + "\n\n")
+	sb.WriteString("# Connect Four — Game " + id.String() + "\n\n")
 	sb.WriteString("- 🔴 Red: `" + g.Red.String() + "`\n")
 	sb.WriteString("- 🟡 Yellow: `" + g.Yellow.String() + "`\n\n")
 
@@ -299,7 +278,7 @@ func renderGame(g *Game) string {
 	sb.WriteString("\n```\n\n")
 
 	if !g.Finished {
-		sb.WriteString("Drop a disc: `Drop(" + strconv.FormatInt(g.ID, 10) + ", <col 0-6>)`\n")
+		sb.WriteString("Drop a disc: `Drop(" + id.String() + ", <col 0-6>)`\n")
 	}
 	return sb.String()
 }

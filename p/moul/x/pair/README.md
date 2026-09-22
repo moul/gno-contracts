@@ -12,13 +12,13 @@ tiny identical contracts, one per token couple.
 | `p/moul/x/pair/v0` | this package, the whole behaviour, deployed once |
 | an instance realm | ~20 lines: two constants, an `init` that registers, one-line re-exports. See `r/moul/x/pairs/aaabbb/v0` |
 | `r/moul/x/pairreg/v0` | the registry every instance announces itself to, and the unified frontend over all of them |
-| `tools/pairgen.py` | the factory, which runs on your machine because gno has no on-chain deploy |
+| `tools/pairgen` | the factory, which runs on your machine because gno has no on-chain deploy |
 
 ## What gno changes about the Ethereum pattern
 
 - **No on-chain factory.** `vm/add_package` is permanently denied to realm code,
   so an instance is an `addpkg` transaction signed by a human, priced in gas and
-  a storage deposit. `tools/pairgen.py` fills the template and prints the
+  a storage deposit. `tools/pairgen` fills the template and prints the
   command.
 - **Spawning is still permissionless.** Any address may deploy under
   `gno.land/r/<its own g1 address>/**` with no registered username, so anyone can
