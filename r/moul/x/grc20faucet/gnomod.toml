@@ -1,0 +1,7 @@
+module = "gno.land/r/moul/x/grc20faucet/v0"
+gno = "0.9"
+
+# public: its init registers the two tokens it owns with r/nt/grc20reg, so
+# this realm's own objects have to be reachable from that one. Measured:
+# with private = true, `make test PKG=grc20faucet` panics with
+# "cannot persist object from the private realm".
