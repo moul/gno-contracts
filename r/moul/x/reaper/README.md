@@ -34,6 +34,66 @@ standing between it and profitable vandalism.
 | `Bounty()` | prices what is currently on the table, as a `storagecost.Quote` |
 | `Reapable()` · `Compactable()` · `Live()` | free reads: the three numbers a bot needs |
 
+## Reading it from outside: every number is a query
+
+The realm is live at [`gno.land/r/moul/x/reaper/v0`](https://gno.land/r/moul/x/reaper/v0).
+None of what follows needs a key, a transaction or a gas budget. `Reapable`,
+`Compactable` and `Bounty` are in the ABI precisely so the incentive is legible
+to a reader *before* anyone signs anything: a bot decides whether to spend gas
+entirely from free reads.
+
+```bash
+RPC=https://rpc.gno.land
+hx() { printf '%s' "$1" | xxd -p | tr -d '\n'; }
+q() { curl -s "$RPC/abci_query?path=%22$1%22&data=0x$(hx "$2")" | python3 -c '
+import base64, json, sys
+r = json.load(sys.stdin)["result"]["response"]
+r = r.get("ResponseBase") or r
+print(base64.b64decode(r["Data"]).decode() if r.get("Data") else r.get("Log"))'; }
+
+R=gno.land/r/moul/x/reaper/v0
+```
+
+| Call | What it answers |
+|---|---|
+| `q vm%2Fqeval "$R.Reapable()"` | how many notes have expired, so a reaper knows whether to bother |
+| `q vm%2Fqeval "$R.Compactable()"` | how many dead tree nodes a `Compact` would free: a separate call, and usually the larger payout |
+| `q vm%2Fqeval "$R.Bounty().String()"` | the whole decision on one line: bytes, refund, gas, break-even, verdict |
+| `q vm%2Fqstorage "$R"` | the chain's own figure for what this realm has locked, which is not the realm's estimate |
+| `q vm%2Fqrender "$R:"` | the page |
+
+`gnokey query vm/qeval -remote https://rpc.gno.land -data '<expr>'` is the same
+call with a binary in front of it.
+
+On 2026-09-22, with three expired notes sitting on the board:
+
+```
+$ q vm%2Fqeval "$R.Bounty().String()"
+("37 bytes, refunds 0.0037 GNOT against 0.005 GNOT of gas, break-even 50 bytes: not worth it yet" string)
+
+$ q vm%2Fqstorage "$R"
+storage: 24435, deposit: 2443500
+```
+
+Read those two together, because the gap between them is the one thing this
+realm cannot close from the inside. `Bounty` prices 37 bytes, estimated from
+the length of the note bodies that have expired. `vm/qstorage` reports what the
+chain has actually locked against the realm, 24,435 bytes and 2.4435 GNOT, for
+everything it owns including its own source. **A realm cannot see that number
+about itself; a querier can.** So price a reap off `Bounty` and settle against
+the chain, never the other way round.
+
+Three expired notes are also, deliberately, not worth reaping: 0.0037 GNOT of
+refund against 0.005 GNOT of gas. The 50-byte break-even is the mechanism
+working rather than failing. A bounty that paid out below its own cost would be
+paying bots to churn.
+
+The same queries run in CI. [`example_test.gno`](./example_test.gno) pins each
+one, and it pins *only* queries for a reason worth knowing: an example function
+takes no arguments, so it never receives a `cur realm` and can never `Post`,
+`Reap` or `Compact`. What an example can reach is exactly what a reader of the
+live realm can reach without a key.
+
 ## The ordering that turned out to matter
 
 `Reap` walks from the **highest index down**, and that is economic rather than
