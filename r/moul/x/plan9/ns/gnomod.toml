@@ -1,0 +1,4 @@
+module = "gno.land/r/moul/x/plan9/ns/v0"
+gno = "0.9"
+
+# public: imported by r/moul/x/plan9/dev, which is what the pair is for

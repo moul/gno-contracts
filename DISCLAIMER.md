@@ -40,6 +40,14 @@ a `/vN` suffix (genesis/older chains). The versioned copies here are moul's
 staging home for them; the canonical upstream copy, when one exists, is linked
 from each package's README.
 
+## Names and marks
+
+Some packages borrow the vocabulary of a system that inspired them (`x/plan9`
+takes its names from Plan 9 from Bell Labs). Those names belong to their
+authors. Nothing here is affiliated with, endorsed by, or sponsored by them, and
+no third-party source code is copied into this repository. The attributions are
+in [`NOTICE`](./NOTICE.md).
+
 ## Not advice
 
 Nothing here is financial, legal, or security advice.

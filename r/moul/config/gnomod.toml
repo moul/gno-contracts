@@ -1,2 +1,10 @@
-module = "gno.land/r/moul/config/v0"
+module = "gno.land/r/moul/config/v1"
 gno = "0.9"
+
+# public: every other realm of moul's imports this one, and a private realm
+# cannot be imported at all. That is the whole reason this realm exists, so
+# `private = true` here would be a contradiction rather than a trade-off.
+#
+# The redeploy-in-place that private would buy is covered a different way: a
+# later version relays to this one instead of replacing it, so the state
+# survives a version bump without the path ever moving. See proxy.gno.

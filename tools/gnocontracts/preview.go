@@ -83,7 +83,7 @@ func cmdPreview(root string, args []string) error {
 	live := fs.String("live", defaultLive, "origin used for links the snapshot does not contain")
 	maxPkgs := fs.Int("max-pkgs", prMaxPkgs, "cap on previewed packages; 0 for no cap")
 	maxPages := fs.Int("max-pages", 0, "cap on crawled pages; 0 picks the default for the mode")
-	maxArgs := fs.Int("max-args", defaultArgBudget, "cap on render-argument pages per package")
+	maxArgs := fs.Int("max-args", defaultArgBudget, "cap on render-argument pages per package; 0 for no cap")
 	port := fs.Int("port", 8899, "port gnodev serves gnoweb on")
 	gnodev := fs.String("gnodev", envOr("GNODEV", "gnodev"), "gnodev binary")
 	chrome := fs.String("chrome", "", "Chrome/Chromium binary for screenshots (default: autodetect)")
@@ -103,6 +103,25 @@ func cmdPreview(root string, args []string) error {
 	}
 	if *baseRoot != "" {
 		*baseRoot = underRoot(root, *baseRoot)
+	}
+
+	// gnodev needs the same two things lint and test need, and getting the
+	// pair wrong is silent: the pinned versions materialized out of history,
+	// and a GNOROOT that resolves gno.land/* from committed vendor/ rather
+	// than from whatever the monorepo checkout holds. Doing it here rather
+	// than in the caller is what stops GNOROOT ever naming the view while the
+	// view is being built out of it (see ensureView).
+	if !*planOnly {
+		if err := gnopmSync(root); err != nil {
+			return err
+		}
+		view, err := ensureView(root)
+		if err != nil {
+			return err
+		}
+		if err := os.Setenv("GNOROOT", view); err != nil {
+			return err
+		}
 	}
 
 	contracts, err := scanContracts(root)
@@ -206,6 +225,18 @@ func buildPreviewPlan(contracts []Contract, all bool, changedFile string, select
 	for _, c := range contracts {
 		if c.Ignored {
 			continue // archived: it does not build, and gnodev would not load it
+		}
+		// A superseded version is pinned by hash to a commit in this
+		// repository's history. Nobody can change what it renders, so a
+		// preview of it reviews nothing; and it renders whatever was true at
+		// that commit, including things fixed since. One of them still carries
+		// a local path in its README that main stopped shipping long ago, and
+		// rendering it gave that a public URL it never had.
+		//
+		// They are still handed to gnodev by workspacePkgDirs: packages in the
+		// tree import them, so they have to load. They are just not crawled.
+		if c.Superseded {
+			continue
 		}
 		live = append(live, c)
 	}
@@ -366,11 +397,10 @@ func workspacePkgDirs(root string) ([]string, error) {
 	return dirs, nil
 }
 
-// startGnodev boots gnodev on the workspace. GNOROOT comes from the environment
-// and should be the stdlib-only view the Makefile builds (`make view`), so
-// gno.land/* dependencies resolve from committed vendor/ exactly as they do for
-// lint and test, rather than from whatever the monorepo checkout happens to
-// hold.
+// startGnodev boots gnodev on the workspace. GNOROOT is the stdlib-only view
+// cmdPreview built, so gno.land/* dependencies resolve from committed vendor/
+// exactly as they do for lint and test, rather than from whatever the monorepo
+// checkout happens to hold.
 func startGnodev(bin, root string, dirs []string, out string, port int, logName string) (func(), <-chan error, error) {
 	args := []string{
 		"local", "-no-watch",
@@ -491,7 +521,7 @@ func packageDirIn(root, pkgPath string) (string, error) {
 func gnowebAssets() (string, error) {
 	gnoroot := os.Getenv("GNOROOT")
 	if gnoroot == "" {
-		return "", fmt.Errorf("GNOROOT is not set (it must point at a gnolang/gno checkout, or the stdlib-only view `make view` builds)")
+		return "", fmt.Errorf("GNOROOT is not set (it must point at a gnolang/gno checkout)")
 	}
 	p := filepath.Join(gnoroot, "gno.land", "pkg", "gnoweb", "public")
 	if !fileExists(p) {

@@ -12,6 +12,8 @@ import (
 	"chain/runtime/unsafe"
 	"strconv"
 	"strings"
+
+	"gno.land/p/moul/kit/ui/v0"
 )
 
 // maxMsgLen is the maximum length (in bytes) of a single post.
@@ -102,11 +104,11 @@ func Render(path string) string {
 	for i := start; i >= end; i-- {
 		p := posts[i]
 		b.WriteString("- **")
-		b.WriteString(shortAddr(p.Author))
+		b.WriteString(ui.AddrOf(p.Author))
 		b.WriteString("** · height ")
 		b.WriteString(strconv.FormatInt(p.Height, 10))
 		b.WriteString("\n\n  ")
-		b.WriteString(escapeInline(p.Msg))
+		b.WriteString(ui.Inline(p.Msg))
 		b.WriteString("\n")
 	}
 
@@ -168,21 +170,4 @@ func parsePage(path string) int {
 		return n
 	}
 	return 1
-}
-
-// shortAddr abbreviates a bech32 address for display: g1abcd…wxyz.
-func shortAddr(addr string) string {
-	if len(addr) <= 12 {
-		return addr
-	}
-	return addr[:6] + "…" + addr[len(addr)-4:]
-}
-
-// escapeInline neutralizes characters that would break the Markdown list item
-// layout (newlines collapse to spaces; leading markers are defused).
-func escapeInline(s string) string {
-	s = strings.ReplaceAll(s, "\r\n", " ")
-	s = strings.ReplaceAll(s, "\n", " ")
-	s = strings.ReplaceAll(s, "\r", " ")
-	return s
 }
