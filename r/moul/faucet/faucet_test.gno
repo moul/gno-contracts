@@ -367,3 +367,14 @@ func countRows(page string) int {
 	}
 	return n
 }
+
+// Path is a hand-written const and the module line is in gnomod.toml, so
+// nothing but this test stops them diverging. They must not: Address() derives
+// the float from Path, while the banker in Approve spends from cur.Address(),
+// which is derived by the VM. A divergence would make Balance() read a
+// different account from the one the payout leaves, and the realm would refuse
+// payouts it could afford while reporting a float it does not hold.
+func TestPathMatchesTheRealmItIsDeployedAs(cur realm, t *testing.T) {
+	uassert.Equal(t, cur.Address().String(), Address().String(),
+		"Path disagrees with the module line in gnomod.toml")
+}
