@@ -1,2 +1,10 @@
-module = "gno.land/r/moul/home/v0"
+module = "gno.land/r/moul/home"
 gno = "0.9"
+
+# Redeployable by its creator. See README.md § "Why private".
+#
+# A private package may be re-added at the same path by the address recorded in
+# [addpkg].creator (gno.land/pkg/sdk/vm/keeper.go, checkRedeployPermission), and
+# nothing else may import it. A redeploy RE-RUNS init() and resets realm state,
+# so content/ is the source of truth and tools/gnohome pushes the slots back.
+private = true

@@ -14,6 +14,7 @@ import (
 	"chain"
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -183,7 +184,7 @@ func renderIndex() string {
 	b.WriteString("|--------|-------|-------------|\n")
 	byHandle.Iterate("", "", func(key string, value interface{}) bool {
 		r := value.(*record)
-		b.WriteString("| [" + key + "](/" + key + ") | " + short(r.owner.String()) +
+		b.WriteString("| [" + key + "](/" + key + ") | " + ui.Addr(r.owner) +
 			" | " + strconv.Itoa(int(r.sinceBlk)) + " |\n")
 		return false
 	})
@@ -207,12 +208,4 @@ func renderHandle(handle string) string {
 	b.WriteString("**Registered at block:** " + strconv.Itoa(int(r.sinceBlk)) + "\n\n")
 	b.WriteString("[← all handles](/)\n")
 	return b.String()
-}
-
-// short truncates a long address for the index table.
-func short(s string) string {
-	if len(s) <= 12 {
-		return s
-	}
-	return s[:6] + "…" + s[len(s)-4:]
 }

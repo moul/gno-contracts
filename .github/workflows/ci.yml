@@ -49,22 +49,32 @@ jobs:
       # gnomod.lock is SOURCE, not a generated artifact: a PR that adds,
       # removes or bumps a package carries its lock entry, because the pin is
       # what keeps the version it replaced resolvable for everything that
-      # still imports it. This proves the lock still describes the tree and
-      # that every pinned version still reproduces byte-for-byte from history.
-      # On a pull request, also require every pinned commit to be reachable
-      # from the base branch. A pin to a commit that exists only on the PR's
-      # own branch is fine until the branch is squash-merged, at which point
-      # the commit is unreachable and the version it held stops resolving for
-      # good. Catching it here is cheap; catching it after the merge is not.
+      # still imports it.
+      #
+      # `tool ci` rather than `verify`: same three failures (the lock describes
+      # the tree, every pinned version reproduces byte-for-byte from history,
+      # no pin would be discarded by a squash merge, which a pin to a commit
+      # living only on this branch would be), plus a fourth check `verify`
+      # cannot make and a Markdown report in the job summary.
+      #
+      # The fourth is a WARNING, not a failure: a pull request that changes a
+      # package's production .gno files without moving its module line, where
+      # that version is already live or parked on the chain. A public package
+      # path cannot be redeployed, so such an edit can never reach the chain
+      # and this tree silently stops matching what is deployed. That is how
+      # r/moul/x/reaper/v0 shipped a rendering fix it could never receive
+      # (#193, corrected by #196): every check here was green, correctly, and
+      # the lock is exactly what stays right while this goes wrong.
+      #
+      # No --comment on purpose. The job summary is enough and this repository
+      # already posts two bot comments per pull request.
+      #
       # gnopm works out the upstream ref itself: GITHUB_BASE_REF on a pull
-      # request, otherwise origin/HEAD. On a pull request it therefore also
-      # requires every pinned commit to be reachable from the base branch,
-      # because a pin to a commit that exists only on this branch dies when
-      # the branch is squash-merged.
+      # request, otherwise origin/HEAD.
       - name: Verify gnomod.lock
         run: |
           git fetch --quiet origin "${{ github.base_ref || github.ref_name }}" || true
-          go -C tools tool gnopm verify
+          go -C tools tool gnopm tool ci
 
       # Materialize the versions that no longer have a directory, so lint and
       # test can build them and so packages importing them resolve.
@@ -83,14 +93,17 @@ jobs:
       # the Makefile's stdlib-only GNOROOT view (empty examples/). Dependency
       # bumps are deliberate: run `make deps` locally and commit.
       # Prove the toolchain actually validates example tests, and that no
-      # Example* is silently skipped (missing // Output:) — otherwise an
-      # ExampleRender is a false-green test that asserts nothing.
-      - name: Validate example tests are real
-        run: make toolcheck guard-examples guard-render
+      # Example* is silently skipped (missing // Output:), otherwise an
+      # ExampleRender is a false-green test that asserts nothing. Also the
+      # render and README guards; `make guards` is the whole set.
+      - name: Run the guards
+        run: make guards
 
       - name: Lint
         run: make lint
 
+      # `make test` re-runs the guards as a prerequisite, which is seconds and
+      # keeps the local `make test` a complete gate on its own.
       - name: Test
         run: make test
 
