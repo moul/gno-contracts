@@ -1,0 +1,44 @@
+# r/moul/x/vm/bfdemo
+
+A realm that runs Brainfuck programs on chain, a slice at a time.
+
+It is a demo of [`p/moul/x/vm/bf`](/p/moul/x/vm/bf/v0) (the machine) and
+[`p/moul/x/vm/vmkit`](/p/moul/x/vm/vmkit/v0) (the host ABI, the fuel meter, the
+instance store), and carries no logic of its own.
+
+What it exists to show is the thing gno realm code cannot do for itself: a
+program that runs out of fuel does not fail, it pauses. The realm keeps the
+snapshot, and the next caller pays for the next slice. Upload a program, call
+`Step` a few times, and watch one computation finish across several
+transactions.
+
+## Calls
+
+| function | what |
+|---|---|
+| `Upload(src, input, budget)` | compile and store a program, returns its id. Compilation happens here, so a malformed program is rejected by the transaction that submitted it |
+| `Step(id, fuel)` | run one slice and keep the snapshot. Anyone may pay for a slice, not only the owner |
+| `Remove(id)` | delete an instance. Owner only |
+
+`Render("/")` lists the instances and offers three sample programs.
+`Render("/<id>")` shows one instance: its compiled program, status, fuel, and
+output.
+
+## Limits
+
+Everything a caller can grow is bounded, because all of it is storage somebody
+pays a deposit on: 64 instances, 64 KiB of source, 1 KiB of input, 4 KiB of
+output, 5,000,000 fuel per slice, 30,000 tape cells. A guest that writes past
+the output cap is trapped rather than truncated, so the rendered output is never
+a lie.
+
+## Untrusted input
+
+A program's source is caller-supplied, and everything outside the eight
+operators is a comment that may hold anything at all. The page never renders it:
+it shows the program the machine actually compiled, which cannot contain a
+backtick or a newline and so cannot break out of its code fence. Guest output is
+arbitrary bytes and is escaped the same way, backtick included.
+
+No instance is funded, so `Host.Send` always returns `ErrNotGranted`. That is
+the capability rule doing its job, not a missing feature.
