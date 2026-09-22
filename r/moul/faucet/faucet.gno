@@ -37,6 +37,24 @@
 // approver's balance, so the float is the ceiling and topping it up is a
 // deliberate act. [MaxPerRequest] caps any single payout under that, and
 // [Withdraw] takes the float back.
+//
+// # It is a private realm, which buys a code fix and costs the ledger
+//
+// gnomod.toml declares private = true, so the creator can redeploy this path
+// with corrected code instead of abandoning it for a v1. That matters for a
+// realm holding other people's rent money.
+//
+// The price is exact and was measured, not assumed: a redeploy re-runs every
+// package initializer, so the float SURVIVES (coins live at the address, which
+// is bank state) and everything on this page DOES NOT. Requests, approvers and
+// counters all return to their init values. Fixing a bug here is therefore
+// cheap in money and expensive in history, which is the right way round for a
+// faucet and the wrong way round for a ledger anyone relies on.
+//
+// Two more consequences worth knowing before copying this: private is one-way
+// and set at first deploy (a public path can never become private, nor the
+// reverse), and no other realm may import this one or hold a reference to its
+// objects.
 package faucet
 
 import (
