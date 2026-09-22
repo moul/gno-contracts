@@ -351,6 +351,10 @@ module = "gno.land/p/moul/x/vm/vmkit/v0"
 source = { dir = "p/moul/x/vm/vmkit" }
 
 [[module]]
+module = "gno.land/p/moul/x/wesh/v0"
+source = { dir = "p/moul/x/wesh" }
+
+[[module]]
 module = "gno.land/p/moul/x/wiki/v0"
 source = { dir = "p/moul/x/wiki" }
 
@@ -1053,6 +1057,10 @@ source = { dir = "r/moul/x/reaper" }
 [[module]]
 module = "gno.land/r/moul/x/vm/bfdemo/v0"
 source = { dir = "r/moul/x/vm/bfdemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/wesh/v0"
+source = { dir = "r/moul/x/wesh" }
 
 [[module]]
 module = "gno.land/r/moul/x/wiki/v0"
