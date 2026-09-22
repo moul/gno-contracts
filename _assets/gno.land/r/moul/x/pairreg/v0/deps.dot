@@ -1,0 +1,8 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/moul/x/pairreg/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/moul/x/pair/v0";
+  "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/nt/ufmt/v0";
+}

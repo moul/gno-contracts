@@ -1,0 +1,5 @@
+module = "gno.land/r/moul/x/pairreg/v0"
+gno = "0.9"
+
+# public: every pair instance imports it to announce itself, and holds the
+# *pair.Pair it registers here. A private realm cannot be imported at all.
