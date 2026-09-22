@@ -197,8 +197,10 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`p/moul/x/daily/sparkline/v0`](p/moul/x/daily/sparkline) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/sparkline/v0) | — | — | — |
 | [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/toposort/v0) | — | — | — |
 | [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie) 📦 | — | — | [✅](https://gno.land/p/moul/x/daily/trie/v0) | — | — | — |
+| [`p/moul/x/framelab/v0`](p/moul/x/framelab) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/x/games/clock/v0`](p/moul/x/games/clock) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/games/prorata/v0`](p/moul/x/games/prorata) 📦 | — | — | — | — | — | — |
+| [`p/moul/x/pair/v0`](p/moul/x/pair) 📦 | — | — | — | — | — | 3 |
 | [`p/moul/x/plan9/memfs/v0`](p/moul/x/plan9/memfs) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/x/plan9/ninep/v0`](p/moul/x/plan9/ninep) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/plan9/ns/v0`](p/moul/x/plan9/ns) 📦 | — | — | — | — | — | 2 |
@@ -369,7 +371,12 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/x/daily/vestoken/v0`](r/moul/x/daily/vestoken) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/vestoken/v0) | — | — | — |
 | [`r/moul/x/daily/wordle/v0`](r/moul/x/daily/wordle) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wordle/v0) | — | — | — |
 | [`r/moul/x/daily/wrapped/v0`](r/moul/x/daily/wrapped) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wrapped/v0) | — | — | 1 |
+| [`r/moul/x/framelab/probe/v0`](r/moul/x/framelab/probe) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/games/lastwords/v0`](r/moul/x/games/lastwords) 🏛️ | — | — | — | — | — | 5 |
+| [`r/moul/x/pairreg/v0`](r/moul/x/pairreg) 🏛️ | — | — | — | — | — | 3 |
+| [`r/moul/x/pairs/aaa/v0`](r/moul/x/pairs/aaa) 🏛️ | — | — | — | — | — | 2 |
+| [`r/moul/x/pairs/aaabbb/v0`](r/moul/x/pairs/aaabbb) 🏛️ | — | — | — | — | — | 5 |
+| [`r/moul/x/pairs/bbb/v0`](r/moul/x/pairs/bbb) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/plan9/dev/v0`](r/moul/x/plan9/dev) 🏛️ | — | — | — | — | — | 3 |
 | [`r/moul/x/plan9/ns/v0`](r/moul/x/plan9/ns) 🏛️ | — | — | — | — | — | 6 |
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
@@ -382,7 +389,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T18:20:15Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T18:32:43Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
