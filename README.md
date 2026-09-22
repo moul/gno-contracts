@@ -247,7 +247,7 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/outfmt/v0`](r/moul/outfmt) 🏛️ | — | — | [✅](https://gno.land/r/moul/outfmt/v0) | — | — | 1 |
 | [`r/moul/present/v0`](r/moul/present) 🏛️ | — | — | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
 | [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | — | — | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
-| [`r/moul/x/amm/v0`](r/moul/x/amm) 🏛️ | — | — | — | — | — | 4 |
+| [`r/moul/x/amm/v0`](r/moul/x/amm) 🏛️ | — | — | — | — | — | 5 |
 | [`r/moul/x/daily/asciiart/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/asciiart) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/daily/asciiart/v0) | — | — | 1 |
 | [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/asciiart/v1) | — | — | — | 2 |
 | [`r/moul/x/daily/b58demo/v0`](r/moul/x/daily/b58demo) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/b58demo/v0) | — | — | 1 |
@@ -405,7 +405,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T20:11:45Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T20:27:05Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 

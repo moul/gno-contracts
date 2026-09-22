@@ -339,6 +339,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/amm/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/amm/v0" -> "gno.land/p/nt/grc20/v0";
+  "gno.land/r/moul/x/amm/v0" -> "gno.land/p/nt/seqid/v0";
   "gno.land/r/moul/x/amm/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/amm/v0" -> "gno.land/r/nt/grc20reg/v0";
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/moul/kit/store/v0";
