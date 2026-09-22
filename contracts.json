@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-22T18:20:15Z",
+  "status_checked_at": "2026-09-22T18:32:43Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2215,6 +2215,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/framelab/v0",
+      "dir": "p/moul/x/framelab",
+      "kind": "p",
+      "name": "x/framelab",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/grc20/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/games/clock/v0",
       "dir": "p/moul/x/games/clock",
       "kind": "p",
@@ -2246,6 +2272,34 @@
       "version": "v0",
       "description": "",
       "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/pair/v0",
+      "dir": "p/moul/x/pair",
+      "kind": "p",
+      "name": "x/pair",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/grc20/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
       "draft": false,
       "published": {
         "mainnet": {
@@ -7273,6 +7327,33 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/framelab/probe/v0",
+      "dir": "r/moul/x/framelab/probe",
+      "kind": "r",
+      "name": "x/framelab/probe",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/framelab/v0",
+        "gno.land/p/nt/grc20/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/games/lastwords/v0",
       "dir": "r/moul/x/games/lastwords",
       "kind": "r",
@@ -7285,6 +7366,118 @@
         "gno.land/p/moul/x/games/clock/v0",
         "gno.land/p/moul/x/games/prorata/v0",
         "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/pairreg/v0",
+      "dir": "r/moul/x/pairreg",
+      "kind": "r",
+      "name": "x/pairreg",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/pair/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/pairs/aaa/v0",
+      "dir": "r/moul/x/pairs/aaa",
+      "kind": "r",
+      "name": "x/pairs/aaa",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/grc20/v0",
+        "gno.land/r/nt/grc20reg/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/pairs/aaabbb/v0",
+      "dir": "r/moul/x/pairs/aaabbb",
+      "kind": "r",
+      "name": "x/pairs/aaabbb",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/pair/v0",
+        "gno.land/r/moul/x/pairreg/v0",
+        "gno.land/r/moul/x/pairs/aaa/v0",
+        "gno.land/r/moul/x/pairs/bbb/v0",
+        "gno.land/r/nt/grc20reg/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/pairs/bbb/v0",
+      "dir": "r/moul/x/pairs/bbb",
+      "kind": "r",
+      "name": "x/pairs/bbb",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/grc20/v0",
+        "gno.land/r/nt/grc20reg/v0"
       ],
       "draft": false,
       "published": {
