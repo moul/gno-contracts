@@ -134,10 +134,18 @@ before every generation, so a line here stops the next repeat.
 ## Adding a contract
 
 1. Create `p/moul/<name>/` or `r/moul/<name>/`, **no `/v0` in the directory**, with a
-   `gnomod.toml`:
+   `gnomod.toml`. A `p/` package is versioned and published, and never private:
    ```toml
-   module = "gno.land/{p|r}/moul/<name>/v0"
+   module = "gno.land/p/moul/<name>/v0"
    gno = "0.9"
+   ```
+   A realm is private by default, so that you can redeploy it at this path later instead
+   of burning a `/v1`. `make guard-private` refuses one that says neither this nor why it
+   has to stay importable, and after the first deploy neither can be changed:
+   ```toml
+   module = "gno.land/r/moul/<name>/v0"
+   gno = "0.9"
+   private = true
    ```
 2. Add sources and tests. Table-driven; realms need a `Render`.
 3. `make deps` if it imports an external `gno.land/*` package.
@@ -165,7 +173,7 @@ commit that still holds the outgoing version and a dirty directory would make th
 a lie. It pins to a commit already on `origin/main` where it can: this repository
 squash-merges, so a pin to a feature branch's HEAD would dangle the moment it lands.
 
-### `private = true`: decide it per realm, at the first deploy, and never after
+### `private = true` is the default for every `r/`, and the guard asks before you ship
 
 A realm whose `gnomod.toml` says `private = true` can be **redeployed at the same
 path by its original creator**, instead of being abandoned for a `vN+1`. Everything
@@ -184,29 +192,56 @@ And the constraints, from `checkGnomodConstraints` and `checkRedeployPermission`
 `gno.land/pkg/sdk/vm/keeper.go`:
 
 - **Public cannot become private, private cannot become public.** Both are refused, so
-  the ~40 realms already on chain can never convert either way.
+  the realms already on chain can never convert either way.
 - **Only `addpkg.creator` may redeploy.** Not the namespace owner, the original signer.
 - **No other realm may import it**, hold a reference to its objects, or retain a value
-  of a type it defines.
-- `private` is realm-only: a `p/` package declaring it is refused.
+  of a type it defines. The import is refused by the type checker (`ImportPrivateError`).
+  The other two are a *runtime* panic out of `assertObjectIsPublic`, `cannot persist
+  object from the private realm <path>`, so `gno lint` is blind to them and only a test
+  that actually exercises the cross-realm call finds them. `r/moul/x/plan9/dev` is the
+  worked example: it posts its own tree into `r/moul/x/plan9/ns`, lints clean as private,
+  and panics on the first `gno test`.
+- `private` is realm-only: a `p/` package declaring it is refused. `p/` is versioned and
+  published, always, and that is the whole difference between the two trees.
 - Reading it from outside is unaffected: `vm/qrender` and `vm/qeval` work normally.
 - On mainnet a redeploy is a `MsgAddPackage`, so it **parks like any other** and waits
   for an approver. "Replaceable" is not "hot-patchable".
 
-**So it is not a repo-wide default, and asking for one is the wrong shape.** The question
-it answers is "would I rather fix the code and lose the state, or keep the state and move
-to a new path", and that has opposite answers for a realm holding money and a realm whose
-whole value is its accumulated history.
+**So every new realm gets `private = true`, and one that must stay importable says why.**
+The default is not a claim that replacing beats versioning in general. It is a claim about
+which mistake is cheaper: a realm that shipped private and wanted to be imported is one
+line and a `vN+1`, while a realm that shipped public and wanted a fix is a new path, a
+migration, and coins stranded at the old address. The second is what `r/moul/faucet` got,
+by two minutes.
 
-| use `private = true` | leave it public |
-|---|---|
-| holds coins or other people's value, where a path migration is expensive (`r/moul/faucet`) | anything another realm imports, registers with, or hands objects to |
-| operated and expected to be fixed, with state that is cheap to lose | the state IS the artifact: a board, a wiki, a log, anything whose history is the point |
-| `r/moul/home`, where content lives in mutable storage precisely so a redeploy does not lose it | an `x/` experiment exploring composition, which is most of `x/` |
+The opt-out is a comment, and the reason is the point:
 
-The one thing that makes it genuinely safe is designing for the wipe: keep the durable
-part in something a redeploy does not touch (coins at the address) or accept losing it.
-`r/moul/home` does the first and says so above.
+```toml
+module = "gno.land/r/moul/x/plan9/ns/v0"
+gno = "0.9"
+
+# public: imported by r/moul/x/plan9/dev, which is what the pair is for
+```
+
+A comment rather than `private = false` because the gnomod field is `omitempty`: `false`
+and absent serialize the same, so a reader could not tell a decision from an oversight.
+
+`make guard-private` enforces it, and is part of `make guards`. It does not ask four kinds
+of realm, because for them the question is not open: archived (`ignore = true`), mirrored
+byte-for-byte from the monorepo, superseded (no directory), and **already live on mainnet
+at that exact module path**, where the chain has answered and will not take another answer.
+
+What the guard cannot see is whether the copy the chain holds matches the flag in the file.
+`r/moul/faucet/v0` declares `private = true` and mainnet's copy at that path does not: the
+deploy landed at 14:56:06Z on 2026-09-22 and the flag was committed at 14:58:25Z. The realm
+is frozen public forever and the flag is decoration. Only the publish path can catch that
+shape, and it does not yet.
+
+The one thing that makes private genuinely safe is designing for the wipe: keep the durable
+part in something a redeploy does not touch (coins at the address, or a local source of
+truth you can push back) or accept losing it. `r/moul/home` does the first and says so in
+its own gnomod.
+
 
 ### Reusable logic splits into a `p/` library and an `r/` demo
 
