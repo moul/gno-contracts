@@ -1,6 +1,8 @@
 package faucet
 
 import (
+	"strconv"
+
 	"chain"
 	"chain/banker"
 	"testing"
@@ -317,4 +319,51 @@ func TestReqPath(t *testing.T) {
 		uassert.Equal(t, tt.want, ok, tt.in)
 		uassert.Equal(t, tt.id, id, tt.in)
 	}
+}
+
+// A board that renders every request ever filed is a page that grows without
+// bound and a gas cost that grows with it, and this path is permanent. Assert
+// the cap holds and that what it hides is counted rather than lost.
+func TestRenderCapsEachTable(cur realm, t *testing.T) {
+	reset()
+	fund(200_000_000)
+
+	const filed = Rows + 5
+	for i := 0; i < filed; i++ {
+		testing.SetRealm(testing.NewUserRealm(carl))
+		Request(cross(cur), zoe.String(), 1_000_000, "batch")
+	}
+	urequire.Equal(t, int64(filed), Pending())
+
+	page := Render("")
+	uassert.Equal(t, Rows, countRows(page), "the open table is capped")
+	uassert.True(t, contains(page, "5 more not shown"), "and the rest are counted")
+
+	// Decide them all: the open table empties and the decided one caps in turn,
+	// newest first, so the most recent decision is on the page and the oldest
+	// is the one hidden.
+	for id := int64(1); id <= filed; id++ {
+		testing.SetRealm(testing.NewUserRealm(Owner))
+		Deny(cross(cur), id, "batch")
+	}
+	page = Render("")
+	uassert.Equal(t, int64(0), Pending())
+	uassert.Equal(t, Rows, countRows(page), "the decided table is capped too")
+	uassert.True(t, contains(page, "5 more not shown"))
+	uassert.True(t, contains(page, ":req/"+strconv.FormatInt(int64(filed), 10)+")"), "newest is shown")
+	uassert.False(t, contains(page, ":req/1)"), "oldest is the one hidden")
+
+	testing.SetRealm(testing.NewUserRealm(Owner))
+	Withdraw(cross(cur), Balance())
+}
+
+// countRows counts request rows on a page: every one links to :req/.
+func countRows(page string) int {
+	n, needle := 0, "](/r/moul/faucet/v0:req/"
+	for i := 0; i+len(needle) <= len(page); i++ {
+		if page[i:i+len(needle)] == needle {
+			n++
+		}
+	}
+	return n
 }

@@ -69,6 +69,12 @@ gnokey query vm/qrender -data 'gno.land/r/moul/faucet/v0:'
 `Render("")` is the board: float, open requests, decided ones, approvers.
 `Render("req/<id>")` is one request, with its reason and, if it was refused, why.
 
+Each table shows at most 20 rows, open oldest first and decided newest first,
+and says how many it is hiding. The cap is not cosmetic: the totals come from
+the realm's counters, so the walk stops once a table is full. A board that
+rendered every request ever filed would grow its page and its gas cost forever,
+and this path is permanent. Anything hidden is still reachable by id.
+
 Every caller-supplied string on those pages is escaped before it is rendered.
 A reason is arbitrary text from an arbitrary account and `Render` output is
 markdown that gnoweb parses, so an unescaped one can plant a link, an image

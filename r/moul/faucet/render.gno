@@ -7,6 +7,10 @@ import (
 	"gno.land/p/nt/markdown/sanitize/v0"
 )
 
+// Rows is how many requests each table on the board shows. The rest are
+// counted, not rendered: the per-request page is always reachable by id.
+const Rows = 20
+
 // Render shows the float, the open asks and everything already decided.
 //
 // Two paths: "" is the whole board, "req/<id>" is one request.
@@ -42,9 +46,9 @@ func renderBoard() string {
 	b.WriteString("| Float address | `" + Address().String() + "` |\n\n")
 
 	b.WriteString("## Open\n\n")
-	b.WriteString(table(StatusPending))
+	b.WriteString(table(true, pendingN))
 	b.WriteString("\n## Decided\n\n")
-	b.WriteString(table(""))
+	b.WriteString(table(false, sentCount+deniedCount))
 
 	b.WriteString("\n## Approvers\n\n")
 	approvers.Iterate("", "", func(k string, _ any) bool {
@@ -56,30 +60,44 @@ func renderBoard() string {
 	return b.String()
 }
 
-// table lists requests in filing order, keeping only those in `want`, or
-// everything already decided when want is empty.
-func table(want string) string {
+// table lists at most Rows requests: the open ones oldest first, because a
+// queue is worked from the front, and the decided ones newest first, because
+// nobody scrolls to the bottom of a ledger.
+//
+// It takes the total from the realm's counters rather than counting rows, so
+// it can STOP iterating once the page is full. A Render that walks every
+// request ever filed is a page that grows without bound and a gas cost that
+// grows with it, and this realm's path is permanent, so that would only ever
+// be fixable at a new path.
+func table(open bool, total int64) string {
+	if total == 0 {
+		return "_Nothing here yet._\n"
+	}
 	var rows strings.Builder
-	n := 0
-	requests.Iterate("", "", func(_ string, v any) bool {
+	shown := int64(0)
+	visit := func(_ string, v any) bool {
 		r := v.(*request)
-		if want == "" && r.Status == StatusPending {
+		if (r.Status == StatusPending) != open {
 			return false
 		}
-		if want != "" && r.Status != want {
-			return false
-		}
-		n++
 		rows.WriteString("| [" + strconv.FormatInt(r.ID, 10) + "](" + Link + ":req/" +
 			strconv.FormatInt(r.ID, 10) + ") | `" + r.To.String() + "` | " +
 			gnot(r.Amount) + " | " + sanitize.TableCell(excerpt(r.Reason, 60)) + " | " +
 			r.Status + " |\n")
-		return false
-	})
-	if n == 0 {
-		return "_Nothing here yet._\n"
+		shown++
+		return shown >= Rows // a true return stops the walk
 	}
-	return "| # | To | GNOT | Why | State |\n| ---: | --- | ---: | --- | --- |\n" + rows.String()
+	if open {
+		requests.Iterate("", "", visit)
+	} else {
+		requests.ReverseIterate("", "", visit)
+	}
+
+	out := "| # | To | GNOT | Why | State |\n| ---: | --- | ---: | --- | --- |\n" + rows.String()
+	if rest := total - shown; rest > 0 {
+		out += "\n_" + strconv.FormatInt(rest, 10) + " more not shown._\n"
+	}
+	return out
 }
 
 func renderOne(id int64) string {
