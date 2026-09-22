@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-22T19:15:49Z",
+  "status_checked_at": "2026-09-22T19:42:48Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -95,6 +95,30 @@
           "uploaded": false
         },
         "topaz": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/agents/commit/v0",
+      "dir": "p/moul/agents/commit",
+      "kind": "p",
+      "name": "agents/commit",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
           "uploaded": false
         }
       }
@@ -2710,6 +2734,164 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/agents/capwallet/v0",
+      "dir": "r/moul/agents/capwallet",
+      "kind": "r",
+      "name": "agents/capwallet",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/agents/gnomem/v0",
+      "dir": "r/moul/agents/gnomem",
+      "kind": "r",
+      "name": "agents/gnomem",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/agents/jury/v0",
+      "dir": "r/moul/agents/jury",
+      "kind": "r",
+      "name": "agents/jury",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/agents/commit/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/agents/maintainer/v0",
+      "dir": "r/moul/agents/maintainer",
+      "kind": "r",
+      "name": "agents/maintainer",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/agents/passport/v0",
+      "dir": "r/moul/agents/passport",
+      "kind": "r",
+      "name": "agents/passport",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/agents/receipt/v0",
+      "dir": "r/moul/agents/receipt",
+      "kind": "r",
+      "name": "agents/receipt",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
