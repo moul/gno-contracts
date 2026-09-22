@@ -1,3 +1,43 @@
+// Package config is the one realm moul's other realms read their settings
+// from: a key/value store plus the manager list that decides who may write it.
+//
+// # Why a realm and not a constant
+//
+// A value shared by several contracts, hardcoded in each, is changed by
+// redeploying each. On mainnet a public realm cannot even be redeployed at its
+// own path, so "changing it" means a new version and a new path for every
+// consumer. Here it is a transaction.
+//
+// # Bump rarely, and never for a new setting
+//
+// This realm IS public and versioned, so its path moves on every bump. That
+// makes a bump expensive, which is exactly why the settings API is generic: a
+// new setting is a new KEY, and a key costs one transaction. Only a change to
+// the shape of this realm (a new function, a changed signature) is worth a
+// version.
+//
+// # When a bump does happen, the state does not move
+//
+// A later version imports this one and relays to it rather than holding
+// anything of its own, so v1, v2 and v3 all read and write the same settings,
+// the same pause and the same member list. Delegation only runs backwards in
+// time, which is why the root is the oldest version that has the state and not
+// the newest. See proxy.gno.
+//
+// # What lives here
+//
+// settings.gno  the key/value store, and the mygnoscan accessors over it
+// keys.gno      the key grammar: a name, optionally scoped to one realm
+// blocks.gno    the notice a realm renders above and below its content
+// pause.gno     the switch a realm checks before it acts
+// proxy.gno     the relay that lets a later version share this state
+// config.gno    the member list, unchanged from v0
+//
+// # Governance
+//
+// init seeds the authority with the deploying EOA. Everything that writes goes
+// through Authorizer, so transferring authority to a DAO transfers the
+// settings with it: there is no address hardcoded on the write path.
 package config
 
 import (

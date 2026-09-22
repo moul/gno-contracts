@@ -7,6 +7,7 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/dynreplacer/v0"
+	"gno.land/r/moul/config/v1"
 )
 
 // defaultLayout is what renders before a layout slot exists, i.e. right after
@@ -55,11 +56,15 @@ func renderPage() string {
 	// Computed from chain state. Registered first; assertWritableSlug keeps a
 	// slot from ever taking one of these names, so nothing shadows them.
 	r.RegisterCallback(":owner:", func() string { return admin.String() })
-	r.RegisterCallback(":realm:", func() string { return "gno.land/r/moul/home" })
+	r.RegisterCallback(":realm:", func() string { return realmPath })
 	r.RegisterCallback(":chainid:", func() string { return runtime.ChainID() })
 	r.RegisterCallback(":height:", func() string { return strconv.FormatInt(runtime.ChainHeight(), 10) })
 	r.RegisterCallback(":rev:", func() string { return strconv.Itoa(rev) })
 	r.RegisterCallback(":slots:", func() string { return slotLinks() })
+
+	// The explorer links, which are computed the same way but come from
+	// another realm's configuration. See scan.gno.
+	registerScanCallbacks(r)
 
 	// One callback per slot. The closure captures s, which is re-bound on each
 	// iteration, so every callback sees its own slot.
@@ -69,7 +74,17 @@ func renderPage() string {
 		return false
 	})
 
-	return r.Replace(layout)
+	// The notice blocks, from gno.land/r/moul/config: a warning, a changelog
+	// line or a bit of news, set either on every realm of moul's at once or on
+	// this one alone, and empty by default. A pause banner rides along at the
+	// top, so the page explains itself if this realm is ever held back.
+	//
+	// The path is passed explicitly rather than using config's zero-argument
+	// TopBlock(). That form reads the caller off the stack, which is correct
+	// here and is covered by config's own tests, but this realm's Render IS
+	// gno.land/u/moul and it already states its own path: passing the constant
+	// cannot be wrong, at no cost.
+	return config.TopBlockFor(realmPath) + r.Replace(layout) + config.BottomBlockFor(realmPath)
 }
 
 // slotLinks is the :slots: placeholder: a bullet list of every slot, linking to

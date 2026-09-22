@@ -127,6 +127,17 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   `gno.land/r/moul/x/plan9/nstest` fails to build with `package name "main" does not
   match path element "nstest"`; `…/plan9/main` works. Anything `println`ed before an
   abort is dropped, so an aborting filetest gets an `// Error:` block and no `// Output:`.
+- **A read with no `cur realm` sees the CALLER as `unsafe.CurrentRealm()`, not itself.**
+  Such a function is borrowed: gno opens no realm frame for it, so a plain read exported by
+  one realm and called by another reports the caller's path. That is what makes a
+  zero-argument helper on a shared realm possible at all
+  (`config.TopBlock()`, `config.IsPaused()`), and it reverses the moment the function
+  grows a `cur realm` parameter, at which point it silently starts reporting its own realm
+  for every caller. Measured 2026-09-22 from `r/moul/config/v1`, called by a code realm at
+  `gno.land/r/test/caller`: `CurrentRealm=gno.land/r/test/caller`,
+  `PreviousRealm=gno.land/r/moul/config/v1`. A paired `…For(pkgPath)` variant is the
+  escape hatch for crossing functions, and `r/moul/config/blocks_test.gno` pins the rule.
+  Never branch on it for authorisation either way: it is `unsafe` for that reason.
 
 When a new divergence costs a red CI, add it here. This file is pulled by the build agent
 before every generation, so a line here stops the next repeat.
