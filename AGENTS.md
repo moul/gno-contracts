@@ -128,6 +128,13 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   silently. That matters for avl keys: unpadded numeric keys sort `"0","1","10","11","2"`,
   so anything keyed that way loses insertion order past nine entries. Pad by hand
   (`padIdx` in `r/moul/demo/importdemo`).
+- **`uassert.AbortsContains` takes a `func()`, not a `func(realm)`.** With the
+  `func(realm)` form the helper does its own `cross(rlm)` first, which consumes the pending
+  `testing.SetRealm`, so the abort under test runs with the realm itself as caller and
+  every authorization assertion fails with `unauthorized` instead of the error you meant to
+  pin. Use a no-arg closure that crosses with the outer `cur`, as `r/moul/x/wesh` and
+  `r/moul/forge` do:
+  `uassert.AbortsContains(t, cur, "stale ref", func() { SetRef(cross(cur), …) })`.
 - **`recover()` cannot catch a panic from a crossing call.** A panic raised across
   `cross(cur)` is a realm abort and a `defer`/`recover()` in the caller never fires, even
   when the test is in the realm's own package: the test dies with

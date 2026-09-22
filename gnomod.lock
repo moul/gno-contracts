@@ -66,6 +66,10 @@ module = "gno.land/p/moul/fifo/v0"
 source = { dir = "p/moul/fifo" }
 
 [[module]]
+module = "gno.land/p/moul/forge/v0"
+source = { dir = "p/moul/forge" }
+
+[[module]]
 module = "gno.land/p/moul/fp/v0"
 source = { dir = "p/moul/fp" }
 
@@ -470,6 +474,10 @@ source = { dir = "r/moul/demo/wikicoin" }
 [[module]]
 module = "gno.land/r/moul/faucet/v0"
 source = { dir = "r/moul/faucet" }
+
+[[module]]
+module = "gno.land/r/moul/forge/v0"
+source = { dir = "r/moul/forge" }
 
 [[module]]
 module = "gno.land/r/moul/gns/v0"
