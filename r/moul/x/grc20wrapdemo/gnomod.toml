@@ -1,0 +1,6 @@
+module = "gno.land/r/moul/x/grc20wrapdemo/v0"
+gno = "0.9"
+
+# public: Wrap and Basket register the tokens they mint with r/nt/grc20reg,
+# so this realm's own objects have to be reachable from that one. Same
+# measured failure as r/moul/x/grc20faucet when the flag is flipped.

@@ -1,0 +1,9 @@
+module = "gno.land/r/moul/x/amm/v0"
+gno = "0.9"
+
+# public: a pool mints its LP token and registers it with r/nt/grc20reg, and
+# holds the *grc20.Token values that registry hands out for the pair's two
+# sides. Both make this realm's own objects reachable from those token realms.
+# As private = true the first CreatePool panics with "cannot persist object
+# from the private realm gno.land/r/moul/x/amm/v0" out of assertObjectIsPublic.
+# Measured, not inferred: flip the flag and `make test PKG=amm` fails.

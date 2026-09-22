@@ -108,14 +108,33 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   deterministically (on address, say): a `Render` that reshuffles between identical calls
   is a bug, and gno map iteration order is unspecified, so never iterate a map to build
   output.
-- **`testing.SkipHeights` is RELATIVE and there is no `testing.Height`.** No absolute
-  height setter exists, so tests drive the height forward from wherever the previous test
-  left it and never assert an absolute height or anything derived from one. Ask the realm
-  instead (a `Day()` helper).
+- **Every test function starts at block height 123; only realm state carries over.**
+  `testing.SkipHeights` is RELATIVE, there is no `testing.Height` and no absolute setter,
+  and a skip only moves the height *within* the test that called it: the next test starts
+  back at 123 while package-level state (an avl tree, a cooldown map) keeps whatever the
+  previous test wrote. So anything height-gated needs a fresh account per test, or its own
+  skip, or it fails on the second test to touch it. Never assert an absolute height or a
+  value derived from one, ask the realm instead (a `Day()` helper). Measured 2026-09-19
+  against gno master while writing `r/moul/x/grc20wrapdemo`; the claim that stood here
+  before, that height carries over between tests, was wrong.
+- **`testing.SetRealm` only governs the crossing calls made from the frame that called
+  it.** Call it in a test helper that does not itself cross and it is silently ignored:
+  the caller stays whoever it was, usually the realm's own address, and that surfaces much
+  later as `cannot send transfer to self` or a balance credited to nobody. A helper that
+  crosses right afterwards (claim, approve) DOES work, which is exactly what makes this
+  hard to spot. Switch accounts INLINE in the test body. `testing.SkipHeights` in between
+  is safe, it does not clear the actor (checked 2026-09-19).
 - **`ufmt` supports NO width or padding flags.** `ufmt.Sprintf("%03d", 7)` returns `"7"`,
   silently. That matters for avl keys: unpadded numeric keys sort `"0","1","10","11","2"`,
   so anything keyed that way loses insertion order past nine entries. Pad by hand
   (`padIdx` in `r/moul/demo/importdemo`).
+- **`uassert.AbortsContains` takes a `func()`, not a `func(realm)`.** With the
+  `func(realm)` form the helper does its own `cross(rlm)` first, which consumes the pending
+  `testing.SetRealm`, so the abort under test runs with the realm itself as caller and
+  every authorization assertion fails with `unauthorized` instead of the error you meant to
+  pin. Use a no-arg closure that crosses with the outer `cur`, as `r/moul/x/wesh` and
+  `r/moul/forge` do:
+  `uassert.AbortsContains(t, cur, "stale ref", func() { SetRef(cross(cur), …) })`.
 - **`recover()` cannot catch a panic from a crossing call.** A panic raised across
   `cross(cur)` is a realm abort and a `defer`/`recover()` in the caller never fires, even
   when the test is in the realm's own package: the test dies with
