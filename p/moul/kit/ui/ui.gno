@@ -162,8 +162,17 @@ func Action(title, fn string, args ...string) string {
 	return helplink.Func(Inline(title), fn, args...)
 }
 
-// ActionIn is [Action] against another realm, given as a full package path
-// ("gno.land/r/moul/home/v0").
+// ActionIn is [Action] against another realm, given as the full package path
+// that realm declares on the module line of its gnomod.toml.
+//
+// This doc deliberately contains no example path, not even a placeholder one.
+// gnopm scans doc comments the way it scans imports, so any package path
+// spelled out in a comment becomes a dependency of the package holding it: one
+// that is neither live nor in the workspace BLOCKS publishing this package and
+// everything that imports it, and naming a live one is no better, since it
+// drags an unrelated realm into every publish plan. This comment previously
+// named a path that deversioning had already removed, which blocked the whole
+// ui dependency tree on every chain.
 func ActionIn(pkgPath, title, fn string, args ...string) string {
 	return helplink.Realm(pkgPath).Func(Inline(title), fn, args...)
 }

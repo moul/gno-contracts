@@ -163,8 +163,8 @@ func TestAction(t *testing.T) {
 }
 
 func TestActionIn(t *testing.T) {
-	got := ActionIn("gno.land/r/moul/home/v0", "Say hi", "Hello", "name", "moul")
-	uassert.True(t, strings.Contains(got, "/r/moul/home/v0"), "must target the named realm, got: "+got)
+	got := ActionIn("gno.land/r/moul/gns/v0", "Say hi", "Hello", "name", "moul")
+	uassert.True(t, strings.Contains(got, "/r/moul/gns/v0"), "must target the named realm, got: "+got)
 	uassert.True(t, strings.Contains(got, "Hello"), "must name the function")
 }
 
