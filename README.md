@@ -207,6 +207,7 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`p/moul/x/storagecost/v0`](p/moul/x/storagecost) 📦 | — | — | [✅](https://gno.land/p/moul/x/storagecost/v0) | — | — | 1 |
 | [`p/moul/x/vm/bf/v0`](p/moul/x/vm/bf) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/x/vm/vmkit/v0`](p/moul/x/vm/vmkit) 📦 | — | — | — | — | — | 1 |
+| [`p/moul/x/wesh/v0`](p/moul/x/wesh) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/x/wiki/v0`](p/moul/x/wiki) 📦 | — | — | — | — | — | 6 |
 | [`p/moul/xdao/v0`](p/moul/xdao) 📦 | — | — | [✅](https://gno.land/p/moul/xdao/v0) | — | — | 1 |
 | [`p/moul/xmath/v0`](p/moul/xmath) 📦 | — | — | [✅](https://gno.land/p/moul/xmath/v0) | — | — | — |
@@ -374,13 +375,14 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
 | [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | — | — | — | — | 5 |
 | [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | — | — | — | — | 6 |
+| [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | — | — | — | — | — | 8 |
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinned in `gnomod.lock`, still built)._
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T18:07:38Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T18:20:15Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 

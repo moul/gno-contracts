@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-22T18:07:38Z",
+  "status_checked_at": "2026-09-22T18:20:15Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2458,6 +2458,32 @@
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/wesh/v0",
+      "dir": "p/moul/x/wesh",
+      "kind": "p",
+      "name": "x/wesh",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/b58/v0"
       ],
       "draft": false,
       "published": {
@@ -7413,6 +7439,33 @@
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/seqid/v0",
         "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/wesh/v0",
+      "dir": "r/moul/x/wesh",
+      "kind": "r",
+      "name": "x/wesh",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/wesh/v0",
+        "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
       "published": {
