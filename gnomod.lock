@@ -303,6 +303,26 @@ module = "gno.land/p/moul/x/daily/trie/v0"
 source = { dir = "p/moul/x/daily/trie" }
 
 [[module]]
+module = "gno.land/p/moul/x/plan9/memfs/v0"
+source = { dir = "p/moul/x/plan9/memfs" }
+
+[[module]]
+module = "gno.land/p/moul/x/plan9/ninep/v0"
+source = { dir = "p/moul/x/plan9/ninep" }
+
+[[module]]
+module = "gno.land/p/moul/x/plan9/ns/v0"
+source = { dir = "p/moul/x/plan9/ns" }
+
+[[module]]
+module = "gno.land/p/moul/x/plan9/rc/v0"
+source = { dir = "p/moul/x/plan9/rc" }
+
+[[module]]
+module = "gno.land/p/moul/x/plan9/synfs/v0"
+source = { dir = "p/moul/x/plan9/synfs" }
+
+[[module]]
 module = "gno.land/p/moul/x/storagecost/v0"
 source = { dir = "p/moul/x/storagecost" }
 
@@ -979,6 +999,14 @@ source = { dir = "r/moul/x/daily/wordle" }
 [[module]]
 module = "gno.land/r/moul/x/daily/wrapped/v0"
 source = { dir = "r/moul/x/daily/wrapped" }
+
+[[module]]
+module = "gno.land/r/moul/x/plan9/dev/v0"
+source = { dir = "r/moul/x/plan9/dev" }
+
+[[module]]
+module = "gno.land/r/moul/x/plan9/ns/v0"
+source = { dir = "r/moul/x/plan9/ns" }
 
 [[module]]
 module = "gno.land/r/moul/x/reaper/v0"

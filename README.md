@@ -393,3 +393,6 @@ one-line-per-rule index, and [`.github/README.md`](./.github/README.md) covers C
 
 See [`LICENSE`](./LICENSE): the GNO Network General Public License, consistent with
 `gnolang/gno`.
+
+Third-party names and prior art the contracts borrow from (Plan 9, and anything
+that follows it) are attributed in [`NOTICE`](./NOTICE.md).
