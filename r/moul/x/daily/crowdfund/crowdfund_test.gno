@@ -3,6 +3,7 @@ package crowdfund
 import (
 	"testing"
 
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
@@ -41,10 +42,13 @@ func TestState(t *testing.T) {
 	uassert.Equal(t, "Funded", state(exact, 200))
 }
 
+// v0 asserted that its own key() padded to width 12. That rule held only below
+// the width: key(10^12) is 13 characters and sorts before key(10^12-1), so the
+// campaign list would have rendered out of order from that id on. The store key
+// has no width to outgrow.
 func TestKeyOrdering(t *testing.T) {
-	uassert.Equal(t, "000000000001", key(1))
-	uassert.Equal(t, "000000000042", key(42))
-	// zero-padded keys keep numeric order under lexical string sort
-	uassert.True(t, key(2) < key(10))
-	uassert.True(t, key(9) < key(100))
+	uassert.True(t, store.ID(2).Key() < store.ID(10).Key())
+	uassert.True(t, store.ID(9).Key() < store.ID(100).Key())
+	uassert.True(t, store.ID(999999999999).Key() < store.ID(1000000000000).Key(),
+		"and it keeps holding one past v0's width-12 ceiling")
 }

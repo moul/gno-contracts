@@ -45,7 +45,7 @@ func TestRenderHistoryNewestFirst(t *testing.T) {
 
 	out := Render("")
 	uassert.True(t, strings.Contains(out, "### Recent guesses"), "history section should appear")
-	uassert.True(t, strings.Contains(out, "| bob | 5678 | 0 | 1 |\n| alice | 1234 | 1 | 2 |\n"),
+	uassert.True(t, strings.Contains(out, "| `bob` | 5678 | 0 | 1 |\n| `alice` | 1234 | 1 | 2 |\n"),
 		"newest guess should be listed first")
 	uassert.False(t, strings.Contains(out, "_No guesses yet"), "empty-history notice should be gone")
 }
@@ -57,7 +57,7 @@ func TestRenderLeaderboard(t *testing.T) {
 	addRecord(record{player: "dave", attempts: 7, round: 2})
 
 	out := Render("")
-	uassert.True(t, strings.Contains(out, "| 1 | carol | 3 | 1 |\n| 2 | dave | 7 | 2 |\n"),
+	uassert.True(t, strings.Contains(out, "| 1 | `carol` | 3 | 1 |\n| 2 | `dave` | 7 | 2 |\n"),
 		"leaderboard should rank fastest first")
 	uassert.False(t, strings.Contains(out, "_Nobody has cracked a code yet._"),
 		"empty-leaderboard notice should be gone")
@@ -72,7 +72,7 @@ func TestRenderShortensLongAddresses(t *testing.T) {
 
 	out := Render("")
 	uassert.False(t, strings.Contains(out, long), "full address should not be rendered")
-	uassert.True(t, strings.Contains(out, "| "+long[:6]+"…"+long[len(long)-4:]+" | 1234 |"),
+	uassert.True(t, strings.Contains(out, "| `"+long[:8]+"…"+long[len(long)-4:]+"` | 1234 |"),
 		"address should be shortened to prefix…suffix")
 }
 

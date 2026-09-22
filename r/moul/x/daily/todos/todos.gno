@@ -9,23 +9,23 @@ import (
 	"strconv"
 	"strings"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/kit/store/v0"
 )
 
 // item is one entry on the board. `address` is the uverse bech32 type — it is
 // persistable (unlike a `realm` value), so it is safe to store across txs.
+// It carries no id field: the id belongs to the store, which hands it back on
+// lookup and iteration.
 type item struct {
-	id     int
 	text   string
 	done   bool
 	author address
 }
 
-var (
-	// items is keyed by zero-padded id string so avl iteration is ordered by id.
-	items  avl.Tree
-	nextID int
-)
+// items assigns the item ids. v1 kept its own nextID plus an idKey() that
+// zero-padded to width 12, which stopped ordering Render past 10^12.
+var items = store.Named("todos: item")
 
 // Add appends a new item authored by the caller and returns its id.
 //
@@ -42,15 +42,11 @@ func Add(cur realm, text string) int {
 
 	author := cur.Previous().Address()
 
-	nextID++
-	id := nextID
-	items.Set(idKey(id), &item{
-		id:     id,
+	return int(items.Add(&item{
 		text:   text,
 		done:   false,
 		author: author,
-	})
-	return id
+	}))
 }
 
 // Toggle flips the done state of the item with the given id.
@@ -58,11 +54,7 @@ func Toggle(cur realm, id int) {
 	if !cur.IsCurrent() {
 		panic("spoofed realm")
 	}
-	v := items.Get(idKey(id))
-	if v == nil {
-		panic("todos: item not found: #" + strconv.Itoa(id))
-	}
-	it := v.(*item)
+	it := items.MustGet(store.ID(id)).(*item)
 	it.done = !it.done
 }
 
@@ -71,40 +63,19 @@ func Remove(cur realm, id int) {
 	if !cur.IsCurrent() {
 		panic("spoofed realm")
 	}
-	if _, removed := items.Remove(idKey(id)); !removed {
-		panic("todos: item not found: #" + strconv.Itoa(id))
+	if _, removed := items.Remove(store.ID(id)); !removed {
+		panic("todos: item #" + strconv.Itoa(id) + " not found")
 	}
-}
-
-// idKey renders an id as a fixed-width, zero-padded key so avl.Tree's
-// byte-lexicographic ordering matches numeric id ordering.
-func idKey(id int) string {
-	s := strconv.Itoa(id)
-	const width = 12
-	if len(s) >= width {
-		return s
-	}
-	return strings.Repeat("0", width-len(s)) + s
-}
-
-// shortAddr renders an address as "g1abc…" (first 6 chars + ellipsis).
-func shortAddr(a address) string {
-	s := a.String()
-	if len(s) <= 6 {
-		return s
-	}
-	return s[:6] + "…"
 }
 
 // counts returns the number of open and done items.
 func counts() (open, done int) {
-	items.Iterate("", "", func(_ string, v interface{}) bool {
+	items.Each(func(_ store.ID, v any) {
 		if v.(*item).done {
 			done++
 		} else {
 			open++
 		}
-		return false
 	})
 	return open, done
 }
@@ -127,24 +98,17 @@ func Render(path string) string {
 		return b.String()
 	}
 
-	// Collect in ascending id order, then emit newest first.
-	var lines []string
-	items.Iterate("", "", func(_ string, v interface{}) bool {
+	// The store iterates by id, so newest-first is one call rather than a
+	// collect-then-walk-backwards.
+	items.EachReverse(func(id store.ID, v any) {
 		it := v.(*item)
 		mark := " "
 		if it.done {
 			mark = "x"
 		}
-		line := "- [" + mark + "] #" + strconv.Itoa(it.id) + " " +
-			it.text + " (" + shortAddr(it.author) + ")"
-		lines = append(lines, line)
-		return false
+		b.WriteString("- [" + mark + "] #" + id.String() + " " +
+			it.text + " (" + ui.Addr(it.author) + ")\n")
 	})
-
-	for i := len(lines) - 1; i >= 0; i-- {
-		b.WriteString(lines[i])
-		b.WriteString("\n")
-	}
 
 	return b.String()
 }
