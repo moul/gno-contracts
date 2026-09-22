@@ -395,6 +395,10 @@ module = "gno.land/r/moul/demo/wikicoin/v0"
 source = { dir = "r/moul/demo/wikicoin" }
 
 [[module]]
+module = "gno.land/r/moul/faucet/v0"
+source = { dir = "r/moul/faucet" }
+
+[[module]]
 module = "gno.land/r/moul/gns/v0"
 source = { dir = "r/moul/gns" }
 
