@@ -71,6 +71,7 @@ digraph gnocontracts {
   "gno.land/p/moul/x/framelab/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/games/clock/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/games/prorata/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/grc20wrap/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/pair/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/memfs/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/ninep/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -228,6 +229,8 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/wrapped/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/framelab/probe/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/games/lastwords/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/grc20faucet/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/grc20wrapdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/pairreg/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/pairs/aaa/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/pairs/aaabbb/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -282,6 +285,9 @@ digraph gnocontracts {
   "gno.land/p/moul/x/daily/markov/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/x/daily/ratelimit/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/x/framelab/v0" -> "gno.land/p/nt/grc20/v0";
+  "gno.land/p/moul/x/grc20wrap/v0" -> "gno.land/p/nt/grc20/v0";
+  "gno.land/p/moul/x/grc20wrap/v0" -> "gno.land/p/nt/seqid/v0";
+  "gno.land/p/moul/x/grc20wrap/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/x/pair/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/x/pair/v0" -> "gno.land/p/nt/grc20/v0";
   "gno.land/p/moul/x/pair/v0" -> "gno.land/p/nt/ufmt/v0";
@@ -498,6 +504,16 @@ digraph gnocontracts {
   "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/moul/x/games/clock/v0";
   "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/moul/x/games/prorata/v0";
   "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/grc20faucet/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/grc20faucet/v0" -> "gno.land/p/nt/grc20/v0";
+  "gno.land/r/moul/x/grc20faucet/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/grc20faucet/v0" -> "gno.land/r/nt/grc20reg/v0";
+  "gno.land/r/moul/x/grc20wrapdemo/v0" -> "gno.land/p/moul/x/grc20wrap/v0";
+  "gno.land/r/moul/x/grc20wrapdemo/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/grc20wrapdemo/v0" -> "gno.land/p/nt/grc20/v0";
+  "gno.land/r/moul/x/grc20wrapdemo/v0" -> "gno.land/p/nt/seqid/v0";
+  "gno.land/r/moul/x/grc20wrapdemo/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/grc20wrapdemo/v0" -> "gno.land/r/nt/grc20reg/v0";
   "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/moul/x/pair/v0";
   "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/nt/ufmt/v0";
