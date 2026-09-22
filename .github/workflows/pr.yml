@@ -122,8 +122,8 @@ jobs:
       # shown as it renders today next to how this branch renders it. Both
       # passes run the head's gnodev against the head's assets, so the pair
       # differs by the package change alone.
-      # Only the merge-base tree: `make preview` below builds the view and syncs
-      # this one itself.
+      # Only the merge-base tree: `gnocontracts preview` below builds the view
+      # and syncs the head tree itself.
       - name: Check out the merge base
         if: steps.plan.outputs.skip != 'true'
         run: |
@@ -136,9 +136,8 @@ jobs:
           go -C tools tool gnopm -C "$RUNNER_TEMP/base" sync \
             || echo "::warning::the merge base did not sync, before/after may be incomplete"
 
-      # `make preview`, not the tool directly: the target builds the stdlib-only
-      # GNOROOT view from the real GNOROOT and only then points the renderer at
-      # it, which is the pair that is easy to get wrong (see main.yml). gnodev
+      # GNOROOT stays the real checkout: preview builds the stdlib-only view out
+      # of it and points the renderer at that itself (see main.yml). gnodev
       # comes from PATH, where setup-gno put it.
       - name: Render the preview
         if: steps.plan.outputs.skip != 'true'

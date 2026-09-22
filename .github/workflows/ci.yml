@@ -83,14 +83,17 @@ jobs:
       # the Makefile's stdlib-only GNOROOT view (empty examples/). Dependency
       # bumps are deliberate: run `make deps` locally and commit.
       # Prove the toolchain actually validates example tests, and that no
-      # Example* is silently skipped (missing // Output:) — otherwise an
-      # ExampleRender is a false-green test that asserts nothing.
-      - name: Validate example tests are real
-        run: make toolcheck guard-examples guard-render guard-readmes
+      # Example* is silently skipped (missing // Output:), otherwise an
+      # ExampleRender is a false-green test that asserts nothing. Also the
+      # render and README guards; `make guards` is the whole set.
+      - name: Run the guards
+        run: make guards
 
       - name: Lint
         run: make lint
 
+      # `make test` re-runs the guards as a prerequisite, which is seconds and
+      # keeps the local `make test` a complete gate on its own.
       - name: Test
         run: make test
 
