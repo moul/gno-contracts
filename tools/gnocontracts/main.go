@@ -14,6 +14,8 @@
 //	pr         everything CI needs to know about a pull request: the sticky
 //	           comment body, the path labels, the realms to preview
 //	preview    render realms with gnodev into a self-contained static tree
+//	gno        lint / test / fmt every contract against a stdlib-only GNOROOT
+//	upload     the gnokey script for what a network is missing
 //	guard-*    the CI guards (examples, render, readmes, generated artifacts)
 //
 // It is invoked from the repository root, typically via the Makefile
@@ -73,6 +75,10 @@ func main() {
 		err = cmdPreview(root, args)
 	case "graph":
 		err = cmdGraph(root)
+	case "gno":
+		err = cmdGno(root, args)
+	case "upload":
+		err = cmdUpload(root, args)
 	case "help", "-h", "--help":
 		usage()
 		return
@@ -104,6 +110,9 @@ commands:
   pr         analyze the PR diff (base...HEAD) → the sticky comment body, the
              path labels, and the realm selectors to preview
   preview    render the selected realms with gnodev into a static tree
+  gno        run the gno toolchain over every contract:
+             gno lint | gno test | gno fmt | gno toolcheck | gno list
+  upload     write the gnokey script for what a network is missing; -yes runs it
   guard-examples   fail if an Example* test pins no // Output: block
   guard-render     fail if a realm declares Render that no test calls
   guard-readmes    fail if a package ships a README that documents nothing

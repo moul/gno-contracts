@@ -2,127 +2,118 @@
 
 [![CI](https://github.com/moul/gno-contracts/actions/workflows/ci.yml/badge.svg)](https://github.com/moul/gno-contracts/actions/workflows/ci.yml)
 
-**moul's personal [gno.land](https://gno.land) contracts** — every `p/moul/*`
-package and `r/moul/*` realm, developed in one place, **versioned from day one**,
-**self-contained** (dependencies vendored), and **continuously tested against
-gno master**.
+**moul's personal [gno.land](https://gno.land) contracts**: every `p/moul/*` package and
+`r/moul/*` realm, developed in one place, **versioned from day one**, **self-contained**
+(dependencies vendored) and **continuously tested against gno master**.
 
-This repository is the home for contracts that previously lived in the
-`gnolang/gno` monorepo under `examples/gno.land/{p,r}/moul/*`. It is designed so
-that a single `git clone` + a gno toolchain is enough to build, test, lint, and
-publish everything.
+This repository is the home of contracts that used to live in the `gnolang/gno` monorepo
+under `examples/gno.land/{p,r}/moul/*`. One `git clone` plus a gno toolchain is enough to
+build, test, lint and publish everything.
 
 ## Features
 
-- **Mandatory versioning** — every contract is `.../<name>/vN`; breaking changes
-  ship as a new `vN`, never an in-place edit. The version lives in the package's
-  `gnomod.toml`, **not** in its directory name, so a bump is a one-line change
-  plus the real content diff instead of a directory copy git cannot pair. The
-  version it replaces is pinned in [`gnomod.lock`](./gnomod.lock) and rebuilt
-  from history on demand (see [`gnopm`](./tools/gnopm)). Originals that no longer
-  build on master are kept as `ignore = true` (archived, 💤, skipped by CI).
-- **Autonomous builds** — external `gno.land/*` deps are vendored; only the gno
-  stdlibs come from the toolchain. One clone builds offline, independent of
-  monorepo drift.
-- **CI against gno master** — every package is `gno lint`-ed and `gno test`-ed on
-  each PR; `make sync` reports drift from the upstream monorepo copies.
-- **Self-maintaining catalog** — [`contracts.json`](./contracts.json) + the table
-  below, every per-package README (docs + repo link + disclaimer + embedded
-  dependency graph), and the `_assets/` graphs are **regenerated after merge** by a
-  bot, so PRs carry only source and never conflict on generated files.
-- **Dependency graphs** — per-package, a latest-version-only overview (embedded
-  below), and a full graph with every version, in [`_assets/`](./_assets).
-- **On-chain status** — the table shows where each contract is published
-  (✅ our versioned path, 🗄️ the monorepo's un-versioned copy), refreshed hourly.
-  A chain that is unreachable is skipped rather than recorded as hosting nothing.
-- **One PR bot, one comment** — a single sticky comment: counts, sizes, test
-  counts and ⚠️/🔥 signals on three lines, everything per-package folded away.
-  It also reconciles the path labels (`p`/`r`/`meta`) and links the **live realm
-  preview** (below).
-- **Publishing** (`make upload`) asks `gnopm` what's missing on a network, orders
-  it by dependency, and writes a `gnokey` script you read before running. It
-  never signs on your behalf; `YES=1` runs the script you just read.
+- **Mandatory versioning.** Every contract is `.../<name>/vN`, and a breaking change ships
+  as a new `vN` rather than an in-place edit. The version lives in the package's
+  `gnomod.toml`, **not** in its directory name, so a bump is a one-line change plus the
+  real content diff instead of a directory copy git cannot pair. The version it replaces
+  is pinned in [`gnomod.lock`](./gnomod.lock) and rebuilt from history on demand (see
+  [gnopm](https://github.com/moul/gnopm)). Originals that no longer build on master are
+  kept as `ignore = true`: archived, 💤, skipped by CI.
+- **Autonomous builds.** External `gno.land/*` deps are vendored and only the gno stdlibs
+  come from the toolchain, so one clone builds offline and independently of monorepo
+  drift.
+- **CI against gno master.** Every package is `gno lint`ed and `gno test`ed on each pull
+  request, and `make sync` reports drift from the upstream monorepo copies.
+- **Self-maintaining catalog.** [`contracts.json`](./contracts.json), the table below,
+  every per-package README footer and the `_assets/` graphs are **regenerated after merge**
+  by a workflow, so pull requests carry only source and never conflict on generated files.
+- **Dependency graphs**, per package, latest-version-only (embedded below) and full, in
+  [`_assets/`](./_assets).
+- **On-chain status.** The table shows where each contract is published (✅ our versioned
+  path, 🗄️ the monorepo's un-versioned copy), refreshed hourly. A chain that is unreachable
+  is skipped rather than recorded as hosting nothing.
+- **One pull request bot, one comment**: counts, sizes, test counts and ⚠️/🔥 signals on
+  three lines, everything per-package folded away. It also reconciles the path labels
+  (`p`/`r`/`meta`) and links the live realm preview.
+- **Publishing.** `make upload` asks what a network is missing, orders it by dependency and
+  writes a `gnokey` script you read before running. It never signs on your behalf; `YES=1`
+  runs the script you just read.
 
-### 🖼️ Realm previews on every PR
+### 🖼️ Realm previews on every pull request
 
-When a PR touches a realm, a bot renders it with **gnodev → static gnoweb** and
-publishes a browsable snapshot to `https://moul.github.io/gno-contracts/pr-<N>/`,
-linked from the PR comment — so reviewers can *see* the rendered output without
-checking out the branch. The preview is removed when the PR closes. Locally:
-`make preview ARGS="./r/moul/..."`, then serve `_preview/`.
+A pull request touching a realm gets it rendered with **gnodev into static gnoweb** and
+published to `https://moul.github.io/gno-contracts-previews/pr-<N>/`, linked from the bot
+comment, so a reviewer can *see* the output without checking the branch out. Every package
+on `main` is at
+[the same site's `main/`](https://moul.github.io/gno-contracts-previews/main/). A preview
+outlives its pull request by three weeks, because the comment embeds its screenshots by
+URL. Locally: `make preview ARGS="./r/moul/home"`, then serve `_preview/`.
 
 ## Layout
 
 ```
-p/moul/<name>/            pure packages          → gno.land/p/moul/<name>/vN
-r/moul/<name>/            realms                 → gno.land/r/moul/<name>/vN
-vendor/gno.land/...       vendored dependencies (committed, autonomous)
-tools/                    Go maintenance CLI (manifest, readme, vendor, sync, publish)
-contracts.json           the contract catalog (source of truth for the table below)
-gnomod.lock              where every version's source is (committed, hand-owned)
-gnowork.toml             gno workspace marker (enables local package resolution)
-.gnopm/                   superseded versions, rebuilt from history (gitignored)
-Makefile                 test / lint / deps / gen / sync / publish
+p/moul/<name>/          packages            -> gno.land/p/moul/<name>/vN
+r/moul/<name>/          realms              -> gno.land/r/moul/<name>/vN
+vendor/gno.land/...     vendored deps (committed, autonomous)
+tools/                  the Go tools: gnocontracts, gnohome, gnopublish
+contracts.json          the catalog, source of truth for the table below
+gnomod.lock             where every version's source is (committed, hand-owned)
+gnowork.toml            workspace marker (enables local package resolution)
+.gnopm/                 superseded versions, rebuilt from history (gitignored)
+Makefile                one line per target; `make help` groups them
 ```
 
-The directory does **not** carry the version; the `module` line in its
-`gnomod.toml` does. `p/moul/md/` declaring `module = "gno.land/p/moul/md/v1"`
-publishes to `gno.land/p/moul/md/v1`. The gno toolchain resolves a workspace
-import from that line and ignores the directory name entirely.
+The directory does **not** carry the version; the `module` line in its `gnomod.toml` does.
+`p/moul/md/` declaring `module = "gno.land/p/moul/md/v1"` publishes to
+`gno.land/p/moul/md/v1`. The gno toolchain resolves a workspace import from that line and
+ignores the directory name entirely.
 
 ### Versioning (mandatory)
 
-**Every** contract has an explicit version segment in its **package path**,
-starting at **`v0`**
-— gno's own convention for *initial, unaudited* ([gnolang/gno#5220](https://github.com/gnolang/gno/issues/5220))
-— then `/v1`, `/v2`, … There is no un-versioned contract, and **the version is
-always the LAST path element**: `gno.land/p/moul/ulist/lplist/v0`, never
+**Every** contract has an explicit version segment in its **package path**, starting at
+**`v0`**, gno's own convention for *initial, unaudited*
+([gnolang/gno#5220](https://github.com/gnolang/gno/issues/5220)), then `/v1`, `/v2`. The
+version is always the LAST path element: `gno.land/p/moul/ulist/lplist/v0`, never
 `gno.land/p/moul/ulist/v0/lplist`.
-
-That version is declared in the package's `gnomod.toml`, not in its directory
-name:
 
 ```
 p/moul/md/gnomod.toml     module = "gno.land/p/moul/md/v1"
 p/moul/md/md.gno          edited in place, git diffs it properly
 ```
 
-A breaking change is a **bump**, `gnopm bump md`: one line in
-`gnomod.toml`, and then the real edit. The version it replaces keeps working for
-existing callers, pinned in [`gnomod.lock`](./gnomod.lock) to the commit that
-still holds it and rebuilt into `.gnopm/` on demand, so anything still importing
-`.../md/v0` resolves, lints and tests exactly as before. Non-breaking work — new
-functions, tests, comments, docs — edits the current version in place.
+A breaking change is a bump, `gnopm bump md`: one line in `gnomod.toml`, then the real
+edit. The version it replaces keeps working for existing callers, pinned in
+[`gnomod.lock`](./gnomod.lock) to the commit that still holds it and rebuilt into `.gnopm/`
+on demand, so anything still importing `.../md/v0` resolves, lints and tests exactly as
+before. Non-breaking work, new functions, tests, comments and docs, edits the current
+version in place.
 
-This used to be a directory copy: `p/moul/md/v0` to `p/moul/md/v1`, files and
-all. git pairs nothing across a copy, so the review diff of a version bump was a
-pile of added files with no content diff at all: precisely backwards, since a
-bump is by definition the change that most needs reviewing. One port of 25
-realms landed as +11,103 / −0 across 112 files. See
-[`tools/gnopm`](./tools/gnopm) for the format and the reasoning.
+This used to be a directory copy, `p/moul/md/v0` to `p/moul/md/v1`, files and all. git
+pairs nothing across a copy, so the review diff of a version bump was a pile of added
+files with no content diff at all: precisely backwards, since a bump is by definition the
+change that most needs reviewing. One port of 25 realms landed as +11,103 / 0 across 112
+files. See [gnopm](https://github.com/moul/gnopm) for the format and the reasoning.
 
 ### Autonomy (vendored dependencies)
 
-`gnowork.toml` makes the whole repo one gno workspace, so `gno.land/p/moul/*`
-imports resolve locally. External `gno.land/*` dependencies are copied into
-`vendor/gno.land/...` (each with its `gnomod.toml`) by `make deps`, so the repo
-resolves them without relying on `$GNOROOT/examples`. Only the gno **stdlibs**
-come from the toolchain (`$GNOROOT`).
+`gnowork.toml` makes the whole repo one gno workspace, so `gno.land/p/moul/*` imports
+resolve locally. External `gno.land/*` dependencies are copied into `vendor/gno.land/...`,
+each with its `gnomod.toml`, by `make deps`, so the repo resolves them without relying on
+`$GNOROOT/examples`. Only the gno **stdlibs** come from the toolchain.
 
 ## Usage
 
 ```sh
-export GNOROOT=/path/to/gnolang/gno     # a gno master checkout (stdlibs + gno binary)
+export GNOROOT=/path/to/gnolang/gno   # a gno master checkout (stdlibs + the gno binary)
 
-make deps        # vendor external dependencies into vendor/
-make test        # gno test every p/moul and r/moul package
-make lint        # gno lint every package
-make gen         # refresh contracts.json + the table below
-make sync        # report drift vs the monorepo (someone changed my contract?)
-make publish NET=mainnet CHECK=1   # dependency-ordered publish plan + on-chain status
-make upload NET=pearl PKG=kit/store          # write the publish script; read it
+make help                             # every target, grouped
+make lint test                        # the gate: lint, the guards, and every test
+make test PKG=x/daily/b58             # narrow any of them to one package
+make deps                             # vendor external dependencies into vendor/
+make sync                             # drift vs the monorepo: did someone change my contract?
+make publish NET=mainnet CHECK=1      # dependency-ordered publish plan + on-chain status
+make upload NET=pearl PKG=kit/store   # write the publish script, and read it
 make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
-make help        # list all targets
 ```
 
 ## Contracts
@@ -375,9 +366,9 @@ _On-chain status last checked: 2026-09-22T13:21:34Z (✅ = published from this r
 
 <!-- END CONTRACTS TABLE -->
 
-The table is generated from [`contracts.json`](./contracts.json) by
-`make readme`; CI fails if it is stale (`make check`). Descriptions and upload
-status are hand-authored/queried and preserved across regenerations.
+The table is generated from [`contracts.json`](./contracts.json) by `make readme`, on
+`main` and never in a pull request. Descriptions and upload status are hand-authored or
+queried, and preserved across regenerations.
 
 ## Dependency graph
 
@@ -393,12 +384,12 @@ The **full graph**, with every version as its own node, is at
 
 ## Contributing / agents
 
-This repo is built to be worked on by humans and coding agents alike. Start with
-[`AGENTS.md`](./AGENTS.md) (and [`CLAUDE.md`](./CLAUDE.md), which points to it)
-for the conventions: versioning, workspace/vendor model, how to add a contract,
-and the invariants CI enforces.
+This repo is built to be worked on by humans and coding agents alike.
+[`AGENTS.md`](./AGENTS.md) is the guide: versioning, the workspace and vendor model, how to
+add a contract, and the invariants CI enforces. [`CLAUDE.md`](./CLAUDE.md) is its
+one-line-per-rule index, and [`.github/README.md`](./.github/README.md) covers CI itself.
 
 ## License
 
-See [`LICENSE`](./LICENSE) — distributed under the GNO Network General Public
-License, consistent with `gnolang/gno`.
+See [`LICENSE`](./LICENSE): the GNO Network General Public License, consistent with
+`gnolang/gno`.
