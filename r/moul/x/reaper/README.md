@@ -1,4 +1,4 @@
-# `gno.land/r/moul/x/reaper/v0`
+# `gno.land/r/moul/x/reaper/v1`
 
 A noticeboard whose garbage is a standing bounty.
 
@@ -36,7 +36,10 @@ standing between it and profitable vandalism.
 
 ## Reading it from outside: every number is a query
 
-The realm is live at [`gno.land/r/moul/x/reaper/v0`](https://gno.land/r/moul/x/reaper/v0).
+`v0` is live at [`gno.land/r/moul/x/reaper/v0`](https://gno.land/r/moul/x/reaper/v0); `v1`
+is this source, and is not published yet. A package path is immutable once
+deployed, so the escaping fix below could not reach `v0` and is the reason `v1`
+exists.
 None of what follows needs a key, a transaction or a gas budget. `Reapable`,
 `Compactable` and `Bounty` are in the ABI precisely so the incentive is legible
 to a reader *before* anyone signs anything: a bot decides whether to spend gas
@@ -149,9 +152,18 @@ live note still sits below the dead ones.
 Anyone who pays the deposit chooses the bytes, and `Render` puts them on a page
 every reader of the realm loads. That makes a note body untrusted input landing
 in an **inline** markdown slot, the same category as a username or a post title,
-and it is escaped with
-[`p/nt/markdown/sanitize`](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/nt/markdown/sanitize/v0)
-`InlineText` before it reaches the page.
+and the board never emits one unescaped. One call does it:
+
+```go
+func summarize(body string) string {
+	return ui.Excerpt(strings.ReplaceAll(body, "|", " "), 48)
+}
+```
+
+[`ui.Excerpt`](https://github.com/moul/gno-contracts/blob/main/p/moul/kit/ui/ui.gno) owns both
+halves, the length cap and the escaping, and does them in the order that is safe.
+It delegates the escaping itself to
+[`p/nt/markdown/sanitize`](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/nt/markdown/sanitize/v0).
 
 This realm shipped without that, and it is worth naming what the gap actually
 allowed, because the hand-rolled version looked like it was doing the job:
@@ -169,22 +181,23 @@ oneLine := strings.ReplaceAll(strings.ReplaceAll(body, "\n", " "), "|", " ")
 | `\r`, U+2028, U+2029 | a line break | leave the bullet item and emit top-level markdown |
 | U+202E, U+200B | nothing visible | reorder what a reader sees away from what the bytes say |
 
-`InlineText` closes all five, and none of them were a bug in the incentive
+The escaper closes all five, and none of them were a bug in the incentive
 design: the storage accounting was right, the rendering was not.
 
-Two details that are easy to get backwards:
+Two details are easy to get backwards, which is exactly why they live in
+`ui.Excerpt` and not at this call site:
 
-- **Truncate first, sanitize second.** The escaper works by inserting
-  backslashes and is not idempotent, so cutting its output at an offset can
-  strand a trailing lone backslash that escapes the chrome appended after it.
+- **Cut first, escape second.** Escaping works by inserting backslashes, so
+  cutting an already-escaped string can strand a trailing lone backslash that
+  escapes the chrome appended after it.
 - **Cut on a rune boundary.** Slicing a body at byte 48 splits a multi-byte
   character in half and puts invalid UTF-8 on the page. One emoji in a note was
   enough.
 
-The general rule, for any realm that renders something a caller stored: match
-the helper to the slot the content lands in (inline text, block, table cell,
-URL, code fence) and wrap each user-supplied string exactly once. The package
-doc carries the table.
+The general rule, for any realm that renders something a caller stored: reach
+for `ui.Inline`, `ui.Cell` or `ui.Excerpt`, and drop to `sanitize.*` only for a
+slot they do not cover (a multi-paragraph body, a URL, a code fence). Its
+package doc carries the slot table.
 
 ## What it is built from
 
@@ -213,7 +226,7 @@ Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul
 
 **Dependency graph:**
 
-![gno.land/r/moul/x/reaper/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/reaper/v0/deps.png)
+![gno.land/r/moul/x/reaper/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/reaper/v1/deps.png)
 
 > 🧪 **Highly experimental — potentially vibe-coded.** Not audited; may break, change, or be removed at any time. Do not use with anything of value. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 

@@ -9,10 +9,11 @@
 //   - Addr: one address shortening for the whole namespace. Eleven realms had
 //     their own shortAddr with four different truncation rules, so the same
 //     account rendered differently depending on which realm you opened.
-//   - Inline / Cell: markdown escaping, delegated to
+//   - Inline / Cell / Excerpt: markdown escaping, delegated to
 //     [p/nt/markdown/sanitize](/p/nt/markdown/sanitize/v0). Eight realms
 //     hand-rolled a seven-pair strings.NewReplacer that misses most of what
-//     the real escaper handles.
+//     the real escaper handles. Excerpt adds the length cap those previews
+//     also need, in the order that is safe: cut, then escape.
 //   - Action: a clickable call link instead of prose telling the reader to go
 //     type a function name.
 //   - Table, Empty, Podium: the last recurring scraps.
@@ -122,6 +123,33 @@ func Inline(s string) string {
 // tab and pipe handling, so the value cannot open a new column.
 func Cell(s string) string {
 	return sanitize.TableCell(s)
+}
+
+// Excerpt is [Inline] for a string too long to show whole: it keeps the first
+// width runes, appends [Ellipsis], and escapes what it kept.
+//
+// Use it for a preview of user-written prose where only the beginning carries
+// meaning: the first line of a post in an index, a note on a board, a comment
+// in a list. For an identifier whose tail has to stay recognisable, an
+// address, a hash, a URL, use [Short] instead, which keeps both ends.
+//
+// The order is the whole point, and it is what a call site gets wrong.
+// Escaping inserts backslashes, so cutting an ALREADY-escaped string can
+// strand a trailing lone backslash that escapes whatever chrome follows it.
+// Excerpt cuts first, on a rune boundary so a multi-byte character is never
+// split, then escapes. [Ellipsis] stays outside the escaper: it is this
+// package's chrome, not the user's text.
+func Excerpt(s string, width int) string {
+	if width < 0 {
+		width = 0
+	}
+	r := []rune(s)
+	// The same threshold as [ShortN] with no tail: cutting is only worth doing
+	// when it saves a character, so a string one rune over is kept whole.
+	if len(r) <= width+1 {
+		return Inline(s)
+	}
+	return Inline(string(r[:width])) + Ellipsis
 }
 
 // Action renders a clickable call to a function of the current realm.
