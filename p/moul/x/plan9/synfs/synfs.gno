@@ -19,6 +19,14 @@
 // A synthetic file reports Qid.Version 0 forever. Its contents can change on
 // every block, so a version would be a lie; clients that need change detection
 // should read the file.
+//
+// NOTICE. Plan 9 from Bell Labs is the work of the Computing Science Research
+// Center at Bell Labs; the name and the marks are theirs, and the copyright is
+// held by the Plan 9 Foundation (https://p9f.org). This package is not
+// affiliated with, endorsed by, or sponsored by them, and contains no Plan 9
+// code: it borrows the vocabulary so that the design reads without a glossary,
+// and it is an homage, asking what that ecosystem's spirit looks like on a
+// chain. Full attribution: NOTICE.md at the root of moul/gno-contracts.
 package synfs
 
 import (

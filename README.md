@@ -359,3 +359,6 @@ and the invariants CI enforces.
 
 See [`LICENSE`](./LICENSE) — distributed under the GNO Network General Public
 License, consistent with `gnolang/gno`.
+
+Third-party names and prior art the contracts borrow from (Plan 9, and anything
+that follows it) are attributed in [`NOTICE`](./NOTICE.md).

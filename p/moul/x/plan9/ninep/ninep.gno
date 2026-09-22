@@ -26,6 +26,14 @@
 //
 // See gno.land/p/moul/x/plan9/ns for the namespace that binds these trees
 // together, and gno.land/p/moul/x/plan9/memfs for the reference server.
+//
+// NOTICE. Plan 9 from Bell Labs is the work of the Computing Science Research
+// Center at Bell Labs; the name and the marks are theirs, and the copyright is
+// held by the Plan 9 Foundation (https://p9f.org). This package is not
+// affiliated with, endorsed by, or sponsored by them, and contains no Plan 9
+// code: it borrows the vocabulary so that the design reads without a glossary,
+// and it is an homage, asking what that ecosystem's spirit looks like on a
+// chain. Full attribution: NOTICE.md at the root of moul/gno-contracts.
 package ninep
 
 import (

@@ -51,6 +51,8 @@ func ExampleRender() {
 	// - [`demo`](:ns?u=demo)
 	//
 	// Design and analysis: [moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).
+	//
+	// _Not affiliated with Plan 9. Plan 9 from Bell Labs is the work of the Computing Science Research Center at Bell Labs; the name and the marks are theirs, and the copyright is held by the [Plan 9 Foundation](https://p9f.org). This realm borrows the vocabulary and none of the code: it is an homage, asking what that ecosystem's spirit looks like on a chain._
 }
 
 // ExampleRender_ls pins a union directory listing.

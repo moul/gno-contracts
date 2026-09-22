@@ -47,3 +47,13 @@ application order, then the working directory.
 **Live demo:** [`r/moul/x/plan9/ns`](../../../../../r/moul/x/plan9/ns/v0) gives
 every account one of these. Design and analysis:
 [moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).
+
+
+---
+
+**Not affiliated with Plan 9.** Plan 9 from Bell Labs is the work of the
+Computing Science Research Center at Bell Labs; the name and the marks are
+theirs, and the copyright is held by the [Plan 9 Foundation](https://p9f.org).
+This package borrows the vocabulary and none of the code: it is an independent
+homage, asking what that ecosystem's spirit looks like as a gno realm. Full
+attribution: [NOTICE](../../../../../NOTICE.md).

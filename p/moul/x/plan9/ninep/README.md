@@ -50,3 +50,13 @@ Used by [`memfs`](../../memfs/v0) (a RAM server), [`synfs`](../../synfs/v0) (a
 computed server), [`ns`](../../ns/v0) (namespaces) and
 [`rc`](../../rc/v0) (the shell). Design and analysis:
 [moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).
+
+
+---
+
+**Not affiliated with Plan 9.** Plan 9 from Bell Labs is the work of the
+Computing Science Research Center at Bell Labs; the name and the marks are
+theirs, and the copyright is held by the [Plan 9 Foundation](https://p9f.org).
+This package borrows the vocabulary and none of the code: it is an independent
+homage, asking what that ecosystem's spirit looks like as a gno realm. Full
+attribution: [NOTICE](../../../../../NOTICE.md).

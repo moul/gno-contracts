@@ -23,6 +23,14 @@
 // delegated key scoped to a list of path prefixes, which is Plan 9's "the
 // namespace IS the capability" rediscovered thirty-four years later. Printing
 // it as a file makes that visible.
+//
+// NOTICE. Plan 9 from Bell Labs is the work of the Computing Science Research
+// Center at Bell Labs; the name and the marks are theirs, and the copyright is
+// held by the Plan 9 Foundation (https://p9f.org). This realm is not
+// affiliated with, endorsed by, or sponsored by them, and contains no Plan 9
+// code: it borrows the vocabulary so that the design reads without a glossary,
+// and it is an homage, asking what that ecosystem's spirit looks like on a
+// chain. Full attribution: NOTICE.md at the root of moul/gno-contracts.
 package dev
 
 import (
@@ -163,5 +171,11 @@ func renderIndex() string {
 	}
 	b.WriteString("\nDesign and analysis: ")
 	b.WriteString("[moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).\n")
+	b.WriteString("\n_Not affiliated with Plan 9. Plan 9 from Bell Labs is the ")
+	b.WriteString("work of the Computing Science Research Center at Bell Labs; the name ")
+	b.WriteString("and the marks are theirs, and the copyright is held by the ")
+	b.WriteString("[Plan 9 Foundation](https://p9f.org). This realm borrows the ")
+	b.WriteString("vocabulary and none of the code: it is an homage, asking what that ")
+	b.WriteString("ecosystem's spirit looks like on a chain._\n")
 	return b.String()
 }

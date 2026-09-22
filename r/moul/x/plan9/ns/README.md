@@ -65,3 +65,13 @@ Built on [`ninep`](../../../../../p/moul/x/plan9/ninep/v0),
 [`ns`](../../../../../p/moul/x/plan9/ns/v0) and
 [`rc`](../../../../../p/moul/x/plan9/rc/v0). Design and analysis:
 [moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).
+
+
+---
+
+**Not affiliated with Plan 9.** Plan 9 from Bell Labs is the work of the
+Computing Science Research Center at Bell Labs; the name and the marks are
+theirs, and the copyright is held by the [Plan 9 Foundation](https://p9f.org).
+This realm borrows the vocabulary and none of the code: it is an independent
+homage, asking what that ecosystem's spirit looks like as a gno realm. Full
+attribution: [NOTICE](../../../../../NOTICE.md).
