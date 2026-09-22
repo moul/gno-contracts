@@ -323,6 +323,10 @@ module = "gno.land/p/moul/x/games/prorata/v0"
 source = { dir = "p/moul/x/games/prorata" }
 
 [[module]]
+module = "gno.land/p/moul/x/grc20wrap/v0"
+source = { dir = "p/moul/x/grc20wrap" }
+
+[[module]]
 module = "gno.land/p/moul/x/pair/v0"
 source = { dir = "p/moul/x/pair" }
 
@@ -1048,6 +1052,14 @@ source = { dir = "r/moul/x/framelab/probe" }
 [[module]]
 module = "gno.land/r/moul/x/games/lastwords/v0"
 source = { dir = "r/moul/x/games/lastwords" }
+
+[[module]]
+module = "gno.land/r/moul/x/grc20faucet/v0"
+source = { dir = "r/moul/x/grc20faucet" }
+
+[[module]]
+module = "gno.land/r/moul/x/grc20wrapdemo/v0"
+source = { dir = "r/moul/x/grc20wrapdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/pairreg/v0"
