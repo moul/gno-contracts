@@ -98,6 +98,11 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   `v := t.Get(k); if v == nil { … }`. `v, ok := t.Get(k)` is `assignment mismatch: 2
   variables but Get returns 1 value`, and it turned `r/moul/x/daily/asciiart` red. The
   comma-ok form *is* right on the type assertion: `p, ok := t.Get(k).(*poll)`.
+- **…and `Remove` returns TWO**, `(value, removed)`, which is the opposite rule on the
+  neighbouring method of the same tree. `if !t.Remove(k)` is `multiple-value
+  t.Remove(k) in single-value context`; write `if _, removed := t.Remove(k); !removed`.
+  Caught by lint in `r/moul/faucet`. Knowing the `Get` rule is what makes this one land,
+  so the two belong next to each other.
 - **`sort.Slice` does not exist.** gno's `sort` has `Sort(Interface)` and the `Search*`
   helpers only, so ordering needs an explicit `sort.Interface`. Break ties
   deterministically (on address, say): a `Render` that reshuffles between identical calls
