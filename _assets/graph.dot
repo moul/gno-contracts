@@ -68,6 +68,8 @@ digraph gnocontracts {
   "gno.land/p/moul/x/daily/sparkline/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/toposort/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/trie/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/games/clock/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/games/prorata/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/memfs/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/ninep/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/ns/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -221,6 +223,7 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/urlshort/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/vault/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/wrapped/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/games/lastwords/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/plan9/dev/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/plan9/ns/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/reaper/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -474,6 +477,11 @@ digraph gnocontracts {
   "gno.land/r/moul/x/daily/urlshort/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/vault/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/wrapped/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/moul/x/daily/pullpayment/v0";
+  "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/moul/x/games/clock/v0";
+  "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/moul/x/games/prorata/v0";
+  "gno.land/r/moul/x/games/lastwords/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/plan9/dev/v0" -> "gno.land/p/moul/x/plan9/ninep/v0";
   "gno.land/r/moul/x/plan9/dev/v0" -> "gno.land/p/moul/x/plan9/synfs/v0";
   "gno.land/r/moul/x/plan9/dev/v0" -> "gno.land/r/moul/x/plan9/ns/v0";

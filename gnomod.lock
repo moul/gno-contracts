@@ -311,6 +311,14 @@ module = "gno.land/p/moul/x/daily/trie/v0"
 source = { dir = "p/moul/x/daily/trie" }
 
 [[module]]
+module = "gno.land/p/moul/x/games/clock/v0"
+source = { dir = "p/moul/x/games/clock" }
+
+[[module]]
+module = "gno.land/p/moul/x/games/prorata/v0"
+source = { dir = "p/moul/x/games/prorata" }
+
+[[module]]
 module = "gno.land/p/moul/x/plan9/memfs/v0"
 source = { dir = "p/moul/x/plan9/memfs" }
 
@@ -1024,6 +1032,10 @@ source = { dir = "r/moul/x/daily/wordle" }
 [[module]]
 module = "gno.land/r/moul/x/daily/wrapped/v0"
 source = { dir = "r/moul/x/daily/wrapped" }
+
+[[module]]
+module = "gno.land/r/moul/x/games/lastwords/v0"
+source = { dir = "r/moul/x/games/lastwords" }
 
 [[module]]
 module = "gno.land/r/moul/x/plan9/dev/v0"
