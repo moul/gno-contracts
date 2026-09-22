@@ -20,12 +20,25 @@ inputs:
   deploy-key:
     description: private half of the previews repository's write deploy key
     required: true
-  prune-closed:
-    description: also delete pr-<N>/ for every pull request that is not open
+  prune:
+    description: also run the eviction pass over every pr-<N>/ on the site
     required: false
     default: "false"
+  grace-days:
+    description: >
+      how long a closed pull request keeps its preview. The comment embeds the
+      screenshots by URL, so evicting on the close event leaves every merged
+      pull request with a comment full of broken images.
+    required: false
+    default: "21"
+  max-total-mb:
+    description: >
+      size the whole site is kept under, by evicting closed previews early,
+      oldest first. GitHub Pages refuses to publish a site over 1 GB.
+    required: false
+    default: "700"
   token:
-    description: token used to read pull request state, required by prune-closed
+    description: token used to read pull request state, required by prune
     required: false
     default: ""
   repo:
@@ -50,7 +63,9 @@ runs:
         SOURCE: ${{ inputs.source }}
         MESSAGE: ${{ inputs.message }}
         DEPLOY_KEY: ${{ inputs.deploy-key }}
-        PRUNE_CLOSED: ${{ inputs.prune-closed }}
+        PRUNE: ${{ inputs.prune }}
+        GRACE_DAYS: ${{ inputs.grace-days }}
+        MAX_TOTAL_MB: ${{ inputs.max-total-mb }}
         GH_TOKEN: ${{ inputs.token }}
         REPO: ${{ inputs.repo }}
         SOURCE_REPO: ${{ inputs.source-repo }}
@@ -104,19 +119,57 @@ runs:
             fi
           fi
 
-          # Previews of pull requests that are no longer open. The close event
-          # normally removes its own, so this only catches what a failed or
-          # never-run cleanup left behind, and previews that predate it.
-          if [ "$PRUNE_CLOSED" = "true" ]; then
+          # Eviction. A closed pull request keeps its preview for GRACE_DAYS,
+          # because its comment embeds the screenshots by URL: deleting on the
+          # close event leaves every merged pull request with a comment full of
+          # broken images, which is what this repository did until 2026-09-21.
+          #
+          # A pull request whose state cannot be read is never evicted. Being
+          # unable to ask is not evidence that it closed.
+          if [ "$PRUNE" = "true" ]; then
+            now=$(date -u +%s)
+            grace=$((GRACE_DAYS * 86400))
+            # n <TAB> closed-at epoch, for every closed preview still in grace,
+            # oldest first: the order the budget sweep below evicts them in.
+            spared=$(mktemp)
             for d in "$work"/pr-*; do
               [ -d "$d" ] || continue
               n=$(basename "$d"); n=${n#pr-}
-              state=$(gh pr view "$n" -R "$SOURCE_REPO" --json state --jq .state 2>/dev/null || echo UNKNOWN)
-              if [ "$state" != "OPEN" ] && [ "$state" != "UNKNOWN" ]; then
-                echo "evicting pr-$n ($state)"
+              json=$(gh pr view "$n" -R "$SOURCE_REPO" --json state,closedAt 2>/dev/null || echo '{}')
+              state=$(printf '%s' "$json" | jq -r '.state // "UNKNOWN"')
+              closed=$(printf '%s' "$json" | jq -r '.closedAt // empty')
+              if [ "$state" = "OPEN" ] || [ "$state" = "UNKNOWN" ] || [ -z "$closed" ]; then
+                [ "$state" = "UNKNOWN" ] && echo "pr-$n: state unreadable, keeping"
+                continue
+              fi
+              ts=$(date -u -d "$closed" +%s)
+              age=$(( (now - ts) / 86400 ))
+              if [ $((now - ts)) -gt "$grace" ]; then
+                echo "evicting pr-$n ($state, closed ${age}d ago, grace ${GRACE_DAYS}d)"
                 rm -rf "$d"
+              else
+                printf '%s\t%s\n' "$ts" "$n" >> "$spared"
               fi
             done
+
+            # Then the budget. Closed previews still in their grace period are
+            # given up oldest first rather than letting the site grow past what
+            # Pages will publish; an open pull request's preview is never taken.
+            total=$(du -sm --exclude=.git "$work" | cut -f1)
+            if [ "$total" -gt "$MAX_TOTAL_MB" ]; then
+              echo "site is ${total} MB, over the ${MAX_TOTAL_MB} MB budget"
+              while [ "$total" -gt "$MAX_TOTAL_MB" ] && [ -s "$spared" ]; do
+                n=$(sort -n "$spared" | head -1 | cut -f2)
+                sed -i "/\t$n\$/d" "$spared"
+                echo "  evicting pr-$n early, for the budget"
+                rm -rf "${work:?}/pr-$n"
+                total=$(du -sm --exclude=.git "$work" | cut -f1)
+              done
+              if [ "$total" -gt "$MAX_TOTAL_MB" ]; then
+                echo "::warning::site is still ${total} MB with only open previews left"
+              fi
+            fi
+            rm -f "$spared"
           fi
 
           : > "$work/.nojekyll"

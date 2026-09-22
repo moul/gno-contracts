@@ -9,7 +9,7 @@ tools/tools
 # gno toolchain checkout used by CI / local dev
 /.gno/
 
-# ephemeral stdlib-only GNOROOT view built by `make view` (empty examples/)
+# ephemeral stdlib-only GNOROOT view, rebuilt by every gno invocation
 /.gnoroot-view/
 
 # gnopm's assembly of package versions that no longer exist in the working

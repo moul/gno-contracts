@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/vm/bfdemo/v0"
+gno = "0.9"
+private = true

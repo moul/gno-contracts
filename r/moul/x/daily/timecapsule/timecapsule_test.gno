@@ -4,14 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
 func resetState() {
-	capsules = avl.Tree{}
-	nextID = 0
+	capsules = store.Named("capsule")
 }
 
 func TestLeaveAndReveal(cur realm, t *testing.T) {
@@ -19,14 +18,16 @@ func TestLeaveAndReveal(cur realm, t *testing.T) {
 	alice := testutils.TestAddress("alice")
 	testing.SetRealm(testing.NewUserRealm(alice))
 
+	// v1 ids start at 1: the store never assigns 0, so the zero id stays
+	// usable as "absent". v0 handed out 0 for the first capsule.
 	id := Leave(cross(cur), "hello, future", 5)
-	uassert.Equal(t, int64(0), id)
+	uassert.Equal(t, int64(1), id)
 
 	if got := Render(""); !strings.Contains(got, "1 still sealed") {
 		t.Fatalf("expected capsule to still be sealed, got: %s", got)
 	}
-	if got := Render("sealed"); !strings.Contains(got, "capsule/0") {
-		t.Fatalf("expected capsule 0 listed as sealed, got: %s", got)
+	if got := Render("sealed"); !strings.Contains(got, "capsule/1") {
+		t.Fatalf("expected capsule 1 listed as sealed, got: %s", got)
 	}
 
 	testing.SkipHeights(5)
@@ -34,8 +35,13 @@ func TestLeaveAndReveal(cur realm, t *testing.T) {
 	if got := Render(""); !strings.Contains(got, "hello, future") {
 		t.Fatalf("expected capsule to be revealed, got: %s", got)
 	}
-	if got := Render("capsule/0"); !strings.Contains(got, "hello, future") {
+	if got := Render("capsule/1"); !strings.Contains(got, "hello, future") {
 		t.Fatalf("expected capsule detail to reveal message, got: %s", got)
+	}
+
+	// Id 0 is never assigned, so the path is rejected rather than looked up.
+	if got := Render("capsule/0"); !strings.Contains(got, "Invalid capsule id") {
+		t.Fatalf("expected capsule/0 to be rejected, got: %s", got)
 	}
 }
 
