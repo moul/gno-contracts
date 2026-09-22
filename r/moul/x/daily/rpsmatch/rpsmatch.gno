@@ -11,6 +11,7 @@ import (
 	"chain"
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -208,24 +209,9 @@ func renderHome() string {
 	return b.String()
 }
 
-// escapeInline neutralizes markdown-active characters in untrusted text
-// before it's embedded inline in Render output.
-func escapeInline(s string) string {
-	r := strings.NewReplacer(
-		"\\", "\\\\",
-		"`", "\\`",
-		"*", "\\*",
-		"_", "\\_",
-		"[", "\\[",
-		"]", "\\]",
-		"|", "\\|",
-	)
-	return r.Replace(s)
-}
-
 func renderPlayer(rawAddr string) string {
 	addr := strings.TrimSpace(rawAddr)
-	safe := escapeInline(addr)
+	safe := ui.Inline(addr)
 
 	v := players.Get(addr)
 	if v == nil {

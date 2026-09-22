@@ -102,3 +102,11 @@ func TestDraw(cur realm, t *testing.T) {
 	uassert.True(t, g.draw, "should be a draw")
 	uassert.Equal(t, 0, g.winner)
 }
+
+// The store's labelled MustGet names the game v0's "game not found" left out.
+func TestMoveOnAMissingGameNamesIt(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(alice))
+	uassert.AbortsWithMessage(t, cur, "game #999999 not found", func() {
+		Move(cross(cur), 999999, 0)
+	})
+}

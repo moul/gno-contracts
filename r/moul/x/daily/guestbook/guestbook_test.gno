@@ -4,14 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 )
 
 // resetState clears package globals between tests (globals persist across
 // test functions in the same package binary).
 func resetState() {
-	entries = avl.NewTree()
-	count = 0
+	entries = store.Named("guestbook: entry")
 }
 
 func TestAddEntryAppendsAndCounts(t *testing.T) {
@@ -42,12 +41,12 @@ func TestAddEntryAppendsAndCounts(t *testing.T) {
 func TestRenderNewestFirst(t *testing.T) {
 	resetState()
 
-	addEntry("g1alice", "AAA-oldest", 1)
-	addEntry("g1alice", "BBB-newest", 2)
+	addEntry("g1alice", "AAA oldest", 1)
+	addEntry("g1alice", "BBB newest", 2)
 
 	out := Render("")
-	iNew := strings.Index(out, "BBB-newest")
-	iOld := strings.Index(out, "AAA-oldest")
+	iNew := strings.Index(out, "BBB newest")
+	iOld := strings.Index(out, "AAA oldest")
 	if iNew < 0 || iOld < 0 {
 		t.Fatalf("both messages must appear; got:\n%s", out)
 	}
@@ -76,23 +75,31 @@ func TestEmptyMessagePanics(t *testing.T) {
 	addEntry("g1alice", "   ", 1)
 }
 
-func TestEscapeCell(t *testing.T) {
-	cases := []struct {
-		in, want string
-	}{
-		{"plain", "plain"},
-		{"a|b", "a\\|b"},
-		{"line1\nline2", "line1 line2"},
+// A message must not be able to break out of its table cell. The escaping now
+// lives in ui.Cell, so this asserts the realm's rendered output rather than a
+// local helper.
+func TestRenderEscapesMessage(t *testing.T) {
+	resetState()
+	defer resetState()
+	addEntry("g1manfred47kzduec920z88wfr64ylksmdcedlf5", "a|b", 1)
+	out := Render("")
+	if strings.Contains(out, "| a|b |") {
+		t.Errorf("an unescaped pipe would open a column:\n%s", out)
 	}
-	for _, tc := range cases {
-		if got := escapeCell(tc.in); got != tc.want {
-			t.Errorf("escapeCell(%q) = %q, want %q", tc.in, got, tc.want)
-		}
+	if !strings.Contains(out, `a\|b`) {
+		t.Errorf("message should appear escaped:\n%s", out)
 	}
 }
 
+// v1 asserted that its own seqKey() ordered numerically. That held only below
+// its width of 16: seqKey(10^16) is 17 characters and sorts before
+// seqKey(10^16-1). The store key is 8 bytes for every id, so there is no
+// ceiling to reach.
 func TestSeqKeyOrders(t *testing.T) {
-	if a, b := seqKey(2), seqKey(10); !(a < b) {
-		t.Errorf("seqKey(2)=%q should sort before seqKey(10)=%q", a, b)
+	if a, b := store.ID(2).Key(), store.ID(10).Key(); !(a < b) {
+		t.Error("id 2 should sort before id 10")
+	}
+	if a, b := store.ID(9999999999999999).Key(), store.ID(10000000000000000).Key(); !(a < b) {
+		t.Error("ordering should survive one past v1's width-16 ceiling")
 	}
 }

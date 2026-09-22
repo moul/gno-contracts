@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -149,11 +150,11 @@ func Render(path string) string {
 	deals.Iterate("", "", func(_ string, v interface{}) bool {
 		d := v.(*Deal)
 		b.WriteString("| " + strconv.Itoa(d.ID) +
-			" | " + short(d.Creator) +
-			" | " + short(d.Counterparty) +
+			" | " + ui.Addr(d.Creator) +
+			" | " + ui.Addr(d.Counterparty) +
 			" | " + d.State +
 			" | " + confs(d) +
-			" | " + escapePipe(d.Terms) + " |\n")
+			" | " + ui.Cell(d.Terms) + " |\n")
 		return false
 	})
 	return b.String()
@@ -185,16 +186,4 @@ func yn(b bool) string {
 		return "confirmed"
 	}
 	return "pending"
-}
-
-func short(a address) string {
-	s := a.String()
-	if len(s) <= 12 {
-		return s
-	}
-	return s[:8] + "…" + s[len(s)-4:]
-}
-
-func escapePipe(s string) string {
-	return strings.ReplaceAll(s, "|", "\\|")
 }

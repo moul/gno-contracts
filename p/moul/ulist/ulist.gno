@@ -22,14 +22,14 @@
 // * No balancing needed
 // * Memory efficient
 // * Natural support for range queries
-// * Support for soft deletion of elements
+// * Support for soft deletion of elements, and index-preserving compaction of
+//   what those deletions leave behind (see compact.gno)
 // * Forward and reverse iteration capabilities
 // * Offset-based iteration with count control
 package ulist
 
 // TODO: Make avl/pager compatible in some way. Explain the limitations (not always 10 items because of nil ones).
 // TODO: Use this ulist in moul/collection for the primary index.
-// TODO: Consider adding a "compact" method that removes nil nodes.
 // TODO: Benchmarks.
 
 import (

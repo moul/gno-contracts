@@ -1,350 +1,331 @@
-# AGENTS.md — working in moul/gno-contracts
+# AGENTS.md: working in moul/gno-contracts
 
-This repository holds **moul's personal gno.land contracts** (`p/moul/*` packages
-and `r/moul/*` realms). It is optimized so a human or a coding agent can build,
-test, lint, and publish everything from a single clone. Read this file fully
-before making changes.
+moul's personal gno.land contracts, `p/moul/*` packages and `r/moul/*` realms, built,
+tested, linted and published from a single clone. Read this file before changing anything.
+[CLAUDE.md](./CLAUDE.md) is the one-line-per-rule index of it.
 
 ## The three rules
 
-1. **Everything is versioned, starting at `v0`; bump only on a compatibility
-   change.** Every contract path ends in an explicit version segment —
-   `gno.land/{p,r}/moul/<name>/v0` (then `v1`, `v2`, …). There is *no*
-   un-versioned contract, ever, and **the version is always the LAST path
-   element**: `gno.land/p/moul/ulist/lplist/v0`, never
-   `gno.land/p/moul/ulist/v0/lplist`. That is the PACKAGE path; the directory
-   is `p/moul/ulist/lplist` and carries no version at all.
-   - **`v0` is the first version of any path**, per gno's own convention
-     (gnolang/gno#5220): *initial, unaudited*. New contracts start there.
-   - **The version lives in `gnomod.toml`, not in the directory name.**
-     `p/moul/md/` declaring `module = "gno.land/p/moul/md/v1"` publishes to
-     `gno.land/p/moul/md/v1`. The gno toolchain resolves a workspace import
-     from the module line and ignores the directory path.
-   - **Bump** with `gnopm bump <name>` for a **compatibility /
-     breaking change**: removing, renaming, or changing the signature or
-     on-chain behavior of an existing exported symbol, or changing storage
-     layout / the backing data structure (e.g. swapping `avl` → `bptree`).
-     Never make such a change in place on a published version, and **never
-     create a `vN` directory or copy a package to bump it**: the copy is
-     invisible to git, so the review diff of the change that most needs
-     reviewing is a pile of added files with no content diff.
-     `bump` rewrites the one line and pins the outgoing version in
-     `gnomod.lock`; you then edit the files in place and git diffs them.
-   - **Edit in place** for everything **non-breaking**: adding new
-     exported functions, unit tests, comments, README/docs. (Test files and
-     READMEs are not part of the deployed package, so they never change its
-     on-chain hash; adding a function is backward-compatible.)
-   - **A superseded version has no directory.** It is pinned in `gnomod.lock`
-     to the commit that still holds it, rebuilt into the gitignored `.gnopm/`
-     by `gnopm sync` (which `make lint`/`make test` do for you), and it is
-     still linted, tested and listed in the catalog. Anything importing
-     `.../md/v0` keeps resolving. See [`tools/gnopm`](./tools/gnopm).
-   - **Mirrored `v0`s are frozen.** For the twelve packages that also live in
-     `gnolang/gno` examples (see *Drift & monorepo relationship*), every `.gno`
-     file and the `gnomod.toml` are a **byte-for-byte copy** of the monorepo's
-     and are **never hand-edited** — not a comment, not a test. That is what lets
-     `make sync` treat any diff as real upstream drift. Anything we want to
-     change goes in a new `v1`. The only file we add is `README.md`, which is not
-     part of the deployed package and is excluded from the drift comparison.
-2. **The repo is autonomous.** It builds with only a gno toolchain (`$GNOROOT`)
-   plus what is in this repo. Local `gno.land/p/moul/*` imports resolve through
-   the workspace (`gnowork.toml`); external `gno.land/*` deps are **vendored**
-   under `vendor/` (committed). Never introduce a dependency that only resolves
-   from `$GNOROOT/examples` — vendor it (`make deps`).
-3. **The catalog is generated on `main`, not in PRs.** `contracts.json`, the
-   README table, per-package README footers, and `_assets/` graphs are all
-   produced by the tools. **A PR carries only package SOURCE** — never run
-   `make gen` or commit those generated files in a branch/PR. The `main`
-   workflow regenerates them, refreshes on-chain status and commits the lot on
-   `main` after every merge (and hourly); committing them in a PR only creates
-   conflicts. (CI does **not** run `make check`, but it does reject a PR that
-   carries a generated file: `gnocontracts guard-generated`.)
+**1. The version is the `module` line, and it never lives in a directory name.**
+
+Every package path ends in `/vN`: `gno.land/p/moul/ulist/lplist/v0`, never
+`.../ulist/v0/lplist`. The directory is `p/moul/ulist/lplist` and carries no version at
+all, so `p/moul/md/` declaring `module = "gno.land/p/moul/md/v1"` publishes to
+`gno.land/p/moul/md/v1`. The toolchain resolves a workspace import from that line and
+ignores the path.
+
+- **New contracts start at `v0`**, gno's own convention for *initial, unaudited*
+  ([gnolang/gno#5220](https://github.com/gnolang/gno/issues/5220)).
+- **A breaking change is `gnopm bump <name>`**: removing or renaming an exported symbol,
+  changing its signature or on-chain behavior, or swapping the backing storage
+  (`avl` to `bptree`). `bump` rewrites the module line and pins the outgoing version in
+  `gnomod.lock`; you then edit the files in place and git diffs the change.
+  **Never create a `vN` directory and never copy a package to bump it.** git pairs
+  nothing across a copy, so the review diff of the change that most needs reviewing
+  becomes a pile of added files with no content diff. One port of 25 realms landed as
+  +11,103 / 0 across 112 files that way.
+- **Everything non-breaking edits the current version in place**: new exported functions,
+  tests, comments, docs. Tests and READMEs are not part of the deployed package, so they
+  never change its on-chain hash.
+- **A superseded version has no directory.** It is pinned in `gnomod.lock` to a commit
+  that still holds it and rebuilt into the gitignored `.gnopm/`, so anything importing
+  `.../md/v0` still resolves, lints and tests. See [gnopm](https://github.com/moul/gnopm).
+- **The one unversioned path is `r/moul/home`.** gnoweb serves `gno.land/u/<username>` by
+  calling `Render("")` on the realm at exactly `/r/<username>/home`
+  (`gno.land/pkg/gnoweb/handler_http.go`, `GetUserView`: built by string concatenation,
+  with no version resolution anywhere in the lookup), so a `/v0` would publish where
+  `/u/moul` never looks. The bare module line is an interface with gnoweb, which is why
+  `gnopm bump` refuses the package: there is no `/vN` to increment. It versions inside
+  instead, content in mutable storage and `private = true` in `gnomod.toml` so the code
+  can be replaced in place. Do not generalise this without an external consumer that
+  hard-codes the path.
+- **The twelve mirrored `v0` are frozen.** For the packages that also live in
+  `gnolang/gno` examples (see *Drift*), every `.gno` file and the `gnomod.toml` is a
+  byte-for-byte copy of the monorepo's and is **never hand-edited**, not a comment, not a
+  test. That is what lets `make sync` treat any diff as real upstream drift. Changes go
+  in a new `v1`. `README.md` is the one file we add, and it is excluded from the compare.
+
+**2. The repo is autonomous.** It builds with a gno toolchain (`$GNOROOT`, stdlibs only)
+plus what is committed here. Local `gno.land/{p,r}/moul/*` imports resolve through the
+workspace (`gnowork.toml`); external `gno.land/*` deps are vendored under `vendor/`.
+Never introduce a dependency that only resolves from `$GNOROOT/examples`: vendor it with
+`make deps`.
+
+**3. A pull request carries only source**, plus `gnomod.lock` when a version changed.
+`contracts.json`, the README contracts table, per-package README footers and `_assets/`
+graphs are written on `main` by the `main` workflow after every merge and hourly. Never
+run `make gen` in a branch: it only creates a conflict, and CI's `guard-generated` step
+rejects a pull request that carries one. (CI does not run `make check`.)
 
 ## Repository map
 
 ```
-p/moul/<name>/          pure package   → gno.land/p/moul/<name>/vN
-r/moul/<name>/          realm          → gno.land/r/moul/<name>/vN
-                        (vN comes from gnomod.toml, not from the path)
+p/moul/<name>/          package   -> gno.land/p/moul/<name>/vN  (vN from gnomod.toml)
+r/moul/<name>/          realm     -> gno.land/r/moul/<name>/vN
 vendor/gno.land/...     vendored external deps (committed)
-tools/gnocontracts/     Go maintenance CLI, run via `go tool gnocontracts` (see below)
-tools/gnopm/            versions, gnomod.lock and the .gnopm/ assembly
-tools/internal/gnomod/  the gnomod.lock format, shared by both tools
-contracts.json          catalog: source of truth for the README table + publish
+tools/gnocontracts/     the maintenance CLI: go -C tools tool gnocontracts help
+tools/gnohome/          Go companion driving r/moul/home
+tools/gnopublish/       the simulation-based publisher (its own module)
+contracts.json          catalog, generated on main
 gnomod.lock             where each version's source is (SOURCE, a PR carries it)
-gnowork.toml            empty workspace marker (enables local resolution)
+gnowork.toml            workspace marker (enables local resolution)
 .gnopm/                 superseded versions, rebuilt from history (gitignored)
-Makefile                task entrypoints
-.github/workflows/    ci (the gate), pr (one bot comment + preview), main (regen)
-.github/actions/      setup-gno, previews-sync, pr-comment — shared by those workflows
+.gnoroot-view/          stdlib-only image of GNOROOT (gitignored, see below)
+Makefile                one line per target; `make help` groups them
+.github/workflows/      ci (the gate), pr (comment + preview), main (regen)
+.github/actions/        setup-gno, previews-sync, pr-comment
 ```
 
-## Toolchain & environment
+## Toolchain and environment
 
-- `GNOROOT` must point at a `gnolang/gno` checkout (provides the gno binary's
-  stdlibs). CI builds gno from `master`; locally, set it to your checkout.
-- The gno version convention is `gno = "0.9"` in every `gnomod.toml`, built
-  against gno **master** (the sapphire-era API: `chain`, `chain/runtime`,
-  `chain/banker`, `gno.land/p/nt/avl/v0`, …). State-mutating exported realm
-  functions are crossing functions (first parameter `cur realm`).
+`GNOROOT` must point at a `gnolang/gno` checkout. CI builds gno from `master`. Every
+`gnomod.toml` declares `gno = "0.9"`, built against master (the sapphire-era API:
+`chain`, `chain/runtime`, `chain/banker`, `gno.land/p/nt/avl/v0`). State-mutating
+exported realm functions are crossing functions, first parameter `cur realm`.
 
-### Where gno differs from Go (these have each broken CI)
+`make help` lists every target, grouped. `make lint test` is the gate; add
+`PKG=<substring>` to narrow any of them to one package.
 
-gno is close enough to Go that Go habits compile in your head and fail in CI.
-The ones that have actually bitten this repo:
+**Nothing reads `$GNOROOT` directly.** `gnocontracts gno` builds `.gnoroot-view/`, a
+symlink image of the checkout whose `examples/` is empty, and points the toolchain at
+that. gno resolves a `gno.land/*` import from `GNOROOT/examples` before anywhere else, so
+without the view every lint, test and preview would silently pick up whatever the
+monorepo checkout held that day rather than the copy committed under `vendor/`.
 
-- **`avl/v0`'s `Get` returns ONE value**, not `(value, ok)`. A miss is a nil
-  interface, so it is `v := t.Get(k); if v == nil { … }`. Writing
-  `v, ok := t.Get(k)` is `assignment mismatch: 2 variables but Get returns 1
-  value` — it turned `r/moul/x/daily/asciiart/v0` red. The comma-ok form IS
-  right on the *type assertion* of the result: `p, ok := t.Get(k).(*poll)`.
-- **`sort.Slice` does not exist.** gno's `sort` has `Sort(Interface)` and the
-  `Search*` helpers only, so ordering needs an explicit `sort.Interface`. Break
-  ties deterministically (e.g. on address) — a `Render` that reshuffles between
-  identical calls is a bug, and gno map iteration order is unspecified, so never
-  iterate a map to build output.
-- **`testing.SkipHeights` is RELATIVE and there is no `testing.Height`.** There
-  is no absolute height setter, so tests must drive block height forward from
-  wherever the previous test left it and never assert an absolute height or
-  derived value — ask the realm (e.g. a `Day()` helper) instead.
-- **`ufmt` supports NO width or padding flags.** `ufmt.Sprintf("%03d", 7)`
-  returns `"7"`, not `"007"` — silently, with no error. This matters for avl
-  keys: unpadded numeric keys sort `"0","1","10","11","2"`, so anything keyed
-  that way silently loses insertion order past nine entries. Pad by hand (see
-  `padIdx` in `r/moul/demo/importdemo/v0`).
+### Where gno differs from Go (each of these has broken CI)
+
+- **`avl/v0`'s `Get` returns ONE value**, not `(value, ok)`. A miss is a nil interface:
+  `v := t.Get(k); if v == nil { … }`. `v, ok := t.Get(k)` is `assignment mismatch: 2
+  variables but Get returns 1 value`, and it turned `r/moul/x/daily/asciiart` red. The
+  comma-ok form *is* right on the type assertion: `p, ok := t.Get(k).(*poll)`.
+- **…and `Remove` returns TWO**, `(value, removed)`, which is the opposite rule on the
+  neighbouring method of the same tree. `if !t.Remove(k)` is `multiple-value
+  t.Remove(k) in single-value context`; write `if _, removed := t.Remove(k); !removed`.
+  Caught by lint in `r/moul/faucet`. Knowing the `Get` rule is what makes this one land,
+  so the two belong next to each other.
+- **`sort.Slice` does not exist.** gno's `sort` has `Sort(Interface)` and the `Search*`
+  helpers only, so ordering needs an explicit `sort.Interface`. Break ties
+  deterministically (on address, say): a `Render` that reshuffles between identical calls
+  is a bug, and gno map iteration order is unspecified, so never iterate a map to build
+  output.
+- **`testing.SkipHeights` is RELATIVE and there is no `testing.Height`.** No absolute
+  height setter exists, so tests drive the height forward from wherever the previous test
+  left it and never assert an absolute height or anything derived from one. Ask the realm
+  instead (a `Day()` helper).
+- **`ufmt` supports NO width or padding flags.** `ufmt.Sprintf("%03d", 7)` returns `"7"`,
+  silently. That matters for avl keys: unpadded numeric keys sort `"0","1","10","11","2"`,
+  so anything keyed that way loses insertion order past nine entries. Pad by hand
+  (`padIdx` in `r/moul/demo/importdemo`).
 - **`uassert.AbortsContains` takes a `func()`, not a `func(realm)`.** With the
-  `func(realm)` form the helper does its own `cross(rlm)` first, which consumes
-  the pending `testing.SetRealm`, so the abort under test runs with the realm
-  itself as caller and every authorization assertion fails with `unauthorized`
-  instead of the error you meant to pin. Use a no-arg closure that crosses with
-  the outer `cur`, as `r/moul/x/wesh/v0` and `r/moul/forge/v0` do:
+  `func(realm)` form the helper does its own `cross(rlm)` first, which consumes the pending
+  `testing.SetRealm`, so the abort under test runs with the realm itself as caller and
+  every authorization assertion fails with `unauthorized` instead of the error you meant to
+  pin. Use a no-arg closure that crosses with the outer `cur`, as `r/moul/x/wesh` and
+  `r/moul/forge` do:
   `uassert.AbortsContains(t, cur, "stale ref", func() { SetRef(cross(cur), …) })`.
+- **`recover()` cannot catch a panic from a crossing call.** A panic raised across
+  `cross(cur)` is a realm abort and a `defer`/`recover()` in the caller never fires, even
+  when the test is in the realm's own package: the test dies with
+  `unexpected panic: <message>`. Assert a refusal with
+  `uassert.AbortsWithMessage(t, cur, "msg", func() { F(cross(cur), …) })` (or
+  `AbortsContains`) from `gno.land/p/nt/uassert/v0`. Break the expected message once and
+  watch it fail, or you cannot tell it from a silent pass.
+- **A filetest's `// PKGPATH:` must end in a path element literally named `main`.**
+  `gno.land/r/moul/x/plan9/nstest` fails to build with `package name "main" does not
+  match path element "nstest"`; `…/plan9/main` works. Anything `println`ed before an
+  abort is dropped, so an aborting filetest gets an `// Error:` block and no `// Output:`.
+- **A read with no `cur realm` sees the CALLER as `unsafe.CurrentRealm()`, not itself.**
+  Such a function is borrowed: gno opens no realm frame for it, so a plain read exported by
+  one realm and called by another reports the caller's path. That is what makes a
+  zero-argument helper on a shared realm possible at all
+  (`config.TopBlock()`, `config.IsPaused()`), and it reverses the moment the function
+  grows a `cur realm` parameter, at which point it silently starts reporting its own realm
+  for every caller. Measured 2026-09-22 from `r/moul/config/v1`, called by a code realm at
+  `gno.land/r/test/caller`: `CurrentRealm=gno.land/r/test/caller`,
+  `PreviousRealm=gno.land/r/moul/config/v1`. A paired `…For(pkgPath)` variant is the
+  escape hatch for crossing functions, and `r/moul/config/blocks_test.gno` pins the rule.
+  Never branch on it for authorisation either way: it is `unsafe` for that reason.
 
-- **`recover()` cannot catch a panic from a crossing call.** A panic raised
-  across `cross(cur)` is a realm *abort*, and a `defer`/`recover()` in the
-  caller never fires: the test just dies with `unexpected panic: <message>`.
-  This holds even when the test is in the realm's own package. Assert a refusal
-  with `uassert.AbortsWithMessage(t, cur, "msg", func() { F(cross(cur), …) })`
-  (or `AbortsContains`) from `gno.land/p/nt/uassert/v0`, which is also the form
-  this file ranks above a filetest. Check it is not a silent pass by breaking
-  the expected message once and watching it fail.
-- **A filetest's `// PKGPATH:` must end in a path element literally named
-  `main`.** `gno.land/r/moul/x/plan9/nstest` fails to build with
-  `package name "main" does not match path element "nstest"`; `…/plan9/main`
-  works. Anything `println`ed before an abort is dropped, so an aborting
-  filetest gets an `// Error:` block and no `// Output:` block at all.
-
-When a new divergence costs a red CI, add it here: this file is pulled by the
-daily build agent before every generation, so a line here stops the next repeat.
-
-## Common tasks
-
-```sh
-make help      # list targets
-make test      # gno test every contract
-make lint      # gno lint every contract
-make deps      # vendor external gno.land deps into vendor/
-make gen       # refresh contracts.json + README table  (bot runs this on main; local preview only)
-make check     # verify the catalog is not stale (used by the main regen bot, NOT PR CI)
-make sync      # report drift vs the gnolang/gno monorepo
-make publish NET=sapphire CHECK=1   # dependency-ordered publish plan + on-chain status
-make publish NET=pearl CHECK=1      # …same, against the other testnet
-```
-
-### Networks
-
-**`mainnet` — chain-id `gnoland-1`**, launched 2026-09-12T15:00:00Z from the
-`chain/mainnet` tag (commit `9c8eb132e`). A fresh chain, not a hardfork of
-betanet. `rpc.gno.land` / gnoweb at `gno.land`. It **replaced** the old `betanet`
-row, which named the same endpoint with chain-id `gnoland1` — a different chain,
-so that row probed mainnet under the wrong label and would have signed publishes
-for a chain-id the node rejects.
-
-Two things make mainnet unlike the testnets:
-
-- **Publishing is not immediate.** The inert code-submission policy is on from
-  block 1: a post-genesis `MsgAddPackage` parks until the funded gpao approvals
-  oracle clears it. Budget for that; a publish that "succeeds" is queued, not live.
-- **Paths there are permanent.** The `moul` namespace is registered at genesis,
-  and nine of our mirrored `p/moul/*/v0` are already deployed as transitive deps
-  of the genesis set (`addrset` `authz` `fifo` `helplink` `md` `mdtable` `once`
-  `realmpath` `txlink`). Those nine are frozen upstream artifacts — never publish
-  over them; changes go in a `v1` here. `dynreplacer`, `typeutil` and `ulist` are
-  the three mirrors NOT at genesis.
-
-### Publishing: keep the client at the chain's revision
-
-`tools/gnopublish` builds against a **local gno checkout** — `go.mod` carries a
-`replace github.com/gnolang/gno => ../../../../gnoland/gno`, so it silently
-compiles against whatever revision that working tree happens to sit at. There is
-no version pin to warn you.
-
-When the chain is ahead of that checkout, the first symptom is an opaque amino
-error from the account query, e.g. mainnet adding `vesting` to `std.BaseAccount`:
-
-```
-error: query account g1…: unknown JSON field "vesting" for type std.BaseAccount
-```
-
-Fix: move that checkout to the revision the chain runs — for mainnet the
-`chain/mainnet` tag — and re-run. `gnopublish` now annotates this specific
-failure with that instruction, and performs the account query **before**
-prompting for the gnokey password, so a stale client costs nothing.
-
-Two live testnets, both on gno `v1.0.0-rc.0` and interchangeable as publish
-targets — `sapphire` (`sapphire-1`) and `pearl` (`pearl-1`). Each exposes the
-same host pattern: `rpc.<net>.testnets.gno.land`, gnoweb at
-`<net>.testnets.gno.land`, and an agent faucet at
-`faucet-agent.<net>.testnets.gno.land` (`/fund` is POST-only; `/limits` reports
-the grant and the per-address window — the bare root has no index route and
-404s, which says nothing about the faucet being up).
-
-The network list is **code-owned**: edit `defaultNetworks()` in
-`tools/gnocontracts/model.go`. `manifest` reconciles `contracts.json` against
-it, so the change lands via the `main` workflow — hand-editing the catalog
-can't work, the `guard-generated` CI step rejects PRs that touch it.
+When a new divergence costs a red CI, add it here. This file is pulled by the build agent
+before every generation, so a line here stops the next repeat.
 
 ## Adding a contract
 
-1. Create `p/moul/<name>/` or `r/moul/<name>/` (**no `/v0` in the directory**)
-   with a `gnomod.toml`:
+1. Create `p/moul/<name>/` or `r/moul/<name>/`, **no `/v0` in the directory**, with a
+   `gnomod.toml`. A `p/` package is versioned and published, and never private:
    ```toml
-   module = "gno.land/{p|r}/moul/<name>/v0"
+   module = "gno.land/p/moul/<name>/v0"
    gno = "0.9"
    ```
-   New contracts always start at `v0` (rule 1). The only paths that start at
-   `v1` are successors to a `v0` the monorepo owns.
-2. Add sources + tests. Prefer table-driven tests; realms should have a `Render`.
-3. If it imports an external `gno.land/*` package, run `make deps` to vendor it.
-4. `gnopm sync` to add it to `gnomod.lock`, then `make lint test` until green.
-5. **Commit the new source files** (the contract directory) **and
-   `gnomod.lock`**. The lock is source, not a generated artifact: CI checks it
-   with `make verify`. Do **not** run `make gen` and do **not** stage
-   `contracts.json`, `README.md`, or `_assets/` — the `main` workflow
-   generates those after merge. (You can run `make gen` locally to
-   preview the catalog, but revert it before committing.)
-6. Commit + open the PR.
+   A realm is private by default, so that you can redeploy it at this path later instead
+   of burning a `/v1`. `make guard-private` refuses one that says neither this nor why it
+   has to stay importable, and after the first deploy neither can be changed:
+   ```toml
+   module = "gno.land/r/moul/<name>/v0"
+   gno = "0.9"
+   private = true
+   ```
+2. Add sources and tests. Table-driven; realms need a `Render`.
+3. `make deps` if it imports an external `gno.land/*` package.
+4. `gnopm sync` to record it in `gnomod.lock`, then `make lint test` until green.
+5. Commit the contract directory **and `gnomod.lock`**. Do not stage `contracts.json`,
+   the root `README.md` or `_assets/` (rule 3). `make gen` previews the catalog locally;
+   revert it before committing.
 
 ## Bumping a contract
 
-```
+```sh
 gnopm bump <name>      # rewrites the module line, pins the old version
 # ...edit the files in place...
 make lint test
 ```
 
-`<name>` is a directory, a module path, or any unambiguous part of one, so
-`p/moul/md`, `gno.land/p/moul/md/v0` and `md` all work. `gnopm status` says
-where things stand, `gnopm sync` fixes whatever is out of date.
+`<name>` is a directory, a module path, or any unambiguous part of one, so `p/moul/md`,
+`gno.land/p/moul/md/v0` and `md` all work. `gnopm status` says where things stand,
+`gnopm sync` fixes whatever is out of date. Commit the source edit and `gnomod.lock`
+together: the directory never moves and nothing is copied, so the diff is the
+compatibility change itself.
 
-Commit the source edit **and** `gnomod.lock` together. The directory never
-moves and nothing is copied, so the diff is the compatibility change itself.
+`bump` refuses to run on a package with uncommitted changes, because it records the
+commit that still holds the outgoing version and a dirty directory would make that record
+a lie. It pins to a commit already on `origin/main` where it can: this repository
+squash-merges, so a pin to a feature branch's HEAD would dangle the moment it lands.
 
-`bump` refuses to run when the package has uncommitted changes: it records the
-commit that still holds the outgoing version, and a dirty directory would make
-that record a lie. It also pins to a commit already on `origin/main` where it
-can, because this repository squash-merges and a pin to a feature branch's HEAD
-would dangle the moment the PR lands.
+### `private = true` is the default for every `r/`, and the guard asks before you ship
 
-### Libraries vs. demos — split reusable logic into `p/` + `r/`
+A realm whose `gnomod.toml` says `private = true` can be **redeployed at the same
+path by its original creator**, instead of being abandoned for a `vN+1`. Everything
+else about it is a one-way door, so this is decided once, before the first publish.
 
-When a contract is **reusable logic** (a codec, algorithm, data structure,
-utility — most `x/daily/*` ports fall here), don't ship it as a single realm.
-Split it into two contracts:
+Measured on `gnolang/gno@master` with the integration harness, 2026-09-22, not inferred:
 
-- a **pure library** `p/moul/<…>/<name>/vN` — the reusable API as exported
-  types/functions, with no realm-global state and no chain imports where they
-  can be avoided (the caller supplies context such as the block height or the
-  address). Unit-tested (table-driven).
-- a **thin demo realm** `r/moul/<…>/<name>demo/vN` — imports the library, wires
-  it to the chain (`runtime.ChainHeight()`, `unsafe.PreviousRealm()`, package-
-  level state) and shows it off through `Render`. **No logic of its own.**
+| across a redeploy | |
+|---|---|
+| the code | replaced |
+| coins at the realm address | **kept** (probe: 700000ugnot before and after) |
+| every package-level variable | **wiped**, back to its initializer (probe: a counter at 3 read 0) |
+| storage deposit | accumulates. Prior objects are not evicted and nothing can free them, so each redeploy is charged in full and refunds nothing |
 
-The two must **cross-reference each other** in both the package doc-comment and
-the README: the library links to its demo ("Live demo: `r/…`"), the demo says it
-is a demo of the library ("Demo of the `p/…` library"). Worked examples:
-`p/moul/x/daily/b58` + `r/moul/x/daily/b58demo` (#53); `p/moul/x/daily/ratelimit`
-+ `r/moul/x/daily/ratelimitdemo` (#50).
+And the constraints, from `checkGnomodConstraints` and `checkRedeployPermission` in
+`gno.land/pkg/sdk/vm/keeper.go`:
 
-Only keep a lone realm when the contract is inherently a stateful app with
-nothing reusable to extract.
+- **Public cannot become private, private cannot become public.** Both are refused, so
+  the realms already on chain can never convert either way.
+- **Only `addpkg.creator` may redeploy.** Not the namespace owner, the original signer.
+- **No other realm may import it**, hold a reference to its objects, or retain a value
+  of a type it defines. The import is refused by the type checker (`ImportPrivateError`).
+  The other two are a *runtime* panic out of `assertObjectIsPublic`, `cannot persist
+  object from the private realm <path>`, so `gno lint` is blind to them and only a test
+  that actually exercises the cross-realm call finds them. `r/moul/x/plan9/dev` is the
+  worked example: it posts its own tree into `r/moul/x/plan9/ns`, lints clean as private,
+  and panics on the first `gno test`.
+- `private` is realm-only: a `p/` package declaring it is refused. `p/` is versioned and
+  published, always, and that is the whole difference between the two trees.
+- Reading it from outside is unaffected: `vm/qrender` and `vm/qeval` work normally.
+- On mainnet a redeploy is a `MsgAddPackage`, so it **parks like any other** and waits
+  for an approver. "Replaceable" is not "hot-patchable".
 
-> This convention grows from moul's PR feedback. When moul gives new guidance on
-> how to structure a contract, record it **here** (and in `CLAUDE.md`) so the
-> next contract follows it from the start — the contract-building agent rereads
-> these files each time.
+**So every new realm gets `private = true`, and one that must stay importable says why.**
+The default is not a claim that replacing beats versioning in general. It is a claim about
+which mistake is cheaper: a realm that shipped private and wanted to be imported is one
+line and a `vN+1`, while a realm that shipped public and wanted a fix is a new path, a
+migration, and coins stranded at the old address. The second is what `r/moul/faucet` got,
+by two minutes.
 
-## The maintenance CLI (`tools/gnocontracts`)
+The opt-out is a comment, and the reason is the point:
 
-A dependency-free Go tool declared in `go.mod` (`tool` directive) and invoked as
-`go tool gnocontracts <cmd>` — **never** built into a committed binary. Also
-driven by the Makefile. Subcommands:
+```toml
+module = "gno.land/r/moul/x/plan9/ns/v0"
+gno = "0.9"
 
-- `manifest` — scan the trees, reconcile `contracts.json` (preserves
-  `description`, `draft`, `published`).
-- `readme` — regenerate the README table from `contracts.json`.
-- `gen` — `manifest` + `readme`.
-- `check` — `gen` then fail on any diff (CI drift guard).
-- `vendor` — copy external `gno.land/*` deps (transitively) into `vendor/`.
-- `sync` — diff our contracts against the monorepo copy at the SAME path and
-  report drift / ours / new-here / monorepo-only.
-- `publish` — topologically order contracts by dependency; with `-net`/`-check`,
-  query the chain (`gnokey query vm/qfile`) and record upload status.
-- `status` — refresh that status for every network at once. A chain that does
-  not answer is SKIPPED, not recorded as hosting nothing (see below).
-- `pr` — everything CI needs about a pull request, from one diff: the sticky
-  comment body, the `gh pr edit` label arguments, the realms to preview.
-- `preview` — boot gnodev on the workspace and crawl the resulting gnoweb into
-  a self-contained static tree. `-all` renders every package (`make site`); a
-  `-changed` file list renders what a pull request touched plus every package
-  that imports it (`make preview`). See *Previews* below.
-- `guard-examples`, `guard-render`, `guard-generated` — the CI guards. They read
-  `.gno` with `go/scanner`, so `// Output:` inside a string literal and an
-  identifier like `printRender` no longer fool them (both did, as regexps).
+# public: imported by r/moul/x/plan9/dev, which is what the pair is for
+```
 
-## Drift & monorepo relationship
+A comment rather than `private = false` because the gnomod field is `omitempty`: `false`
+and absent serialize the same, so a reader could not tell a decision from an oversight.
 
-Twelve `p/moul/*` packages also live in `gnolang/gno` under
-`examples/gno.land/p/moul/<name>/v0` — `addrset`, `authz`, `dynreplacer`,
-`fifo`, `helplink`, `md`, `mdtable`, `once`, `realmpath`, `txlink`, `typeutil`,
-`ulist`. Those paths ship in the **gnoland1 genesis set**, so their `v0` is
-owned by the monorepo and frozen forever. There is no `r/moul/*` upstream at
-all.
+`make guard-private` enforces it, and is part of `make guards`. It does not ask four kinds
+of realm, because for them the question is not open: archived (`ignore = true`), mirrored
+byte-for-byte from the monorepo, superseded (no directory), and **already live on mainnet
+at that exact module path**, where the chain has answered and will not take another answer.
 
-Our copy of each is a **byte-for-byte mirror at the same path**. `make sync`
-compares them position-for-position:
+What the guard cannot see is whether the copy the chain holds matches the flag in the file.
+`r/moul/faucet/v0` declares `private = true` and mainnet's copy at that path does not: the
+deploy landed at 14:56:06Z on 2026-09-22 and the flag was committed at 14:58:25Z. The realm
+is frozen public forever and the flag is decoration. Only the publish path can catch that
+shape, and it does not yet.
 
-- `[drift]` — the monorepo copy changed. Reconcile deliberately: re-sync the
-  mirror, or cut a `v1` here if we want to diverge. Never auto-overwrite.
-- `[ours]` — a version above the mirrored one (`addrset/v1`, `authz/v1`): our
-  own successor, nothing upstream to compare against.
-- `[new]` — the ~175 packages that exist only here.
-- `[miss]` — upstream has a `p/moul/*` we do not carry yet.
+The one thing that makes private genuinely safe is designing for the wipe: keep the durable
+part in something a redeploy does not touch (coins at the address, or a local source of
+truth you can push back) or accept losing it. `r/moul/home` does the first and says so in
+its own gnomod.
 
-Because the monorepo owns `v0` for those twelve, and only those twelve, a
-version number is meaningful across both repos: `p/moul/addrset/v1` is the
-second generation of a package whose first lives in `gnolang/gno`, while
-`p/moul/x/daily/b58/v0` is a first cut that only ever existed here.
 
-## Conventions
+### Reusable logic splits into a `p/` library and an `r/` demo
 
-- **Commits:** conventional, single-line (`feat(hello): …`, `fix: …`,
-  `chore(deps): vendor …`). Never add Claude/AI co-author trailers.
-- **Commit author:** `Manfred Touron <94029+moul@users.noreply.github.com>`
-  (the push-safe noreply identity).
-- **Go tools:** stdlib only, no third-party deps (keeps the repo autonomous).
-- **Never commit a compiled binary.** The CLI runs via `go tool gnocontracts`
-  (declared in `go.mod`); there is no build artifact in the tree.
-- **Never** hand-edit the region between the README table markers, or the
-  generated fields of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`,
-  `version`, `deps`).
+A codec, algorithm, data structure or utility (most `x/daily/*` ports) is never a single
+realm. It is:
 
-## Every realm MUST test its `Render` (example test)
+- a **pure library** `p/moul/<…>/<name>`: the reusable API, no realm-global state, no
+  chain imports where they can be avoided (the caller supplies the height, the address).
+  Unit-tested, table-driven.
+- a **thin demo realm** `r/moul/<…>/<name>demo`: imports the library, wires it to the
+  chain (`runtime.ChainHeight()`, `unsafe.PreviousRealm()`, package-level state) and
+  shows it through `Render`. **No logic of its own.**
 
-A realm's `Render(path)` is user-facing output — lock it down with a gno
-**example test** (`Example…` functions, gno's recent example-test feature). Put
-it in a normal `_test.gno` **in the realm's package** so it calls `Render`
-directly, no self-import (**especially demos**):
+The two cross-reference each other in both the package doc comment and the README: the
+library links to its demo ("Live demo: `r/…`"), the demo says what it demonstrates
+("Demo of the `p/…` library"). Worked examples: `p/moul/x/daily/b58` +
+`r/moul/x/daily/b58demo` (#53), `p/moul/x/daily/ratelimit` + `…/ratelimitdemo` (#50).
+
+Keep a lone realm only when the contract is inherently a stateful app with nothing
+reusable to extract.
+
+> This convention grows from moul's pull request feedback. When moul gives new guidance on
+> how to structure a contract, record it **here**, because the contract-building agent
+> rereads this file every time.
+
+### Go companions live in `tools/<name>/`
+
+A contract driven from a laptop (content pushed from local files, a generated payload, a
+state dump) ships a small Go program at **`tools/<name>/`**, registered in the `tool`
+block of `tools/go.mod` and run as `go -C tools tool <name>`. Worked example:
+`tools/gnohome`, which drives `r/moul/home`.
+
+Beside the contract would read better and is **not possible**. There is no Go module at
+the repository root and there cannot be one: the root holds `vendor/gno.land`, and Go
+treats a `vendor/` in a module root as Go vendoring, refusing to build and deleting what
+it did not put there (the comment at the top of `tools/go.mod`). So `tools/` is the only
+module covering ordinary packages, and anything outside it is built by nothing: `go vet`
+and `go test` refuse it with *"directory prefix ... does not contain main module"*, and
+CI, which runs `go -C tools vet ./...` and `go -C tools test ./...`, never sees it. A
+companion placed beside its contract is silently untested, which is how `gnohome` spent
+one pull request orphaned.
+
+Rules that keep a companion small and safe:
+
+- **Standard library only.** No `gnoclient`, no cgo, no third `go.mod`. Read the chain
+  over plain JSON-RPC `abci_query`, about 60 lines, and the companion stays inside the
+  `tools` module where vet and test cover it. (`tools/gnopublish` is the counter-example:
+  it links the full gno client stack, so it had to become a separate module.)
+- **Print transactions, never sign them.** Emit `gnokey maketx …` commands to review and
+  paste. A companion holds no key and broadcasts nothing, so it can never surprise
+  anyone. Name moul's key `moul` in what it emits.
+- **Mirror, and say so.** Anything duplicated from the realm (slug rules, reserved names,
+  a default template) carries a comment naming the `.gno` file it mirrors, and a Go test
+  pinning the two to the same behaviour.
+- **Table-driven tests, no network.** The chain-facing code is one function returning a
+  string; test the parsing, not the transport.
+- **Cross-link it** from the contract's README, since it no longer sits in the same
+  directory. The gno toolchain ignores it: package discovery only finds directories
+  holding a `gnomod.toml`, and `tools/` has none.
+
+## Every realm MUST test its `Render`
+
+A realm's `Render(path)` is its whole public surface, and a `Render` whose output varies
+is a consensus bug. Lock it down with a gno example test, in a normal `_test.gno` **in
+the realm's package** so it calls `Render` directly with no self-import (especially
+demos):
 
 ```gno
 package foodemo
@@ -357,160 +338,237 @@ func ExampleRender() {
 }
 ```
 
-This is **enforced by CI**: `make guard-render` (`gnocontracts guard-render`) fails
-when an `r/` package declares `func Render` and no test ever calls it. Coverage
-counts from a normal `*_test.gno` **or** a `*_filetest.gno`, and the call may be
-bare (`Render(`) or qualified (`home.Render(`). `ignore = true` packages are
-skipped. Five realms had shipped with a completely unexercised `Render` before
-the guard existed.
+Enforced by `make guard-render`, which fails when an `r/` package declares `func Render`
+and no test ever calls it. Coverage counts from a `*_test.gno` or a `*_filetest.gno`, and
+the call may be bare (`Render(`) or qualified (`home.Render(`); `ignore = true` packages
+are skipped. Five realms had shipped with a completely unexercised `Render` before the
+guard existed.
 
-Rules that make it actually run and verify:
+What makes it actually run and verify:
 
-- The **`// Output:` block is required** — an example with no `// Output:` is
-  silently **skipped**. Its content must match `Render`'s output exactly
-  (leading/trailing whitespace is trimmed).
-- Use the builtin **`print(...)`** — its output is captured on stdout in tests,
-  and it needs **no import** (prefer it over `fmt.Println` to keep the test file
-  import-free). Trailing whitespace is trimmed, so the missing newline is fine.
-- Cover the root plus a couple of argument paths (one `ExampleRender…` each).
-- Keep output **deterministic**: tests run at a fixed chain height, but don't
-  render wall-clock/random values.
-- **Realm globals persist for the whole test binary, and examples run *after*
-  every `Test`.** So an `ExampleRender` sees the state the tests left behind, and
-  its pinned output silently depends on test ordering. Have the example **reset
-  the state it renders** first (call the realm's `Reset`, or assign the globals
-  back to their `init()` values from a helper — same package, so it's allowed).
-  Likewise don't hardcode a generated id: take it from the constructor's return
-  value, since it depends on how many objects earlier tests created.
-- Validated by `gno test` on a **master** gno (what CI builds). Older gno
-  binaries silently skip examples, so verify with a freshly built master gno
-  (`go build -o /tmp/gno ./gnovm/cmd/gno` in your gno checkout) — a plain `ok`
-  from a stale local `gno` does not prove the example ran.
+- **The `// Output:` block is required.** An example without one is silently skipped.
+  Its content must match exactly, leading and trailing whitespace trimmed.
+  `make guard-examples` fails on a missing block.
+- **Use the builtin `print(...)`.** It is captured on stdout in tests and needs no import,
+  which keeps the test file import-free.
+- **Cover the root plus a couple of argument paths**, one `ExampleRender…` each.
+- **Keep the output deterministic.** Tests run at a fixed height; never render a
+  wall-clock or random value.
+- **Realm globals persist for the whole test binary, and examples run after every
+  `Test`.** So an `ExampleRender` sees the state the tests left and its pinned output
+  silently depends on their order. Reset the state it renders first (call the realm's
+  `Reset`, or assign the globals back to their `init()` values from a helper: same
+  package, so it is allowed). Likewise never hardcode a generated id, take it from the
+  constructor's return value.
+- **Only a master gno validates examples.** An older binary skips them, so `make test`
+  runs `make toolcheck` first: a canary package whose pinned output is deliberately wrong,
+  which must fail. If it passes, the toolchain is blind to examples and everything green
+  here means nothing.
 
-Populating `// Output:`: run the example once with an empty `// Output:` and copy
-the `got:` block the failure prints. Worked examples: the `x/daily/*demo` realms.
+To populate `// Output:`, run the example once with the block empty and copy the `got:`
+block the failure prints. Worked examples: the `x/daily/*demo` realms.
 
-**Consecutive blank lines can't be pinned by an example.** gno (like Go)
-**collapses consecutive blank lines** in a `// Output:` block, so any output with
-two-or-more blank lines in a row (a lot of markdown `Render`s) will never match.
-When that happens, don't use an example — assert the output in a normal `Test`
-with `uassert.Equal(t, expected, got)` using a raw-string literal (backticks),
-which preserves blank lines exactly, stays in-package, and needs no `fmt`. Worked
-example: `p/moul/mdlist` `TestEntriesRendering`.
+**Two consecutive blank lines can never be pinned by an example.** gno collapses them in
+an `// Output:` block, like Go, and a lot of markdown `Render`s produce them. Assert those
+in a normal `Test` with `uassert.Equal(t, expected, got)` and a backtick literal, which
+preserves blank lines exactly, stays in-package and needs no `fmt`. Worked example:
+`p/moul/mdlist` `TestEntriesRendering`.
 
-Order of preference: **example test** → **`Test` + `uassert.Equal`** (blank-line
-or panic/error outputs) → **filetest** (`filetests/*_filetest.gno`, auto-populated
-by `-update-golden-tests`; last resort, e.g. a package `main`/entrypoint).
+Order of preference: **example test**, then **`Test` + `uassert.Equal`** (blank-line or
+aborting output), then **filetest** (`filetests/*_filetest.gno`, auto-populated by
+`-update-golden-tests`; last resort, such as a package `main`).
 
-## Every package MUST have a README
+## A package README must say something, or not exist
 
-Each package/realm directory ships a standalone `README.md` that:
+The rule is not "every package has a README". It is that **a README which exists must say
+something true and useful**. A placeholder is worse than nothing, because the package then
+looks documented and the real text never gets written: this repo shipped 28 READMEs whose
+entire content was `_TODO: describe this package._` plus boilerplate.
 
-1. **Explains the package** — what it is, what it does, minimal API/usage. This
-   is hand-authored, ABOVE the generated footer marker.
-2. **Links back to the repo** and **carries the disclaimer** — this lives in a
-   generated managed block (between the `<!-- BEGIN/END GNOCONTRACTS FOOTER -->`
-   markers). Do not hand-edit inside it; run `make readmes`.
-3. **Experimental (`/x/`) packages** get the stronger disclaimer automatically:
-   "Highly experimental — potentially vibe-coded", linking to
-   [`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
-   treated as experimental/AI-assisted and not for production use.
+In order of preference:
 
-A PR includes the **hand-authored top** of each new package's README (the
-explanation above the footer marker). The generated footer, the root README
-table, and the catalog are all produced on `main`: `make readmes` creates/
-refreshes footers and `make gen` runs it, invoked by the `main` workflow after
-merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
-(the long form); the per-package minimal disclaimer links to it.
+1. **A good README**: what the package is, the minimal API, and the thing a reader cannot
+   get from the source. Why it exists, what it is *not* for, what is unimplemented, which
+   trap it avoids. If it is an unimplemented API sketch, say so in the first line.
+2. **A minimal accurate one.** One true sentence is a perfectly good README.
+3. **No README at all.** Legal, and `make guard-readmes LIST=1` lists these: undocumented,
+   and visibly so.
 
-## CI invariants (must stay green)
+Never a placeholder. `make guard-readmes` (in `make test` and in PR CI) fails on
+TODO / TBD / FIXME / WIP / "coming soon" in the hand-authored region, on a README that is
+nothing but its title and the footer, and on a body under 20 characters.
 
-PR CI checks only **source**: `gno lint` + `gno test` pass for every contract,
-and committed `vendor/` matches `make deps`. It does **not** run `make check` —
-`contracts.json`, the README table, per-package footers and `_assets/` are
-regenerated and committed on `main` by the `main` workflow.
+Everything hand-authored goes **above** the footer marker
+(`<!-- BEGIN/END GNOCONTRACTS FOOTER -->`), which carries the repo link, the dependency
+graph, the provenance line and the disclaimer. Do not hand-edit inside it; run
+`make readmes`, which will not invent a README for a package with no catalog description.
+Packages under an `/x/` path get the stronger "highly experimental, potentially
+vibe-coded" disclaimer automatically. Full text: [DISCLAIMER.md](./DISCLAIMER.md).
 
-### The four workflows
+## Drift and the monorepo relationship
+
+Twelve `p/moul/*` packages also live in `gnolang/gno` under
+`examples/gno.land/p/moul/<name>/v0`: `addrset`, `authz`, `dynreplacer`, `fifo`,
+`helplink`, `md`, `mdtable`, `once`, `realmpath`, `txlink`, `typeutil`, `ulist`. Those
+paths ship in the gnoland1 genesis set, so their `v0` is owned by the monorepo and frozen
+forever. There is no `r/moul/*` upstream at all.
+
+Our copy of each is a byte-for-byte mirror at the same path, and `make sync` compares them
+position for position:
+
+| | |
+|---|---|
+| `[drift]` | the monorepo copy changed. Reconcile deliberately: re-sync the mirror, or cut a `v1` to diverge. Never auto-overwrite. |
+| `[ours]` | a version above the mirrored one (`addrset/v1`, `authz/v1`): our own successor, nothing upstream to compare against. |
+| `[new]` | the ~175 packages that exist only here. |
+| `[miss]` | upstream has a `p/moul/*` we do not carry yet. |
+
+Because the monorepo owns `v0` for those twelve and only those twelve, a version number is
+meaningful across both repos: `p/moul/addrset/v1` is the second generation of a package
+whose first lives in `gnolang/gno`, while `p/moul/x/daily/b58/v0` only ever existed here.
+
+## Publishing
+
+### The networks
+
+| name | chain-id | notes |
+|---|---|---|
+| `mainnet` | `gnoland-1` | `rpc.gno.land`, gnoweb at `gno.land`. Launched 2026-09-12T15:00:00Z from the `chain/mainnet` tag (commit `9c8eb132e`): a fresh chain, not a hardfork of betanet. |
+| `pearl` | `pearl-1` | testnet, gno `v1.0.0-rc.0`. The default testnet. |
+| `sapphire` | `sapphire-1` | testnet, same build. **On 2026-09-22 `rpc.sapphire.testnets.gno.land` had no DNS record at all**; re-check before sending anything to it. |
+| `staging` | `staging` | `rpc.staging.gno.land`. |
+
+Both testnets expose the same host pattern: `rpc.<net>.testnets.gno.land`, gnoweb at
+`<net>.testnets.gno.land`, and an agent faucet at `faucet-agent.<net>.testnets.gno.land`
+(`/fund` is POST-only; `/limits` reports the grant and the per-address window; the bare
+root has no index route and 404s, which says nothing about the faucet being up).
+
+The list is **code-owned**: edit `defaultNetworks()` in `tools/gnocontracts/model.go`.
+`manifest` reconciles `contracts.json` against it on `main`. Hand-editing the catalog
+cannot work, `guard-generated` rejects a pull request that touches it.
+
+Two things make mainnet unlike the testnets:
+
+- **Publishing is not immediate.** The inert code-submission policy has been on since
+  block 1: a post-genesis `MsgAddPackage` parks until the funded gpao approvals oracle
+  clears it. A publish that "succeeds" is queued, not live.
+- **Paths there are permanent.** The `moul` namespace is registered at genesis, and nine
+  of the mirrored `p/moul/*/v0` are already deployed as transitive deps of the genesis set
+  (`addrset` `authz` `fifo` `helplink` `md` `mdtable` `once` `realmpath` `txlink`). Those
+  nine are frozen upstream artifacts: never publish over them, changes go in a `v1` here.
+  `dynreplacer`, `typeutil` and `ulist` are the three mirrors not at genesis.
+
+### `make upload` writes a script, it does not sign
+
+`make upload NET=<net> KEY=<key> PKG=<substring>` asks gnopm what is live, parked or
+absent on that chain and writes dependency-ordered `gnokey maketx addpkg` commands to
+`.cache/publish.sh`. Read it, then re-run with `YES=1`. Nothing leaves the machine until
+then: gnopm never signs and never broadcasts.
+
+Three things about that path are deliberate, and each one bit:
+
+- **The script is run from a file, never piped.** gnokey reads its passphrase with
+  `term.ReadPassword` on **fd 0** (`tm2/pkg/commands/utils.go`), so the `gnopm publish | sh`
+  form gnopm's own help suggests hands gnokey a pipe as stdin and the prompt fails.
+  `sh <file>` leaves stdin the terminal.
+- **An unknown `NET=` is an error.** gnopm discovers the chain from the package path, so
+  `gno.land/...` means **mainnet** unless told otherwise. This used to be a `$(shell)`,
+  which cannot fail a make run: a typo'd network name expanded to nothing and produced a
+  mainnet broadcast script.
+- **A failed run leaves no script**, so `sh .cache/publish.sh` can never replay a stale
+  plan aimed at a different chain.
+
+gnopm sizes gas at a flat 1800 gas/byte and the fee at 0.01 ugnot/gas. Measured mainnet
+`addpkg` history is 1,014 to 1,781 gas/byte, so that is a ceiling just above the observed
+maximum, and a ceiling is not charged.
+
+### `make upload-sim`: gnopublish, and keeping it at the chain's revision
+
+`tools/gnopublish` is the older path, kept because it sizes gas from a **real simulation**
+rather than an estimate and can merge every package into one transaction. Reach for it
+when a package's `init()` work makes the flat estimate wrong.
+
+It builds against a **local gno checkout**: its `go.mod` carries a
+`replace github.com/gnolang/gno => ../../../../gnoland/gno`, so it silently compiles
+against whatever revision that tree sits at, with no pin to warn you. When the chain is
+ahead, the first symptom is an opaque amino error from the account query, such as mainnet
+adding `vesting` to `std.BaseAccount`:
+
+```
+error: query account g1…: unknown JSON field "vesting" for type std.BaseAccount
+```
+
+Move that checkout to the revision the chain runs (for mainnet, the `chain/mainnet` tag)
+and re-run. `gnopublish` annotates this specific failure with that instruction, and does
+the account query **before** prompting for the gnokey password, so a stale client costs
+nothing.
+
+### On-chain status, and chains that do not answer
+
+`make status` (and `publish -check`) probe every network with `gnokey query vm/qfile`. A
+query to a chain that is **down** fails exactly like a query for a package that was
+**never published**, and conflating the two used to write "not uploaded" for all 193
+packages of any unreachable network. So each network is probed once with an HTTP
+`/status` call first and skipped if it does not answer, a per-package query that fails for
+a transport reason leaves that entry alone, and only a clean "not found" records an
+absence. A skipped network keeps stale data rather than wrong data; the run says which
+ones it skipped and the `main` workflow warns instead of failing.
+
+## The tools
+
+`go -C tools tool gnocontracts help` lists every subcommand; each one carries its
+reasoning as a doc comment. The Makefile is a thin wrapper, one line per target, so a flag
+belongs on the tool and not in a recipe. The ones worth knowing about by name:
+
+- `gno lint | test | fmt | toolcheck | list`: the toolchain runner. It materializes the
+  pinned versions, builds `.gnoroot-view/`, enumerates every non-archived package
+  (archived ones must be filtered here: the toolchain skips an `ignore = true` module for
+  `lint` but builds it anyway for a `test` that names it) and runs `gno` over the lot,
+  eight at a time by default (`-j`).
+- `sync`: drift against the monorepo copy at the same path.
+- `pr`: everything CI needs from one diff, the sticky comment body, the `gh pr edit` label
+  arguments, the realms to preview.
+- `preview`: boot gnodev on the workspace and crawl the resulting gnoweb into a
+  self-contained static tree.
+- `guard-examples`, `guard-render`, `guard-readmes`, `guard-generated`: the CI guards.
+  They read `.gno` with `go/scanner`, so an `// Output:` inside a string literal and an
+  identifier like `printRender` no longer fool them (both did, as regexps).
+
+Go tools here are **standard library only** and never built into a committed binary.
+
+## CI
+
+PR CI checks only source: `gno lint` and `gno test` pass for every contract, and committed
+`vendor/` matches `make deps`. It does not run `make check` (rule 3).
 
 | workflow | when | what it owns |
 |---|---|---|
-| `ci` | push to main, every PR | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make toolcheck guard-examples guard-render lint test` |
-| `pr` | every PR event | **one** sticky comment, the path labels, and the published preview at `pr-<N>/` |
-| `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, package README footers, `_assets/`, and on-chain status |
-| `gnopublish-ci` | PRs touching `tools/gnopublish/**` | that module only; it links the whole gno client stack and must not slow every PR |
+| `ci` | push to main, every pull request | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make guards lint test` |
+| `pr` | pull request opened / pushed / reopened | **one** sticky comment, the path labels, the published preview at `pr-<N>/` |
+| `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, README footers, `_assets/`, and on-chain status |
+| `gnopublish-ci` | pull requests touching `tools/gnopublish/**` | that module only, because it links the whole gno client stack and must not slow every pull request |
 
-Three composite actions carry what they share: `.github/actions/setup-gno`
-(clone gno master outside the workspace, build the requested binaries, cached on
-the upstream SHA, Go version from `tools/go.mod`), `.github/actions/previews-sync`
-(rewrite one subfolder of the previews site and push, retrying when a parallel
-job moved the branch) and `.github/actions/pr-comment` (upsert the one sticky
-comment and delete any duplicate).
+**One bot comment per pull request**, marker `<!-- gnocontracts-pr -->`, rendered by
+`gnocontracts pr`. It fits in three lines: counts, risk signals, preview link, everything
+per-package inside a `<details>`. When adding a check, add a *count* to the signal line or
+a *chip* to a table row, never a new bullet per package: that is what made the old comment
+45 lines long.
 
-### Previews
+Every package is also browsable as gnoweb renders it, without a checkout:
+<https://moul.github.io/gno-contracts-previews/main/> for `main` and `…/pr-<N>/` for a
+pull request, linked from its comment. Locally `make preview ARGS="./r/moul/home"` or
+`make site`, then serve the result (`python3 -m http.server -d _site`). A previews link is
+never a live chain: no signer, no transactions, no faucet, and every package shows the
+state right after `init()`.
 
-Every package is browsable as gnoweb renders it, without a checkout:
+How the workflows, the three composite actions and the previews site work, and the traps
+in each: [`.github/README.md`](./.github/README.md).
 
-| URL | What | Rebuilt |
-|---|---|---|
-| <https://moul.github.io/gno-contracts-previews/main/> | every package on `main` | every push to `main` |
-| `…/pr-<N>/` | what pull request N changed, plus every package that imports it | every push to the PR |
+## Conventions
 
-Both come from `gnocontracts preview`, which boots **one** gnodev on the whole
-workspace and crawls it. Three things about that are load-bearing:
-
-1. **gnodev is given every package, not just the ones being rendered.** A package
-   here is versioned in its `gnomod.toml`, not in its directory path, so gnodev
-   cannot find `gno.land/p/moul/authz/v0` by walking to `p/moul/authz/v0`. Lazy
-   loading makes the whole workspace cost the same as one package: 193 packages,
-   node ready in 9s.
-2. **`GNOROOT` is the stdlib-only view**, the same one `lint` and `test` use, so a
-   preview resolves dependencies out of committed `vendor/` rather than out of
-   whatever the gno checkout happens to hold.
-3. **A changed pure package previews its dependents.** The reverse-import walk is
-   transitive: touching `p/moul/md` renders every realm that renders markdown. The
-   previous preview rendered nothing at all for a diff that touched no `r/`.
-
-Bounds, because a realm may link as many pages as it likes: at most 25 packages on
-a pull request (changed ones are never dropped, and the comment says how many
-were), 10 render-argument pages per package, and never a `$state`, `$help&func=`,
-`$download` or `:args$source` page. Without the argument budget one realm
-(`romannumdemo`, one page per numeral) produced 4,065 of 5,437 pages and 220 MB of
-323 MB on its own.
-
-Every page is `noindex, nofollow`: each is a near-duplicate of a real gno.land
-page, and gnoweb's own layout asks to be indexed.
-
-The site lives in **[moul/gno-contracts-previews](https://github.com/moul/gno-contracts-previews)**,
-not in this repository's `gh-pages`: the main snapshot is 103 MB rewritten on every
-push, and this repository is one everybody clones. That branch is rewritten as a
-single orphan commit each time, so the previews repository only ever holds the site
-as it is now. Publishing needs the `PREVIEWS_DEPLOY_KEY` secret, the private half of
-a write deploy key on that repository; a fork has no secrets, so it renders nothing
-and is linked to nothing.
-
-Locally: `make preview ARGS="./r/moul/home"` or `make site`, then serve the result
-(`python3 -m http.server -d _site`). A previews link is always safe to click and
-never a live chain: no signer, no transactions, no faucet, and every package shows
-the state right after `init()`.
-
-**One bot comment per PR**, marker `<!-- gnocontracts-pr -->`, rendered by
-`gnocontracts pr`. It fits in three lines: counts, risk signals, preview link.
-Everything per-package is inside a `<details>`. When adding a check, add a
-*count* to the signal line or a *chip* to a table row, never a new bullet per
-package: that is what made the old comment 45 lines long.
-
-### On-chain status and unreachable chains
-
-`make status` (and `publish -check`) probe every network with
-`gnokey query vm/qfile`. A query to a chain that is **down** fails exactly like
-a query for a package that was **never published**, and conflating the two used
-to write "not uploaded" for all 193 packages of any network that happened to be
-unreachable. So:
-
-- each network is probed once with an HTTP `/status` call first, and a network
-  that does not answer is skipped, keeping its last known values;
-- a per-package query that fails for a transport reason leaves that entry alone;
-- only a clean "not found" answer records an absence.
-
-A skipped network keeps stale data rather than wrong data. The run says which
-ones it skipped, and the `main` workflow logs a warning instead of failing.
+- **Commits**: conventional, single line (`feat(hello): …`, `fix: …`,
+  `chore(deps): vendor …`). Never a Claude or AI co-author trailer.
+- **Author**: `Manfred Touron <94029+moul@users.noreply.github.com>`, the push-safe
+  noreply identity.
+- **Never hand-edit** the region between the README table markers, or the generated fields
+  of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`, `version`, `deps`).

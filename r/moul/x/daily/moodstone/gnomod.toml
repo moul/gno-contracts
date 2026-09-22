@@ -1,2 +1,3 @@
-module = "gno.land/r/moul/x/daily/moodstone/v0"
+module = "gno.land/r/moul/x/daily/moodstone/v1"
 gno = "0.9"
+private = true
