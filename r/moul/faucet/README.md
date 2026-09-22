@@ -1,0 +1,76 @@
+# GNOT faucet
+
+A two-step, on-the-record way to get a small amount of GNOT to someone who has
+none: anyone files a request on their behalf, an approver releases it, and both
+halves stay on the page with a reason attached.
+
+It exists because the accounts that most need a first coin are exactly the ones
+that cannot ask for it. An empty account cannot pay the gas to call anything,
+so `Request` takes the recipient as an argument and the filer pays for the ask.
+
+This is not the grant board. The grant board weighs work against milestones and
+proofs; this hands over pocket change so somebody can try the chain at all.
+
+## The float
+
+The faucet spends only what has been sent to its own package address, never the
+approver's balance. Top it up with a plain bank send to that address, or with
+`Fund` if you want the donation on the record. `Withdraw` takes it back, to the
+owner and nowhere else.
+
+## The two calls, and why they travel together
+
+| call | who | what it does |
+|---|---|---|
+| `Request(to, amount, reason)` | anyone | files an ask, returns its id, moves no money |
+| `Approve(id, to, amount)` | an approver | pays it out of the float |
+| `Deny(id, why)` | an approver | closes it unpaid, with the reason on the page |
+| `Fund()` | anyone, payable | credits the float and emits an event |
+| `Withdraw(amount)` | the owner | returns float to the owner |
+| `AddApprover` / `RemoveApprover` / `SetMaxPerRequest` | the owner | the knobs |
+
+A tm2 transaction carries a list of messages, runs them in order, and stops at
+the first failure; a failed transaction writes none of their state, only the
+fee and the sequence survive. So `Request` and `Approve` sent as two messages of
+one transaction either both happen or neither does, and the common case is a
+single signature.
+
+### The id the second message cannot know
+
+`Approve` names a request by id, and message 2 of a transaction cannot read what
+message 1 returned. The caller reads `NextID` before signing and writes that
+number into the approval, which is a race: another request landing in between
+shifts the id, and the approval would pay a stranger.
+
+That is why `Approve` also takes the recipient and the amount it believes it is
+approving, and aborts when the stored request disagrees. The race then costs a
+failed transaction instead of the wrong person's money.
+
+## Calls
+
+```sh
+# Ask, on someone else's behalf. Amount is in ugnot.
+gnokey maketx call -pkgpath "gno.land/r/moul/faucet/v0" -func Request \
+  -args "g1..." -args 100000000 -args "no gas, wants to try the chain" \
+  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid gnoland-1 moul
+
+# What id the next request will get, so an approval can be signed alongside it.
+gnokey query vm/qeval -data 'gno.land/r/moul/faucet/v0.NextID()'
+
+# What the float holds.
+gnokey query vm/qeval -data 'gno.land/r/moul/faucet/v0.Balance()'
+
+# The page.
+gnokey query vm/qrender -data 'gno.land/r/moul/faucet/v0:'
+```
+
+## Reading it
+
+`Render("")` is the board: float, open requests, decided ones, approvers.
+`Render("req/<id>")` is one request, with its reason and, if it was refused, why.
+
+Every caller-supplied string on those pages is escaped before it is rendered.
+A reason is arbitrary text from an arbitrary account and `Render` output is
+markdown that gnoweb parses, so an unescaped one can plant a link, an image
+beacon or page chrome on a page the realm signs for. This path is permanent, so
+that bug could only ever be fixed at a new path.
