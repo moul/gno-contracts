@@ -83,7 +83,7 @@ func cmdPreview(root string, args []string) error {
 	live := fs.String("live", defaultLive, "origin used for links the snapshot does not contain")
 	maxPkgs := fs.Int("max-pkgs", prMaxPkgs, "cap on previewed packages; 0 for no cap")
 	maxPages := fs.Int("max-pages", 0, "cap on crawled pages; 0 picks the default for the mode")
-	maxArgs := fs.Int("max-args", defaultArgBudget, "cap on render-argument pages per package")
+	maxArgs := fs.Int("max-args", defaultArgBudget, "cap on render-argument pages per package; 0 for no cap")
 	port := fs.Int("port", 8899, "port gnodev serves gnoweb on")
 	gnodev := fs.String("gnodev", envOr("GNODEV", "gnodev"), "gnodev binary")
 	chrome := fs.String("chrome", "", "Chrome/Chromium binary for screenshots (default: autodetect)")

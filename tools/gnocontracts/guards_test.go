@@ -139,6 +139,52 @@ func TestGuardRenderSkipsArchivedPackages(t *testing.T) {
 	}
 }
 
+// The guard's whole point: a MISSING README passes, a placeholder does not.
+func TestGuardReadmesAllowsMissingAndRejectsPlaceholders(t *testing.T) {
+	footer := "\n" + pkgFooterBegin + "\nrepo link, graph, disclaimer\n" + pkgFooterEnd + "\n"
+	for _, tt := range []struct {
+		name   string
+		readme string // "" means no README file at all
+		ok     bool
+	}{
+		{"missing", "", true},
+		{"real body", "# `gno.land/p/moul/x`\n\nBuild Markdown tables." + footer, true},
+		{"todo stub", "# `gno.land/p/moul/x`\n\n_TODO: describe this package._" + footer, false},
+		{"title only", "# `gno.land/p/moul/x`\n" + footer, false},
+		{"too short", "# `gno.land/p/moul/x`\n\nA thing." + footer, false},
+		{"wip bullet", "# `gno.land/p/moul/x`\n\n- WIP, come back later, it will be great\n" + footer, false},
+		// The placeholder words are only rejected as the START of a line: a
+		// README saying the package has an unimplemented TODO is describing it.
+		{"todo mid-sentence", "# `gno.land/p/moul/x`\n\nProposals are a TODO: every path panics.\n" + footer, true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			files := map[string]string{"p/moul/x/x.gno": "package x\n"}
+			if tt.readme != "" {
+				files["p/moul/x/README.md"] = tt.readme
+			}
+			err := cmdGuardReadmes(fixture(t, files), nil)
+			if tt.ok && err != nil {
+				t.Fatalf("rejected a legal README: %v", err)
+			}
+			if !tt.ok && err == nil {
+				t.Fatal("accepted a README that documents nothing")
+			}
+		})
+	}
+}
+
+// Archived packages are skipped by every other guard; this one too.
+func TestGuardReadmesSkipsArchivedPackages(t *testing.T) {
+	root := fixture(t, map[string]string{
+		"p/moul/old/gnomod.toml": "module = \"gno.land/p/moul/old\"\ngno = \"0.9\"\nignore = true\n",
+		"p/moul/old/x.gno":       "package old\n",
+		"p/moul/old/README.md":   "# `gno.land/p/moul/old`\n\n_TODO: describe this package._\n",
+	})
+	if err := cmdGuardReadmes(root, nil); err != nil {
+		t.Fatalf("archived package judged: %v", err)
+	}
+}
+
 func TestReadmeRegionsExtractsOnlyGeneratedParts(t *testing.T) {
 	readme := "# Title\n\nprose that a PR may edit\n\n" +
 		tableBegin + "\n| a | b |\n" + tableEnd + "\n\n" +

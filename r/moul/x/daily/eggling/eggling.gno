@@ -16,6 +16,7 @@ import (
 
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -227,29 +228,6 @@ func Rename(cur realm, id string, name string) string {
 	return rename(e, name)
 }
 
-// escapeInline neutralizes markdown-active characters in untrusted text
-// before it's embedded inline in Render output.
-func escapeInline(s string) string {
-	r := strings.NewReplacer(
-		"\\", "\\\\",
-		"`", "\\`",
-		"*", "\\*",
-		"_", "\\_",
-		"[", "\\[",
-		"]", "\\]",
-		"|", "\\|",
-	)
-	return r.Replace(s)
-}
-
-func shortAddr(a address) string {
-	s := a.String()
-	if len(s) > 12 {
-		return s[:8] + "…" + s[len(s)-4:]
-	}
-	return s
-}
-
 // byIDNumeric orders eggs by their numeric ID, ascending.
 type byIDNumeric []*egg
 
@@ -303,10 +281,10 @@ func renderHome() string {
 		status := "🥚 incubating"
 		level := "-"
 		if e.Hatched {
-			status = rarityEmoji[e.RarityTier] + " " + escapeInline(e.Name) + " (" + rarityNames[e.RarityTier] + " " + e.Species + ")"
+			status = rarityEmoji[e.RarityTier] + " " + ui.Inline(e.Name) + " (" + rarityNames[e.RarityTier] + " " + e.Species + ")"
 			level = strconv.Itoa(e.Level)
 		}
-		b.WriteString("| #" + e.ID + " | `" + shortAddr(e.Owner) + "` | " + status + " | " + level + " |\n")
+		b.WriteString("| #" + e.ID + " | " + ui.Addr(e.Owner) + " | " + status + " | " + level + " |\n")
 	}
 	b.WriteString("\n_View a single egg at this realm's path plus its ID (e.g. `.../eggling:3`), " +
 		"or one owner's eggs plus their address._\n")
@@ -316,7 +294,7 @@ func renderHome() string {
 func renderEgg(id string, height int64) string {
 	e, ok := get(id)
 	if !ok {
-		return "# Egg #" + escapeInline(id) + "\n\nNo such egg.\n"
+		return "# Egg #" + ui.Inline(id) + "\n\nNo such egg.\n"
 	}
 
 	var b strings.Builder
@@ -343,7 +321,7 @@ func renderEgg(id string, height int64) string {
 
 func renderOwner(rawAddr string) string {
 	owner := address(strings.TrimSpace(rawAddr))
-	safe := escapeInline(owner.String())
+	safe := ui.Inline(owner.String())
 
 	var b strings.Builder
 	b.WriteString("# Eggs owned by " + safe + "\n\n")
@@ -355,7 +333,7 @@ func renderOwner(rawAddr string) string {
 		}
 		found = true
 		if e.Hatched {
-			b.WriteString("- #" + e.ID + ": " + rarityEmoji[e.RarityTier] + " " + escapeInline(e.Name) +
+			b.WriteString("- #" + e.ID + ": " + rarityEmoji[e.RarityTier] + " " + ui.Inline(e.Name) +
 				" — " + rarityNames[e.RarityTier] + " " + e.Species + ", level " + strconv.Itoa(e.Level) + "\n")
 		} else {
 			b.WriteString("- #" + e.ID + ": 🥚 incubating\n")

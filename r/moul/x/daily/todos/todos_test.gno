@@ -4,14 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/testutils/v0"
 )
 
 // reset clears package globals between tests (t.Run/subtests do not reset them).
 func reset() {
-	items = avl.Tree{}
-	nextID = 0
+	items = store.Named("todos: item")
 }
 
 // TestAddToggleRemove exercises the full lifecycle through the crossing API.
@@ -55,7 +54,7 @@ func TestAddToggleRemove(cur realm, t *testing.T) {
 	if open != 1 || done != 0 {
 		t.Fatalf("after remove: open=%d done=%d, want 1/0", open, done)
 	}
-	if items.Has(idKey(1)) {
+	if items.Has(store.ID(1)) {
 		t.Fatalf("item #1 still present after Remove")
 	}
 }
@@ -102,21 +101,27 @@ func TestRender(cur realm, t *testing.T) {
 		t.Fatalf("render not newest-first:\n%s", out)
 	}
 	// Author short form present.
-	if !strings.Contains(out, "(g1") {
+	if !strings.Contains(out, "(`g1") {
 		t.Fatalf("render missing author short address:\n%s", out)
 	}
 }
 
-// TestIDKeyOrdering verifies idKey produces lexicographically-ordered keys so
-// avl iteration matches numeric id order. Non-crossing: plain signature.
+// TestIDKeyOrdering verifies the store key sorts numerically. v1 asserted the
+// same thing about its own idKey, which padded to width 12: that held only
+// below the width, since idKey(10^12) is 13 characters and sorts before
+// idKey(10^12-1). The store key is 8 bytes for every id, so there is no
+// ceiling. Non-crossing: plain signature.
 func TestIDKeyOrdering(t *testing.T) {
-	if idKey(2) >= idKey(10) {
-		t.Fatalf("idKey(2)=%q should sort before idKey(10)=%q", idKey(2), idKey(10))
+	if store.ID(2).Key() >= store.ID(10).Key() {
+		t.Fatal("id 2 should sort before id 10")
 	}
-	if idKey(9) >= idKey(100) {
-		t.Fatalf("idKey(9)=%q should sort before idKey(100)=%q", idKey(9), idKey(100))
+	if store.ID(9).Key() >= store.ID(100).Key() {
+		t.Fatal("id 9 should sort before id 100")
 	}
-	if len(idKey(1)) != 12 {
-		t.Fatalf("idKey width = %d, want 12", len(idKey(1)))
+	if store.ID(999999999999).Key() >= store.ID(1000000000000).Key() {
+		t.Fatal("ordering should survive one past v1's width-12 ceiling")
+	}
+	if len(store.ID(1).Key()) != len(store.ID(1000000000000).Key()) {
+		t.Fatal("every key is the same width")
 	}
 }

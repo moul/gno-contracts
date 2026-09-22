@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
 )
@@ -16,8 +16,7 @@ var (
 )
 
 func resetState() {
-	games = avl.NewTree()
-	nextID = 0
+	games = store.Named("game")
 }
 
 // TestVerticalWin plays 🔴 stacking column 0 four high while 🟡 plays column 1.
