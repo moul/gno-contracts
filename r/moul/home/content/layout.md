@@ -19,3 +19,5 @@
 ---
 
 [:realm:](/r/moul/home:slots) · rev :rev: · :chainid: @ :height:
+
+Explore: :scan.links:

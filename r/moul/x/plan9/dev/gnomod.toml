@@ -1,0 +1,5 @@
+module = "gno.land/r/moul/x/plan9/dev/v0"
+gno = "0.9"
+
+# public: posts its own tree into r/moul/x/plan9/ns, and a private realm may
+# not persist an object it owns into another realm

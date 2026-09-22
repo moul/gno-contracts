@@ -116,12 +116,11 @@ jobs:
         with:
           binaries: gnodev
 
-      # `make site`, not the tool directly: the target already carries the two
-      # things that are easy to get wrong together. It builds the stdlib-only
-      # GNOROOT view from the REAL GNOROOT and only then points the renderer at
-      # the view. Setting GNOROOT to the view for the whole step instead makes
-      # `make view` build the view out of itself, and gnodev dies on
-      # `failed loading stdlib "errors": does not exist`.
+      # GNOROOT stays the REAL checkout here. `gnocontracts preview` builds the
+      # stdlib-only view out of it and points gnodev at that itself, so
+      # gno.land/* resolves from committed vendor/ (and so this step can never
+      # build the view out of the view, which killed a run with `failed loading
+      # stdlib "errors": does not exist`).
       - name: Render every package
         run: |
           set -euo pipefail

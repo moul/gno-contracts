@@ -163,7 +163,53 @@ func TestAction(t *testing.T) {
 }
 
 func TestActionIn(t *testing.T) {
-	got := ActionIn("gno.land/r/moul/home/v0", "Say hi", "Hello", "name", "moul")
-	uassert.True(t, strings.Contains(got, "/r/moul/home/v0"), "must target the named realm, got: "+got)
+	got := ActionIn("gno.land/r/moul/gns/v0", "Say hi", "Hello", "name", "moul")
+	uassert.True(t, strings.Contains(got, "/r/moul/gns/v0"), "must target the named realm, got: "+got)
 	uassert.True(t, strings.Contains(got, "Hello"), "must name the function")
+}
+
+func TestExcerpt(t *testing.T) {
+	cases := []struct {
+		name  string
+		in    string
+		width int
+		want  string
+	}{
+		{"empty", "", 10, ""},
+		{"shorter than the width", "hello", 10, "hello"},
+		{"one over is kept whole, as ShortN does", "0123456789a", 10, "0123456789a"},
+		{"two over is cut", "0123456789ab", 10, "0123456789…"},
+		{"zero width", "hello", 0, "…"},
+		{"negative width clamps to zero", "hello", -3, "…"},
+		// The cut counts runes. A byte slice at 10 would split the 11th 'é'
+		// and put invalid UTF-8 on the page.
+		{"multibyte is not split", strings.Repeat("é", 20), 10, strings.Repeat("é", 10) + "…"},
+		// The escaping half: what is kept is escaped, the ellipsis is not.
+		{"escapes what it keeps", "[link](url) and more", 11, "\\[link\\]\\(url\\)…"},
+		{"newline cannot escape the line", "one\ntwo", 10, "one two"},
+	}
+	for _, tc := range cases {
+		uassert.Equal(t, tc.want, Excerpt(tc.in, tc.width), tc.name)
+	}
+}
+
+// Excerpt must never leave a trailing lone backslash: that is the bug that
+// comes from escaping first and cutting second, and it escapes whatever the
+// caller appends after the excerpt.
+func TestExcerptNeverStrandsABackslash(t *testing.T) {
+	// Each of these ends, at some width, on a character the escaper backslashes.
+	for _, in := range []string{
+		"....................", "********************", "[[[[[[[[[[[[[[[[[[[[",
+		"!!!!!!!!!!!!!!!!!!!!", "<<<<<<<<<<<<<<<<<<<<", "--------------------",
+	} {
+		for width := 0; width <= 15; width++ {
+			got := Excerpt(in, width)
+			body := strings.TrimSuffix(got, Ellipsis)
+			trailing := 0
+			for i := len(body) - 1; i >= 0 && body[i] == '\\'; i-- {
+				trailing++
+			}
+			uassert.Equal(t, 0, trailing%2, "odd run of trailing backslashes in Excerpt("+in+")")
+		}
+	}
 }

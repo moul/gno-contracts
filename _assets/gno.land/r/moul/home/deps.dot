@@ -3,5 +3,7 @@ digraph deps {
   node [shape=box, fontname="sans-serif"];
   "gno.land/r/moul/home" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/home" -> "gno.land/p/moul/dynreplacer/v0";
+  "gno.land/r/moul/home" -> "gno.land/p/moul/mygnoscan/v0";
   "gno.land/r/moul/home" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/home" -> "gno.land/r/moul/config/v1";
 }

@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-22T11:36:15Z",
+  "status_checked_at": "2026-09-22T16:38:43Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -475,6 +475,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/grants/v0",
+      "dir": "p/moul/grants",
+      "kind": "p",
+      "name": "grants",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/greet/v0",
       "dir": "p/moul/greet",
       "kind": "p",
@@ -713,6 +741,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/mygnoscan/v0",
+      "dir": "p/moul/mygnoscan",
+      "kind": "p",
+      "name": "mygnoscan",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/nestedpkg/v0",
       "dir": "p/moul/nestedpkg",
       "kind": "p",
@@ -816,6 +868,30 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/pausable/v0",
+      "dir": "p/moul/pausable",
+      "kind": "p",
+      "name": "pausable",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -2139,6 +2215,139 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/plan9/memfs/v0",
+      "dir": "p/moul/x/plan9/memfs",
+      "kind": "p",
+      "name": "x/plan9/memfs",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/ninep/v0",
+      "dir": "p/moul/x/plan9/ninep",
+      "kind": "p",
+      "name": "x/plan9/ninep",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/ns/v0",
+      "dir": "p/moul/x/plan9/ns",
+      "kind": "p",
+      "name": "x/plan9/ns",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/rc/v0",
+      "dir": "p/moul/x/plan9/rc",
+      "kind": "p",
+      "name": "x/plan9/rc",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/memfs/v0",
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/ns/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/synfs/v0",
+      "dir": "p/moul/x/plan9/synfs",
+      "kind": "p",
+      "name": "x/plan9/synfs",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/storagecost/v0",
       "dir": "p/moul/x/storagecost",
       "kind": "p",
@@ -2153,6 +2362,59 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/vm/bf/v0",
+      "dir": "p/moul/x/vm/bf",
+      "kind": "p",
+      "name": "x/vm/bf",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/vm/vmkit/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/vm/vmkit/v0",
+      "dir": "p/moul/x/vm/vmkit",
+      "kind": "p",
+      "name": "x/vm/vmkit",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -2265,6 +2527,8 @@
         "gno.land/p/moul/authz/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "bd1ff5de0053958282ac81f08ed8bfcb2081982c",
       "published": {
         "betanet": {
           "uploaded": false
@@ -2272,6 +2536,35 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/config/v1",
+      "dir": "r/moul/config",
+      "kind": "r",
+      "name": "config",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/authz/v0",
+        "gno.land/p/moul/mygnoscan/v0",
+        "gno.land/p/moul/pausable/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -2608,6 +2901,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/faucet/v0",
+      "dir": "r/moul/faucet",
+      "kind": "r",
+      "name": "faucet",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/gns/v0",
       "dir": "r/moul/gns",
       "kind": "r",
@@ -2623,6 +2944,32 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/grant/v0",
+      "dir": "r/moul/grant",
+      "kind": "r",
+      "name": "grant",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/grants/v0"
+      ],
+      "draft": false,
+      "published": {
         "mainnet": {
           "uploaded": false
         },
@@ -2676,7 +3023,9 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/dynreplacer/v0",
-        "gno.land/p/nt/avl/v0"
+        "gno.land/p/moul/mygnoscan/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/r/moul/config/v1"
       ],
       "draft": false,
       "published": {
@@ -6821,6 +7170,65 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/plan9/dev/v0",
+      "dir": "r/moul/x/plan9/dev",
+      "kind": "r",
+      "name": "x/plan9/dev",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/synfs/v0",
+        "gno.land/r/moul/x/plan9/ns/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/plan9/ns/v0",
+      "dir": "r/moul/x/plan9/ns",
+      "kind": "r",
+      "name": "x/plan9/ns",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/plan9/memfs/v0",
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/ns/v0",
+        "gno.land/p/moul/x/plan9/rc/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/reaper/v0",
       "dir": "r/moul/x/reaper",
       "kind": "r",
@@ -6836,10 +7244,73 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "72317f0ab9702651dfd50da24b9cc1599399e6a1",
       "published": {
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/reaper/v1",
+      "dir": "r/moul/x/reaper",
+      "kind": "r",
+      "name": "x/reaper",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/ulist/v1",
+        "gno.land/p/moul/x/storagecost/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/vm/bfdemo/v0",
+      "dir": "r/moul/x/vm/bfdemo",
+      "kind": "r",
+      "name": "x/vm/bfdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/vm/bf/v0",
+        "gno.land/p/moul/x/vm/vmkit/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/seqid/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false

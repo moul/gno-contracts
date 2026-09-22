@@ -5,6 +5,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/x/storagecost/v0"
 	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
@@ -184,12 +185,13 @@ func TestRenderShowsTheBountyAndTheReapLink(cur realm, t *testing.T) {
 	// argument, or the button on the page does nothing useful. txlink builds
 	// it relative to the current realm, so there is no path to get wrong.
 	uassert.True(t, strings.Contains(out, "$help&func=Reap&limit=100"), out)
-	// The author is named, which is what makes "the poster paid" visible.
-	uassert.True(t, strings.Contains(out, poster.String()), out)
+	// The author is named, in the house address format, which is what makes
+	// "the poster paid" visible without 40 opaque characters per row.
+	uassert.True(t, strings.Contains(out, ui.Addr(poster)), out)
 	uassert.True(t, strings.Contains(out, "**reapable**"), out)
 
 	// A long note is summarized rather than dumped into the table.
-	uassert.True(t, strings.Contains(out, "..."), out)
+	uassert.True(t, strings.Contains(out, ui.Ellipsis), out)
 	uassert.False(t, strings.Contains(out, strings.Repeat("y", 200)), "body should be truncated")
 }
 
@@ -324,6 +326,7 @@ func TestSummarizeNeutralizesAnAttackerAuthoredBody(t *testing.T) {
 func TestSummarizeEscapesAnUnbalancedBracket(t *testing.T) {
 	uassert.Equal(t, "\\[", summarize("["))
 	uassert.Equal(t, "\\]", summarize("]"))
+	uassert.Equal(t, "\\[", ui.Excerpt("[", 48))
 }
 
 // TestSummarizeCutsOnARuneBoundary pins the other half of the old bug: the
@@ -334,7 +337,7 @@ func TestSummarizeCutsOnARuneBoundary(t *testing.T) {
 	// 4-byte rune rather than on a boundary.
 	out := summarize("x" + strings.Repeat("\U0001F33E", 60))
 	uassert.True(t, utf8.ValidString(out), "cut mid-rune: "+out)
-	uassert.True(t, strings.HasSuffix(out, "..."), "long body should be elided: "+out)
+	uassert.True(t, strings.HasSuffix(out, ui.Ellipsis), "long body should be elided: "+out)
 
 	// A short body comes back whole, with no elision and nothing to escape.
 	short := summarize("plain note")

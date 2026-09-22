@@ -53,6 +53,7 @@ func Render(path string) string {
 | `AddrOf(s)` | `Addr` for an address already in string form (an avl key) |
 | `Short(s)`, `ShortN(s, head, tail)` | the same rule for any string: a URL, a handle, a commitment hash |
 | `Inline(s)`, `Cell(s)` | escape user text, delegated to [`p/nt/markdown/sanitize`](/p/nt/markdown/sanitize/v0) |
+| `Excerpt(s, width)` | a preview of user prose: cut to `width` runes, then escape. That order, because escaping first and cutting second strands a backslash |
 | `Action(title, fn, args...)` | a clickable call, instead of prose telling the reader to type a function name |
 | `ActionIn(pkgPath, title, fn, args...)` | the same, against another realm |
 | `NewTable(headers...)`, `.Row(...)`, `.String()`, `.OrEmpty(msg)` | GFM tables |
