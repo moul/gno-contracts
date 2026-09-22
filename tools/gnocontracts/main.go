@@ -14,7 +14,10 @@
 //	pr         everything CI needs to know about a pull request: the sticky
 //	           comment body, the path labels, the realms to preview
 //	preview    render realms with gnodev into a self-contained static tree
-//	guard-*    the CI guards (examples, render, generated artifacts)
+//	gno        lint / test / fmt every contract against a stdlib-only GNOROOT
+//	upload     the gnokey script for what a network is missing
+//	guard-*    the CI guards (examples, render, readmes, private, generated
+//	           artifacts)
 //
 // It is invoked from the repository root, typically via the Makefile
 // (`go run ./tools <cmd>`).
@@ -65,12 +68,20 @@ func main() {
 		err = cmdGuardExamples(root)
 	case "guard-render":
 		err = cmdGuardRender(root)
+	case "guard-readmes":
+		err = cmdGuardReadmes(root, args)
+	case "guard-private":
+		err = cmdGuardPrivate(root)
 	case "guard-generated":
 		err = cmdGuardGenerated(root, args)
 	case "preview":
 		err = cmdPreview(root, args)
 	case "graph":
 		err = cmdGraph(root)
+	case "gno":
+		err = cmdGno(root, args)
+	case "upload":
+		err = cmdUpload(root, args)
 	case "help", "-h", "--help":
 		usage()
 		return
@@ -102,8 +113,13 @@ commands:
   pr         analyze the PR diff (base...HEAD) → the sticky comment body, the
              path labels, and the realm selectors to preview
   preview    render the selected realms with gnodev into a static tree
+  gno        run the gno toolchain over every contract:
+             gno lint | gno test | gno fmt | gno toolcheck | gno list
+  upload     write the gnokey script for what a network is missing; -yes runs it
   guard-examples   fail if an Example* test pins no // Output: block
   guard-render     fail if a realm declares Render that no test calls
+  guard-readmes    fail if a package ships a README that documents nothing
+  guard-private    fail if a realm never answered the private question
   guard-generated  fail if a PR modifies generated artifacts
   graph      write per-package + global dependency graphs into _assets/
 `)

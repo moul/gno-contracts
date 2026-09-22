@@ -4,13 +4,12 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/testutils/v0"
 )
 
 func resetState() {
-	gallery = avl.Tree{}
-	nextID = 0
+	gallery = store.Named("piece")
 }
 
 func TestRenderDiamond(t *testing.T) {
@@ -63,12 +62,16 @@ func TestRenderPatternUnknown(t *testing.T) {
 	renderPattern("spiral", 3)
 }
 
+// v1 asserted that its own padID() padded to width 6. That is the narrowest
+// ceiling in this repo: padID(10^6) is 7 characters and sorts before
+// padID(10^6-1), so from the millionth piece on the gallery would have
+// rendered out of order. The store key is 8 bytes for every id.
 func TestPadID(t *testing.T) {
-	if padID(1) != "000001" {
-		t.Fatalf("padID(1) = %q, want 000001", padID(1))
+	if a, b := store.ID(2).Key(), store.ID(10).Key(); !(a < b) {
+		t.Error("id 2 should sort before id 10")
 	}
-	if padID(42) != "000042" {
-		t.Fatalf("padID(42) = %q, want 000042", padID(42))
+	if a, b := store.ID(999999).Key(), store.ID(1000000).Key(); !(a < b) {
+		t.Error("ordering should survive one past v1's width-6 ceiling")
 	}
 }
 
@@ -82,14 +85,14 @@ func TestGenerateAddsToGallery(cur realm, t *testing.T) {
 	if art != RenderChecker(3) {
 		t.Fatal("Generate should return the rendered art")
 	}
-	if nextID != 1 {
-		t.Fatalf("nextID = %d, want 1", nextID)
+	if gallery.LastID() != 1 {
+		t.Fatalf("LastID = %s, want 1", gallery.LastID())
 	}
 
-	// avl/v0's Get returns a single `any` (a miss is a nil interface), not the
-	// value, ok pair a Go map yields — asciiart.gno:230 already does it this way.
-	v := gallery.Get(padID(1))
-	if v == nil {
+	// The store's Get returns (value, ok), so a stored nil is distinguishable
+	// from an absent id, which avl/v0's single-value Get cannot express.
+	v, ok := gallery.Get(1)
+	if !ok {
 		t.Fatal("expected piece #1 to exist in the gallery")
 	}
 	p := v.(*piece)

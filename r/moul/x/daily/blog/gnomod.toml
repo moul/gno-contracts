@@ -1,2 +1,3 @@
-module = "gno.land/r/moul/x/daily/blog/v0"
+module = "gno.land/r/moul/x/daily/blog/v1"
 gno = "0.9"
+private = true

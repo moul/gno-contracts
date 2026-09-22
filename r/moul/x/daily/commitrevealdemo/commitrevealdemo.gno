@@ -9,6 +9,7 @@ package commitrevealdemo
 import (
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/x/daily/commitreveal/v0"
 )
 
@@ -33,8 +34,8 @@ func Render(path string) string {
 	b.WriteString("Each player publishes only `H(value ‖ salt)`. Nothing about the move ")
 	b.WriteString("leaks, but neither can change it later.\n\n")
 	b.WriteString("| player | commitment |\n|---|---|\n")
-	b.WriteString("| alice | `" + short(aliceCommit) + "` |\n")
-	b.WriteString("| bob | `" + short(bobCommit) + "` |\n")
+	b.WriteString("| alice | `" + ui.ShortN(aliceCommit, 16, 0) + "` |\n")
+	b.WriteString("| bob | `" + ui.ShortN(bobCommit, 16, 0) + "` |\n")
 
 	b.WriteString("\n## Phase 2 — reveal\n\n")
 	b.WriteString("Now the values and salts are published and checked against the ")
@@ -64,8 +65,8 @@ func Render(path string) string {
 	one := commitreveal.MustCommit("rock", "salt-one-0123456789")
 	two := commitreveal.MustCommit("rock", "salt-two-0123456789")
 	b.WriteString("| same move, different salt | commitment |\n|---|---|\n")
-	b.WriteString("| player 1 | `" + short(one) + "` |\n")
-	b.WriteString("| player 2 | `" + short(two) + "` |\n")
+	b.WriteString("| player 1 | `" + ui.ShortN(one, 16, 0) + "` |\n")
+	b.WriteString("| player 2 | `" + ui.ShortN(two, 16, 0) + "` |\n")
 
 	b.WriteString("\n## Two details that are easy to get wrong\n\n")
 	b.WriteString("- **Length-prefixed hashing.** With plain concatenation `(\"ab\",\"cd…\")` ")
@@ -86,8 +87,6 @@ func row(b *strings.Builder, label string, err error) {
 	}
 	b.WriteString(" |\n")
 }
-
-func short(c string) string { return c[:16] + "…" }
 
 func itoa(i int) string {
 	if i == 0 {

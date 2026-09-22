@@ -17,17 +17,23 @@ const (
 	disclaimerURL  = "https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md"
 )
 
-// cmdReadmes ensures every contract directory has a README.md that (a) describes
-// the package, (b) links back to the repo, and (c) carries the standard
-// disclaimer — the stronger "experimental / vibe-coded" variant for packages
-// under an /x/ path. Hand-written content above the footer marker is preserved;
-// a stub is created for packages that have no README yet.
+// cmdReadmes refreshes the generated footer of every contract README: the repo
+// link, the dependency graph, the provenance line and the disclaimer: the
+// stronger "experimental / vibe-coded" variant for packages under an /x/ path.
+// Hand-written content above the footer marker is always preserved.
+//
+// It creates a README only when it has something true to say, i.e. when the
+// catalog carries a hand-authored description for the package. It used to write
+// a "_TODO: describe this package._" stub instead, which produced 28 READMEs
+// whose entire content was an apology plus boilerplate. A missing README is
+// better than a bad one: the package then shows up in `make guard-readmes` as
+// undocumented, which is the honest state, instead of looking documented.
 func cmdReadmes(root string) error {
 	m, err := loadManifest(root)
 	if err != nil {
 		return err
 	}
-	created, updated := 0, 0
+	created, updated, skipped := 0, 0, 0
 	for _, c := range m.Contracts {
 		// A superseded version's files live in git history, not in the tree.
 		// Writing a README for it would either fail or, worse, recreate the
@@ -40,6 +46,11 @@ func cmdReadmes(root string) error {
 
 		b, err := os.ReadFile(p)
 		if os.IsNotExist(err) {
+			if c.Description == "" {
+				// Nothing true to say yet. Do not invent a stub.
+				skipped++
+				continue
+			}
 			if err := os.WriteFile(p, []byte(pkgStub(c)+"\n"+footer+"\n"), 0o644); err != nil {
 				return err
 			}
@@ -66,7 +77,11 @@ func cmdReadmes(root string) error {
 			updated++
 		}
 	}
-	fmt.Printf("readmes: %d created, %d updated (%d contracts)\n", created, updated, len(m.Contracts))
+	fmt.Printf("readmes: %d created, %d updated, %d skipped for lack of a description (%d contracts)\n",
+		created, updated, skipped, len(m.Contracts))
+	if skipped > 0 {
+		fmt.Printf("readmes: run `make guard-readmes` to list the undocumented packages\n")
+	}
 	return nil
 }
 
@@ -80,12 +95,11 @@ func isExperimental(dir string) bool {
 	return false
 }
 
+// pkgStub is the seed body for a brand-new README. It is only ever called with
+// a non-empty c.Description: a package with nothing written about it gets no
+// README at all rather than a placeholder (see cmdReadmes).
 func pkgStub(c Contract) string {
-	desc := c.Description
-	if desc == "" {
-		desc = "_TODO: describe this package._"
-	}
-	return "# `" + c.PkgPath + "`\n\n" + desc + "\n"
+	return "# `" + c.PkgPath + "`\n\n" + c.Description + "\n"
 }
 
 func pkgFooter(c Contract) string {
