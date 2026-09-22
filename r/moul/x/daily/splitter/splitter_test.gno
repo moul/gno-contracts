@@ -4,14 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
 func reset() {
-	groups = avl.Tree{}
-	nextID = 0
+	groups = store.Named("splitter: group")
 }
 
 func TestRegisterAndOwed(cur realm, t *testing.T) {
@@ -25,13 +24,15 @@ func TestRegisterAndOwed(cur realm, t *testing.T) {
 	b := testutils.TestAddress("bob").String()
 
 	id := Register(cross(cur), a+","+b, "3,1")
-	uassert.Equal(t, 0, id, "first group id should be 0")
+	// v1 ids start at 1: the store never assigns 0, so the zero id stays
+	// usable as "absent". v0 handed out 0 for the first group.
+	uassert.Equal(t, 1, id, "first group id should be 1")
 
 	// pool 100, shares 3:1 -> alice 75, bob 25
 	RecordIncome(cross(cur), id, 100)
 
 	out := Render("")
-	uassert.True(t, strings.Contains(out, "Group #0"), "render shows group")
+	uassert.True(t, strings.Contains(out, "Group #1"), "render shows group")
 	uassert.True(t, strings.Contains(out, "| 3 | 75 |"), "alice owed 75")
 	uassert.True(t, strings.Contains(out, "| 1 | 25 |"), "bob owed 25")
 	uassert.True(t, strings.Contains(out, "Pool: 100"), "pool shown")

@@ -141,8 +141,10 @@ jobs:
           message: "preview: main at ${{ github.sha }}"
           deploy-key: ${{ secrets.PREVIEWS_DEPLOY_KEY }}
 
-  # Previews of pull requests that closed without their cleanup running. Hourly,
-  # because the site has a 1 GB budget and nothing else ever shrinks it.
+  # The only thing that ever shrinks the previews site. Hourly, because nothing
+  # else does: a pull request closing no longer deletes its own preview. The
+  # comment embeds the screenshots by URL, so evicting on the close event left
+  # every merged pull request with a comment full of broken images.
   evict:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
@@ -150,7 +152,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/previews-sync
         with:
-          message: "preview: evict closed pull requests"
-          prune-closed: "true"
+          message: "preview: evict previews past their grace period"
+          prune: "true"
           token: ${{ github.token }}
           deploy-key: ${{ secrets.PREVIEWS_DEPLOY_KEY }}

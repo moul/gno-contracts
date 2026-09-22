@@ -83,7 +83,7 @@ func cmdPreview(root string, args []string) error {
 	live := fs.String("live", defaultLive, "origin used for links the snapshot does not contain")
 	maxPkgs := fs.Int("max-pkgs", prMaxPkgs, "cap on previewed packages; 0 for no cap")
 	maxPages := fs.Int("max-pages", 0, "cap on crawled pages; 0 picks the default for the mode")
-	maxArgs := fs.Int("max-args", defaultArgBudget, "cap on render-argument pages per package")
+	maxArgs := fs.Int("max-args", defaultArgBudget, "cap on render-argument pages per package; 0 for no cap")
 	port := fs.Int("port", 8899, "port gnodev serves gnoweb on")
 	gnodev := fs.String("gnodev", envOr("GNODEV", "gnodev"), "gnodev binary")
 	chrome := fs.String("chrome", "", "Chrome/Chromium binary for screenshots (default: autodetect)")
@@ -206,6 +206,18 @@ func buildPreviewPlan(contracts []Contract, all bool, changedFile string, select
 	for _, c := range contracts {
 		if c.Ignored {
 			continue // archived: it does not build, and gnodev would not load it
+		}
+		// A superseded version is pinned by hash to a commit in this
+		// repository's history. Nobody can change what it renders, so a
+		// preview of it reviews nothing; and it renders whatever was true at
+		// that commit, including things fixed since. One of them still carries
+		// a local path in its README that main stopped shipping long ago, and
+		// rendering it gave that a public URL it never had.
+		//
+		// They are still handed to gnodev by workspacePkgDirs: packages in the
+		// tree import them, so they have to load. They are just not crawled.
+		if c.Superseded {
+			continue
 		}
 		live = append(live, c)
 	}

@@ -11,6 +11,7 @@ import (
 
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -113,21 +114,13 @@ func (b byRank) Less(i, j int) bool {
 	return b[i].owner.String() < b[j].owner.String()
 }
 
-func shortAddr(a address) string {
-	s := a.String()
-	if len(s) > 12 {
-		return s[:8] + "…" + s[len(s)-4:]
-	}
-	return s
-}
-
 func renderDetail(r *record, height int64) string {
 	current, alive := project(r, height)
 	status := "🔥 active"
 	if !alive {
 		status = "💤 lapsed"
 	}
-	out := "## `" + shortAddr(r.owner) + "`\n\n"
+	out := "## " + ui.Addr(r.owner) + "\n\n"
 	out += "- Status: " + status + "\n"
 	out += "- Current streak: " + strconv.FormatInt(current, 10) + "\n"
 	out += "- Longest streak: " + strconv.FormatInt(r.longest, 10) + "\n"
@@ -173,7 +166,7 @@ func Render(path string) string {
 		if !alive {
 			status = "💤"
 		}
-		out += "| " + strconv.Itoa(i+1) + " | `" + shortAddr(r.owner) + "` | " + status +
+		out += "| " + strconv.Itoa(i+1) + " | " + ui.Addr(r.owner) + " | " + status +
 			" | " + strconv.FormatInt(current, 10) + " | " + strconv.FormatInt(r.longest, 10) +
 			" | " + strconv.FormatInt(r.total, 10) + " |\n"
 	}

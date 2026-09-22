@@ -10,10 +10,23 @@ before making changes.
 1. **Everything is versioned, starting at `v0`; bump only on a compatibility
    change.** Every contract path ends in an explicit version segment —
    `gno.land/{p,r}/moul/<name>/v0` (then `v1`, `v2`, …). There is *no*
-   un-versioned contract, ever, and **the version is always the LAST path
-   element**: `gno.land/p/moul/ulist/lplist/v0`, never
+   un-versioned contract **except where an external consumer dictates the path**
+   (see below), and **the version is always the LAST path element**:
+   `gno.land/p/moul/ulist/lplist/v0`, never
    `gno.land/p/moul/ulist/v0/lplist`. That is the PACKAGE path; the directory
    is `p/moul/ulist/lplist` and carries no version at all.
+   - **The one exception: `r/moul/home`, which has no version at all.** gnoweb
+     serves `gno.land/u/<username>` by calling `Render("")` on the realm at the
+     exact path `/r/<username>/home`
+     (`gno.land/pkg/gnoweb/handler_http.go`, `GetUserView`: the path is built by
+     string concatenation and there is no version resolution anywhere in the
+     lookup). So a module line of `gno.land/r/moul/home/v0` publishes to a path
+     `/u/moul` will never read. The bare module line is an interface with
+     gnoweb, not a naming choice, and it is why `gnopm bump` refuses this
+     package: there is no `/vN` to increment. It versions *inside* instead:
+     content in mutable storage, `private = true` in `gnomod.toml` so the code
+     can be replaced in place. Do not generalise this: it needs an external
+     consumer that hard-codes the path.
    - **`v0` is the first version of any path**, per gno's own convention
      (gnolang/gno#5220): *initial, unaudited*. New contracts start there.
    - **The version lives in `gnomod.toml`, not in the directory name.**
@@ -267,6 +280,46 @@ nothing reusable to extract.
 > next contract follows it from the start — the contract-building agent rereads
 > these files each time.
 
+### Go companions (`<contract>/cmd/<name>/`)
+
+A contract that is **driven from a laptop** (content pushed from local files, a
+generated payload, a state dump to inspect) ships a small Go program. It goes at
+**`tools/<name>/`**, registered in the `tool` block of `tools/go.mod`, and is run
+as `go -C tools tool <name>`.
+
+Next to the contract, at `<contract-dir>/cmd/<name>/`, would read better and is
+**not possible**: there is no Go module at the repository root and there cannot
+be one. The root holds `vendor/gno.land`, and Go treats a `vendor/` in a module
+root as Go vendoring, refusing to build and deleting what it did not put there
+(see the comment at the top of `tools/go.mod`). So the only Go module that
+covers ordinary packages is `tools/`, and anything outside it is built by
+nothing: `go vet` and `go test` refuse it with *"directory prefix ... does not
+contain main module"*, and CI, which runs `go -C tools vet ./...` and
+`go -C tools test ./...`, never sees it. A companion placed beside its contract
+is silently untested, which is how `gnohome` spent one PR orphaned.
+
+Rules, so a companion stays small and safe:
+
+- **Standard library only.** No `gnoclient`, no cgo, no third `go.mod`. Read the
+  chain over plain JSON-RPC `abci_query`; that is ~60 lines and it keeps the
+  companion inside the `tools` module, so `go -C tools vet ./...` and
+  `go -C tools test ./...` cover it. (`tools/gnopublish` is the counter-example:
+  it links the full gno client stack and therefore had to become a separate
+  module.)
+- **Print transactions, do not sign them.** Emit `gnokey maketx …` commands for
+  the user to review and paste. A companion holds no key and broadcasts nothing,
+  so it can never surprise anyone. Name moul's key `moul` in what it emits.
+- **Mirror, and say so.** Anything duplicated from the realm (slug rules,
+  reserved names, a default template) carries a comment naming the `.gno` file it
+  mirrors, and a Go test pinning the two to the same behaviour.
+- **Table-driven tests, no network.** The chain-facing code is one function that
+  returns a string; test the parsing, not the transport.
+- The gno toolchain ignores it: `PKG_DIRS` only finds directories holding a
+  `gnomod.toml`, and `tools/` has none. **Cross-link it** from the contract's own
+  README, since it no longer sits in the same directory.
+
+Worked example: `tools/gnohome`, which drives `r/moul/home`.
+
 ## The maintenance CLI (`tools/gnocontracts`)
 
 A dependency-free Go tool declared in `go.mod` (`tool` directive) and invoked as
@@ -395,26 +448,46 @@ Order of preference: **example test** → **`Test` + `uassert.Equal`** (blank-li
 or panic/error outputs) → **filetest** (`filetests/*_filetest.gno`, auto-populated
 by `-update-golden-tests`; last resort, e.g. a package `main`/entrypoint).
 
-## Every package MUST have a README
+## A package README must say something, or not exist
 
-Each package/realm directory ships a standalone `README.md` that:
+The rule is **not** "every package has a README". It is: **a README that exists
+must say something true and useful.** A placeholder is worse than nothing,
+because the package then looks documented and the real text never gets written.
+This repo shipped 28 READMEs whose entire content was
+`_TODO: describe this package._` plus boilerplate, and every one of them was a
+click that taught the reader nothing.
 
-1. **Explains the package** — what it is, what it does, minimal API/usage. This
-   is hand-authored, ABOVE the generated footer marker.
-2. **Links back to the repo** and **carries the disclaimer** — this lives in a
-   generated managed block (between the `<!-- BEGIN/END GNOCONTRACTS FOOTER -->`
-   markers). Do not hand-edit inside it; run `make readmes`.
-3. **Experimental (`/x/`) packages** get the stronger disclaimer automatically:
-   "Highly experimental — potentially vibe-coded", linking to
-   [`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
-   treated as experimental/AI-assisted and not for production use.
+So, in order of preference:
 
-A PR includes the **hand-authored top** of each new package's README (the
-explanation above the footer marker). The generated footer, the root README
-table, and the catalog are all produced on `main`: `make readmes` creates/
-refreshes footers and `make gen` runs it, invoked by the `main` workflow after
-merge — not in a PR. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md)
-(the long form); the per-package minimal disclaimer links to it.
+1. **A good README.** What the package is, what it does, the minimal API, and
+   the thing a reader cannot get from the source: why it exists, what it is
+   *not* for, what is broken or unimplemented, which trap it avoids. If the
+   package is an unimplemented API sketch, say so in the first line.
+2. **A minimal accurate one.** One sentence that says what the package does is
+   a perfectly good README. Several here are exactly that.
+3. **No README at all.** Legal. `make guard-readmes LIST=1` lists these, which
+   is the honest state: undocumented, and visibly so.
+
+Never a placeholder. `make guard-readmes` (part of `make test` and of PR CI)
+fails on TODO / TBD / FIXME / WIP / "coming soon" in the hand-authored region,
+on a README that is nothing but its title plus the footer, and on a body under
+20 characters.
+
+Everything hand-authored goes **above** the generated footer marker. The footer
+(`<!-- BEGIN/END GNOCONTRACTS FOOTER -->`) carries the repo link, the dependency
+graph, the provenance line and the disclaimer; do not hand-edit inside it, run
+`make readmes`. **Experimental (`/x/`) packages** get the stronger disclaimer
+automatically: "Highly experimental — potentially vibe-coded", linking to
+[`DISCLAIMER.md`](./DISCLAIMER.md). Any package under an `/x/` path segment is
+treated as experimental/AI-assisted and not for production use.
+
+A PR includes the **hand-authored top** of each new package's README. The
+generated footer, the root README table, and the catalog are all produced on
+`main`: `make readmes` refreshes footers and `make gen` runs it, invoked by the
+`main` workflow after merge, not in a PR. `make readmes` will **not** create a
+README for a package that has no description in the catalog; write one by hand
+instead. The full disclaimer is [`DISCLAIMER.md`](./DISCLAIMER.md) (the long
+form); the per-package minimal disclaimer links to it.
 
 ## CI invariants (must stay green)
 
@@ -428,7 +501,7 @@ regenerated and committed on `main` by the `main` workflow.
 | workflow | when | what it owns |
 |---|---|---|
 | `ci` | push to main, every PR | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make toolcheck guard-examples guard-render lint test` |
-| `pr` | every PR event | **one** sticky comment, the path labels, and the published preview at `pr-<N>/` |
+| `pr` | PR opened / pushed / reopened | **one** sticky comment, the path labels, and the published preview at `pr-<N>/` |
 | `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, package README footers, `_assets/`, and on-chain status |
 | `gnopublish-ci` | PRs touching `tools/gnopublish/**` | that module only; it links the whole gno client stack and must not slow every PR |
 
@@ -480,6 +553,15 @@ single orphan commit each time, so the previews repository only ever holds the s
 as it is now. Publishing needs the `PREVIEWS_DEPLOY_KEY` secret, the private half of
 a write deploy key on that repository; a fork has no secrets, so it renders nothing
 and is linked to nothing.
+
+**A preview outlives its pull request by 21 days.** Nothing is deleted when a pull request
+closes: the sticky comment embeds the before/after screenshots *by URL*, so evicting on the
+close event leaves every merged pull request with a comment full of broken images (it did,
+until 2026-09-21). The hourly `main` run is the only thing that ever shrinks the site: it drops
+previews whose pull request closed more than `grace-days` ago, and if the site is still over
+`max-total-mb` (700) it gives up the closed ones early, oldest first. **A preview of an open
+pull request is never evicted**, whatever the budget says; if only those are left, the run warns
+instead.
 
 Locally: `make preview ARGS="./r/moul/home"` or `make site`, then serve the result
 (`python3 -m http.server -d _site`). A previews link is always safe to click and
