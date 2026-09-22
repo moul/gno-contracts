@@ -106,7 +106,10 @@ func TestRequestArithmetic(t *testing.T) {
 	uassert.Equal(t, 0, r.Next())
 	uassert.Equal(t, "pending", r.Status.String())
 	uassert.Equal(t, "grant", r.Kind.String())
-	uassert.Equal(t, dave.String(), r.Excluded().String())
+	uassert.True(t, r.Excludes(dave), "the applicant never votes on their own grant")
+	uassert.False(t, r.Excludes(alice))
+	uassert.Equal(t, dave.String(), r.Payee().String(), "a self request pays its applicant")
+	uassert.False(t, r.OnBehalf())
 	uassert.Equal(t, 1, r.ID)
 	uassert.Equal(t, r.ID, b.Get(1).ID)
 	uassert.True(t, b.Get(42) == nil, "unknown id")
@@ -440,3 +443,85 @@ func longString(n int) string {
 // reads as a single assertion.
 func errOf(_ Status, err error) error   { return err }
 func errOf2(_ Outcome, err error) error { return err }
+
+func TestFilingForSomeoneElseNeedsAReason(t *testing.T) {
+	b := board3()
+	ms := func() []*Milestone { return []*Milestone{NewMilestone("m", 100)} }
+
+	_, err := b.SubmitFor(dave, mallory, "", "t", "", ms(), 10)
+	uassert.ErrorIs(t, err, ErrNeedReason, "a request for someone else has to say why")
+
+	// The same address is just a self request, and needs nothing extra.
+	self, err := b.SubmitFor(dave, dave, "", "t", "", ms(), 10)
+	urequire.NoError(t, err)
+	uassert.False(t, self.OnBehalf())
+
+	_, err = b.SubmitFor(dave, address("not-an-address"), "because", "t", "", ms(), 10)
+	uassert.ErrorIs(t, err, ErrBadAddress)
+
+	long := ""
+	for i := 0; i <= MaxReason; i++ {
+		long += "x"
+	}
+	_, err = b.SubmitFor(dave, mallory, long, "t", "", ms(), 10)
+	uassert.ErrorIs(t, err, ErrBadReason)
+
+	r, err := b.SubmitFor(dave, mallory, "their account is empty", "t", "", ms(), 10)
+	urequire.NoError(t, err)
+	uassert.True(t, r.OnBehalf())
+	uassert.Equal(t, mallory.String(), r.Payee().String())
+	uassert.Equal(t, dave.String(), r.Applicant.String())
+}
+
+// A member who is paid by a request someone else filed is the same conflict of
+// interest as a member who filed it, with one address in between.
+func TestBothPartiesAreBarredFromVotingOnAGrant(t *testing.T) {
+	b := board3()
+	r, err := b.SubmitFor(alice, bob, "bob asked me to file it", "t", "",
+		[]*Milestone{NewMilestone("m", 100)}, 10)
+	urequire.NoError(t, err)
+
+	uassert.True(t, r.Excludes(alice), "the applicant")
+	uassert.True(t, r.Excludes(bob), "the beneficiary")
+	uassert.False(t, r.Excludes(carol))
+	uassert.Equal(t, 1, b.Eligible(r), "three members, two of them party to it")
+	uassert.Equal(t, 1, b.Majority(r))
+
+	_, err = b.Vote(alice, r.ID, true, "", 11)
+	uassert.ErrorIs(t, err, ErrConflict, "the applicant may not vote")
+	_, err = b.Vote(bob, r.ID, true, "", 11)
+	uassert.ErrorIs(t, err, ErrConflict, "the payee may not vote")
+
+	st, err := b.Vote(carol, r.ID, true, "fine", 12)
+	urequire.NoError(t, err)
+	uassert.Equal(t, "approved", st.String(), "the one eligible member carries it")
+
+	// And the same exclusion holds on the proof review, which is where the
+	// money actually moves.
+	urequire.NoError(t, b.SubmitProof(alice, r.ID, 0, Proof{Kind: "text", Ref: "done", Height: 13}))
+	_, err = b.Review(bob, r.ID, 0, true, "", 14)
+	uassert.ErrorIs(t, err, ErrConflict, "the payee may not review their own proof")
+}
+
+// The payee of a request filed for an empty account cannot transact until the
+// first tranche lands, so the filer has to be able to prove the work; once the
+// payee can transact, they have to be able to prove their own.
+func TestEitherPartyMaySubmitAProof(t *testing.T) {
+	b := board3()
+	r, err := b.SubmitFor(dave, mallory, "empty account", "t", "",
+		[]*Milestone{NewMilestone("one", 100), NewMilestone("two", 100)}, 10)
+	urequire.NoError(t, err)
+	b.Vote(alice, r.ID, true, "", 11)
+	b.Vote(bob, r.ID, true, "", 12)
+	urequire.Equal(t, "approved", r.Status.String())
+
+	uassert.ErrorIs(t, b.SubmitProof(carol, r.ID, 0, Proof{Kind: "text", Ref: "x", Height: 13}),
+		ErrNotApplicant, "a third party may not")
+
+	urequire.NoError(t, b.SubmitProof(dave, r.ID, 0, Proof{Kind: "text", Ref: "filer", Height: 13}))
+	b.Review(alice, r.ID, 0, true, "", 14)
+	b.Review(bob, r.ID, 0, true, "", 15)
+	urequire.True(t, r.Milestones[0].Released)
+
+	urequire.NoError(t, b.SubmitProof(mallory, r.ID, 1, Proof{Kind: "text", Ref: "payee", Height: 16}))
+}

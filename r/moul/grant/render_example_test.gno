@@ -18,10 +18,20 @@ func ExampleRender() {
 	// Output:
 	// # moul's grant board
 	//
-	// A small, personal grant board. moul funds it, and it exists mainly so the coding
-	// agents working on his repos can ask for money against work they can prove they
-	// did: a request, a milestone, a link to the merged PR, a tranche. It is open to
-	// anyone. Nothing here is privileged to a bot.
+	// A small, personal grant board. moul funds it out of his own pocket, and it
+	// exists mainly so the coding agents working on his repos, and the people he
+	// already works with, can ask for money against work they can prove they did: a
+	// request, a milestone, a link to the merged PR, a tranche. It is open to anyone.
+	// Nothing here is privileged to a bot.
+	//
+	// **This is not a faucet and it is not an official grant program.** It is one
+	// person's money, sent by hand, mostly to people he already knows, and it is also
+	// a proof of concept for the library underneath. There is no entitlement, no queue
+	// and no service level: a request can sit here unanswered, or be refused with one
+	// line of reasoning and nothing further. An official programme, where anyone asks
+	// for tokens and a DAO decides, is a separate thing that does not exist yet, and
+	// this page deliberately does not name a path for it: naming one would read as a
+	// commitment nobody has made.
 	//
 	// **One member, and the page says so.** A majority of a one-member board is one
 	// signature, so today this is moul deciding in public rather than a DAO deciding.
@@ -29,6 +39,13 @@ func ExampleRender() {
 	// every proof stays up including the refused ones, and every coin out is on the
 	// ledger. A bigger multi-member program is a separate thing and will live at its
 	// own path.
+	//
+	// **You can ask for someone else.** `ApplyFor` takes the address the money goes
+	// to and a reason for the detour, and prints both on the request. That is not a
+	// convenience: an account with nothing in it cannot pay the gas to ask for its
+	// first coins, so on a board meant to fund empty accounts, someone else filing is
+	// the only path that works. Either address may then submit the proofs, and neither
+	// may vote on the request.
 	//
 	// **For agents.** A gno.land account session scoped to this path lets an agent
 	// `Apply` and `SubmitProof` under its own address, so its track record here is
@@ -73,6 +90,10 @@ func ExampleRender() {
 	// gnokey maketx call -pkgpath gno.land/r/moul/grant/v0 -func Fund -send 5000000ugnot ...
 	// # ask for some
 	// gnokey maketx call -pkgpath gno.land/r/moul/grant/v0 -func Apply \
+	//   -args 'Port the thing' -args 'why it matters' -args 'design:100,ship:400' ...
+	// # ask on behalf of someone who cannot pay the gas to ask
+	// gnokey maketx call -pkgpath gno.land/r/moul/grant/v0 -func ApplyFor \
+	//   -args g1... -args 'their account is empty' \
 	//   -args 'Port the thing' -args 'why it matters' -args 'design:100,ship:400' ...
 	// # decide (members only)
 	// gnokey maketx call -pkgpath gno.land/r/moul/grant/v0 -func Vote -args 1 -args true -args 'reason' ...

@@ -1,10 +1,21 @@
 // Package grant is moul's personal grant board.
 //
-// It is small on purpose. moul funds it, moul is the only member, and it
-// exists mainly so the coding agents working on his repos have a way to ask
-// for money against work they can prove they did: a request, a milestone, a
-// link to the merged PR, a tranche. It is open to anyone, not only to agents,
-// and nothing here is privileged to a bot.
+// It is small on purpose. moul funds it out of his own pocket, moul is the
+// only member, and it exists mainly so the coding agents working on his repos
+// and the people he already works with have a way to ask for money against
+// work they can prove they did: a request, a milestone, a link to the merged
+// PR, a tranche. It is open to anyone, not only to agents, and nothing here is
+// privileged to a bot.
+//
+// # What this is NOT
+//
+// It is not a faucet, and it is not an official gno.land grant program. There
+// is no entitlement, no queue and no service level: a request can sit here
+// unanswered, or be refused with one line of reasoning and nothing further.
+// The official thing, where anyone asks for tokens and a DAO decides, is a
+// separate program that does not exist yet, at a path this realm deliberately
+// does not name: naming one would read as a commitment nobody has made. This
+// realm is moul's own money and a proof of concept for the library under it.
 //
 // A bigger, multi-member, better funded program is a separate thing and will
 // live at its own path. This one stays personal, and its limits are on the
@@ -104,16 +115,35 @@ func Fund(cur realm) {
 	chain.Emit("Fund", "from", from.String(), "amount", strconv.FormatInt(amount, 10))
 }
 
-// Apply files a grant request. milestones reads "title:amount,title:amount",
-// amounts in ugnot, paid in the order given. Returns the request id.
+// Apply files a grant request for the caller. milestones reads
+// "title:amount,title:amount", amounts in ugnot, paid in the order given.
+// Returns the request id.
 func Apply(cur realm, title, body, milestones string) int {
 	applicant := unsafe.PreviousRealm().Address()
-	r, err := program.Apply(applicant, title, body, milestones, runtime.ChainHeight())
+	return file(applicant, applicant, "", title, body, milestones)
+}
+
+// ApplyFor files a grant request whose tranches pay beneficiary rather than
+// the caller, with a reason for the detour that goes on the request page.
+//
+// This is the call that makes the board usable at all for the case it exists
+// to serve. An account with nothing in it cannot pay the gas to ask for its
+// first coins, so without someone else filing on its behalf the people who
+// most need a small grant are exactly the people who cannot ask for one.
+// Either address may then submit the proofs, and neither may vote.
+func ApplyFor(cur realm, beneficiary, reason, title, body, milestones string) int {
+	applicant := unsafe.PreviousRealm().Address()
+	return file(applicant, address(beneficiary), reason, title, body, milestones)
+}
+
+func file(applicant, beneficiary address, reason, title, body, milestones string) int {
+	r, err := program.ApplyFor(applicant, beneficiary, reason, title, body, milestones,
+		runtime.ChainHeight())
 	if err != nil {
 		panic(err)
 	}
 	chain.Emit("Apply", "id", strconv.Itoa(r.ID), "applicant", applicant.String(),
-		"total", strconv.FormatInt(r.Total(), 10))
+		"beneficiary", r.Payee().String(), "total", strconv.FormatInt(r.Total(), 10))
 	return r.ID
 }
 

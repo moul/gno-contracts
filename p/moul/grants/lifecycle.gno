@@ -11,12 +11,34 @@ func NewMilestone(title string, amount int64) *Milestone {
 	return &Milestone{Title: title, Amount: amount}
 }
 
-// Submit files a grant application. Anyone may apply; being a member is not
-// required and does not help, since a member is barred from voting on their
-// own request.
+// Submit files a grant application for the applicant themselves. Anyone may
+// apply; being a member is not required and does not help, since a member is
+// barred from voting on their own request.
 func (b *Board) Submit(applicant address, title, body string, ms []*Milestone, height int64) (*Request, error) {
-	if !applicant.IsValid() {
+	return b.SubmitFor(applicant, applicant, "", title, body, ms, height)
+}
+
+// SubmitFor files a grant application whose money goes to beneficiary rather
+// than to the applicant, with a reason for the detour.
+//
+// The reason is required, and it is required because it is the only thing on
+// the page that answers the question a reader will have: why is this person
+// asking for someone else's money. The usual honest answer is that the payee
+// has an empty account and cannot pay the gas to ask, which is exactly the
+// case a grant board exists to serve and exactly the case an impersonation
+// looks like. Making the claim explicit is what lets a member check it.
+//
+// Passing the applicant's own address is the same as Submit and needs no
+// reason.
+func (b *Board) SubmitFor(applicant, beneficiary address, reason, title, body string, ms []*Milestone, height int64) (*Request, error) {
+	if !applicant.IsValid() || !beneficiary.IsValid() {
 		return nil, ErrBadAddress
+	}
+	if len(reason) > MaxReason {
+		return nil, ErrBadReason
+	}
+	if beneficiary != applicant && reason == "" {
+		return nil, ErrNeedReason
 	}
 	if err := checkTitle(title); err != nil {
 		return nil, err
@@ -36,12 +58,14 @@ func (b *Board) Submit(applicant address, title, body string, ms []*Milestone, h
 		}
 	}
 	return b.file(&Request{
-		Kind:       KindGrant,
-		Applicant:  applicant,
-		Title:      title,
-		Body:       body,
-		Milestones: ms,
-		CreatedAt:  height,
+		Kind:        KindGrant,
+		Applicant:   applicant,
+		Beneficiary: beneficiary,
+		Reason:      reason,
+		Title:       title,
+		Body:        body,
+		Milestones:  ms,
+		CreatedAt:   height,
 	}), nil
 }
 
@@ -71,13 +95,14 @@ func (b *Board) SubmitMemberChange(proposer, subject address, add bool, body str
 		title = "Add " + subject.String()
 	}
 	return b.file(&Request{
-		Kind:      KindMember,
-		Applicant: proposer,
-		Title:     title,
-		Body:      body,
-		Subject:   subject,
-		Add:       add,
-		CreatedAt: height,
+		Kind:        KindMember,
+		Applicant:   proposer,
+		Beneficiary: proposer,
+		Title:       title,
+		Body:        body,
+		Subject:     subject,
+		Add:         add,
+		CreatedAt:   height,
 	}), nil
 }
 
@@ -120,7 +145,7 @@ func (b *Board) Decides(id int, voter address, approve bool) (bool, Status) {
 	if r == nil || r.Status != Pending {
 		return false, Pending
 	}
-	if !b.IsMember(voter) || voter == r.Excluded() || r.BallotOf(voter) != nil {
+	if !b.IsMember(voter) || r.Excludes(voter) || r.BallotOf(voter) != nil {
 		return false, Pending
 	}
 	yes, no := b.Standing(r)
@@ -154,7 +179,7 @@ func (b *Board) ReviewDecides(id, idx int, voter address, accept bool) (bool, Ou
 	if a == nil {
 		return false, UnderReview
 	}
-	if !b.IsMember(voter) || voter == r.Applicant || find(a.Reviews, voter) != nil {
+	if !b.IsMember(voter) || r.Excludes(voter) || find(a.Reviews, voter) != nil {
 		return false, UnderReview
 	}
 	yes, no := b.standing(a.Reviews)
@@ -201,7 +226,7 @@ func (b *Board) Vote(voter address, id int, approve bool, reason string, height 
 	if r.Status != Pending {
 		return r.Status, ErrNotPending
 	}
-	if voter == r.Excluded() {
+	if r.Excludes(voter) {
 		return r.Status, ErrConflict
 	}
 	if r.BallotOf(voter) != nil {
@@ -241,6 +266,12 @@ func (b *Board) applyMemberChange(r *Request, height int64) {
 // SubmitProof offers evidence for the next unreleased milestone of an
 // approved grant. Milestones are earned in order, and only one proof is under
 // review at a time.
+//
+// Either the applicant or the beneficiary may submit. On a request filed for
+// an empty account, the payee cannot transact until the first tranche lands,
+// so restricting this to the payee would strand the grant it was filed to
+// unstick; restricting it to the filer would leave the payee unable to show
+// their own work once they can.
 func (b *Board) SubmitProof(caller address, id, idx int, p Proof) error {
 	r := b.Get(id)
 	if r == nil {
@@ -249,7 +280,7 @@ func (b *Board) SubmitProof(caller address, id, idx int, p Proof) error {
 	if r.Kind != KindGrant || r.Status != Approved {
 		return ErrNotApproved
 	}
-	if r.Applicant != caller {
+	if r.Applicant != caller && r.Payee() != caller {
 		return ErrNotApplicant
 	}
 	if idx < 0 || idx >= len(r.Milestones) {
@@ -289,7 +320,7 @@ func (b *Board) Review(voter address, id, idx int, accept bool, reason string, h
 	if idx < 0 || idx >= len(r.Milestones) {
 		return UnderReview, ErrNoMilestone
 	}
-	if voter == r.Applicant {
+	if r.Excludes(voter) {
 		return UnderReview, ErrConflict
 	}
 	if len(reason) > MaxReason {

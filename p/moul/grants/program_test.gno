@@ -187,3 +187,23 @@ func TestOneMemberBoard(t *testing.T) {
 }
 
 func errOf3(_ Outcome, _ *Payment, err error) error { return err }
+
+func TestTheTrancheGoesToTheBeneficiary(t *testing.T) {
+	p := NewProgram("ugnot", alice, bob)
+	r, err := p.ApplyFor(dave, mallory, "mallory cannot pay the gas to ask", "t", "", "one:700", 10)
+	urequire.NoError(t, err)
+	p.Board.Vote(alice, r.ID, true, "", 11)
+	p.Board.Vote(bob, r.ID, true, "", 12)
+	urequire.NoError(t, p.Board.SubmitProof(dave, r.ID, 0, Proof{Kind: "text", Ref: "done", Height: 13}))
+
+	_, pay, err := p.Review(alice, r.ID, 0, true, "", 14, 700)
+	urequire.NoError(t, err)
+	uassert.True(t, pay == nil, "neither party sits on the board, so both members must accept")
+
+	_, pay, err = p.Review(bob, r.ID, 0, true, "", 15, 700)
+	urequire.NoError(t, err)
+	urequire.True(t, pay != nil, "the second accept releases it")
+	uassert.Equal(t, mallory.String(), pay.To.String(), "the money goes to the payee, not the filer")
+	uassert.Equal(t, int64(700), pay.Amount)
+	uassert.Equal(t, mallory.String(), p.Payments[0].To.String(), "and so does the ledger row")
+}

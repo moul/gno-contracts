@@ -62,6 +62,28 @@ leaves zero eligible voters and `Majority` returns an unreachable 1 rather than 
 it. `Request.Tally` counts the raw record. The two differ exactly when a voter has since
 been removed from the board: their ballot stays readable and stops carrying weight.
 
+## Asking for someone else
+
+`SubmitFor(applicant, beneficiary, reason, …)` files a request whose tranches pay an address
+other than the one that filed it. `Submit` is the same call with the two addresses equal.
+
+The split is not a convenience. **An account with nothing in it cannot pay the gas to ask for
+its first coins**, so on a board whose purpose is to fund empty accounts, someone else filing
+is the only path that works. Two rules follow from that, and both are in the library:
+
+- **The reason is required** when the payee is someone else. Nothing verifies it; it is a
+  claim by the applicant, and the renderer prints it under its own heading so a member can
+  check it before voting.
+- **Both addresses are excluded from voting**, on the request and on every proof. A member
+  paid by a request a friend filed is the same conflict of interest with one address in
+  between. `Request.Excludes` is the predicate, `Board.Eligible` recounts over it, and the
+  majority moves with it.
+
+Either the applicant or the beneficiary may `SubmitProof`: the payee may not be able to
+transact until the first tranche lands, and once they can, they have to be able to show
+their own work. `Request.Payee()` is who a released tranche pays, and it is what the
+`Payment` handed back to the realm carries.
+
 ## Membership is a request like any other
 
 `SubmitMemberChange` files a `KindMember` request. It asks for no money, and when it
@@ -108,8 +130,25 @@ anything else that needs to check a precondition it cannot roll back.
 callouts), so a realm's whole `Render` is a struct literal.
 
 Build it **inside** `Render`, not in a realm global: `Note` is a func, and `Balance` has to
-be read fresh on every call anyway. The four `ExampleRenderer*` tests pin every page of a
+be read fresh on every call anyway. The five `ExampleRenderer*` tests pin every page of a
 board mid-flight, so a change to any rule shows up as a diff in the markdown.
+
+**Escaping happens here, once.** Everything a caller typed goes through
+[`p/moul/kit/ui`](/p/moul/kit/ui/v0) and
+[`p/nt/markdown/sanitize`](/p/nt/markdown/sanitize/v0) on its way to the page, so a realm
+neither repeats it nor pre-escapes (escaping twice shows the backslashes). The bar differs
+by slot on purpose: a one-line slot (a title, a milestone name, a reason on a ballot) keeps
+nothing a caller typed as markup, while a prose slot (the body of an application, the note
+on a proof) goes through `sanitize.Block`, which preserves inline links and emphasis because
+a grant application whose link to the merged PR renders as literal text is a worse page.
+What `Block` still kills is everything structural, so a paragraph cannot leave its paragraph.
+The realm's own `Title`, `Intro`, `Notes` and `Footer` are chrome, written by whoever
+deployed it, and are emitted as-is.
+
+`TestEveryCallerSuppliedStringIsEscaped` drives one board through every caller-controlled
+slot and asserts no structural line of any page carries a live link, an image or a gnoweb
+tag. It asserts the dangerous sequence is dead, never the exact escaped bytes: those belong
+to the sanitizer and change when it changes.
 
 ## What this deliberately does not do
 

@@ -8,7 +8,7 @@
 // height, and the caller performs the transfer. That is what makes the whole
 // state machine unit-testable without a node, and it is what lets the same
 // board be driven by a realm, by a test, or by a different payment rail.
-// Live demo: gno.land/r/moul/x/grantsdao/v0.
+// Live board: gno.land/r/moul/grant/v0.
 //
 // # The shape of a grant
 //
@@ -19,6 +19,19 @@
 // A rejected proof does not kill the grant, it just closes one Attempt; the
 // applicant submits another. Every attempt, accepted or not, stays on the
 // record with the ballots that decided it.
+//
+// # Asking for someone else
+//
+// A request has an applicant, who files it and answers for it, and a
+// beneficiary, who gets paid. SubmitFor separates the two and takes a reason
+// for the detour; Submit is the common case where they are the same address.
+//
+// The split is not a convenience. An account with nothing in it cannot pay the
+// gas to ask for its first coins, so on a board whose whole purpose is to fund
+// empty accounts, "someone else files it" is the ONLY path that works. Both
+// addresses are then barred from voting on the request, and either of them may
+// submit a proof, for the same reason: the payee may not be able to transact
+// at all until the first tranche lands.
 //
 // # Who may vote
 //
@@ -63,6 +76,7 @@ var (
 	ErrBadAmount     = errors.New("grants: every milestone must ask for a positive amount")
 	ErrBadProof      = errors.New("grants: proof kind must be url, hash or text, with a reference")
 	ErrBadReason     = errors.New("grants: reason must be at most 300 characters")
+	ErrNeedReason    = errors.New("grants: filing for someone else needs a reason")
 	ErrBadAddress    = errors.New("grants: invalid address")
 	ErrIsMember      = errors.New("grants: already a board member")
 	ErrLastMember    = errors.New("grants: the last member cannot be removed")
@@ -193,18 +207,34 @@ func (m *Milestone) Current() *Attempt {
 
 // Request is a grant application or a membership change.
 type Request struct {
-	ID         int
-	Kind       Kind
-	Applicant  address
-	Title      string
-	Body       string
-	Milestones []*Milestone
-	Subject    address // KindMember only: the address being added or removed
-	Add        bool    // KindMember only: true adds, false removes
-	Votes      []Ballot
-	Status     Status
-	CreatedAt  int64
-	DecidedAt  int64
+	ID          int
+	Kind        Kind
+	Applicant   address // who filed it and answers for it
+	Beneficiary address // who gets paid; equal to Applicant on a self request
+	Reason      string  // why the applicant is asking on someone else's behalf
+	Title       string
+	Body        string
+	Milestones  []*Milestone
+	Subject     address // KindMember only: the address being added or removed
+	Add         bool    // KindMember only: true adds, false removes
+	Votes       []Ballot
+	Status      Status
+	CreatedAt   int64
+	DecidedAt   int64
+}
+
+// OnBehalf reports whether this grant was filed by one address for another.
+func (r *Request) OnBehalf() bool {
+	return r.Kind == KindGrant && r.Beneficiary != r.Applicant
+}
+
+// Payee is the address a released tranche pays. It is the beneficiary, which
+// is the applicant unless the request was filed for someone else.
+func (r *Request) Payee() address {
+	if r.Beneficiary.IsValid() {
+		return r.Beneficiary
+	}
+	return r.Applicant
 }
 
 // Total is the sum of every milestone, released or not.
@@ -258,13 +288,17 @@ func (r *Request) BallotOf(voter address) *Ballot {
 	return find(r.Votes, voter)
 }
 
-// Excluded is the address barred from voting on this request because the
-// decision is about them.
-func (r *Request) Excluded() address {
+// Excludes reports whether addr is barred from voting on this request because
+// the decision is about them.
+//
+// A grant excludes BOTH parties, not just the one who typed the transaction:
+// letting a member be paid by a request a friend filed for them is the same
+// conflict with one more step in it.
+func (r *Request) Excludes(addr address) bool {
 	if r.Kind == KindMember {
-		return r.Subject
+		return addr == r.Subject
 	}
-	return r.Applicant
+	return addr == r.Applicant || addr == r.Payee()
 }
 
 func count(bs []Ballot) (yes, no int) {
@@ -334,13 +368,16 @@ func (b *Board) JoinedAt(addr address) int64 {
 	return v.(int64)
 }
 
-// Eligible is how many members may vote on a request: everyone but the party
+// Eligible is how many members may vote on a request: everyone but the parties
 // the decision is about.
 func (b *Board) Eligible(r *Request) int {
-	n := b.MemberCount()
-	if b.IsMember(r.Excluded()) {
-		n--
-	}
+	n := 0
+	b.members.Iterate("", "", func(k string, _ any) bool {
+		if !r.Excludes(address(k)) {
+			n++
+		}
+		return false
+	})
 	return n
 }
 

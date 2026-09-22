@@ -61,11 +61,17 @@ func (p *Program) Fund(from address, amount, height int64) error {
 // Apply files a grant request from a milestone spec, "design:100,ship:400".
 // See ParseMilestones for the grammar.
 func (p *Program) Apply(applicant address, title, body, spec string, height int64) (*Request, error) {
+	return p.ApplyFor(applicant, applicant, "", title, body, spec, height)
+}
+
+// ApplyFor is Apply for a request whose money goes to someone other than the
+// address filing it. See Board.SubmitFor for why the reason is required.
+func (p *Program) ApplyFor(applicant, beneficiary address, reason, title, body, spec string, height int64) (*Request, error) {
 	ms, err := ParseMilestones(spec)
 	if err != nil {
 		return nil, err
 	}
-	return p.Board.Submit(applicant, title, body, ms, height)
+	return p.Board.SubmitFor(applicant, beneficiary, reason, title, body, ms, height)
 }
 
 // Review casts a member's verdict on the proof under review and, when that
@@ -94,7 +100,7 @@ func (p *Program) Review(voter address, id, idx int, accept bool, reason string,
 		Height:    height,
 		Request:   id,
 		Milestone: idx,
-		To:        r.Applicant,
+		To:        r.Payee(),
 		Amount:    r.Milestones[idx].Amount,
 	}
 	p.Payments = append(p.Payments, pay)

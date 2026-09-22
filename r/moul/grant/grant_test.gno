@@ -201,3 +201,44 @@ func TestRenderUnknownPaths(t *testing.T) {
 	uassert.True(t, len(Render("ledger")) > 0)
 	uassert.True(t, len(Render("nope")) > 0)
 }
+
+// The case this board exists for: an account with nothing in it cannot pay the
+// gas to ask for its first coins, so someone else asks for it. The treasury
+// ends where it started, at zero, which is what the pinned pages render.
+func TestApplyForPaysTheBeneficiaryNotTheFiler(cur realm, t *testing.T) {
+	reset()
+	urequire.Equal(t, int64(0), Balance())
+	before := balanceOf(kim)
+
+	issue(300)
+	testing.SetOriginSend(chain.NewCoins(chain.NewCoin(Denom, 300)))
+	testing.SetRealm(testing.NewUserRealm(address(Owner)))
+	Fund(cross(cur))
+
+	// zoe files for kim, whose account is empty.
+	testing.SetRealm(testing.NewUserRealm(zoe))
+	id := ApplyFor(cross(cur), kim.String(), "kim's account is empty, she cannot pay the gas",
+		"Fund a first key", "so she can transact at all", "first transfer:300")
+	r := program.Board.Get(id)
+	urequire.True(t, r.OnBehalf())
+	uassert.Equal(t, kim.String(), r.Payee().String())
+
+	// The owner carries it alone, and either party may prove it. Here the
+	// filer does, because the payee still cannot send a transaction.
+	testing.SetRealm(testing.NewUserRealm(address(Owner)))
+	Vote(cross(cur), id, true, "I know kim.")
+	testing.SetRealm(testing.NewUserRealm(zoe))
+	SubmitProof(cross(cur), id, 0, "text", "she has a key and no coins", "")
+	testing.SetRealm(testing.NewUserRealm(address(Owner)))
+	Review(cross(cur), id, 0, true, "Sent.")
+
+	uassert.Equal(t, before+300, balanceOf(kim), "the payee got the coins")
+	uassert.Equal(t, int64(0), Balance(), "and the treasury is back to empty")
+	uassert.Equal(t, kim.String(), program.Payments[0].To.String())
+
+	// A reason is not optional when the payee is someone else.
+	testing.SetRealm(testing.NewUserRealm(zoe))
+	uassert.AbortsContains(t, cur, "needs a reason", func() {
+		ApplyFor(cross(cur), kim.String(), "", "no reason given", "", "x:1")
+	})
+}
