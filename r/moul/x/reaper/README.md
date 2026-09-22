@@ -57,6 +57,48 @@ what is legal to delete. It only changes how much the reaper gets paid, by about
 and they are worth batching in that order: compaction returns nothing while a
 live note still sits below the dead ones.
 
+## A note body is attacker-controlled, and the board renders it
+
+Anyone who pays the deposit chooses the bytes, and `Render` puts them on a page
+every reader of the realm loads. That makes a note body untrusted input landing
+in an **inline** markdown slot, the same category as a username or a post title,
+and it is escaped with
+[`p/nt/markdown/sanitize`](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/nt/markdown/sanitize/v0)
+`InlineText` before it reaches the page.
+
+This realm shipped without that, and it is worth naming what the gap actually
+allowed, because the hand-rolled version looked like it was doing the job:
+
+```go
+// what the board used to do, and what it stopped: only "\n" and "|"
+oneLine := strings.ReplaceAll(strings.ReplaceAll(body, "\n", " "), "|", " ")
+```
+
+| a note containing | rendered as | so a poster could |
+|---|---|---|
+| `[Claim 100 GNOT](https://evil.example)` | a live link | phish every reader, with the realm's page as the attribution |
+| `![x](https://evil.example/p.png)` | an image request | log the IP of everyone who opened the board |
+| `<gno-columns>`, `<h5>` | gnoweb chrome | lay out the page, or forge a section heading |
+| `\r`, U+2028, U+2029 | a line break | leave the bullet item and emit top-level markdown |
+| U+202E, U+200B | nothing visible | reorder what a reader sees away from what the bytes say |
+
+`InlineText` closes all five, and none of them were a bug in the incentive
+design: the storage accounting was right, the rendering was not.
+
+Two details that are easy to get backwards:
+
+- **Truncate first, sanitize second.** The escaper works by inserting
+  backslashes and is not idempotent, so cutting its output at an offset can
+  strand a trailing lone backslash that escapes the chrome appended after it.
+- **Cut on a rune boundary.** Slicing a body at byte 48 splits a multi-byte
+  character in half and puts invalid UTF-8 on the page. One emoji in a note was
+  enough.
+
+The general rule, for any realm that renders something a caller stored: match
+the helper to the slot the content lands in (inline text, block, table cell,
+URL, code fence) and wrap each user-supplied string exactly once. The package
+doc carries the table.
+
 ## What it is built from
 
 The realm is thin on purpose. Two packages own the parts it does not:
