@@ -218,7 +218,7 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/demo/render/v0`](r/moul/demo/render) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/render/v0) | — | — | — |
 | [`r/moul/demo/vault/v0`](r/moul/demo/vault) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/vault/v0) | — | — | 1 |
 | [`r/moul/demo/wikicoin/v0`](r/moul/demo/wikicoin) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/wikicoin/v0) | — | — | 2 |
-| [`r/moul/faucet/v0`](r/moul/faucet) 🏛️ | — | — | — | — | — | 2 |
+| [`r/moul/faucet/v0`](r/moul/faucet) 🏛️ | — | — | [✅](https://gno.land/r/moul/faucet/v0) | — | — | 2 |
 | [`r/moul/gns/v0`](r/moul/gns) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/grant/v0`](r/moul/grant) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/hello/v0`](r/moul/hello) 🏛️ | — | — | [✅](https://gno.land/r/moul/hello/v0) | — | — | 1 |
@@ -373,7 +373,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T14:49:19Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T15:03:35Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
