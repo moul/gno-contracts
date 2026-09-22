@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-22T16:38:43Z",
+  "status_checked_at": "2026-09-22T18:20:15Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2215,6 +2215,54 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/games/clock/v0",
+      "dir": "p/moul/x/games/clock",
+      "kind": "p",
+      "name": "x/games/clock",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/games/prorata/v0",
+      "dir": "p/moul/x/games/prorata",
+      "kind": "p",
+      "name": "x/games/prorata",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/plan9/memfs/v0",
       "dir": "p/moul/x/plan9/memfs",
       "kind": "p",
@@ -2410,6 +2458,32 @@
       "description": "",
       "deps": [
         "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/wesh/v0",
+      "dir": "p/moul/x/wesh",
+      "kind": "p",
+      "name": "x/wesh",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/b58/v0"
       ],
       "draft": false,
       "published": {
@@ -3157,6 +3231,35 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/amm/v0",
+      "dir": "r/moul/x/amm",
+      "kind": "r",
+      "name": "x/amm",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/grc20/v0",
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/nt/grc20reg/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -7170,6 +7273,36 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/games/lastwords/v0",
+      "dir": "r/moul/x/games/lastwords",
+      "kind": "r",
+      "name": "x/games/lastwords",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/pullpayment/v0",
+        "gno.land/p/moul/x/games/clock/v0",
+        "gno.land/p/moul/x/games/prorata/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/plan9/dev/v0",
       "dir": "r/moul/x/plan9/dev",
       "kind": "r",
@@ -7306,6 +7439,33 @@
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/seqid/v0",
         "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/wesh/v0",
+      "dir": "r/moul/x/wesh",
+      "kind": "r",
+      "name": "x/wesh",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/wesh/v0",
+        "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
       "published": {
