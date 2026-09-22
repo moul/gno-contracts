@@ -19,8 +19,10 @@ digraph gnocontracts {
   "gno.land/p/moul/mdlist/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/mdtable/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/memo/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/mygnoscan/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/once/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/pageable/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/pausable/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/printfdebugging/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/realmpath/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/svg/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -86,6 +88,7 @@ digraph gnocontracts {
   "gno.land/p/nt/seqid/v0";
   "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/config/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/config/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/gnoface/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/grc20/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/importdemo/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -285,6 +288,10 @@ digraph gnocontracts {
   "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/xdao/v0" -> "gno.land/p/moul/udao/v0";
   "gno.land/r/moul/config/v0" -> "gno.land/p/moul/authz/v0";
+  "gno.land/r/moul/config/v1" -> "gno.land/p/moul/authz/v0";
+  "gno.land/r/moul/config/v1" -> "gno.land/p/moul/mygnoscan/v0";
+  "gno.land/r/moul/config/v1" -> "gno.land/p/moul/pausable/v0";
+  "gno.land/r/moul/config/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/demo/gnoface/v0" -> "gno.land/p/moul/entropy/v0";
   "gno.land/r/moul/demo/gnoface/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/demo/grc20/v0" -> "gno.land/p/nt/grc20/v0";
@@ -301,7 +308,9 @@ digraph gnocontracts {
   "gno.land/r/moul/grant/v0" -> "gno.land/p/moul/grants/v0";
   "gno.land/r/moul/hello/v0" -> "gno.land/p/moul/greet/v0";
   "gno.land/r/moul/home" -> "gno.land/p/moul/dynreplacer/v0";
+  "gno.land/r/moul/home" -> "gno.land/p/moul/mygnoscan/v0";
   "gno.land/r/moul/home" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/home" -> "gno.land/r/moul/config/v1";
   "gno.land/r/moul/outfmt/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/moul/mdtable/v0";

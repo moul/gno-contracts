@@ -145,10 +145,12 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`p/moul/mdlist/v0`](p/moul/mdlist) 📦 | — | — | [✅](https://gno.land/p/moul/mdlist/v0) | — | — | 1 |
 | [`p/moul/mdtable/v0`](p/moul/mdtable) 📦 | — | — | [🗄️](https://gno.land/p/moul/mdtable/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable/v0) ≈ | — |
 | [`p/moul/memo/v0`](p/moul/memo) 📦 | — | — | [✅](https://gno.land/p/moul/memo/v0) | — | — | 2 |
+| [`p/moul/mygnoscan/v0`](p/moul/mygnoscan) 📦 | — | — | — | — | — | — |
 | [`p/moul/nestedpkg/v0`](p/moul/nestedpkg) 📦 | — | — | [✅](https://gno.land/p/moul/nestedpkg/v0) | — | — | — |
 | [`p/moul/once/v0`](p/moul/once) 📦 | — | — | [🗄️](https://gno.land/p/moul/once/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/once/v0) ≈ | — |
 | [`p/moul/ownable/v0`](p/moul/ownable) 📦 | — | — | [✅](https://gno.land/p/moul/ownable/v0) | — | — | — |
 | [`p/moul/pageable/v0`](p/moul/pageable) 📦 | — | — | [✅](https://gno.land/p/moul/pageable/v0) | — | — | 1 |
+| [`p/moul/pausable/v0`](p/moul/pausable) 📦 | — | — | — | — | — | — |
 | [`p/moul/printfdebugging/v0`](p/moul/printfdebugging) 📦 | — | — | [✅](https://gno.land/p/moul/printfdebugging/v0) | — | — | 1 |
 | [`p/moul/realmpath/v0`](p/moul/realmpath) 📦 | — | — | [🗄️](https://gno.land/p/moul/realmpath/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/realmpath/v0) ≈ | — |
 | [`p/moul/safe/v0`](p/moul/safe) 📦 | — | — | [✅](https://gno.land/p/moul/safe/v0) | — | — | — |
@@ -206,7 +208,8 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`p/moul/x/wiki/v0`](p/moul/x/wiki) 📦 | — | — | — | — | — | 6 |
 | [`p/moul/xdao/v0`](p/moul/xdao) 📦 | — | — | [✅](https://gno.land/p/moul/xdao/v0) | — | — | 1 |
 | [`p/moul/xmath/v0`](p/moul/xmath) 📦 | — | — | [✅](https://gno.land/p/moul/xmath/v0) | — | — | — |
-| [`r/moul/config/v0`](r/moul/config) 🏛️ | — | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
+| [`r/moul/config/v0`](https://github.com/moul/gno-contracts/tree/bd1ff5de0053958282ac81f08ed8bfcb2081982c/r/moul/config) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
+| [`r/moul/config/v1`](r/moul/config) 🏛️ | — | — | — | — | — | 4 |
 | [`r/moul/demo/args/v0`](r/moul/demo/args) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/args/v0) | — | — | — |
 | [`r/moul/demo/data/v0`](r/moul/demo/data) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/data/v0) | — | — | — |
 | [`r/moul/demo/gnoface/v0`](r/moul/demo/gnoface) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/gnoface/v0) | — | — | 2 |
@@ -222,7 +225,7 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/gns/v0`](r/moul/gns) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/grant/v0`](r/moul/grant) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/hello/v0`](r/moul/hello) 🏛️ | — | — | [✅](https://gno.land/r/moul/hello/v0) | — | — | 1 |
-| [`r/moul/home`](r/moul/home) 🏛️ | — | — | [✅](https://gno.land/r/moul/home) | — | — | 2 |
+| [`r/moul/home`](r/moul/home) 🏛️ | — | — | [✅](https://gno.land/r/moul/home) | — | — | 4 |
 | [`r/moul/home/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/home) 🏛️ 🧊 | — | — | — | — | — | — |
 | [`r/moul/outfmt/v0`](r/moul/outfmt) 🏛️ | — | — | [✅](https://gno.land/r/moul/outfmt/v0) | — | — | 1 |
 | [`r/moul/present/v0`](r/moul/present) 🏛️ | — | — | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
@@ -373,7 +376,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T15:53:17Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T16:15:22Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
