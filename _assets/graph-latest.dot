@@ -69,6 +69,8 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/games/clock/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/games/prorata/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/grc20wrap/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/merkle/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/mmr/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/pair/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/memfs/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/ninep/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -151,7 +153,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/lottery/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/luhndemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/markovdemo/v0" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/r/moul/x/daily/merkledrop/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/merkledrop/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/microblog/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/moodstone/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/multisetdemo/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -205,6 +207,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/pairs/bbb/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/plan9/dev/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/plan9/ns/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/provable/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/reaper/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/vm/bfdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/wesh/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -252,6 +255,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/grc20wrap/v0" -> "gno.land/p/nt/grc20/v0";
   "gno.land/p/moul/x/grc20wrap/v0" -> "gno.land/p/nt/seqid/v0";
   "gno.land/p/moul/x/grc20wrap/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/moul/x/mmr/v0" -> "gno.land/p/moul/x/merkle/v0";
   "gno.land/p/moul/x/pair/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/x/pair/v0" -> "gno.land/p/nt/grc20/v0";
   "gno.land/p/moul/x/pair/v0" -> "gno.land/p/nt/ufmt/v0";
@@ -377,7 +381,9 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/lottery/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/luhndemo/v0" -> "gno.land/p/moul/x/daily/luhn/v0";
   "gno.land/r/moul/x/daily/markovdemo/v0" -> "gno.land/p/moul/x/daily/markov/v0";
-  "gno.land/r/moul/x/daily/merkledrop/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/merkledrop/v1" -> "gno.land/p/moul/x/merkle/v0";
+  "gno.land/r/moul/x/daily/merkledrop/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/merkledrop/v1" -> "gno.land/p/nt/ownable/v0";
   "gno.land/r/moul/x/daily/microblog/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/moodstone/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/multisetdemo/v0" -> "gno.land/p/moul/x/daily/multiset/v0";
@@ -477,6 +483,8 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/plan9/ns/v0" -> "gno.land/p/moul/x/plan9/ns/v0";
   "gno.land/r/moul/x/plan9/ns/v0" -> "gno.land/p/moul/x/plan9/rc/v0";
   "gno.land/r/moul/x/plan9/ns/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/provable/v0" -> "gno.land/p/moul/x/merkle/v0";
+  "gno.land/r/moul/x/provable/v0" -> "gno.land/p/moul/x/mmr/v0";
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/txlink/v0";
