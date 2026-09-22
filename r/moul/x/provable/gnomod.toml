@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/provable/v0"
+gno = "0.9"
+private = true

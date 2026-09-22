@@ -17,6 +17,10 @@ module = "gno.land/p/moul/addrset/v1"
 source = { dir = "p/moul/addrset" }
 
 [[module]]
+module = "gno.land/p/moul/agents/commit/v0"
+source = { dir = "p/moul/agents/commit" }
+
+[[module]]
 module = "gno.land/p/moul/authz/v0"
 source = { commit = "3d07a5b2cc02d7c3769caff0c17d884ac033bcfe", dir = "p/moul/authz/v0" }
 hash = "h1:xy1Bxzf36UskxiCm9Dt3KKVm+c9y6K2xaKDEGxwOP3M="
@@ -331,6 +335,14 @@ module = "gno.land/p/moul/x/grc20wrap/v0"
 source = { dir = "p/moul/x/grc20wrap" }
 
 [[module]]
+module = "gno.land/p/moul/x/merkle/v0"
+source = { dir = "p/moul/x/merkle" }
+
+[[module]]
+module = "gno.land/p/moul/x/mmr/v0"
+source = { dir = "p/moul/x/mmr" }
+
+[[module]]
 module = "gno.land/p/moul/x/pair/v0"
 source = { dir = "p/moul/x/pair" }
 
@@ -381,6 +393,30 @@ source = { dir = "p/moul/xdao" }
 [[module]]
 module = "gno.land/p/moul/xmath/v0"
 source = { dir = "p/moul/xmath" }
+
+[[module]]
+module = "gno.land/r/moul/agents/capwallet/v0"
+source = { dir = "r/moul/agents/capwallet" }
+
+[[module]]
+module = "gno.land/r/moul/agents/gnomem/v0"
+source = { dir = "r/moul/agents/gnomem" }
+
+[[module]]
+module = "gno.land/r/moul/agents/jury/v0"
+source = { dir = "r/moul/agents/jury" }
+
+[[module]]
+module = "gno.land/r/moul/agents/maintainer/v0"
+source = { dir = "r/moul/agents/maintainer" }
+
+[[module]]
+module = "gno.land/r/moul/agents/passport/v0"
+source = { dir = "r/moul/agents/passport" }
+
+[[module]]
+module = "gno.land/r/moul/agents/receipt/v0"
+source = { dir = "r/moul/agents/receipt" }
 
 [[module]]
 module = "gno.land/r/moul/config/v0"
@@ -784,6 +820,11 @@ source = { dir = "r/moul/x/daily/memory" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/merkledrop/v0"
+source = { commit = "5b5c3384dcdb1be75699cedb99e03d7be11e0312", dir = "r/moul/x/daily/merkledrop" }
+hash = "h1:wp6/DPyC08+Of4GbfxnXmtc48sA2IB5+uzV6vnxRj6A="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/merkledrop/v1"
 source = { dir = "r/moul/x/daily/merkledrop" }
 
 [[module]]
@@ -1092,6 +1133,10 @@ source = { dir = "r/moul/x/plan9/dev" }
 [[module]]
 module = "gno.land/r/moul/x/plan9/ns/v0"
 source = { dir = "r/moul/x/plan9/ns" }
+
+[[module]]
+module = "gno.land/r/moul/x/provable/v0"
+source = { dir = "r/moul/x/provable" }
 
 [[module]]
 module = "gno.land/r/moul/x/reaper/v0"

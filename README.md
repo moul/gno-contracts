@@ -200,6 +200,9 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`p/moul/x/framelab/v0`](p/moul/x/framelab) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/x/games/clock/v0`](p/moul/x/games/clock) 📦 | — | — | — | — | — | — |
 | [`p/moul/x/games/prorata/v0`](p/moul/x/games/prorata) 📦 | — | — | — | — | — | — |
+| [`p/moul/x/grc20wrap/v0`](p/moul/x/grc20wrap) 📦 | — | — | — | — | — | 3 |
+| [`p/moul/x/merkle/v0`](p/moul/x/merkle) 📦 | — | — | — | — | — | — |
+| [`p/moul/x/mmr/v0`](p/moul/x/mmr) 📦 | — | — | — | — | — | 1 |
 | [`p/moul/x/pair/v0`](p/moul/x/pair) 📦 | — | — | — | — | — | 3 |
 | [`p/moul/x/plan9/memfs/v0`](p/moul/x/plan9/memfs) 📦 | — | — | — | — | — | 2 |
 | [`p/moul/x/plan9/ninep/v0`](p/moul/x/plan9/ninep) 📦 | — | — | — | — | — | — |
@@ -307,7 +310,8 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/x/daily/luhndemo/v0`](r/moul/x/daily/luhndemo) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/luhndemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/markovdemo/v0`](r/moul/x/daily/markovdemo) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/markovdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/memory/v0`](r/moul/x/daily/memory) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/memory/v0) | — | — | — |
-| [`r/moul/x/daily/merkledrop/v0`](r/moul/x/daily/merkledrop) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/merkledrop/v0) | — | — | 1 |
+| [`r/moul/x/daily/merkledrop/v0`](https://github.com/moul/gno-contracts/tree/5b5c3384dcdb1be75699cedb99e03d7be11e0312/r/moul/x/daily/merkledrop) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/daily/merkledrop/v0) | — | — | 1 |
+| [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop) 🏛️ | — | — | — | — | — | 3 |
 | [`r/moul/x/daily/microblog/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/microblog) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/daily/microblog/v0) | — | — | — |
 | [`r/moul/x/daily/microblog/v1`](r/moul/x/daily/microblog) 🏛️ | — | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/microblog/v1) | — | — | — | 1 |
 | [`r/moul/x/daily/moodstone/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/moodstone) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/daily/moodstone/v0) | — | — | — |
@@ -373,12 +377,15 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/x/daily/wrapped/v0`](r/moul/x/daily/wrapped) 🏛️ | — | — | [✅](https://gno.land/r/moul/x/daily/wrapped/v0) | — | — | 1 |
 | [`r/moul/x/framelab/probe/v0`](r/moul/x/framelab/probe) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/games/lastwords/v0`](r/moul/x/games/lastwords) 🏛️ | — | — | — | — | — | 5 |
+| [`r/moul/x/grc20faucet/v0`](r/moul/x/grc20faucet) 🏛️ | — | — | — | — | — | 4 |
+| [`r/moul/x/grc20wrapdemo/v0`](r/moul/x/grc20wrapdemo) 🏛️ | — | — | — | — | — | 6 |
 | [`r/moul/x/pairreg/v0`](r/moul/x/pairreg) 🏛️ | — | — | — | — | — | 3 |
 | [`r/moul/x/pairs/aaa/v0`](r/moul/x/pairs/aaa) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/pairs/aaabbb/v0`](r/moul/x/pairs/aaabbb) 🏛️ | — | — | — | — | — | 5 |
 | [`r/moul/x/pairs/bbb/v0`](r/moul/x/pairs/bbb) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/plan9/dev/v0`](r/moul/x/plan9/dev) 🏛️ | — | — | — | — | — | 3 |
 | [`r/moul/x/plan9/ns/v0`](r/moul/x/plan9/ns) 🏛️ | — | — | — | — | — | 6 |
+| [`r/moul/x/provable/v0`](r/moul/x/provable) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
 | [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | — | — | — | — | 5 |
 | [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | — | — | — | — | 6 |
@@ -389,7 +396,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-22T18:41:20Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-22T19:15:49Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
