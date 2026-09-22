@@ -18,6 +18,7 @@ import (
 // ran before it and in what order.
 func resetSettings() {
 	settings = avl.NewTree()
+	proxies = avl.NewTree()
 	settingsRev = 0
 	Authorizer = authz.NewWithAuthority(authz.NewMemberAuthority(originAddr))
 }
@@ -35,7 +36,17 @@ func TestValidKey(t *testing.T) {
 		{"has space", false},
 		{"tab\there", false},
 		{"colon:here", false},
+		// A bare slash is not a name; it is only legal inside a scope.
 		{"slash/here", false},
+		// Scoped keys.
+		{"pause" + ScopeSep + "r/moul/home", true},
+		{"block.top" + ScopeSep + "p/moul/kit/ui", true},
+		{"pause" + ScopeSep, false},           // scope separator with no scope
+		{ScopeSep + "r/moul/home", false},     // scope with no name
+		{"pause" + ScopeSep + "r//moul", false},
+		{"pause" + ScopeSep + "r/moul/", false},
+		{"pause" + ScopeSep + "R/Moul/Home", false},
+		{"pause" + ScopeSep + "a" + ScopeSep + "b", false},
 	}
 	for _, tt := range tests {
 		uassert.Equal(t, tt.want, validKey(tt.key), "validKey("+tt.key+")")
@@ -43,11 +54,11 @@ func TestValidKey(t *testing.T) {
 
 	// 64 bytes is the last legal length, 65 the first illegal one.
 	long := ""
-	for i := 0; i < maxKeyLen; i++ {
+	for i := 0; i < maxNameLen; i++ {
 		long += "a"
 	}
-	uassert.True(t, validKey(long), "a key of exactly maxKeyLen is legal")
-	uassert.False(t, validKey(long+"a"), "one byte over maxKeyLen is not")
+	uassert.True(t, validKey(long), "a name of exactly maxNameLen is legal")
+	uassert.False(t, validKey(long+"a"), "one byte over maxNameLen is not")
 }
 
 func TestSetGetUnset(cur realm, t *testing.T) {
@@ -242,8 +253,8 @@ func TestMygnoscanFooter(cur realm, t *testing.T) {
 		mygnoscan.DefaultBase+"/realm/r/moul/config",
 		mygnoscan.Default().Realm("gno.land/r/moul/config"),
 		"the footer and a direct build agree while nothing is configured")
-	uassert.True(t, len(MygnoscanFooter("gno.land/r/moul/config")) > 0)
-	uassert.Equal(t, "", MygnoscanFooter(""))
+	uassert.True(t, len(MygnoscanFooterFor("gno.land/r/moul/config")) > 0)
+	uassert.Equal(t, "", MygnoscanFooterFor(""))
 }
 
 // ExampleRender pins the page as it looks right after deployment. It resets
@@ -261,34 +272,44 @@ func ExampleRender() {
 	//
 	// _none set; every reader is on its built-in default_
 	//
+	// ## Pause
+	//
+	// _running; no global pause_
+	//
 	// ## Authority
 	//
 	// `member_authority[g1daexjemfde047h6lta047h6lta047h6ld2pug6]`
 	//
 	// ---
 	//
-	// [explorer](https://mygnoscan.moul.p2p.team/realm/r/moul/config) · [source](https://mygnoscan.moul.p2p.team/realm/r/moul/config?tab=source) · [calls](https://mygnoscan.moul.p2p.team/realm/r/moul/config?tab=calls) · [deps](https://mygnoscan.moul.p2p.team/realm/r/moul/config?tab=deps)
+	// [explorer](https://mygnoscan.moul.p2p.team/realm/r/moul/config/v1) · [source](https://mygnoscan.moul.p2p.team/realm/r/moul/config/v1?tab=source) · [calls](https://mygnoscan.moul.p2p.team/realm/r/moul/config/v1?tab=calls) · [deps](https://mygnoscan.moul.p2p.team/realm/r/moul/config/v1?tab=deps)
 }
 
-// ExampleRender_populated pins the settings table, which is the view a manager
-// actually looks at.
+// ExampleRender_populated pins the settings table and the global pause banner,
+// which together are the view a manager actually looks at during an incident.
 func ExampleRender_populated() {
 	resetSettings()
 	settings.Set(KeyMygnoscanURL, &setting{value: "https://scan.example.com", rev: 1, updated: 42})
-	settings.Set("feature.beta", &setting{value: "1", rev: 2, updated: 43})
-	settingsRev = 2
+	settings.Set(KeyPause, &setting{value: "readonly: migrating storage", rev: 2, updated: 43})
+	settings.Set(KeyFor(KeyBlockTop, "gno.land/r/moul/gns"), &setting{value: "> v2 shipped", rev: 3, updated: 44})
+	settingsRev = 3
 	print(Render(""))
 	// Output:
 	// # gno.land/r/moul/config
 	//
-	// moul's settings, read by his other realms. rev 2 · 2 setting(s)
+	// moul's settings, read by his other realms. rev 3 · 3 setting(s)
 	//
 	// ## Settings
 	//
 	// | key | value | rev | height |
 	// | --- | --- | ---: | ---: |
-	// | `feature.beta` | `1` | 2 | 43 |
+	// | `block.top@r/moul/gns` | `> v2 shipped` | 3 | 44 |
 	// | `mygnoscan.url` | `https://scan.example.com` | 1 | 42 |
+	// | `pause` | `readonly: migrating storage` | 2 | 43 |
+	//
+	// ## Pause
+	//
+	// > **Read-only.** This realm is still readable, but not accepting changes. migrating storage
 	//
 	// ## Authority
 	//
@@ -296,5 +317,5 @@ func ExampleRender_populated() {
 	//
 	// ---
 	//
-	// [explorer](https://scan.example.com/realm/r/moul/config) · [source](https://scan.example.com/realm/r/moul/config?tab=source) · [calls](https://scan.example.com/realm/r/moul/config?tab=calls) · [deps](https://scan.example.com/realm/r/moul/config?tab=deps)
+	// [explorer](https://scan.example.com/realm/r/moul/config/v1) · [source](https://scan.example.com/realm/r/moul/config/v1?tab=source) · [calls](https://scan.example.com/realm/r/moul/config/v1?tab=calls) · [deps](https://scan.example.com/realm/r/moul/config/v1?tab=deps)
 }

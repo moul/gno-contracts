@@ -259,9 +259,15 @@ func (s Scanner) Realm(pkgPath string, tab ...string) string {
 
 // CurrentRealm links the page of the realm that called into this package.
 //
-// It stack-walks (unsafe.CurrentRealm), so inside a helper borrowed by another
-// realm it names the BORROWER. That is the wanted answer for a link and the
-// wrong one for authorisation: never branch on it.
+// It stack-walks (unsafe.CurrentRealm), so it names whichever realm was
+// current when it ran. For a plain read like this one that is the BORROWER,
+// which is the wanted answer: a realm asking for "my page" gets its own, and
+// so does one asking through a shared config realm, because a borrowed call
+// opens no realm frame. Measured in the test harness on 2026-09-22.
+//
+// Inside a CROSSING function it names that function's realm instead. That is
+// also correct and rarely what a link wants, so pass the path explicitly
+// there. Never branch on it for authorisation either way.
 func (s Scanner) CurrentRealm(tab ...string) string {
 	return s.Realm(unsafe.CurrentRealm().PkgPath(), tab...)
 }

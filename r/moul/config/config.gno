@@ -10,12 +10,28 @@
 //
 // # Bump rarely, and never for a new setting
 //
-// This realm IS public and versioned, so its path moves on every bump and
-// every importer keeps reading the old version until it is itself redeployed.
-// That makes a bump expensive, which is exactly why the settings API is
-// generic: a new setting is a new KEY, and a key costs one transaction. Only a
-// change to the shape of this realm (a new function, a changed signature) is
-// worth a version.
+// This realm IS public and versioned, so its path moves on every bump. That
+// makes a bump expensive, which is exactly why the settings API is generic: a
+// new setting is a new KEY, and a key costs one transaction. Only a change to
+// the shape of this realm (a new function, a changed signature) is worth a
+// version.
+//
+// # When a bump does happen, the state does not move
+//
+// A later version imports this one and relays to it rather than holding
+// anything of its own, so v1, v2 and v3 all read and write the same settings,
+// the same pause and the same member list. Delegation only runs backwards in
+// time, which is why the root is the oldest version that has the state and not
+// the newest. See proxy.gno.
+//
+// # What lives here
+//
+// settings.gno  the key/value store, and the mygnoscan accessors over it
+// keys.gno      the key grammar: a name, optionally scoped to one realm
+// blocks.gno    the notice a realm renders above and below its content
+// pause.gno     the switch a realm checks before it acts
+// proxy.gno     the relay that lets a later version share this state
+// config.gno    the member list, unchanged from v0
 //
 // # Governance
 //

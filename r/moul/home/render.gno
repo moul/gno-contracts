@@ -7,6 +7,7 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/dynreplacer/v0"
+	"gno.land/r/moul/config/v1"
 )
 
 // defaultLayout is what renders before a layout slot exists, i.e. right after
@@ -73,7 +74,17 @@ func renderPage() string {
 		return false
 	})
 
-	return r.Replace(layout)
+	// The notice blocks, from gno.land/r/moul/config: a warning, a changelog
+	// line or a bit of news, set either on every realm of moul's at once or on
+	// this one alone, and empty by default. A pause banner rides along at the
+	// top, so the page explains itself if this realm is ever held back.
+	//
+	// The path is passed explicitly rather than using config's zero-argument
+	// TopBlock(). That form reads the caller off the stack, which is correct
+	// here and is covered by config's own tests, but this realm's Render IS
+	// gno.land/u/moul and it already states its own path: passing the constant
+	// cannot be wrong, at no cost.
+	return config.TopBlockFor(realmPath) + r.Replace(layout) + config.BottomBlockFor(realmPath)
 }
 
 // slotLinks is the :slots: placeholder: a bullet list of every slot, linking to

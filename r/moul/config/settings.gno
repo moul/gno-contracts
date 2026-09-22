@@ -8,6 +8,7 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/mygnoscan/v0"
+	"gno.land/p/moul/pausable/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -23,12 +24,13 @@ const (
 	KeyMygnoscanNetwork = "mygnoscan.network"
 )
 
-const (
-	maxKeyLen = 64
-	// maxValueLen bounds one write. Storage is paid for and never refunded, so
-	// this realm holds settings, not content: a URL, a flag, a short list.
-	maxValueLen = 1024
-)
+// maxValueLen bounds one write. Storage is paid for and never refunded, so
+// this realm holds settings, not content: a URL, a flag, a short list.
+//
+// A notice block is the one that pushes against it, and 1024 bytes is several
+// paragraphs of markdown. A realm that needs more than that is asking this one
+// to be a CMS, which is what its own slots are for.
+const maxValueLen = 1024
 
 type setting struct {
 	value   string
@@ -40,26 +42,6 @@ var (
 	settings    = avl.NewTree() // key -> *setting
 	settingsRev int
 )
-
-// validKey reports whether key is legal: 1..maxKeyLen bytes of [a-z0-9._-].
-// The dot is the namespace separator ("mygnoscan.url"), lowercase only so a
-// setting has exactly one name, and no whitespace so a key round-trips through
-// Manifest's tab-separated lines unambiguously.
-func validKey(key string) bool {
-	if len(key) == 0 || len(key) > maxKeyLen {
-		return false
-	}
-	for i := 0; i < len(key); i++ {
-		c := key[i]
-		switch {
-		case c >= 'a' && c <= 'z', c >= '0' && c <= '9':
-		case c == '-', c == '_', c == '.':
-		default:
-			return false
-		}
-	}
-	return true
-}
 
 // Set creates or replaces a setting. Only an address the Authorizer accepts
 // may call it.
@@ -73,11 +55,23 @@ func validKey(key string) bool {
 // and are frozen on chain at v0; new surface does not inherit the mistake.
 func Set(cur realm, key, value string) {
 	assertWritableKey(key)
-	if len(value) > maxValueLen {
-		panic("value too long: max " + strconv.Itoa(maxValueLen) + " bytes, got " + strconv.Itoa(len(value)))
-	}
+	assertValue(key, value)
 	assertAuthorized(cur, "config.Set:"+key)
+	writeSetting(key, value)
+}
 
+// Unset removes a setting, so readers fall back to their built-in default.
+// Removing a key that is not set is an error, not a no-op: it almost always
+// means the key was misspelled here or in the realm that reads it.
+func Unset(cur realm, key string) {
+	assertWritableKey(key)
+	assertAuthorized(cur, "config.Unset:"+key)
+	removeSetting(key)
+}
+
+// writeSetting is the only place a setting is stored, shared by the direct and
+// the relayed path so a new caller cannot forget the revision or the event.
+func writeSetting(key, value string) {
 	settingsRev++
 	settings.Set(key, &setting{
 		value:   value,
@@ -87,13 +81,8 @@ func Set(cur realm, key, value string) {
 	chain.Emit("ConfigSet", "key", key, "value", value, "rev", strconv.Itoa(settingsRev))
 }
 
-// Unset removes a setting, so readers fall back to their built-in default.
-// Removing a key that is not set is an error, not a no-op: it almost always
-// means the key was misspelled here or in the realm that reads it.
-func Unset(cur realm, key string) {
-	assertWritableKey(key)
-	assertAuthorized(cur, "config.Unset:"+key)
-
+// removeSetting is writeSetting's twin.
+func removeSetting(key string) {
 	if _, removed := settings.Remove(key); !removed {
 		panic("no such setting: " + key)
 	}
@@ -103,8 +92,29 @@ func Unset(cur realm, key string) {
 
 func assertWritableKey(key string) {
 	if !validKey(key) {
-		panic("invalid key: want 1-" + strconv.Itoa(maxKeyLen) +
-			" bytes of [a-z0-9._-], got " + strconv.Quote(key))
+		panic("invalid key: want <name> or <name>" + ScopeSep + "<realm-path>, " +
+			"name being 1-" + strconv.Itoa(maxNameLen) + " bytes of [a-z0-9._-], got " +
+			strconv.Quote(key))
+	}
+}
+
+// assertValue rejects a value the reader could not make sense of.
+//
+// Only pause has a grammar today, and it is exactly the setting where a
+// silently unreadable value matters: pausable.MustParse fails CLOSED, so a
+// typo stored here would take every realm offline at the next render. Catching
+// it on the way in costs one comparison and turns that into a failed
+// transaction the writer sees immediately.
+func assertValue(key, value string) {
+	if len(value) > maxValueLen {
+		panic("value too long: max " + strconv.Itoa(maxValueLen) +
+			" bytes, got " + strconv.Itoa(len(value)))
+	}
+	if name, _ := SplitKey(key); name == KeyPause {
+		if _, ok := pausable.Parse(value); !ok {
+			panic("invalid pause value " + strconv.Quote(value) +
+				": want \"\", \"running\", \"readonly\" or \"paused\", each optionally followed by \": <reason>\"")
+		}
 	}
 }
 
@@ -215,18 +225,18 @@ func Scanner() mygnoscan.Scanner {
 	return s
 }
 
-// MygnoscanFor is the one-liner: the explorer page for a realm path.
-//
-// It takes the path explicitly and there is no zero-argument version on
-// purpose. mygnoscan can name the calling realm by stack-walking, but the
-// stack seen from in here has this realm on it, so a "current realm" helper
-// exported from a shared config realm would confidently return
-// gno.land/r/moul/config for every caller. Pass your own path.
+// Mygnoscan is the explorer page of the realm calling in.
+func Mygnoscan() string { return MygnoscanFor(caller()) }
+
+// MygnoscanFor is Mygnoscan for a named realm.
 func MygnoscanFor(pkgPath string) string { return Scanner().Realm(pkgPath) }
 
-// MygnoscanFooter is MygnoscanFor's render-ready form: the markdown line a
-// realm appends under its output.
-func MygnoscanFooter(pkgPath string) string { return Scanner().RealmFooter(pkgPath) }
+// MygnoscanFooter is the render-ready form: the markdown line the realm
+// calling in appends under its output.
+func MygnoscanFooter() string { return MygnoscanFooterFor(caller()) }
+
+// MygnoscanFooterFor is MygnoscanFooter for a named realm.
+func MygnoscanFooterFor(pkgPath string) string { return Scanner().RealmFooter(pkgPath) }
 
 // Render shows the whole configuration: the settings, who may change them, and
 // where this realm itself can be inspected.
@@ -262,15 +272,51 @@ func Render(path string) string {
 		})
 	}
 
+	b.WriteString("\n## Pause\n\n")
+	b.WriteString(renderPause())
+
 	b.WriteString("\n## Authority\n\n")
 	b.WriteString("`")
 	b.WriteString(Authorizer.String())
 	b.WriteString("`\n")
 
+	b.WriteString(renderProxies())
+
 	b.WriteString("\n---\n\n")
-	b.WriteString(MygnoscanFooter("gno.land/r/moul/config"))
+	b.WriteString(MygnoscanFooterFor(realmPath))
 	b.WriteString("\n")
 
+	return b.String()
+}
+
+// renderPause reports the global pause only. A per-realm one is a setting like
+// any other and is already in the table above; repeating them here would be a
+// second list to keep in step, and the one a reader of THIS page wants is the
+// switch that covers everything.
+func renderPause() string {
+	st := pausable.MustParse(Get(KeyPause))
+	if !st.IsPaused() {
+		return "_running; no global pause_\n"
+	}
+	return st.Notice() + "\n"
+}
+
+// renderProxies lists the later versions allowed to relay writes here. The
+// section is omitted entirely while there are none, which is the state this
+// realm ships in and stays in until a v2 exists.
+func renderProxies() string {
+	paths := ListProxies()
+	if len(paths) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	b.WriteString("\n## Proxies\n\n")
+	b.WriteString("Later versions of this realm that may relay a write:\n\n")
+	for _, p := range paths {
+		b.WriteString("- `")
+		b.WriteString(p)
+		b.WriteString("`\n")
+	}
 	return b.String()
 }
 

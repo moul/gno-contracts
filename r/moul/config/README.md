@@ -39,6 +39,133 @@ serving the old value. For a configuration realm that is the one outcome worth
 ruling out, so `Set` and `Unset` abort. The manager functions predate that
 reasoning and are frozen on chain at `v0`; the new surface does not inherit it.
 
+## The notice blocks
+
+Two strings a realm drops at the top and the bottom of its `Render`, empty by
+default, so a warning, a changelog line or a bit of news can go on every realm
+at once or on one of them.
+
+```go
+func Render(path string) string {
+	return config.TopBlock() + body + config.BottomBlock()
+}
+```
+
+Set them with the ordinary `Set`, which is what keeps this realm's surface from
+growing a function per idea:
+
+```sh
+Set block.top            "> Chain migration on Tuesday."    # every realm
+Set block.top@r/moul/gns "> v2 shipped, see the changelog"  # this one only
+Unset block.top                                             # back to silence
+```
+
+`TopBlock` shows **three** things when they exist, in this order, separated by
+blank lines: the pause banner, the global message, then this realm's own. Both
+messages, not one overriding the other: a chain-wide warning and a per-realm
+changelog are different messages, and dropping either because the other exists
+is the surprising behaviour.
+
+When there is nothing to say it returns `""`, so a realm that concatenates it
+unconditionally renders byte-for-byte what it rendered before.
+
+## Pausing
+
+```sh
+Set pause              "paused: incident, back in an hour"  # everything
+Set pause@r/moul/gns   "readonly"                           # one realm
+Unset pause                                                 # running again
+```
+
+```go
+func Post(cur realm, body string) {
+	config.AssertWritable()   // aborts while ReadOnly or Paused
+	...
+}
+```
+
+Three levels (`running`, `readonly`, `paused`, each optionally `: <reason>`),
+because taking a realm fully offline hides the thing people came to read while
+most incidents only need the writes stopped. The levels, the fail-closed parse
+and the precedence rule live in
+[`p/moul/pausable`](../../../p/moul/pausable); this realm is the storage and
+the wiring.
+
+Two properties worth knowing:
+
+- **A global pause cannot be defeated by a per-realm setting.** The two combine
+  with `pausable.Strictest`, so a stale `pause@r/moul/foo` of `running` does
+  not re-open that realm during a global halt. Exempting one realm is therefore
+  not expressible: clear the global and set the others.
+- **A pause value is validated on write.** `pausable.MustParse` fails closed, so
+  an unvalidated typo would take every realm offline at the next render.
+  `Set` refuses anything the reader could not understand, which turns that into
+  a failed transaction the writer sees immediately.
+
+`TopBlock` already carries the pause banner, so guarding writes with
+`AssertWritable` is enough to also explain the refusal on the page.
+
+## Zero-argument or explicit
+
+Every helper comes in two forms: `TopBlock()` names the realm calling in,
+`TopBlockFor(pkgPath)` names one you pass.
+
+The zero-argument form works because these are plain reads with **no `cur realm`
+parameter**, so gno runs them borrowed, opens no realm frame, and
+`unsafe.CurrentRealm()` reports the caller rather than this realm. Measured in
+the test harness on 2026-09-22 and pinned by a test.
+
+Use the explicit form from a crossing function, where there is a realm frame
+and the answer would be that function's realm, or when asking about a realm
+other than your own. **Do not add a `cur realm` parameter to any of the
+zero-argument helpers**: it would silently start answering
+`gno.land/r/moul/config` for every caller.
+
+## Versions: v2 relays to v1, never the other way
+
+This realm is public, so its path is permanent and a new API means a new
+version at a new path. Left alone that fragments everything: a realm importing
+v1 and a realm importing v2 would read two different member lists and two
+different pause switches.
+
+Delegation fixes it, and it only runs one way. A version can import what
+already existed when it was written, never what does not exist yet. So **the
+state stays in the oldest version that has it** and every later version is a
+thin relay:
+
+```
+v3  ->  v2  ->  v1   (the root: settings, pause, managers, proxies)
+```
+
+A realm importing v1, v2 or v3 reads the same state whichever door it came
+through. `v0` cannot take part: it is already on chain and has no settings
+store, so it keeps answering for its own member list and nothing else.
+
+Writing v2: it holds no state, forwards reads directly, and forwards writes
+with the address it was called by.
+
+```go
+func Set(cur realm, key, value string) {
+	config.SetAs(cross(cur), cur.Previous().Address(), key, value)
+}
+
+func Get(key string) string { return config.Get(key) }
+```
+
+Then once, from a manager: `AllowProxy gno.land/r/moul/config/v2`.
+
+**A proxy is trusted to say who is asking, not to decide whether they may.**
+`SetAs` still puts the principal through the `Authorizer`, so the member list
+stays the single answer to "who may change config" for every version at once,
+and adding a manager works through v2 and v3 with no further deploys. It is not
+a boundary against the proxy's own code, and does not need to be: the same
+person deploys both, registration is deliberate, and `RevokeProxy` is
+immediate. What it buys is that v2 never carries a copy of the member list, so
+the two can never disagree.
+
+`AllowProxy` only accepts `gno.land/r/moul/config/vN`, so a fat-fingered path
+cannot become a standing write grant to an unrelated realm.
+
 ## The explorer accessors
 
 ```go
