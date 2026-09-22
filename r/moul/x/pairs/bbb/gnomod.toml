@@ -1,0 +1,5 @@
+module = "gno.land/r/moul/x/pairs/bbb/v0"
+gno = "0.9"
+
+# public: a demo GRC20 whose whole purpose is to be imported by a pair
+# instance, and whose token object is registered with r/nt/grc20reg.

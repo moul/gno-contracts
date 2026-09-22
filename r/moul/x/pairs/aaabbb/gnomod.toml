@@ -1,0 +1,6 @@
+module = "gno.land/r/moul/x/pairs/aaabbb/v0"
+gno = "0.9"
+
+# public: its init registers the *pair.Pair it owns with r/moul/x/pairreg,
+# so this realm's own objects have to be reachable from that one. That
+# hand-off is the whole point of the instance-per-realm shape.
