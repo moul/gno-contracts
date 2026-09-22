@@ -11,6 +11,7 @@ import (
 	"chain"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -20,21 +21,14 @@ const (
 )
 
 var (
-	owners    avl.Tree // tokenID (zero-padded string) -> address
-	balances  avl.Tree // owner address (string) -> uint64
-	approvals avl.Tree // tokenID (zero-padded string) -> approved address
-	nextID    int64    = 1
-	minted    int64    // total tokens ever minted (== live supply, no burn)
-)
+	// owners assigns the token ids. v0 kept its own nextID plus a key() that
+	// zero-padded to width 12; the store keys by seqid, so the iteration order
+	// Render depends on is numeric for every uint64 rather than up to 10^12.
+	owners = store.Named("erc721: token") // tokenID -> address
 
-// key formats a token id into a zero-padded, lexicographically-sortable key.
-func key(id int64) string {
-	s := strconv.FormatInt(id, 10)
-	for len(s) < 12 {
-		s = "0" + s
-	}
-	return s
-}
+	balances  avl.Tree // owner address (string) -> uint64
+	approvals avl.Tree // tokenID (store key) -> approved address
+)
 
 // Mint creates the next token id and assigns it to `to`. Only sequential
 // minting is supported (id is returned via the Mint event).
@@ -42,11 +36,7 @@ func Mint(cur realm, to address) int64 {
 	if !to.IsValid() {
 		panic("erc721: mint to invalid address")
 	}
-	id := nextID
-	nextID++
-	minted++
-
-	owners.Set(key(id), to)
+	id := int64(owners.Add(to))
 	balances.Set(to.String(), balanceOf(to)+1)
 
 	chain.Emit("Mint", "to", to.String(), "tokenID", strconv.FormatInt(id, 10))
@@ -72,10 +62,10 @@ func Transfer(cur realm, to address, id int64) {
 		panic("erc721: transfer to current owner")
 	}
 
-	owners.Set(key(id), to)
+	owners.Set(store.ID(id), to)
 	balances.Set(from.String(), balanceOf(from)-1)
 	balances.Set(to.String(), balanceOf(to)+1)
-	approvals.Remove(key(id)) // clear approval on transfer
+	approvals.Remove(store.ID(id).Key()) // clear approval on transfer
 
 	chain.Emit("Transfer", "from", from.String(), "to", to.String(),
 		"tokenID", strconv.FormatInt(id, 10))
@@ -89,7 +79,7 @@ func Approve(cur realm, spender address, id int64) {
 	if caller != owner {
 		panic("erc721: approve caller is not owner")
 	}
-	approvals.Set(key(id), spender)
+	approvals.Set(store.ID(id).Key(), spender)
 	chain.Emit("Approval", "owner", owner.String(), "spender", spender.String(),
 		"tokenID", strconv.FormatInt(id, 10))
 }
@@ -97,17 +87,15 @@ func Approve(cur realm, spender address, id int64) {
 // --- read-only helpers (safe to call from tests and Render) ---
 
 // ownerOf returns the owner of token `id`, panicking if it does not exist.
+// The store's label puts the id in the message, which v0's fixed string
+// ("erc721: query for nonexistent token") left out.
 func ownerOf(id int64) address {
-	v := owners.Get(key(id))
-	if v == nil {
-		panic("erc721: query for nonexistent token")
-	}
-	return v.(address)
+	return owners.MustGet(store.ID(id)).(address)
 }
 
 // approvedOf returns the approved address for token `id`, or the zero address.
 func approvedOf(id int64) address {
-	v := approvals.Get(key(id))
+	v := approvals.Get(store.ID(id).Key())
 	if v == nil {
 		return address("")
 	}
@@ -125,11 +113,12 @@ func balanceOf(owner address) uint64 {
 
 // exists reports whether token `id` has been minted (and not since moved away).
 func exists(id int64) bool {
-	return owners.Has(key(id))
+	return owners.Has(store.ID(id))
 }
 
-// totalSupply returns the number of tokens in circulation.
-func totalSupply() int64 { return minted }
+// totalSupply returns the number of tokens in circulation. There is no burn,
+// so the highest id ever assigned is the count.
+func totalSupply() int64 { return int64(owners.LastID()) }
 
 // OwnerOf is the exported read-only accessor for ownerOf.
 func OwnerOf(id int64) address { return ownerOf(id) }
@@ -145,24 +134,22 @@ func Render(path string) string {
 	out := "# " + name + " (" + symbol + ")\n\n"
 	out += "**Total supply:** " + strconv.FormatInt(totalSupply(), 10) + "\n\n"
 
-	if owners.Size() == 0 {
+	if owners.Len() == 0 {
 		out += "_No tokens minted yet._\n"
 		return out
 	}
 
 	out += "| Token ID | Owner | Approved |\n"
 	out += "|---------:|-------|----------|\n"
-	owners.Iterate("", "", func(k string, v interface{}) bool {
+	owners.Each(func(id store.ID, v any) {
 		owner := v.(address)
-		id, _ := strconv.ParseInt(k, 10, 64)
-		appr := approvedOf(id)
+		appr := approvedOf(int64(id))
 		apprStr := "—"
 		if appr != address("") {
 			apprStr = appr.String()
 		}
-		out += "| " + strconv.FormatInt(id, 10) + " | " +
+		out += "| " + id.String() + " | " +
 			owner.String() + " | " + apprStr + " |\n"
-		return false
 	})
 	return out
 }

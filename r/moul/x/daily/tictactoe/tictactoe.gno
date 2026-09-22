@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 )
 
 // Cell states.
@@ -17,9 +17,9 @@ const (
 	markO = 2
 )
 
-// Game holds a single tic-tac-toe match.
+// Game holds a single tic-tac-toe match. It carries no id field: the id
+// belongs to the store, which hands it back on lookup and iteration.
 type Game struct {
-	id       int
 	playerX  address // caller of NewGame
 	playerO  address // opponent
 	board    [9]int  // 0 empty, 1 X, 2 O
@@ -30,18 +30,10 @@ type Game struct {
 	finished bool
 }
 
-var (
-	games  = avl.NewTree() // id (padded string) -> *Game
-	nextID = 1
-)
-
-func pad(id int) string {
-	s := strconv.Itoa(id)
-	for len(s) < 12 {
-		s = "0" + s
-	}
-	return s
-}
+// games is keyed by store.ID, whose avl key is fixed-width by construction.
+// v0 kept its own nextID plus a pad() that zero-padded to width 12, which
+// stopped ordering correctly at the 10^12th game.
+var games = store.Named("game")
 
 // NewGame creates a game. Caller is X, opponent is O. Returns the game id.
 func NewGame(cur realm, opponent address) int {
@@ -52,26 +44,18 @@ func NewGame(cur realm, opponent address) int {
 	if !opponent.IsValid() {
 		panic("invalid opponent address")
 	}
-	id := nextID
-	nextID++
-	g := &Game{
-		id:      id,
+	id := int(games.Add(&Game{
 		playerX: caller,
 		playerO: opponent,
 		turn:    markX,
-	}
-	games.Set(pad(id), g)
+	}))
 	chain.Emit("GameCreated", "id", strconv.Itoa(id), "x", caller.String(), "o", opponent.String())
 	return id
 }
 
 // Move plays cell (0-8) for the calling player. Enforces turn order and rejects taken cells.
 func Move(cur realm, gameID int, cell int) {
-	v := games.Get(pad(gameID))
-	if v == nil {
-		panic("game not found")
-	}
-	g := v.(*Game)
+	g := games.MustGet(store.ID(gameID)).(*Game)
 	if g.finished {
 		panic("game already finished")
 	}
@@ -156,8 +140,8 @@ func cellGlyph(m int) string {
 
 // GetGame returns a game by id (read helper for tests / callers).
 func GetGame(id int) (*Game, error) {
-	v := games.Get(pad(id))
-	if v == nil {
+	v, ok := games.Get(store.ID(id))
+	if !ok {
 		return nil, errors.New("game not found")
 	}
 	return v.(*Game), nil
@@ -202,7 +186,7 @@ func Render(path string) string {
 	}
 	var sb strings.Builder
 	sb.WriteString("# Tic-Tac-Toe — Game #")
-	sb.WriteString(strconv.Itoa(g.id))
+	sb.WriteString(strconv.Itoa(id))
 	sb.WriteString("\n\n")
 	sb.WriteString("- X: `")
 	sb.WriteString(g.playerX.String())
@@ -221,15 +205,15 @@ func renderList() string {
 	var sb strings.Builder
 	sb.WriteString("# Tic-Tac-Toe\n\n")
 	sb.WriteString("2-player tic-tac-toe. Call `NewGame(opponent)` to start; view a game at `/<id>`.\n\n")
-	if games.Size() == 0 {
+	if games.Len() == 0 {
 		sb.WriteString("_No games yet._\n")
 		return sb.String()
 	}
 	sb.WriteString("| # | X | O | Status |\n|---|---|---|--------|\n")
-	games.Iterate("", "", func(key string, value interface{}) bool {
+	games.Each(func(id store.ID, value any) {
 		g := value.(*Game)
 		sb.WriteString("| ")
-		sb.WriteString(strconv.Itoa(g.id))
+		sb.WriteString(id.String())
 		sb.WriteString(" | `")
 		sb.WriteString(g.playerX.String())
 		sb.WriteString("` | `")
@@ -237,7 +221,6 @@ func renderList() string {
 		sb.WriteString("` | ")
 		sb.WriteString(gameStatus(g))
 		sb.WriteString(" |\n")
-		return false
 	})
 	return sb.String()
 }

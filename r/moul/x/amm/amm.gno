@@ -443,7 +443,7 @@ func Render(path string) string {
 	out += "|---|---|---|---|---|\n"
 	pools.Iterate("", "", func(key string, value any) bool {
 		p := value.(*pool)
-		out += ufmt.Sprintf("| [%s/%s](/r/moul/x/amm/v1:%s) | %d %s / %d %s | %s | %d | %d |\n",
+		out += ufmt.Sprintf("| [%s/%s](/r/moul/x/amm/v0:%s) | %d %s / %d %s | %s | %d | %d |\n",
 			p.tokA.GetSymbol(), p.tokB.GetSymbol(), key,
 			p.resA, p.tokA.GetSymbol(), p.resB, p.tokB.GetSymbol(),
 			p.lp.GetSymbol(), p.lp.TotalSupply(), p.lp.KnownAccounts())

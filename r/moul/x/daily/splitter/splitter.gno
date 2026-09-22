@@ -15,7 +15,7 @@ import (
 	"chain"
 	"chain/runtime/unsafe"
 
-	"gno.land/p/nt/avl/v0"
+	"gno.land/p/moul/kit/store/v0"
 )
 
 // payee is a single share holder inside a group.
@@ -24,9 +24,9 @@ type payee struct {
 	shares int
 }
 
-// group is one payment-splitting arrangement.
+// group is one payment-splitting arrangement. It carries no id field: the id
+// belongs to the store, which hands it back on lookup and iteration.
 type group struct {
-	id          int
 	owner       address
 	payees      []payee
 	totalShares int
@@ -34,8 +34,10 @@ type group struct {
 }
 
 var (
-	groups   avl.Tree // id (zero-padded string) -> *group
-	nextID   int
+	// groups assigns the group ids. v0 kept its own nextID plus a key() that
+	// zero-padded to width 12, which stopped ordering Render past 10^12.
+	groups = store.Named("splitter: group")
+
 	errEmpty = errors.New("splitter: no payees")
 )
 
@@ -56,10 +58,7 @@ func Register(cur realm, payees string, shares string) int {
 		panic("splitter: payees and shares count mismatch")
 	}
 
-	g := &group{
-		id:    nextID,
-		owner: caller,
-	}
+	g := &group{owner: caller}
 	for i := range addrParts {
 		if addrParts[i] == "" {
 			panic("splitter: empty payee address")
@@ -78,16 +77,15 @@ func Register(cur realm, payees string, shares string) int {
 		g.totalShares += s
 	}
 
-	groups.Set(key(g.id), g)
-	nextID++
+	id := groups.Add(g)
 
 	chain.Emit(
 		"GroupRegistered",
-		"id", strconv.Itoa(g.id),
+		"id", id.String(),
 		"payees", strconv.Itoa(len(g.payees)),
 		"totalShares", strconv.Itoa(g.totalShares),
 	)
-	return g.id
+	return int(id)
 }
 
 // RecordIncome adds amount to the pool of group id. amount must be positive.
@@ -95,13 +93,8 @@ func RecordIncome(cur realm, id int, amount int) {
 	if amount <= 0 {
 		panic("splitter: amount must be positive")
 	}
-	v := groups.Get(key(id))
-	if v == nil {
-		panic("splitter: unknown group id: " + strconv.Itoa(id))
-	}
-	g := v.(*group)
+	g := groups.MustGet(store.ID(id)).(*group)
 	g.pool += amount
-	groups.Set(key(id), g)
 
 	chain.Emit(
 		"IncomeRecorded",
@@ -121,7 +114,7 @@ func (g *group) owed(p payee) int {
 
 // Render shows all groups, their payees, shares, and computed owed amounts.
 func Render(path string) string {
-	if groups.Size() == 0 {
+	if groups.Len() == 0 {
 		return "# Payment Splitter\n\n_No groups registered yet._\n"
 	}
 
@@ -129,9 +122,9 @@ func Render(path string) string {
 	b.WriteString("# Payment Splitter\n\n")
 	b.WriteString("Share-based accounting. `owed = pool * share / totalShares`.\n\n")
 
-	groups.Iterate("", "", func(k string, v interface{}) bool {
+	groups.Each(func(id store.ID, v any) {
 		g := v.(*group)
-		b.WriteString("## Group #" + strconv.Itoa(g.id) + "\n\n")
+		b.WriteString("## Group #" + id.String() + "\n\n")
 		b.WriteString("- Owner: `" + g.owner.String() + "`\n")
 		b.WriteString("- Pool: " + strconv.Itoa(g.pool) + "\n")
 		b.WriteString("- Total shares: " + strconv.Itoa(g.totalShares) + "\n\n")
@@ -151,7 +144,6 @@ func Render(path string) string {
 				strconv.Itoa(remainder) + " |\n")
 		}
 		b.WriteString("\n")
-		return false
 	})
 
 	return b.String()
@@ -170,12 +162,3 @@ func splitTrim(s string) []string {
 	return out
 }
 
-// key produces a zero-padded, lexicographically-sortable avl key for an id,
-// so Render iterates groups in ascending numeric order.
-func key(id int) string {
-	s := strconv.Itoa(id)
-	for len(s) < 12 {
-		s = "0" + s
-	}
-	return s
-}

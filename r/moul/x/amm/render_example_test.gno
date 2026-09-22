@@ -28,7 +28,7 @@ func seedExamplePool() {
 		tokA: tokAAA, tokB: tokBBB,
 		resA: 1_100_000, resB: 3_637_356,
 		lp: exLP, lpLedger: exLedge,
-		lpKey: "gno.land/r/moul/x/amm/v1.LPDEMO",
+		lpKey: "gno.land/r/moul/x/amm/v0.LPDEMO",
 	})
 }
 
@@ -43,7 +43,7 @@ func ExampleRender() {
 	//
 	// | pool | reserves | LP token | supply | holders |
 	// |---|---|---|---|---|
-	// | [AAA/BBB](/r/moul/x/amm/v1:gno.land/r/moul/x/amm/v1.AAA~gno.land/r/moul/x/amm/v1.BBB) | 1100000 AAA / 3637356 BBB | LPDEMO | 1000000 | 1 |
+	// | [AAA/BBB](/r/moul/x/amm/v0:gno.land/r/moul/x/amm/v0.AAA~gno.land/r/moul/x/amm/v0.BBB) | 1100000 AAA / 3637356 BBB | LPDEMO | 1000000 | 1 |
 }
 
 // ExampleRender_pool pins a single pool's detail page.
@@ -53,9 +53,9 @@ func ExampleRender_pool() {
 	// Output:
 	// # AAA / BBB
 	//
-	// - **AAA** reserve: 1100000 (`gno.land/r/moul/x/amm/v1.AAA`)
-	// - **BBB** reserve: 3637356 (`gno.land/r/moul/x/amm/v1.BBB`)
-	// - **LP token**: `gno.land/r/moul/x/amm/v1.LPDEMO` (LPDEMO)
+	// - **AAA** reserve: 1100000 (`gno.land/r/moul/x/amm/v0.AAA`)
+	// - **BBB** reserve: 3637356 (`gno.land/r/moul/x/amm/v0.BBB`)
+	// - **LP token**: `gno.land/r/moul/x/amm/v0.LPDEMO` (LPDEMO)
 	// - **LP shares**: 1000000 across 1 holder(s)
 }
 
