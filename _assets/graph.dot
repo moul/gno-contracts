@@ -92,6 +92,7 @@ digraph gnocontracts {
   "gno.land/r/moul/demo/millipede/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/vault/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/wikicoin/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/faucet/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/gns/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/grant/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/hello/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -293,6 +294,8 @@ digraph gnocontracts {
   "gno.land/r/moul/demo/vault/v0" -> "gno.land/p/nt/grc20/v0";
   "gno.land/r/moul/demo/wikicoin/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/demo/wikicoin/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/faucet/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/faucet/v0" -> "gno.land/p/nt/markdown/sanitize/v0";
   "gno.land/r/moul/gns/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/gns/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/grant/v0" -> "gno.land/p/moul/grants/v0";
