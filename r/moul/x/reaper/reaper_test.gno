@@ -3,6 +3,7 @@ package reaper
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"gno.land/p/moul/x/storagecost/v0"
 	"gno.land/p/nt/testutils/v0"
@@ -235,4 +236,127 @@ func TestReapWalksNewestFirstSoCompactionHasWork(cur realm, t *testing.T) {
 	uassert.True(t, Compactable() > 0)
 
 	drain(cur)
+}
+
+// TestSummarizeNeutralizesAnAttackerAuthoredBody is the regression test for a
+// hole this realm shipped with: Render emitted a note body into the board
+// after nothing but a ReplaceAll of "\n" and "|", so anyone who paid to post
+// could put arbitrary markdown on a page every reader of the realm loads.
+//
+// The body is the one string here an attacker controls and the board is an
+// INLINE slot, so sanitize.InlineText owns it. Each case asserts the dangerous
+// SEQUENCE is dead and the readable text survived, rather than pinning the
+// exact escaped bytes, which are the sanitizer's business and not this realm's.
+func TestSummarizeNeutralizesAnAttackerAuthoredBody(t *testing.T) {
+	cases := []struct {
+		name  string
+		body  string
+		gone  []string // sequences that must not survive into the page
+		kept  string   // the readable text, which must
+	}{
+		{
+			// The payload that matters: a phishing link rendered as prose,
+			// attributed by the page to the realm rather than to the poster.
+			name: "inline link",
+			body: "[Claim your 100 GNOT](https://evil.example/drain)",
+			gone: []string{"](", "](https"},
+			kept: "Claim your 100 GNOT",
+		},
+		{
+			// An image is a beacon: it fires on load and hands the attacker
+			// the IP of everyone who opened the board.
+			name: "image beacon",
+			body: "![x](https://evil.example/pixel.png)",
+			gone: []string{"![", "]("},
+			kept: "pixel",
+		},
+		{
+			// gnoweb renders a set of <gno-...> components, and raw HTML
+			// besides; a body that can open one can lay out the page.
+			name: "gnoweb component and raw html",
+			body: "<gno-columns><h5>Official notice</h5>",
+			gone: []string{"<gno-", "<h5>", "</h5>"},
+			kept: "Official notice",
+		},
+		{
+			// The old ReplaceAll("\n", " ") stopped exactly this and nothing
+			// else. Keep it dead: one newline ends the bullet item, and every
+			// byte after it is top-level markdown.
+			name: "break out of the list item",
+			body: "ok\n# Reaper is deprecated, use /r/evil/reaper",
+			gone: []string{"\n"},
+			kept: "Reaper is deprecated",
+		},
+		{
+			// Folding only "\n" left the other three line terminators open.
+			name: "exotic line terminators",
+			body: "ok\r\n- fake row\u2028- another\u2029- third",
+			gone: []string{"\r", "\n", "\u2028", "\u2029"},
+			kept: "fake row",
+		},
+		{
+			// Invisible reordering: the bytes say one thing, the page shows
+			// another, and a reader diffing the two sees nothing.
+			name: "bidi and zero-width",
+			body: "safe\u202enote\u200b\u202c",
+			gone: []string{"\u202e", "\u200b", "\u202c"},
+			kept: "safe",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := summarize(tc.body)
+			for _, bad := range tc.gone {
+				uassert.False(t, strings.Contains(out, bad),
+					tc.name+": a dangerous sequence survived into "+out)
+			}
+			uassert.True(t, strings.Contains(out, tc.kept),
+				tc.name+": escaping ate the readable text: "+out)
+			uassert.True(t, utf8.ValidString(out), tc.name+": invalid UTF-8: "+out)
+		})
+	}
+}
+
+// TestSummarizeEscapesAnUnbalancedBracket covers the cross-row case: a "[" in
+// one note and a "]" in another used to let two cheap notes bracket every row
+// between them into one link.
+func TestSummarizeEscapesAnUnbalancedBracket(t *testing.T) {
+	uassert.Equal(t, "\\[", summarize("["))
+	uassert.Equal(t, "\\]", summarize("]"))
+}
+
+// TestSummarizeCutsOnARuneBoundary pins the other half of the old bug: the
+// truncation sliced at a byte offset, so a body of multi-byte characters put
+// half a character on the page. One emoji in a note was enough.
+func TestSummarizeCutsOnARuneBoundary(t *testing.T) {
+	// The leading "x" puts byte 48, the old cut point, in the middle of a
+	// 4-byte rune rather than on a boundary.
+	out := summarize("x" + strings.Repeat("\U0001F33E", 60))
+	uassert.True(t, utf8.ValidString(out), "cut mid-rune: "+out)
+	uassert.True(t, strings.HasSuffix(out, "..."), "long body should be elided: "+out)
+
+	// A short body comes back whole, with no elision and nothing to escape.
+	short := summarize("plain note")
+	uassert.Equal(t, "plain note", short)
+}
+
+// TestRenderEscapesTheBoard is the end-to-end half: the sanitizer is only
+// worth anything if Render is what calls it, and the board is the one place a
+// stranger's bytes reach the page.
+func TestRenderEscapesTheBoard(cur realm, t *testing.T) {
+	clear(cur, t)
+	testing.SetRealm(testing.NewUserRealm(poster))
+	Post(cross(cur), "[Claim 100 GNOT](https://evil.example)\n# Official", 0)
+
+	out := Render("")
+	uassert.False(t, strings.Contains(out, "](https://evil.example)"), out)
+	uassert.False(t, strings.Contains(out, "\n# Official"), out)
+	// The note stays legible, just inert: the text survives, the chrome does not.
+	uassert.True(t, strings.Contains(out, "Claim 100 GNOT"), out)
+	uassert.True(t, utf8.ValidString(out), "Render emitted invalid UTF-8")
+
+	testing.SetRealm(testing.NewUserRealm(stranger))
+	Reap(cross(cur), 100)
+	Compact(cross(cur))
 }

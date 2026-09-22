@@ -18,6 +18,10 @@
 //     Compact frees those nodes without moving any live index.
 //   - gno.land/p/moul/x/storagecost/v0 owns the arithmetic: what a byte
 //     refunds, and how many bytes a transaction must free to pay for itself.
+//   - gno.land/p/nt/markdown/sanitize/v0 owns escaping. A note body is
+//     arbitrary bytes chosen by whoever paid to post it and it is rendered
+//     back to every reader, so it is attacker-controlled input in a markdown
+//     slot. Render never emits a body unescaped; see summarize.
 //
 // The realm deliberately cannot see its own byte count. No stdlib call exposes
 // a realm's locked storage, so every figure Render shows is an estimate from
@@ -34,6 +38,7 @@ import (
 	"gno.land/p/moul/txlink/v0"
 	"gno.land/p/moul/ulist/v1"
 	"gno.land/p/moul/x/storagecost/v0"
+	"gno.land/p/nt/markdown/sanitize/v0"
 	"gno.land/p/nt/ufmt/v0"
 )
 
@@ -246,12 +251,46 @@ func verdictWord(q storagecost.Quote) string {
 	return "not worth the gas yet"
 }
 
-// summarize keeps the board readable when a note is long.
+// summarize keeps the board readable when a note is long, and keeps a note
+// from breaking out of the bullet item it is rendered into.
+//
+// A body is whatever bytes a poster paid to store, so on the board it is
+// attacker-controlled input landing in an INLINE markdown slot. Neutralizing
+// it is sanitize.InlineText's job rather than this realm's: it strips bidi and
+// zero-width characters, folds every line separator to a space, and escapes
+// the CommonMark punctuation that would otherwise let a note inject a link, an
+// image, a heading or an HTML block into a page every reader loads. A hand
+// rolled ReplaceAll of "\n" and "|" stops none of that.
+//
+// Truncate first, sanitize second, and never the other way round. InlineText
+// escapes by inserting backslashes and is not idempotent, so cutting its
+// output at an offset can strand a trailing lone backslash that then escapes
+// the chrome this realm appends after it.
 func summarize(body string) string {
 	const width = 48
-	oneLine := strings.ReplaceAll(strings.ReplaceAll(body, "\n", " "), "|", " ")
-	if len(oneLine) <= width {
-		return oneLine
+	// Cosmetic, not a defense: "|" is the column separator of the row this
+	// lands in. InlineText deliberately leaves pipes literal, which is right,
+	// since a lone pipe cannot open a GFM table with no delimiter row, and the
+	// newline fold has already left the item a single line.
+	body = strings.ReplaceAll(body, "|", " ")
+	if head, cut := headRunes(body, width); cut {
+		return sanitize.InlineText(head) + "..."
 	}
-	return oneLine[:width] + "..."
+	return sanitize.InlineText(body)
+}
+
+// headRunes returns the first width runes of s and whether it cut anything.
+//
+// It counts runes, not bytes: slicing a body at a byte offset splits a
+// multi-byte character in half and puts invalid UTF-8 on the page, which one
+// emoji in a note is enough to trigger.
+func headRunes(s string, width int) (string, bool) {
+	n := 0
+	for i := range s {
+		if n == width {
+			return s[:i], true
+		}
+		n++
+	}
+	return s, false
 }
