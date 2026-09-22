@@ -18,10 +18,12 @@
 //     Compact frees those nodes without moving any live index.
 //   - gno.land/p/moul/x/storagecost/v0 owns the arithmetic: what a byte
 //     refunds, and how many bytes a transaction must free to pay for itself.
-//   - gno.land/p/nt/markdown/sanitize/v0 owns escaping. A note body is
-//     arbitrary bytes chosen by whoever paid to post it and it is rendered
-//     back to every reader, so it is attacker-controlled input in a markdown
-//     slot. Render never emits a body unescaped; see summarize.
+//   - gno.land/p/moul/kit/ui/v0 owns display: the escaping, the length cap
+//     and the address format. A note body is arbitrary bytes chosen by
+//     whoever paid to post it and is rendered back to every reader, so it is
+//     attacker-controlled input in a markdown slot. Render never emits a body
+//     unescaped; ui.Excerpt is what makes that true, and it delegates to
+//     p/nt/markdown/sanitize.
 //
 // The realm deliberately cannot see its own byte count. No stdlib call exposes
 // a realm's locked storage, so every figure Render shows is an estimate from
@@ -34,11 +36,10 @@ import (
 
 	"chain/runtime"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/md/v0"
-	"gno.land/p/moul/txlink/v0"
 	"gno.land/p/moul/ulist/v1"
 	"gno.land/p/moul/x/storagecost/v0"
-	"gno.land/p/nt/markdown/sanitize/v0"
 	"gno.land/p/nt/ufmt/v0"
 )
 
@@ -205,19 +206,19 @@ func Render(path string) string {
 			ufmt.Sprintf("verdict: **%s**", verdictWord(quote)),
 		}))
 		b.WriteString("\n")
-		b.WriteString(ufmt.Sprintf("[Reap them](%s)\n\n", txlink.Call("Reap", "limit", "100")))
+		b.WriteString(ui.Action("Reap them", "Reap", "limit", "100") + "\n\n")
 	}
 
 	if dead := Compactable(); dead > 0 {
 		b.WriteString(md.H2("Compaction available"))
-		b.WriteString(ufmt.Sprintf("\n%d dead tree nodes are reclaimable. Compacting frees fewer bytes per unit of gas than reaping does, so it is worth doing in batches.\n\n[Compact](%s)\n\n",
-			dead, txlink.Call("Compact")))
+		b.WriteString(ufmt.Sprintf("\n%d dead tree nodes are reclaimable. Compacting frees fewer bytes per unit of gas than reaping does, so it is worth doing in batches.\n\n%s\n\n",
+			dead, ui.Action("Compact", "Compact")))
 	}
 
 	b.WriteString(md.H2("Board"))
 	b.WriteString("\n")
 	if notes.Size() == 0 {
-		b.WriteString("Empty. [Post the first note](" + txlink.Call("Post", "body", "hello", "ttl", "0") + ")\n\n")
+		b.WriteString("Empty. " + ui.Action("Post the first note", "Post", "body", "hello", "ttl", "0") + "\n\n")
 	} else {
 		height := runtime.ChainHeight()
 		rows := []string{}
@@ -232,7 +233,7 @@ func Render(path string) string {
 				state = "**reapable**"
 			}
 			rows = append(rows, ufmt.Sprintf("`#%d` %s | %d bytes by %s, %s",
-				i, summarize(n.Body), len(n.Body), n.Author.String(), state))
+				i, summarize(n.Body), len(n.Body), ui.Addr(n.Author), state))
 		}
 		b.WriteString(md.BulletList(rows))
 		b.WriteString("\n")
@@ -251,46 +252,17 @@ func verdictWord(q storagecost.Quote) string {
 	return "not worth the gas yet"
 }
 
-// summarize keeps the board readable when a note is long, and keeps a note
-// from breaking out of the bullet item it is rendered into.
+// summarize is the board's one-line view of a note.
 //
 // A body is whatever bytes a poster paid to store, so on the board it is
-// attacker-controlled input landing in an INLINE markdown slot. Neutralizing
-// it is sanitize.InlineText's job rather than this realm's: it strips bidi and
-// zero-width characters, folds every line separator to a space, and escapes
-// the CommonMark punctuation that would otherwise let a note inject a link, an
-// image, a heading or an HTML block into a page every reader loads. A hand
-// rolled ReplaceAll of "\n" and "|" stops none of that.
-//
-// Truncate first, sanitize second, and never the other way round. InlineText
-// escapes by inserting backslashes and is not idempotent, so cutting its
-// output at an offset can strand a trailing lone backslash that then escapes
-// the chrome this realm appends after it.
+// attacker-controlled input in an inline markdown slot. ui.Excerpt owns both
+// halves of that: the rune-boundary cut and the escaping, in the order that is
+// safe. This realm shipped a hand-rolled version that did neither, and the
+// replacement for it is one call.
 func summarize(body string) string {
 	const width = 48
 	// Cosmetic, not a defense: "|" is the column separator of the row this
-	// lands in. InlineText deliberately leaves pipes literal, which is right,
-	// since a lone pipe cannot open a GFM table with no delimiter row, and the
-	// newline fold has already left the item a single line.
-	body = strings.ReplaceAll(body, "|", " ")
-	if head, cut := headRunes(body, width); cut {
-		return sanitize.InlineText(head) + "..."
-	}
-	return sanitize.InlineText(body)
-}
-
-// headRunes returns the first width runes of s and whether it cut anything.
-//
-// It counts runes, not bytes: slicing a body at a byte offset splits a
-// multi-byte character in half and puts invalid UTF-8 on the page, which one
-// emoji in a note is enough to trigger.
-func headRunes(s string, width int) (string, bool) {
-	n := 0
-	for i := range s {
-		if n == width {
-			return s[:i], true
-		}
-		n++
-	}
-	return s, false
+	// lands in. The escaper deliberately leaves pipes literal, which is right,
+	// since a lone pipe cannot open a GFM table with no delimiter row.
+	return ui.Excerpt(strings.ReplaceAll(body, "|", " "), width)
 }
