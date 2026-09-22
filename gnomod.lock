@@ -449,6 +449,10 @@ module = "gno.land/r/moul/sapin/v0"
 source = { dir = "r/moul/sapin" }
 
 [[module]]
+module = "gno.land/r/moul/x/amm/v0"
+source = { dir = "r/moul/x/amm" }
+
+[[module]]
 module = "gno.land/r/moul/x/daily/asciiart/v0"
 source = { commit = "4f2df83869b80470eb81c48a82fdbe82256b8113", dir = "r/moul/x/daily/asciiart" }
 hash = "h1:p+Z37biqtOpHWR9va0M2Ymb/e5sYZGd3/W4E3t9lJHQ="

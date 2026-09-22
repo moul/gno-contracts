@@ -1,0 +1,9 @@
+module = "gno.land/r/moul/x/amm/v0"
+gno = "0.9"
+
+# public: a pool holds the *grc20.Token values r/nt/grc20reg hands out and
+# drives their ledgers, which makes this realm's own objects reachable from
+# those token realms. As private = true the first swap panics with
+# "cannot persist object from the private realm gno.land/r/moul/x/amm/v0"
+# out of assertObjectIsPublic. Measured, not inferred: flip the flag and
+# `make test PKG=amm` fails.
