@@ -17,6 +17,10 @@ module = "gno.land/p/moul/addrset/v1"
 source = { dir = "p/moul/addrset" }
 
 [[module]]
+module = "gno.land/p/moul/agents/commit/v0"
+source = { dir = "p/moul/agents/commit" }
+
+[[module]]
 module = "gno.land/p/moul/authz/v0"
 source = { commit = "3d07a5b2cc02d7c3769caff0c17d884ac033bcfe", dir = "p/moul/authz/v0" }
 hash = "h1:xy1Bxzf36UskxiCm9Dt3KKVm+c9y6K2xaKDEGxwOP3M="
@@ -385,6 +389,30 @@ source = { dir = "p/moul/xdao" }
 [[module]]
 module = "gno.land/p/moul/xmath/v0"
 source = { dir = "p/moul/xmath" }
+
+[[module]]
+module = "gno.land/r/moul/agents/capwallet/v0"
+source = { dir = "r/moul/agents/capwallet" }
+
+[[module]]
+module = "gno.land/r/moul/agents/gnomem/v0"
+source = { dir = "r/moul/agents/gnomem" }
+
+[[module]]
+module = "gno.land/r/moul/agents/jury/v0"
+source = { dir = "r/moul/agents/jury" }
+
+[[module]]
+module = "gno.land/r/moul/agents/maintainer/v0"
+source = { dir = "r/moul/agents/maintainer" }
+
+[[module]]
+module = "gno.land/r/moul/agents/passport/v0"
+source = { dir = "r/moul/agents/passport" }
+
+[[module]]
+module = "gno.land/r/moul/agents/receipt/v0"
+source = { dir = "r/moul/agents/receipt" }
 
 [[module]]
 module = "gno.land/r/moul/config/v0"
