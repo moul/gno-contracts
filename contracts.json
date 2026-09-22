@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-22T19:48:34Z",
+  "status_checked_at": "2026-09-22T20:01:32Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -458,6 +458,32 @@
         "mainnet": {
           "uploaded": true,
           "which": "monorepo"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/forge/v0",
+      "dir": "p/moul/forge",
+      "kind": "p",
+      "name": "forge",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -3304,6 +3330,36 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/forge/v0",
+      "dir": "r/moul/forge",
+      "kind": "r",
+      "name": "forge",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/forge/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/r/sys/users"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
