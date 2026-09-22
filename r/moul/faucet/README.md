@@ -18,6 +18,31 @@ approver's balance. Top it up with a plain bank send to that address, or with
 `Fund` if you want the donation on the record. `Withdraw` takes it back, to the
 owner and nowhere else.
 
+## It is a private realm
+
+`gnomod.toml` declares `private = true`, so the creator can redeploy this path
+with corrected code rather than abandon it for a `v1`. On a realm holding other
+people's rent money that is worth having.
+
+What a redeploy costs is exact, and measured rather than assumed:
+
+| across a redeploy | |
+|---|---|
+| the code | replaced |
+| the float | **kept** — coins live at the address, which is bank state |
+| requests, approvers, counters | **wiped** — every initializer runs again |
+| storage deposit | accumulates; the old objects are not evicted, so nothing refunds them |
+
+So a bug fix here is cheap in money and expensive in history. That is the right
+way round for a faucet and the wrong way round for anything whose ledger people
+rely on, which is why this is a per-realm decision and not a repo-wide default.
+
+Private is **one-way and set at the first deploy**: a public path can never
+become private, nor the reverse. And no other realm may import this one or hold
+a reference to its objects. Nothing else here does, and reading it from outside
+is unaffected: `vm/qrender` and `vm/qeval` both work normally on a private
+realm.
+
 ## The two calls, and why they travel together
 
 | call | who | what it does |

@@ -165,6 +165,49 @@ commit that still holds the outgoing version and a dirty directory would make th
 a lie. It pins to a commit already on `origin/main` where it can: this repository
 squash-merges, so a pin to a feature branch's HEAD would dangle the moment it lands.
 
+### `private = true`: decide it per realm, at the first deploy, and never after
+
+A realm whose `gnomod.toml` says `private = true` can be **redeployed at the same
+path by its original creator**, instead of being abandoned for a `vN+1`. Everything
+else about it is a one-way door, so this is decided once, before the first publish.
+
+Measured on `gnolang/gno@master` with the integration harness, 2026-09-22, not inferred:
+
+| across a redeploy | |
+|---|---|
+| the code | replaced |
+| coins at the realm address | **kept** (probe: 700000ugnot before and after) |
+| every package-level variable | **wiped**, back to its initializer (probe: a counter at 3 read 0) |
+| storage deposit | accumulates. Prior objects are not evicted and nothing can free them, so each redeploy is charged in full and refunds nothing |
+
+And the constraints, from `checkGnomodConstraints` and `checkRedeployPermission` in
+`gno.land/pkg/sdk/vm/keeper.go`:
+
+- **Public cannot become private, private cannot become public.** Both are refused, so
+  the ~40 realms already on chain can never convert either way.
+- **Only `addpkg.creator` may redeploy.** Not the namespace owner, the original signer.
+- **No other realm may import it**, hold a reference to its objects, or retain a value
+  of a type it defines.
+- `private` is realm-only: a `p/` package declaring it is refused.
+- Reading it from outside is unaffected: `vm/qrender` and `vm/qeval` work normally.
+- On mainnet a redeploy is a `MsgAddPackage`, so it **parks like any other** and waits
+  for an approver. "Replaceable" is not "hot-patchable".
+
+**So it is not a repo-wide default, and asking for one is the wrong shape.** The question
+it answers is "would I rather fix the code and lose the state, or keep the state and move
+to a new path", and that has opposite answers for a realm holding money and a realm whose
+whole value is its accumulated history.
+
+| use `private = true` | leave it public |
+|---|---|
+| holds coins or other people's value, where a path migration is expensive (`r/moul/faucet`) | anything another realm imports, registers with, or hands objects to |
+| operated and expected to be fixed, with state that is cheap to lose | the state IS the artifact: a board, a wiki, a log, anything whose history is the point |
+| `r/moul/home`, where content lives in mutable storage precisely so a redeploy does not lose it | an `x/` experiment exploring composition, which is most of `x/` |
+
+The one thing that makes it genuinely safe is designing for the wipe: keep the durable
+part in something a redeploy does not touch (coins at the address) or accept losing it.
+`r/moul/home` does the first and says so above.
+
 ### Reusable logic splits into a `p/` library and an `r/` demo
 
 A codec, algorithm, data structure or utility (most `x/daily/*` ports) is never a single
