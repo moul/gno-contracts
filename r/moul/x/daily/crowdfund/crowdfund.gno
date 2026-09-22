@@ -16,12 +16,14 @@ import (
 	"chain/runtime"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
-// Campaign holds the state of a single crowdfunding campaign.
+// Campaign holds the state of a single crowdfunding campaign. It carries no ID
+// field: the id belongs to the store, which hands it back on lookup and
+// iteration.
 type Campaign struct {
-	ID       int
 	Creator  address
 	Goal     uint64
 	Deadline int64     // block height after which the campaign is closed
@@ -30,26 +32,13 @@ type Campaign struct {
 	pledges  *avl.Tree // backer address (string) -> pledged uint64
 }
 
-var (
-	campaigns = avl.NewTree() // padded id -> *Campaign (ordered by id)
-	nextID    = 1
-)
-
-// key zero-pads an id so avl iteration is in numeric order.
-func key(id int) string {
-	s := strconv.Itoa(id)
-	for len(s) < 12 {
-		s = "0" + s
-	}
-	return s
-}
+// campaigns assigns the campaign ids. v0 kept its own nextID plus a key() that
+// zero-padded to width 12, which stopped ordering Render past 10^12, and its
+// own mustGet whose panic did not say which campaign was missing.
+var campaigns = store.Named("campaign")
 
 func mustGet(id int) *Campaign {
-	v := campaigns.Get(key(id))
-	if v == nil {
-		panic("campaign not found")
-	}
-	return v.(*Campaign)
+	return campaigns.MustGet(store.ID(id)).(*Campaign)
 }
 
 // Launch creates a new campaign owned by the caller and returns its id.
@@ -61,21 +50,17 @@ func Launch(cur realm, goal uint64, durationBlocks int) int {
 		panic("duration must be > 0")
 	}
 	caller := unsafe.PreviousRealm().Address()
-	id := nextID
-	nextID++
-	c := &Campaign{
-		ID:       id,
+	id := campaigns.Add(&Campaign{
 		Creator:  caller,
 		Goal:     goal,
 		Deadline: runtime.ChainHeight() + int64(durationBlocks),
 		pledges:  avl.NewTree(),
-	}
-	campaigns.Set(key(id), c)
+	})
 	chain.Emit("Launch",
-		"id", strconv.Itoa(id),
+		"id", id.String(),
 		"creator", caller.String(),
 		"goal", strconv.FormatUint(goal, 10))
-	return id
+	return int(id)
 }
 
 // Pledge backs campaign id with amount (before the deadline).
@@ -226,22 +211,21 @@ func state(c *Campaign, height int64) string {
 
 // Render shows all campaigns with a progress bar, goal, pledged and state.
 func Render(path string) string {
-	if campaigns.Size() == 0 {
+	if campaigns.Len() == 0 {
 		return "# Crowdfund\n\nNo campaigns yet. Call `Launch(goal, durationBlocks)` to start one.\n"
 	}
 	height := runtime.ChainHeight()
 	out := "# Crowdfund\n\n"
 	out += "Current block height: **" + strconv.FormatInt(height, 10) + "**\n\n"
-	campaigns.Iterate("", "", func(k string, v any) bool {
+	campaigns.Each(func(id store.ID, v any) {
 		c := v.(*Campaign)
-		out += "## Campaign #" + strconv.Itoa(c.ID) + "\n\n"
+		out += "## Campaign #" + id.String() + "\n\n"
 		out += "`" + progressBar(c.Pledged, c.Goal) + "` " + strconv.Itoa(pct(c.Pledged, c.Goal)) + "%\n\n"
 		out += "- State: **" + state(c, height) + "**\n"
 		out += "- Goal: " + strconv.FormatUint(c.Goal, 10) + "\n"
 		out += "- Pledged: " + strconv.FormatUint(c.Pledged, 10) + "\n"
 		out += "- Deadline: block " + strconv.FormatInt(c.Deadline, 10) + "\n"
 		out += "- Creator: `" + c.Creator.String() + "`\n\n"
-		return false
 	})
 	return out
 }

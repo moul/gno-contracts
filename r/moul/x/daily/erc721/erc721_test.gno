@@ -3,17 +3,19 @@ package erc721
 import (
 	"testing"
 
+	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
-func TestKeyPaddingSortable(t *testing.T) {
-	// keys must be fixed-width so avl iteration is numeric-order.
-	uassert.Equal(t, "000000000001", key(1))
-	uassert.Equal(t, "000000000042", key(42))
-	uassert.Equal(t, "000000123456", key(123456))
-	// lexical order must match numeric order
-	uassert.True(t, key(2) < key(10), "padded key(2) should sort before key(10)")
-	uassert.True(t, key(99) < key(100), "padded key(99) should sort before key(100)")
+// v0 asserted that its own key() padded to width 12. That rule held only below
+// the width: key(10^12) is 13 characters and sorts before key(10^12-1), so the
+// token table would have rendered out of order from that id on. The store key
+// has no width to outgrow, which is what this replaces it with.
+func TestTokenKeysSortNumericallyPastTheOldWidth(t *testing.T) {
+	uassert.True(t, store.ID(2).Key() < store.ID(10).Key(), "2 sorts before 10")
+	uassert.True(t, store.ID(99).Key() < store.ID(100).Key(), "99 sorts before 100")
+	uassert.True(t, store.ID(999999999999).Key() < store.ID(1000000000000).Key(),
+		"and it keeps holding one past v0's width-12 ceiling")
 }
 
 func TestReadOnlyDefaults(t *testing.T) {

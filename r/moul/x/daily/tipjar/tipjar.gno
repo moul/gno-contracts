@@ -15,6 +15,7 @@ import (
 	"chain/runtime"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -165,20 +166,6 @@ func leaderboard() []*tipperStats {
 	return stats
 }
 
-// medal returns the emoji for a given zero-based rank, or "" past the podium.
-func medal(rank int) string {
-	switch rank {
-	case 0:
-		return "🥇"
-	case 1:
-		return "🥈"
-	case 2:
-		return "🥉"
-	default:
-		return ""
-	}
-}
-
 // display returns a shortened address for table display.
 func display(addr address) string {
 	s := addr.String()
@@ -207,7 +194,7 @@ func Render(path string) string {
 		out += "| Rank | Tipper | Total tipped | Tips |\n"
 		out += "| ---: | :--- | ---: | ---: |\n"
 		for i, ts := range stats {
-			rankCell := medal(i)
+			rankCell := ui.Podium(i)
 			if rankCell == "" {
 				rankCell = strconv.Itoa(i + 1)
 			}

@@ -15,6 +15,8 @@ import (
 
 	"chain"
 	"chain/runtime"
+
+	"gno.land/p/moul/kit/ui/v0"
 )
 
 const (
@@ -160,7 +162,7 @@ func Reveal(cur realm) string {
 	entries = nil
 
 	return "round " + strconv.Itoa(closedRound) + " revealed: target was " + strconv.Itoa(target) +
-		" — " + shortAddr(winner.addr) + " wins, guessed " + strconv.Itoa(winner.n) +
+		" — " + ui.AddrOf(winner.addr) + " wins, guessed " + strconv.Itoa(winner.n) +
 		" (distance " + strconv.Itoa(best) + ") among " + strconv.Itoa(rec.players) +
 		" player(s). Round " + strconv.Itoa(current.number) + " is now open."
 }
@@ -219,7 +221,7 @@ func renderLeaderboard() string {
 	b.WriteString("| Rank | Player | Round | Target | Guess | Distance | Players |\n")
 	b.WriteString("|---|---|---|---|---|---|---|\n")
 	for i, w := range ranked {
-		b.WriteString("| " + strconv.Itoa(i+1) + " | `" + shortAddr(w.winner) + "` | " +
+		b.WriteString("| " + strconv.Itoa(i+1) + " | " + ui.AddrOf(w.winner) + " | " +
 			strconv.Itoa(w.round) + " | " + strconv.Itoa(w.target) + " | " +
 			strconv.Itoa(w.guess) + " | " + strconv.Itoa(w.distance) + " | " +
 			strconv.Itoa(w.players) + " |\n")
@@ -245,11 +247,4 @@ func closer(a, b winRecord) bool {
 		return a.distance < b.distance
 	}
 	return a.round < b.round
-}
-
-func shortAddr(a string) string {
-	if len(a) <= 12 {
-		return a
-	}
-	return a[:6] + "…" + a[len(a)-4:]
 }

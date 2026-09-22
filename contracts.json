@@ -21,7 +21,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-21T13:37:22Z",
+  "status_checked_at": "2026-09-22T16:38:43Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -475,6 +475,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/grants/v0",
+      "dir": "p/moul/grants",
+      "kind": "p",
+      "name": "grants",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/greet/v0",
       "dir": "p/moul/greet",
       "kind": "p",
@@ -522,6 +550,61 @@
         "mainnet": {
           "uploaded": true,
           "which": "monorepo"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/kit/store/v0",
+      "dir": "p/moul/kit/store",
+      "kind": "p",
+      "name": "kit/store",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/seqid/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/kit/ui/v0",
+      "dir": "p/moul/kit/ui",
+      "kind": "p",
+      "name": "kit/ui",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/helplink/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -658,6 +741,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/mygnoscan/v0",
+      "dir": "p/moul/mygnoscan",
+      "kind": "p",
+      "name": "mygnoscan",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/nestedpkg/v0",
       "dir": "p/moul/nestedpkg",
       "kind": "p",
@@ -761,6 +868,30 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/pausable/v0",
+      "dir": "p/moul/pausable",
+      "kind": "p",
+      "name": "pausable",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -1053,6 +1184,8 @@
       "upstream_match": "gno",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "f6d0693f5161db423c042a4fe7c78057593cff80",
       "published": {
         "betanet": {
           "uploaded": false
@@ -1063,6 +1196,32 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/ulist/v1",
+      "dir": "p/moul/ulist",
+      "kind": "p",
+      "name": "ulist",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -2056,6 +2215,219 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/plan9/memfs/v0",
+      "dir": "p/moul/x/plan9/memfs",
+      "kind": "p",
+      "name": "x/plan9/memfs",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/ninep/v0",
+      "dir": "p/moul/x/plan9/ninep",
+      "kind": "p",
+      "name": "x/plan9/ninep",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/ns/v0",
+      "dir": "p/moul/x/plan9/ns",
+      "kind": "p",
+      "name": "x/plan9/ns",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/rc/v0",
+      "dir": "p/moul/x/plan9/rc",
+      "kind": "p",
+      "name": "x/plan9/rc",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/memfs/v0",
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/ns/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/plan9/synfs/v0",
+      "dir": "p/moul/x/plan9/synfs",
+      "kind": "p",
+      "name": "x/plan9/synfs",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/storagecost/v0",
+      "dir": "p/moul/x/storagecost",
+      "kind": "p",
+      "name": "x/storagecost",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/vm/bf/v0",
+      "dir": "p/moul/x/vm/bf",
+      "kind": "p",
+      "name": "x/vm/bf",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/vm/vmkit/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/vm/vmkit/v0",
+      "dir": "p/moul/x/vm/vmkit",
+      "kind": "p",
+      "name": "x/vm/vmkit",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/wiki/v0",
       "dir": "p/moul/x/wiki",
       "kind": "p",
@@ -2155,6 +2527,8 @@
         "gno.land/p/moul/authz/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "bd1ff5de0053958282ac81f08ed8bfcb2081982c",
       "published": {
         "betanet": {
           "uploaded": false
@@ -2162,6 +2536,35 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/config/v1",
+      "dir": "r/moul/config",
+      "kind": "r",
+      "name": "config",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/authz/v0",
+        "gno.land/p/moul/mygnoscan/v0",
+        "gno.land/p/moul/pausable/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -2498,6 +2901,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/faucet/v0",
+      "dir": "r/moul/faucet",
+      "kind": "r",
+      "name": "faucet",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/gns/v0",
       "dir": "r/moul/gns",
       "kind": "r",
@@ -2513,6 +2944,32 @@
         "betanet": {
           "uploaded": false
         },
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/grant/v0",
+      "dir": "r/moul/grant",
+      "kind": "r",
+      "name": "grant",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/grants/v0"
+      ],
+      "draft": false,
+      "published": {
         "mainnet": {
           "uploaded": false
         },
@@ -2558,6 +3015,36 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/home",
+      "dir": "r/moul/home",
+      "kind": "r",
+      "name": "home",
+      "version": "",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/dynreplacer/v0",
+        "gno.land/p/moul/mygnoscan/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/r/moul/config/v1"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/home/v0",
       "dir": "r/moul/home",
       "kind": "r",
@@ -2566,6 +3053,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -2691,6 +3180,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -2701,6 +3192,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/asciiart/v1",
+      "dir": "r/moul/x/daily/asciiart",
+      "kind": "r",
+      "name": "x/daily/asciiart",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -2871,6 +3390,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -2881,6 +3402,33 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/blog/v1",
+      "dir": "r/moul/x/daily/blog",
+      "kind": "r",
+      "name": "x/daily/blog",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -2927,6 +3475,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -2937,6 +3487,33 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/bullscows/v1",
+      "dir": "r/moul/x/daily/bullscows",
+      "kind": "r",
+      "name": "x/daily/bullscows",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -3013,6 +3590,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3020,6 +3599,32 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/closestguess/v1",
+      "dir": "r/moul/x/daily/closestguess",
+      "kind": "r",
+      "name": "x/daily/closestguess",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -3043,6 +3648,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3053,6 +3660,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/coinflipduel/v1",
+      "dir": "r/moul/x/daily/coinflipduel",
+      "kind": "r",
+      "name": "x/daily/coinflipduel",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -3103,6 +3738,8 @@
         "gno.land/p/moul/x/daily/commitreveal/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3110,6 +3747,33 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/commitrevealdemo/v1",
+      "dir": "r/moul/x/daily/commitrevealdemo",
+      "kind": "r",
+      "name": "x/daily/commitrevealdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/commitreveal/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -3133,6 +3797,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3143,6 +3809,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/connect4/v1",
+      "dir": "r/moul/x/daily/connect4",
+      "kind": "r",
+      "name": "x/daily/connect4",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -3281,6 +3975,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3288,6 +3984,33 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/crowdfund/v1",
+      "dir": "r/moul/x/daily/crowdfund",
+      "kind": "r",
+      "name": "x/daily/crowdfund",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -3401,6 +4124,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3421,6 +4146,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/eggling/v1",
+      "dir": "r/moul/x/daily/eggling",
+      "kind": "r",
+      "name": "x/daily/eggling",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/eightball/v0",
       "dir": "r/moul/x/daily/eightball",
       "kind": "r",
@@ -3429,6 +4182,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3439,6 +4194,33 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/eightball/v1",
+      "dir": "r/moul/x/daily/eightball",
+      "kind": "r",
+      "name": "x/daily/eightball",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -3459,6 +4241,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3466,6 +4250,33 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/englishauction/v1",
+      "dir": "r/moul/x/daily/englishauction",
+      "kind": "r",
+      "name": "x/daily/englishauction",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -3547,6 +4358,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3554,6 +4367,33 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/erc721/v1",
+      "dir": "r/moul/x/daily/erc721",
+      "kind": "r",
+      "name": "x/daily/erc721",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -3577,6 +4417,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3587,6 +4429,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/escrow/v1",
+      "dir": "r/moul/x/daily/escrow",
+      "kind": "r",
+      "name": "x/daily/escrow",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -3697,6 +4567,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3704,6 +4576,33 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/governor/v1",
+      "dir": "r/moul/x/daily/governor",
+      "kind": "r",
+      "name": "x/daily/governor",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -3727,6 +4626,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3747,6 +4648,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/guestbook/v1",
+      "dir": "r/moul/x/daily/guestbook",
+      "kind": "r",
+      "name": "x/daily/guestbook",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/handles/v0",
       "dir": "r/moul/x/daily/handles",
       "kind": "r",
@@ -3757,6 +4686,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3767,6 +4698,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/handles/v1",
+      "dir": "r/moul/x/daily/handles",
+      "kind": "r",
+      "name": "x/daily/handles",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -3907,6 +4866,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3917,6 +4878,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/kingofdice/v1",
+      "dir": "r/moul/x/daily/kingofdice",
+      "kind": "r",
+      "name": "x/daily/kingofdice",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -3997,6 +4986,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4007,6 +4998,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/leaderboard/v1",
+      "dir": "r/moul/x/daily/leaderboard",
+      "kind": "r",
+      "name": "x/daily/leaderboard",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -4289,6 +5308,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4309,6 +5330,33 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/microblog/v1",
+      "dir": "r/moul/x/daily/microblog",
+      "kind": "r",
+      "name": "x/daily/microblog",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/moodstone/v0",
       "dir": "r/moul/x/daily/moodstone",
       "kind": "r",
@@ -4317,6 +5365,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4327,6 +5377,33 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/moodstone/v1",
+      "dir": "r/moul/x/daily/moodstone",
+      "kind": "r",
+      "name": "x/daily/moodstone",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -4645,6 +5722,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4652,6 +5731,33 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/qvote/v1",
+      "dir": "r/moul/x/daily/qvote",
+      "kind": "r",
+      "name": "x/daily/qvote",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -4914,6 +6020,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4924,6 +6032,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/rps/v1",
+      "dir": "r/moul/x/daily/rps",
+      "kind": "r",
+      "name": "x/daily/rps",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -4944,6 +6080,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4954,6 +6092,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/rpsduel/v1",
+      "dir": "r/moul/x/daily/rpsduel",
+      "kind": "r",
+      "name": "x/daily/rpsduel",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -4974,6 +6140,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4994,6 +6162,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/rpsmatch/v1",
+      "dir": "r/moul/x/daily/rpsmatch",
+      "kind": "r",
+      "name": "x/daily/rpsmatch",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/rpsoracle/v0",
       "dir": "r/moul/x/daily/rpsoracle",
       "kind": "r",
@@ -5004,6 +6200,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5014,6 +6212,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/rpsoracle/v1",
+      "dir": "r/moul/x/daily/rpsoracle",
+      "kind": "r",
+      "name": "x/daily/rpsoracle",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -5151,6 +6377,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5161,6 +6389,33 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/splitter/v1",
+      "dir": "r/moul/x/daily/splitter",
+      "kind": "r",
+      "name": "x/daily/splitter",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -5269,6 +6524,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5276,6 +6533,33 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/streaks/v1",
+      "dir": "r/moul/x/daily/streaks",
+      "kind": "r",
+      "name": "x/daily/streaks",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
@@ -5299,6 +6583,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5319,6 +6605,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/tamagotchi/v1",
+      "dir": "r/moul/x/daily/tamagotchi",
+      "kind": "r",
+      "name": "x/daily/tamagotchi",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/tictactoe/v0",
       "dir": "r/moul/x/daily/tictactoe",
       "kind": "r",
@@ -5329,6 +6643,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5339,6 +6655,33 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/tictactoe/v1",
+      "dir": "r/moul/x/daily/tictactoe",
+      "kind": "r",
+      "name": "x/daily/tictactoe",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -5360,6 +6703,8 @@
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5370,6 +6715,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/timecapsule/v1",
+      "dir": "r/moul/x/daily/timecapsule",
+      "kind": "r",
+      "name": "x/daily/timecapsule",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -5421,6 +6794,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5441,6 +6816,34 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/tipjar/v1",
+      "dir": "r/moul/x/daily/tipjar",
+      "kind": "r",
+      "name": "x/daily/tipjar",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/todos/v0",
       "dir": "r/moul/x/daily/todos",
       "kind": "r",
@@ -5451,6 +6854,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5461,6 +6866,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/todos/v1",
+      "dir": "r/moul/x/daily/todos",
+      "kind": "r",
+      "name": "x/daily/todos",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -5571,6 +7004,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "4f2df83869b80470eb81c48a82fdbe82256b8113",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5581,6 +7016,34 @@
         },
         "pearl": {
           "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/urlshort/v1",
+      "dir": "r/moul/x/daily/urlshort",
+      "kind": "r",
+      "name": "x/daily/urlshort",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": true,
+          "which": "ours"
         },
         "sapphire": {
           "uploaded": false
@@ -5694,6 +7157,160 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/plan9/dev/v0",
+      "dir": "r/moul/x/plan9/dev",
+      "kind": "r",
+      "name": "x/plan9/dev",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/synfs/v0",
+        "gno.land/r/moul/x/plan9/ns/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/plan9/ns/v0",
+      "dir": "r/moul/x/plan9/ns",
+      "kind": "r",
+      "name": "x/plan9/ns",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/plan9/memfs/v0",
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/ns/v0",
+        "gno.land/p/moul/x/plan9/rc/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/reaper/v0",
+      "dir": "r/moul/x/reaper",
+      "kind": "r",
+      "name": "x/reaper",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/p/moul/ulist/v1",
+        "gno.land/p/moul/x/storagecost/v0",
+        "gno.land/p/nt/markdown/sanitize/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "superseded": true,
+      "commit": "72317f0ab9702651dfd50da24b9cc1599399e6a1",
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/reaper/v1",
+      "dir": "r/moul/x/reaper",
+      "kind": "r",
+      "name": "x/reaper",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/ulist/v1",
+        "gno.land/p/moul/x/storagecost/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/vm/bfdemo/v0",
+      "dir": "r/moul/x/vm/bfdemo",
+      "kind": "r",
+      "name": "x/vm/bfdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/vm/bf/v0",
+        "gno.land/p/moul/x/vm/vmkit/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/seqid/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
