@@ -123,7 +123,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 |---|---|---|---|---|---|---|
 | [`p/moul/addrset/v0`](https://github.com/moul/gno-contracts/tree/3d07a5b2cc02d7c3769caff0c17d884ac033bcfe/p/moul/addrset/v0) 📦 🧊 | — | — | [🗄️](https://gno.land/p/moul/addrset/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset/v0) ≈ | 1 |
 | [`p/moul/addrset/v1`](p/moul/addrset) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/addrset/v1) | [✅](https://gno.land/p/moul/addrset/v1) | — | — | 1 |
-| [`p/moul/agents/commit/v0`](p/moul/agents/commit) 📦 | — | — | — | — | — | — |
+| [`p/moul/agents/commit/v0`](p/moul/agents/commit) 📦 | — | — | [✅](https://gno.land/p/moul/agents/commit/v0) | — | — | — |
 | [`p/moul/authz/v0`](https://github.com/moul/gno-contracts/tree/3d07a5b2cc02d7c3769caff0c17d884ac033bcfe/p/moul/authz/v0) 📦 🧊 | — | — | [🗄️](https://gno.land/p/moul/authz/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz/v0) ≈ | 5 |
 | [`p/moul/authz/v1`](p/moul/authz) 📦 | — | [✅](https://pearl.testnets.gno.land/p/moul/authz/v1) | [✅](https://gno.land/p/moul/authz/v1) | — | — | 3 |
 | [`p/moul/collection/v0`](p/moul/collection) 📦 | — | — | [✅](https://gno.land/p/moul/collection/v0) | — | — | 3 |
@@ -135,9 +135,9 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/entropy/v0`](p/moul/entropy) 📦 | — | — | [✅](https://gno.land/p/moul/entropy/v0) | — | — | — |
 | [`p/moul/errs/v0`](p/moul/errs) 📦 | — | — | [✅](https://gno.land/p/moul/errs/v0) | — | — | — |
 | [`p/moul/fifo/v0`](p/moul/fifo) 📦 | — | — | [🗄️](https://gno.land/p/moul/fifo/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo/v0) ≈ | — |
-| [`p/moul/forge/v0`](p/moul/forge) 📦 | — | — | — | — | — | 1 |
+| [`p/moul/forge/v0`](p/moul/forge) 📦 | — | — | [✅](https://gno.land/p/moul/forge/v0) | — | — | 1 |
 | [`p/moul/fp/v0`](p/moul/fp) 📦 | — | — | [✅](https://gno.land/p/moul/fp/v0) | — | — | — |
-| [`p/moul/grants/v0`](p/moul/grants) 📦 | — | — | — | — | — | 3 |
+| [`p/moul/grants/v0`](p/moul/grants) 📦 | — | — | [✅](https://gno.land/p/moul/grants/v0) | — | — | 3 |
 | [`p/moul/greet/v0`](p/moul/greet) 📦 | — | — | [✅](https://gno.land/p/moul/greet/v0) | — | — | — |
 | [`p/moul/helplink/v0`](p/moul/helplink) 📦 | — | — | [🗄️](https://gno.land/p/moul/helplink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink/v0) ≈ | 1 |
 | [`p/moul/kit/store/v0`](p/moul/kit/store) 📦 | — | — | — | — | — | 2 |
@@ -405,7 +405,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-23T15:12:39Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-23T15:41:50Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
