@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-23T16:55:52Z",
+  "status_checked_at": "2026-09-23T18:33:56Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2963,7 +2963,8 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
-        "gno.land/p/nt/avl/v0"
+        "gno.land/p/nt/avl/v0",
+        "gno.land/r/moul/config/v1"
       ],
       "draft": false,
       "published": {
@@ -3662,6 +3663,69 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/allinone/devtools/v0",
+      "dir": "r/moul/x/allinone/devtools",
+      "kind": "r",
+      "name": "x/allinone/devtools",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/debug/v0",
+        "gno.land/p/moul/fifo/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/mygnoscan/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/r/moul/config/v1"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/allinone/textlab/v0",
+      "dir": "r/moul/x/allinone/textlab",
+      "kind": "r",
+      "name": "x/allinone/textlab",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/daily/levenshtein/v0",
+        "gno.land/p/moul/x/daily/piglatin/v0",
+        "gno.land/p/moul/x/daily/romannum/v0",
+        "gno.land/p/moul/x/daily/rot13/v0",
+        "gno.land/p/moul/x/daily/soundex/v0",
+        "gno.land/r/moul/config/v1"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": true,
+          "which": "ours"
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {

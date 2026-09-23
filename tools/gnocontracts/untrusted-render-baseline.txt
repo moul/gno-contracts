@@ -1,0 +1,70 @@
+# Realms that render a caller's string without escaping it, and are already
+# live on mainnet.
+#
+# This is a baseline, not an allowlist, and the difference is the whole point: a
+# public package path is IMMUTABLE. AddPackage refuses a path already occupied
+# unless the live package is private, so none of these can be fixed in place.
+# The only fix is a new version at a new path, which is a deliberate deploy and
+# not something a guard should force.
+#
+# So the guard's job is to stop the 55th, not to relitigate the 54. An entry
+# leaves this file when the realm ships a fixed version, and a realm that is not
+# in it must escape or say why.
+#
+# Generated 2026-09-23 from the tree at that date. Do not add to it by hand to
+# silence a failure: that is what the `// untrusted-render: <why>` opt-out is
+# for, and it makes you name the validation.
+r/moul/agents/capwallet
+r/moul/agents/gnomem
+r/moul/agents/jury
+r/moul/agents/maintainer
+r/moul/agents/passport
+r/moul/agents/receipt
+r/moul/config
+r/moul/forge
+r/moul/gns
+r/moul/grant
+r/moul/hello
+r/moul/home
+r/moul/present
+r/moul/x/amm
+r/moul/x/daily/ballot
+r/moul/x/daily/blog
+r/moul/x/daily/bloomfilter
+r/moul/x/daily/bullscows
+r/moul/x/daily/calc
+r/moul/x/daily/dutchauction
+r/moul/x/daily/eightball
+r/moul/x/daily/englishauction
+r/moul/x/daily/governor
+r/moul/x/daily/handles
+r/moul/x/daily/hangman
+r/moul/x/daily/kudos
+r/moul/x/daily/leaderboard
+r/moul/x/daily/linktree
+r/moul/x/daily/lru
+r/moul/x/daily/markovdemo
+r/moul/x/daily/merkledrop
+r/moul/x/daily/moodstone
+r/moul/x/daily/multisig
+r/moul/x/daily/pixelcanvas
+r/moul/x/daily/polls
+r/moul/x/daily/quotes
+r/moul/x/daily/reactions
+r/moul/x/daily/rps
+r/moul/x/daily/semverdemo
+r/moul/x/daily/splitter
+r/moul/x/daily/tamagotchi
+r/moul/x/daily/timelock
+r/moul/x/daily/tipjar
+r/moul/x/daily/todos
+r/moul/x/daily/urlshort
+r/moul/x/daily/vault
+r/moul/x/daily/wordle
+r/moul/x/grc20faucet
+r/moul/x/grc20wrapdemo
+r/moul/x/pairs/aaabbb
+r/moul/x/plan9/ns
+r/moul/x/provable
+r/moul/x/wesh
+r/moul/x/wiki

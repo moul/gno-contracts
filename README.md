@@ -223,7 +223,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/agents/maintainer/v0`](r/moul/agents/maintainer) 🏛️ | — | [✅](https://gno.land/r/moul/agents/maintainer/v0) | — | — | 1 |
 | [`r/moul/agents/passport/v0`](r/moul/agents/passport) 🏛️ | — | [✅](https://gno.land/r/moul/agents/passport/v0) | — | — | 2 |
 | [`r/moul/agents/receipt/v0`](r/moul/agents/receipt) 🏛️ | — | [✅](https://gno.land/r/moul/agents/receipt/v0) | — | — | 1 |
-| [`r/moul/blog`](r/moul/blog) 🏛️ | — | [✅](https://gno.land/r/moul/blog) | — | — | 2 |
+| [`r/moul/blog`](r/moul/blog) 🏛️ | — | [✅](https://gno.land/r/moul/blog) | — | — | 3 |
 | [`r/moul/config/v0`](https://github.com/moul/gno-contracts/tree/bd1ff5de0053958282ac81f08ed8bfcb2081982c/r/moul/config) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
 | [`r/moul/config/v1`](r/moul/config) 🏛️ | — | [✅](https://gno.land/r/moul/config/v1) | — | — | 4 |
 | [`r/moul/demo/args/v0`](r/moul/demo/args) 🏛️ | — | [✅](https://gno.land/r/moul/demo/args/v0) | — | — | — |
@@ -247,6 +247,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/outfmt/v0`](r/moul/outfmt) 🏛️ | — | [✅](https://gno.land/r/moul/outfmt/v0) | — | — | 1 |
 | [`r/moul/present/v0`](r/moul/present) 🏛️ | — | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
 | [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | — | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
+| [`r/moul/x/allinone/devtools/v0`](r/moul/x/allinone/devtools) 🏛️ | — | [✅](https://gno.land/r/moul/x/allinone/devtools/v0) | — | — | 8 |
+| [`r/moul/x/allinone/textlab/v0`](r/moul/x/allinone/textlab) 🏛️ | — | [✅](https://gno.land/r/moul/x/allinone/textlab/v0) | — | — | 9 |
 | [`r/moul/x/amm/v0`](r/moul/x/amm) 🏛️ | — | [✅](https://gno.land/r/moul/x/amm/v0) | — | — | 5 |
 | [`r/moul/x/daily/asciiart/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/asciiart) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/asciiart/v0) | — | — | 1 |
 | [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart) 🏛️ | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/asciiart/v1) | [✅](https://gno.land/r/moul/x/daily/asciiart/v1) | — | — | 2 |
@@ -405,7 +407,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-23T16:55:52Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-23T18:33:56Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 

@@ -24,6 +24,14 @@ type pet struct {
 	hunger     int // 0 (full) .. 100 (starving)
 	happiness  int // 0 (miserable) .. 100 (joyful)
 	energy     int // 0 (exhausted) .. 100 (energetic)
+	// happyDebt and energyDebt carry the blocks that have elapsed but not yet
+	// cost a point, because happiness decays once per 2 blocks and energy once
+	// per 3. Without them the division truncates on EVERY call, so acting once
+	// per block cost 1/2 = 0 happiness and 1/3 = 0 energy forever: a pet fed in
+	// a loop never aged. The remainder makes the decay depend on elapsed time
+	// and not on how often someone calls.
+	happyDebt  int // 0..1 blocks owed toward the next happiness point
+	energyDebt int // 0..2 blocks owed toward the next energy point
 	alive      bool
 	deaths     int
 	feeds      int
@@ -61,8 +69,17 @@ func (p *pet) tick(height int64) {
 		return
 	}
 	p.hunger = clamp(p.hunger+elapsed, 0, 100)
-	p.happiness = clamp(p.happiness-elapsed/2, 0, 100)
-	p.energy = clamp(p.energy-elapsed/3, 0, 100)
+
+	// Spend the elapsed blocks against the debt, take whole points out, and
+	// keep the remainder for next time.
+	p.happyDebt += elapsed
+	p.happiness = clamp(p.happiness-p.happyDebt/2, 0, 100)
+	p.happyDebt %= 2
+
+	p.energyDebt += elapsed
+	p.energy = clamp(p.energy-p.energyDebt/3, 0, 100)
+	p.energyDebt %= 3
+
 	p.lastUpdate = height
 	if p.hunger >= 100 || p.happiness <= 0 || p.energy <= 0 {
 		p.alive = false
@@ -80,9 +97,11 @@ func project(p *pet, height int64) (hunger, happiness, energy int, alive bool) {
 	if elapsed < 0 {
 		elapsed = 0
 	}
+	// Same arithmetic as tick, including the carried debt, so the page never
+	// disagrees with what the next call will do.
 	hunger = clamp(p.hunger+elapsed, 0, 100)
-	happiness = clamp(p.happiness-elapsed/2, 0, 100)
-	energy = clamp(p.energy-elapsed/3, 0, 100)
+	happiness = clamp(p.happiness-(p.happyDebt+elapsed)/2, 0, 100)
+	energy = clamp(p.energy-(p.energyDebt+elapsed)/3, 0, 100)
 	alive = hunger < 100 && happiness > 0 && energy > 0
 	return
 }
