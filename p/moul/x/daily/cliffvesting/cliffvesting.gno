@@ -1,5 +1,5 @@
 // Package cliffvesting computes cliff-then-linear vesting schedules as a PURE
-// calculator — no state, no balances, no transfers.
+// calculator: no state, no balances, no transfers.
 //
 // The shape is the standard employee/token grant: nothing vests until the
 // cliff, the cliff releases the whole elapsed portion at once, and the rest
@@ -9,10 +9,16 @@
 //
 // Everything is integer arithmetic. Vested is computed as
 // total*elapsed/duration with the multiplication FIRST, so the usual rounding
-// bug — dividing before multiplying and truncating the rate to zero — cannot
+// bug, dividing before multiplying and truncating the rate to zero, cannot
 // happen. Rounding is always DOWN, which means the beneficiary never receives
 // more than they have earned and the final instalment collects the remainder;
 // at t >= end the result is exactly total, never total-1.
+//
+// The multiplication goes through a 128-bit intermediate. v0 did it in plain
+// int64, which silently WRAPPED once total*elapsed passed 2^63: over a
+// two-year term in seconds that is any grant above ~146,036 whole coins, and
+// a large one reported a NEGATIVE vested amount rather than failing. See
+// [Schedule.Vested].
 //
 // Times are int64 so the caller can use block heights or unix seconds. The unit
 // only has to be consistent.
@@ -21,7 +27,10 @@
 // [r/moul/x/daily/cliffvestingdemo](/r/moul/x/daily/cliffvestingdemo/v0).
 package cliffvesting
 
-import "errors"
+import (
+	"errors"
+	"math/bits"
+)
 
 var (
 	ErrBadTotal    = errors.New("cliffvesting: total must be positive")
@@ -71,6 +80,12 @@ func (s Schedule) HasCliff() bool { return s.Cliff > s.Start }
 
 // Vested returns how much has vested at time t. Zero before the cliff, exactly
 // Total at or after End, and floor(total*elapsed/duration) in between.
+//
+// The product goes through [mulDiv] rather than int64. v0 computed
+// `s.Total * elapsed / s.Duration()` directly, which is correct only while the
+// product fits: with the term in seconds, a 318,720,000-coin grant over two
+// years returned -6,264,395,224. Nothing signalled it, because a wrapped
+// int64 is still a valid int64.
 func (s Schedule) Vested(t int64) int64 {
 	if t < s.Cliff || t < s.Start {
 		return 0
@@ -78,10 +93,9 @@ func (s Schedule) Vested(t int64) int64 {
 	if t >= s.End {
 		return s.Total
 	}
-	elapsed := t - s.Start
 	// Multiply BEFORE dividing: the reverse truncates the per-tick rate to
 	// zero whenever total < duration, which is the classic vesting bug.
-	return s.Total * elapsed / s.Duration()
+	return mulDiv(s.Total, t-s.Start, s.Duration())
 }
 
 // Unvested returns the remainder still locked at time t.
@@ -103,8 +117,25 @@ func (s Schedule) IsFullyVested(t int64) bool { return t >= s.End }
 // PercentVested returns the vested share at t as an integer percentage,
 // rounded down. Integer-only: no floats reach consensus state.
 func (s Schedule) PercentVested(t int64) int64 {
-	return s.Vested(t) * 100 / s.Total
+	return mulDiv(s.Vested(t), 100, s.Total)
 }
 
 // CliffAmount returns the lump sum released the instant the cliff is reached.
 func (s Schedule) CliffAmount() int64 { return s.Vested(s.Cliff) }
+
+// mulDiv computes floor(a*b/den) through a 128-bit intermediate, so a product
+// that leaves int64 does not wrap.
+//
+// Every caller here passes 0 <= b <= den with den > 0 and a >= 0, which is
+// what makes the bits.Div64 precondition hold: the quotient is then at most a,
+// so it fits in 64 bits, which is exactly the hi < den that Div64 requires and
+// panics without. New enforces Total > 0 and End > Start; Vested only reaches
+// this line with Start < t < End.
+func mulDiv(a, b, den int64) int64 {
+	if a == 0 || b == 0 {
+		return 0
+	}
+	hi, lo := bits.Mul64(uint64(a), uint64(b))
+	q, _ := bits.Div64(hi, lo, uint64(den))
+	return int64(q)
+}
