@@ -18,7 +18,7 @@ GNOPM        ?= go -C tools tool gnopm
 
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
-	guard-readmes guard-private verify deps bump-deps manifest readme readmes gen check \
+	guard-readmes guard-private guard-untrusted-render verify deps bump-deps manifest readme readmes gen check \
 	sync graph publish status report preview site clean
 
 help: ## show this help
@@ -35,7 +35,7 @@ test: guards ## run the guards, then gno test every contract
 fmt: ## gno fmt every contract in place
 	$(GNOCONTRACTS) gno fmt $(ARGS) $(PKG)
 
-guards: toolcheck guard-examples guard-render guard-readmes guard-private ## every guard CI enforces
+guards: toolcheck guard-examples guard-render guard-readmes guard-private guard-untrusted-render ## every guard CI enforces
 
 toolcheck: ## fail if this gno skips example tests, which would make them false-green
 	@$(GNOCONTRACTS) gno toolcheck
@@ -51,6 +51,9 @@ guard-readmes: ## fail if a package ships a README that documents nothing; LIST=
 
 guard-private: ## fail if a realm declares neither private = true nor why it is public
 	@$(GNOCONTRACTS) guard-private
+
+guard-untrusted-render: ## fail if a realm renders a caller's string without escaping it
+	@$(GNOCONTRACTS) guard-untrusted-render
 
 verify: ## fail if gnomod.lock is stale or a pinned version no longer reproduces
 	$(GNOPM) verify
