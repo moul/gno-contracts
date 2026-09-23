@@ -405,7 +405,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-23T04:41:08Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-23T05:36:25Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
