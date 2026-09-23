@@ -163,12 +163,14 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/ulist/lplist/v0`](p/moul/ulist/lplist) 📦 | — | [✅](https://gno.land/p/moul/ulist/lplist/v0) | — | — | 1 |
 | [`p/moul/ulist/v0`](https://github.com/moul/gno-contracts/tree/f6d0693f5161db423c042a4fe7c78057593cff80/p/moul/ulist) 📦 🧊 | — | [🗄️](https://gno.land/p/moul/ulist/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/ulist/v0) ≈ | — |
 | [`p/moul/ulist/v1`](p/moul/ulist) 📦 | [✅](https://pearl.testnets.gno.land/p/moul/ulist/v1) | [✅](https://gno.land/p/moul/ulist/v1) | — | — | — |
+| [`p/moul/vesting/v0`](p/moul/vesting) 📦 | — | — | — | — | — |
 | [`p/moul/web25/v0`](p/moul/web25) 📦 | — | [✅](https://gno.land/p/moul/web25/v0) | — | — | 1 |
 | [`p/moul/x/daily/b58/v0`](p/moul/x/daily/b58) 📦 | — | [✅](https://gno.land/p/moul/x/daily/b58/v0) | — | — | — |
 | [`p/moul/x/daily/base32/v0`](p/moul/x/daily/base32) 📦 | — | [✅](https://gno.land/p/moul/x/daily/base32/v0) | — | — | — |
 | [`p/moul/x/daily/bidimap/v0`](p/moul/x/daily/bidimap) 📦 | — | [✅](https://gno.land/p/moul/x/daily/bidimap/v0) | — | — | — |
 | [`p/moul/x/daily/bitset/v0`](p/moul/x/daily/bitset) 📦 | — | [✅](https://gno.land/p/moul/x/daily/bitset/v0) | — | — | — |
-| [`p/moul/x/daily/cliffvesting/v0`](p/moul/x/daily/cliffvesting) 📦 | — | [✅](https://gno.land/p/moul/x/daily/cliffvesting/v0) | — | — | — |
+| [`p/moul/x/daily/cliffvesting/v0`](https://github.com/moul/gno-contracts/tree/d9879cdf25236a55f92c93fbb523faad01c1e7ae/p/moul/x/daily/cliffvesting) 📦 🧊 | — | [✅](https://gno.land/p/moul/x/daily/cliffvesting/v0) | — | — | — |
+| [`p/moul/x/daily/cliffvesting/v1`](p/moul/x/daily/cliffvesting) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/commitreveal/v0`](p/moul/x/daily/commitreveal) 📦 | — | [✅](https://gno.land/p/moul/x/daily/commitreveal/v0) | — | — | — |
 | [`p/moul/x/daily/countminsketch/v0`](p/moul/x/daily/countminsketch) 📦 | — | [✅](https://gno.land/p/moul/x/daily/countminsketch/v0) | — | — | — |
 | [`p/moul/x/daily/cowsay/v0`](p/moul/x/daily/cowsay) 📦 | — | [✅](https://gno.land/p/moul/x/daily/cowsay/v0) | — | — | — |
@@ -247,6 +249,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/outfmt/v0`](r/moul/outfmt) 🏛️ | — | [✅](https://gno.land/r/moul/outfmt/v0) | — | — | 1 |
 | [`r/moul/present/v0`](r/moul/present) 🏛️ | — | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
 | [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | — | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
+| [`r/moul/vesting/v0`](r/moul/vesting) 🏛️ | — | — | — | — | 5 |
 | [`r/moul/x/allinone/devtools/v0`](r/moul/x/allinone/devtools) 🏛️ | — | [✅](https://gno.land/r/moul/x/allinone/devtools/v0) | — | — | 8 |
 | [`r/moul/x/allinone/textlab/v0`](r/moul/x/allinone/textlab) 🏛️ | — | [✅](https://gno.land/r/moul/x/allinone/textlab/v0) | — | — | 9 |
 | [`r/moul/x/amm/v0`](r/moul/x/amm) 🏛️ | — | [✅](https://gno.land/r/moul/x/amm/v0) | — | — | 5 |
@@ -263,7 +266,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/bullscows/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/bullscows) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/bullscows/v0) | — | — | — |
 | [`r/moul/x/daily/bullscows/v1`](r/moul/x/daily/bullscows) 🏛️ | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/bullscows/v1) | [✅](https://gno.land/r/moul/x/daily/bullscows/v1) | — | — | 1 |
 | [`r/moul/x/daily/calc/v0`](r/moul/x/daily/calc) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/calc/v0) | — | — | — |
-| [`r/moul/x/daily/cliffvestingdemo/v0`](r/moul/x/daily/cliffvestingdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/cliffvestingdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/cliffvestingdemo/v0`](https://github.com/moul/gno-contracts/tree/d9879cdf25236a55f92c93fbb523faad01c1e7ae/r/moul/x/daily/cliffvestingdemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/cliffvestingdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/cliffvestingdemo/v1`](r/moul/x/daily/cliffvestingdemo) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/closestguess/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/closestguess) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/closestguess/v0) | — | — | — |
 | [`r/moul/x/daily/closestguess/v1`](r/moul/x/daily/closestguess) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/closestguess/v1) | — | — | 1 |
 | [`r/moul/x/daily/coinflipduel/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/coinflipduel) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/coinflipduel/v0) | — | — | 1 |
@@ -407,7 +411,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-23T18:43:18Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-23T18:55:06Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 

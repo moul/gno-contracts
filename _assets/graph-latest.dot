@@ -32,12 +32,13 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/udao/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/ulist/lplist/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/ulist/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/vesting/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/b58/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/base32/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/bidimap/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/bitset/v0" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/p/moul/x/daily/cliffvesting/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/cliffvesting/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/commitreveal/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/countminsketch/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/cowsay/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -116,6 +117,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/home" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/outfmt/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/present/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/vesting/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/allinone/devtools/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/allinone/textlab/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/amm/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -127,7 +129,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/bitsetdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/blog/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/bullscows/v1" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/r/moul/x/daily/cliffvestingdemo/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/cliffvestingdemo/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/closestguess/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/coinflipduel/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/collatz/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -343,6 +345,11 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/ownable/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/seqid/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/realmpath/v0";
+  "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/vesting/v0";
+  "gno.land/r/moul/vesting/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/vesting/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/debug/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/fifo/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/kit/ui/v0";
@@ -376,7 +383,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/blog/v1" -> "gno.land/p/moul/kit/store/v0";
   "gno.land/r/moul/x/daily/blog/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/bullscows/v1" -> "gno.land/p/moul/kit/ui/v0";
-  "gno.land/r/moul/x/daily/cliffvestingdemo/v0" -> "gno.land/p/moul/x/daily/cliffvesting/v0";
+  "gno.land/r/moul/x/daily/cliffvestingdemo/v1" -> "gno.land/p/moul/x/daily/cliffvesting/v1";
   "gno.land/r/moul/x/daily/closestguess/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/coinflipduel/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/coinflipduel/v1" -> "gno.land/p/nt/avl/v0";

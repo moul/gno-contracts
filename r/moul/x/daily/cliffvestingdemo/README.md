@@ -20,7 +20,7 @@ Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul
 
 **Dependency graph:**
 
-![gno.land/r/moul/x/daily/cliffvestingdemo/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/daily/cliffvestingdemo/v0/deps.png)
+![gno.land/r/moul/x/daily/cliffvestingdemo/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/daily/cliffvestingdemo/v1/deps.png)
 
 > 🧪 **Highly experimental — potentially vibe-coded.** Not audited; may break, change, or be removed at any time. Do not use with anything of value. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
