@@ -105,11 +105,16 @@ type Pub struct {
 // same thing happened to portal-loop/test6 before).
 func defaultNetworks() []Network {
 	return []Network{
-		// The two live testnets. Both chain_ids verified against the nodes'
-		// /status (2026-08-27); both run gno v1.0.0-rc.0 and expose the same
-		// gnoweb + agent-faucet host pattern, so they are interchangeable
-		// publish targets rather than one superseding the other.
-		{Name: "sapphire", ChainID: "sapphire-1", RPC: "https://rpc.sapphire.testnets.gno.land:443"},
+		// pearl is the testnet. chain_id verified against the node's /status
+		// (2026-08-27); gno v1.0.0-rc.0.
+		//
+		// sapphire was the second one, and is RETIRED: on 2026-09-22
+		// rpc.sapphire.testnets.gno.land had no DNS record at all, and moul
+		// confirmed it is gone for good on 2026-09-23. It is removed rather
+		// than left in place with a warning, because a name in this list is a
+		// publish target: `make upload NET=sapphire` would resolve it, build a
+		// script against a dead endpoint, and the failure would look like a
+		// network blip rather than a retired chain.
 		{Name: "pearl", ChainID: "pearl-1", RPC: "https://rpc.pearl.testnets.gno.land:443"},
 		// gno.land mainnet, launched 2026-09-12T15:00:00Z (gnolang/gno tag
 		// `chain/mainnet`, commit 9c8eb132e). It REPLACES the old betanet entry:

@@ -374,13 +374,18 @@ func TestDefaultNetworksAreWellFormed(t *testing.T) {
 		}
 		seen[n.Name] = true
 	}
-	for _, want := range []string{"sapphire", "pearl"} {
+	for _, want := range []string{"pearl"} {
 		if !seen[want] {
 			t.Errorf("live testnet %q missing from defaultNetworks", want)
 		}
 	}
-	if seen["topaz"] {
-		t.Error("topaz is retired and must not be a tracked network")
+	// A name in this list is a publish target, so a retired chain must be gone
+	// from it: NET=<retired> would otherwise resolve and build a script against
+	// a dead endpoint. sapphire's RPC stopped resolving on 2026-09-22.
+	for _, dead := range []string{"topaz", "sapphire"} {
+		if seen[dead] {
+			t.Errorf("%q is retired and must not be a tracked network", dead)
+		}
 	}
 }
 
@@ -435,7 +440,7 @@ func TestManifestReconcilesNetworksAndKeepsPublished(t *testing.T) {
 	if got, ok := pub["topaz"]; !ok || got.Tx != "deadbeef" {
 		t.Errorf("retiring a network dropped its historical published entry: %+v", pub)
 	}
-	for _, n := range []string{"sapphire", "pearl"} {
+	for _, n := range []string{"pearl"} {
 		if _, ok := pub[n]; !ok {
 			t.Errorf("no published slot created for live network %q", n)
 		}
