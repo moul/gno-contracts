@@ -208,7 +208,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/plan9/memfs/v0`](p/moul/x/plan9/memfs) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/memfs/v0) | — | — | 2 |
 | [`p/moul/x/plan9/ninep/v0`](p/moul/x/plan9/ninep) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/ninep/v0) | — | — | — |
 | [`p/moul/x/plan9/ns/v0`](p/moul/x/plan9/ns) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/ns/v0) | — | — | 2 |
-| [`p/moul/x/plan9/rc/v0`](p/moul/x/plan9/rc) 📦 | — | — | — | — | 3 |
+| [`p/moul/x/plan9/rc/v0`](p/moul/x/plan9/rc) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/rc/v0) | — | — | 3 |
 | [`p/moul/x/plan9/synfs/v0`](p/moul/x/plan9/synfs) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/synfs/v0) | — | — | 2 |
 | [`p/moul/x/storagecost/v0`](p/moul/x/storagecost) 📦 | — | [✅](https://gno.land/p/moul/x/storagecost/v0) | — | — | 1 |
 | [`p/moul/x/vm/bf/v0`](p/moul/x/vm/bf) 📦 | — | [✅](https://gno.land/p/moul/x/vm/bf/v0) | — | — | 2 |
@@ -392,12 +392,12 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/pairs/aaa/v0`](r/moul/x/pairs/aaa) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/aaa/v0) | — | — | 2 |
 | [`r/moul/x/pairs/aaabbb/v0`](r/moul/x/pairs/aaabbb) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/aaabbb/v0) | — | — | 5 |
 | [`r/moul/x/pairs/bbb/v0`](r/moul/x/pairs/bbb) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/bbb/v0) | — | — | 2 |
-| [`r/moul/x/plan9/dev/v0`](r/moul/x/plan9/dev) 🏛️ | — | — | — | — | 3 |
-| [`r/moul/x/plan9/ns/v0`](r/moul/x/plan9/ns) 🏛️ | — | — | — | — | 6 |
+| [`r/moul/x/plan9/dev/v0`](r/moul/x/plan9/dev) 🏛️ | — | [✅](https://gno.land/r/moul/x/plan9/dev/v0) | — | — | 3 |
+| [`r/moul/x/plan9/ns/v0`](r/moul/x/plan9/ns) 🏛️ | — | [✅](https://gno.land/r/moul/x/plan9/ns/v0) | — | — | 6 |
 | [`r/moul/x/provable/v0`](r/moul/x/provable) 🏛️ | — | [✅](https://gno.land/r/moul/x/provable/v0) | — | — | 2 |
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
 | [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | [✅](https://gno.land/r/moul/x/reaper/v1) | — | — | 5 |
-| [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | — | — | — | 6 |
+| [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/bfdemo/v0) | — | — | 6 |
 | [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | — | [✅](https://gno.land/r/moul/x/wesh/v0) | — | — | 2 |
 | [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | — | [✅](https://gno.land/r/moul/x/wiki/v0) | — | — | 8 |
 
@@ -405,7 +405,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-23T16:11:22Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-23T16:38:25Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 

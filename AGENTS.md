@@ -475,10 +475,27 @@ Two things make mainnet unlike the testnets:
 ### `make publish` is gnopm, and gnopm is the only publisher
 
 `make publish KEY=<key> PKG=<substring>` asks gnopm what is live, parked or absent on the
-chain the package paths point at, and runs `gnokey maketx addpkg` once per package in
-dependency order, with your terminal attached. `PRINT=1` writes the commands out and runs
-nothing. gnopm holds no key and signs nothing: gnokey does, and it prompts exactly as it
-would if you had typed the command.
+chain the package paths point at, and sends the rest in dependency order with your terminal
+attached. `PRINT=1` writes the commands out and runs nothing. gnopm holds no key and signs
+nothing: gnokey does, and it prompts exactly as it would if you had typed the command.
+
+**One signature per dependency LAYER, not per package** (gnopm v0.7.2). A layer is packages
+that do not import each other, so the order they execute in cannot matter and one
+transaction covers the layer. This workspace is 80 packages five layers deep: **6 prompts,
+not 80**. `-one-tx-per-package` is the way back to a transaction each, for when a layer is
+too big to review in one document or a failure should stop at exactly one package.
+
+Layers rather than the whole graph in one transaction, deliberately: messages in a
+transaction do share a store and run in order, but on a chain with an inert submission
+policy `add_package` **parks** the bytes instead of making the package live, so a dependency
+in the same transaction would not be there for the next message to import. Batching is also
+capped at **70% of a block's gas**, which is `DefaultTargetGasRatio`: above it the chain's
+dynamic gas price rises, and an uncapped batch is exactly the block that would raise the
+price the rest of the same publish then pays.
+
+Batching needs the signing address, because every message carries it as a field. gnopm asks
+gnokey for its key list, or `-addr` names it; if neither answers it falls back to a
+transaction per package and says so.
 
 There used to be two other paths here, `gnocontracts publish`/`upload` and
 `tools/gnopublish`. Both are gone. Anything that publishes goes through gnopm, so there is
