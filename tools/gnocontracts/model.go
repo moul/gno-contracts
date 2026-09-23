@@ -356,13 +356,24 @@ func parseModuleIgnore(gnomodPath string) bool {
 //     instead: content in mutable storage, private = true in gnomod.toml so the
 //     code can be replaced in place.
 //
+//   - gno.land/r/moul/blog: the consumer is every link already shared. A post
+//     URL is pasted into chats, posts and other people's articles, none of
+//     which this repo can rewrite, so a /v1 would break them all at once and
+//     the blog's whole point is that the link keeps working. It versions inside
+//     the same way home does: posts in mutable storage, private = true so a
+//     code change is a redeploy of this path, and tools/gnoblog pushes the
+//     posts back from the local markdown after the wipe.
+//
 // Such a contract has an empty Version. Both version-aware helpers already cope:
 // splitVersion reports ok=false (so latestOwn skips it, correctly: an
 // unversioned path is its own family) and basePath returns the path unchanged.
 //
-// Do not add an entry without that external consumer.
+// Do not add an entry without an external consumer of that shape: a reader
+// outside this repo that would break if the path moved. "The name is nicer" is
+// not one.
 var unversionedContracts = map[string]bool{
 	"gno.land/r/moul/home": true,
+	"gno.land/r/moul/blog": true,
 }
 
 // deriveContract builds a Contract from a module path such as
