@@ -35,9 +35,9 @@ build, test, lint and publish everything.
 - **One pull request bot, one comment**: counts, sizes, test counts and ⚠️/🔥 signals on
   three lines, everything per-package folded away. It also reconciles the path labels
   (`p`/`r`/`meta`) and links the live realm preview.
-- **Publishing.** `make upload` asks what a network is missing, orders it by dependency and
-  writes a `gnokey` script you read before running. It never signs on your behalf; `YES=1`
-  runs the script you just read.
+- **Publishing.** `make publish` asks the chain what is missing, orders it by dependency and
+  runs `gnokey` once per package with your terminal attached. It never signs on your behalf;
+  `PRINT=1` writes the commands out and runs nothing.
 
 ### 🖼️ Realm previews on every pull request
 
@@ -55,7 +55,7 @@ URL. Locally: `make preview ARGS="./r/moul/home"`, then serve `_preview/`.
 p/moul/<name>/          packages            -> gno.land/p/moul/<name>/vN
 r/moul/<name>/          realms              -> gno.land/r/moul/<name>/vN
 vendor/gno.land/...     vendored deps (committed, autonomous)
-tools/                  the Go tools: gnocontracts, gnohome, gnopublish
+tools/                  the Go tools: gnocontracts, gnohome, gnoblog, pairgen
 contracts.json          the catalog, source of truth for the table below
 gnomod.lock             where every version's source is (committed, hand-owned)
 gnowork.toml            workspace marker (enables local package resolution)
@@ -111,9 +111,8 @@ make lint test                        # the gate: lint, the guards, and every te
 make test PKG=x/daily/b58             # narrow any of them to one package
 make deps                             # vendor external dependencies into vendor/
 make sync                             # drift vs the monorepo: did someone change my contract?
-make publish NET=mainnet CHECK=1      # dependency-ordered publish plan + on-chain status
-make upload NET=pearl PKG=kit/store   # write the publish script, and read it
-make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
+make publish PRINT=1 KEY=moul          # the dependency-ordered plan, running nothing
+make publish KEY=moul PKG=kit/store    # publish that package and what it imports
 ```
 
 ## Contracts

@@ -213,7 +213,7 @@ Run "gnohome <command> -h" for the flags of one command.
 }
 
 // defaultContentDir walks up from the working directory to the repo root
-// (the directory holding gnowork.toml, as gnopublish does) and returns the
+// (the directory holding gnowork.toml) and returns the
 // realm's content directory under it.
 func defaultContentDir() (string, error) {
 	dir, err := os.Getwd()

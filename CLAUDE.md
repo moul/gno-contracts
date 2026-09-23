@@ -63,5 +63,5 @@ make lint test              # the gate
 make test PKG=x/daily/b58   # one package
 make guard-readmes LIST=1   # which packages are undocumented
 make sync                   # drift vs the gnolang/gno monorepo
-make upload NET=pearl       # what that chain is missing, as a script you review
+make publish PRINT=1        # what the chain is missing, as a plan you review
 ```

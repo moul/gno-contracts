@@ -65,7 +65,6 @@ r/moul/<name>/          realm     -> gno.land/r/moul/<name>/vN
 vendor/gno.land/...     vendored external deps (committed)
 tools/gnocontracts/     the maintenance CLI: go -C tools tool gnocontracts help
 tools/gnohome/          Go companion driving r/moul/home
-tools/gnopublish/       the simulation-based publisher (its own module)
 contracts.json          catalog, generated on main
 gnomod.lock             where each version's source is (SOURCE, a PR carries it)
 gnowork.toml            workspace marker (enables local resolution)
@@ -318,8 +317,7 @@ Rules that keep a companion small and safe:
 
 - **Standard library only.** No `gnoclient`, no cgo, no third `go.mod`. Read the chain
   over plain JSON-RPC `abci_query`, about 60 lines, and the companion stays inside the
-  `tools` module where vet and test cover it. (`tools/gnopublish` is the counter-example:
-  it links the full gno client stack, so it had to become a separate module.)
+  `tools` module where vet and test cover it.
 - **Print transactions, never sign them.** Emit `gnokey maketx …` commands to review and
   paste. A companion holds no key and broadcasts nothing, so it can never surprise
   anyone. Name moul's key `moul` in what it emits.
@@ -470,54 +468,40 @@ Two things make mainnet unlike the testnets:
   nine are frozen upstream artifacts: never publish over them, changes go in a `v1` here.
   `dynreplacer`, `typeutil` and `ulist` are the three mirrors not at genesis.
 
-### `make upload` writes a script, it does not sign
+### `make publish` is gnopm, and gnopm is the only publisher
 
-`make upload NET=<net> KEY=<key> PKG=<substring>` asks gnopm what is live, parked or
-absent on that chain and writes dependency-ordered `gnokey maketx addpkg` commands to
-`.cache/publish.sh`. Read it, then re-run with `YES=1`. Nothing leaves the machine until
-then: gnopm never signs and never broadcasts.
+`make publish KEY=<key> PKG=<substring>` asks gnopm what is live, parked or absent on the
+chain the package paths point at, and runs `gnokey maketx addpkg` once per package in
+dependency order, with your terminal attached. `PRINT=1` writes the commands out and runs
+nothing. gnopm holds no key and signs nothing: gnokey does, and it prompts exactly as it
+would if you had typed the command.
 
-Three things about that path are deliberate, and each one bit:
+There used to be two other paths here, `gnocontracts publish`/`upload` and
+`tools/gnopublish`. Both are gone. Anything that publishes goes through gnopm, so there is
+one place where gas, fees, dependency order and chain discovery are decided, and one place
+to fix when one of them is wrong.
 
-- **The script is run from a file, never piped.** gnokey reads its passphrase with
-  `term.ReadPassword` on **fd 0** (`tm2/pkg/commands/utils.go`), so the `gnopm publish | sh`
-  form gnopm's own help suggests hands gnokey a pipe as stdin and the prompt fails.
-  `sh <file>` leaves stdin the terminal.
-- **An unknown `NET=` is an error.** gnopm discovers the chain from the package path, so
-  `gno.land/...` means **mainnet** unless told otherwise. This used to be a `$(shell)`,
-  which cannot fail a make run: a typo'd network name expanded to nothing and produced a
-  mainnet broadcast script.
-- **A failed run leaves no script**, so `sh .cache/publish.sh` can never replay a stale
-  plan aimed at a different chain.
+Two things that path still gets right, and each one bit before:
 
-gnopm sizes gas at a flat 1800 gas/byte and the fee at 0.01 ugnot/gas. Measured mainnet
-`addpkg` history is 1,014 to 1,781 gas/byte, so that is a ceiling just above the observed
-maximum, and a ceiling is not charged.
+- **Never pipe the plan into a shell.** gnokey reads its passphrase with
+  `term.ReadPassword` on **fd 0** (`tm2/pkg/commands/utils.go`), so `gnopm publish -print | sh`
+  hands gnokey a pipe as stdin and the prompt fails. gnopm running gnokey itself is the
+  normal path; if you save `-print` output, run it as `sh <file>`.
+- **gnopm discovers the chain from the package path**, so `gno.land/...` means **mainnet**
+  unless told otherwise. There is no network name to typo into a different chain.
 
-### `make upload-sim`: gnopublish, and keeping it at the chain's revision
-
-`tools/gnopublish` is the older path, kept because it sizes gas from a **real simulation**
-rather than an estimate and can merge every package into one transaction. Reach for it
-when a package's `init()` work makes the flat estimate wrong.
-
-It builds against a **local gno checkout**: its `go.mod` carries a
-`replace github.com/gnolang/gno => ../../../../gnoland/gno`, so it silently compiles
-against whatever revision that tree sits at, with no pin to warn you. When the chain is
-ahead, the first symptom is an opaque amino error from the account query, such as mainnet
-adding `vesting` to `std.BaseAccount`:
-
-```
-error: query account g1…: unknown JSON field "vesting" for type std.BaseAccount
-```
-
-Move that checkout to the revision the chain runs (for mainnet, the `chain/mainnet` tag)
-and re-run. `gnopublish` annotates this specific failure with that instruction, and does
-the account query **before** prompting for the gnokey password, so a stale client costs
-nothing.
+**Gas is a fixed cost plus a per-byte cost**, and sizing it from bytes alone is wrong rather
+than merely tight. Over 464 successful mainnet `add_package` transactions the fit is
+`gas ~= 3.8M + 1,285 * bytes`: every deployment pays to be parsed, type-checked and
+initialised before the first source byte is charged for, and gas per byte ranges 989 to
+16,435. gnopm sizes `12,000,000 + 2,600/byte` (v0.7.1), clamped to block `MaxGas`, with the
+fee at 0.003 ugnot/gas against a chain floor of 0.001 (`auth/gasprice`). The flat
+`1800/byte` it carried until then under-funded 37% of that history and killed a real
+83-package run on a 4 KB package.
 
 ### On-chain status, and chains that do not answer
 
-`make status` (and `publish -check`) probe every network with `gnokey query vm/qfile`. A
+`make status` probes every network with `gnokey query vm/qfile`. A
 query to a chain that is **down** fails exactly like a query for a package that was
 **never published**, and conflating the two used to write "not uploaded" for all 193
 packages of any unreachable network. So each network is probed once with an HTTP
@@ -558,7 +542,6 @@ PR CI checks only source: `gno lint` and `gno test` pass for every contract, and
 | `ci` | push to main, every pull request | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make guards lint test` |
 | `pr` | pull request opened / pushed / reopened | **one** sticky comment, the path labels, the published preview at `pr-<N>/` |
 | `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, README footers, `_assets/`, and on-chain status |
-| `gnopublish-ci` | pull requests touching `tools/gnopublish/**` | that module only, because it links the whole gno client stack and must not slow every pull request |
 
 **One bot comment per pull request**, marker `<!-- gnocontracts-pr -->`, rendered by
 `gnocontracts pr`. It fits in three lines: counts, risk signals, preview link, everything

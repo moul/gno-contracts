@@ -19,7 +19,7 @@ GNOPM        ?= go -C tools tool gnopm
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
 	guard-readmes guard-private verify deps bump-deps manifest readme readmes gen check \
-	sync graph publish upload upload-sim status report preview site clean
+	sync graph publish status report preview site clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^##@/{printf "\n%s\n",substr($$0,5)} /^[a-z][a-z-]*:.*?## /{printf "  %-14s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -84,14 +84,8 @@ check: ## fail if contracts.json or the README table is stale
 
 ##@ The chain
 
-publish: ## dependency-ordered publish plan; NET=<net> CHECK=1 to query the chain
-	$(GNOCONTRACTS) publish $(if $(NET),-net $(NET),) $(if $(CHECK),-check,)
-
-upload: ## write the gnokey script for what a network is missing; NET= KEY= PKG=, then YES=1 to run it
-	@$(GNOCONTRACTS) upload $(if $(NET),-net $(NET),) $(if $(KEY),-key $(KEY),) $(if $(YES),-yes,) $(PKG)
-
-upload-sim: ## the same broadcast through gnopublish, whose gas comes from a real simulation
-	cd tools/gnopublish && GOTOOLCHAIN=auto go run . $(ARGS)
+publish: ## publish what the chain is missing, in dependency order; PRINT=1 plans without acting, KEY= names the gnokey key, PKG= filters
+	$(GNOPM) publish $(if $(PRINT),-print,) $(if $(KEY),-key $(KEY),) $(PKG)
 
 status: ## refresh on-chain upload status for every network; needs gnokey
 	$(GNOCONTRACTS) status $(if $(NET),-net $(NET),)
