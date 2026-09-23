@@ -224,6 +224,7 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/agents/maintainer/v0`](r/moul/agents/maintainer) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/agents/passport/v0`](r/moul/agents/passport) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/agents/receipt/v0`](r/moul/agents/receipt) 🏛️ | — | — | — | — | — | 1 |
+| [`r/moul/blog`](r/moul/blog) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/config/v0`](https://github.com/moul/gno-contracts/tree/bd1ff5de0053958282ac81f08ed8bfcb2081982c/r/moul/config) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
 | [`r/moul/config/v1`](r/moul/config) 🏛️ | — | — | — | — | — | 4 |
 | [`r/moul/demo/args/v0`](r/moul/demo/args) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/args/v0) | — | — | — |
@@ -405,7 +406,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-23T12:47:54Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-23T13:16:03Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
