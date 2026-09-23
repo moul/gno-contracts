@@ -388,6 +388,45 @@ Order of preference: **example test**, then **`Test` + `uassert.Equal`** (blank-
 aborting output), then **filetest** (`filetests/*_filetest.gno`, auto-populated by
 `-update-golden-tests`; last resort, such as a package `main`).
 
+## A realm that renders a caller's string MUST escape it
+
+`make guard-untrusted-render` fails when a realm declares `Render`, takes a
+string through a crossing function, and never calls `ui.Inline` / `ui.Cell` /
+`sanitize.*`. Anything a caller typed and the realm stored is attacker-controlled
+markdown: a link, an image, a table that breaks its own column, a bidi run that
+reverses the sentence around it.
+
+Wrap it once, at the call site that builds the markdown:
+
+| helper | for |
+|---|---|
+| `ui.Inline(s)` | a sentence, a list item, a link title |
+| `ui.Cell(s)` | a table cell, which must not open a new column |
+
+If every stored string is validated at write time (one letter, an enum, a
+semver, a charset-checked word), say so in the file instead:
+
+```gno
+// untrusted-render: every stored word is checked against the a-z charset at write time
+```
+
+The reason has a 20-character floor, because "n/a" answers nothing.
+
+**Why a guard and not a review.** A public package path is immutable:
+`AddPackage` refuses a path already occupied unless the live package is private,
+so a realm that ships an unescaped `Render` keeps it forever and the only fix is
+a new version at a new path. This is a pre-deploy gate or it is nothing. It was
+a convention until 2026-09-22 and the convention lost: `r/moul/x/reaper` rendered
+a caller's note body raw one PR after 25 other realms were ported to `ui.*`.
+
+**The baseline is not an allowlist.**
+`tools/gnocontracts/untrusted-render-baseline.txt` lists the 54 realms that were
+already live when the guard landed. They cannot be fixed in place, so the guard
+grandfathers them and gates the 55th. An entry leaves the file when the realm
+ships a fixed version, and a stale entry is itself a failure: it would silence a
+realm nobody is watching any more. Do not add to it by hand to quiet a failure,
+that is what the opt-out is for.
+
 ## A package README must say something, or not exist
 
 The rule is not "every package has a README". It is that **a README which exists must say

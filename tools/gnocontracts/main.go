@@ -63,6 +63,8 @@ func main() {
 		err = cmdGuardExamples(root)
 	case "guard-render":
 		err = cmdGuardRender(root)
+	case "guard-untrusted-render":
+		err = cmdGuardUntrusted(root)
 	case "guard-readmes":
 		err = cmdGuardReadmes(root, args)
 	case "guard-private":
@@ -108,6 +110,7 @@ commands:
   gno        run the gno toolchain over every contract:
              gno lint | gno test | gno fmt | gno toolcheck | gno list
   guard-examples   fail if an Example* test pins no // Output: block
+  guard-untrusted-render  a realm that renders a caller's string must escape it
   guard-render     fail if a realm declares Render that no test calls
   guard-readmes    fail if a package ships a README that documents nothing
   guard-private    fail if a realm never answered the private question
