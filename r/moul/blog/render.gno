@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/r/moul/config/v1"
 )
 
 // linkPrefix is what a permalink starts with. gnoweb addresses a realm's
@@ -26,7 +27,20 @@ const defaultIntro = "# moul's blog\n\nNotes on gno.land, from the person buildi
 //	""         the index, newest first
 //	"<slug>"   one post
 //	"t/<tag>"  every post carrying a tag
+// Render wraps every view in the notice blocks from gno.land/r/moul/config: a
+// warning, a changelog line or a bit of news, set either on every realm of
+// moul's at once or on this one alone, plus a pause banner if this realm is
+// ever held back. Both are empty by default, so an unconfigured chain renders
+// exactly what it rendered before.
+//
+// The path is passed explicitly rather than using config's zero-argument
+// helpers. Both work, but this realm already states its own path for its
+// permalinks, and a constant cannot be wrong.
 func Render(path string) string {
+	return config.TopBlockFor(realmPath) + render(path) + config.BottomBlockFor(realmPath)
+}
+
+func render(path string) string {
 	path = strings.TrimSpace(path)
 	switch {
 	case path == "":

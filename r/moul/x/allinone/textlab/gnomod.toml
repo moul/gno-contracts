@@ -1,0 +1,6 @@
+module = "gno.land/r/moul/x/allinone/textlab/v0"
+gno = "0.9"
+
+# Redeployable by its creator. This realm holds no state worth keeping: it runs
+# algorithms over a string in the render path, so a redeploy loses nothing.
+private = true
