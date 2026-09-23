@@ -35,11 +35,11 @@ func TestOnlyTheAuthorMayWrite(cur realm, t *testing.T) {
 	// AbortsWithMessage, not PanicsWithMessage: a panic that crosses a realm
 	// boundary becomes an abort, which recover() cannot catch, so asserting it
 	// as a panic does not fail the assertion, it kills the whole test binary.
-	uassert.AbortsWithMessage(t, cur, "restricted to the author", func(cur realm) {
-		Set(cur, "nope", "Nope", "2026-09-23", "", "Body.")
+	uassert.AbortsWithMessage(t, cur, "restricted to the author", func() {
+		Set(cross(cur), "nope", "Nope", "2026-09-23", "", "Body.")
 	})
-	uassert.AbortsWithMessage(t, cur, "restricted to the author", func(cur realm) {
-		SetIntro(cur, "mine now")
+	uassert.AbortsWithMessage(t, cur, "restricted to the author", func() {
+		SetIntro(cross(cur), "mine now")
 	})
 	uassert.Equal(t, 0, Count(), "nothing was written")
 }
@@ -62,17 +62,17 @@ func TestSetRedatingMovesTheIndexEntry(cur realm, t *testing.T) {
 func TestSetRejectsWhatTheToolRejects(cur realm, t *testing.T) {
 	reset()
 	testing.SetRealm(testing.NewUserRealm(author))
-	uassert.AbortsContains(t, cur, "invalid slug", func(cur realm) {
-		Set(cur, "Caps", "T", "2026-09-23", "", "Body.")
+	uassert.AbortsContains(t, cur, "invalid slug", func() {
+		Set(cross(cur), "Caps", "T", "2026-09-23", "", "Body.")
 	})
-	uassert.AbortsContains(t, cur, "reserved slug", func(cur realm) {
-		Set(cur, introSlug, "T", "2026-09-23", "", "Body.")
+	uassert.AbortsContains(t, cur, "reserved slug", func() {
+		Set(cross(cur), introSlug, "T", "2026-09-23", "", "Body.")
 	})
-	uassert.AbortsContains(t, cur, "invalid date", func(cur realm) {
-		Set(cur, "ok", "T", "23-09-2026", "", "Body.")
+	uassert.AbortsContains(t, cur, "invalid date", func() {
+		Set(cross(cur), "ok", "T", "23-09-2026", "", "Body.")
 	})
-	uassert.AbortsContains(t, cur, "a post needs a title", func(cur realm) {
-		Set(cur, "ok", "  ", "2026-09-23", "", "Body.")
+	uassert.AbortsContains(t, cur, "a post needs a title", func() {
+		Set(cross(cur), "ok", "  ", "2026-09-23", "", "Body.")
 	})
 	uassert.Equal(t, 0, Count(), "none of them was written")
 }
@@ -84,15 +84,15 @@ func TestAppendAndDelete(cur realm, t *testing.T) {
 	Append(cross(cur), "long", " Second half.")
 	uassert.Equal(t, "First half. Second half.", Get("long"), "append concatenates, it does not replace")
 
-	uassert.AbortsWithMessage(t, cur, `no such post: "ghost"`, func(cur realm) {
-		Append(cur, "ghost", "x")
+	uassert.AbortsWithMessage(t, cur, `no such post: "ghost"`, func() {
+		Append(cross(cur), "ghost", "x")
 	})
 
 	Delete(cross(cur), "long")
 	uassert.Equal(t, 0, Count(), "deleted")
 	uassert.True(t, strings.Contains(Render(""), "Nothing published yet."), "and gone from the index")
-	uassert.AbortsWithMessage(t, cur, `no such post: "long"`, func(cur realm) {
-		Delete(cur, "long")
+	uassert.AbortsWithMessage(t, cur, `no such post: "long"`, func() {
+		Delete(cross(cur), "long")
 	})
 }
 
