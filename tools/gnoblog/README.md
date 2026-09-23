@@ -4,9 +4,9 @@ The local half of [`r/moul/blog`](../../r/moul/blog/README.md): write markdown
 in a directory, see the index before anyone else does, push only what changed.
 
 Standard library only: no `gnoclient`, no cgo, no second `go.mod`. It reads the
-chain over plain JSON-RPC `abci_query` and **writes** an unsigned transaction
-document rather than signing one, so it holds no key and can broadcast nothing
-by accident.
+chain over plain JSON-RPC `abci_query`, builds an unsigned transaction document,
+and hands it to `gnokey`, which signs it and prompts on your terminal for a
+passphrase this process never sees. It holds no key and signs nothing.
 
 ## The content directory is not in this repository
 
@@ -44,23 +44,28 @@ export GNOBLOG_CONTENT=/where/the/markdown/lives
 go -C tools tool gnoblog posts      # what is here: date, slug, bytes, hash
 go -C tools tool gnoblog preview    # the index, as the realm will lay it out
 go -C tools tool gnoblog status     # what differs from the chain, one query
-go -C tools tool gnoblog tx         # the transaction that fixes exactly that
+go -C tools tool gnoblog tx         # publish exactly that, one signature
 ```
 
-`tx` writes `.gnoblog-tx.json` next to the content directory, plus a
-`.gnoblog-tx.sh` that signs and broadcasts it. **Read the document before you
-run the script**: it is the last point at which a post is still private.
+**`status` is the review step, and it is the last point at which a post is still
+private.** `tx` writes `.gnoblog-tx.json` next to the content directory and then
+signs and broadcasts it, so read `status` first and mean it.
+
+`tx -print` writes the two commands out and runs nothing. It does not exist as a
+safety net, `status` is that; it exists for the case where the signing happens
+somewhere else.
 
 | command | what it does |
 | --- | --- |
 | `posts` | the local posts: date, slug, bytes, hash, title |
 | `preview` | render the index, or `-post SLUG` for one post; `-out FILE` to write it |
 | `status` | diff the content directory against the chain manifest, one query, no bodies |
-| `tx` | write the transaction document and the sign/broadcast commands |
+| `tx` | publish the difference: one document, one signature, one broadcast |
 
-`tx` flags: `-all` pushes everything rather than the difference, `-prune` also
-emits `Delete` for a post on chain with no local file, `-out` moves the
-document, `-gas-wanted` / `-gas-fee` / `-max-deposit` override the estimates.
+`tx` flags: `-all` pushes everything rather than the difference, `-print` writes
+the commands instead of running them, `-prune` also emits `Delete` for a post on
+chain with no local file, `-out` moves the document, `-gas-wanted` / `-gas-fee` /
+`-max-deposit` override the estimates.
 
 ## `-all` is the redeploy button
 
@@ -82,8 +87,12 @@ string, so there is no shell in the loop at all.
 
 A tm2 transaction carries a list of messages and `gnokey sign` signs the
 document rather than the message, so publishing three posts is one passphrase
-prompt and one atomic broadcast. The signature binds chain id, account number
-and sequence, so broadcast it before the key signs anything else.
+prompt and one atomic broadcast.
+
+That signature binds chain id, account number and sequence, which is also why
+`tx` broadcasts rather than printing: the gap between reading a pasted command
+and running it is a window in which anything else this key signs voids the
+document, and nothing was checking the paste anyway.
 
 ## The hash both halves have to agree on
 

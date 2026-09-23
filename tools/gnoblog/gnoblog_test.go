@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -284,5 +285,76 @@ func TestPreviewOrderMatchesTheRealm(t *testing.T) {
 	}
 	if !strings.Contains(out, "[#gno](/r/moul/blog:t/gno)") {
 		t.Fatal("tags must render as links into the tag view")
+	}
+}
+
+// --- publishing, not printing ------------------------------------------------
+
+// gnoblog tx has to sign and broadcast, not hand back two lines to paste. The
+// paste is what makes a document go stale: the signature covers the account
+// sequence, so anything else this key signs between the read and the paste
+// voids it.
+func TestRunClientRunsSignThenBroadcast(t *testing.T) {
+	prev := startClient
+	t.Cleanup(func() { startClient = prev })
+
+	var ran [][]string
+	startClient = func(name string, args []string) error {
+		if name != "gnokey" {
+			t.Fatalf("ran %q, want gnokey", name)
+		}
+		ran = append(ran, append([]string(nil), args...))
+		return nil
+	}
+	cmds := []clientCmd{
+		{what: "sign x", name: "gnokey", args: []string{"sign", "-tx-path", "/tmp/x.json"}},
+		{what: "broadcast x", name: "gnokey", args: []string{"broadcast", "/tmp/x.json"}},
+	}
+	if err := runClient(cmds); err != nil {
+		t.Fatal(err)
+	}
+	if len(ran) != 2 || ran[0][0] != "sign" || ran[1][0] != "broadcast" {
+		t.Fatalf("ran %v, want sign then broadcast", ran)
+	}
+}
+
+// A failed sign must not be followed by a broadcast. `gnokey broadcast` does
+// not refuse an unsigned document locally: it sends it and lets the chain
+// reject it, which is a pointless round trip for a mistake visible on disk.
+func TestRunClientStopsAfterAFailedSign(t *testing.T) {
+	prev := startClient
+	t.Cleanup(func() { startClient = prev })
+
+	calls := 0
+	startClient = func(string, []string) error {
+		calls++
+		return errors.New("no such key")
+	}
+	err := runClient([]clientCmd{
+		{what: "sign x", name: "gnokey", args: []string{"sign"}},
+		{what: "broadcast x", name: "gnokey", args: []string{"broadcast"}},
+	})
+	if err == nil {
+		t.Fatal("a failed sign reported success")
+	}
+	if calls != 1 {
+		t.Fatalf("ran %d command(s) after a failed sign, want 1", calls)
+	}
+	if !strings.Contains(err.Error(), "step 1 of 2") {
+		t.Fatalf("the error must say which step failed, got: %v", err)
+	}
+}
+
+func TestQuoteAll(t *testing.T) {
+	for _, tc := range []struct{ in, want string }{
+		{"sign", "sign"},
+		{"/tmp/x.json", "/tmp/x.json"},
+		{"", "''"},
+		{"a b", "'a b'"},
+		{"$(x)", "'$(x)'"},
+	} {
+		if got := quoteAll([]string{tc.in})[0]; got != tc.want {
+			t.Fatalf("quoteAll(%q) = %q, want %q", tc.in, got, tc.want)
+		}
 	}
 }

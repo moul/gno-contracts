@@ -7,7 +7,7 @@
 //	gnoblog posts     list the local posts, with dates, sizes and hashes
 //	gnoblog preview   render the index, or one post, the way the realm will
 //	gnoblog status    diff the local markdown against what is on chain
-//	gnoblog tx        write the transaction that fixes exactly what differs
+//	gnoblog tx        publish exactly what differs, in one transaction
 //
 // # Where the markdown lives
 //
@@ -23,10 +23,13 @@
 //
 // # It holds no key
 //
-// Reads go over plain JSON-RPC abci_query, standard library only. Writes are
-// emitted as an unsigned transaction document plus the two gnokey commands
-// that sign and broadcast it, so nothing here can broadcast by accident and
-// the author reads the diff before anything is signed.
+// Reads go over plain JSON-RPC abci_query, standard library only. A write is
+// built as an unsigned transaction document and handed to gnokey, which signs
+// it and prompts on your terminal for a passphrase this process never sees.
+// `status` is the review step and `-print` writes the commands out instead of
+// running them; the copy-paste in between was never a third gate, and a
+// document's signature covers the account sequence, so the gap it opened was a
+// window in which anything else this key signed voided the document.
 //
 // Deploying the realm itself is NOT here: that is `gnopm publish`.
 package main
@@ -69,7 +72,7 @@ func usage(out *os.File) {
   gnoblog posts              the local posts: slug, date, bytes, hash
   gnoblog preview [-post S]  render the index, or one post
   gnoblog status             diff the local markdown against the chain
-  gnoblog tx [-all] [-prune] write the transaction that fixes the difference
+  gnoblog tx [-all] [-prune] publish the difference, in one transaction
 
 The content directory is not defaulted: pass -content, or set GNOBLOG_CONTENT.
 
@@ -83,6 +86,7 @@ The content directory is not defaulted: pass -content, or set GNOBLOG_CONTENT.
 tx flags:
   -all           push every post, not only what differs. This is what a
                  redeploy needs: a private realm redeploy wipes the posts
+  -print         write the sign and broadcast commands out, run nothing
   -prune         also emit Delete for a post on chain with no local file
   -out FILE      where to write the transaction document
   -gas-wanted N  override the per-message gas estimate
@@ -121,6 +125,7 @@ func run(args []string, out *os.File) error {
 	case "tx":
 		fs.BoolVar(&all, "all", false, "push every post, not only what differs")
 		fs.BoolVar(&opt.prune, "prune", false, "emit Delete for a post on chain with no local file")
+		fs.BoolVar(&opt.print, "print", false, "write the sign and broadcast commands out instead of running them")
 		fs.StringVar(&batchOut, "out", "", "where to write the transaction document (default: <content>/../.gnoblog-tx.json)")
 		fs.Int64Var(&opt.gasWanted, "gas-wanted", 0, "override the per-message gas estimate")
 		fs.StringVar(&opt.gasFee, "gas-fee", "", "override the gas fee")
@@ -163,7 +168,7 @@ func run(args []string, out *os.File) error {
 			}
 			batchOut = filepath.Join(filepath.Dir(abs), ".gnoblog-tx.json")
 		}
-		return printBatch(out, cfg, changes, opt, batchOut)
+		return publishBatch(out, cfg, changes, opt, batchOut)
 	default:
 		usage(out)
 		return fmt.Errorf("unknown command %q", cmd)
