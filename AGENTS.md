@@ -444,11 +444,15 @@ whose first lives in `gnolang/gno`, while `p/moul/x/daily/b58/v0` only ever exis
 | name | chain-id | notes |
 |---|---|---|
 | `mainnet` | `gnoland-1` | `rpc.gno.land`, gnoweb at `gno.land`. Launched 2026-09-12T15:00:00Z from the `chain/mainnet` tag (commit `9c8eb132e`): a fresh chain, not a hardfork of betanet. |
-| `pearl` | `pearl-1` | testnet, gno `v1.0.0-rc.0`. The default testnet. |
-| `sapphire` | `sapphire-1` | testnet, same build. **On 2026-09-22 `rpc.sapphire.testnets.gno.land` had no DNS record at all**; re-check before sending anything to it. |
+| `pearl` | `pearl-1` | testnet, gno `v1.0.0-rc.0`. **The** testnet. |
 | `staging` | `staging` | `rpc.staging.gno.land`. |
 
-Both testnets expose the same host pattern: `rpc.<net>.testnets.gno.land`, gnoweb at
+`sapphire` (`sapphire-1`) was the second testnet and is **retired**: its RPC host stopped
+resolving on 2026-09-22 and it is gone for good. It is removed from `defaultNetworks()`
+rather than kept with a warning, because a name in that list is a publish target and
+`NET=sapphire` would have built a script against a dead endpoint.
+
+pearl exposes `rpc.<net>.testnets.gno.land`, gnoweb at
 `<net>.testnets.gno.land`, and an agent faucet at `faucet-agent.<net>.testnets.gno.land`
 (`/fund` is POST-only; `/limits` reports the grant and the per-address window; the bare
 root has no index route and 404s, which says nothing about the faucet being up).
