@@ -100,6 +100,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/agents/maintainer/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/agents/passport/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/agents/receipt/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/blog" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/config/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/gnoface/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/grc20/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -299,6 +300,8 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/agents/passport/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/agents/passport/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/agents/receipt/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/blog" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/blog" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/config/v1" -> "gno.land/p/moul/authz/v1";
   "gno.land/r/moul/config/v1" -> "gno.land/p/moul/mygnoscan/v0";
   "gno.land/r/moul/config/v1" -> "gno.land/p/moul/pausable/v0";
