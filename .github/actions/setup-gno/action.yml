@@ -35,9 +35,9 @@ runs:
         key: gno-bin-${{ runner.os }}-${{ steps.upstream.outputs.sha }}-${{ inputs.binaries }}
 
     # The clone happens either way: GNOROOT is a source tree, not a binary.
-    # lint/test read the stdlibs out of it, `regen` reads examples/ to resolve
-    # each contract's monorepo counterpart, and gnopublish repoints its replace
-    # at it. It must live OUTSIDE the repo workspace: inside (say ./.gno), the
+    # lint/test read the stdlibs out of it, and `regen` reads examples/ to
+    # resolve each contract's monorepo counterpart. It must live OUTSIDE the
+    # repo workspace: inside (say ./.gno), the
     # gnowork.toml workspace would discover the toolchain's bundled examples/
     # and pkg/mod packages and they would shadow our committed vendor/,
     # breaking reproducible resolution.

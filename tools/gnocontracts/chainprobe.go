@@ -1,8 +1,12 @@
 package main
 
+// Chain-facing helpers shared by `status` (is this package live on that
+// network) and `graph` (dependency order). They used to live in publish.go
+// beside a `gnocontracts publish` subcommand; publishing is gnopm's job now,
+// and these outlived it.
+
 import (
 	"context"
-	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,91 +15,6 @@ import (
 	"strings"
 	"time"
 )
-
-// cmdPublish orders contracts by dependency (so a package is always published
-// before anything that imports it) and, with -check -net <name>, queries the
-// chain for current upload status and records it in contracts.json.
-//
-//	go run ./tools publish                 # print upload order
-//	go run ./tools publish -net sapphire -check   # + refresh on-chain status
-func cmdPublish(root string, args []string) error {
-	fs := flag.NewFlagSet("publish", flag.ContinueOnError)
-	net := fs.String("net", "", "network name to check status against (see contracts.json)")
-	check := fs.Bool("check", false, "query the chain for current upload status")
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
-	m, err := loadManifest(root)
-	if err != nil {
-		return err
-	}
-
-	ordered, err := topoOrder(m.Contracts)
-	if err != nil {
-		return err
-	}
-
-	var network *Network
-	if *net != "" {
-		for i := range m.Networks {
-			if m.Networks[i].Name == *net {
-				network = &m.Networks[i]
-			}
-		}
-		if network == nil {
-			return fmt.Errorf("unknown network %q", *net)
-		}
-	}
-
-	if *check {
-		if network == nil {
-			return fmt.Errorf("-check requires -net <name>")
-		}
-		if _, err := exec.LookPath("gnokey"); err != nil {
-			return fmt.Errorf("-check needs gnokey in PATH")
-		}
-		if !netReachable(network.RPC) {
-			return fmt.Errorf("%s (%s) is not answering: refusing to record every package as absent", network.Name, network.RPC)
-		}
-		byPath := m.byPkgPath()
-		known := 0
-		for _, c := range ordered {
-			up := queryUploaded(network.RPC, c.PkgPath)
-			if up == probeUnknown {
-				continue // leave the last known value alone
-			}
-			known++
-			pc := byPath[c.PkgPath]
-			pub := pc.Published[network.Name]
-			pub.Uploaded = up == probePresent
-			pc.Published[network.Name] = pub
-		}
-		if err := m.save(root); err != nil {
-			return err
-		}
-		fmt.Printf("checked %d contracts on %s (%d answered)\n", len(ordered), network.Name, known)
-	}
-
-	fmt.Println("publish order (dependencies first):")
-	for i, c := range ordered {
-		status := ""
-		if c.Draft {
-			status = " [draft — skipped]"
-		} else if c.Superseded {
-			// No directory to publish from: it is already on chain and is
-			// kept resolvable from the lock, not republishable from the tree.
-			status = " [superseded — already published, no source dir]"
-		} else if network != nil {
-			if m.byPkgPath()[c.PkgPath].Published[network.Name].Uploaded {
-				status = " [already on " + network.Name + "]"
-			} else {
-				status = " [pending on " + network.Name + "]"
-			}
-		}
-		fmt.Printf("  %2d. %s%s\n", i+1, c.PkgPath, status)
-	}
-	return nil
-}
 
 // topoOrder returns the contracts in dependency order (a contract appears after
 // every moul contract it depends on). Non-moul deps are ignored (assumed to be
