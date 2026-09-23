@@ -142,7 +142,7 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`p/moul/greet/v0`](p/moul/greet) 📦 | — | — | [✅](https://gno.land/p/moul/greet/v0) | — | — | — |
 | [`p/moul/helplink/v0`](p/moul/helplink) 📦 | — | — | [🗄️](https://gno.land/p/moul/helplink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink/v0) ≈ | 1 |
 | [`p/moul/kit/store/v0`](p/moul/kit/store) 📦 | — | — | — | — | — | 2 |
-| [`p/moul/kit/ui/v0`](p/moul/kit/ui) 📦 | — | — | — | — | — | 3 |
+| [`p/moul/kit/ui/v0`](p/moul/kit/ui) 📦 | — | — | [✅](https://gno.land/p/moul/kit/ui/v0) | — | — | 3 |
 | [`p/moul/md/v0`](p/moul/md) 📦 | — | — | [🗄️](https://gno.land/p/moul/md/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md/v0) ≈ | 1 |
 | [`p/moul/mdlist/v0`](p/moul/mdlist) 📦 | — | — | [✅](https://gno.land/p/moul/mdlist/v0) | — | — | 1 |
 | [`p/moul/mdtable/v0`](p/moul/mdtable) 📦 | — | — | [🗄️](https://gno.land/p/moul/mdtable/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/mdtable/v0) ≈ | — |
@@ -224,7 +224,7 @@ make upload NET=pearl PKG=kit/store YES=1   # run the script you just read
 | [`r/moul/agents/maintainer/v0`](r/moul/agents/maintainer) 🏛️ | — | — | — | — | — | 1 |
 | [`r/moul/agents/passport/v0`](r/moul/agents/passport) 🏛️ | — | — | — | — | — | 2 |
 | [`r/moul/agents/receipt/v0`](r/moul/agents/receipt) 🏛️ | — | — | — | — | — | 1 |
-| [`r/moul/blog`](r/moul/blog) 🏛️ | — | — | — | — | — | 2 |
+| [`r/moul/blog`](r/moul/blog) 🏛️ | — | — | [✅](https://gno.land/r/moul/blog) | — | — | 2 |
 | [`r/moul/config/v0`](https://github.com/moul/gno-contracts/tree/bd1ff5de0053958282ac81f08ed8bfcb2081982c/r/moul/config) 🏛️ 🧊 | — | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
 | [`r/moul/config/v1`](r/moul/config) 🏛️ | — | — | — | — | — | 4 |
 | [`r/moul/demo/args/v0`](r/moul/demo/args) 🏛️ | — | — | [✅](https://gno.land/r/moul/demo/args/v0) | — | — | — |
@@ -406,7 +406,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-23T14:40:11Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-23T15:12:39Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 
