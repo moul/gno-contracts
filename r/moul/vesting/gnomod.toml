@@ -1,0 +1,9 @@
+module = "gno.land/r/moul/vesting/v0"
+gno = "0.9"
+
+# Redeployable by its creator: nothing imports this realm and it hands no
+# object of its own to another one, so `private = true` costs nothing and keeps
+# the path reusable. Designed for the wipe a redeploy causes: the seeded
+# schedules are source constants that init() restores, and a declared schedule
+# is one transaction for its owner to re-submit.
+private = true

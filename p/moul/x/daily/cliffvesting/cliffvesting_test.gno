@@ -162,3 +162,55 @@ func TestCliffAtEndIsAllOrNothing(t *testing.T) {
 	uassert.Equal(t, int64(100), s.Vested(100))
 	uassert.Equal(t, int64(100), s.CliffAmount())
 }
+
+// TestVestedDoesNotOverflow pins the defect that forced v1.
+//
+// v0 computed total*elapsed in plain int64. Over a term measured in seconds,
+// the product passes 2^63 for any grant above roughly 146,036 whole coins, and
+// the wrap is silent: the figures below came back NEGATIVE, which every caller
+// then treated as a real vested amount.
+func TestVestedDoesNotOverflow(t *testing.T) {
+	// The real gno.land mainnet vesting term, 2026-09-12 to 2028-09-12.
+	const (
+		start int64 = 1789225200
+		end   int64 = 1852383600
+		term        = end - start // 63,158,400 seconds
+	)
+
+	for _, tc := range []struct {
+		name  string
+		total int64
+	}{
+		{"just under the v0 ceiling", 146035000000},
+		{"just over the v0 ceiling", 146037000000},
+		{"the largest genesis grant", 318720000000000},
+		{"the whole genesis allocation", 1332999998328067},
+	} {
+		s, err := NewLinear(tc.total, start, end)
+		uassert.NoError(t, err, tc.name)
+
+		// Halfway through the term is exactly half the grant, and the naive
+		// int64 product has long since wrapped by this size.
+		uassert.Equal(t, tc.total/2, s.Vested(start+term/2), tc.name)
+
+		// The curve stays inside its bounds and never goes backwards.
+		prev := int64(0)
+		for i := int64(0); i <= 8; i++ {
+			got := s.Vested(start + term*i/8)
+			uassert.True(t, got >= prev, tc.name+": vested went backwards")
+			uassert.True(t, got >= 0, tc.name+": vested went negative")
+			uassert.True(t, got <= tc.total, tc.name+": vested exceeded the total")
+			prev = got
+		}
+		uassert.Equal(t, tc.total, prev, tc.name)
+
+		// PercentVested multiplies by 100 on top, so it has its own ceiling.
+		// It is 49 and not 50 at halfway for an ODD total: Vested floors to
+		// (total-1)/2 and the percentage floors again, so two roundings in the
+		// same direction land just under. That is the documented behaviour,
+		// not the overflow, so the assertion allows both.
+		half := s.PercentVested(start + term/2)
+		uassert.True(t, half == 49 || half == 50, tc.name+": halfway percent left 49..50")
+		uassert.Equal(t, int64(100), s.PercentVested(end), tc.name)
+	}
+}

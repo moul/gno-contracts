@@ -179,6 +179,10 @@ module = "gno.land/p/moul/ulist/v1"
 source = { dir = "p/moul/ulist" }
 
 [[module]]
+module = "gno.land/p/moul/vesting/v0"
+source = { dir = "p/moul/vesting" }
+
+[[module]]
 module = "gno.land/p/moul/web25/v0"
 source = { dir = "p/moul/web25" }
 
@@ -200,6 +204,11 @@ source = { dir = "p/moul/x/daily/bitset" }
 
 [[module]]
 module = "gno.land/p/moul/x/daily/cliffvesting/v0"
+source = { commit = "d9879cdf25236a55f92c93fbb523faad01c1e7ae", dir = "p/moul/x/daily/cliffvesting" }
+hash = "h1:yzaBYrFBW8QlnN9Bm+3JemUxUSG7tGimUcR35aJnVJ0="
+
+[[module]]
+module = "gno.land/p/moul/x/daily/cliffvesting/v1"
 source = { dir = "p/moul/x/daily/cliffvesting" }
 
 [[module]]
@@ -517,6 +526,10 @@ module = "gno.land/r/moul/sapin/v0"
 source = { dir = "r/moul/sapin" }
 
 [[module]]
+module = "gno.land/r/moul/vesting/v0"
+source = { dir = "r/moul/vesting" }
+
+[[module]]
 module = "gno.land/r/moul/x/allinone/devtools/v0"
 source = { dir = "r/moul/x/allinone/devtools" }
 
@@ -585,6 +598,11 @@ source = { dir = "r/moul/x/daily/calc" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/cliffvestingdemo/v0"
+source = { commit = "d9879cdf25236a55f92c93fbb523faad01c1e7ae", dir = "r/moul/x/daily/cliffvestingdemo" }
+hash = "h1:NJVQZHT6CweoJ1a5mSR1aXP36wccz61wPC+r5k4rcbo="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/cliffvestingdemo/v1"
 source = { dir = "r/moul/x/daily/cliffvestingdemo" }
 
 [[module]]

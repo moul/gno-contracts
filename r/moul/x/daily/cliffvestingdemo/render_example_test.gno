@@ -6,7 +6,7 @@ func ExampleRender() {
 	// Output:
 	// # Cliff Vesting
 	//
-	// A pure vesting calculator, demoing the [`p/moul/x/daily/cliffvesting`](/p/moul/x/daily/cliffvesting/v0) library.
+	// A pure vesting calculator, demoing the [`p/moul/x/daily/cliffvesting`](/p/moul/x/daily/cliffvesting/v1) library.
 	//
 	// ## A 12-month grant with a 3-month cliff
 	//
@@ -32,7 +32,7 @@ func ExampleRender() {
 	//
 	// ## Claiming
 	//
-	// The library tracks no balances — the caller supplies what has already been claimed:
+	// The library tracks no balances, so the caller supplies what has already been claimed:
 	//
 	// | at month | already claimed | claimable |
 	// |---|---|---|
@@ -43,7 +43,7 @@ func ExampleRender() {
 	//
 	// ## Integer rounding
 	//
-	// All arithmetic is integer — no float ever reaches consensus state. Rounding is **down**, so nobody is ever paid more than they earned, and the final instalment collects the remainder.
+	// All arithmetic is integer, no float ever reaches consensus state. Rounding is **down**, so nobody is ever paid more than they earned, and the final instalment collects the remainder.
 	//
 	// `1000` over `3` periods:
 	//
@@ -54,11 +54,11 @@ func ExampleRender() {
 	// | 2 | 666 |
 	// | 3 | 1000 |
 	//
-	// `333 + 333 + 334` — the end is exactly `1000`, never `999`.
+	// `333 + 333 + 334`, and the end is exactly `1000`, never `999`.
 	//
-	// ## The bug this avoids
+	// ## Bug 1: a rate truncated to zero
 	//
-	// When the total is smaller than the duration, computing a per-tick rate first truncates it to zero and **nothing ever vests**. Multiplying before dividing keeps it honest — `7` tokens over `1000` ticks:
+	// When the total is smaller than the duration, computing a per-tick rate first truncates it to zero and **nothing ever vests**. Multiplying before dividing keeps it honest. `7` tokens over `1000` ticks:
 	//
 	// | t | vested |
 	// |---|---|
@@ -66,4 +66,16 @@ func ExampleRender() {
 	// | 150 | 1 |
 	// | 500 | 3 |
 	// | 1000 | 7 |
+	//
+	// ## Bug 2: a product that leaves int64
+	//
+	// Multiplying first is only safe if the product fits. Over a term measured in **seconds**, `total * elapsed` passes 2^63 for any grant above about `146,036` whole coins, and a wrapped int64 is still a valid int64: `v0` of this library returned a **negative** vested amount and nothing signalled it. `v1` routes the product through a 128-bit intermediate.
+	//
+	// A real two-year schedule, `1789225200` to `1852383600`, at the halfway mark:
+	//
+	// | grant | vested at halfway | expected |
+	// |---|---|---|
+	// | 100000000000 | 50000000000 | 50000000000 |
+	// | 146037000000 | 73018500000 | 73018500000 |
+	// | 318720000000000 | 159360000000000 | 159360000000000 |
 }
