@@ -1,0 +1,62 @@
+# `r/moul/vesting`
+
+How much of a gno.land account's balance can **actually move right now**.
+
+## Read this before trusting a number here
+
+A realm cannot read an account's vesting schedule. `banker.GetCoins` returns the **total**
+balance with the locked part included, and no native exposes `std.VestingSchedule`. So the
+page reads two things from the chain and is told the third:
+
+| figure | source | trust |
+|---|---|---|
+| balance | `banker.GetCoins`, every render | always true |
+| the clock | the block time, every render | always true |
+| the schedule | supplied, see below | only as good as its source |
+
+Every rendered figure says which of the two it rests on. Nothing is presented as verified
+when it is not. That honesty is the feature: a page that quietly guessed the locked amount
+would be worse than no page.
+
+## Where a schedule comes from
+
+**The URL**, for a one-off that stores nothing:
+
+```
+/r/moul/vesting/v0:g1youraddress?o=106560000000&s=1789225200&e=1852383600
+```
+
+`o` original vesting in ugnot, `s` start, `e` end, both unix seconds, `&d=1` for a `delayed`
+schedule. Read your real one off the chain:
+
+```sh
+gnokey query auth/accounts/g1youraddress -remote https://rpc.gno.land:443
+```
+
+**Or the registry.** `Declare` writes a schedule for the **caller's own address and no
+other**. That is the whole trust model: an address can only misdescribe itself, and a wrong
+entry misleads nobody but its author. `Forget` takes it off again.
+
+## Why a cached schedule is honest rather than stale
+
+Because a schedule can never change. `std.SetVesting` has exactly one caller in the
+monorepo, `gno.land/pkg/gnoland/app.go`, during genesis balance loading, and no message type
+creates or modifies one. A schedule declared correctly today is correct forever.
+
+## Routes
+
+| | |
+|---|---|
+| `/r/moul/vesting/v0` | every schedule on file |
+| `…:g1…` | one address |
+| `…:g1…?o=&s=&e=` | one address, with a schedule you supply |
+
+## Notes
+
+The seeded schedules are source constants, not registry rows. This realm is
+`private = true`, so a redeploy wipes realm state, and the one schedule the page exists to
+show should not need a transaction to come back. A seeded address is refused by `Declare`
+for the same reason: a redeploy would silently revert whatever it set.
+
+The arithmetic is [`p/moul/vesting`](/p/moul/vesting/v0), which mirrors what the chain
+enforces, down to the rounding direction.

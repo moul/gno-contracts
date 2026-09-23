@@ -1,0 +1,56 @@
+# `p/moul/vesting`
+
+The vesting curve **the gno.land chain itself enforces**, as a pure calculator.
+
+This is not a vesting scheme of its own. It is a faithful reimplementation of tm2's
+`std.VestingSchedule`, so a realm can answer "how much of this balance can actually move
+right now" with the same arithmetic the ante handler uses. Divergence here would be worse
+than useless, so every rule is copied from `tm2/pkg/std/vesting.go` rather than designed.
+
+```go
+s, err := vesting.New(106560000000, 1789225200, 1852383600, vesting.Continuous)
+s.Vested(now)              // how much has unlocked
+s.Locked(now)              // what the chain still refuses to move
+s.Spendable(balance, now)  // what can actually leave the account
+s.PermilleVested(now)      // tenths of a percent, for display
+```
+
+## The rules, all of them from tm2
+
+| | |
+|---|---|
+| `Continuous` | vests linearly between `Start` and `End` |
+| `Delayed` | a cliff: nothing before `End`, everything at or after it, and `Start` is ignored |
+| rounding | **down**, always |
+| a zero `Original` | means no schedule, which locks nothing |
+| times | unix seconds, never compared against the chain's clock |
+
+Rounding down is the direction that matters. Reporting one ugnot more than the chain will
+move turns a page into a lie somebody acts on.
+
+`Spendable` caps the locked part at the balance: an account that spent while its coins were
+free can owe the schedule more than it now holds, and the honest answer there is that
+nothing moves, not a negative number.
+
+## Why this is not `p/moul/x/daily/cliffvesting`
+
+That package is the employee-grant shape (start, **cliff**, end) for amounts a person is
+granted. This one is the chain's shape, for amounts a chain holds, and the difference is not
+only the curve:
+
+`cliffvesting` v0 multiplied in plain `int64`. Over the real mainnet term of 63,158,400
+seconds that wraps for any grant above **146,036 GNOT**, silently: a 318,720,000 GNOT grant
+returned `-6,264,395,224`, a negative vested amount that every caller would have treated as
+real. tm2 reaches for `math/big` at exactly this point. gno has no `math/big`, so `Vested`
+goes through a 128-bit intermediate via `math/bits`. `cliffvesting` v1 now does the same.
+
+The largest schedule this has to survive is the whole genesis allocation, 1,332,999,998
+GNOT, and the tests take it there.
+
+## What this package cannot do
+
+Find out an address's schedule. **Realm code cannot read one.** The VM's whole view of an
+account is `banker.GetCoins`, which returns the total balance with the locked part included,
+and no native exposes `std.VestingSchedule`. The schedule has to come from the caller.
+
+[`r/moul/vesting`](/r/moul/vesting/v0) is what that constraint looks like in a page.
