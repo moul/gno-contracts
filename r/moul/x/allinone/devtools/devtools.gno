@@ -4,7 +4,7 @@
 // Everything here is a COMBINATION. Any one of these packages has its own demo
 // showing it alone; the thing that is hard to find is what they look like used
 // together, which is the only form a real realm ever meets them in. So this
-// realm imports seven of them and every one earns its place in the output:
+// realm imports eight of them and every one earns its place in the output:
 //
 //	r/moul/config     the notice block, the pause switch, the explorer to link
 //	p/moul/mygnoscan  the explorer routes themselves
@@ -103,7 +103,7 @@ func Render(path string) string {
 	var b strings.Builder
 	b.WriteString(config.TopBlockFor(realmPath))
 	b.WriteString(md.H1("allinone: devtools"))
-	b.WriteString("\nSeven packages, used together rather than one at a time. ")
+	b.WriteString("\nEight packages, used together rather than one at a time. ")
 	b.WriteString(md.Link("source", config.MygnoscanFor(realmPath)))
 	b.WriteString("\n\n")
 

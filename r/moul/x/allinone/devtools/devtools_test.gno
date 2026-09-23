@@ -88,7 +88,7 @@ func ExampleRender() {
 	// Output:
 	// # allinone: devtools
 	//
-	// Seven packages, used together rather than one at a time. [source](https://mygnoscan.moul.p2p.team/realm/r/moul/x/allinone/devtools/v0)
+	// Eight packages, used together rather than one at a time. [source](https://mygnoscan.moul.p2p.team/realm/r/moul/x/allinone/devtools/v0)
 	//
 	// ## Notes
 	//
