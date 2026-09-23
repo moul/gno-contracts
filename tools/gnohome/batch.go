@@ -85,6 +85,7 @@ func fetchAccount(remote, addr string) (account, error) {
 
 // buildBatch turns the outstanding changes into one unsigned document.
 func buildBatch(cfg config, changes []change, opt txOptions) (*txDoc, int64, error) {
+	changes = emittable(changes, opt.prune)
 	if len(changes) == 0 {
 		return nil, 0, nil
 	}
@@ -151,8 +152,10 @@ func printBatch(out *os.File, cfg config, changes []change, opt txOptions, path 
 		return err
 	}
 
+	// Named from the emitted set, not from every change: a slot held back
+	// must not be listed as though it went out.
 	var slugs []string
-	for _, c := range changes {
+	for _, c := range emittable(changes, opt.prune) {
 		slugs = append(slugs, c.slug)
 	}
 	fmt.Fprintf(out, "# wrote %s: %d message(s) in one transaction (%s)\n",
