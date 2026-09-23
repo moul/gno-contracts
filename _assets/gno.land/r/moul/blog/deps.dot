@@ -4,4 +4,5 @@ digraph deps {
   "gno.land/r/moul/blog" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/blog" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/blog" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/blog" -> "gno.land/r/moul/config/v1";
 }
