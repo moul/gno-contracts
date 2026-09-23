@@ -188,3 +188,44 @@ func TestIntroDefaultsAndOverrides(t *testing.T) {
 	uassert.True(t, strings.Contains(Render(""), "Something else"), "a set intro replaces it")
 	uassert.False(t, strings.Contains(Render(""), "moul's blog"), "and the default is gone")
 }
+
+// A markdown link in the first line of a post reached the index as its own
+// source, backslash-escaped, on 2026-09-23. The excerpt is plain text, so the
+// link has to be flattened before ui.Excerpt escapes what is left.
+func TestFlattenLinks(t *testing.T) {
+	for _, tc := range []struct{ in, want string }{
+		{"plain text", "plain text"},
+		{"I built [mygnoscan](https://x.example) in April", "I built mygnoscan in April"},
+		{"[a](1) and [b](2)", "a and b"},
+		{"", ""},
+		// Unbalanced: left alone rather than half-parsed.
+		{"an [unclosed link", "an [unclosed link"},
+		{"brackets [only] here", "brackets [only] here"},
+		{"[text](no-close", "[text](no-close"},
+	} {
+		uassert.Equal(t, tc.want, flattenLinks(tc.in), "flattenLinks("+tc.in+")")
+	}
+}
+
+// The index excerpt must read as a sentence, not as markdown source.
+func TestExcerptIsProseNotSource(t *testing.T) {
+	reset()
+	seed("a", "A", "2026-09-23", "", "I built [mygnoscan](https://mygnoscan.example) in April.")
+
+	out := Render("")
+	uassert.False(t, strings.Contains(out, "\\["), "no escaped bracket survives into the index")
+	uassert.True(t, strings.Contains(out, "I built mygnoscan in April"), "the excerpt reads as prose")
+}
+
+// The back link is the realm root, which carries no ':'. linkPrefix with an
+// empty path would produce "/r/moul/blog:", which shipped on 2026-09-23.
+func TestBackLinkHasNoTrailingColon(t *testing.T) {
+	reset()
+	seed("a", "A", "2026-09-23", "tag", "Body.")
+
+	for _, view := range []string{"a", "t/tag", "nosuchpost"} {
+		out := Render(view)
+		uassert.True(t, strings.Contains(out, "]("+indexLink+")"), view+" links back to the index")
+		uassert.False(t, strings.Contains(out, "]("+indexLink+":)"), view+" must not emit a trailing colon")
+	}
+}

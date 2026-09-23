@@ -200,8 +200,11 @@ func status(out *os.File, cfg config, posts []postFile) error {
 	}
 	changes := diff(posts, remote)
 	if len(changes) == 0 {
-		fmt.Fprintf(out, "up to date: %d post(s) match %s on %s\n",
-			countPosts(posts), cfg.realm, cfg.chainID)
+		// Name the intro separately rather than folding it into the count.
+		// "1 post(s) match" next to a directory holding two files reads as
+		// half a sync, and the intro is the one thing a reader sees first.
+		fmt.Fprintf(out, "up to date: %d post(s)%s match %s on %s\n",
+			countPosts(posts), introState(posts, remote), cfg.realm, cfg.chainID)
 		return nil
 	}
 	for _, c := range changes {
@@ -233,6 +236,20 @@ func changesFor(cfg config, posts []postFile, all, prune bool) ([]change, error)
 		}
 	}
 	return out, nil
+}
+
+// introState says whether the index header is in play, so `status` never
+// reports a clean tree by counting only the things it calls posts.
+func introState(posts []postFile, remote map[string]remotePost) string {
+	for _, p := range posts {
+		if p.isIntro() {
+			return " and the intro"
+		}
+	}
+	if r, ok := remote[introKey]; ok && r.size > 0 {
+		return " (the chain has an intro, there is no local intro.md)"
+	}
+	return " (no intro)"
 }
 
 func countPosts(posts []postFile) int {
