@@ -391,7 +391,7 @@ func TestBuildBatchIsOneTxForEveryChange(t *testing.T) {
 		{kind: kindOutdated, slug: "now", slot: slotFile{slug: "now", body: "x"}},
 		{kind: kindExtra, slug: "gone"},
 	}
-	doc, gas, err := buildBatch(cfg, changes, txOptions{})
+	doc, gas, err := buildBatch(cfg, changes, txOptions{prune: true})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -448,5 +448,52 @@ func TestBuildBatchOnNoChangesIsNoDocument(t *testing.T) {
 	}
 	if doc != nil {
 		t.Error("no changes must produce no document, not an empty transaction")
+	}
+}
+
+// The batch path used to emit a Delete for an extra slot whether or not
+// -prune asked for one, while the one-command-per-slot path skipped it. That
+// disagreement is dangerous rather than untidy: holding a slot back is done by
+// keeping its file out of -content, and the recommended path would then have
+// deleted it on chain. Caught on 2026-09-23 while pushing three slots of
+// r/moul/home and holding `layout` back.
+func TestBuildBatchDeletesOnlyWhenPruneAsks(t *testing.T) {
+	cfg := config{realm: "gno.land/r/moul/home", owner: "g1owner", key: "moul"}
+	changes := []change{
+		{kind: kindOutdated, slug: "now", slot: slotFile{slug: "now", body: "x"}},
+		{kind: kindExtra, slug: "layout"},
+	}
+
+	doc, _, err := buildBatch(cfg, changes, txOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(doc.Msg) != 1 {
+		t.Fatalf("got %d messages without -prune, want only the outdated slot", len(doc.Msg))
+	}
+	var m callMsg
+	if err := json.Unmarshal(doc.Msg[0], &m); err != nil {
+		t.Fatal(err)
+	}
+	if m.Func != "Set" || m.Args[0] != "now" {
+		t.Errorf("msg = %+v, want Set now", m)
+	}
+
+	// With -prune it is back, because that is what the flag is for.
+	doc, _, err = buildBatch(cfg, changes, txOptions{prune: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(doc.Msg) != 2 {
+		t.Fatalf("got %d messages with -prune, want the Delete as well", len(doc.Msg))
+	}
+
+	// An extra slot on its own is nothing to sign, not an empty document.
+	doc, _, err = buildBatch(cfg, changes[1:], txOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if doc != nil {
+		t.Errorf("got a document for a held-back slot alone, want nil")
 	}
 }

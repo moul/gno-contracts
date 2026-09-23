@@ -273,13 +273,7 @@ func printStatus(out *os.File, changes []change) error {
 
 func printTx(out *os.File, cfg config, changes []change, opt txOptions) error {
 	emitted := 0
-	for _, c := range changes {
-		if c.kind == kindExtra && !opt.prune {
-			continue
-		}
-		if c.kind == kindSame {
-			continue
-		}
+	for _, c := range emittable(changes, opt.prune) {
 		fmt.Fprint(out, command(cfg, c, opt))
 		fmt.Fprintln(out)
 		emitted++

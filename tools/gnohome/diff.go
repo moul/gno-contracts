@@ -68,6 +68,27 @@ func allChanges(local []slotFile) []change {
 	return out
 }
 
+// emittable drops the changes that must not become a message.
+//
+// A slot on chain with no local file is only ever deleted when -prune asks for
+// it, because the ordinary reason for one is that the file is being held back
+// deliberately, not that the slot is garbage. Both emitters go through here:
+// they disagreed once, printTx skipping the extra slot while buildBatch turned
+// it into a Delete, and the batch path is the one the README recommends.
+func emittable(changes []change, prune bool) []change {
+	out := make([]change, 0, len(changes))
+	for _, c := range changes {
+		if c.kind == kindSame {
+			continue
+		}
+		if c.kind == kindExtra && !prune {
+			continue
+		}
+		out = append(out, c)
+	}
+	return out
+}
+
 // catCmd is spelled absolutely on purpose; see command().
 const catCmd = "/bin/cat"
 
