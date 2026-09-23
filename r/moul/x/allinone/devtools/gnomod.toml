@@ -1,0 +1,7 @@
+module = "gno.land/r/moul/x/allinone/devtools/v0"
+gno = "0.9"
+
+# Redeployable by its creator. A demo's state is disposable by design: its whole
+# job is to be redeployed whenever one of the packages it shows off changes, so
+# losing the notes people left is the intended trade rather than a regret.
+private = true
