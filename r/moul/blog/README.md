@@ -1,0 +1,95 @@
+# `gno.land/r/moul/blog`
+
+moul's personal blog, on chain. One author, posts stored as data rather than
+code, and a URL that is meant to survive being pasted into someone else's chat.
+
+```
+gno.land/r/moul/blog             the index, newest first
+gno.land/r/moul/blog:<slug>      one post
+gno.land/r/moul/blog:t/<tag>     every post carrying a tag
+```
+
+## Why private, and why no `/vN`
+
+These are the same decision seen from two sides.
+
+A post URL leaves this repository the moment it is published: it goes into
+chats, into other people's articles, into a link someone bookmarked. None of
+those can be rewritten. A `/v1` would break all of them at once, which is the
+one failure a blog cannot absorb, so the module line carries no version.
+
+What normally pays for a version is the ability to change the code. Here that
+comes from `private = true` instead: a private package may be re-added at the
+same path by the address in `[addpkg].creator`
+(`gno.land/pkg/sdk/vm/keeper.go`, `checkRedeployPermission`), and nothing else
+may import it. So the code can be replaced without the path moving.
+
+The bill for that arrives as a wipe. A redeploy re-runs `init()` and resets
+every package-level variable, so **every post is erased**. That is survivable
+only because the markdown is kept off chain and `tools/gnoblog -all` pushes all
+of it back in one transaction. The chain holds the published copy; it is not
+the only copy.
+
+`tools/gnocontracts` records the exemption from the repository's "every path
+ends in `/vN`" rule, next to `r/moul/home`'s, with the reason.
+
+## The API
+
+Writes are restricted to `g1manfred47kzduec920z88wfr64ylksmdcedlf5`.
+
+| function | what it does |
+| --- | --- |
+| `Set(cur, slug, title, date, tags, body)` | create or replace a post, the ordinary publish |
+| `Append(cur, slug, body)` | append, for a body too large for one transaction |
+| `Delete(cur, slug)` | remove a post |
+| `SetIntro(cur, body)` | the markdown above the index; `""` restores the default |
+| `Get(slug)` | one post's raw markdown |
+| `Count()` · `Revision()` | how many posts, and how many writes have been accepted |
+| `Manifest()` | `slug⇥rev⇥date⇥len⇥sha256` per post, the diff surface |
+
+A slug is 1 to 64 bytes of `[a-z0-9._-]`. No `':'` and no `'/'`, so a slug can
+never break out of its own render path. `intro` is refused, because `intro.md`
+names the index header on the local side and a post there would have nowhere to
+live.
+
+A date is exactly `YYYY-MM-DD`, and that is load-bearing rather than cosmetic:
+posts are kept in a second avl tree keyed by `"<date>/<slug>"` and walked in
+reverse, so lexical order has to be chronological order. gno has no
+`sort.Slice`; this is what replaces it.
+
+## `Manifest()` is the whole sync protocol
+
+One `vm/qeval` returns a line per post carrying a sha256 over the title, date,
+tags and body **together**. So `gnoblog status` can say exactly which local
+file needs a transaction without downloading a single body, and changing any
+one of the four fields changes the hash.
+
+Both halves build that hashed record the same way, and neither can check the
+other at run time: the realm's test asserts the record, and the tool's test
+pins its digest as a literal. If one side ever drifts, the tool reports every
+post as up to date while the chain holds the old text.
+
+## Escaping
+
+The body renders **verbatim**. It is markdown written by the one address that
+can call `Set`, and escaping it would turn every heading and link in a post
+into literal text.
+
+Titles, tags and index excerpts go through `p/moul/kit/ui` anyway. Not because
+the author is untrusted, but because a title with a `]` in it would otherwise
+break the link it sits inside, and that is a rendering bug with no attacker in
+it at all.
+
+## Publishing a post
+
+The markdown lives outside this repository; `tools/gnoblog` never defaults to a
+path to it.
+
+```sh
+go -C tools tool gnoblog -content DIR status   # what differs from the chain
+go -C tools tool gnoblog -content DIR tx       # the transaction that fixes it
+```
+
+`tx` writes an unsigned transaction document and the two `gnokey` commands that
+sign and broadcast it. Several posts go in one document, so publishing three is
+one signature and one atomic broadcast. After a redeploy, `tx -all`.

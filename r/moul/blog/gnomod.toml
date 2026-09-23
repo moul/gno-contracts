@@ -1,0 +1,13 @@
+module = "gno.land/r/moul/blog"
+gno = "0.9"
+
+# Redeployable by its creator. See README.md § "Why private, and why no /vN".
+#
+# A private package may be re-added at the same path by the address recorded in
+# [addpkg].creator (gno.land/pkg/sdk/vm/keeper.go, checkRedeployPermission), and
+# nothing else may import it. A redeploy RE-RUNS init() and resets realm state,
+# so the markdown kept off chain is the source of truth and tools/gnoblog pushes
+# every post back. That wipe is the reason the post URL can stay version-free:
+# a code change is a redeploy of this path, never a /v1 that moves every link
+# already shared.
+private = true

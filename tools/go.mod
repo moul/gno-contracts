@@ -15,6 +15,7 @@ go 1.24.0
 require moul.io/gnopm v0.6.1
 
 tool (
+	github.com/moul/gno-contracts/tools/gnoblog
 	github.com/moul/gno-contracts/tools/gnocontracts
 	github.com/moul/gno-contracts/tools/gnohome
 	moul.io/gnopm

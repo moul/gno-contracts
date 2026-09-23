@@ -419,6 +419,10 @@ module = "gno.land/r/moul/agents/receipt/v0"
 source = { dir = "r/moul/agents/receipt" }
 
 [[module]]
+module = "gno.land/r/moul/blog"
+source = { dir = "r/moul/blog" }
+
+[[module]]
 module = "gno.land/r/moul/config/v0"
 source = { commit = "bd1ff5de0053958282ac81f08ed8bfcb2081982c", dir = "r/moul/config" }
 hash = "h1:3f7yxl/XvHWA/hpCW64nDPHNdh0GhWhn0OAn4WqyktE="
