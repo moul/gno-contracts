@@ -168,3 +168,66 @@ func TestHatchViaCrossingCall(cur realm, t *testing.T) {
 		t.Fatal("expected pet to be persisted for caller")
 	}
 }
+
+// decayOver ticks one pet from full stats across `blocks` blocks, calling tick
+// every `every` blocks, and returns what it is left with. It drives tick
+// directly rather than through Feed/Play/Sleep, because those also restore
+// stats and the question here is only what decay does.
+func decayOver(blocks, every int) (hunger, happiness, energy int) {
+	p := &pet{alive: true, hunger: 0, happiness: 100, energy: 100, lastUpdate: 0}
+	for h := every; h <= blocks; h += every {
+		p.tick(int64(h))
+	}
+	return p.hunger, p.happiness, p.energy
+}
+
+// TestDecayDoesNotDependOnCallFrequency is the bug this file exists for.
+//
+// happiness decays once per 2 blocks and energy once per 3, by integer
+// division. Before the carried debt, that division truncated on EVERY call, so
+// ticking once per block cost 1/2 = 0 happiness and 1/3 = 0 energy, forever: a
+// pet fed in a `while true` loop was immortal while everyone else's died. The
+// leaderboard rewarded a bot, which is the opposite of what the realm claims.
+//
+// Over the same 60 blocks the outcome must now be the same whether the owner
+// acts every block or once at the end.
+func TestDecayDoesNotDependOnCallFrequency(t *testing.T) {
+	const blocks = 60
+	wantHunger, wantHappy, wantEnergy := decayOver(blocks, blocks)
+
+	for _, every := range []int{1, 2, 3, 5, 30} {
+		h, hap, e := decayOver(blocks, every)
+		if h != wantHunger || hap != wantHappy || e != wantEnergy {
+			t.Errorf("acting every %d block(s) over %d blocks: hunger=%d happiness=%d energy=%d, "+
+				"want %d/%d/%d as when acting once",
+				every, blocks, h, hap, e, wantHunger, wantHappy, wantEnergy)
+		}
+	}
+}
+
+// The absolute numbers, so a future change to the rates is a deliberate edit
+// and not a silent one: 60 blocks costs 60 hunger, 30 happiness, 20 energy.
+func TestDecayRates(t *testing.T) {
+	h, hap, e := decayOver(60, 1)
+	if h != 60 || hap != 70 || e != 80 {
+		t.Errorf("60 blocks of decay = hunger %d, happiness %d, energy %d; want 60, 70, 80", h, hap, e)
+	}
+}
+
+// project draws the page; tick decides the outcome. If they disagree, the pet a
+// reader sees is not the pet the next call will act on.
+func TestProjectAgreesWithTick(t *testing.T) {
+	for _, every := range []int{1, 2, 3, 7} {
+		p := &pet{alive: true, hunger: 0, happiness: 100, energy: 100, lastUpdate: 0}
+		for h := every; h <= 42; h += every {
+			p.tick(int64(h))
+		}
+		// One more step, projected rather than applied.
+		ph, phap, pe, _ := project(p, int64(42+every))
+		p.tick(int64(42 + every))
+		if ph != p.hunger || phap != p.happiness || pe != p.energy {
+			t.Errorf("every %d: project says %d/%d/%d, tick says %d/%d/%d",
+				every, ph, phap, pe, p.hunger, p.happiness, p.energy)
+		}
+	}
+}
