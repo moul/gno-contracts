@@ -216,6 +216,13 @@ go -C tools tool gnohome status    # what differs from the chain
 go -C tools tool gnohome tx        # the commands to fix that
 ```
 
+⚠️ **`gnohome preview` is the only preview of this realm that means anything.**
+The CI preview link deploys the package to a fresh dev chain, where there are no
+slots and `content/` never travels (the uploader skips sub-directories), so it
+always renders `defaultLayout` and is identical on every content-only PR.
+Confirmed on PR #225, whose preview reads "No layout slot yet" while the change
+was six slots. The bot cannot know this and links it anyway.
+
 The `packages` slot is generated, not written: it is a claim about what is
 deployed, and `contracts.json` already tracks that per network.
 
