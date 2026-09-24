@@ -55,9 +55,11 @@ func TestEverySampleReachesItsAnswer(cur realm, t *testing.T) {
 		{"sum100", 5, 5050, ""},
 		{"heavy", 5, 1250025000, ""},
 		{"mext", 5, 3000000021, ""},
+		{"clang", 0, 0, "fb7ffba0"},
+		{"ledger", 0, 0, "alice 70\nbob 80\n"},
 	}
 	for _, c := range cases {
-		id := UploadSample(cross(cur), c.slug, "", 0)
+		id := UploadSample(cross(cur), c.slug, sampleByName(c.slug).input, 0)
 		status := ""
 		for i := 0; i < 20; i++ {
 			status = Step(cross(cur), id, 0)

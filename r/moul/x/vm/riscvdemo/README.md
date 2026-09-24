@@ -11,6 +11,15 @@ What it exists to show is two things realm code cannot do for itself.
 `riscv32im-unknown-none-elf`. `Upload` takes hex, so anything you can build with
 `clang`, `rustc`, TinyGo or Zig and strip to its text segment goes in unchanged.
 
+Two samples are exactly that and neither is a mock up. **Compiled by clang** is
+a freestanding C program; **A token, in Rust** is `#![no_std]` Rust that mints,
+sends and burns, linking Rust's real `core` and `compiler_builtins`, so a
+64-bit divide in it runs `__udivdi3` on a machine with no 64-bit divide
+instruction. Both are shipped as the bytes the compiler emitted, and the page
+shows their source rather than a disassembly, because a disassembly would bury
+the only interesting fact: nobody wrote the machine code. Sources and build
+commands: `tools/riscv-guests`.
+
 **A program pauses instead of failing.** It runs until its fuel slice is spent,
 then stops with a snapshot the realm keeps, and the next caller pays for the
 next slice. The "Heavy loop" sample is 200,006 instructions and takes three

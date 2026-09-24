@@ -47,7 +47,7 @@ func renderHome() string {
 	for i := range samples {
 		s := &samples[i]
 		sb.WriteString("**" + ui.Inline(s.name) + "**: " + s.note + "\n\n")
-		sb.WriteString("```asm\n" + s.asm + "\n```\n\n")
+		sb.WriteString("```" + s.lang() + "\n" + s.asm + "\n```\n\n")
 		sb.WriteString(ui.Action("Upload "+s.name, "UploadSample",
 			"name", s.slug, "input", s.input,
 			"budget", ufmt.Sprintf("%d", s.budget)) + "\n\n")
