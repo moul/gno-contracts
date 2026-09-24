@@ -94,6 +94,42 @@ change, never a code one: the renderer registers one placeholder per slot by
 iterating the tree, so writing `content/social.md` and referencing `:social:`
 is the whole of it.
 
+### The slots this page ships with
+
+`content/` is the source of truth, one file per slot, the slug being the file
+name without `.md`. Nothing registers them: `gnohome` reads the directory and
+the realm iterates the tree.
+
+| slot | what it is |
+| --- | --- |
+| `bio` | who I am, three sentences, in the header column |
+| `social` | the links under it |
+| `now` | what I am working on, hand-written |
+| `previously` | what I built before |
+| `stack` | the tools, one line |
+| `numbers` | a counted table, with the date it was counted |
+| `packages` | **generated**, see below |
+| `about` | a collapsed `> [!NOTE]-` explaining that this page is a realm |
+| `layout` | the template all of the above are filled into |
+
+`about` is deliberately last and deliberately collapsed. gnoweb renders an alert
+as `<details>`, and a `-` after the type closes it
+(`gno.land/pkg/gnoweb/markdown/ext_alert.go`), so the mechanism is one click away
+instead of occupying the paragraph where a reader decides whether to keep going.
+
+### `layout` may only reference placeholders that are deployed
+
+An unmatched placeholder survives into the output verbatim (see below), which
+makes the layout slot the one file that can be **ahead of the chain in a way
+that shows**. `content/layout.md` carried `Explore: :scan.links:` for a while
+against a deployed realm with no `scan.gno`, so pushing it would have printed
+that literal string on the page. The line was removed and belongs back in the
+same change that deploys `scan.gno`.
+
+Rule: before pushing `layout`, every `:slug:` in it is either a file in
+`content/` or a computed placeholder **the deployed code answers**, which is not
+the same as one this repo implements.
+
 ### Images: two gates, and neither is the one you expect
 
 An image in a slot passes **gnoweb's validator** and then the **CSP the site is
@@ -190,10 +226,14 @@ go -C tools tool gnohome packages > r/moul/home/content/packages.md
 
 See [`tools/gnohome/README.md`](../../../tools/gnohome/README.md).
 
-## First deploy
+## Deploying
 
-The realm is not on chain yet. `Set` needs the package there first, and a
-`private` package still needs `MsgAddPackage`, which no account session can sign.
+The realm **is live on mainnet** (`gnoland-1`), serving https://gno.land/u/moul.
+What follows applies to a redeploy, or to a first deploy on another network.
+
+⚠️ A redeploy of this path wipes every slot, so it is always followed by
+`gnohome tx -all`. `Set` needs the package on chain first, and a `private`
+package still needs `MsgAddPackage`, which no account session can sign.
 
 **mainnet deploys in two phases.** `gnoland-1` runs
 `vm:p:code_submission_policy = "inert"` (read back from the chain 2026-09-19), so
