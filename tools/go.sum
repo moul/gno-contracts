@@ -2,3 +2,5 @@ moul.io/gnopm v0.7.2 h1:SEzBxCStVrPxIq8MZnARRtNJSZW+lwEC8haPd40DVZA=
 moul.io/gnopm v0.7.2/go.mod h1:WOifxqA3P8TEMl2Sw1XjuMzioaHffR82s9hPFSDQHj4=
 moul.io/gnopm v0.8.0 h1:LPugctJpQmT9s/6dHaQKXUsiGKjlwrkjKNgHcReygZg=
 moul.io/gnopm v0.8.0/go.mod h1:WOifxqA3P8TEMl2Sw1XjuMzioaHffR82s9hPFSDQHj4=
+moul.io/gnopm v0.9.0 h1:NORz4ljVEasYi/DdWgtK8dIY6a7PxNrm02dC1i9LBag=
+moul.io/gnopm v0.9.0/go.mod h1:WOifxqA3P8TEMl2Sw1XjuMzioaHffR82s9hPFSDQHj4=
