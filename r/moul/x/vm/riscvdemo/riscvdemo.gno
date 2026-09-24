@@ -48,9 +48,12 @@ const (
 	// slice size Step uses when asked for none.
 	DefaultFuel = 100000
 	// MaxSliceFuel bounds one transaction's work regardless of what the
-	// caller asked for. An RV32IM instruction costs about 8,500 gas, so
-	// 200,000 of them is most of a block.
-	MaxSliceFuel = 200000
+	// caller asked for, and it is derived from the measurement rather than
+	// picked: an RV32IM instruction costs about 8,500 gas, so 100,000 of them
+	// is about 850M, a little under a third of a 3G block. Twice this would
+	// still be a legal transaction and a rude one, and it would leave no room
+	// for the predecode and the realm's own storage writes on top.
+	MaxSliceFuel = 100000
 )
 
 var (

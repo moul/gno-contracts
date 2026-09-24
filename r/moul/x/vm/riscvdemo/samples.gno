@@ -65,8 +65,8 @@ ecall`,
 			0x05D00893, 0x00000073,
 		},
 		budget: 250000,
-		note: "200,006 instructions, four per iteration. At the default slice it takes " +
-			"three transactions to finish, which is the thing this realm exists to show.",
+		note: "200,006 instructions, four per iteration. At the largest slice this realm " +
+			"allows it takes three transactions to finish, which is the thing it exists to show.",
 		asm: `lui  s0, 0xc000           # s0 = 50000
 addi s0, s0, 0x350
 addi t0, zero, 0

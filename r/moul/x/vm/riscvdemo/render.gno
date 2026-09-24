@@ -128,9 +128,9 @@ func renderInstance(id string) string {
 	sb.WriteString("## Image\n\n```\n" + hexDump(inst.Program, 64) + "\n```\n\n")
 
 	if inst.Status == vmkit.Running {
-		sb.WriteString(ui.Action("Run 100000 instructions", "Step", "id", id, "fuel", "100000"))
+		sb.WriteString(ui.Action("Run 25000 instructions", "Step", "id", id, "fuel", "25000"))
 		sb.WriteString(" · ")
-		sb.WriteString(ui.Action("Run 200000 instructions", "Step", "id", id, "fuel", "200000"))
+		sb.WriteString(ui.Action("Run 100000 instructions", "Step", "id", id, "fuel", "100000"))
 		sb.WriteString("\n")
 	} else {
 		sb.WriteString("This instance is **" + inst.Status.String() + "** and cannot be stepped again.\n")
