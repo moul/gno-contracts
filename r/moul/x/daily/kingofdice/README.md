@@ -31,7 +31,7 @@ outlasting the field matters more than the roll itself.
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/kingofdice" \
   -func Roll \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 -remote <rpc> <keyname>
 ```
 

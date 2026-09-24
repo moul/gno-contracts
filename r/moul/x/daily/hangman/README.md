@@ -22,7 +22,7 @@ position, or lose one of six lives — solve the word before the gallows fills u
 ```sh
 # Guess a letter (tx — mutates the shared daily game)
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/hangman" \
-  -func Guess -args "e" -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -func Guess -args "e" -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 KEY
 
 # View the current board (masked word, guesses, gallows, status)

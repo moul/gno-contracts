@@ -33,7 +33,7 @@ gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/microblog" \
   -func Post \
   -args "gm gno.land 👋" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 -remote <rpc> mykey
 ```
 

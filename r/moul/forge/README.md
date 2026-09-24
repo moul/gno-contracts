@@ -31,7 +31,7 @@ the whole forge is usable from gnoweb without a client.
 ```sh
 gnokey maketx call -pkgpath gno.land/r/moul/forge/v0 \
   -func CreateRepo -args "moul/forge" -args "an on-chain forge" -args "" \
-  -gas-fee 1000000ugnot -gas-wanted 3000000 \
+  -gas-fee 30000ugnot -gas-wanted 3000000 \
   -broadcast -chainid <chain> -remote <rpc> <key>
 ```
 
@@ -40,7 +40,7 @@ gnokey maketx call -pkgpath gno.land/r/moul/forge/v0 \
 gnokey maketx call -pkgpath gno.land/r/moul/forge/v0 \
   -func SetRef -args "moul/forge" -args "refs/heads/main" \
   -args "<expected-oid>" -args "<new-oid>" -args "ship it" \
-  -gas-fee 1000000ugnot -gas-wanted 3000000 \
+  -gas-fee 30000ugnot -gas-wanted 3000000 \
   -broadcast -chainid <chain> -remote <rpc> <key>
 ```
 

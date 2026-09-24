@@ -26,7 +26,7 @@ kept on-chain and viewable per-address.
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsmatch" \
   -func Throw -args "rock" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
+  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 
 # View the arena dashboard
 gnokey query vm/qrender \

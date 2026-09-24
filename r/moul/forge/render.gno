@@ -324,7 +324,7 @@ new head and it stops counting, with nothing to remember to dismiss.
 ## Calling it
 
 ` + md.CodeBlock(`gnokey maketx call -pkgpath gno.land/r/moul/forge/v0 \
-  -func SetRef -send "" -gas-fee 1000000ugnot -gas-wanted 3000000 \
+  -func SetRef -send "" -gas-fee 30000ugnot -gas-wanted 3000000 \
   -args "moul/forge" -args "refs/heads/main" \
   -args "<expected-oid>" -args "<new-oid>" -args "ship it" \
   -broadcast -chainid <chain> -remote <rpc> <key>`) + `

@@ -27,7 +27,7 @@ means the oracle has less to work with).
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsoracle" \
   -func Play -args "rock" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
+  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 
 # View the oracle's dashboard (total rounds, oracle win rate, top outwitter)
 gnokey query vm/qrender \

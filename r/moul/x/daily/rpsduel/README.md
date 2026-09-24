@@ -30,19 +30,19 @@ gnokey query vm/qeval \
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel" \
   -func Open -args "g1opponentaddr..." -args "<64-char hex commit>" \
-  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid sapphire-1 <key>
+  -gas-fee 30000ugnot -gas-wanted 3000000 -broadcast -chainid sapphire-1 <key>
 
 # 3. Opponent replies in the clear
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel" \
   -func Accept -args "1" -args "paper" \
-  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid sapphire-1 <key>
+  -gas-fee 30000ugnot -gas-wanted 3000000 -broadcast -chainid sapphire-1 <key>
 
 # 4. Challenger reveals to settle it
 gnokey maketx call \
   -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel" \
   -func Reveal -args "1" -args "rock" -args "xyz123" \
-  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid sapphire-1 <key>
+  -gas-fee 30000ugnot -gas-wanted 3000000 -broadcast -chainid sapphire-1 <key>
 
 # View the lobby, a specific duel, or a player's record
 gnokey query vm/qrender --data "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/rpsduel:"

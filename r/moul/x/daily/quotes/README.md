@@ -30,7 +30,7 @@ gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/quotes" \
   -func AddQuote \
   -args "Luck is what happens when preparation meets opportunity." \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 -remote <rpc> <key>
 ```
 

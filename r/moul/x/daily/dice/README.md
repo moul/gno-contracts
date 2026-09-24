@@ -24,7 +24,7 @@ per-caller roll history and a global distribution across the six faces.
 ```sh
 # Roll the dice (state-changing crossing call, returns the 1-6 face)
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/dice" \
-  -func Roll -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast ...
+  -func Roll -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast ...
 
 # Query the current view (distribution chart + recent rolls)
 gnokey query "vm/qrender" -data "gno.land/r/REPLACE_ADDR/dice:"

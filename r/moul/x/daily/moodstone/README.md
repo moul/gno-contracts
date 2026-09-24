@@ -25,7 +25,7 @@ gnokey maketx call \
   -pkgpath gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/moodstone \
   -func LogMood \
   -args 'happy' -args 'Just deployed my first realm!' \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid test5 \
   test5.gno.land:443
 

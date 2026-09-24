@@ -28,7 +28,7 @@ gno.land/r/REPLACE_ADDR/faucet
 ```sh
 # Claim 100 points (subject to the 100-block cooldown).
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/faucet" \
-  -func Claim -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast \
+  -func Claim -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast \
   -chainid sapphire-1 mykey
 
 # Query a balance (read-only).

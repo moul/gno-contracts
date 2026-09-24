@@ -15,7 +15,7 @@ on chain or off.
 
 ```bash
 gnokey maketx call -pkgpath gno.land/r/moul/demo/hello \
-  -func Hello -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast moul
+  -func Hello -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast moul
 ```
 
 Next: [`args`](../args) adds a parameter.
