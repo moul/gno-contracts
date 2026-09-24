@@ -52,7 +52,16 @@ jobs:
 
       - name: Analyze the pull request
         run: |
-          git fetch --quiet origin "$BASE" --depth=100
+          # No --depth here, and it matters. The checkout above is
+          # `fetch-depth: 0`, so every commit is already local; a later fetch
+          # that names a depth does not add history, it GRAFTS A SHALLOW
+          # BOUNDARY onto a complete clone and throws the rest away (verified
+          # 2026-09-25: a 15-commit clone fetched at --depth=3 reports
+          # `is-shallow-repository true` and `rev-list --count` 3). gnomod.lock
+          # pins 42 versions to commits far older than any such boundary, so
+          # `gnopm tool ci` below saw 39 of them as unreachable from origin/main
+          # and reported a squash merge would strand every one.
+          git fetch --quiet origin "$BASE"
           # The gnopm verdict goes INTO this comment rather than posting one of
           # its own: `gnocontracts pr` stays the only author here, as it already
           # is for the labels and the preview. ci.yml is where `tool ci` is a
@@ -101,7 +110,10 @@ jobs:
       - name: Collect the changed paths
         run: |
           set -euo pipefail
-          git fetch --quiet origin "$BASE" --depth=100
+          # Full, not --depth: see the report job. A shallow boundary grafted
+          # onto a complete clone is also how `merge-base` starts answering
+          # with the boundary commit instead of the real one.
+          git fetch --quiet origin "$BASE"
           merge_base=$(git merge-base "origin/$BASE" HEAD)
           git diff --name-only "$merge_base" HEAD > /tmp/changed.txt
           echo "changed files: $(wc -l < /tmp/changed.txt)"
