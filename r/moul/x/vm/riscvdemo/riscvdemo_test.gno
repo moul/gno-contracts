@@ -56,6 +56,7 @@ func TestEverySampleReachesItsAnswer(cur realm, t *testing.T) {
 		{"heavy", 5, 1250025000, ""},
 		{"mext", 5, 3000000021, ""},
 		{"clang", 0, 0, "fb7ffba0"},
+		{"ledger", 0, 0, "alice 70\nbob 80\n"},
 	}
 	for _, c := range cases {
 		id := UploadSample(cross(cur), c.slug, sampleByName(c.slug).input, 0)

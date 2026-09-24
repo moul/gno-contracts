@@ -84,35 +84,54 @@ REMU by zero returning 0 takes out `rv32um-remu` at case 8. Both are recorded in
 the test file, and the harness's own pass and fail decoding is pinned by two
 tests so a change that made every case report success would not read as green.
 
-## A guest a compiler produced
+## Guests a compiler produced
 
 The claim this package rests on is that a program arrives compiled by the real
-compiler, so there is a test that does exactly that and nothing else is trusted
-to stand in for it.
+compiler, so two of them are shipped compiled and nothing is trusted to stand in
+for that. Both are rebuildable: source, linker script and exact command are in
+[`tools/riscv-guests`](../../../../tools/riscv-guests), and the committed words
+were verified to match a fresh build.
 
-`riscv.GuestFNV()` is 49 instructions of freestanding C, built by **clang
-19.1.7** for `riscv32im`, that reads the call input, hashes it with FNV-1a and
-writes eight hex digits back. The source, the linker script and the exact build
-command are in [`tools/riscv-guests/fnv`](../../../../tools/riscv-guests/fnv),
-so the committed words can be rebuilt and diffed rather than believed.
+| | language | words | what it does |
+|---|---|---:|---|
+| `riscv.GuestFNV()` | C, clang 19.1.7 | 49 | hashes the call input with FNV-1a |
+| `riscv.GuestLedger()` | Rust, rustc 1.98.1, `#![no_std]` | 1,959 | mint, send and burn from a script |
 
 ```go
-m, _ := riscv.NewMachine(riscv.GuestFNV(), riscv.DefaultEntry)
-m.Step(host, vmkit.Unmetered)   // host.Input() = "gno.land" -> "fb7ffba0"
+m, _ := riscv.NewMachine(riscv.GuestLedger(), riscv.DefaultEntry)
+m.Step(host, 50_000)
+// input:  "mint alice 100\nmint bob 50\nsend alice bob 30\n"
+// output: "alice 70\nbob 80\n"
 ```
 
-It is the only test here not written by the same person who wrote the emulator,
-and it exercises what a hand-written program does not: a real function prologue
-spilling `ra` and `s0` to a stack the host set up, `.bss` addressed at `0x40000`
-far above a text segment the host refuses stores into, LLVM materializing the
-2166136261 offset basis through a `lui`/`addi` pair, and `MUL` in an inner loop.
-It also pauses and resumes correctly when sliced three instructions at a time,
-which is the property a realm depends on and the one most likely to break on
-code nobody wrote to be sliceable.
+Between them they exercise what a hand-written program does not: a real function
+prologue spilling `ra` and `s0` to a stack the host set up, `.bss` addressed far
+above a text segment the host refuses stores into, LLVM materializing constants
+through `lui`/`addi` pairs at the sign-extension boundary that bit this package
+twice, and `MUL` in an inner loop.
+
+**The Rust one goes further, and that is why it is worth its size.** It links
+Rust's real `core` and `compiler_builtins`, which it never calls directly: a
+bounds check reaches `core::panicking`, and the balances are 64-bit, so a divide
+reaches `__udivdi3` because **RV32 has no 64-bit divide instruction**. The
+emulator is running the standard library's own software arithmetic, not only
+what the compiler emitted for my source. `TestRustLedgerDoes64BitArithmetic`
+pins a balance past 2^32 to keep that path live.
+
+Both pause and resume correctly when sliced, the Rust one seventeen instructions
+at a time, in the middle of a library routine it never asked to call. That is
+the property a realm depends on and the one most likely to break on code nobody
+wrote to be sliceable.
+
+A refusal from the ledger is **halted, not trapped**: `line 2: insufficient
+balance`, exit code 1. The program said no and the machine did not break, and a
+chain has to be able to tell a user which happened.
 
 The memory layout is not incidental. W xor X means a guest whose writable data
 shared a page with its code would trap on its first store, so the linker script
-is part of the ABI and says so.
+is part of the ABI and each guest pins its own: the addresses in it are baked
+into the instruction stream as `lui` immediates, so a shared script edited for
+one guest would silently invalidate every image built against the old one.
 
 ## What the GnoVM charges for, measured
 

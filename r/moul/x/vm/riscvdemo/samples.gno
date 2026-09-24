@@ -132,13 +132,45 @@ for (int i = 0; i < 8; i++) {
 syscall3(SYS_WRITE, 1, (long)out, 8);
 syscall3(SYS_EXIT, 0, 0, 0);`,
 	},
+	{
+		slug:   "ledger",
+		name:   "A token, in Rust",
+		input:  "mint alice 100\nmint bob 50\nsend alice bob 30\n",
+		budget: 20000,
+		note: "no_std Rust, compiled by rustc for riscv32im: mint, send and burn, applied " +
+			"from the call input. It links Rust's real core and compiler_builtins, so the " +
+			"balances being 64-bit means a divide runs __udivdi3 here, because RV32 has no " +
+			"64-bit divide instruction. With the default input it prints alice 70 and bob 80. " +
+			"Source: tools/riscv-guests/ledger.",
+		builtin: "ledger",
+		asm: `match cmd {
+	b"send" => {
+		let (from, rest) = field(rest);
+		let (to, rest) = field(rest);
+		let (amount, _) = field(rest);
+		let n = parse_u32(amount).ok_or("bad amount")?;
+		let fi = led.find(from).ok_or("unknown sender")?;
+		if led.balances[fi] < n {
+			return Err("insufficient balance");
+		}
+		let ti = led.intern(to).ok_or("ledger full or bad name")?;
+		led.balances[fi] -= n;
+		led.balances[ti] += n;
+		Ok(())
+	}
+	_ => Err("unknown command"),
+}`,
+	},
 }
 
 // image is what gets uploaded: either the words assembled here, or a program
 // the library ships because a compiler produced it.
 func (s *sample) image() []byte {
-	if s.builtin == "fnv" {
+	switch s.builtin {
+	case "fnv":
 		return riscv.GuestFNV()
+	case "ledger":
+		return riscv.GuestLedger()
 	}
 	return riscv.Image(s.words)
 }
@@ -147,8 +179,11 @@ func (s *sample) image() []byte {
 // its C, because showing a disassembly of what LLVM did with it would bury the
 // only interesting fact: nobody wrote the machine code.
 func (s *sample) lang() string {
-	if s.builtin != "" {
+	switch s.builtin {
+	case "fnv":
 		return "c"
+	case "ledger":
+		return "rust"
 	}
 	return "asm"
 }
