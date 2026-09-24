@@ -52,6 +52,36 @@ small one: a sort, a parser, a state machine, a few thousand iterations of a
 loop. It is not a signature verification, which is millions of instructions, and
 the chain already has secp256k1 natively for that reason.
 
+## A guest a compiler produced
+
+The claim this package rests on is that a program arrives compiled by the real
+compiler, so there is a test that does exactly that and nothing else is trusted
+to stand in for it.
+
+`riscv.GuestFNV()` is 49 instructions of freestanding C, built by **clang
+19.1.7** for `riscv32im`, that reads the call input, hashes it with FNV-1a and
+writes eight hex digits back. The source, the linker script and the exact build
+command are in [`tools/riscv-guests/fnv`](../../../../tools/riscv-guests/fnv),
+so the committed words can be rebuilt and diffed rather than believed.
+
+```go
+m, _ := riscv.NewMachine(riscv.GuestFNV(), riscv.DefaultEntry)
+m.Step(host, vmkit.Unmetered)   // host.Input() = "gno.land" -> "fb7ffba0"
+```
+
+It is the only test here not written by the same person who wrote the emulator,
+and it exercises what a hand-written program does not: a real function prologue
+spilling `ra` and `s0` to a stack the host set up, `.bss` addressed at `0x40000`
+far above a text segment the host refuses stores into, LLVM materializing the
+2166136261 offset basis through a `lui`/`addi` pair, and `MUL` in an inner loop.
+It also pauses and resumes correctly when sliced three instructions at a time,
+which is the property a realm depends on and the one most likely to break on
+code nobody wrote to be sliceable.
+
+The memory layout is not incidental. W xor X means a guest whose writable data
+shared a page with its code would trap on its first store, so the linker script
+is part of the ABI and says so.
+
 ## What the GnoVM charges for, measured
 
 The rungs above are not classic interpreter optimizations. They are answers to

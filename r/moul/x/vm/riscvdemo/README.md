@@ -11,6 +11,12 @@ What it exists to show is two things realm code cannot do for itself.
 `riscv32im-unknown-none-elf`. `Upload` takes hex, so anything you can build with
 `clang`, `rustc`, TinyGo or Zig and strip to its text segment goes in unchanged.
 
+The "Compiled by clang" sample is exactly that and is not a mock up: a
+freestanding C program, built by clang for `riscv32im`, shipped as the bytes
+LLVM emitted. The page shows its C because a disassembly would bury the only
+interesting fact, which is that nobody wrote the machine code. Source and build
+command: `tools/riscv-guests/fnv`.
+
 **A program pauses instead of failing.** It runs until its fuel slice is spent,
 then stops with a snapshot the realm keeps, and the next caller pays for the
 next slice. The "Heavy loop" sample is 200,006 instructions and takes three

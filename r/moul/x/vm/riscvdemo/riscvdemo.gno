@@ -136,7 +136,7 @@ func UploadSample(cur realm, name, input string, budget int64) string {
 	if budget <= 0 {
 		budget = s.budget
 	}
-	return upload(imageOf(s.words), input, budget)
+	return upload(s.image(), input, budget)
 }
 
 func upload(img []byte, input string, budget int64) string {
@@ -233,15 +233,6 @@ func inputOf(id string) string {
 		return ""
 	}
 	return v.(string)
-}
-
-// imageOf serializes instruction words little-endian, which is what RV32 is.
-func imageOf(words []uint32) []byte {
-	b := make([]byte, 0, len(words)*4)
-	for _, w := range words {
-		b = append(b, byte(w), byte(w>>8), byte(w>>16), byte(w>>24))
-	}
-	return b
 }
 
 // decodeHex accepts the output of any hexdump: an even number of hex digits,

@@ -1,0 +1,5 @@
+# Build output. The committed artifact is the word list in
+# p/moul/x/vm/riscv/guests.gno, which `make words` reproduces.
+*.o
+*.elf
+*.bin

@@ -1,5 +1,7 @@
 package riscvdemo
 
+import "gno.land/p/moul/x/vm/riscv/v0"
+
 // The programs the front page offers, as the machine words a cross compiler
 // would have emitted. They are assembled outside this repo and pinned here,
 // and riscvdemo_test.gno runs every one of them to the expected answer, so a
@@ -8,6 +10,10 @@ type sample struct {
 	slug   string // what UploadSample takes: short, no punctuation, stable
 	name   string
 	budget int64 // the instance's total instruction budget, not the slice
+
+	// builtin names an image the library ships compiled, instead of the words
+	// below. Empty means the words are the program.
+	builtin string
 	words []uint32
 	input string
 	note  string
@@ -99,6 +105,52 @@ divu t1, t0, t2
 addi a7, zero, 93
 ecall`,
 	},
+	{
+		slug:   "clang",
+		name:   "Compiled by clang",
+		input:  "gno.land",
+		budget: 20000,
+		note: "Not written for gno and not written by hand: a freestanding C program, " +
+			"compiled by clang for riscv32im and shipped as the bytes LLVM emitted. It reads " +
+			"the call input, hashes it with FNV-1a and writes eight hex digits back. " +
+			"With the default input it prints fb7ffba0. Source and build command: " +
+			"tools/riscv-guests/fnv.",
+		builtin: "fnv",
+		asm: `long n = syscall3(SYS_READ, 0, (long)in, sizeof(in));
+
+unsigned int h = 2166136261u;
+for (long i = 0; i < n; i++) {
+	h ^= in[i];
+	h *= 16777619u;      /* the reason this is rv32im */
+}
+
+for (int i = 0; i < 8; i++) {
+	unsigned int nib = (h >> (28 - i * 4)) & 0xF;
+	out[i] = nib < 10 ? '0' + nib : 'a' + (nib - 10);
+}
+
+syscall3(SYS_WRITE, 1, (long)out, 8);
+syscall3(SYS_EXIT, 0, 0, 0);`,
+	},
+}
+
+// image is what gets uploaded: either the words assembled here, or a program
+// the library ships because a compiler produced it.
+func (s *sample) image() []byte {
+	if s.builtin == "fnv" {
+		return riscv.GuestFNV()
+	}
+	return riscv.Image(s.words)
+}
+
+// lang is the fence tag for what the sample shows. The compiled guest shows
+// its C, because showing a disassembly of what LLVM did with it would bury the
+// only interesting fact: nobody wrote the machine code.
+func (s *sample) lang() string {
+	if s.builtin != "" {
+		return "c"
+	}
+	return "asm"
 }
 
 func sampleByName(slug string) *sample {
