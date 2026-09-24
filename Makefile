@@ -101,7 +101,9 @@ sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
 # `@`-prefixed: this recipe's stdout IS the comment body CI posts, so an echoed
 # command line would land at the top of every pull request comment (it did).
 report: ## render the sticky PR comment body from the diff; BASE=<ref>
-	@$(GNOCONTRACTS) pr $(if $(BASE),-base $(BASE),)
+	@mkdir -p .cache
+	@$(GNOPM) tool ci > .cache/gnopm-ci.md 2>/dev/null || true
+	@$(GNOCONTRACTS) pr $(if $(BASE),-base $(BASE),) -gnopm-report .cache/gnopm-ci.md
 
 preview: ## render what ARGS selects into _preview/, e.g. ARGS="./r/moul/home"
 	$(GNOCONTRACTS) preview -out _preview $(ARGS)

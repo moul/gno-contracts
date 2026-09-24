@@ -136,7 +136,7 @@ func TestPRCommentStaysShortWhateverTheDiffSize(t *testing.T) {
 		t.Fatalf("labels = %v, want [r]", a.labels)
 	}
 
-	body := renderPRComment(root, a, "HEAD~1", "https://example.org/pr-1/", "")
+	body := renderPRComment(root, a, "HEAD~1", "https://example.org/pr-1/", "", "")
 
 	// Visible size is what this is about: everything below a <details> is folded.
 	visible := 0
@@ -178,7 +178,7 @@ func TestPRCommentOnAnEmptyDiff(t *testing.T) {
 	if !reflect.DeepEqual(a.labels, []string{"meta"}) {
 		t.Fatalf("labels = %v, want [meta]", a.labels)
 	}
-	body := renderPRComment(root, a, "HEAD~1", "https://example.org/pr-1/", "")
+	body := renderPRComment(root, a, "HEAD~1", "https://example.org/pr-1/", "", "")
 	if strings.Contains(body, "<details>") {
 		t.Fatalf("no packages changed, yet the comment folds a table:\n%s", body)
 	}

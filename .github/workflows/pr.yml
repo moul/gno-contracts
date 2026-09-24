@@ -53,9 +53,16 @@ jobs:
       - name: Analyze the pull request
         run: |
           git fetch --quiet origin "$BASE" --depth=100
+          # The gnopm verdict goes INTO this comment rather than posting one of
+          # its own: `gnocontracts pr` stays the only author here, as it already
+          # is for the labels and the preview. ci.yml is where `tool ci` is a
+          # gate, so a failure must still leave a comment that names it instead
+          # of stopping the comment being written, hence `|| true`.
+          go -C tools tool gnopm tool ci > /tmp/gnopm-ci.md || true
           go -C tools tool gnocontracts pr \
             -base "origin/$BASE" \
             -preview-url "$PAGES_URL" \
+            -gnopm-report /tmp/gnopm-ci.md \
             -out /tmp/pr-comment.md \
             -labels-out /tmp/pr-labels.txt \
             -selectors-out /tmp/pr-selectors.txt
@@ -172,10 +179,15 @@ jobs:
       - name: Fold the preview into the comment
         if: steps.plan.outputs.skip != 'true'
         run: |
+          # Every render of this comment passes every section, or the one that
+          # is missing is silently dropped: this step REPLACES what the report
+          # job wrote, it does not append to it.
+          go -C tools tool gnopm tool ci > /tmp/gnopm-ci.md || true
           go -C tools tool gnocontracts pr \
             -base "origin/$BASE" \
             -preview-url "${{ env.PAGES_URL }}" \
             -preview-detail _preview/preview.md \
+            -gnopm-report /tmp/gnopm-ci.md \
             -out /tmp/pr-comment.md
 
       - uses: ./.github/actions/pr-comment

@@ -95,6 +95,7 @@ func cmdPR(root string, args []string) error {
 	labelsOut := fs.String("labels-out", "", "write the `gh pr edit` label arguments here")
 	selectorsOut := fs.String("selectors-out", "", "write the changed realm selectors here, one per line")
 	previewDetail := fs.String("preview-detail", "", "markdown fragment written by `preview`, folded under the preview link")
+	gnopmReport := fs.String("gnopm-report", "", "markdown written by `gnopm tool ci`, folded into the comment")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -105,13 +106,14 @@ func cmdPR(root string, args []string) error {
 	// missing detail file is indistinguishable from "the preview has not been
 	// rendered yet" — so the comment silently lost its preview section.
 	*previewDetail = underRoot(root, *previewDetail)
+	*gnopmReport = underRoot(root, *gnopmReport)
 
 	a, err := analyzePR(root, *base)
 	if err != nil {
 		return err
 	}
 
-	body := renderPRComment(root, a, *base, *previewURL, readPreviewDetail(*previewDetail))
+	body := renderPRComment(root, a, *base, *previewURL, readPreviewDetail(*previewDetail), readGnopmReport(*gnopmReport))
 	if *out == "" {
 		fmt.Print(body)
 	} else if err := os.WriteFile(*out, []byte(body), 0o644); err != nil {
@@ -289,7 +291,7 @@ func flagsFor(root string, p *pkgAgg, c *Contract) []prFlag {
 // every list folds. A 13-package pull request used to render 45 lines, a dozen
 // of which said the same thing about a dozen packages. This renders three,
 // whatever the size of the diff.
-func renderPRComment(root string, a *prAnalysis, base, previewURL, previewDetail string) string {
+func renderPRComment(root string, a *prAnalysis, base, previewURL, previewDetail, gnopmReport string) string {
 	var b strings.Builder
 	b.WriteString(prMarker + "\n")
 
@@ -337,6 +339,11 @@ func renderPRComment(root string, a *prAnalysis, base, previewURL, previewDetail
 	if lines := lockReport(root, base); len(lines) > 0 {
 		b.WriteString("\n" + details(fmt.Sprintf("`gnomod.lock` · %d change%s", len(lines), pluralS(len(lines))),
 			"- "+strings.Join(lines, "\n- ")+"\n"))
+	}
+	// Last, because it is the only section whose source is another tool: it is
+	// the verdict of the gate, not part of the diff this comment describes.
+	if gnopmReport != "" {
+		b.WriteString("\n" + gnopmReport)
 	}
 	return b.String()
 }
