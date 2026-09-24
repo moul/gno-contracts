@@ -82,6 +82,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/plan9/synfs/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/storagecost/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/vm/bf/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/vm/riscv/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/vm/vmkit/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/wesh/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/wiki/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -224,6 +225,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/provable/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/reaper/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/vm/bfdemo/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/vm/riscvdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/wesh/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/wiki/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/nt/grc20reg/v0";
@@ -287,6 +289,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/storagecost/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/x/vm/bf/v0" -> "gno.land/p/moul/x/vm/vmkit/v0";
   "gno.land/p/moul/x/vm/bf/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/moul/x/vm/riscv/v0" -> "gno.land/p/moul/x/vm/vmkit/v0";
   "gno.land/p/moul/x/vm/vmkit/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/x/wesh/v0" -> "gno.land/p/moul/x/daily/b58/v0";
   "gno.land/p/moul/x/wiki/v0" -> "gno.land/p/moul/fifo/v0";
@@ -553,6 +556,12 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/vm/bfdemo/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/vm/bfdemo/v0" -> "gno.land/p/nt/seqid/v0";
   "gno.land/r/moul/x/vm/bfdemo/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/vm/riscvdemo/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/vm/riscvdemo/v0" -> "gno.land/p/moul/x/vm/riscv/v0";
+  "gno.land/r/moul/x/vm/riscvdemo/v0" -> "gno.land/p/moul/x/vm/vmkit/v0";
+  "gno.land/r/moul/x/vm/riscvdemo/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/vm/riscvdemo/v0" -> "gno.land/p/nt/seqid/v0";
+  "gno.land/r/moul/x/vm/riscvdemo/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/wesh/v0" -> "gno.land/p/moul/x/wesh/v0";
   "gno.land/r/moul/x/wesh/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/wiki/v0" -> "gno.land/p/moul/addrset/v1";

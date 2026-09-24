@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-24T22:35:20Z",
+  "status_checked_at": "2026-09-24T22:57:51Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2685,6 +2685,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/vm/riscv/v0",
+      "dir": "p/moul/x/vm/riscv",
+      "kind": "p",
+      "name": "x/vm/riscv",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/vm/vmkit/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -8345,6 +8368,34 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/vm/riscvdemo/v0",
+      "dir": "r/moul/x/vm/riscvdemo",
+      "kind": "r",
+      "name": "x/vm/riscvdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/vm/riscv/v0",
+        "gno.land/p/moul/x/vm/vmkit/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/seqid/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
