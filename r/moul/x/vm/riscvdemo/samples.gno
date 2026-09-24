@@ -1,5 +1,7 @@
 package riscvdemo
 
+import "gno.land/p/moul/x/vm/riscv/v0"
+
 // The programs the front page offers, as the machine words a cross compiler
 // would have emitted. They are assembled outside this repo and pinned here,
 // and riscvdemo_test.gno runs every one of them to the expected answer, so a
@@ -8,6 +10,10 @@ type sample struct {
 	slug   string // what UploadSample takes: short, no punctuation, stable
 	name   string
 	budget int64 // the instance's total instruction budget, not the slice
+
+	// builtin names an image the library ships compiled, instead of the words
+	// below. Empty means the words are the program.
+	builtin string
 	words []uint32
 	input string
 	note  string
@@ -99,6 +105,87 @@ divu t1, t0, t2
 addi a7, zero, 93
 ecall`,
 	},
+	{
+		slug:   "clang",
+		name:   "Compiled by clang",
+		input:  "gno.land",
+		budget: 20000,
+		note: "Not written for gno and not written by hand: a freestanding C program, " +
+			"compiled by clang for riscv32im and shipped as the bytes LLVM emitted. It reads " +
+			"the call input, hashes it with FNV-1a and writes eight hex digits back. " +
+			"With the default input it prints fb7ffba0. Source and build command: " +
+			"tools/riscv-guests/fnv.",
+		builtin: "fnv",
+		asm: `long n = syscall3(SYS_READ, 0, (long)in, sizeof(in));
+
+unsigned int h = 2166136261u;
+for (long i = 0; i < n; i++) {
+	h ^= in[i];
+	h *= 16777619u;      /* the reason this is rv32im */
+}
+
+for (int i = 0; i < 8; i++) {
+	unsigned int nib = (h >> (28 - i * 4)) & 0xF;
+	out[i] = nib < 10 ? '0' + nib : 'a' + (nib - 10);
+}
+
+syscall3(SYS_WRITE, 1, (long)out, 8);
+syscall3(SYS_EXIT, 0, 0, 0);`,
+	},
+	{
+		slug:   "ledger",
+		name:   "A token, in Rust",
+		input:  "mint alice 100\nmint bob 50\nsend alice bob 30\n",
+		budget: 20000,
+		note: "no_std Rust, compiled by rustc for riscv32im: mint, send and burn, applied " +
+			"from the call input. It links Rust's real core and compiler_builtins, so the " +
+			"balances being 64-bit means a divide runs __udivdi3 here, because RV32 has no " +
+			"64-bit divide instruction. With the default input it prints alice 70 and bob 80. " +
+			"Source: tools/riscv-guests/ledger.",
+		builtin: "ledger",
+		asm: `match cmd {
+	b"send" => {
+		let (from, rest) = field(rest);
+		let (to, rest) = field(rest);
+		let (amount, _) = field(rest);
+		let n = parse_u32(amount).ok_or("bad amount")?;
+		let fi = led.find(from).ok_or("unknown sender")?;
+		if led.balances[fi] < n {
+			return Err("insufficient balance");
+		}
+		let ti = led.intern(to).ok_or("ledger full or bad name")?;
+		led.balances[fi] -= n;
+		led.balances[ti] += n;
+		Ok(())
+	}
+	_ => Err("unknown command"),
+}`,
+	},
+}
+
+// image is what gets uploaded: either the words assembled here, or a program
+// the library ships because a compiler produced it.
+func (s *sample) image() []byte {
+	switch s.builtin {
+	case "fnv":
+		return riscv.GuestFNV()
+	case "ledger":
+		return riscv.GuestLedger()
+	}
+	return riscv.Image(s.words)
+}
+
+// lang is the fence tag for what the sample shows. The compiled guest shows
+// its C, because showing a disassembly of what LLVM did with it would bury the
+// only interesting fact: nobody wrote the machine code.
+func (s *sample) lang() string {
+	switch s.builtin {
+	case "fnv":
+		return "c"
+	case "ledger":
+		return "rust"
+	}
+	return "asm"
 }
 
 func sampleByName(slug string) *sample {

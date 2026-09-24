@@ -52,6 +52,87 @@ small one: a sort, a parser, a state machine, a few thousand iterations of a
 loop. It is not a signature verification, which is millions of instructions, and
 the chain already has secp256k1 natively for that reason.
 
+## Conformance
+
+The official [riscv-tests](https://github.com/riscv-software-src/riscv-tests)
+suite passes: **all 42 `rv32ui` cases and all 8 `rv32um`**, embedded in
+`conformance_test.gno` and run on every `gno test`.
+
+This is the only thing here a third party wrote. Everything in `riscv_test.gno`
+checks that the emulator agrees with its author's reading of the spec; this
+checks that it agrees with the people who wrote the spec, using their
+assertions, compiled from their source.
+
+One case is skipped and the skip is declared rather than omitted:
+**`rv32ui-fence_i`**. `FENCE.I` exists to make writes to the instruction stream
+visible, and this machine predecodes its text and refuses stores into it, so
+there is nothing to make visible. Self-modifying code is not unimplemented here,
+it is excluded.
+
+The suite's own environment sets up `mtvec`, delegates exceptions and enters
+through `mret`, none of which exists on a hart with no CSRs. The corpus was
+therefore built against a replacement `riscv_test.h` that keeps the `_start`
+symbol and `TESTNUM` in `gp` and drops the machine-mode ceremony. **The exit
+convention is the suite's own, untouched**: it already spells pass and fail as
+`li a7, 93; ecall`, which is this host's exit syscall. What was replaced is how
+a case starts and hands back its verdict, not what it checks. Rebuild it with
+[`tools/riscv-guests/conformance`](../../../../tools/riscv-guests/conformance).
+
+Two faults were injected to confirm the suite bites rather than merely passing:
+SRAI as a logical shift takes out `rv32ui-srai` and `rv32ui-lui` at case 3, and
+REMU by zero returning 0 takes out `rv32um-remu` at case 8. Both are recorded in
+the test file, and the harness's own pass and fail decoding is pinned by two
+tests so a change that made every case report success would not read as green.
+
+## Guests a compiler produced
+
+The claim this package rests on is that a program arrives compiled by the real
+compiler, so two of them are shipped compiled and nothing is trusted to stand in
+for that. Both are rebuildable: source, linker script and exact command are in
+[`tools/riscv-guests`](../../../../tools/riscv-guests), and the committed words
+were verified to match a fresh build.
+
+| | language | words | what it does |
+|---|---|---:|---|
+| `riscv.GuestFNV()` | C, clang 19.1.7 | 49 | hashes the call input with FNV-1a |
+| `riscv.GuestLedger()` | Rust, rustc 1.98.1, `#![no_std]` | 1,959 | mint, send and burn from a script |
+
+```go
+m, _ := riscv.NewMachine(riscv.GuestLedger(), riscv.DefaultEntry)
+m.Step(host, 50_000)
+// input:  "mint alice 100\nmint bob 50\nsend alice bob 30\n"
+// output: "alice 70\nbob 80\n"
+```
+
+Between them they exercise what a hand-written program does not: a real function
+prologue spilling `ra` and `s0` to a stack the host set up, `.bss` addressed far
+above a text segment the host refuses stores into, LLVM materializing constants
+through `lui`/`addi` pairs at the sign-extension boundary that bit this package
+twice, and `MUL` in an inner loop.
+
+**The Rust one goes further, and that is why it is worth its size.** It links
+Rust's real `core` and `compiler_builtins`, which it never calls directly: a
+bounds check reaches `core::panicking`, and the balances are 64-bit, so a divide
+reaches `__udivdi3` because **RV32 has no 64-bit divide instruction**. The
+emulator is running the standard library's own software arithmetic, not only
+what the compiler emitted for my source. `TestRustLedgerDoes64BitArithmetic`
+pins a balance past 2^32 to keep that path live.
+
+Both pause and resume correctly when sliced, the Rust one seventeen instructions
+at a time, in the middle of a library routine it never asked to call. That is
+the property a realm depends on and the one most likely to break on code nobody
+wrote to be sliceable.
+
+A refusal from the ledger is **halted, not trapped**: `line 2: insufficient
+balance`, exit code 1. The program said no and the machine did not break, and a
+chain has to be able to tell a user which happened.
+
+The memory layout is not incidental. W xor X means a guest whose writable data
+shared a page with its code would trap on its first store, so the linker script
+is part of the ABI and each guest pins its own: the addresses in it are baked
+into the instruction stream as `lui` immediates, so a shared script edited for
+one guest would silently invalidate every image built against the old one.
+
 ## What the GnoVM charges for, measured
 
 The rungs above are not classic interpreter optimizations. They are answers to

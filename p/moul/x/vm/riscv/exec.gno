@@ -85,6 +85,32 @@ func NewMachine(image []byte, entry uint32) (*Machine, error) {
 	return m, nil
 }
 
+// LoadData places initialized data in memory, outside the text segment.
+//
+// The other half of a flat-image loader. A program with a .data section needs
+// its initial bytes in memory and needs to write them back afterwards, which
+// the text segment forbids: W xor X is what makes the predecode sound. So the
+// linker puts data at its own address and it arrives here separately, rather
+// than being concatenated onto the code and silently becoming read-only.
+//
+// The pages are marked dirty, so a snapshot carries the data the same way it
+// carries the program.
+func (m *Machine) LoadData(addr uint32, b []byte) error {
+	if m.mem == nil {
+		return ErrNoProgram
+	}
+	if len(b) > 0 && m.code != nil && m.code.words > 0 {
+		lo, hi := uint64(addr), uint64(addr)+uint64(len(b))
+		if lo < uint64(m.code.end) && hi > uint64(m.code.base) {
+			return errors.New("riscv: data segment overlaps the text segment")
+		}
+	}
+	if !m.mem.WriteImage(addr, b) {
+		return errors.New("riscv: data does not fit at that address")
+	}
+	return nil
+}
+
 // Registers returns a copy of the register file, for tests and rendering.
 func (m *Machine) Registers() [32]uint32 { return m.reg }
 

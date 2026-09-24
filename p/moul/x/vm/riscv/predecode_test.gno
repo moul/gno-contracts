@@ -141,3 +141,35 @@ func TestJalrRefusesAMisalignedTarget(t *testing.T) {
 	uassert.Equal(t, "trapped", status.String())
 	uassert.Equal(t, "misaligned jump target", m.Trap())
 }
+
+// A .data section has to land somewhere writable, and refusing an overlap with
+// the text is the check that keeps a bad linker script from producing a program
+// that traps on its first store instead of at load.
+func TestLoadDataRefusesTheTextSegment(t *testing.T) {
+	m, err := NewMachine(asm(exitWith()), entry)
+	uassert.NoError(t, err)
+
+	uassert.Error(t, m.LoadData(entry, []byte{1, 2, 3, 4}))
+	uassert.Error(t, m.LoadData(entry-2, []byte{1, 2, 3, 4}))
+	uassert.NoError(t, m.LoadData(entry-4, []byte{1, 2, 3, 4}))
+	uassert.NoError(t, m.LoadData(0x40000, []byte{9, 8, 7, 6}))
+	uassert.Error(t, m.LoadData(MemSize-2, []byte{1, 2, 3, 4}))
+
+	v, ok := m.Memory().Load32(0x40000)
+	uassert.True(t, ok)
+	uassert.Equal(t, uint64(0x06070809), uint64(v))
+}
+
+// Data is memory, so it rides in the snapshot like everything else the guest
+// touched. A resumed program must not find its constants gone.
+func TestLoadedDataSurvivesASnapshot(t *testing.T) {
+	m, err := NewMachine(asm(exitWith()), entry)
+	uassert.NoError(t, err)
+	uassert.NoError(t, m.LoadData(0x40000, []byte{0xDE, 0xAD, 0xBE, 0xEF}))
+
+	var restored Machine
+	uassert.NoError(t, restored.Restore(m.Snapshot()))
+	v, ok := restored.Memory().Load32(0x40000)
+	uassert.True(t, ok)
+	uassert.Equal(t, uint64(0xEFBEADDE), uint64(v))
+}
