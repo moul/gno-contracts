@@ -22,7 +22,7 @@ the last few rounds played.
 ```
 # Play a round (choice: rock|paper|scissors; single letters r|p|s also work)
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/rps" \
-  -func Play -args "rock" -gas-fee 1000000ugnot -gas-wanted 2000000 ...
+  -func Play -args "rock" -gas-fee 20000ugnot -gas-wanted 2000000 ...
 
 # View the dashboard
 gnokey query vm/qrender --data "gno.land/r/REPLACE_ADDR/rps:"

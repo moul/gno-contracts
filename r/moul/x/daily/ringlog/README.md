@@ -23,7 +23,7 @@ The realm maintains a 16-slot ring buffer backed by a fixed-size array. `head` t
 # Post a message (up to 280 chars)
 gnokey maketx call -pkgpath "gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/ringlog" \
   -func Post -args "hello gno.land" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 \
   -remote https://rpc.sapphire.testnets.gno.land:443 \
   <keyname>

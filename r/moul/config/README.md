@@ -180,7 +180,7 @@ This is the worked example of the whole idea. A realm renders
 every one of them at a different explorer with:
 
 ```sh
-gnokey maketx call -pkgpath gno.land/r/moul/config/v1 -func Set   -args mygnoscan.url -args https://scan.example.com   -gas-fee 1000000ugnot -gas-wanted 20000000   -broadcast -chainid gnoland-1 -remote https://rpc.gno.land:443 moul
+gnokey maketx call -pkgpath gno.land/r/moul/config/v1 -func Set   -args mygnoscan.url -args https://scan.example.com   -gas-fee 200000ugnot -gas-wanted 20000000   -broadcast -chainid gnoland-1 -remote https://rpc.gno.land:443 moul
 ```
 
 Keys: `mygnoscan.url` (base URL) and `mygnoscan.network` (overrides the

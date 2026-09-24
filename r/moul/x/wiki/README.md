@@ -28,7 +28,7 @@ gnokey maketx call -pkgpath gno.land/r/moul/x/wiki/v0 -func Edit \
   -args 'Gno land' -args 'gno.land is a chain that runs [[Gno]].
 [[Category:Chains]]
 ' -args 'expand the intro' \
-  -gas-fee 1000000ugnot -gas-wanted 20000000 -broadcast -chainid <id> <key>
+  -gas-fee 200000ugnot -gas-wanted 20000000 -broadcast -chainid <id> <key>
 ```
 
 The body is markdown plus `[[wikilinks]]`, `[[Category:Name]]` and a

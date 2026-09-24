@@ -32,14 +32,14 @@ count. State is kept in an `avl.Tree` so rendering is deterministic across nodes
 gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/leaderboard" \
   -func AddPoints -args 10 \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 -remote <rpc> <keyname>
 
 # Set your display name
 gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/leaderboard" \
   -func SetName -args "Alice" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 -remote <rpc> <keyname>
 ```
 

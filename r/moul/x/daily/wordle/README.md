@@ -36,7 +36,7 @@ with up to 6 attempts per day and a per-caller board rendered as Markdown.
 gnokey maketx call \
   -pkgpath "gno.land/r/REPLACE_ADDR/wordle" \
   -func Guess -args "crane" \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 \
+  -gas-fee 20000ugnot -gas-wanted 2000000 \
   -broadcast -chainid sapphire-1 <keyname>
 ```
 

@@ -33,12 +33,12 @@ returns a Markdown dashboard with the token metadata and a table of holders.
 # Mint 1000 MINI to yourself
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/erc20" \
   -func Mint -args "<your-addr>" -args 1000 \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
+  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 
 # Transfer 250 MINI to another account
 gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/erc20" \
   -func Transfer -args "<recipient-addr>" -args 250 \
-  -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
+  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 ```
 
 View the token dashboard at `https://gno.land/r/REPLACE_ADDR/erc20` on gnoweb.

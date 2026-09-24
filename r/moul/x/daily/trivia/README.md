@@ -23,7 +23,7 @@ Realm path: `gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/trivia`
 ```
 # answer the live question (choice index 0-3, shown in Render)
 gnokey maketx call -pkgpath gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/trivia \
-  -func Answer -args 2 -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
+  -func Answer -args 2 -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 <key>
 ```
 
 View `Render("")` (or just the realm path in gnoweb) to see the current

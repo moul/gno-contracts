@@ -77,7 +77,7 @@ failed transaction instead of the wrong person's money.
 # Ask, on someone else's behalf. Amount is in ugnot.
 gnokey maketx call -pkgpath "gno.land/r/moul/faucet/v0" -func Request \
   -args "g1..." -args 100000000 -args "no gas, wants to try the chain" \
-  -gas-fee 1000000ugnot -gas-wanted 3000000 -broadcast -chainid gnoland-1 moul
+  -gas-fee 30000ugnot -gas-wanted 3000000 -broadcast -chainid gnoland-1 moul
 
 # What id the next request will get, so an approval can be signed alongside it.
 gnokey query vm/qeval -data 'gno.land/r/moul/faucet/v0.NextID()'

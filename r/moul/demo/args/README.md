@@ -13,7 +13,7 @@ returns, so two identical calls return the same thing.
 
 ```bash
 gnokey maketx call -pkgpath gno.land/r/moul/demo/args \
-  -func Hello -args People -gas-fee 1000000ugnot -gas-wanted 2000000 -broadcast moul
+  -func Hello -args People -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast moul
 ```
 
 Previous: [`hello`](../hello). Next: [`data`](../data) adds state that survives
