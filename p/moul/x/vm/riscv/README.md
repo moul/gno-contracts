@@ -52,6 +52,38 @@ small one: a sort, a parser, a state machine, a few thousand iterations of a
 loop. It is not a signature verification, which is millions of instructions, and
 the chain already has secp256k1 natively for that reason.
 
+## Conformance
+
+The official [riscv-tests](https://github.com/riscv-software-src/riscv-tests)
+suite passes: **all 42 `rv32ui` cases and all 8 `rv32um`**, embedded in
+`conformance_test.gno` and run on every `gno test`.
+
+This is the only thing here a third party wrote. Everything in `riscv_test.gno`
+checks that the emulator agrees with its author's reading of the spec; this
+checks that it agrees with the people who wrote the spec, using their
+assertions, compiled from their source.
+
+One case is skipped and the skip is declared rather than omitted:
+**`rv32ui-fence_i`**. `FENCE.I` exists to make writes to the instruction stream
+visible, and this machine predecodes its text and refuses stores into it, so
+there is nothing to make visible. Self-modifying code is not unimplemented here,
+it is excluded.
+
+The suite's own environment sets up `mtvec`, delegates exceptions and enters
+through `mret`, none of which exists on a hart with no CSRs. The corpus was
+therefore built against a replacement `riscv_test.h` that keeps the `_start`
+symbol and `TESTNUM` in `gp` and drops the machine-mode ceremony. **The exit
+convention is the suite's own, untouched**: it already spells pass and fail as
+`li a7, 93; ecall`, which is this host's exit syscall. What was replaced is how
+a case starts and hands back its verdict, not what it checks. Rebuild it with
+[`tools/riscv-guests/conformance`](../../../../tools/riscv-guests/conformance).
+
+Two faults were injected to confirm the suite bites rather than merely passing:
+SRAI as a logical shift takes out `rv32ui-srai` and `rv32ui-lui` at case 3, and
+REMU by zero returning 0 takes out `rv32um-remu` at case 8. Both are recorded in
+the test file, and the harness's own pass and fail decoding is pinned by two
+tests so a change that made every case report success would not read as green.
+
 ## A guest a compiler produced
 
 The claim this package rests on is that a program arrives compiled by the real
