@@ -12,12 +12,24 @@
 
 :now:
 
+## Previously
+
+:previously:
+
+## Stack
+
+:stack:
+
+## Numbers
+
+:numbers:
+
 ## Packages
 
 :packages:
 
+:about:
+
 ---
 
 [:realm:](/r/moul/home:slots) · rev :rev: · :chainid: @ :height:
-
-Explore: :scan.links:
