@@ -132,7 +132,7 @@ Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul
 
 **Dependency graph:**
 
-![gno.land/r/moul/faucet/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/faucet/v0/deps.png)
+![gno.land/r/moul/faucet/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/faucet/v1/deps.png)
 
 > ⚠️ **Disclaimer:** provided as-is, without warranty; not security-audited. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 

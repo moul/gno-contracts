@@ -240,7 +240,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/demo/render/v0`](r/moul/demo/render) 🏛️ | — | [✅](https://gno.land/r/moul/demo/render/v0) | — | — | — |
 | [`r/moul/demo/vault/v0`](r/moul/demo/vault) 🏛️ | — | [✅](https://gno.land/r/moul/demo/vault/v0) | — | — | 1 |
 | [`r/moul/demo/wikicoin/v0`](r/moul/demo/wikicoin) 🏛️ | — | [✅](https://gno.land/r/moul/demo/wikicoin/v0) | — | — | 2 |
-| [`r/moul/faucet/v0`](r/moul/faucet) 🏛️ | — | [✅](https://gno.land/r/moul/faucet/v0) | — | — | 2 |
+| [`r/moul/faucet/v0`](https://github.com/moul/gno-contracts/tree/a04bb0d9caf27fb01fe37c64629ce8c8ae4a77cf/r/moul/faucet) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/faucet/v0) | — | — | 2 |
+| [`r/moul/faucet/v1`](r/moul/faucet) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/forge/v0`](r/moul/forge) 🏛️ | — | [✅](https://gno.land/r/moul/forge/v0) | — | — | 5 |
 | [`r/moul/gns/v0`](r/moul/gns) 🏛️ | — | [✅](https://gno.land/r/moul/gns/v0) | — | — | 2 |
 | [`r/moul/grant/v0`](r/moul/grant) 🏛️ | — | [✅](https://gno.land/r/moul/grant/v0) | — | — | 1 |
@@ -413,7 +414,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-25T06:53:22Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
+_On-chain status last checked: 2026-09-25T07:33:33Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._
 
 <!-- END CONTRACTS TABLE -->
 

@@ -116,6 +116,7 @@ digraph gnocontracts {
   "gno.land/r/moul/demo/vault/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/wikicoin/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/faucet/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/faucet/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/forge/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/gns/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/grant/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -365,6 +366,8 @@ digraph gnocontracts {
   "gno.land/r/moul/demo/wikicoin/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/faucet/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/faucet/v0" -> "gno.land/p/nt/markdown/sanitize/v0";
+  "gno.land/r/moul/faucet/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/faucet/v1" -> "gno.land/p/nt/markdown/sanitize/v0";
   "gno.land/r/moul/forge/v0" -> "gno.land/p/moul/forge/v0";
   "gno.land/r/moul/forge/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/forge/v0" -> "gno.land/p/moul/realmpath/v0";

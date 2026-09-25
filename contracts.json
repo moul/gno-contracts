@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-25T06:53:22Z",
+  "status_checked_at": "2026-09-25T07:33:33Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -3449,6 +3449,8 @@
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "a04bb0d9caf27fb01fe37c64629ce8c8ae4a77cf",
       "published": {
         "mainnet": {
           "uploaded": true,
@@ -3458,6 +3460,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/faucet/v1",
+      "dir": "r/moul/faucet",
+      "kind": "r",
+      "name": "faucet",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/markdown/sanitize/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
