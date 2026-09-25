@@ -359,7 +359,7 @@ func TestRenderCapsEachTable(cur realm, t *testing.T) {
 
 // countRows counts request rows on a page: every one links to :req/.
 func countRows(page string) int {
-	n, needle := 0, "](/r/moul/faucet/v0:req/"
+	n, needle := 0, "](/r/moul/faucet/v1:req/"
 	for i := 0; i+len(needle) <= len(page); i++ {
 		if page[i:i+len(needle)] == needle {
 			n++

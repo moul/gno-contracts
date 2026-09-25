@@ -25,7 +25,7 @@ func ExampleRender() {
 	// | Open requests | 0 |
 	// | Refused | 0 |
 	// | Cap per request | 200 GNOT |
-	// | Float address | `g18jy5sp2hx5n8kkwvvs3l908ynyqdxgfh44ay88` |
+	// | Float address | `g162rfssecz2jq770f7as3qunm4wvh4pmna0guxv` |
 	//
 	// ## Open
 	//
