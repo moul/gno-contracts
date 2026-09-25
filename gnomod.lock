@@ -490,6 +490,11 @@ source = { dir = "r/moul/demo/wikicoin" }
 
 [[module]]
 module = "gno.land/r/moul/faucet/v0"
+source = { commit = "a04bb0d9caf27fb01fe37c64629ce8c8ae4a77cf", dir = "r/moul/faucet" }
+hash = "h1:5uDF5hhSUqOBl4b/jt12kiIgHKHW62hO4zfE15ccPUw="
+
+[[module]]
+module = "gno.land/r/moul/faucet/v1"
 source = { dir = "r/moul/faucet" }
 
 [[module]]

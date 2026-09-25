@@ -18,11 +18,29 @@ approver's balance. Top it up with a plain bank send to that address, or with
 `Fund` if you want the donation on the record. `Withdraw` takes it back, to the
 owner and nowhere else.
 
+## `v0` is on chain, frozen, and not this code
+
+`gno.land/r/moul/faucet/v0` was published to mainnet at block 245194, two
+minutes before the commit that added `private = true`. `private` is read off the
+submitted package at deploy time, so the chain never saw the flag, and a public
+path cannot later be redeployed as a private one or at all. `v0` is therefore
+frozen forever, carrying an unbounded `Render` whose page and query gas grow
+with every request.
+
+That is what this `v1` exists to replace. Its float lives at a different
+address, its float was moved by hand, and `v0`'s page still answers with an
+empty board. **If you found `v0` first, this is the live one.**
+
+The lesson is cheap to state and was not cheap to learn: **publish from the
+commit you mean to publish**, because for a public realm the deploy is the last
+moment anything about it can change.
+
 ## It is a private realm
 
 `gnomod.toml` declares `private = true`, so the creator can redeploy this path
-with corrected code rather than abandon it for a `v1`. On a realm holding other
-people's rent money that is worth having.
+with corrected code rather than abandon it for a `v2`. On a realm holding other
+people's rent money that is worth having, and `v0` is the demonstration of what
+its absence costs.
 
 What a redeploy costs is exact, and measured rather than assumed:
 
@@ -75,18 +93,18 @@ failed transaction instead of the wrong person's money.
 
 ```sh
 # Ask, on someone else's behalf. Amount is in ugnot.
-gnokey maketx call -pkgpath "gno.land/r/moul/faucet/v0" -func Request \
+gnokey maketx call -pkgpath "gno.land/r/moul/faucet/v1" -func Request \
   -args "g1..." -args 100000000 -args "no gas, wants to try the chain" \
   -gas-fee 30000ugnot -gas-wanted 3000000 -broadcast -chainid gnoland-1 moul
 
 # What id the next request will get, so an approval can be signed alongside it.
-gnokey query vm/qeval -data 'gno.land/r/moul/faucet/v0.NextID()'
+gnokey query vm/qeval -data 'gno.land/r/moul/faucet/v1.NextID()'
 
 # What the float holds.
-gnokey query vm/qeval -data 'gno.land/r/moul/faucet/v0.Balance()'
+gnokey query vm/qeval -data 'gno.land/r/moul/faucet/v1.Balance()'
 
 # The page.
-gnokey query vm/qrender -data 'gno.land/r/moul/faucet/v0:'
+gnokey query vm/qrender -data 'gno.land/r/moul/faucet/v1:'
 ```
 
 ## Reading it

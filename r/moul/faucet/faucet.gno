@@ -74,9 +74,9 @@ const (
 	Denom = "ugnot"
 	// Path is this realm's package path; its float is held at the address
 	// derived from it.
-	Path = "gno.land/r/moul/faucet/v0"
+	Path = "gno.land/r/moul/faucet/v1"
 	// Link is Path as a gnoweb route.
-	Link = "/r/moul/faucet/v0"
+	Link = "/r/moul/faucet/v1"
 )
 
 // Owner funds the faucet, approves by default, and is the only account that
