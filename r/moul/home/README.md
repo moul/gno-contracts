@@ -102,10 +102,9 @@ the realm iterates the tree.
 
 | slot | what it is |
 | --- | --- |
-| `bio` | who I am, three sentences, in the header column |
+| `bio` | who I am, and what this page is, in the header column |
 | `social` | the links under it |
 | `now` | what I am working on, hand-written |
-| `previously` | what I built before |
 | `stack` | the tools, one line |
 | `numbers` | a counted table, with the date it was counted |
 | `packages` | **generated**, see below |
@@ -121,14 +120,28 @@ instead of occupying the paragraph where a reader decides whether to keep going.
 
 An unmatched placeholder survives into the output verbatim (see below), which
 makes the layout slot the one file that can be **ahead of the chain in a way
-that shows**. `content/layout.md` carried `Explore: :scan.links:` for a while
-against a deployed realm with no `scan.gno`, so pushing it would have printed
-that literal string on the page. The line was removed and belongs back in the
-same change that deploys `scan.gno`.
+that shows**.
 
 Rule: before pushing `layout`, every `:slug:` in it is either a file in
 `content/` or a computed placeholder **the deployed code answers**, which is not
 the same as one this repo implements.
+
+⚠️ **This is currently true of `layout` itself.** It ends with
+`On mygnoscan: :scan.links:`, and `scan.gno` is in this repo but **not in the
+deployed package**: `vm/qfile` on `gno.land/r/moul/home` lists six files and
+none of them is `scan.gno` (re-read 2026-09-28 through mygnoscan's
+`/api/realm`, the RPC being blocked from that host). So `layout` must not be
+pushed on its own. It goes out with the redeploy that carries `scan.gno`, which
+also wipes every slot and is therefore followed by `gnohome tx -all` anyway.
+
+Both of that redeploy's dependencies are now live on mainnet, so it is no
+longer blocked: `p/moul/mygnoscan` and `r/moul/config/v1` both answer
+(checked the same day). What is left is the `MsgAddPackage`, which no account
+session may sign.
+
+`gnohome status` is the check, and `tools/gnohome/scan.go` makes `preview`
+render these links rather than showing a literal `:scan.links:`, so the page
+can be judged before any of it is signed.
 
 ### Images: two gates, and neither is the one you expect
 

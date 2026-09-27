@@ -57,6 +57,7 @@ func render(slots []slotFile, e env) string {
 	add(":height:", strconv.FormatInt(e.height, 10))
 	add(":rev:", strconv.Itoa(e.rev))
 	add(":slots:", slotLinks(slots))
+	addScanPlaceholders(add, e)
 	for _, s := range slots {
 		add(":"+s.slug+":", s.body)
 	}
