@@ -7,9 +7,12 @@
 //   - URL query parameter parsing
 //   - Markdown-based pagination UI
 //
-// This package is currently used by:
-//   - gno.land/p/nt/avl/pager: implementation for AVL trees.
-//   - gno.land/p/moul/ulist/pager: implementation for ulist
+// Nothing imports it yet. An earlier version of this comment named
+// gno.land/p/nt/avl/pager and gno.land/p/moul/ulist/pager as consumers; neither
+// is one. The upstream avl pager is a standalone implementation that does not
+// go through this interface, and ulist ships lplist, not a pager. Treat this as
+// a proposed interface with a reference Pager and a test, not as load-bearing
+// code.
 package pageable
 
 import (
