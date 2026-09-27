@@ -98,5 +98,44 @@ func Test(cur realm, t *testing.T) {
 		}
 	}
 
-	// TODO: additional test case(s) for Recover().
+	// Recover sends test1's still-locked 250 to the recovery address recorded
+	// at deposit time (test3), leaving the vault empty.
+	//
+	// It is called here by test2, a bystander who never deposited, because
+	// Recover has NO caller check. That is a real flaw and this test pins it:
+	// it cannot steal (the destination is whatever the target itself recorded)
+	// but anyone can rewind anyone's deposit at will, which is a free denial of
+	// service. If a caller check is ever added, this assertion is what will
+	// fail, so the change has to be deliberate.
+	testing.SetOriginCaller(test2)
+	Recover(cross(cur), test1)
+
+	// the recovery address received the whole locked balance.
+	{
+		got := Token.BalanceOf(test3)
+		expected := int64(250)
+		if got != expected {
+			t.Fatalf("expected %d, got %d.", expected, got)
+		}
+	}
+
+	// the vault is empty.
+	{
+		got := Token.BalanceOf(vaultAddr)
+		expected := int64(0)
+		if got != expected {
+			t.Fatalf("expected %d, got %d.", expected, got)
+		}
+	}
+
+	// Recovering twice is a no-op rather than a second payout: the vaulted
+	// balance is zero, so Recover returns before transferring anything.
+	Recover(cross(cur), test1)
+	{
+		got := Token.BalanceOf(test3)
+		expected := int64(250)
+		if got != expected {
+			t.Fatalf("expected %d, got %d.", expected, got)
+		}
+	}
 }
