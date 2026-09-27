@@ -109,6 +109,28 @@ change leaves `status` quiet instead of proposing a no-op transaction.
 Sub-directories and non-`.md` files are ignored; an invalid or reserved slug is
 an error, not a surprise on chain.
 
+## Computed placeholders, and how exact `preview` is
+
+The realm fills eleven placeholders from chain state rather than from a slot,
+and `preview` reproduces all of them so the rendered page is the real one:
+`:owner:` `:realm:` `:chainid:` `:height:` `:rev:` `:slots:`, plus the five
+explorer links `:scan:` `:scan.realm:` `:scan.me:` `:scan.block:`
+`:scan.links:` (`scan.go`, mirroring `r/moul/home/scan.gno`).
+
+Two deliberate approximations, and nothing else differs:
+
+- `:height:` and `:rev:` are whatever the chain query returned, or zero offline.
+- The explorer **base URL** is `p/moul/mygnoscan`'s `DefaultBase`. On chain it
+  comes from `r/moul/config`, so if the explorer is ever repointed the preview
+  keeps showing the default. The path shapes are identical either way.
+
+`scan.go` is a mirror, not an import, because `p/moul/mygnoscan` is gno and its
+`Scanner` reads chain state. When the two disagree, **the realm is right and
+the mirror is the bug**. `scan_test.go` pins the URL shapes and asserts that
+the shipped `content/layout.md` renders with no `:slug:` left in it, which is
+the failure this whole file exists to prevent: an unmatched placeholder is not
+an error, it is a literal `:scan.links:` shown to every visitor.
+
 ## The one subtle part: `"$(/bin/cat …)"`
 
 `tx` emits the body as `-args "$(/bin/cat '<abs path>')"` rather than inlining a
