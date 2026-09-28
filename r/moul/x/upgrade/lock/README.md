@@ -1,4 +1,4 @@
-# `lock` — retire the predecessor (pattern B)
+# `lock`: retire the predecessor (pattern B)
 
 [`wrap`](../wrap) leaves two writable versions and no single total. This one
 fixes that with the smallest possible amount of coordination: one transaction.
@@ -21,5 +21,5 @@ caller pinned to the old path gets an error that tells it what to do.
 Costs: one owner transaction, and a flag day. Everything pointed at `v0` breaks
 at retirement rather than drifting quietly, which is the point.
 
-Run it: `gno test ./r/moul/x/upgrade/lock/...` — `TestHandover` walks the whole
+Run it: `gno test ./r/moul/x/upgrade/lock/...`, `TestHandover` walks the whole
 sequence, both refusals included.

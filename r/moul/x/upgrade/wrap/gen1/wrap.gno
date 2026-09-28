@@ -4,7 +4,7 @@
 // v1 owns a counter of its own and ADDS v0's on read. Both versions stay live
 // and independently writable, so the two paths report different totals and
 // neither is authoritative. That is the pattern's defining trade-off: no
-// migration, no downtime, no coordination — and no single answer either.
+// migration, no downtime, no coordination, and no single answer either.
 package wrap
 
 import (
