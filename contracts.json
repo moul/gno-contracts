@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T22:16:29Z",
+  "status_checked_at": "2026-09-28T22:31:40Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -534,7 +534,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -644,7 +645,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -695,7 +697,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -1907,7 +1910,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -2463,7 +2467,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -2511,7 +2516,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -2862,7 +2868,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -3773,7 +3780,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -4108,7 +4116,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -4231,7 +4240,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8400,7 +8410,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8580,7 +8591,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8606,7 +8618,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8901,7 +8914,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8924,7 +8938,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8947,7 +8962,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8971,7 +8987,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8996,7 +9013,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9020,7 +9038,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9044,7 +9063,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9067,7 +9087,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9090,7 +9111,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9113,7 +9135,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9137,7 +9160,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9161,7 +9185,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9185,7 +9210,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9208,7 +9234,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -9232,7 +9259,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
