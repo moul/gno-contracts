@@ -12,10 +12,6 @@
 
 :now:
 
-## Stack
-
-:stack:
-
 ## Packages
 
 :packages:
