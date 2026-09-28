@@ -6,8 +6,9 @@ import (
 
 	"chain/runtime"
 
-	"gno.land/p/nt/uassert/v0"
 	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/uassert/v0"
+	"gno.land/p/nt/ufmt/v0"
 )
 
 const (
@@ -250,4 +251,32 @@ func TestRenderQueryRejectsGarbage(t *testing.T) {
 // non-deterministic if it were wrong.
 func TestChainHeightIsReadable(t *testing.T) {
 	uassert.Equal(t, runtime.ChainHeight(), chainHeight())
+}
+
+// TestIndexIsBounded is the defect this realm shipped with: renderIndex
+// iterated EVERY registry row, and Declare is open to anyone, so the front
+// page grew without limit until it exceeded the query gas ceiling and stopped
+// rendering for everybody.
+//
+// vm/qrender runs on a gas meter. A realm that returns a large string fails
+// with OutOfGasError{Descriptor:"CPUCycles"} rather than answering slowly, and
+// the safe budget is tens of KB. A row is ~120 bytes, so a few hundred
+// declarations was enough. The realm is private = true, so the only repair
+// would have been a redeploy, which wipes every declaration and re-charges the
+// whole storage deposit.
+func TestIndexIsBounded(cur realm, t *testing.T) {
+	reset()
+	for i := 0; i < 400; i++ {
+		testing.SetRealm(testing.NewUserRealm(testutils.TestAddress(ufmt.Sprintf("spam%d", i))))
+		Declare(cross(cur), 1000, 100, 200, false)
+	}
+	uassert.Equal(t, 400, Count(), "the registry should hold every declaration")
+
+	out := Render("")
+	uassert.True(t, len(out) < 12000,
+		ufmt.Sprintf("the index rendered %d bytes for 401 rows; it must page", len(out)))
+
+	// Paging still has to reach them, so page 2 differs from page 1.
+	uassert.True(t, Render("?page=2") != out, "?page=2 rendered the same page as page 1")
+	reset()
 }

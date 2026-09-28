@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/nt/ufmt/v0"
+
 	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/realmpath/v0"
 	"gno.land/p/moul/vesting/v0"
@@ -23,6 +25,10 @@ func Render(path string) string {
 	target := strings.TrimSpace(req.PathPart(0))
 
 	if target == "" {
+		curPage = 1
+		if p, err := strconv.Atoi(req.Query.Get("page")); err == nil && p > 1 {
+			curPage = p
+		}
 		return renderIndex()
 	}
 	if !isAddr(target) {
@@ -79,30 +85,39 @@ func header() string {
 		"How much of an account's balance can actually move right now.\n\n"
 }
 
+// pageSize bounds the declared table. vm/qrender runs on a gas meter and a
+// large return value fails with OutOfGasError{Descriptor:"CPUCycles"} rather
+// than answering slowly, so an unbounded index is a page that eventually stops
+// rendering for everyone. Anyone may Declare, so "eventually" is somebody
+// else's choice unless it is capped here.
+const pageSize = 25
+
 func renderIndex() string {
 	var b strings.Builder
 	b.WriteString(header())
 
+	// Seeded rows always render in full: there are as many as this realm's
+	// source says and no caller can add one.
 	t := ui.NewTable("account", "balance", "spendable", "locked", "vested")
-	declared.Iterate("", "", func(key string, v any) bool {
-		e := v.(*entry)
-		addr := address(key)
-		bal := balanceOf(addr)
-		n := now()
-		name := ui.AddrText(addr)
-		if e.label != "" {
-			name = ui.Inline(e.label) + " " + ui.Addr(addr)
-		}
-		t.Row(
-			name,
-			gnot(bal),
-			gnot(e.schedule.Spendable(bal, n)),
-			gnot(lockedCapped(e.schedule, bal, n)),
-			permille(e.schedule.PermilleVested(n)),
-		)
+	seedIndex.Iterate("", "", func(key string, v any) bool {
+		t.Row(rowFor(address(key), v.(*entry))...)
 		return false
 	})
-	b.WriteString(t.OrEmpty("No schedules yet."))
+	b.WriteString(t.String())
+
+	if n := declared.Size(); n > 0 {
+		b.WriteString("\n## Declared\n\n")
+		b.WriteString(ufmt.Sprintf("%d address(es) have put their own schedule on file.\n\n", n))
+
+		d := ui.NewTable("account", "balance", "spendable", "locked", "vested")
+		declared.IterateByOffset(pageOffset(curPage)*pageSize, pageSize, func(key string, v any) bool {
+			d.Row(rowFor(address(key), v.(*entry))...)
+			return false
+		})
+		b.WriteString(d.String())
+		b.WriteString("\n")
+		b.WriteString(pager(n))
+	}
 
 	b.WriteString("\n")
 	b.WriteString(lookupForm())
@@ -117,6 +132,54 @@ func renderIndex() string {
 	b.WriteString("That is safe to cache because a schedule can never change: it is set ")
 	b.WriteString("once, at genesis, and no message type creates or modifies one. A ")
 	b.WriteString("schedule declared correctly today is correct forever.\n")
+	return b.String()
+}
+
+// curPage is the page renderIndex is currently building, set by Render before
+// it delegates. A parameter would be cleaner; Render's signature is fixed by
+// the VM, and threading it through every helper for one value is worse.
+var curPage = 1
+
+func pageOffset(page int) int {
+	if page < 1 {
+		return 0
+	}
+	return page - 1
+}
+
+// rowFor builds one table row. Shared so the seeded and declared tables cannot
+// drift apart in what they show.
+func rowFor(addr address, e *entry) []string {
+	bal := balanceOf(addr)
+	n := now()
+	name := ui.AddrText(addr)
+	if e.label != "" {
+		name = ui.Inline(e.label) + " " + ui.Addr(addr)
+	}
+	return []string{
+		name,
+		gnot(bal),
+		gnot(e.schedule.Spendable(bal, n)),
+		gnot(lockedCapped(e.schedule, bal, n)),
+		permille(e.schedule.PermilleVested(n)),
+	}
+}
+
+// pager renders the page links, and nothing at all when everything fits.
+func pager(total int) string {
+	pages := (total + pageSize - 1) / pageSize
+	if pages <= 1 {
+		return ""
+	}
+	var b strings.Builder
+	b.WriteString(ufmt.Sprintf("Page %d of %d.", curPage, pages))
+	if curPage > 1 {
+		b.WriteString(ufmt.Sprintf(" [previous](%s?page=%d)", Link, curPage-1))
+	}
+	if curPage < pages {
+		b.WriteString(ufmt.Sprintf(" [next](%s?page=%d)", Link, curPage+1))
+	}
+	b.WriteString("\n")
 	return b.String()
 }
 
