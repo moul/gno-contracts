@@ -1,0 +1,48 @@
+# `gno.land/r/moul/x/games/idle/v0`
+
+**A mine that keeps working while you are not looking at it**: `Start`, `Claim`, `Upgrade`,
+`Prestige`.
+
+```
+maketx call ... -func Start      # open a mine at level 1
+maketx call ... -func Claim      # bank what it dug
+maketx call ... -func Upgrade    # spend the bank to dig faster
+maketx call ... -func Prestige   # at level 10: reset for a permanent multiplier
+```
+
+Ore accrues at a rate set by your level. There are no turns, no block hook and no keeper:
+the realm stores what you had and when, and everything else is arithmetic done at the moment
+somebody asks. `Render("")` is the board, `Render("<address>")` is one mine's card.
+
+**The numbers move on their own.** Refresh the page a minute later and the mine has dug more,
+with no transaction in between, because every figure comes from the read-only projection
+rather than from stored state. That is a live dashboard with no frontend, no indexer and no
+JavaScript, which is the one thing this chain gives you that the others charge for
+separately.
+
+Three decisions make it a game rather than a counter:
+
+- **The mine is small.** It holds 120 periods of production and then spills. Without a
+  ceiling the optimal play is to never log in and claim once at the end, which is a savings
+  account. The ceiling scales with the rate, so the fill time stays two hours at every level
+  and showing up is the only skill. Removing it turns five tests red.
+- **Upgrades are quadratic against linear production.** Level `L` costs `10*L*L` and pays `L`
+  per period, so the next level always takes about `10*L` periods to afford. Linear against
+  linear never ends; exponential against linear dies at level four.
+- **Prestige exists.** Without a reset the leaderboard is settled by whoever started first
+  and nobody else has a reason to join. Trading a level-10 mine for a permanent multiplier
+  means a player starting today has a reachable ceiling. Banked and pending ore burn; the
+  lifetime total does not.
+
+**Nothing rolls dice.** Every outcome is a pure function of when you acted, so there is no
+block hash to grind and no ordering to front-run, and the card can tell you exactly what an
+action produces before you sign it. Combat games reach for randomness and inherit a
+validator-manipulable seed; this one does not need to.
+
+Time is unix seconds from the block, not block height: a height-denominated economy silently
+reprices itself whenever the chain's block time moves.
+
+The arithmetic is [p/moul/x/games/accrual](/p/moul/x/games/accrual/v0), which owns the rule
+that makes lazy time honest. Claiming every period and claiming once pay exactly the same,
+right up to the point where the mine fills, and that limit is the design rather than the
+arithmetic.
