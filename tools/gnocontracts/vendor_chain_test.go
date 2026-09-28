@@ -81,6 +81,7 @@ func TestRetryableStatus(t *testing.T) {
 	}{
 		// 403 is retryable because this endpoint uses it for rate limiting as
 		// well as for refusal, and from here the two look identical.
+		// Nothing about the request changes the answer: see chainFetchUA.
 		{"rate limited or refused", 403, true},
 		{"too many requests", 429, true},
 		{"bad gateway", 502, true},
