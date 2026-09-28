@@ -6,4 +6,5 @@ digraph deps {
   "gno.land/r/moul/home" -> "gno.land/p/moul/mygnoscan/v0";
   "gno.land/r/moul/home" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/home" -> "gno.land/r/moul/config/v1";
+  "gno.land/r/moul/home" -> "gno.land/r/moul/reactions/v0";
 }

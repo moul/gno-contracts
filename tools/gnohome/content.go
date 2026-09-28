@@ -16,7 +16,8 @@ const maxSlugLen = 64
 
 // reservedSlugs mirrors r/moul/home/home.gno: names the realm computes at
 // render time and refuses as slot names. The scan.* half mirrors
-// r/moul/home/scan.gno's scanPlaceholders.
+// r/moul/home/scan.gno's scanPlaceholders, and "reactions" mirrors
+// r/moul/home/reactions.gno's reactionsPlaceholders.
 //
 // Keeping this in step matters more than it looks: this is the only thing that
 // refuses a reserved name BEFORE a transaction is signed. Miss one here and
@@ -33,6 +34,7 @@ var reservedSlugs = map[string]bool{
 	"scan.me":    true,
 	"scan.block": true,
 	"scan.links": true,
+	"reactions":  true,
 }
 
 type slotFile struct {

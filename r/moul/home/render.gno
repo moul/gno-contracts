@@ -76,6 +76,10 @@ func renderPage() string {
 	// another realm's configuration. See scan.gno.
 	registerScanCallbacks(r)
 
+	// The reaction block, which is the one thing on this page a reader can
+	// act on. See reactions.gno.
+	registerReactionCallbacks(r)
+
 	// One callback per slot. The closure captures s, which is re-bound on each
 	// iteration, so every callback sees its own slot.
 	slots.Iterate("", "", func(key string, value any) bool {

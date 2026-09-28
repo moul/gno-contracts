@@ -125,18 +125,24 @@ Rule: before pushing `layout`, every `:slug:` in it is either a file in
 `content/` or a computed placeholder **the deployed code answers**, which is not
 the same as one this repo implements.
 
-⚠️ **This is currently true of `layout` itself.** It ends with
-`On mygnoscan: :scan.links:`, and `scan.gno` is in this repo but **not in the
-deployed package**: `vm/qfile` on `gno.land/r/moul/home` lists six files and
-none of them is `scan.gno` (re-read 2026-09-28 through mygnoscan's
-`/api/realm`, the RPC being blocked from that host). So `layout` must not be
-pushed on its own. It goes out with the redeploy that carries `scan.gno`, which
-also wipes every slot and is therefore followed by `gnohome tx -all` anyway.
+⚠️ **This is currently true of `layout` itself.** It now contains
+`:reactions:`, and `reactions.gno` is in this repo but **not in the deployed
+package**. The live `gno.land/r/moul/home` holds eight files, `README.md`
+`gnomod.toml` `home.gno` `home_test.gno` `render.gno` `render_example_test.gno`
+`scan.gno` `scan_test.gno`, and `reactions.gno` is not one of them (read from
+the chain 2026-09-28 with `gnopie INSPECT gno.land/r/moul/home -all`). So
+`layout` must not be pushed on its own. It goes out with the redeploy that
+carries `reactions.gno`, which also wipes every slot and is therefore followed
+by `gnohome tx -all` anyway.
 
-Both of that redeploy's dependencies are now live on mainnet, so it is no
-longer blocked: `p/moul/mygnoscan` and `r/moul/config/v1` both answer
-(checked the same day). What is left is the `MsgAddPackage`, which no account
-session may sign.
+That same file list settles the older half of this warning: `scan.gno` **is**
+deployed, so `:scan.links:` resolves on the live page and the redeploy it was
+waiting for has happened. Do not re-add it here from memory; the file list is
+the check.
+
+The redeploy's one new dependency, [`r/moul/reactions/v0`](../../../r/moul/reactions),
+is not on chain yet and has to be published first. After that what is left is
+this realm's own `MsgAddPackage`, which no account session may sign.
 
 `gnohome status` is the check, and `tools/gnohome/scan.go` makes `preview`
 render these links rather than showing a literal `:scan.links:`, so the page
@@ -164,7 +170,7 @@ So a GitHub avatar needs no hosting of its own:
 `*.githubusercontent.com` and renders as-is. Verified by running this exact
 page through gnoweb's real goldmark pipeline, not by reading the policy.
 
-Eleven placeholders are computed at render time rather than stored, and are
+Twelve placeholders are computed at render time rather than stored, and are
 refused as slot names so nothing can shadow them.
 
 Six come straight from chain state: `:owner:` `:realm:` `:chainid:` `:height:`
@@ -176,7 +182,13 @@ Five are explorer links, built by [`p/moul/mygnoscan`](../../../p/moul/mygnoscan
 account and to the block being rendered, and `:scan.links:` is the three of
 them on one line.
 
-Which explorer they point at is read from
+One is the reaction block: `:reactions:` renders the embeddable widget from
+[`r/moul/reactions`](../../../r/moul/reactions), keyed on this realm's path. It
+is the only thing on this page a reader can act on, and this realm stores
+nothing for it: the tallies live in that realm, so the redeploy that wipes every
+slot here does not touch anyone's reaction. See `reactions.gno`.
+
+Which explorer the scan links point at is read from
 [`r/moul/config`](../../../r/moul/config), not hardcoded here, so moving every
 one of moul's realms to a different instance is one transaction against that
 realm rather than a redeploy of each. With nothing configured, they fall back

@@ -56,9 +56,10 @@ func TestLoadSlotsRejectsCarriageReturns(t *testing.T) {
 }
 
 func TestLoadSlotsRejectsReservedNames(t *testing.T) {
-	// One from each half of the mirror: a chain-state placeholder and an
-	// explorer one, so dropping either group out of reservedSlugs fails here.
-	for _, name := range []string{"height.md", "scan.realm.md"} {
+	// One from each group of the mirror: a chain-state placeholder, an explorer
+	// one and the reaction block, so dropping any group out of reservedSlugs
+	// fails here.
+	for _, name := range []string{"height.md", "scan.realm.md", "reactions.md"} {
 		dir := t.TempDir()
 		write(t, dir, name, "boom")
 		if _, err := loadSlots(dir); err == nil || !strings.Contains(err.Error(), "reserved") {

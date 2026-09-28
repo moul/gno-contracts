@@ -77,11 +77,15 @@ type slot struct {
 // A slot may not take one, because it would shadow the computed value and make
 // the page depend on callback registration order.
 //
-// The scan.* half comes from scan.gno's scanPlaceholders, so adding an explorer
-// placeholder there reserves it here and cannot be forgotten.
+// The scan.* half comes from scan.gno's scanPlaceholders and the :reactions:
+// one from reactions.gno, so adding a placeholder in either file reserves it
+// here and cannot be forgotten.
 var reservedSlugs = append(
-	[]string{"chainid", "height", "owner", "realm", "rev", "slots"},
-	scanPlaceholders...,
+	append(
+		[]string{"chainid", "height", "owner", "realm", "rev", "slots"},
+		scanPlaceholders...,
+	),
+	reactionsPlaceholders...,
 )
 
 func assertAdmin(cur realm) {
