@@ -1,0 +1,104 @@
+# `gno.land/r/moul/reactions/v0`
+
+A reaction block any realm can embed, keyed on the **page** it appears on rather
+than on the realm that stores it.
+
+It is the shape the web settled on for this in 2010: one hosted widget, the same
+snippet pasted everywhere, deciding what to show from the page identifier it is
+handed. Here the snippet is two lines of gno.
+
+```go
+import "gno.land/r/moul/reactions/v0"
+
+func Render(path string) string {
+	return body + reactions.RenderBlock()
+}
+```
+
+That is the whole integration. Your realm stores nothing, registers nothing and
+configures nothing, and redeploying it never loses anyone's reaction.
+
+## Why `RenderBlock` needs no argument
+
+A plain read exported by one realm and called by another is **borrowed**: gno
+opens no realm frame for it, so `unsafe.CurrentRealm()` inside it reports the
+**caller**. `RenderBlock` uses that as the page key, which is why the same line
+does the right thing in every realm that pastes it. (Measured on
+`gnolang/gno@master` 2026-09-22, recorded in this repo's `AGENTS.md`; it is the
+same mechanism behind `r/moul/config`'s `TopBlock`.)
+
+Adding a `cur realm` parameter would silently reverse it and key every embed to
+this realm, which is exactly why there is none.
+
+`RenderBlockFor(page)` is the explicit form: use it from a crossing function,
+where there is no caller to read off the stack, or to key one block per article
+on the path you already serve.
+
+```go
+return body + reactions.RenderBlockFor("gno.land/r/you/blog:" + path)
+```
+
+## What it is, and what it refuses to be
+
+Not a comment system. There is no text field anywhere, which is what lets it run
+with **no moderation at all**: a closed palette of six, one reaction per address
+per page, changeable and removable. The block shows the tally and who reacted
+last. That is the feature.
+
+| key | |
+|---|---|
+| `up` | 👍 |
+| `heart` | 💜 |
+| `fire` | 🔥 |
+| `party` | 🎉 |
+| `rocket` | 🚀 |
+| `eyes` | 👀 |
+
+`React` aborts on anything else. That is the entire content policy, and it is a
+compile-time constant rather than a list someone has to curate.
+
+## The surface
+
+| | |
+|---|---|
+| `React(cur, page, key)` | record the caller's reaction. Reacting again with a different key moves it; with the same key it only updates the "last reaction" line |
+| `Unreact(cur, page)` | remove it. Aborts when there is none, rather than succeeding silently |
+| `RenderBlock()` | the embed, keyed on the calling realm |
+| `RenderBlockFor(page)` | the embed for a named page |
+| `Count` · `CountOf` · `ReactionOf` · `Last` · `Pages` | reads, for a host realm that wants the numbers without the markdown |
+
+`Render("")` is the getting-started page plus the board;
+`Render("<page>")` is one page's tally, which is where the link under every
+block goes.
+
+## Two things that are permanent, and were decided on purpose
+
+**This realm is public, so it can never be redeployed.** A private realm cannot
+be imported at all, and being imported is the entire feature. The redeploy that
+`private = true` would have bought is given up deliberately: the tallies under
+this path belong to everyone who reacted, not to the deployer, and a redeploy
+wipes every package-level variable. A fix ships as a `v1` beside this one that
+keeps reading it, never as a replacement.
+
+**The page key is not checked against anything.** A page is just a name: nothing
+verifies that the realm exists, that it embeds the block, or that the caller has
+any relationship to it. That is what lets a realm key the block on something
+finer than itself, and it means the board index is an open list. The index is
+capped at 25 rows for that reason; every page keeps its own view regardless.
+
+## Not to be confused with
+
+[`r/moul/x/daily/reactions`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/reactions)
+is an older, unrelated experiment: a single self-contained board with its own
+"topics", no embedding, and no way for a reader to change or remove a reaction.
+Nothing is shared between the two.
+
+## Where the code is
+
+The engine (pages, tallies, palette, the block markdown) is
+[`p/moul/reactions/v0`](https://github.com/moul/gno-contracts/tree/main/p/moul/reactions).
+This realm is the authority half: who may write, what the chain says the height
+and the caller are, and the two views.
+
+First host: [`r/moul/home`](https://github.com/moul/gno-contracts/tree/main/r/moul/home),
+which renders it as a `:reactions:` layout placeholder.

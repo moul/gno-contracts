@@ -138,6 +138,10 @@ module = "gno.land/p/moul/printfdebugging/v0"
 source = { dir = "p/moul/printfdebugging" }
 
 [[module]]
+module = "gno.land/p/moul/reactions/v0"
+source = { dir = "p/moul/reactions" }
+
+[[module]]
 module = "gno.land/p/moul/realmpath/v0"
 source = { dir = "p/moul/realmpath" }
 
@@ -533,6 +537,10 @@ source = { dir = "r/moul/outfmt" }
 [[module]]
 module = "gno.land/r/moul/present/v0"
 source = { dir = "r/moul/present" }
+
+[[module]]
+module = "gno.land/r/moul/reactions/v0"
+source = { dir = "r/moul/reactions" }
 
 [[module]]
 module = "gno.land/r/moul/sapin/v0"
