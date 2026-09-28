@@ -166,6 +166,29 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   `uassert.AbortsWithMessage(t, cur, "msg", func() { F(cross(cur), …) })` (or
   `AbortsContains`) from `gno.land/p/nt/uassert/v0`. Break the expected message once and
   watch it fail, or you cannot tell it from a silent pass.
+- **A `p/` package can neither DECLARE nor TEST a crossing function.** `func F(cur realm,
+  ...)` in a non-realm package fails to build with `crossing function (realm first argument)
+  declared in non-realm package`, and renaming it is no help: a realm first argument must be
+  called `cur`, and `cur` in a `p/` is refused. Thread it later instead, `func F(_ int, rlm
+  realm, ...)`, which is the shape `p/nt/grc20`'s tellers already use. Testing one from the
+  package that declares it is impossible too: anything calling `rlm.Previous()` (minting a
+  banker, reading the caller) dies with `frame not found: cannot seek beyond origin caller
+  override`, because a `p/` test has no realm frame to walk. Exercise it from a realm's
+  tests. Both hit while writing `p/moul/x/envelope`, 2026-09-28.
+- **`banker.SendCoins`'s refusal panics with an `address`, not a string**, so
+  `uassert.PanicsContains` reports `recover: unsupported type` and reads nothing. The message
+  is built as `"..." + b.pkgAddr + "..."`, and in gno a string concatenated with a named
+  string type takes that type. Catch it with a hand-written `recover()` carrying a
+  `case address:` arm. Anything panicking with a value derived from an `address`, a
+  `chain.Coin` denom or any other named string has the same shape.
+- **`BankerTypeOriginSend` is gated on WHO entered the realm, not on how deep you are.**
+  `NewBanker` requires `rlm.Previous().IsUserCall()`, and `Realm.IsUserCall` is literally
+  `r.pkgPath == ""` (`gnovm/stdlibs/chain/runtime/frame.gno`). So passing `cur` down through
+  your own helpers is fine (measured at three nested calls, through a function value and
+  through a closure), while a realm called BY another realm cannot forward the envelope, and
+  `maketx run` cannot reach a payable function at all. There is a second, unrelated
+  `IsUserCall` in `chain/runtime/native.go` that DOES count frames; it is not on this path,
+  and reading it instead cost a package doc that had to be rewritten.
 - **A filetest's `// PKGPATH:` must end in a path element literally named `main`.**
   `gno.land/r/moul/x/plan9/nstest` fails to build with `package name "main" does not
   match path element "nstest"`; `…/plan9/main` works. Anything `println`ed before an
