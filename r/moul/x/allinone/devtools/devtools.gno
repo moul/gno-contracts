@@ -4,7 +4,7 @@
 // Everything here is a COMBINATION. Any one of these packages has its own demo
 // showing it alone; the thing that is hard to find is what they look like used
 // together, which is the only form a real realm ever meets them in. So this
-// realm imports eight of them and every one earns its place in the output:
+// realm imports ten of them and every one earns its place in the output:
 //
 //	r/moul/config     the notice block, the pause switch, the explorer to link
 //	p/moul/mygnoscan  the explorer routes themselves
@@ -14,6 +14,8 @@
 //	p/moul/md         the markdown, without hand-rolled strings
 //	p/moul/txlink     the "call this function" link
 //	p/moul/fifo       the bounded note list, so the state cannot grow forever
+//	p/moul/kit/tally  the note leaderboard, ties ordered rather than arbitrary
+//	p/moul/kit/num    pricing that list in GNOT rather than raw ugnot
 //
 // # The three lines worth copying
 //
@@ -40,9 +42,12 @@ import (
 	"strings"
 
 	"chain/runtime"
+	"chain/runtime/unsafe"
 
 	"gno.land/p/moul/debug/v0"
 	"gno.land/p/moul/fifo/v0"
+	"gno.land/p/moul/kit/num/v0"
+	"gno.land/p/moul/kit/tally/v0"
 	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/mygnoscan/v0"
@@ -66,6 +71,15 @@ const maxNotes = 10
 
 var notes = fifo.New(maxNotes)
 
+// authors counts notes per writer. A tally.Board rather than a map: gno map
+// iteration order is unspecified, so a leaderboard built by ranging one is not
+// reproducible between calls.
+var authors = tally.NewBoard()
+
+// depositPerByte is what the chain charges to keep a byte, in ugnot. Used only
+// to price the note list on the page, never to settle anything.
+const depositPerByte = 100
+
 // Add appends a note. It is the only mutating function here, and it carries
 // both guards a real one should.
 func Add(cur realm, body string) {
@@ -85,6 +99,11 @@ func Add(cur realm, body string) {
 	// 2. Escaping. body is a string a caller typed, and it is about to land in
 	//    a markdown list. ui.Inline is the repo's standard for exactly this.
 	notes.Append(ui.Inline(body))
+
+	// 3. The scoreboard. tally.Board keeps one score per author and orders
+	//    ties by key, so two authors on the same count always render in the
+	//    same order.
+	authors.Add(unsafe.PreviousRealm().Address().String(), 1)
 }
 
 // Reset empties the list, so the realm can be put back to a known state
@@ -92,6 +111,7 @@ func Add(cur realm, body string) {
 // you still want to do while paused.
 func Reset(cur realm) {
 	notes = fifo.New(maxNotes)
+	authors = tally.NewBoard()
 }
 
 // Render shows every package at work. The root view is deliberately free of
@@ -103,7 +123,7 @@ func Render(path string) string {
 	var b strings.Builder
 	b.WriteString(config.TopBlockFor(realmPath))
 	b.WriteString(md.H1("allinone: devtools"))
-	b.WriteString("\nEight packages, used together rather than one at a time. ")
+	b.WriteString("\nTen packages, used together rather than one at a time. ")
 	b.WriteString(md.Link("source", config.MygnoscanFor(realmPath)))
 	b.WriteString("\n\n")
 
@@ -143,6 +163,8 @@ func renderHome(path string) string {
 	}))
 	b.WriteString("\n")
 
+	b.WriteString(renderBoard())
+
 	b.WriteString(md.H2("What each package does here"))
 	b.WriteString("\n")
 	t := ui.NewTable("package", "what it contributed")
@@ -154,9 +176,47 @@ func renderHome(path string) string {
 	t.Row("`p/moul/md`", "every heading, link and list on the page")
 	t.Row("`p/moul/txlink`", "the call links above, relative to this realm")
 	t.Row("`p/moul/fifo`", "the note list, bounded so storage cannot grow forever")
+	t.Row("`p/moul/kit/tally`", "the note leaderboard, with ties ordered by address")
+	t.Row("`p/moul/kit/num`", "pricing the note list in GNOT instead of raw ugnot")
 	b.WriteString(t.String())
 
 	return b.String()
+}
+
+// renderBoard shows who has written the most notes, and what the list costs to
+// keep. Both numbers come from a package rather than from arithmetic here.
+func renderBoard() string {
+	var b strings.Builder
+	b.WriteString(md.H2("Who has written the most"))
+	b.WriteString("\n")
+
+	top := authors.Top(5)
+	if len(top) == 0 {
+		b.WriteString(ui.Empty("No notes yet, so nobody is on the board."))
+	} else {
+		t := ui.NewTable("#", "author", "notes")
+		for i, e := range top {
+			t.Row(ui.Podium(i+1), ui.AddrOf(e.Key), num.Pad(e.Score, 2))
+		}
+		b.WriteString(t.String())
+	}
+
+	// num.GNOTf, not a hand-rolled divide by a million. The storage deposit is
+	// what the chain charges to keep these bytes, so it is the honest price of
+	// the list above.
+	b.WriteString("\nStorage deposit for the list: **")
+	b.WriteString(num.GNOTf(int64(notesBytes()) * depositPerByte))
+	b.WriteString("**\n\n")
+	return b.String()
+}
+
+// notesBytes is the length of every note currently held.
+func notesBytes() int {
+	n := 0
+	for _, v := range notes.Entries() {
+		n += len(v.(string))
+	}
+	return n
 }
 
 // renderChain is everything that moves: the height, and the links built from
