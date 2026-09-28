@@ -74,6 +74,10 @@ module = "gno.land/p/moul/fp/v0"
 source = { dir = "p/moul/fp" }
 
 [[module]]
+module = "gno.land/p/moul/gnopm/v0"
+source = { dir = "p/moul/gnopm" }
+
+[[module]]
 module = "gno.land/p/moul/grants/v0"
 source = { dir = "p/moul/grants" }
 
@@ -530,6 +534,10 @@ source = { dir = "r/moul/faucet" }
 [[module]]
 module = "gno.land/r/moul/forge/v0"
 source = { dir = "r/moul/forge" }
+
+[[module]]
+module = "gno.land/r/moul/gnopm/registry/v0"
+source = { dir = "r/moul/gnopm/registry" }
 
 [[module]]
 module = "gno.land/r/moul/gns/v0"
