@@ -100,8 +100,8 @@ publish: ## publish what the chain is missing, in dependency order; PRINT=1 plan
 status: ## refresh on-chain upload status for every network; needs gnokey
 	$(GNOCONTRACTS) status $(if $(NET),-net $(NET),)
 
-home-push: ## push r/moul/home's slots: one transaction, one signature, signed and broadcast; PRINT=1 writes the document and the commands instead
-	$(GNOHOME) tx -all $(if $(PRINT),-batch $(HOME_TX),-run)
+home-push: ## push r/moul/home to match content/: sets what differs, deletes what is gone, one signature; PRINT=1 writes the document instead of signing
+	$(GNOHOME) tx -prune $(if $(PRINT),-batch $(HOME_TX),-run)
 
 sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
 	$(GNOCONTRACTS) sync

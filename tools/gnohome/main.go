@@ -171,15 +171,17 @@ func run(args []string, out *os.File) error {
 		}
 		return printStatus(out, diff(local, remote))
 	case "tx":
-		var d []change
+		// The manifest is fetched either way. -all changes which local slots
+		// are pushed, not whether the chain is consulted: the extras only
+		// exist in the manifest, and skipping it is what made -all -prune a
+		// silent no-op.
+		remote, err := fetchManifest(cfg.remote, cfg.realm)
+		if err != nil {
+			return err
+		}
+		d := diff(local, remote)
 		if all {
-			d = allChanges(local)
-		} else {
-			remote, err := fetchManifest(cfg.remote, cfg.realm)
-			if err != nil {
-				return err
-			}
-			d = diff(local, remote)
+			d = allChanges(local, remote)
 		}
 		warnOversize(out, local)
 		// -run acts on ONE transaction, so it implies -batch. Defaulting the

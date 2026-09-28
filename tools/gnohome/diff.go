@@ -41,31 +41,46 @@ func diff(local []slotFile, remote map[string]remoteSlot) []change {
 		}
 	}
 
-	extras := make([]string, 0, len(remote))
+	return append(out, extraChanges(seen, remote)...)
+}
+
+// extraChanges lists the slots the chain holds and the content directory does
+// not, in slug order. Split out of diff so that -all reports them too: it used
+// to build its plan from the local files alone, which meant -all quietly threw
+// away every Delete that -prune had asked for.
+func extraChanges(seen map[string]bool, remote map[string]remoteSlot) []change {
+	slugs := make([]string, 0, len(remote))
 	for slug := range remote {
 		if !seen[slug] {
-			extras = append(extras, slug)
+			slugs = append(slugs, slug)
 		}
 	}
-	sort.Strings(extras)
-	for _, slug := range extras {
-		r := remote[slug]
+	sort.Strings(slugs)
+	out := make([]change, 0, len(slugs))
+	for _, slug := range slugs {
 		out = append(out, change{kind: kindExtra, slug: slug,
-			detail: fmt.Sprintf("%d bytes on chain, no local file (use -prune to emit Delete)", r.size)})
+			detail: fmt.Sprintf("%d bytes on chain, no local file (use -prune to emit Delete)", remote[slug].size)})
 	}
 	return out
 }
 
-// allChanges treats every local slot as needing a push. It is what -all uses,
-// and what a redeploy needs: a private redeploy re-runs init() and clears the
-// tree, so every slot has to go back up without consulting the chain.
-func allChanges(local []slotFile) []change {
+// allChanges treats every local slot as needing a push, and still reports what
+// the chain holds and the content directory does not. It is what -all uses.
+//
+// It takes the manifest rather than ignoring it. The first version did not, on
+// the reasoning that a redeploy wipes the store so there is nothing to ask the
+// chain about. That was true of the slots it pushed and false of the ones it
+// did not: with no manifest there are no extras, so -all -prune emitted zero
+// Delete messages, accepted the flag, and warned about nothing.
+func allChanges(local []slotFile, remote map[string]remoteSlot) []change {
 	out := make([]change, 0, len(local))
+	seen := make(map[string]bool, len(local))
 	for _, s := range local {
+		seen[s.slug] = true
 		out = append(out, change{kind: kindMissing, slug: s.slug, slot: s,
 			detail: fmt.Sprintf("%d bytes", len(s.body))})
 	}
-	return out
+	return append(out, extraChanges(seen, remote)...)
 }
 
 // emittable drops the changes that must not become a message.

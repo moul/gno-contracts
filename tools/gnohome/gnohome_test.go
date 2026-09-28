@@ -497,3 +497,70 @@ func TestBuildBatchDeletesOnlyWhenPruneAsks(t *testing.T) {
 		t.Errorf("got a document for a held-back slot alone, want nil")
 	}
 }
+
+// TestAllChangesKeepsTheExtras is the regression for the bug that made
+// `-all -prune` a silent no-op: -all built its plan from the local files alone,
+// so a slot the chain held and the content directory did not simply was not in
+// it, and the Delete that -prune had asked for was never emitted. Nothing
+// failed and nothing warned; the slot stayed on chain.
+func TestAllChangesKeepsTheExtras(t *testing.T) {
+	local := []slotFile{
+		{slug: "layout", body: "a", hash: "aaaa"},
+		{slug: "bio", body: "b", hash: "bbbb"},
+	}
+	remote := map[string]remoteSlot{
+		"layout":  {hash: "aaaa", size: 1, rev: 1}, // identical, -all pushes it anyway
+		"numbers": {hash: "cccc", size: 403, rev: 5},
+		"stack":   {hash: "dddd", size: 125, rev: 8},
+	}
+
+	got := allChanges(local, remote)
+
+	kinds := map[string]string{}
+	for _, c := range got {
+		kinds[c.slug] = c.kind
+	}
+	want := map[string]string{
+		"layout":  kindMissing, // -all means "push it regardless"
+		"bio":     kindMissing,
+		"numbers": kindExtra,
+		"stack":   kindExtra,
+	}
+	if len(got) != len(want) {
+		t.Fatalf("got %d changes, want %d: %+v", len(got), len(want), got)
+	}
+	for slug, k := range want {
+		if kinds[slug] != k {
+			t.Errorf("%s classified as %q, want %q", slug, kinds[slug], k)
+		}
+	}
+
+	// The point of keeping them: with -prune they become messages.
+	pruned := emittable(got, true)
+	deletes := 0
+	for _, c := range pruned {
+		if c.kind == kindExtra {
+			deletes++
+		}
+	}
+	if deletes != 2 {
+		t.Errorf("-all -prune emitted %d Delete(s), want 2", deletes)
+	}
+	if n := len(emittable(got, false)); n != 2 {
+		t.Errorf("-all without -prune emitted %d change(s), want 2 (the local slots only)", n)
+	}
+}
+
+// TestExtraChangesIsSortedAndSkipsSeen pins the helper both plans share.
+func TestExtraChangesIsSortedAndSkipsSeen(t *testing.T) {
+	remote := map[string]remoteSlot{
+		"zeta": {size: 1}, "alpha": {size: 2}, "kept": {size: 3},
+	}
+	got := extraChanges(map[string]bool{"kept": true}, remote)
+	if len(got) != 2 {
+		t.Fatalf("got %d, want 2: %+v", len(got), got)
+	}
+	if got[0].slug != "alpha" || got[1].slug != "zeta" {
+		t.Errorf("not slug-sorted: %s, %s", got[0].slug, got[1].slug)
+	}
+}
