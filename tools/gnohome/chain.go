@@ -109,14 +109,36 @@ func abciQuery(remote, path, data string) (string, error) {
 		return "", err
 	}
 
+	// The transport is retried, the ABCI answer is not. See retry.go: this
+	// endpoint intermittently refuses a source at the edge, and a single 403
+	// on the first call used to end a whole `tx -run` with nothing done.
+	var got string
+	err = withRetry(path, func() error {
+		var err error
+		got, err = postQuery(remote, body)
+		return err
+	}, isTransient)
+	return got, err
+}
+
+// postQuery is one attempt: the HTTP round trip and the decoding of what comes
+// back. Transport-level refusals are wrapped as transientError so withRetry can
+// tell them from an answer; an ABCI error is an answer and is returned plain.
+func postQuery(remote string, body []byte) (string, error) {
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Post(remote, "application/json", bytes.NewReader(body))
 	if err != nil {
-		return "", fmt.Errorf("querying %s: %w", remote, err)
+		// A refused connection, a reset or a timeout: the request never got an
+		// answer, so asking again is meaningful.
+		return "", transientError{fmt.Errorf("querying %s: %w", remote, err)}
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("querying %s: HTTP %s", remote, resp.Status)
+		err := fmt.Errorf("querying %s: HTTP %s", remote, resp.Status)
+		if retryableStatus(resp.StatusCode) {
+			return "", transientError{err}
+		}
+		return "", err
 	}
 
 	var out rpcResponse

@@ -127,6 +127,36 @@ change leaves `status` quiet instead of proposing a no-op transaction.
 `-content` defaults to `<repo>/r/moul/home/content`, found by walking up to
 `gnowork.toml`, so the commands above work from anywhere in the repo.
 
+## Every chain read is retried, including on 403
+
+`rpc.gno.land` sits behind a load balancer that intermittently answers a bare
+`403` to a source it has decided to throttle: no `Retry-After`, no rate-limit
+header, no body, and the next request often succeeds. Seen from two different
+hosts on 2026-09-24 and 2026-09-28, minutes apart, while the same endpoint
+answered 200 to another host.
+
+`tx -run` reads the account before it can build anything, so one 403 on the
+first call ended the whole push with nothing done. That is how `make home-push`
+failed the first time it was used for real:
+
+```
+gnohome: reading g1manfred…: querying https://rpc.gno.land:443: HTTP 403 Forbidden
+make: *** [Makefile:101: home-push] Error 1
+```
+
+So `abciQuery` retries 5 times with a doubling backoff (1s, 2s, 4s, 8s), says so
+on stderr each time, and gives up after about 15s rather than hanging.
+
+**403 is normally the one status it is wrong to retry**, and it is retried here
+deliberately: this endpoint is an *unauthenticated public read*, so there is no
+credential that could be wrong and 403 cannot mean what it usually means. The
+only reading left is that the edge refused to pass the request on. If gnohome
+ever reads an endpoint that takes a credential, this has to be revisited.
+
+Retried: `403`, `429`, `5xx`, and transport failures. **Not** retried: an ABCI
+error, `400`, `404`. Those are answers from a healthy node and will not change,
+and retrying them would turn a clear message into a slow one.
+
 ## How a slot maps to a file
 
 `content/<slug>.md` → the slot `<slug>`. `layout.md` is the page template.
