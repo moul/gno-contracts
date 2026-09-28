@@ -86,6 +86,10 @@ module = "gno.land/p/moul/helplink/v0"
 source = { dir = "p/moul/helplink" }
 
 [[module]]
+module = "gno.land/p/moul/kit/num/v0"
+source = { dir = "p/moul/kit/num" }
+
+[[module]]
 module = "gno.land/p/moul/kit/store/v0"
 source = { dir = "p/moul/kit/store" }
 
