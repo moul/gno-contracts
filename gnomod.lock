@@ -1298,6 +1298,22 @@ module = "gno.land/r/moul/x/upgrade/lock/v1"
 source = { dir = "r/moul/x/upgrade/lock/gen1" }
 
 [[module]]
+module = "gno.land/r/moul/x/upgrade/schema/facade/v0"
+source = { dir = "r/moul/x/upgrade/schema/facade" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/schema/impl/bad/v0"
+source = { dir = "r/moul/x/upgrade/schema/impl/bad" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/schema/impl/v0"
+source = { dir = "r/moul/x/upgrade/schema/impl/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/schema/impl/v1"
+source = { dir = "r/moul/x/upgrade/schema/impl/gen1" }
+
+[[module]]
 module = "gno.land/r/moul/x/upgrade/selfreg/facade/v0"
 source = { dir = "r/moul/x/upgrade/selfreg/facade" }
 

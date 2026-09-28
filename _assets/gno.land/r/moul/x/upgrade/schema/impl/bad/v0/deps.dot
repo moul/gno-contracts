@@ -1,0 +1,6 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/moul/x/upgrade/schema/impl/bad/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/upgrade/schema/impl/bad/v0" -> "gno.land/r/moul/x/upgrade/schema/facade/v0";
+}

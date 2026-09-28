@@ -252,6 +252,9 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/upgrade/adminreg/impl/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/upgrade/lazy/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/upgrade/lock/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/upgrade/schema/facade/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/upgrade/schema/impl/bad/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/upgrade/schema/impl/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/upgrade/selfreg/facade/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/upgrade/selfreg/impl/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/upgrade/store/logic/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -657,6 +660,11 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/upgrade/lazy/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/upgrade/lock/v1" -> "gno.land/p/nt/ownable/v0";
   "gno.land/r/moul/x/upgrade/lock/v1" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/upgrade/schema/facade/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/upgrade/schema/facade/v0" -> "gno.land/p/nt/ownable/v0";
+  "gno.land/r/moul/x/upgrade/schema/facade/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/upgrade/schema/impl/bad/v0" -> "gno.land/r/moul/x/upgrade/schema/facade/v0";
+  "gno.land/r/moul/x/upgrade/schema/impl/v1" -> "gno.land/r/moul/x/upgrade/schema/facade/v0";
   "gno.land/r/moul/x/upgrade/selfreg/facade/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/upgrade/selfreg/impl/v1" -> "gno.land/r/moul/x/upgrade/selfreg/facade/v0";
   "gno.land/r/moul/x/upgrade/store/logic/v1" -> "gno.land/p/nt/ufmt/v0";

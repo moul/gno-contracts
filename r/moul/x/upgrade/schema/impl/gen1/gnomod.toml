@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/upgrade/schema/impl/v1"
+gno = "0.9"
+# public: hands its own handler to the facade; private aborts with "cannot persist object from the private realm"
