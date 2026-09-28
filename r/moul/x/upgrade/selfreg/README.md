@@ -1,4 +1,4 @@
-# `selfreg` — self-registering implementation (pattern E)
+# `selfreg`: self-registering implementation (pattern E)
 
 The permanent path holds an interface value and no business logic. A new
 implementation realm takes the facade over **by being deployed**: it registers
@@ -20,10 +20,16 @@ this, but neither helper fits: `AssertCallerIsSubPath` wants the implementation
 nested under the facade, and with the version segment last no sibling is a
 sub-path of another; `IsSameNamespace` would let any realm in the namespace
 seize the facade. The caller's path is read off the crossing frame, so there is
-no argument to forge — the outsider filetest in `facade/v0` proves the refusal.
+no argument to forge, and the outsider filetest in `facade/v0` proves the refusal.
 
 The interface itself is frozen at deploy, like every Go interface. Growing the
 API means an extension realm, or an API declared as data instead of as a type
 (see the notes on prior art in [../README.md](../README.md)).
+
+**Ending it.** `Seal` is one-way and callable only by the implementation currently
+serving, because with no owner that is the only actor the facade already trusts. It
+grants nothing new: whoever can deploy under the prefix could already take the realm
+over, and sealing only lets them make that the last word. After it, nothing registers
+again and `Render` says `[sealed]`.
 
 Run it: `gno test ./r/moul/x/upgrade/selfreg/...`

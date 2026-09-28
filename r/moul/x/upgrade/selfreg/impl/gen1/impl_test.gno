@@ -27,5 +27,34 @@ func TestTakeoverOnDeploy(cur realm, t *testing.T) {
 	// And forward again.
 	Register(cross(cur))
 	uassert.Equal(t, "impl/v1", facade.Version())
-	uassert.Equal(t, "selfreg/facade/v0: impl/v1 (gno.land/r/moul/x/upgrade/selfreg/impl/v1)\nHELLO, world!\n", facade.Render(""))
+	uassert.Equal(t, "selfreg/facade/v0 [open]: impl/v1 (gno.land/r/moul/x/upgrade/selfreg/impl/v1)\nHELLO, world!\n", facade.Render(""))
+}
+
+// TestSeal ends the realm's upgradeability and checks that it is terminal.
+//
+// Runs after TestTakeoverOnDeploy on purpose: sealing is one-way, so every test
+// that needs to register must already have run.
+func TestSeal(cur realm, t *testing.T) {
+	// The live implementation is the only actor that may seal, because with no
+	// owner it is the only one the facade already trusts.
+	uassert.Equal(t, "gno.land/r/moul/x/upgrade/selfreg/impl/v1", facade.Live())
+	uassert.Equal(t, facade.StageOpen, facade.Stage())
+	uassert.AbortsContains(t, cur, "only the live implementation may seal", func() {
+		implv0.Seal(cross(cur))
+	})
+
+	Seal(cross(cur))
+	uassert.Equal(t, facade.StageSealed, facade.Stage())
+
+	// Nothing registers again, not even the implementation that sealed it.
+	uassert.AbortsContains(t, cur, "is sealed", func() {
+		Register(cross(cur))
+	})
+	uassert.AbortsContains(t, cur, "is sealed", func() {
+		implv0.Register(cross(cur))
+	})
+
+	// What was live stays live, and says so.
+	uassert.Equal(t, "HELLO, world!", facade.Greet("world"))
+	uassert.Equal(t, "selfreg/facade/v0 [sealed]: impl/v1 (gno.land/r/moul/x/upgrade/selfreg/impl/v1)\nHELLO, world!\n", facade.Render(""))
 }

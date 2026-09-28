@@ -5,7 +5,7 @@ package facade
 func ExampleRender() {
 	print(Render(""))
 	// Output:
-	// adminreg/facade/v0
+	// adminreg/facade/v0 [open]
 	// live: none accepted
 	// candidates: 0
 }

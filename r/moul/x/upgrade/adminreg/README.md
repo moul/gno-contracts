@@ -1,4 +1,4 @@
-# `adminreg` — propose and accept (pattern F)
+# `adminreg`: propose and accept (pattern F)
 
 [`selfreg`](../selfreg) lets a deploy take the realm over on the spot. This
 splits that into two steps that different people can hold: an implementation
@@ -27,5 +27,11 @@ are asserted.
 Upgrade and rollback are the same single call with a different path, since every
 candidate stays in the tree once nominated. What rollback does not do is undo
 anything a bad version wrote.
+
+**Ending it, in two steps.** The stage ladder runs `open`, `closed`, `frozen`, and only
+ever tightens: `tighten` refuses to loosen even for the owner. `Close` stops new
+candidates while leaving a rollback among those already proposed possible, which is the
+rung [`selfreg`](../selfreg) cannot express for want of an owner. `Freeze` ends `Accept`
+itself. The shape is Sui's `UpgradeCap` policy ladder, and `Render` names the rung.
 
 Run it: `gno test ./r/moul/x/upgrade/adminreg/...`
