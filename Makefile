@@ -22,7 +22,7 @@ HOME_TX      ?= /tmp/home.tx.json
 
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
-	guard-readmes guard-private guard-untrusted-render verify deps bump-deps manifest readme readmes gen check \
+	guard-readmes guard-private guard-untrusted-render verify deps deps-chain bump-deps manifest readme readmes gen check \
 	sync graph publish status home-push home-packages report preview site clean
 
 help: ## show this help
@@ -66,6 +66,9 @@ verify: ## fail if gnomod.lock is stale or a pinned version no longer reproduces
 
 deps: ## vendor the external gno.land deps that are missing (reads the real GNOROOT/examples)
 	$(GNOCONTRACTS) vendor
+
+deps-chain: ## vendor the missing deps, falling back to mainnet for what lives only on a chain
+	$(GNOCONTRACTS) vendor -from-chain https://rpc.gno.land
 
 bump-deps: ## re-vendor EVERY external dep from GNOROOT/examples: the deliberate "bump gno" step
 	$(GNOCONTRACTS) vendor -refresh

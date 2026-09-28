@@ -1,0 +1,538 @@
+// arithmetic provides arithmetic operations for Uint objects.
+// This includes basic binary operations such as addition, subtraction, multiplication, division, and modulo operations
+// as well as overflow checks, and negation. These functions are essential for numeric
+// calculations using 256-bit unsigned integers.
+package uint256
+
+import (
+	"math/bits"
+)
+
+// Add sets z to the sum x+y and returns z.
+//
+// Parameters:
+//   - x: the first addend; its 256-bit value is added modulo 2^256
+//   - y: the second addend; its 256-bit value is added modulo 2^256
+//
+// Returns:
+//   - result: z containing x+y modulo 2^256; any carry beyond bit 255 is discarded
+func (z *Uint) Add(x, y *Uint) *Uint {
+	var carry uint64
+	z[0], carry = bits.Add64(x[0], y[0], 0)
+	z[1], carry = bits.Add64(x[1], y[1], carry)
+	z[2], carry = bits.Add64(x[2], y[2], carry)
+	z[3], _ = bits.Add64(x[3], y[3], carry)
+	return z
+}
+
+// AddOverflow sets z to the sum x+y and returns z and true if overflow occurred.
+//
+// Parameters:
+//   - x: the first addend
+//   - y: the second addend
+//
+// Returns:
+//   - result: z containing x+y modulo 2^256
+//   - overflow: true when x+y exceeds the 256-bit range
+func (z *Uint) AddOverflow(x, y *Uint) (*Uint, bool) {
+	var carry uint64
+	z[0], carry = bits.Add64(x[0], y[0], 0)
+	z[1], carry = bits.Add64(x[1], y[1], carry)
+	z[2], carry = bits.Add64(x[2], y[2], carry)
+	z[3], carry = bits.Add64(x[3], y[3], carry)
+	return z, carry != 0
+}
+
+// Sub sets z to the difference x-y and returns z.
+//
+// Parameters:
+//   - x: the minuend
+//   - y: the subtrahend
+//
+// Returns:
+//   - result: z containing x-y modulo 2^256; underflow wraps in the unsigned representation
+func (z *Uint) Sub(x, y *Uint) *Uint {
+	var carry uint64
+	z[0], carry = bits.Sub64(x[0], y[0], 0)
+	z[1], carry = bits.Sub64(x[1], y[1], carry)
+	z[2], carry = bits.Sub64(x[2], y[2], carry)
+	z[3], _ = bits.Sub64(x[3], y[3], carry)
+	return z
+}
+
+// SubOverflow sets z to the difference x-y and returns z and true if underflow occurred.
+//
+// Parameters:
+//   - x: the minuend
+//   - y: the subtrahend
+//
+// Returns:
+//   - result: z containing x-y modulo 2^256
+//   - underflow: true when x is less than y
+func (z *Uint) SubOverflow(x, y *Uint) (*Uint, bool) {
+	var carry uint64
+	z[0], carry = bits.Sub64(x[0], y[0], 0)
+	z[1], carry = bits.Sub64(x[1], y[1], carry)
+	z[2], carry = bits.Sub64(x[2], y[2], carry)
+	z[3], carry = bits.Sub64(x[3], y[3], carry)
+	return z, carry != 0
+}
+
+// Neg returns -x mod 2^256.
+//
+// Parameters:
+//   - x: the value whose additive inverse modulo 2^256 is computed
+//
+// Returns:
+//   - result: z containing -x modulo 2^256
+func (z *Uint) Neg(x *Uint) *Uint {
+	return z.Sub(Zero(), x)
+}
+
+// Mul sets z to the product x*y and returns z.
+//
+// Parameters:
+//   - x: the first multiplicand
+//   - y: the second multiplicand
+//
+// Returns:
+//   - result: z containing the low 256 bits of x*y
+func (z *Uint) Mul(x, y *Uint) *Uint {
+	var (
+		res              Uint
+		carry            uint64
+		res1, res2, res3 uint64
+	)
+
+	carry, res[0] = bits.Mul64(x[0], y[0])
+	carry, res1 = umulHop(carry, x[1], y[0])
+	carry, res2 = umulHop(carry, x[2], y[0])
+	res3 = x[3]*y[0] + carry
+
+	carry, res[1] = umulHop(res1, x[0], y[1])
+	carry, res2 = umulStep(res2, x[1], y[1], carry)
+	res3 = res3 + x[2]*y[1] + carry
+
+	carry, res[2] = umulHop(res2, x[0], y[2])
+	res3 = res3 + x[1]*y[2] + carry
+
+	res[3] = res3 + x[0]*y[3]
+
+	return z.Set(&res)
+}
+
+// MulOverflow sets z to the product x*y and returns z and true if overflow occurred.
+//
+// Parameters:
+//   - x: the first multiplicand
+//   - y: the second multiplicand
+//
+// Returns:
+//   - result: z containing the low 256 bits of x*y
+//   - overflow: true when the full product needs more than 256 bits
+func (z *Uint) MulOverflow(x, y *Uint) (*Uint, bool) {
+	p := umul(x, y)
+	copy(z[:], p[:4])
+	return z, (p[4] | p[5] | p[6] | p[7]) != 0
+}
+
+// Div sets z to the quotient x/y and returns z.
+// It panics if y == 0.
+//
+// Parameters:
+//   - x: the dividend
+//   - y: the non-zero divisor; zero causes a division-by-zero panic
+//
+// Returns:
+//   - result: z containing the unsigned quotient x/y
+func (z *Uint) Div(x, y *Uint) *Uint {
+	if y.IsZero() {
+		panic("division by zero")
+	}
+	if y.Gt(x) {
+		return z.Clear()
+	}
+	if x.Eq(y) {
+		return z.SetOne()
+	}
+	// Shortcut some cases
+	if x.IsUint64() {
+		return z.SetUint64(x.Uint64() / y.Uint64())
+	}
+
+	// At this point, we know
+	// x/y ; x > y > 0
+
+	var quot Uint
+	udivrem(quot[:], x[:], y)
+	return z.Set(&quot)
+}
+
+// Mod sets z to the modulus x%y and returns z.
+// It panics if y == 0.
+//
+// Parameters:
+//   - x: the dividend
+//   - y: the non-zero divisor; zero causes a modulo-by-zero panic
+//
+// Returns:
+//   - result: z containing the unsigned remainder x%y
+func (z *Uint) Mod(x, y *Uint) *Uint {
+	if y.IsZero() {
+		panic("modulo by zero")
+	}
+	if x.IsZero() {
+		return z.Clear()
+	}
+	switch x.Cmp(y) {
+	case -1:
+		// x < y
+		copy(z[:], x[:])
+		return z
+	case 0:
+		// x == y
+		return z.Clear() // They are equal
+	}
+
+	// At this point:
+	// x != 0
+	// y != 0
+	// x > y
+
+	// Shortcut trivial case
+	if x.IsUint64() {
+		return z.SetUint64(x.Uint64() % y.Uint64())
+	}
+
+	var quot Uint
+	*z = udivrem(quot[:], x[:], y)
+	return z
+}
+
+// MulMod sets z to (x * y) mod m and returns z.
+// It panics if m == 0.
+//
+// Parameters:
+//   - x: the first multiplicand
+//   - y: the second multiplicand
+//   - m: the non-zero modulus; zero causes a modulo-by-zero panic
+//
+// Returns:
+//   - result: z containing (x*y) modulo m
+func (z *Uint) MulMod(x, y, m *Uint) *Uint {
+	if m.IsZero() {
+		panic("modulo by zero")
+	}
+	if x.IsZero() || y.IsZero() {
+		return z.Clear()
+	}
+	p := umul(x, y)
+
+	if m[3] != 0 {
+		mu := Reciprocal(m)
+		r := reduce4(p, m, mu)
+		return z.Set(&r)
+	}
+
+	var (
+		pl Uint
+		ph Uint
+	)
+
+	pl[0], pl[1], pl[2], pl[3] = p[0], p[1], p[2], p[3]
+	ph[0], ph[1], ph[2], ph[3] = p[4], p[5], p[6], p[7]
+
+	// If the multiplication is within 256 bits use Mod().
+	if ph.IsZero() {
+		return z.Mod(&pl, m)
+	}
+
+	var quot [8]uint64
+	rem := udivrem(quot[:], p[:], m)
+	return z.Set(&rem)
+}
+
+// DivMod sets z to the quotient x/y and m to the modulus x%y, returning the pair (z, m).
+// It panics if y == 0.
+//
+// Parameters:
+//   - x: the dividend
+//   - y: the non-zero divisor; zero causes a division-by-zero panic
+//   - m: the destination overwritten with x modulo y
+//
+// Returns:
+//   - quotient: z containing x/y
+//   - remainder: m containing x%y
+func (z *Uint) DivMod(x, y, m *Uint) (*Uint, *Uint) {
+	if y.IsZero() {
+		panic("division by zero")
+	}
+
+	switch x.Cmp(y) {
+	case -1:
+		// x < y
+		return z.Clear(), m.Set(x)
+	case 0:
+		// x == y
+		return z.SetOne(), m.Clear()
+	}
+
+	// At this point:
+	// x != 0
+	// y != 0
+	// x > y
+
+	// Shortcut trivial case
+	if x.IsUint64() {
+		x0, y0 := x.Uint64(), y.Uint64()
+		return z.SetUint64(x0 / y0), m.SetUint64(x0 % y0)
+	}
+
+	var quot Uint
+	*m = udivrem(quot[:], x[:], y)
+	*z = quot
+	return z, m
+}
+
+// udivrem divides u by d and produces both quotient and remainder.
+// The quotient is stored in provided quot - len(u)-len(d)+1 words.
+// It loosely follows the Knuth's division algorithm (sometimes referenced as "schoolbook" division) using 64-bit words.
+// See Knuth, Volume 2, section 4.3.1, Algorithm D.
+func udivrem(quot, u []uint64, d *Uint) (rem Uint) {
+	var dLen int
+	for i := len(d) - 1; i >= 0; i-- {
+		if d[i] != 0 {
+			dLen = i + 1
+			break
+		}
+	}
+
+	shift := uint(bits.LeadingZeros64(d[dLen-1]))
+
+	var dnStorage Uint
+	dn := dnStorage[:dLen]
+	for i := dLen - 1; i > 0; i-- {
+		dn[i] = (d[i] << shift) | (d[i-1] >> (64 - shift))
+	}
+	dn[0] = d[0] << shift
+
+	var uLen int
+	for i := len(u) - 1; i >= 0; i-- {
+		if u[i] != 0 {
+			uLen = i + 1
+			break
+		}
+	}
+
+	if uLen < dLen {
+		copy(rem[:], u)
+		return rem
+	}
+
+	var unStorage [9]uint64
+	un := unStorage[:uLen+1]
+	un[uLen] = u[uLen-1] >> (64 - shift)
+	for i := uLen - 1; i > 0; i-- {
+		un[i] = (u[i] << shift) | (u[i-1] >> (64 - shift))
+	}
+	un[0] = u[0] << shift
+
+	if dLen == 1 {
+		r := udivremBy1(quot, un, dn[0])
+		rem.SetUint64(r >> shift)
+		return rem
+	}
+
+	udivremKnuth(quot, un, dn)
+
+	for i := 0; i < dLen-1; i++ {
+		rem[i] = (un[i] >> shift) | (un[i+1] << (64 - shift))
+	}
+	rem[dLen-1] = un[dLen-1] >> shift
+
+	return rem
+}
+
+// umul computes full 256 x 256 -> 512 multiplication.
+func umul(x, y *Uint) [8]uint64 {
+	var res [8]uint64
+
+	topX := highestNonZeroWord(x)
+	topY := highestNonZeroWord(y)
+
+	if topX < 0 || topY < 0 {
+		return res
+	}
+
+	lenX := topX + 1
+	lenY := topY + 1
+
+	for i := 0; i < lenX; i++ {
+		xi := x[i]
+		if xi == 0 {
+			continue
+		}
+		var carry uint64
+		k := i
+		for j := 0; j < lenY; j++ {
+			hi, lo := bits.Mul64(xi, y[j])
+			lo, c := bits.Add64(lo, res[k], 0)
+			hi += c
+			lo, c = bits.Add64(lo, carry, 0)
+			hi += c
+			res[k] = lo
+			carry = hi
+			k++
+		}
+		res[i+lenY] = carry
+	}
+
+	return res
+}
+
+// highestNonZeroWord returns the highest index with non-zero value or -1 if the Uint is zero.
+func highestNonZeroWord(u *Uint) int {
+	for i := 3; i >= 0; i-- {
+		if u[i] != 0 {
+			return i
+		}
+	}
+	return -1
+}
+
+// umulStep computes (hi * 2^64 + lo) = z + (x * y) + carry.
+func umulStep(z, x, y, carry uint64) (hi, lo uint64) {
+	hi, lo = bits.Mul64(x, y)
+	lo, carry = bits.Add64(lo, carry, 0)
+	hi += carry
+	lo, carry = bits.Add64(lo, z, 0)
+	hi += carry
+	return hi, lo
+}
+
+// umulHop computes (hi * 2^64 + lo) = z + (x * y)
+func umulHop(z, x, y uint64) (hi, lo uint64) {
+	hi, lo = bits.Mul64(x, y)
+	lo, carry := bits.Add64(lo, z, 0)
+	hi += carry
+	return hi, lo
+}
+
+// udivremBy1 divides u by single normalized word d and produces both quotient and remainder.
+// The quotient is stored in provided quot.
+func udivremBy1(quot, u []uint64, d uint64) (rem uint64) {
+	reciprocal := reciprocal2by1(d)
+	rem = u[len(u)-1] // Set the top word as remainder.
+	for j := len(u) - 2; j >= 0; j-- {
+		quot[j], rem = udivrem2by1(rem, u[j], d, reciprocal)
+	}
+	return rem
+}
+
+// udivremKnuth implements the division of u by normalized multiple word d from the Knuth's division algorithm.
+// The quotient is stored in provided quot - len(u)-len(d) words.
+// Updates u to contain the remainder - len(d) words.
+func udivremKnuth(quot, u, d []uint64) {
+	dLen := len(d)
+	dh := d[dLen-1]
+	dl := d[dLen-2]
+	reciprocal := reciprocal2by1(dh)
+
+	for j := len(u) - dLen - 1; j >= 0; j-- {
+		u2 := u[j+dLen]
+		u1 := u[j+dLen-1]
+		u0 := u[j+dLen-2]
+
+		var qhat, rhat uint64
+		if u2 >= dh { // Division overflows.
+			qhat = 18446744073709551615 // max uint64
+			// NOTE: Add "qhat one to big" adjustment (not needed for correctness, but helps avoiding "add back" case).
+		} else {
+			qhat, rhat = udivrem2by1(u2, u1, dh, reciprocal)
+			ph, pl := bits.Mul64(qhat, dl)
+			if ph > rhat || (ph == rhat && pl > u0) {
+				qhat--
+				// NOTE: Add "qhat one to big" adjustment (not needed for correctness, but helps avoiding "add back" case).
+			}
+		}
+
+		// Multiply and subtract.
+		borrow := subMulTo(u[j:], d, qhat)
+		u[j+dLen] = u2 - borrow
+		if u2 < borrow { // Too much subtracted, add back.
+			qhat--
+			u[j+dLen] += addTo(u[j:], d)
+		}
+
+		quot[j] = qhat // Store quotient digit.
+	}
+}
+
+// isBitSet returns true if bit n-th is set, where n = 0 is LSB.
+// The n must be <= 255.
+func (z *Uint) isBitSet(n uint) bool {
+	return (z[n/64] & (1 << (n % 64))) != 0
+}
+
+// IsOverflow reports whether the highest bit of z is set.
+//
+// Returns:
+//   - overflow: true when z has bit 255 set
+func (z *Uint) IsOverflow() bool {
+	return z.isBitSet(255)
+}
+
+// addTo computes x += y.
+// Requires len(x) >= len(y).
+func addTo(x, y []uint64) uint64 {
+	var carry uint64
+	for i := 0; i < len(y); i++ {
+		x[i], carry = bits.Add64(x[i], y[i], carry)
+	}
+	return carry
+}
+
+// subMulTo computes x -= y * multiplier.
+// Requires len(x) >= len(y).
+func subMulTo(x, y []uint64, multiplier uint64) uint64 {
+	var borrow uint64
+	for i := 0; i < len(y); i++ {
+		s, carry1 := bits.Sub64(x[i], borrow, 0)
+		ph, pl := bits.Mul64(y[i], multiplier)
+		t, carry2 := bits.Sub64(s, pl, 0)
+		x[i] = t
+		borrow = ph + carry1 + carry2
+	}
+	return borrow
+}
+
+// reciprocal2by1 computes <^d, ^0> / d.
+func reciprocal2by1(d uint64) uint64 {
+	reciprocal, _ := bits.Div64(^d, 18446744073709551615, d)
+	return reciprocal
+}
+
+// udivrem2by1 divides <uh, ul> / d and produces both quotient and remainder.
+// It uses the provided d's reciprocal.
+// Implementation ported from https://github.com/chfast/intx and is based on
+// "Improved division by invariant integers", Algorithm 4.
+func udivrem2by1(uh, ul, d, reciprocal uint64) (quot, rem uint64) {
+	qh, ql := bits.Mul64(reciprocal, uh)
+	ql, carry := bits.Add64(ql, ul, 0)
+	qh, _ = bits.Add64(qh, uh, carry)
+	qh++
+
+	r := ul - qh*d
+
+	if r > ql {
+		qh--
+		r += d
+	}
+
+	if r >= d {
+		qh++
+		r -= d
+	}
+
+	return qh, r
+}
