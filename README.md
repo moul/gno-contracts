@@ -202,6 +202,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort) 📦 | — | [✅](https://gno.land/p/moul/x/daily/toposort/v0) | — | — | — |
 | [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie) 📦 | — | [✅](https://gno.land/p/moul/x/daily/trie/v0) | — | — | — |
 | [`p/moul/x/framelab/v0`](p/moul/x/framelab) 📦 | — | [✅](https://gno.land/p/moul/x/framelab/v0) | — | — | 1 |
+| [`p/moul/x/games/accrual/v0`](p/moul/x/games/accrual) 📦 | — | — | — | — | — |
 | [`p/moul/x/games/clock/v0`](p/moul/x/games/clock) 📦 | — | [✅](https://gno.land/p/moul/x/games/clock/v0) | — | — | — |
 | [`p/moul/x/games/prorata/v0`](p/moul/x/games/prorata) 📦 | — | [✅](https://gno.land/p/moul/x/games/prorata/v0) | — | — | — |
 | [`p/moul/x/grc20wrap/v0`](p/moul/x/grc20wrap) 📦 | — | [✅](https://gno.land/p/moul/x/grc20wrap/v0) | — | — | 3 |
@@ -395,6 +396,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/wordle/v0`](r/moul/x/daily/wordle) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/wordle/v0) | — | — | — |
 | [`r/moul/x/daily/wrapped/v0`](r/moul/x/daily/wrapped) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/wrapped/v0) | — | — | 1 |
 | [`r/moul/x/framelab/probe/v0`](r/moul/x/framelab/probe) 🏛️ | — | [✅](https://gno.land/r/moul/x/framelab/probe/v0) | — | — | 2 |
+| [`r/moul/x/games/idle/v0`](r/moul/x/games/idle) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/games/lastwords/v0`](r/moul/x/games/lastwords) 🏛️ | — | [✅](https://gno.land/r/moul/x/games/lastwords/v0) | — | — | 5 |
 | [`r/moul/x/grc20faucet/v0`](r/moul/x/grc20faucet) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20faucet/v0) | — | — | 4 |
 | [`r/moul/x/grc20wrapdemo/v0`](r/moul/x/grc20wrapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20wrapdemo/v0) | — | — | 6 |
@@ -432,7 +434,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-28T17:38:07Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-09-28T17:51:00Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
