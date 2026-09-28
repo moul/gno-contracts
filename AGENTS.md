@@ -685,7 +685,7 @@ never a live chain: no signer, no transactions, no faucet, and every package sho
 state right after `init()`.
 
 How the workflows, the three composite actions and the previews site work, and the traps
-in each: [`.github/README.md`](./.github/README.md).
+in each: [`.github/ci-internals.md`](./.github/ci-internals.md).
 
 ## Conventions
 

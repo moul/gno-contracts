@@ -14,6 +14,12 @@ This repository is the home of contracts that used to live in the `gnolang/gno` 
 under `examples/gno.land/{p,r}/moul/*`. One `git clone` plus a gno toolchain is enough to
 build, test, lint and publish everything.
 
+**Where to look:** [the catalog](#contracts), every package and realm with where it is
+published · [rendered previews](https://moul.github.io/gno-contracts-previews/main/) of what
+`main` looks like in gnoweb · [`r/moul/home` on chain](https://gnoscope.com/realm/r/moul/home)
+· [AGENTS.md](./AGENTS.md) for how the repo is worked on, and
+[`.github/ci-internals.md`](./.github/ci-internals.md) for what CI does.
+
 ## Features
 
 - **Mandatory versioning.** Every contract is `.../<name>/vN`, and a breaking change ships
@@ -478,7 +484,7 @@ The **full graph**, with every version as its own node, is at
 This repo is built to be worked on by humans and coding agents alike.
 [`AGENTS.md`](./AGENTS.md) is the guide: versioning, the workspace and vendor model, how to
 add a contract, and the invariants CI enforces. [`CLAUDE.md`](./CLAUDE.md) is its
-one-line-per-rule index, and [`.github/README.md`](./.github/README.md) covers CI itself.
+one-line-per-rule index, and [`.github/ci-internals.md`](./.github/ci-internals.md) covers CI itself.
 
 ## License
 
