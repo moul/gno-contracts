@@ -1,7 +1,6 @@
-_Last updated September 2026._
-
-- **One package a day.** 169 of them are on chain under `x/daily`: small and
-  finished, each one a question about what Gno can express, answered.
+- **One package a day**, under `x/daily`: small and finished, each one a
+  question about what Gno can express, answered. The current count is in
+  Packages below, because a number typed here would be wrong by next week.
 - **[mygnoscan](https://github.com/gnoverse/mygnoscan)**, an explorer for gno
   chains. It is the only one that distinguishes a package that is live from one
   that was uploaded and is still waiting to be approved.

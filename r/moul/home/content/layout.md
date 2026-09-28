@@ -16,10 +16,6 @@
 
 :stack:
 
-## Numbers
-
-:numbers:
-
 ## Packages
 
 :packages:
