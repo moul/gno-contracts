@@ -24,6 +24,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/pageable/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/pausable/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/printfdebugging/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/reactions/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/realmpath/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/svg/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/template/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -120,6 +121,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/home" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/outfmt/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/present/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/reactions/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/vesting/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/allinone/devtools/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/allinone/textlab/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -274,6 +276,9 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/memo/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/pageable/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/printfdebugging/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/moul/reactions/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/p/moul/reactions/v0" -> "gno.land/p/moul/md/v0";
+  "gno.land/p/moul/reactions/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/svg/v0" -> "gno.land/p/nt/bptree/v0";
   "gno.land/p/moul/svg/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/template/v0" -> "gno.land/p/moul/md/v0";
@@ -352,6 +357,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/home" -> "gno.land/p/moul/mygnoscan/v0";
   "gno.land/r/moul/home" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/home" -> "gno.land/r/moul/config/v1";
+  "gno.land/r/moul/home" -> "gno.land/r/moul/reactions/v0";
   "gno.land/r/moul/outfmt/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/moul/mdtable/v0";
@@ -362,6 +368,8 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/ownable/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/seqid/v0";
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/reactions/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/reactions/v0" -> "gno.land/p/moul/reactions/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/realmpath/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/vesting/v0";
