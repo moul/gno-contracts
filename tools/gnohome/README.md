@@ -43,6 +43,12 @@ Shared flags: `-content` `-realm` `-remote` `-chainid` `-key` `-owner`.
 `-gas-wanted` `-gas-fee` `-max-deposit`; `packages` adds `-catalog` `-network`.
 `gnohome <cmd> -h` lists them.
 
+`tx` describes by default and `-run` performs. **`-print` is the same thing as the
+default**, and it exists because every other tool in this ecosystem spells "show
+me, run nothing" that way; the one that inverts the flag is the one a reader
+abandons for raw `gnokey`. It also **beats `-run`**, so appending it to a recalled
+command line can never broadcast.
+
 ### `-batch`: one transaction, one signature
 
 `tx` emits one command per outdated slot, which is one passphrase prompt per

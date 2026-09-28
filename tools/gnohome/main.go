@@ -84,6 +84,7 @@ func run(args []string, out *os.File) error {
 		maxDeposit  string
 		batchOut    string
 		runTx       bool
+		printOnly   bool
 		catalogFile string
 		network     string
 	)
@@ -101,6 +102,13 @@ func run(args []string, out *os.File) error {
 		fs.StringVar(&maxDeposit, "max-deposit", "", "max storage deposit for the emitted commands")
 		fs.StringVar(&batchOut, "batch", "", "write ONE transaction holding every change to this file, to sign once")
 		fs.BoolVar(&runTx, "run", false, "sign and broadcast the batch instead of printing the two commands")
+		// Printing is already the default here, and -print is therefore
+		// redundant on its own. It exists because every other tool in this
+		// ecosystem spells "show me, run nothing" as -print, and a reader who
+		// has to remember that THIS one inverts the flag is a reader who
+		// reaches for raw gnokey instead. It also beats -run, so a -print
+		// appended to a recalled command line can never broadcast.
+		fs.BoolVar(&printOnly, "print", false, "write the commands out and run nothing; wins over -run")
 	case "packages":
 		fs.StringVar(&catalogFile, "catalog", "", "path to contracts.json (default: <repo>/contracts.json)")
 		fs.StringVar(&network, "network", "mainnet", "which network's deployment status to report")
@@ -184,13 +192,7 @@ func run(args []string, out *os.File) error {
 			d = allChanges(local, remote)
 		}
 		warnOversize(out, local)
-		// -run acts on ONE transaction, so it implies -batch. Defaulting the
-		// path rather than refusing keeps the Makefile target a single line
-		// with no temp-file bookkeeping in it, which is the repo's rule for a
-		// recipe: the knob is a flag on the tool, never a longer recipe.
-		if runTx && batchOut == "" {
-			batchOut = defaultBatchPath(cfg)
-		}
+		runTx, batchOut = txMode(runTx, printOnly, batchOut, defaultBatchPath(cfg))
 		if batchOut != "" {
 			return printBatch(out, cfg, d, txOptions{
 				inline: inline, prune: prune, gasWanted: gasWanted,
@@ -313,4 +315,25 @@ func warnOversize(out *os.File, slots []slotFile) {
 				s.slug, len(s.body))
 		}
 	}
+}
+
+// txMode settles the three flags that decide whether tx describes the update or
+// performs it, and it is a function so the decision can be tested without a
+// chain: through run() a dead remote fails identically either way, which is how
+// a first version of this passed with the precedence deleted.
+//
+// Two rules. -run acts on ONE transaction, so it implies -batch; defaulting the
+// path rather than refusing keeps the Makefile target a single line with no
+// temp-file bookkeeping, which is this repo's rule for a recipe. And -print
+// BEATS -run: gnohome prints by default and every other tool here spells "show
+// me, run nothing" as -print, so somebody will append it to a recalled line that
+// already carries -run, and that append must never broadcast.
+func txMode(runTx, printOnly bool, batchOut, defaultBatch string) (bool, string) {
+	if printOnly {
+		return false, batchOut
+	}
+	if runTx && batchOut == "" {
+		batchOut = defaultBatch
+	}
+	return runTx, batchOut
 }
