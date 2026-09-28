@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T21:31:35Z",
+  "status_checked_at": "2026-09-28T21:35:39Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2451,6 +2451,29 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/envelope/v0",
+      "dir": "p/moul/x/envelope",
+      "kind": "p",
+      "name": "x/envelope",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/framelab/v0",
       "dir": "p/moul/x/framelab",
       "kind": "p",
@@ -3058,7 +3081,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
@@ -8462,6 +8486,62 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/nativeify/v0",
+      "dir": "r/moul/x/nativeify",
+      "kind": "r",
+      "name": "x/nativeify",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/envelope/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/grc20/v0",
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/moul/x/nativereg/v0",
+        "gno.land/r/nt/grc20reg/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/nativereg/v0",
+      "dir": "r/moul/x/nativereg",
+      "kind": "r",
+      "name": "x/nativereg",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false
