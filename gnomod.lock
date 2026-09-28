@@ -590,6 +590,10 @@ module = "gno.land/r/moul/vesting/v0"
 source = { dir = "r/moul/vesting" }
 
 [[module]]
+module = "gno.land/r/moul/x/across/v0"
+source = { dir = "r/moul/x/across" }
+
+[[module]]
 module = "gno.land/r/moul/x/allinone/devtools/v0"
 source = { dir = "r/moul/x/allinone/devtools" }
 

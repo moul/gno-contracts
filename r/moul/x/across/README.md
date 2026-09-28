@@ -1,0 +1,57 @@
+# `gno.land/r/moul/x/across/v0`
+
+One address, read across fifteen realms that were already on chain.
+
+Open `/r/moul/x/across/v0:<address>` and the page answers with everything fifteen
+other realms will say about that address: token balances, an LP position, stake
+and unclaimed rewards, a check-in streak, dice rolled, a rate-limit bucket, a
+lottery entry, a reaction. Rows that came back empty are counted and hidden.
+
+## What it is demonstrating
+
+Not one of the fifteen source realms was changed. None of them knows this realm
+exists, none of them registered anywhere, and there is no shared interface, no
+base package, no version handshake. The only thing every source had to do was
+**not** declare `private = true` in its `gnomod.toml`, which is what lets another
+realm import it at all.
+
+That is the composability claim in its weakest, most testable form: a realm's
+exported reads are a permanent public API, because the path it lives at can never
+be replaced. What you compile against today is what is on chain forever.
+
+## What it cost
+
+Eight of the sources hold a per-address balance. They agree on nothing:
+
+| realm | signature |
+| --- | --- |
+| `r/moul/x/daily/erc20/v0`, `…/vestoken/v0`, `…/wrapped/v0` | `BalanceOf(address) uint64` |
+| `r/moul/x/pairs/aaa/v0`, `…/bbb/v0` | `BalanceOf(address) int64` |
+| `r/moul/x/grc20faucet/v0` | `BalanceOf(symbol string, owner address) int64` |
+| `r/moul/demo/wikicoin/v0` | `BalanceOf(address) uint` |
+| `r/moul/x/daily/dice/v0` | `RollsOf(addr string) []int` |
+
+Three integer widths, two signednesses, one that wants a symbol before the
+address, one that wants the address as a `string`. Composition still works, it
+just costs one hand-written adapter line per source. `Report` is those lines and
+nothing else, which is also why this realm ships no `p/` library: extract one and
+both halves are empty.
+
+## The two sources that could not be read
+
+- **`r/moul/x/amm/v0`** exports `SharesOf(keyA, keyB string, owner address)`,
+  which routes through a helper that **panics** on an unknown pool. A getter that
+  panics is not composable: one panicking source takes down a page assembled from
+  fifteen, and `recover()` does not catch a cross-realm abort. Only its
+  `PoolCount()` is called from here.
+- **`r/moul/demo/vault/v0`** exports `MyBalance()` with no address parameter, so
+  it answers for its caller, which from here is this realm.
+
+Neither is a bug. Both are what a getter looks like before anyone has tried to
+call it from another realm.
+
+## Private by default, and why this one is too
+
+`private = true`, the repo default, because nothing needs to import *this* realm.
+The flag is a one-way door decided before the first publish, and it is the single
+thing that determines whether a realm can ever appear in a page like this one.
