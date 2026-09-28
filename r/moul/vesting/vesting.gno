@@ -67,6 +67,13 @@ const (
 // page exists to show should not need a transaction to come back. Each is
 // copied from the genesis allocation sheet that built mainnet, which is the
 // public, pinned input named in misc/deployments/mainnet.gno.land/gen-genesis.sh.
+//
+// An address is seeded here only when its LABEL is public too. The addresses
+// are all on chain, but naming one is a claim about who holds it, and this
+// realm is public and permanent. gen-genesis.sh names the investors-vesting
+// multisig outright, so that one ships; the treasuries and the other buckets
+// are identified nowhere public, so they do not, and the URL form serves
+// anyone who wants to check them anyway.
 var seeded = []struct {
 	addr     address
 	label    string
@@ -82,10 +89,29 @@ var seeded = []struct {
 		start:    1789225200,
 		end:      1852383600,
 	},
+	{
+		// "including the investors-vesting multisig
+		// g1x7tm26g9wj84cmg3cs74uwf3g9lqj4mjp6gax3, 150,000,000 GNOT total,
+		// 144,000,000 of it vesting continuously" -- gen-genesis.sh, and the
+		// sheet row it describes:
+		//   g1x7tm26…=150000000000000ugnot;vesting=144000000000000ugnot,1789225200,1852383600
+		addr:     "g1x7tm26g9wj84cmg3cs74uwf3g9lqj4mjp6gax3",
+		label:    "investors-vesting multisig",
+		original: 144000000000000,
+		start:    1789225200,
+		end:      1852383600,
+	},
 }
 
 // declared maps an address to the schedule that address declared for itself.
+// Seeded schedules are NOT in here: they are read from the seeded slice, which
+// is what lets the index render them in full while paging everything else.
+// Anyone may Declare, so this tree is unbounded and the page that shows it
+// cannot be.
 var declared avl.Tree
+
+// seedIndex resolves a seeded address without walking the slice twice.
+var seedIndex avl.Tree
 
 // entry is one row of the registry.
 type entry struct {
@@ -103,6 +129,7 @@ func init() { reset() }
 // Test in the package and sees the state they left.
 func reset() {
 	declared = avl.Tree{}
+	seedIndex = avl.Tree{}
 	for _, s := range seeded {
 		typ := vesting.Continuous
 		if s.delayed {
@@ -112,7 +139,7 @@ func reset() {
 		if err != nil {
 			panic("vesting: seeded schedule for " + s.label + ": " + err.Error())
 		}
-		declared.Set(s.addr.String(), &entry{schedule: sch, label: s.label, seeded: true})
+		seedIndex.Set(s.addr.String(), &entry{schedule: sch, label: s.label, seeded: true})
 	}
 }
 
@@ -156,8 +183,12 @@ func Forget(cur realm) {
 	chain.Emit("forgot", "addr", who.String())
 }
 
-// Count returns how many schedules the registry holds.
+// Count returns how many schedules addresses have declared for themselves.
+// Seeded schedules are not included; SeededCount reports those.
 func Count() int { return declared.Size() }
+
+// SeededCount returns how many schedules this realm ships in its source.
+func SeededCount() int { return seedIndex.Size() }
 
 // ScheduleOf returns the declared schedule for addr, and whether there is one.
 func ScheduleOf(addr address) (original, start, end int64, delayed, ok bool) {
@@ -196,9 +227,13 @@ func LockedOf(addr address) (locked int64, ok bool) {
 	return l, true
 }
 
-// lookup reads a row. avl's Get returns ONE value and nil for a miss, unlike
-// Remove which returns two; that asymmetry is a documented gno-vs-Go trap.
+// lookup reads a row, seeded first so a seeded address can never be shadowed.
+// avl's Get returns ONE value and nil for a miss, unlike Remove which returns
+// two; that asymmetry is a documented gno-vs-Go trap.
 func lookup(addr address) (*entry, bool) {
+	if v := seedIndex.Get(addr.String()); v != nil {
+		return v.(*entry), true
+	}
 	v := declared.Get(addr.String())
 	if v == nil {
 		return nil, false

@@ -47,9 +47,30 @@ creates or modifies one. A schedule declared correctly today is correct forever.
 
 | | |
 |---|---|
-| `/r/moul/vesting/v0` | every schedule on file |
+| `/r/moul/vesting/v0` | the seeded schedules, then declared ones, 25 to a page |
+| `…?page=2` | the next page of declared schedules |
 | `…:g1…` | one address |
 | `…:g1…?o=&s=&e=` | one address, with a schedule you supply |
+
+**The index is paged because it has to be.** `vm/qrender` runs on a gas meter, so a realm that
+returns a large string fails with `OutOfGasError{Descriptor:"CPUCycles"}` rather than answering
+slowly, and anyone may `Declare`. An unbounded index is a front page that a stranger can
+switch off by declaring enough rows, permanently, since the only repair for a
+`private = true` realm is a redeploy that wipes every declaration.
+
+## What gets seeded, and what deliberately does not
+
+A seeded row names an address. The addresses are all on chain and public, but **saying who
+holds one is a separate claim**, and this realm is public and permanent. So an address is
+seeded only when its label is public too:
+
+| | |
+|---|---|
+| `moul` | his own |
+| the investors-vesting multisig | named outright in `misc/deployments/mainnet.gno.land/gen-genesis.sh`, with the same figures |
+
+The treasury and other buckets are **not** seeded. Their addresses are public, their roles are
+not published anywhere, and the URL form answers for them just as exactly.
 
 ## Notes
 

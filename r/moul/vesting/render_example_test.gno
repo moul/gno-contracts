@@ -5,8 +5,11 @@ package vesting
 // reset() first, deliberately: an Example runs AFTER every Test in the package
 // and sees the rows they declared, so without it this output depends on test
 // order. The block time inside a gno test is fixed at 2009-02-13, before the
-// real mainnet term starts, so the seeded row renders at 0% vested with the
+// real mainnet term starts, so the seeded rows render at 0% vested with the
 // whole grant locked. That is a legitimate point on the curve and a stable one.
+//
+// With no declarations there is no Declared section and no pager, which is the
+// shape the page has on a fresh deploy.
 func ExampleRender() {
 	reset()
 	print(Render(""))
@@ -18,6 +21,7 @@ func ExampleRender() {
 	// | account | balance | spendable | locked | vested |
 	// | --- | --- | --- | --- | --- |
 	// | moul `g1manfre…dlf5` | 0.000000 GNOT | 0.000000 GNOT | 0.000000 GNOT | 0.0% |
+	// | investors\-vesting multisig `g1x7tm26…gax3` | 0.000000 GNOT | 0.000000 GNOT | 0.000000 GNOT | 0.0% |
 	//
 	// ## Check another address
 	//
