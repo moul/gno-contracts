@@ -7,6 +7,7 @@
 //	gnohome preview   render the page locally, the way the realm would
 //	gnohome status    diff local content/ against what is on chain
 //	gnohome tx        print the gnokey commands for exactly what is outdated
+//	gnohome tx -run   ... or sign and broadcast them, in one transaction
 //	gnohome packages  regenerate the packages slot from contracts.json
 //
 // Deploying the realm is NOT here: that is `gnopm publish`, which does it for
@@ -15,6 +16,11 @@
 // It has no dependencies beyond the Go standard library: the chain is read
 // over plain JSON-RPC abci_query, and writes are emitted as gnokey commands
 // rather than signed here, so nothing broadcasts by accident.
+//
+// The one exception is `tx -run`, which signs and broadcasts the batch it just
+// wrote by shelling out to gnokey. It is opt-in, it still holds no key, and it
+// writes the same document and script first, so the run is reproducible by
+// hand if it fails halfway.
 package main
 
 import (
@@ -77,6 +83,7 @@ func run(args []string, out *os.File) error {
 		gasFee      string
 		maxDeposit  string
 		batchOut    string
+		runTx       bool
 		catalogFile string
 		network     string
 	)
@@ -93,6 +100,7 @@ func run(args []string, out *os.File) error {
 		fs.StringVar(&gasFee, "gas-fee", "", "gas-fee override (default: sized from -gas-wanted at ten times the accepted floor)")
 		fs.StringVar(&maxDeposit, "max-deposit", "", "max storage deposit for the emitted commands")
 		fs.StringVar(&batchOut, "batch", "", "write ONE transaction holding every change to this file, to sign once")
+		fs.BoolVar(&runTx, "run", false, "sign and broadcast the batch instead of printing the two commands")
 	case "packages":
 		fs.StringVar(&catalogFile, "catalog", "", "path to contracts.json (default: <repo>/contracts.json)")
 		fs.StringVar(&network, "network", "mainnet", "which network's deployment status to report")
@@ -174,11 +182,18 @@ func run(args []string, out *os.File) error {
 			d = diff(local, remote)
 		}
 		warnOversize(out, local)
+		// -run acts on ONE transaction, so it implies -batch. Defaulting the
+		// path rather than refusing keeps the Makefile target a single line
+		// with no temp-file bookkeeping in it, which is the repo's rule for a
+		// recipe: the knob is a flag on the tool, never a longer recipe.
+		if runTx && batchOut == "" {
+			batchOut = defaultBatchPath(cfg)
+		}
 		if batchOut != "" {
 			return printBatch(out, cfg, d, txOptions{
 				inline: inline, prune: prune, gasWanted: gasWanted,
 				gasFee: gasFee, maxDeposit: maxDeposit,
-			}, batchOut)
+			}, batchOut, runTx)
 		}
 		return printTx(out, cfg, d, txOptions{
 			inline:     inline,
