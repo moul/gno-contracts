@@ -1,0 +1,527 @@
+package staker
+
+import (
+	"chain"
+	"chain/runtime"
+	"time"
+
+	"gno.land/p/gnoswap/gnsmath/v1"
+	prbac "gno.land/p/gnoswap/rbac/v1"
+	u256 "gno.land/p/gnoswap/uint256/v1"
+	"gno.land/p/gnoswap/utils/v1"
+	ufmt "gno.land/p/nt/ufmt/v0"
+
+	"gno.land/r/gnoswap/access/v1"
+	"gno.land/r/gnoswap/common"
+	en "gno.land/r/gnoswap/emission"
+	"gno.land/r/gnoswap/halt/v1"
+	sr "gno.land/r/gnoswap/staker"
+)
+
+// CreateExternalIncentive creates an external incentive program for a pool.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the staker proxy.
+//   - targetPoolPath: Pool path to incentivize.
+//   - rewardToken: Registered reward-token path.
+//   - rewardAmount: Total reward amount deposited, in reward-token units.
+//   - startTimestamp: Incentive start time as Unix seconds.
+//   - endTimestamp: Incentive end time as Unix seconds; it must follow startTimestamp by a valid duration.
+//
+// Any caller may create an incentive after satisfying token, duration, start-time, reward-minimum,
+// and GNS-deposit checks.
+func (s *stakerV1) CreateExternalIncentive(
+	_ int,
+	rlm realm,
+	targetPoolPath string,
+	rewardToken string, // token path should be registered
+	rewardAmount int64,
+	startTimestamp int64,
+	endTimestamp int64,
+) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	halt.AssertIsNotHaltedStaker()
+
+	prevRealm := rlm.Previous()
+	caller := prevRealm.Address()
+	currentTime := time.Now().Unix()
+
+	assertIsPoolExists(s, targetPoolPath)
+
+	assertIsGreaterThanMinimumRewardAmount(s, rewardToken, rewardAmount)
+	assertIsAllowedForExternalReward(s, targetPoolPath, rewardToken)
+	assertIsExternalRewardTokenAvailable(s, targetPoolPath, rewardToken, currentTime)
+	assertIsValidIncentiveStartTime(startTimestamp)
+	assertIsValidIncentiveEndTime(endTimestamp)
+	assertIsValidIncentiveDuration(gnsmath.SafeSubInt64(endTimestamp, startTimestamp))
+	// assert that the user has sent the correct amount of native coin
+	common.AssertIsNotHandleNativeCoin()
+
+	en.MintAndDistributeGns(cross(rlm))
+
+	stakerAddr := access.MustGetAddress(prbac.ROLE_STAKER.String())
+
+	// transfer reward token from user to staker
+	common.SafeGRC20TransferFrom(0, rlm, rewardToken, caller, stakerAddr, rewardAmount)
+
+	depositGnsAmount := s.store.GetDepositGnsAmount()
+
+	// deposit gns amount
+	common.SafeGRC20TransferFrom(0, rlm, GNS_TOKEN_KEY, caller, stakerAddr, depositGnsAmount)
+
+	currentHeight := runtime.ChainHeight()
+	incentiveId := s.store.NextIncentiveID(caller, currentTime)
+	pool := s.getPools().GetPoolOrNil(targetPoolPath)
+	if pool == nil {
+		pool = sr.NewPool(targetPoolPath, currentTime)
+		s.getPools().set(targetPoolPath, pool)
+	}
+
+	incentive := sr.NewExternalIncentive(
+		incentiveId,
+		targetPoolPath,
+		rewardToken,
+		rewardAmount,
+		startTimestamp,
+		endTimestamp,
+		caller,
+		depositGnsAmount,
+		currentHeight,
+		currentTime,
+	)
+
+	externalIncentives := s.store.GetExternalIncentives()
+	if externalIncentives.Has(incentiveId) {
+		panic(makeErrorWithDetails(
+			errIncentiveAlreadyExists,
+			ufmt.Sprintf("incentiveId(%s)", incentiveId),
+		))
+	}
+	// store external incentive information for each incentiveId
+	externalIncentives.Set(incentiveId, incentive)
+
+	poolResolver := NewPoolResolver(pool)
+	poolResolver.IncentivesResolver().create(incentive)
+
+	chain.Emit(
+		"CreateExternalIncentive",
+		"prevAddr", caller.String(),
+		"prevRealm", prevRealm.PkgPath(),
+		"incentiveId", incentiveId,
+		"targetPoolPath", targetPoolPath,
+		"rewardToken", rewardToken,
+		"rewardAmount", utils.FormatInt(rewardAmount),
+		"startTimestamp", utils.FormatInt(startTimestamp),
+		"endTimestamp", utils.FormatInt(endTimestamp),
+		"depositGnsAmount", utils.FormatInt(depositGnsAmount),
+		"currentHeight", utils.FormatInt(currentHeight),
+		"currentTime", utils.FormatInt(currentTime),
+	)
+}
+
+// EndExternalIncentive ends an external incentive after its end timestamp and finalizes the
+// refundable unclaimable/remainder amount.
+//
+// The reward-token refund and GNS deposit are sent to the caller-supplied refundAddress. Rewards
+// still owed by live positions remain claimable, and the incentive record is retained for that
+// accounting. Accumulated warmup penalties are collected separately with
+// CollectExternalIncentivePenalty after this function succeeds.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the staker proxy.
+//   - targetPoolPath: Pool containing the incentive to end.
+//   - incentiveId: Unique identifier of the incentive to finalize.
+//   - refundAddress: Address receiving the refundable reward amount and GNS deposit.
+//
+// Process:
+//  1. Validates that the incentive end time has been reached and no exit checkpoint still owes it.
+//  2. Calculates unclaimable/remainder rewards.
+//  3. Marks the incentive refunded and retains its record.
+//  4. Transfers the refundable rewards and deposited GNS to refundAddress.
+//
+// Only callable by the incentive creator or admin.
+func (s *stakerV1) EndExternalIncentive(_ int, rlm realm, targetPoolPath, incentiveId string, refundAddress address) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	halt.AssertIsNotHaltedWithdraw()
+
+	// checks pool registry
+	assertIsPoolExists(s, targetPoolPath)
+	assertIsValidAddress(refundAddress)
+	assertHasNoUncollectedIncentive(s, incentiveId)
+
+	// checks if the pool has been incentivized
+	pool, ok := s.getPools().Get(targetPoolPath)
+	if !ok {
+		panic(makeErrorWithDetails(
+			errDataNotFound,
+			ufmt.Sprintf("targetPoolPath(%s) not found", targetPoolPath),
+		))
+	}
+
+	poolResolver := NewPoolResolver(pool)
+	incentivesResolver := poolResolver.IncentivesResolver()
+
+	// Get incentive to check if GNS already refunded
+	incentiveResolver, exists := incentivesResolver.GetIncentiveResolver(incentiveId)
+	if !exists {
+		panic(makeErrorWithDetails(
+			errCannotEndIncentive,
+			ufmt.Sprintf("cannot end non existent incentive(%s)", incentiveId),
+		))
+	}
+
+	// Check if incentive has already been refunded
+	if incentiveResolver.Refunded() {
+		panic(makeErrorWithDetails(
+			errCannotEndIncentive,
+			ufmt.Sprintf("incentive(%s) has already been refunded", incentiveId),
+		))
+	}
+
+	caller := rlm.Previous().Address()
+
+	// Process ending
+	incentive, refund, err := s.endExternalIncentive(poolResolver, incentiveResolver, caller, time.Now().Unix())
+	if err != nil {
+		panic(err)
+	}
+
+	stakerAddr := access.MustGetAddress(prbac.ROLE_STAKER.String())
+	poolLeftExternalRewardAmount := common.BalanceOf(incentiveResolver.RewardToken(), stakerAddr)
+	if poolLeftExternalRewardAmount < refund {
+		previousRealm := rlm.Previous()
+		chain.Emit(
+			"EndExternalIncentiveShortfall",
+			"prevAddr", previousRealm.Address().String(),
+			"prevRealm", previousRealm.PkgPath(),
+			"incentiveId", incentiveId,
+			"targetPoolPath", targetPoolPath,
+			"refundee", refundAddress.String(),
+			"refundToken", incentiveResolver.RewardToken(),
+			"expectedRefundAmount", utils.FormatInt(refund),
+			"actualRefundAmount", utils.FormatInt(poolLeftExternalRewardAmount),
+			"creator", incentiveResolver.Creator().String(),
+		)
+		refund = poolLeftExternalRewardAmount
+	}
+
+	// Mark incentive as refunded and update
+	// After this update, attempts to re-claim GNS or rewards that were deposited
+	// through the `endExternalIncentive` function will be blocked.
+	incentiveResolver.SetRefunded(true)
+	incentiveResolver.SetRewardAmount(gnsmath.SafeSubInt64(incentiveResolver.RewardAmount(), refund))
+	incentiveResolver.addDistributedRewardAmount(refund)
+	incentivesResolver.update(incentive)
+
+	// refund reward token to refundee
+	common.SafeGRC20Transfer(0, rlm, incentiveResolver.RewardToken(), refundAddress, refund)
+
+	// Transfer GNS deposit back to refundee
+	common.SafeGRC20Transfer(0, rlm, GNS_TOKEN_KEY, refundAddress, incentiveResolver.DepositGnsAmount())
+
+	previousRealm := rlm.Previous()
+	chain.Emit(
+		"EndExternalIncentive",
+		"prevAddr", previousRealm.Address().String(),
+		"prevRealm", previousRealm.PkgPath(),
+		"incentiveId", incentiveId,
+		"targetPoolPath", targetPoolPath,
+		"refundee", refundAddress.String(),
+		"refundToken", incentiveResolver.RewardToken(),
+		"refundAmount", utils.FormatInt(refund),
+		"refundGnsAmount", utils.FormatInt(incentiveResolver.DepositGnsAmount()),
+		"externalIncentiveEndBy", previousRealm.Address().String(),
+		"creator", incentiveResolver.Creator().String(),
+	)
+}
+
+// endExternalIncentive processes the end of an external incentive program.
+func (s *stakerV1) endExternalIncentive(resolver *PoolResolver, incentiveResolver *ExternalIncentiveResolver, caller address, currentTime int64) (*sr.ExternalIncentive, int64, error) {
+	if currentTime < incentiveResolver.EndTimestamp() {
+		return nil, 0, makeErrorWithDetails(
+			errCannotEndIncentive,
+			ufmt.Sprintf("cannot end incentive before endTime(%d), current(%d)", incentiveResolver.EndTimestamp(), currentTime),
+		)
+	}
+
+	// only creator or admin can end incentive
+	if !access.IsAuthorized(prbac.ROLE_ADMIN.String(), caller) && caller != incentiveResolver.Creator() {
+		adminAddr := access.MustGetAddress(prbac.ROLE_ADMIN.String())
+		return nil, 0, makeErrorWithDetails(
+			errNoPermission,
+			ufmt.Sprintf(
+				"only creator(%s) or admin(%s) can end incentive, but called from %s",
+				incentiveResolver.Creator(), adminAddr.String(), caller,
+			),
+		)
+	}
+
+	// refund = unclaimableReward + remainder. Accumulated warmup penalties are tracked separately
+	// and collected through CollectExternalIncentivePenalty after the incentive is ended.
+	incentivesResolver := resolver.IncentivesResolver()
+	unclaimableReward := incentivesResolver.calculateUnclaimableReward(incentiveResolver.IncentiveId())
+	duration := gnsmath.SafeSubInt64(incentiveResolver.EndTimestamp(), incentiveResolver.StartTimestamp())
+	distributableU256 := u256.MulDiv(
+		incentiveResolver.RewardPerSecondX128(),
+		u256.NewUintFromInt64(duration),
+		q128,
+	)
+
+	distributable := gnsmath.SafeConvertToInt64(distributableU256)
+	remainder := gnsmath.SafeSubInt64(incentiveResolver.TotalRewardAmount(), distributable)
+
+	refund := gnsmath.SafeAddInt64(unclaimableReward, remainder)
+
+	maxRefund := incentiveResolver.RewardAmount()
+	if refund > maxRefund {
+		refund = maxRefund
+	}
+
+	if refund < 0 {
+		return nil, 0, makeErrorWithDetails(
+			errCalculationError,
+			ufmt.Sprintf("refund should never be negative: Got %d", refund),
+		)
+	}
+
+	return incentiveResolver.ExternalIncentive, refund, nil
+}
+
+// CancelExternalIncentive cancels an external incentive before it starts and
+// removes it entirely.
+//
+// EndExternalIncentive is the counterpart for an incentive whose end timestamp
+// has passed: it keeps the record so the penalty accounting and the deposits
+// that already collected from it stay resolvable. Cancelling is only allowed
+// strictly before startTimestamp, where nothing has accrued yet - no deposit
+// references the incentive (both StakeToken and the lazy reward discovery only
+// look at incentives whose start timestamp is already in the past), so the
+// record can be dropped from the incentive tree and the start-time index
+// instead of being marked refunded.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the staker proxy.
+//   - targetPoolPath: Pool path for which the incentive was created.
+//   - incentiveId: Unique identifier of the incentive to cancel.
+//
+// Process:
+//  1. Validates the incentive exists and has not started.
+//  2. Removes it from the incentive tree and the start-time index.
+//  3. Refunds the available reward-token balance (capped by the staker balance) and the GNS deposit to the creator.
+//
+// Only callable by admin, governance, or the incentive creator. The permission
+// check runs after the incentive is resolved because the creator identity comes
+// from the stored record; every step before it is read-only, so no unauthorized
+// side effect can occur ahead of the check.
+func (s *stakerV1) CancelExternalIncentive(_ int, rlm realm, targetPoolPath, incentiveId string) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	halt.AssertIsNotHaltedWithdraw()
+
+	assertIsPoolExists(s, targetPoolPath)
+
+	prevRealm := rlm.Previous()
+	caller := prevRealm.Address()
+
+	pool, ok := s.getPools().Get(targetPoolPath)
+	if !ok {
+		panic(makeErrorWithDetails(
+			errDataNotFound,
+			ufmt.Sprintf("targetPoolPath(%s) not found", targetPoolPath),
+		))
+	}
+
+	poolResolver := NewPoolResolver(pool)
+	incentivesResolver := poolResolver.IncentivesResolver()
+
+	incentiveResolver, exists := incentivesResolver.GetIncentiveResolver(incentiveId)
+	if !exists {
+		panic(makeErrorWithDetails(
+			errCannotCancelIncentive,
+			ufmt.Sprintf("cannot cancel non existent incentive(%s)", incentiveId),
+		))
+	}
+
+	// Admin, governance, or the incentive creator may cancel it.
+	assertIsAdminGovernanceOrCreator(caller, incentiveResolver.Creator())
+
+	currentTime := time.Now().Unix()
+	assertIsNotStartedIncentive(incentiveResolver, currentTime)
+
+	rewardToken := incentiveResolver.RewardToken()
+	depositGnsAmount := incentiveResolver.DepositGnsAmount()
+	refundAmount := incentiveResolver.RewardAmount()
+
+	// The reward tokens and the GNS deposit are always returned to the incentive
+	// creator - the address that funded them in CreateExternalIncentive - so the
+	// refund destination is never caller-controlled.
+	creator := incentiveResolver.Creator()
+
+	// Cap the refund by the balance actually held, mirroring
+	// EndExternalIncentive: a short balance must not abort the cancellation and
+	// strand the GNS deposit as well.
+	stakerAddr := access.MustGetAddress(prbac.ROLE_STAKER.String())
+	rewardBalance := common.BalanceOf(rewardToken, stakerAddr)
+	if rewardBalance < refundAmount {
+		chain.Emit(
+			"CancelExternalIncentiveShortfall",
+			"prevAddr", caller.String(),
+			"prevRealm", prevRealm.PkgPath(),
+			"incentiveId", incentiveId,
+			"targetPoolPath", targetPoolPath,
+			"refundToken", rewardToken,
+			"expectedRefundAmount", utils.FormatInt(refundAmount),
+			"actualRefundAmount", utils.FormatInt(rewardBalance),
+			"refundee", creator.String(),
+			"creator", creator.String(),
+		)
+		refundAmount = rewardBalance
+	}
+
+	// Effects before interactions: once removed, no stake, collect or discovery
+	// path can resolve the incentive, so the refund cannot be replayed.
+	incentivesResolver.remove(incentiveResolver.ExternalIncentive)
+	s.getExternalIncentives().remove(incentiveId)
+
+	if refundAmount > 0 {
+		// transfer reward token back to creator
+		common.SafeGRC20Transfer(0, rlm, rewardToken, creator, refundAmount)
+	}
+
+	if depositGnsAmount > 0 {
+		// transfer GNS deposit back to creator
+		common.SafeGRC20Transfer(0, rlm, GNS_TOKEN_KEY, creator, depositGnsAmount)
+	}
+
+	chain.Emit(
+		"CancelExternalIncentive",
+		"prevAddr", caller.String(),
+		"prevRealm", prevRealm.PkgPath(),
+		"incentiveId", incentiveId,
+		"targetPoolPath", targetPoolPath,
+		"refundToken", rewardToken,
+		"refundAmount", utils.FormatInt(refundAmount),
+		"refundGnsAmount", utils.FormatInt(depositGnsAmount),
+		"startTimestamp", utils.FormatInt(incentiveResolver.StartTimestamp()),
+		"endTimestamp", utils.FormatInt(incentiveResolver.EndTimestamp()),
+		"externalIncentiveCancelBy", caller.String(),
+		"creator", creator.String(),
+		"currentTime", utils.FormatInt(currentTime),
+	)
+}
+
+// CollectExternalIncentivePenalty collects accumulated warmup penalties for a specific ended
+// external incentive. The incentive must first be finalized with EndExternalIncentive.
+// Penalties are accumulated during CollectReward and stored in the incentive.
+// This function transfers the accumulated penalty to the specified refund address.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the staker proxy.
+//   - targetPoolPath: Pool containing the ended incentive.
+//   - incentiveId: Unique identifier of the ended incentive whose penalty is collected.
+//   - refundAddress: Address receiving the transferred penalty amount.
+//
+// Returns:
+//   - penaltyAmount: Accumulated warmup penalty transferred, capped by the staker's available reward-token balance.
+//
+// Only callable by the incentive creator or admin.
+func (s *stakerV1) CollectExternalIncentivePenalty(
+	_ int,
+	rlm realm,
+	targetPoolPath string,
+	incentiveId string,
+	refundAddress address,
+) int64 {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	halt.AssertIsNotHaltedWithdraw()
+
+	assertIsPoolExists(s, targetPoolPath)
+	assertIsValidAddress(refundAddress)
+
+	pool, ok := s.getPools().Get(targetPoolPath)
+	if !ok {
+		panic(makeErrorWithDetails(
+			errDataNotFound,
+			ufmt.Sprintf("targetPoolPath(%s) not found", targetPoolPath),
+		))
+	}
+
+	poolResolver := NewPoolResolver(pool)
+	incentivesResolver := poolResolver.IncentivesResolver()
+
+	incentiveResolver, exists := incentivesResolver.GetIncentiveResolver(incentiveId)
+	if !exists {
+		panic(makeErrorWithDetails(
+			errDataNotFound,
+			ufmt.Sprintf("incentive(%s) not found", incentiveId),
+		))
+	}
+
+	if !incentiveResolver.Refunded() {
+		panic(makeErrorWithDetails(
+			errIsNotEndedIncentive,
+			ufmt.Sprintf("incentive(%s) must be ended first (call EndExternalIncentive)", incentiveId),
+		))
+	}
+
+	caller := rlm.Previous().Address()
+	if !access.IsAuthorized(prbac.ROLE_ADMIN.String(), caller) && caller != incentiveResolver.Creator() {
+		adminAddr := access.MustGetAddress(prbac.ROLE_ADMIN.String())
+		panic(makeErrorWithDetails(
+			errNoPermission,
+			ufmt.Sprintf("only creator(%s) or admin(%s) can collect penalty, but called from %s", incentiveResolver.Creator(), adminAddr.String(), caller),
+		))
+	}
+
+	penaltyAmount := incentiveResolver.AccumulatedPenaltyAmount()
+	if penaltyAmount == 0 {
+		return 0
+	}
+
+	// Cap by actual staker balance
+	stakerAddr := access.MustGetAddress(prbac.ROLE_STAKER.String())
+	balance := common.BalanceOf(incentiveResolver.RewardToken(), stakerAddr)
+	if balance < penaltyAmount {
+		previousRealm := rlm.Previous()
+		chain.Emit(
+			"CollectExternalIncentivePenaltyShortfall",
+			"prevAddr", previousRealm.Address().String(),
+			"prevRealm", previousRealm.PkgPath(),
+			"targetPoolPath", targetPoolPath,
+			"incentiveId", incentiveId,
+			"refundAddress", refundAddress.String(),
+			"refundToken", incentiveResolver.RewardToken(),
+			"expectedPenaltyAmount", utils.FormatInt(penaltyAmount),
+			"actualPenaltyAmount", utils.FormatInt(balance),
+			"creator", incentiveResolver.Creator().String(),
+		)
+		penaltyAmount = balance
+	}
+
+	// Reset accumulated penalty
+	incentiveResolver.SetAccumulatedPenaltyAmount(gnsmath.SafeSubInt64(incentiveResolver.AccumulatedPenaltyAmount(), penaltyAmount))
+	incentivesResolver.update(incentiveResolver.ExternalIncentive)
+
+	// Transfer penalty to refund address
+	common.SafeGRC20Transfer(0, rlm, incentiveResolver.RewardToken(), refundAddress, penaltyAmount)
+
+	previousRealm := rlm.Previous()
+	chain.Emit(
+		"CollectExternalIncentivePenalty",
+		"prevAddr", previousRealm.Address().String(),
+		"prevRealm", previousRealm.PkgPath(),
+		"targetPoolPath", targetPoolPath,
+		"incentiveId", incentiveId,
+		"refundAddress", refundAddress.String(),
+		"penaltyAmount", utils.FormatInt(penaltyAmount),
+	)
+
+	return penaltyAmount
+}

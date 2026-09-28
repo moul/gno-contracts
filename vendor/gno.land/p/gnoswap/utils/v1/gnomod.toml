@@ -1,0 +1,7 @@
+module = "gno.land/p/gnoswap/utils/v1"
+gno = "0.9"
+
+[addpkg]
+  creator = "g1q5tjjv3kkslzwf2na9y9wk7e5a8ugph8xfsk04"
+  height = 77244
+  max_deposit = "100000000ugnot"

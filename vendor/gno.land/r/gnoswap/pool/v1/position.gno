@@ -1,0 +1,374 @@
+package pool
+
+import (
+	"errors"
+	"time"
+
+	"gno.land/p/gnoswap/gnsmath/v1"
+	i256 "gno.land/p/gnoswap/int256/v1"
+	u256 "gno.land/p/gnoswap/uint256/v1"
+	ufmt "gno.land/p/nt/ufmt/v0"
+
+	pl "gno.land/r/gnoswap/pool"
+)
+
+// getPositionKey generates a compact deterministic key for a liquidity position.
+//
+// Creates deterministic identifier for position tracking.
+// Ensures unique positions per price range while preserving lexical ordering.
+//
+// Used internally for position state management.
+//
+// Parameters:
+//   - tickLower: Lower boundary tick of position range
+//   - tickUpper: Upper boundary tick of position range
+//
+// Key Format: EncodePositionKey(tickLower, tickUpper)
+func getPositionKey(
+	tickLower int32,
+	tickUpper int32,
+) string {
+	return pl.EncodePositionKey(tickLower, tickUpper)
+}
+
+// positionUpdate updates a position's liquidity and calculates fees owed.
+// Returns the updated position information and any error.
+func positionUpdate(
+	position pl.PositionInfo,
+	liquidityDelta *i256.Int,
+	feeGrowthInside0X128 *u256.Uint,
+	feeGrowthInside1X128 *u256.Uint,
+) (pl.PositionInfo, error) {
+	isZeroLiquidityDelta := liquidityDelta.IsZero()
+
+	posLiquidity := u256.MustFromDecimal(position.Liquidity())
+	if posLiquidity.IsZero() && isZeroLiquidityDelta {
+		return pl.NewDefaultPositionInfo(), makeErrorWithDetails(
+			errZeroLiquidity,
+			"both liquidityDelta and current position's liquidity are zero",
+		)
+	}
+
+	if liquidityDelta.IsNeg() {
+		absDelta := i256.Zero().Set(liquidityDelta).Abs()
+		if absDelta.Gt(posLiquidity) {
+			return pl.NewDefaultPositionInfo(), makeErrorWithDetails(
+				errZeroLiquidity,
+				ufmt.Sprintf("liquidity delta(%s) is greater than current liquidity(%s)",
+					liquidityDelta.ToString(), posLiquidity.ToString()),
+			)
+		}
+	}
+
+	var liquidityNext *u256.Uint
+	if isZeroLiquidityDelta {
+		liquidityNext = posLiquidity
+	} else {
+		liquidityNext = gnsmath.LiquidityMathAddDelta(posLiquidity, liquidityDelta)
+	}
+
+	feeGrowthLast0 := u256.MustFromDecimal(position.FeeGrowthInside0LastX128())
+	feeGrowthLast1 := u256.MustFromDecimal(position.FeeGrowthInside1LastX128())
+
+	diff0 := u256.Zero().Sub(feeGrowthInside0X128, feeGrowthLast0)
+	diff1 := u256.Zero().Sub(feeGrowthInside1X128, feeGrowthLast1)
+
+	tokensOwed0 := u256.Zero()
+	if !diff0.IsZero() {
+		tokensOwed0 = u256.MulDiv(diff0, posLiquidity, q128FromDecimal)
+	}
+
+	tokensOwed1 := u256.Zero()
+	if !diff1.IsZero() {
+		tokensOwed1 = u256.MulDiv(diff1, posLiquidity, q128FromDecimal)
+	}
+
+	if !isZeroLiquidityDelta {
+		position.SetLiquidity(liquidityNext.ToString())
+	}
+
+	position.SetFeeGrowthInside0LastX128(feeGrowthInside0X128.ToString())
+	position.SetFeeGrowthInside1LastX128(feeGrowthInside1X128.ToString())
+
+	if tokensOwed0.Gt(zero) || tokensOwed1.Gt(zero) {
+		owed0 := gnsmath.SafeAddInt64(position.TokensOwed0(), gnsmath.SafeConvertToInt64(tokensOwed0))
+		owed1 := gnsmath.SafeAddInt64(position.TokensOwed1(), gnsmath.SafeConvertToInt64(tokensOwed1))
+
+		position.SetTokensOwed0(owed0)
+		position.SetTokensOwed1(owed1)
+	}
+
+	return position, nil
+}
+
+// calculateToken0Amount calculates the amount of token0 based on price range and liquidity delta.
+func calculateToken0Amount(sqrtPriceLower, sqrtPriceUpper *u256.Uint, liquidityDelta *i256.Int) *i256.Int {
+	return gnsmath.GetAmount0Delta(sqrtPriceLower, sqrtPriceUpper, liquidityDelta)
+}
+
+// calculateToken1Amount calculates the amount of token1 based on price range and liquidity delta.
+func calculateToken1Amount(sqrtPriceLower, sqrtPriceUpper *u256.Uint, liquidityDelta *i256.Int) *i256.Int {
+	return gnsmath.GetAmount1Delta(sqrtPriceLower, sqrtPriceUpper, liquidityDelta)
+}
+
+// positionUpdateWithKey updates a position in the pool and returns the updated position.
+func positionUpdateWithKey(
+	p *pl.Pool,
+	positionKey string,
+	liquidityDelta *i256.Int,
+	feeGrowthInside0X128, feeGrowthInside1X128 *u256.Uint,
+) (pl.PositionInfo, error) {
+	// if position does not exist, create a new position
+	//
+	// Note: The positionUpdate function is designed to handle both new positions and existing positions,
+	// so there's no need to check for existence in GetPosition.
+	positionToUpdate, err := p.GetPosition(positionKey)
+	if err != nil {
+		positionToUpdate = pl.NewDefaultPositionInfo()
+	}
+
+	positionAfterUpdate, err := positionUpdate(positionToUpdate, liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128)
+	if err != nil {
+		return pl.NewDefaultPositionInfo(), err
+	}
+
+	setPosition(p, positionKey, positionAfterUpdate)
+
+	return positionAfterUpdate, nil
+}
+
+// setPosition sets the position info for a given key.
+func setPosition(p *pl.Pool, posKey string, positionInfo pl.PositionInfo) {
+	p.SetPosition(posKey, positionInfo)
+}
+
+// modifyPosition updates a position in the pool and calculates the amount of tokens
+// needed (for minting) or returned (for burning). The calculation depends on the current
+// price (tick) relative to the position's price range.
+//
+// The function handles three cases:
+//  1. Current price below range (tick < tickLower): only token0 is used/returned
+//  2. Current price in range (tickLower <= tick < tickUpper): both tokens are used/returned
+//  3. Current price above range (tick >= tickUpper): only token1 is used/returned
+//
+// Parameters:
+//   - params: ModifyPositionParams containing owner, tickLower, tickUpper, and liquidityDelta
+//
+// Returns:
+//   - PositionInfo: updated position information
+//   - *u256.Uint: amount of token0 needed/returned
+//   - *u256.Uint: amount of token1 needed/returned
+func modifyPosition(p *pl.Pool, observations *pl.ObservationTree, params ModifyPositionParams) (pl.PositionInfo, *u256.Uint, *u256.Uint, error) {
+	if err := validateTicks(params.tickLower, params.tickUpper); err != nil {
+		return pl.NewDefaultPositionInfo(), zero, zero, err
+	}
+
+	// get current state and price bounds
+	tick := p.Slot0Tick()
+	// update position state
+	position, err := updatePosition(p, observations, params, tick)
+	if err != nil {
+		return pl.NewDefaultPositionInfo(), zero, zero, err
+	}
+
+	liqDelta := params.liquidityDelta
+	if liqDelta.IsZero() {
+		return position, zero, zero, nil
+	}
+
+	amount0, amount1 := i256.Zero(), i256.Zero()
+
+	// covert ticks to sqrt price to use in amount calculations
+	// price = 1.0001^tick, but we use sqrtPriceX96
+	sqrtRatioLower := gnsmath.TickMathGetSqrtRatioAtTick(params.tickLower)
+	sqrtRatioUpper := gnsmath.TickMathGetSqrtRatioAtTick(params.tickUpper)
+	sqrtPriceX96 := p.Slot0SqrtPriceX96()
+
+	// calculate token amounts based on current price position relative to range
+	switch {
+	case tick < params.tickLower:
+		// case 1
+		// full range between lower and upper tick is used for token0
+		// current tick is below the passed range; liquidity can only become in range by crossing from left to
+		// right, when we'll need _more_ token0 (it's becoming more valuable) so user must provide it
+		amount0 = calculateToken0Amount(sqrtRatioLower, sqrtRatioUpper, liqDelta)
+
+	case tick < params.tickUpper:
+		// case 2: Current price is within the position range
+		liquidityBefore := p.Liquidity()
+		currentTime := time.Now().Unix()
+		// Update oracle BEFORE liquidity changes
+		if observations == nil {
+			return pl.NewDefaultPositionInfo(), zero, zero, errors.New("observations not initialized")
+		}
+		slot0 := p.Slot0()
+		observationIndex, observationCardinality, err := writeObservation(
+			observations,
+			slot0.ObservationIndex(),
+			currentTime,
+			tick,
+			liquidityBefore,
+			slot0.ObservationCardinality(),
+			slot0.ObservationCardinalityNext(),
+		)
+		if err != nil {
+			return pl.NewDefaultPositionInfo(), zero, zero, err
+		}
+		slot0.SetObservationIndex(observationIndex)
+		slot0.SetObservationCardinality(observationCardinality)
+		p.SetSlot0(slot0)
+
+		// token0 used from current price to upper tick
+		amount0 = calculateToken0Amount(sqrtPriceX96, sqrtRatioUpper, liqDelta)
+		// token1 used from lower tick to current price
+		amount1 = calculateToken1Amount(sqrtRatioLower, sqrtPriceX96, liqDelta)
+		// update pool's active liquidity since price is in range
+		p.SetLiquidity(gnsmath.LiquidityMathAddDelta(liquidityBefore, liqDelta))
+
+	default:
+		// case 3
+		// full range between lower and upper tick is used for token1
+		// current tick is above the passed range; liquidity can only become in range by crossing from right to
+		// left, when we'll need _more_ token1 (it's becoming more valuable) so user must provide it
+		amount1 = calculateToken1Amount(sqrtRatioLower, sqrtRatioUpper, liqDelta)
+	}
+
+	return position, amount0.Abs(), amount1.Abs(), nil
+}
+
+// updatePosition modifies the position's liquidity and updates the corresponding tick states.
+//
+// This function updates the position data based on the specified liquidity delta and tick range.
+// It also manages the fee growth, tick state flipping, and cleanup of unused tick data.
+//
+// Parameters:
+//   - positionParams: ModifyPositionParams, the parameters for the position modification, which include:
+//   - owner: The address of the position owner.
+//   - tickLower: The lower tick boundary of the position.
+//   - tickUpper: The upper tick boundary of the position.
+//   - liquidityDelta: The change in liquidity (positive or negative).
+//   - tick: int32, the current tick position.
+//
+// Returns:
+//   - PositionInfo: The updated position information.
+//
+// Workflow:
+//  1. Clone the global fee growth values (token 0 and token 1).
+//  2. If the liquidity delta is non-zero:
+//     - Update the lower and upper ticks using `tickUpdate`, flipping their states if necessary.
+//     - If a tick's state was flipped, update the tick bitmap to reflect the new state.
+//  3. Calculate the fee growth inside the tick range using `getFeeGrowthInside`.
+//  4. Generate a unique position key and update the position data using `positionUpdateWithKey`.
+//  5. If liquidity is being removed (negative delta), clean up unused tick data by deleting the tick entries.
+//  6. Return the updated position.
+//
+// Notes:
+//   - The function flips the tick states and cleans up unused tick data when liquidity is removed.
+//   - It ensures fee growth and position data remain accurate after the update.
+//
+// Example Usage:
+//
+// ```gno
+//
+//	updatedPosition := pool.updatePosition(positionParams, currentTick)
+//	println("Updated Position Info:", updatedPosition)
+//
+// ```
+func updatePosition(p *pl.Pool, observations *pl.ObservationTree, positionParams ModifyPositionParams, tick int32) (pl.PositionInfo, error) {
+	feeGrowthGlobal0X128 := p.FeeGrowthGlobal0X128().Clone()
+	feeGrowthGlobal1X128 := p.FeeGrowthGlobal1X128().Clone()
+	liquidityDelta := positionParams.liquidityDelta
+
+	var flippedLower, flippedUpper bool
+	if !liquidityDelta.IsZero() {
+		blockTimestamp := time.Now().Unix()
+		if observations == nil {
+			return pl.NewDefaultPositionInfo(), errors.New("observations not initialized")
+		}
+		slot0 := p.Slot0()
+		tickCumulative, secondsPerLiquidityStr, err := observeSingle(
+			observations,
+			blockTimestamp,
+			0,
+			slot0.Tick(),
+			slot0.ObservationIndex(),
+			p.Liquidity(),
+			slot0.ObservationCardinality(),
+		)
+		if err != nil {
+			return pl.NewDefaultPositionInfo(), err
+		}
+
+		secondsPerLiquidityCumulativeX128 := u256.MustFromDecimal(secondsPerLiquidityStr)
+
+		flippedLower = tickUpdate(
+			p,
+			positionParams.tickLower,
+			tick,
+			liquidityDelta,
+			feeGrowthGlobal0X128,
+			feeGrowthGlobal1X128,
+			secondsPerLiquidityCumulativeX128,
+			tickCumulative,
+			blockTimestamp,
+			false,
+			calculateMaxLiquidityPerTick(p.TickSpacing()),
+		)
+
+		flippedUpper = tickUpdate(
+			p,
+			positionParams.tickUpper,
+			tick,
+			liquidityDelta,
+			feeGrowthGlobal0X128,
+			feeGrowthGlobal1X128,
+			secondsPerLiquidityCumulativeX128,
+			tickCumulative,
+			blockTimestamp,
+			true,
+			calculateMaxLiquidityPerTick(p.TickSpacing()),
+		)
+
+		if flippedLower {
+			tickBitmapFlipTick(p, positionParams.tickLower, p.TickSpacing())
+		}
+
+		if flippedUpper {
+			tickBitmapFlipTick(p, positionParams.tickUpper, p.TickSpacing())
+		}
+	}
+
+	feeGrowthInside0X128, feeGrowthInside1X128 := getFeeGrowthInside(
+		p,
+		positionParams.tickLower,
+		positionParams.tickUpper,
+		tick,
+		feeGrowthGlobal0X128,
+		feeGrowthGlobal1X128,
+	)
+
+	positionKey := getPositionKey(positionParams.tickLower, positionParams.tickUpper)
+
+	position, err := positionUpdateWithKey(
+		p,
+		positionKey,
+		liquidityDelta,
+		feeGrowthInside0X128.Clone(),
+		feeGrowthInside1X128.Clone(),
+	)
+	if err != nil {
+		return pl.NewDefaultPositionInfo(), err
+	}
+
+	// clear any tick data that is no longer needed
+	if liquidityDelta.IsNeg() {
+		if flippedLower {
+			deleteTick(p, positionParams.tickLower)
+		}
+		if flippedUpper {
+			deleteTick(p, positionParams.tickUpper)
+		}
+	}
+
+	return position, nil
+}

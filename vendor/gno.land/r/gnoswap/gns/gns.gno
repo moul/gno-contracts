@@ -1,0 +1,319 @@
+package gns
+
+import (
+	"chain"
+	"strings"
+	"time"
+
+	"gno.land/p/nt/grc20/v0"
+	"gno.land/p/nt/ufmt/v0"
+
+	"gno.land/r/gnoswap/access/v1"
+	"gno.land/r/nt/grc20reg/v0"
+
+	"gno.land/p/gnoswap/gnsmath/v1"
+	"gno.land/p/gnoswap/utils/v1"
+	_ "gno.land/r/gnoswap/rbac/v1"
+)
+
+const (
+	tokenID             = 0
+	MAXIMUM_SUPPLY      = int64(1_000_000_000_000_000)
+	INITIAL_MINT_AMOUNT = int64(100_000_000_000_000)
+	MAX_EMISSION_AMOUNT = int64(900_000_000_000_000) // MAXIMUM_SUPPLY - INITIAL_MINT_AMOUNT
+)
+
+var (
+	token         *grc20.Token
+	privateLedger *grc20.PrivateLedger
+	userTeller    grc20.Teller
+
+	leftEmissionAmount   int64 // amount of GNS can be minted for emission
+	mintedEmissionAmount int64 // amount of GNS that has been minted for emission
+	lastMintedTimestamp  int64 // last block time that gns was minted for emission
+)
+
+func init(cur realm) {
+	token, privateLedger = grc20.NewToken("Gnoswap", "GNS", 6, tokenID, cur)
+	userTeller = privateLedger.CallerTeller()
+
+	grc20reg.Register(cross(cur), token, "")
+
+	// Initial amount set to 900_000_000_000_000 (MAXIMUM_SUPPLY - INITIAL_MINT_AMOUNT).
+	// leftEmissionAmount will decrease as tokens are minted.
+	setLeftEmissionAmount(MAX_EMISSION_AMOUNT)
+	setMintedEmissionAmount(0)
+	setLastMintedTimestamp(0)
+
+	// Pre-mint the initial GNS supply.
+	setupPreMint(cur)
+}
+
+// Name returns the name of the GNS token.
+//
+// Returns:
+//   - name: token name
+func Name() string { return token.GetName() }
+
+// Symbol returns the symbol of the GNS token.
+//
+// Returns:
+//   - symbol: token symbol
+func Symbol() string { return token.GetSymbol() }
+
+// Decimals returns the number of decimal places for GNS token.
+//
+// Returns:
+//   - decimals: number of decimal places
+func Decimals() int { return token.GetDecimals() }
+
+// TotalSupply returns the total supply of GNS tokens in circulation.
+//
+// Returns:
+//   - supply: total token supply
+func TotalSupply() int64 { return token.TotalSupply() }
+
+// KnownAccounts returns the number of addresses that have held GNS.
+//
+// Returns:
+//   - count: number of known accounts
+func KnownAccounts() int { return token.KnownAccounts() }
+
+// BalanceOf returns the GNS balance of a specific address.
+//
+// Parameters:
+//   - owner: address to check balance for
+//
+// Returns:
+//   - balance: token balance
+func BalanceOf(owner address) int64 { return token.BalanceOf(owner) }
+
+// Allowance returns the amount of GNS that a spender is allowed to transfer from an owner.
+//
+// Parameters:
+//   - owner: token owner address
+//   - spender: spender address
+//
+// Returns:
+//   - allowance: approved amount
+func Allowance(owner, spender address) int64 { return token.Allowance(owner, spender) }
+
+// MintGns mints new GNS tokens according to the emission schedule.
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//   - address: recipient address for minted tokens
+//
+// Returns:
+//   - amount: GNS minted for the current timestamp; zero when emission is
+//     already processed for that timestamp or the schedule has ended
+//
+// Only callable by emission contract.
+//
+// Note: Halt check is performed by the caller (emission.MintAndDistributeGns)
+// to allow graceful handling. This function assumes caller has already verified
+// halt status before invoking.
+func MintGns(cur realm, address address) int64 {
+	previousRealm := cur.Previous()
+	caller := previousRealm.Address()
+	access.AssertIsEmission(caller)
+
+	lastGNSMintedTimestamp := LastMintedTimestamp()
+	currentTime := time.Now().Unix()
+
+	// Skip if already minted this timestamp or emission ended.
+	if lastGNSMintedTimestamp == currentTime || lastGNSMintedTimestamp >= GetEmissionEndTimestamp() {
+		return 0
+	}
+
+	amountToMint, err := calculateAmountToMint(getEmissionState(), lastGNSMintedTimestamp+1, currentTime)
+	if err != nil {
+		panic(err)
+	}
+
+	err = validEmissionAmount(amountToMint)
+	if err != nil {
+		panic(err)
+	}
+
+	setLastMintedTimestamp(currentTime)
+	setMintedEmissionAmount(gnsmath.SafeAddInt64(MintedEmissionAmount(), amountToMint))
+	setLeftEmissionAmount(gnsmath.SafeSubInt64(LeftEmissionAmount(), amountToMint))
+
+	err = privateLedger.Mint(address, amountToMint)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	chain.Emit(
+		"MintGNS",
+		"prevAddr", caller.String(),
+		"prevRealm", previousRealm.PkgPath(),
+		"mintedBlockTime", utils.FormatInt(currentTime),
+		"mintedGNSAmount", utils.FormatInt(amountToMint),
+		"accumMintedGNSAmount", utils.FormatInt(MintedEmissionAmount()),
+		"accumLeftMintGNSAmount", utils.FormatInt(LeftEmissionAmount()),
+	)
+
+	return amountToMint
+}
+
+// Transfer transfers GNS tokens from caller to recipient.
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//   - to: recipient address
+//   - amount: number of GNS base units to transfer
+func Transfer(cur realm, to address, amount int64) {
+	checkErr(userTeller.Transfer(0, cur, to, amount))
+}
+
+// Approve allows spender to transfer GNS tokens from caller's account.
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//   - spender: address authorized to spend
+//   - amount: maximum number of GNS base units spender can transfer
+func Approve(cur realm, spender address, amount int64) {
+	checkErr(userTeller.Approve(0, cur, spender, amount))
+}
+
+// TransferFrom transfers GNS tokens on behalf of owner.
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//   - from: token owner address
+//   - to: recipient address
+//   - amount: number of GNS base units to transfer
+func TransferFrom(cur realm, from, to address, amount int64) {
+	checkErr(userTeller.TransferFrom(0, cur, from, to, amount))
+}
+
+// Render returns token information for web interface.
+//
+// Parameters:
+//   - path: render path for specific views
+//
+// Returns:
+//   - output: formatted token information
+func Render(path string) string {
+	parts := strings.Split(path, "/")
+	c := len(parts)
+
+	switch {
+	case path == "":
+		return token.RenderHome()
+	case c == 2 && parts[0] == "balance":
+		owner := address(parts[1])
+		balance := token.BalanceOf(owner)
+		return ufmt.Sprintf("%d\n", balance)
+	default:
+		return "404\n"
+	}
+}
+
+// checkErr panics if error is not nil.
+func checkErr(err error) {
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+// calculateAmountToMint calculates and allocates GNS tokens to mint for given timestamp range.
+// This function has side effects: it updates the accumulated and remaining amounts
+// for each halving year in the emission state.
+func calculateAmountToMint(state *EmissionState, fromTimestamp, toTimestamp int64) (int64, error) {
+	// Cache state to avoid repeated lookups
+	endTimestamp := state.getEndTimestamp()
+	if toTimestamp > endTimestamp {
+		toTimestamp = endTimestamp
+	}
+
+	if fromTimestamp > toTimestamp {
+		return 0, nil
+	}
+
+	startTimestamp := state.getStartTimestamp()
+	if fromTimestamp < startTimestamp {
+		fromTimestamp = startTimestamp
+	}
+
+	if toTimestamp < startTimestamp {
+		return 0, nil
+	}
+
+	fromYear := state.getCurrentYear(fromTimestamp)
+	toYear := state.getCurrentYear(toTimestamp)
+
+	if fromYear == 0 || toYear == 0 {
+		return 0, nil
+	}
+
+	totalAmountToMint := int64(0)
+
+	for year := fromYear; year <= toYear; year++ {
+		yearEndTimestamp := state.getHalvingYearEndTimestamp(year)
+		currentToTimestamp := i64Min(toTimestamp, yearEndTimestamp)
+
+		seconds := currentToTimestamp - fromTimestamp + 1
+		if seconds <= 0 {
+			break
+		}
+
+		amountPerSecond := state.getHalvingYearAmountPerSecond(year)
+		yearAmountToMint := gnsmath.SafeMulInt64(amountPerSecond, seconds)
+
+		if currentToTimestamp >= yearEndTimestamp {
+			leftover := gnsmath.SafeSubInt64(state.getHalvingYearLeftAmount(year), yearAmountToMint)
+			yearAmountToMint = gnsmath.SafeAddInt64(yearAmountToMint, leftover)
+		}
+
+		totalAmountToMint = gnsmath.SafeAddInt64(totalAmountToMint, yearAmountToMint)
+
+		err := state.addHalvingYearMintedAmount(year, yearAmountToMint)
+		if err != nil {
+			return 0, err
+		}
+
+		err = state.subHalvingYearLeftAmount(year, yearAmountToMint)
+		if err != nil {
+			return 0, err
+		}
+
+		fromTimestamp = currentToTimestamp + 1
+
+		if fromTimestamp > toTimestamp {
+			break
+		}
+	}
+
+	return totalAmountToMint, nil
+}
+
+// LastMintedTimestamp returns the timestamp of the last GNS emission mint.
+//
+// Returns:
+//   - timestamp: last minted timestamp
+func LastMintedTimestamp() int64 { return lastMintedTimestamp }
+
+// LeftEmissionAmount returns the remaining GNS tokens available for emission.
+//
+// Returns:
+//   - amount: remaining emission amount
+func LeftEmissionAmount() int64 { return leftEmissionAmount }
+
+// MintedEmissionAmount returns the total GNS tokens minted through emission,
+// excluding the initial mint amount.
+//
+// Returns:
+//   - amount: total minted emission amount
+func MintedEmissionAmount() int64 { return mintedEmissionAmount }
+
+// setLastMintedTimestamp sets the timestamp of the last emission mint.
+func setLastMintedTimestamp(timestamp int64) { lastMintedTimestamp = timestamp }
+
+// setLeftEmissionAmount sets the remaining emission amount.
+func setLeftEmissionAmount(amount int64) { leftEmissionAmount = amount }
+
+// setMintedEmissionAmount sets the total minted emission amount.
+func setMintedEmissionAmount(amount int64) { mintedEmissionAmount = amount }
