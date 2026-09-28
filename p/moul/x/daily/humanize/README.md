@@ -1,10 +1,10 @@
-# `gno.land/p/moul/x/daily/humanize/v0`
+# `gno.land/p/moul/x/daily/humanize/v1`
 
 **Human-facing number formatting** — `Bytes`, `Comma`, `Ordinal`, `Plural`,
 `Blocks`, `Truncate`.
 
 ```go
-import "gno.land/p/moul/x/daily/humanize/v0"
+import "gno.land/p/moul/x/daily/humanize/v1"
 
 humanize.Bytes(1536)        // "1.5 KiB"
 humanize.Comma(1234567)     // "1,234,567"
@@ -13,6 +13,12 @@ humanize.Plural(2, "mouse", "mice")  // "2 mice"
 humanize.Blocks(1234)       // "~1,200 blocks"
 humanize.Truncate("ééé", 2) // "é…"
 ```
+
+**v1 fixes `Comma` at the int64 minimum.** `v0` negated in `int64`, and `-n` on
+`math.MinInt64` is `math.MinInt64`, so `FormatInt` emitted its own sign and the
+`neg` branch prepended a second: `Comma(math.MinInt64)` returned
+`--9,223,372,036,854,775,808`. The magnitude now goes through `uint64`.
+`v0` stays resolvable for its existing importers.
 
 **Integer-only, on purpose.** No floats anywhere: a rendered value that differed
 between nodes would be a consensus bug, so the single decimal place in `Bytes`

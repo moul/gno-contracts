@@ -1,6 +1,7 @@
 package humanize
 
 import (
+	"strings"
 	"testing"
 
 	"gno.land/p/nt/uassert/v0"
@@ -82,4 +83,29 @@ func TestTruncateCountsRunes(t *testing.T) {
 	uassert.Equal(t, "", Truncate("hello", 0))
 	uassert.Equal(t, "éé", Truncate("éé", 2))
 	uassert.Equal(t, "é…", Truncate("ééé", 2)) // not sliced mid-rune
+}
+
+// TestCommaSurvivesTheInt64Minimum pins the defect v0 shipped. -n on
+// math.MinInt64 is math.MinInt64, so FormatInt emitted its own sign and the
+// neg branch prepended a second: v0 returned
+// "--9,223,372,036,854,775,808". Break the mag split and this goes red.
+func TestCommaSurvivesTheInt64Minimum(t *testing.T) {
+	const minInt64 = -9223372036854775808
+	uassert.Equal(t, "-9,223,372,036,854,775,808", Comma(minInt64))
+	uassert.Equal(t, "9,223,372,036,854,775,807", Comma(9223372036854775807))
+}
+
+// TestCommaNeverDoublesTheSign is the invariant behind it, stated so a future
+// rewrite cannot reintroduce the shape without failing.
+func TestCommaNeverDoublesTheSign(t *testing.T) {
+	const minInt64 = -9223372036854775808
+	for _, n := range []int64{0, 1, -1, 999, -1000, 1234567, -1234567, minInt64} {
+		s := Comma(n)
+		if strings.HasPrefix(s, "--") || strings.Contains(s, "-,") {
+			t.Errorf("Comma(%d) = %q", n, s)
+		}
+		if (n < 0) != strings.HasPrefix(s, "-") {
+			t.Errorf("Comma(%d) = %q, sign disagrees with the input", n, s)
+		}
+	}
 }

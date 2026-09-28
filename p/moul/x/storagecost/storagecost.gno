@@ -21,7 +21,10 @@
 // Demo realm: gno.land/r/moul/x/reaper/v0.
 package storagecost
 
-import "gno.land/p/nt/ufmt/v0"
+import (
+	"gno.land/p/moul/kit/num/v0"
+	"gno.land/p/nt/ufmt/v0"
+)
 
 const (
 	// DefaultStoragePrice is the ugnot locked per byte of realm state, the
@@ -147,31 +150,15 @@ func EvaluateAtFloor(bytes, gasWanted int64) Quote {
 	return Evaluate(bytes, DefaultStoragePrice, gasWanted, 1, GasPerUgnotFloor)
 }
 
-// FormatGNOT renders ugnot as GNOT with six decimal places and trailing zeros
-// trimmed, because a bounty shown in ugnot is unreadable and gno has no
-// floats.
+// FormatGNOT renders ugnot as GNOT with trailing zeros trimmed, because a
+// bounty shown in ugnot is unreadable and gno has no floats.
+//
+// It delegates to [p/moul/kit/num], which owns amount formatting. v0 did it by
+// hand with `amount = -amount`, and since that leaves math.MinInt64 negative
+// both the whole and the fractional part then carried their own sign:
+// FormatGNOT(math.MinInt64) returned "--9223372036854.-775808 GNOT". No caller
+// in this repo can reach it, but the function is exported and a formatter that
+// can return a non-number is not one.
 func FormatGNOT(amount int64) string {
-	neg := amount < 0
-	if neg {
-		amount = -amount
-	}
-	whole := amount / ugnotPerGNOT
-	frac := amount % ugnotPerGNOT
-
-	out := ufmt.Sprintf("%d", whole)
-	if frac != 0 {
-		// Left-pad the fraction to six digits, then trim trailing zeros.
-		digits := ufmt.Sprintf("%d", frac)
-		for len(digits) < 6 {
-			digits = "0" + digits
-		}
-		for len(digits) > 1 && digits[len(digits)-1] == '0' {
-			digits = digits[:len(digits)-1]
-		}
-		out += "." + digits
-	}
-	if neg {
-		out = "-" + out
-	}
-	return out + " GNOT"
+	return num.GNOTf(amount)
 }

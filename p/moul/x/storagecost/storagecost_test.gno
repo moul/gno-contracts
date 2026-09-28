@@ -136,3 +136,16 @@ func TestEstimateBytes(t *testing.T) {
 	// Monotonic, which is all a bounty estimate really needs.
 	uassert.True(t, EstimateBytes(2048) > EstimateBytes(1024))
 }
+
+// TestFormatGNOTIsTotal pins what v0 could not do. v0 negated in int64, so at
+// math.MinInt64 both halves kept a sign and it returned
+// "--9223372036854.-775808 GNOT". Delegating to kit/num is the fix; this
+// asserts the contract rather than the delegation.
+func TestFormatGNOTIsTotal(t *testing.T) {
+	const minInt64 = -9223372036854775808
+	uassert.Equal(t, "-9223372036854.775808 GNOT", FormatGNOT(minInt64))
+	uassert.Equal(t, "-1.5 GNOT", FormatGNOT(-1500000))
+	uassert.Equal(t, "-0.000001 GNOT", FormatGNOT(-1))
+	uassert.Equal(t, "1.5 GNOT", FormatGNOT(1500000))
+	uassert.Equal(t, "0 GNOT", FormatGNOT(0))
+}

@@ -2,7 +2,7 @@
 // percentages and zero padding.
 //
 // Thousands separators are NOT here. They belong to
-// [p/moul/x/daily/humanize](/p/moul/x/daily/humanize/v0), which already owns
+// [p/moul/x/daily/humanize](/p/moul/x/daily/humanize/v1), which already owns
 // Comma, Bytes, Ordinal, Plural and Blocks.
 //
 // It exists because nothing in p/moul or p/nt did. Measured across the 828
