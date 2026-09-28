@@ -1,0 +1,5 @@
+module = "gno.land/r/moul/x/upgrade/store/logic/v1"
+gno = "0.9"
+# private on purpose: it holds no state and hands out no object, so the chain lets it
+# be redeployed in place. That is the seventh pattern, and it is measured in the README.
+private = true

@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/upgrade/lazy/v0"
+gno = "0.9"
+# public: imported by .../lazy/v1, which reads records out of it to migrate them

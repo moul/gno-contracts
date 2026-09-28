@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/upgrade/lock/v1"
+gno = "0.9"
+# public: its successor must import it to read the total it will freeze

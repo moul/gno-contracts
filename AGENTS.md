@@ -651,7 +651,7 @@ in each: [`.github/README.md`](./.github/README.md).
 ## Meta issues: the hubs, and the shape they share
 
 A `[meta]` issue is a **hub**: the one place for everything about one theme, so a narrow
-thought becomes a comment there rather than a fourteenth issue nobody finds again. Seven
+thought becomes a comment there rather than a fourteenth issue nobody finds again. Eight
 exist, they cross-link each other in an identical footer, and **GitHub pins at most three per
 repository**, which is why the footer carries all of them.
 
@@ -664,6 +664,7 @@ repository**, which is why the footer carries all of them.
 | [#178](https://github.com/moul/gno-contracts/issues/178) | render: how a realm shows itself |
 | [#179](https://github.com/moul/gno-contracts/issues/179) | cost: gas, storage deposit |
 | [#180](https://github.com/moul/gno-contracts/issues/180) | upstream: the `gnolang/gno` relationship |
+| [#241](https://github.com/moul/gno-contracts/issues/241) | upgradeability: changing a realm whose path is permanent |
 
 Write a new one only when a theme has outgrown being a comment on an existing hub. The shape,
 which every one of them follows:
@@ -685,7 +686,7 @@ which every one of them follows:
 # Inspiration   optional: prior art worth stealing, and what to steal from it
 # Principles    numbered, bold lead
 # Non-goals     bullets, the lines that are not up for discussion
-<footer>        the identical index of all seven
+<footer>        the identical index of all eight
 ```
 
 Three rules that matter more than the layout:

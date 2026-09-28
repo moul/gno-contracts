@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/upgrade/lock/v0"
+gno = "0.9"
+# public: imported by .../lock/v1, which folds its frozen total in after retirement
