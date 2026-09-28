@@ -1,0 +1,58 @@
+package pool
+
+import (
+	ufmt "gno.land/p/nt/ufmt/v0"
+	pl "gno.land/r/gnoswap/pool"
+)
+
+func assertIsNotUserCall(_ int, rlm realm) {
+	previousRealm := rlm.Previous()
+	if previousRealm.IsUserCall() {
+		panic(newErrorWithDetail(
+			errNotAccessEOA,
+			ufmt.Sprintf("previousRealm(%s) is EOA", previousRealm.Address()),
+		))
+	}
+}
+
+// assertIsNotEqualsTokens asserts that the token0Path and token1Path are not equal.
+func assertIsNotEqualsTokens(token0Path, token1Path string) {
+	if token0Path == token1Path {
+		panic(newErrorWithDetail(
+			errDuplicateTokenInPool,
+			ufmt.Sprintf("expected token0Path(%s) != token1Path(%s)", token0Path, token1Path),
+		))
+	}
+}
+
+// assertIsSupportedFeeTier asserts that the fee is a supported fee tier.
+func assertIsSupportedFeeTier(fee uint32) {
+	if !isValidFeeTier(fee) {
+		panic(newErrorWithDetail(
+			errUnsupportedFeeTier,
+			ufmt.Sprintf("expected fee(%d) to be one of %d, %d, %d, %d", fee, FeeTier100, FeeTier500, FeeTier3000, FeeTier10000),
+		))
+	}
+}
+
+// assertIsNotExistsPoolPath asserts that the pool path does not exist.
+func assertIsNotExistsPoolPath(instance *poolV1, token0Path, token1Path string, fee uint32) {
+	poolPath := pl.GetPoolPath(token0Path, token1Path, fee)
+
+	pools := instance.store.GetPools()
+	if pools.Has(poolPath) {
+		panic(newErrorWithDetail(
+			errPoolAlreadyExists,
+			ufmt.Sprintf("expected poolPath(%s:%s:%d) not to exist", token0Path, token1Path, fee),
+		))
+	}
+}
+
+func assertIsValidTokenOrder(token0Path, token1Path string) {
+	if token0Path >= token1Path {
+		panic(newErrorWithDetail(
+			errInvalidInput,
+			ufmt.Sprintf("expected token0Path(%s) < token1Path(%s)", token0Path, token1Path),
+		))
+	}
+}
