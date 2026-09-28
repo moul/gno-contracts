@@ -133,6 +133,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/present/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/reactions/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/vesting/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/across/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/allinone/devtools/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/allinone/textlab/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/amm/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -162,6 +163,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/eightball/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/englishauction/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/erc1155/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/erc20/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/erc721/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/escrow/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/faucet/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -227,6 +229,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/trivia/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/urlshort/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/vault/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/vestoken/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/wrapped/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/framelab/probe/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/games/idle/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -398,6 +401,22 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/vesting/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/demo/wikicoin/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/reactions/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/amm/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/dice/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/erc20/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/lottery/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/ratelimitdemo/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/staking/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/streak/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/vestoken/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/daily/wrapped/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/grc20faucet/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/pairs/aaa/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/pairs/aaabbb/v0";
+  "gno.land/r/moul/x/across/v0" -> "gno.land/r/moul/x/pairs/bbb/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/debug/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/fifo/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/kit/num/v0";
