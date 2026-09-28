@@ -120,6 +120,16 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   between tests, was wrong) and corrected 2026-09-28 while writing `r/moul/x/moultest`,
   where "no absolute setter" turned out to be wrong too: `SetHeight` has been in
   `gnovm/tests/stdlibs/testing` all along.
+- **The block CLOCK resets the same way, and it starts in 2009.** `time.Now()` in a realm
+  is the block timestamp, and in a test it is **1234567890** (2009-02-13) at the top of
+  every test function, exactly as height is 123. `testing.SkipHeights(10)` moves it 50s, so
+  the test machine runs 5s blocks. The trap is a realm that stores a timestamp: build state
+  in a test at a hand-picked "realistic" unix second (1700000000, say) and every later call
+  reading `time.Now()` sees a clock fifteen years BEHIND the state it is being asked about,
+  which surfaces as a time-went-backwards error from whatever does the arithmetic rather
+  than as anything about tests. Drive the pure helpers with an explicit `at` argument and
+  any constant you like; anchor anything that reaches `time.Now()` at `time.Now()`. Measured
+  2026-09-28 against gno master while writing `r/moul/x/games/idle`.
 - **The BANK does not carry over between test functions, though realm state does.** A
   balance issued in one test is gone in the next, while the package-level counters that
   recorded issuing it are not, so a realm's own view and the chain's can be made to
