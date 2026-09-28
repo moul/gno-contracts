@@ -14,7 +14,7 @@ functions, `chain`-era stdlibs, `p/nt/*`, and this repo's version-last path
 convention. The port is where most of the new findings came from, because
 several of the originals no longer mean what they meant.
 
-## The six
+## The catalogue
 
 | Dir | Was | Idea | Upgrade is | Data moves | One answer? |
 |---|---|---|---|---|---|
@@ -24,9 +24,12 @@ several of the originals no longer mean what they meant.
 | [`lazy`](./lazy) | `upgrade_d` | New layout, records converted on first touch | a deploy, nothing else | per record, on read | yes |
 | [`selfreg`](./selfreg) | `upgrade_e` | Permanent facade holds an interface; impl registers itself from `init` | a deploy, nothing else | never | yes |
 | [`adminreg`](./adminreg) | `upgrade_f` | Same, but nominating and accepting are separate transactions | a deploy + one `Accept` tx | never | yes |
+| [`schema`](./schema) | new | The API is **data** the handler declares, behind one `Call(verb, payload)` | a deploy + one `Accept` tx | never | yes |
 
 Read them in that order. `wrap` is the cheapest and weakest; each of the next
 buys one guarantee back and charges a transaction, a gate, or a realm for it.
+`schema` is the odd one out: it buys the same guarantee `adminreg` does and spends
+the type system instead of a realm.
 
 Choosing, very roughly:
 
@@ -37,6 +40,7 @@ Choosing, very roughly:
   `store` or `lock` can migrate lazily).
 - **Callers must not have to know a version exists** → `selfreg`.
 - **Same, but deploying must not be enough to take the realm over** → `adminreg`.
+- **The set of operations will keep growing, and callers should discover it** → `schema`.
 
 ## What the port changed
 
@@ -91,6 +95,45 @@ that are not cosmetic.
    not have to carry state. Every implementation realm in `selfreg` and
    `adminreg` therefore carries a `# public:` line quoting that panic, on a path
    where the flag can never be changed again.
+
+## Ending it: the ladder, not the boolean
+
+Three chains solved this before gno existed, and all three landed on the same primitive: an
+upgrade authority you can drop, permanently. Sui gates a package with an `UpgradeCap` whose
+policy runs compatible, additive, dependency-only, immutable, and **a policy can only ever
+become more restrictive**; `make_immutable` discards the cap. CosmWasm makes a contract
+immutable by leaving its `admin` empty. Solana's upgradeable loader does it by setting the
+upgrade authority to `None`.
+
+That matters here because of the limitation at the bottom of this file: per gno's interrealm
+spec, two mutable realms cannot export trust, so everything downstream of a facade is trusting
+its owner rather than its code. An authority that can be dropped is the only way out, and a
+ladder beats a boolean because the interesting states are between "anything may take this over"
+and "nothing may ever change again".
+
+Both facade patterns now have one, and the rung count is a property of how many actors the
+pattern has rather than a design choice:
+
+| | rung | who may climb | what it stops |
+|---|---|---|---|
+| `selfreg` | `open` | | the default |
+| | `sealed` | the **live implementation**, the only actor a facade with no owner already trusts | every future `Register`, including its own |
+| `adminreg` | `open` | | the default |
+| | `closed` | the owner | new candidates. Rolling back among those already proposed still works |
+| | `frozen` | the owner | `Accept` itself. Whatever is live is final |
+
+Every transition is one-way, `adminreg`'s `tighten` refuses to loosen even for the owner, and
+`Render` names the current rung so a caller can see it without reading code.
+
+**Sealing `selfreg` grants nobody anything new.** Whoever could deploy under the prefix could
+already take the realm over; all `Seal` adds is the ability to make that the last word. That is
+the same trade the pattern already made, made terminal.
+
+**And freezing the pointer is not freezing the behaviour, unless every realm behind it is
+public.** A private realm may be re-added at its own path, so a private implementation could be
+swapped underneath a frozen facade and the freeze would be theatre. It holds here only by
+construction: an implementation hands the facade its own object, which is exactly what forbids
+private. Two findings on this page that were derived separately turn out to hold each other up.
 
 ## The seventh pattern is the chain's own
 
@@ -164,11 +207,15 @@ It carries no LICENSE file, so nothing from it is vendored here.
 
 Open threads, roughly in order of interest:
 
-1. **A `freeze` terminal state** for `selfreg` and `adminreg`. Cheap to add, and
-   it is the answer to the trust problem, not a mitigation of it.
-2. **Schema dispatch as a seventh pattern**, built here rather than copied, to
-   measure what the string boundary actually costs against `adminreg`'s typed
-   one.
+1. **A second look at the ladder's middle.** `adminreg` has one rung between open
+   and frozen; Sui has two, and `dependency-only` has no analogue here yet. Is
+   there a useful rung that says "the interface may not change but the
+   implementation may"?
+2. **Separate the crossing from the string boundary** in `schema`'s cost table.
+   A dispatch costs ~182,000 gas there against ~9,400 through `adminreg`'s typed
+   entry point, 19.5x, and one realm crossing is inside that gap. Worth knowing
+   how much, because it decides whether the string boundary is the thing to
+   optimise or the crossing is.
 3. **Paged migration** next to `lazy`: an owner-driven `MigrateN(n)` that drains
    the predecessor in bounded batches, so the two-answer window closes instead
    of lasting forever.

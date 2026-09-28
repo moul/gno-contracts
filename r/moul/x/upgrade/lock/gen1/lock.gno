@@ -3,7 +3,7 @@
 //
 // v1 refuses every write until v0 has been retired. That is the whole point:
 // at most one version is writable at any height, so v1 can safely fold v0's
-// frozen total into its own and report a single authoritative number — the
+// frozen total into its own and report a single authoritative number, the
 // thing pattern A cannot do.
 package lock
 

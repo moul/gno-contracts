@@ -18,7 +18,8 @@
 // buys 1000 gas. So a byte is worth 100,000 gas, and any deletion costing less
 // than that per byte pays for itself.
 //
-// Demo realm: gno.land/r/moul/x/reaper/v0.
+// Demo realms: gno.land/r/moul/x/reaper for reaping expired state, and
+// gno.land/r/moul/x/compact for the compaction half.
 package storagecost
 
 import (
@@ -46,6 +47,19 @@ const (
 	// the chain's own, from the vm/qstorage query or a StorageDepositEvent.
 	payloadOverheadNum int64 = 185
 	payloadOverheadDen int64 = 100
+
+	// BytesPerTreeNode is the realm state one balanced-tree container node
+	// occupies, for the tree containers in this namespace (p/moul/ulist and
+	// what is built on it).
+	//
+	// Measured twice, agreeing exactly. Compacting 8 dead nodes on mainnet
+	// freed 6,848 bytes (2026-09-23), and 31 nodes in the local integration
+	// harness freed 26,536. Both give 856.
+	//
+	// It is a property of the node, not of the element: the node costs this
+	// whether the value it carried was 8 bytes or 1,024. That is what makes
+	// EstimateNodes accurate where EstimateBytes is only indicative.
+	BytesPerTreeNode int64 = 856
 
 	ugnotPerGNOT int64 = 1_000_000
 )
@@ -103,6 +117,26 @@ func EstimateBytes(payloadBytes int64) int64 {
 		return 0
 	}
 	return payloadBytes * payloadOverheadNum / payloadOverheadDen
+}
+
+// EstimateNodes is the realm state a count of dead container nodes occupies,
+// and so what compacting them frees.
+//
+// Prefer it to EstimateBytes wherever the caller can count, which for a
+// compaction it always can. EstimateBytes scales a payload length by a ratio
+// measured at one size and is wrong at the others: a per-entry floor dominates
+// at the small end, and a realm advertising a bounty that way under-reported
+// by 25x against what the cleanup actually returned on chain (2026-09-23).
+// Counting nodes has no such failure mode. The container reports the exact
+// number, and every node costs the same.
+//
+// Still an estimate. BytesPerTreeNode is measured rather than derived, and the
+// chain's own StorageDepositEvent remains the only settlement.
+func EstimateNodes(nodes int64) int64 {
+	if nodes <= 0 {
+		return 0
+	}
+	return nodes * BytesPerTreeNode
 }
 
 // Quote is a complete answer for one candidate cleanup.

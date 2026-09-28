@@ -25,10 +25,16 @@ import (
 	"time"
 )
 
-// chainFetchUA is sent on every request because rpc.gno.land's edge answers 403
-// to Go's and curl's default User-Agent. The failure is indistinguishable from
-// the intermittent rate-limit 403 the same host returns, which is what made it
-// cost an hour to find.
+// chainFetchUA names this client in rpc.gno.land's logs. It is politeness, not
+// a workaround: the 403 this endpoint returns is rate limiting and nothing else.
+//
+// Recorded because the opposite looked true for a while. A request with curl's
+// default agent 403'd and the next one with a browser agent succeeded, which
+// reads as an agent filter and is not: the limit had simply expired between the
+// two. A/B'd 2026-09-28 with default, custom and Go-style agents issued back to
+// back, and all three answer alike, 403 while limited and 200 after. Do not
+// reach for a header when this endpoint refuses you; reach for the backoff
+// below.
 const chainFetchUA = "gnocontracts-vendor/1"
 
 // chainFetchTimeout bounds one query. A package is a handful of them, and a
@@ -77,8 +83,9 @@ const (
 
 // chainFetchPace is the gap left between queries. Measured against
 // rpc.gno.land 2026-09-28: a burst of qfile calls trips a 403 rate limit that
-// clears about 30 seconds later, so a whole closure fetched flat out spends
-// more time backing off than it would have spent pacing itself.
+// clears about 30 seconds later when the burst stops, and sooner than a whole
+// closure fetched flat out ever will, since every retry feeds the same limiter.
+// Pacing is what makes the run finish; the backoff is only the safety net.
 const chainFetchPace = 150 * time.Millisecond
 
 // abciQFile runs one vm/qfile query and returns its decoded body, retrying a

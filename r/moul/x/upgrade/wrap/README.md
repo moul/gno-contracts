@@ -1,4 +1,4 @@
-# `wrap` — wrapping versions (pattern A)
+# `wrap`: wrapping versions (pattern A)
 
 The cheapest thing that can be called an upgrade: deploy `v1`, have it read `v0`
 and add its own state on top. No transaction, no coordination, no migration.
@@ -21,5 +21,5 @@ When they must agree, go to [`lock`](../lock).
 Reading across the version boundary is a plain non-crossing call, so
 `v1.Get()`, and therefore `v1.Render`, stay queryable without a transaction.
 
-Run it: `gno test ./r/moul/x/upgrade/wrap/...` — the filetest in `v1` walks the
+Run it: `gno test ./r/moul/x/upgrade/wrap/...`, the filetest in `v1` walks the
 divergence step by step.

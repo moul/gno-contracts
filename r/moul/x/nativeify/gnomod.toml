@@ -1,0 +1,7 @@
+module = "gno.land/r/moul/x/nativeify/v0"
+gno = "0.9"
+
+# public: it issues coins, and an issuing realm must be immutable. private = true
+# buys a redeploy, and a redeploy of an issuer replaces the code that decided not
+# to claw anybody's balance back while the coins themselves survive. Holders of a
+# coin from here are trusting this code, so this path can never be rewritten.

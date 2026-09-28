@@ -149,3 +149,47 @@ func TestFormatGNOTIsTotal(t *testing.T) {
 	uassert.Equal(t, "1.5 GNOT", FormatGNOT(1500000))
 	uassert.Equal(t, "0 GNOT", FormatGNOT(0))
 }
+
+func TestEstimateNodes(t *testing.T) {
+	cases := []struct {
+		name  string
+		nodes int64
+		want  int64
+	}{
+		{"none", 0, 0},
+		{"negative is not an error", -5, 0},
+		// The mainnet measurement this constant comes from: compacting a
+		// drained 8-node board returned 6,848 bytes.
+		{"the mainnet sample", 8, 6848},
+		// And the local harness, which agreed to the byte.
+		{"the local harness sample", 31, 26536},
+	}
+	for _, tc := range cases {
+		uassert.Equal(t, tc.want, EstimateNodes(tc.nodes), tc.name)
+	}
+}
+
+// TestEstimateNodesBeatsEstimateBytesOnTheCaseThatBurnedUs pins the reason
+// EstimateNodes exists, not just what it computes.
+//
+// A realm advertised a bounty by running the payload length of five small
+// entries through EstimateBytes and got 481 bytes. Reaping and compacting them
+// actually returned 11,972. The payload path cannot see either the per-entry
+// floor or the container, and no existing test could catch that because they
+// all fed EstimateBytes the 1,024-byte payloads its ratio was measured on.
+func TestEstimateNodesBeatsEstimateBytesOnTheCaseThatBurnedUs(t *testing.T) {
+	const payload = 8 + 231 + 7 + 5 + 9 // the five note bodies, 260 bytes
+	const reallyFreed = 11972
+
+	guess := EstimateBytes(payload)
+	uassert.True(t, guess*20 < reallyFreed,
+		"EstimateBytes is still supposed to be the bad one here")
+
+	// The container half is the part that is countable, and counting it gets
+	// most of the way there on its own: 8 nodes were the larger share.
+	counted := EstimateNodes(8)
+	uassert.True(t, counted > guess*10,
+		"counting nodes should dominate guessing from payload")
+	uassert.True(t, counted <= reallyFreed,
+		"counting nodes must never over-advertise")
+}

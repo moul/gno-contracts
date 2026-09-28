@@ -28,3 +28,10 @@ func init(cur realm) {
 func Register(cur realm) {
 	facade.Register(cross(cur), Instance())
 }
+
+// Seal asks the facade to end its upgradeability, forever. It only succeeds
+// while this implementation is the live one: the facade reads the caller off
+// the crossing frame, so this cannot be used to seal somebody else's tenure.
+func Seal(cur realm) {
+	facade.Seal(cross(cur))
+}

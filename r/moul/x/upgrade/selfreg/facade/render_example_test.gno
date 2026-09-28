@@ -5,5 +5,5 @@ package facade
 func ExampleRender() {
 	print(Render(""))
 	// Output:
-	// selfreg/facade/v0: no implementation registered
+	// selfreg/facade/v0 [open]: no implementation registered
 }

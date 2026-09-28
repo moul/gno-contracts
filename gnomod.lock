@@ -358,6 +358,10 @@ module = "gno.land/p/moul/x/daily/trie/v0"
 source = { dir = "p/moul/x/daily/trie" }
 
 [[module]]
+module = "gno.land/p/moul/x/envelope/v0"
+source = { dir = "p/moul/x/envelope" }
+
+[[module]]
 module = "gno.land/p/moul/x/framelab/v0"
 source = { dir = "p/moul/x/framelab" }
 
@@ -591,6 +595,10 @@ module = "gno.land/r/moul/vesting/v0"
 source = { dir = "r/moul/vesting" }
 
 [[module]]
+module = "gno.land/r/moul/x/across/v0"
+source = { dir = "r/moul/x/across" }
+
+[[module]]
 module = "gno.land/r/moul/x/allinone/devtools/v0"
 source = { dir = "r/moul/x/allinone/devtools" }
 
@@ -601,6 +609,10 @@ source = { dir = "r/moul/x/allinone/textlab" }
 [[module]]
 module = "gno.land/r/moul/x/amm/v0"
 source = { dir = "r/moul/x/amm" }
+
+[[module]]
+module = "gno.land/r/moul/x/compact/v0"
+source = { dir = "r/moul/x/compact" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/asciiart/v0"
@@ -1218,6 +1230,14 @@ module = "gno.land/r/moul/x/moultest/v0"
 source = { dir = "r/moul/x/moultest" }
 
 [[module]]
+module = "gno.land/r/moul/x/nativeify/v0"
+source = { dir = "r/moul/x/nativeify" }
+
+[[module]]
+module = "gno.land/r/moul/x/nativereg/v0"
+source = { dir = "r/moul/x/nativereg" }
+
+[[module]]
 module = "gno.land/r/moul/x/pairreg/v0"
 source = { dir = "r/moul/x/pairreg" }
 
@@ -1281,6 +1301,22 @@ source = { dir = "r/moul/x/upgrade/lock/gen0" }
 [[module]]
 module = "gno.land/r/moul/x/upgrade/lock/v1"
 source = { dir = "r/moul/x/upgrade/lock/gen1" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/schema/facade/v0"
+source = { dir = "r/moul/x/upgrade/schema/facade" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/schema/impl/bad/v0"
+source = { dir = "r/moul/x/upgrade/schema/impl/bad" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/schema/impl/v0"
+source = { dir = "r/moul/x/upgrade/schema/impl/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/schema/impl/v1"
+source = { dir = "r/moul/x/upgrade/schema/impl/gen1" }
 
 [[module]]
 module = "gno.land/r/moul/x/upgrade/selfreg/facade/v0"

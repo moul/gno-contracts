@@ -1,4 +1,4 @@
-# `store` — data realm, swappable logic (pattern C)
+# `store`: data realm, swappable logic (pattern C)
 
 The separation the other patterns keep re-deriving: put the state in a realm
 that has no business logic worth changing, and let exactly one logic realm write
@@ -25,5 +25,5 @@ calls a dedicated state realm. The limit is that `root`'s own API is frozen
 forever: if the *shape* of the data has to change, `root` cannot help you and
 you are in [`lazy`](../lazy) territory.
 
-Run it: `gno test ./r/moul/x/upgrade/store/...` — `TestSwapLogic` swaps the
+Run it: `gno test ./r/moul/x/upgrade/store/...`, `TestSwapLogic` swaps the
 live realm mid-test and checks both lockouts.
