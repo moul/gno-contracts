@@ -67,6 +67,11 @@ source = { dir = "p/moul/fifo" }
 
 [[module]]
 module = "gno.land/p/moul/forge/v0"
+source = { commit = "da79dcac66e3f2712c39ed0f8265373a9faf2eff", dir = "p/moul/forge" }
+hash = "h1:SCPlKt+Tkb2hKNxUEVOop1jvCIjKrBX+Vj1/tFwAW9g="
+
+[[module]]
+module = "gno.land/p/moul/forge/v1"
 source = { dir = "p/moul/forge" }
 
 [[module]]

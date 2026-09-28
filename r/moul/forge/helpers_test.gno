@@ -3,7 +3,7 @@ package forge
 import (
 	"strings"
 
-	fg "gno.land/p/moul/forge/v0"
+	fg "gno.land/p/moul/forge/v1"
 	"gno.land/p/nt/testutils/v0"
 )
 

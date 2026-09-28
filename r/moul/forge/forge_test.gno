@@ -3,7 +3,7 @@ package forge
 import (
 	"testing"
 
-	fg "gno.land/p/moul/forge/v0"
+	fg "gno.land/p/moul/forge/v1"
 	"gno.land/p/nt/uassert/v0"
 )
 

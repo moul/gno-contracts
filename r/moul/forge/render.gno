@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	fg "gno.land/p/moul/forge/v0"
+	fg "gno.land/p/moul/forge/v1"
 	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/realmpath/v0"
 	"gno.land/p/moul/txlink/v0"
@@ -519,3 +519,11 @@ func pageOf(req *realmpath.Request) int {
 }
 
 func itoa(n int64) string { return strconv.FormatInt(n, 10) }
+
+// btoa renders a bool for an event value: chain.Emit takes strings only.
+func btoa(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}

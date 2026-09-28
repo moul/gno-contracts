@@ -5,6 +5,31 @@ reference log, issues, change requests and reviews. Pure gno, no chain imports,
 no realm globals. The realm that wires it to gno.land is
 [`gno.land/r/moul/forge/v0`](../../../../r/moul/forge/v0).
 
+## Packages and releases: the bridge to a deployed path
+
+A repo id is `<namespace>/<name>`, exactly two parts, so `r/moul/home` can never
+be one. Without a mapping there is no way to ask *which repo publishes this
+package path*, which is the first question anyone arriving from an explorer has.
+
+`PublishPackage` records the claim and indexes it forge-wide, so `PackageRepo`
+answers from the path alone without scanning every repo. One repo publishes many
+paths (moul/gno-contracts publishes 193 of them), and a path may be claimed by
+exactly one repo: silently letting a second repo take it would be a capture of
+another project's package in every explorer reading this index.
+
+**The claim is not verified, and cannot be.** A realm cannot ask the chain who
+deployed a path. What is guaranteed is that someone with write access to the
+repo said it, under a namespace `r/sys/users` governs. Weigh it the way you
+weigh a `go.mod`: it says where the author says the source lives.
+
+A `Release` is a tag, notes, and the object the tag names. A tag cannot be
+re-cut, because a consumer who pinned `v1.2.0` and later received different
+bytes has been lied to. Withdrawing one is `YankRelease`, which leaves it
+visible: a version that vanished reads as "never published" rather than "do not
+use this". Releases iterate in **cut order, never tag order** — tags are not
+required to be semver here (gno.land's own packages are `v0` and `v1`), so any
+version sort would present `v10` before `v2` and call it newest.
+
 ## What it stores, and what it refuses to store
 
 It does not store code. Git objects stay in git, behind whatever mirror a repo
@@ -22,6 +47,9 @@ alone does not authenticate:
 3. **The social layer**: issues, change requests and reviews bound to addresses
    rather than to platform accounts.
 4. **The merge decision**, recorded as one more entry in the same log.
+5. **Which deployed package paths a repo publishes**, and **which releases it
+   has cut**. See below: these two are what let an explorer start from a
+   `gno.land/...` path and find the repo behind it.
 
 ## The reference log
 

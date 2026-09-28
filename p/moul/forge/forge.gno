@@ -90,11 +90,16 @@ func ParseRole(s string) (Role, error) {
 // Forge is the top-level registry: repo id -> repo.
 type Forge struct {
 	repos *avl.Tree // "<namespace>/<name>" -> *Repo
+	// packages is the forge-wide index behind PackageRepo: a deployed package
+	// path resolves to the repo claiming it without scanning every repo. It
+	// lives here rather than only on the repo because the question an explorer
+	// asks starts from the path and does not know the repo yet.
+	packages *avl.Tree // package path -> *Package
 }
 
 // New returns an empty forge.
 func New() *Forge {
-	return &Forge{repos: avl.NewTree()}
+	return &Forge{repos: avl.NewTree(), packages: avl.NewTree()}
 }
 
 // Repo is one repository. Nothing here is the code: Mirrors says where the
@@ -117,6 +122,13 @@ type Repo struct {
 	log     *avl.Tree // padded seq -> *LogEntry (append-only)
 	issues  *avl.Tree // padded id -> *Issue
 	changes *avl.Tree // padded id -> *Change
+
+	packages *avl.Tree // package path -> *Package (this repo's half of the index)
+	releases *avl.Tree // tag -> *Release
+	// releaseOrder is cut order, which is the only order the forge knows to be
+	// true. Tags are not required to be semver, so sorting the release tree by
+	// key would present v10 before v2 and call it newest.
+	releaseOrder *avl.Tree // padded seq -> tag
 
 	head       string // digest of the last log entry ("" when the log is empty)
 	nextSeq    int64
@@ -152,6 +164,11 @@ func (f *Forge) CreateRepo(actor address, height int64, id, description, default
 		log:               avl.NewTree(),
 		issues:            avl.NewTree(),
 		changes:           avl.NewTree(),
+		// A fork routes through here too, and inherits neither: the parent
+		// publishes those package paths and cut those releases, not the child.
+		packages:     avl.NewTree(),
+		releases:     avl.NewTree(),
+		releaseOrder: avl.NewTree(),
 	}
 	r.members.Set(actor.String(), RoleOwner)
 	f.repos.Set(id, r)
