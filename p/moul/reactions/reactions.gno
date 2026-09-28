@@ -108,8 +108,10 @@ func (b *Board) React(page string, who address, key string, height int64) bool {
 //
 // The last-reaction line is deliberately NOT rewound: it records an event that
 // happened, and recomputing it would mean walking every address on the page.
-// A page whose only reaction is removed goes back to reading as empty, because
-// [Page.Total] is what decides that.
+// [Page.Last] therefore keeps naming a reaction nobody holds any more, which is
+// the honest answer to "what happened here last". What is shown is a separate
+// decision, and [Summary] makes it: a page with no reactors left renders as
+// empty, not as a withdrawn reaction.
 func (b *Board) Unreact(page string, who address) bool {
 	p := b.Page(page)
 	if p == nil {
@@ -219,6 +221,14 @@ func (p *Page) Last() (key string, who address, height int64) {
 // markdown escaper exists for, plus every byte above ASCII, so a stored key
 // cannot carry a bidi run, a zero-width joiner or an image.
 //
+// Two of the exclusions are STRUCTURAL and not about markdown, so widening this
+// set is not free. gnoweb parses a render path as `<path>[:<args>][$<webargs>]`
+// and cuts on "$" BEFORE it cuts on ":" (gno.land/pkg/gnoweb/weburl/url.go,
+// ParseFromURL, read 2026-09-28), so a "$" in a key would truncate it on the
+// way back in, and a "%" would be eaten by the unescape that follows. ":" is
+// safe only because that second cut takes the FIRST colon, which leaves the
+// rest of the key intact however many it carries.
+//
 // ":" is in the set because a host realm keying the block per article wants the
 // path it already serves: "gno.land/r/you/blog:hello-world".
 func ValidPage(page string) bool {
@@ -280,10 +290,17 @@ func Block(realmPath, page string, p *Page) string {
 // caller can put it somewhere else.
 func Summary(realmPath, page string, p *Page) string {
 	key, who, _ := p.Last()
-	if key == "" {
+	n := p.Total()
+
+	// Two different ways to have nothing to say, and both have to be checked.
+	// key == "" is a page nobody ever touched. n == 0 is a page whose reactors
+	// have all left: [Board.Unreact] deliberately does not rewind the last
+	// reaction, so key still names one. Gating on key alone would print
+	// "last <emoji> by <addr> - 0 reactions" above an empty strip, which
+	// contradicts itself and keeps attributing a reaction its author took back.
+	if key == "" || n == 0 {
 		return "no reactions yet"
 	}
-	n := p.Total()
 	label := strconv.Itoa(n) + " reaction"
 	if n != 1 {
 		label += "s"

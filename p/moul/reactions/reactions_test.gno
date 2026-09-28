@@ -220,3 +220,26 @@ func TestEmojiSurviveTheEscaper(t *testing.T) {
 		uassert.True(t, strings.Contains(got, "["+Emoji(k)+"]"), k)
 	}
 }
+
+// TestSummaryGoesEmptyWhenEveryoneLeaves is the interaction between the two
+// halves of Last: it is deliberately not rewound by Unreact, so the summary has
+// to decide for itself whether there is anything left to summarise. Gating on
+// the last key alone would print "last 👍 by g1… · 0 reactions" above an empty
+// strip, which contradicts itself and keeps attributing a reaction its author
+// took back.
+func TestSummaryGoesEmptyWhenEveryoneLeaves(t *testing.T) {
+	b := NewBoard()
+	b.React(homePage, alice, KeyUp, 100)
+	b.Unreact(homePage, alice)
+
+	p := b.Page(homePage)
+	uassert.Equal(t, 0, p.Total(), "the tally is empty")
+
+	key, _, _ := p.Last()
+	uassert.Equal(t, KeyUp, key, "and Last still records the event, by design")
+
+	uassert.Equal(t, "no reactions yet", Summary(realmPath, homePage, p),
+		"so the summary shows the empty state rather than a withdrawn reaction")
+
+	uassert.True(t, strings.HasSuffix(Block(realmPath, homePage, p), "*no reactions yet*\n"))
+}

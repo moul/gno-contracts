@@ -51,9 +51,14 @@ the casualty; `heart` is 💜, a codepoint that is colour on its own. Pinned by
 `TestEmojiSurviveTheEscaper`.
 
 **`Unreact` does not rewind the last-reaction line.** It records an event that
-happened, and recomputing it would mean walking every address on the page. The
-line under the block says what happened here last, which is a different question
-from what is currently counted.
+happened, and recomputing it would mean walking every address on the page, so
+`Page.Last` keeps naming a reaction nobody holds any more.
+
+What is *shown* is a separate decision, and `Summary` makes it: a page whose
+reactors have all left renders as empty, not as a withdrawn reaction. Gating on
+the last key alone would print "last 👍 by `g1…` · 0 reactions" above an empty
+strip, which contradicts itself. `TestSummaryGoesEmptyWhenEveryoneLeaves` pins
+the pair.
 
 ## Page keys
 
