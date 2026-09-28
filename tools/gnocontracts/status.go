@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+// unansweredStreakLimit is how many consecutive no-answers end a network's
+// pass. Well under the count that means "this chain is genuinely missing
+// everything", and low enough that a rate-limited run stops instead of
+// spending ten minutes being refused.
+const unansweredStreakLimit = 10
+
 // cmdStatus refreshes the on-chain upload status of every (non-draft) contract
 // across every configured network, then regenerates the README table. It is the
 // entry point for the post-merge / manually-triggered CI job.
@@ -14,10 +20,11 @@ import (
 //	go tool gnocontracts status            # all networks in contracts.json
 //	go tool gnocontracts status -net sapphire # a single network
 //
-// Uses read-only chain queries (vm/qfile) via gnokey — no key required.
+// Uses read-only chain queries (vm/qpkgmeta_json) via gnokey: no key required.
 func cmdStatus(root string, args []string) error {
 	fs := flag.NewFlagSet("status", flag.ContinueOnError)
 	only := fs.String("net", "", "restrict to this network (default: all)")
+	pace := fs.Duration("pace", 250*time.Millisecond, "wait between per-package queries, to stay under the RPC's rate limit")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -46,35 +53,52 @@ func cmdStatus(root string, args []string) error {
 			continue
 		}
 		nets++
-		up, unknown := 0, 0
+		up, parked, unknown, streak := 0, 0, 0, 0
 		for j := range m.Contracts {
 			c := &m.Contracts[j]
 			if c.Draft {
 				continue
 			}
+			// rpc.gno.land sits behind a load balancer that starts answering
+			// 403 to every request, /status included, once queries arrive fast
+			// enough. Probing 288 packages back to back trips it: a run on
+			// 2026-09-28 got 93 answers and then 195 refusals, and kept asking.
+			// Pace the queries, and stop asking a chain that has stopped
+			// answering rather than deepening the block.
+			if streak >= unansweredStreakLimit {
+				fmt.Printf("  %-12s stopped after %d unanswered in a row: the chain is refusing, not empty\n", net.Name, streak)
+				break
+			}
+			time.Sleep(*pace)
 			// One probe is enough: since gnolang/gno#6162 a monorepo-origin
 			// package sits at OUR exact pkgpath, so a hit on a mirrored
 			// package is the genesis deployment and a hit on anything else
 			// was published from this repo.
-			switch queryUploaded(net.RPC, c.PkgPath) {
+			state := queryPkgStatus(net.RPC, c.PkgPath)
+			switch state {
 			case probeUnknown:
 				// The chain answered for others but not for this one. Leave
 				// the recorded value as it was; do not invent an absence.
 				unknown++
+				streak++
 				continue
 			case probePresent:
 				up++
-				c.setPublished(net.Name, true)
-			case probeAbsent:
-				c.setPublished(net.Name, false)
+			case probeParked:
+				parked++
 			}
+			streak = 0
+			c.setPublished(net.Name, state)
 			checks++
 		}
 		note := ""
-		if unknown > 0 {
-			note = fmt.Sprintf("  (%d unanswered, left as they were)", unknown)
+		if parked > 0 {
+			note = fmt.Sprintf("  (%d queued behind the submission policy)", parked)
 		}
-		fmt.Printf("  %-12s %d uploaded / %d contracts%s\n", net.Name, up, len(m.Contracts), note)
+		if unknown > 0 {
+			note += fmt.Sprintf("  (%d unanswered, left as they were)", unknown)
+		}
+		fmt.Printf("  %-12s %d live / %d contracts%s\n", net.Name, up, len(m.Contracts), note)
 	}
 	if nets == 0 && skipped > 0 {
 		return fmt.Errorf("no network answered (%d unreachable): nothing to refresh", skipped)
@@ -97,14 +121,23 @@ func cmdStatus(root string, args []string) error {
 // setPublished records a probe result for one network, labelling where an
 // on-chain package came from: a mirrored package is deployed by the monorepo
 // (genesis), anything else was published from here.
-func (c *Contract) setPublished(net string, uploaded bool) {
+//
+// Only probePresent counts as uploaded. A parked package keeps its own state
+// instead, because it is on the chain without being usable, and flattening
+// that into the same empty cell as "never sent" is the thing this stopped
+// doing.
+func (c *Contract) setPublished(net string, state probe) {
 	if c.Published == nil {
 		c.Published = map[string]Pub{}
 	}
 	pub := c.Published[net]
-	pub.Uploaded = uploaded
+	pub.Uploaded = state == probePresent
+	pub.State = ""
+	if state == probeParked {
+		pub.State = "inert"
+	}
 	switch {
-	case !uploaded:
+	case !pub.Uploaded:
 		pub.Which = ""
 	case c.Upstream != "":
 		pub.Which = "monorepo"

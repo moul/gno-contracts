@@ -6,7 +6,9 @@ package main
 // and these outlived it.
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -81,56 +83,83 @@ func topoOrder(contracts []Contract) ([]Contract, error) {
 	return order, nil
 }
 
-// probe is the answer to "is this package on this chain": present, absent, or
-// no answer at all.
+// probe is the answer to "is this package on this chain": live, parked behind
+// the submission policy, absent, or no answer at all.
 type probe int
 
 const (
 	probeAbsent probe = iota
 	probePresent
 	probeUnknown
+	probeParked
 )
 
-// transportErrors are the substrings that mean the chain never answered, as
-// opposed to answering "no such package". Everything that is not a clean
-// answer is unknown: reporting an unreachable chain as "not published" is how
-// 193 packages were recorded absent from sapphire while sapphire was simply
-// down.
-var transportErrors = []string{
-	"connection refused", "no such host", "i/o timeout", "timeout", "deadline exceeded",
-	"connection reset", "eof", "tls", "network is unreachable", "bad gateway",
-	"service unavailable", "no route to host", "context canceled",
+// pkgMeta is what vm/qpkgmeta_json answers for one path. Only Status is read
+// here; creator, height, max_deposit, reason and pending come back in the same
+// call and are what makes this query worth preferring, left for whoever needs
+// them next.
+type pkgMeta struct {
+	Path   string `json:"path"`
+	Status string `json:"status"` // "live" | "inert" | "absent"
 }
 
-// absentAnswers are the substrings that mean the chain answered, and the answer
-// was no.
-var absentAnswers = []string{"not found", "unknown request", "invalid package", "could not read file"}
-
-// queryUploaded asks whether pkgpath resolves on the given RPC, via
-// `gnokey query vm/qfile`.
-func queryUploaded(rpc, pkgpath string) probe {
+// queryPkgStatus asks what a chain knows about pkgpath, via
+// `gnokey query vm/qpkgmeta_json`.
+//
+// It replaces a vm/qfile probe, which cannot see a parked package. Under the
+// inert code-submission policy a successful MsgAddPackage stores the bytes
+// under inert_pkg:<path> and leaves the package unusable until an approver
+// enables it; vm/qfile then answers "package is not available", character for
+// character what it answers for a path nobody ever published. So a publish
+// that is queued and a publish that never happened were the same empty cell in
+// the README table, and the only way to tell them apart was to remember having
+// sent it.
+//
+// qpkgmeta_json answers live / inert / absent in one call. Both chains that
+// are up implement it (mainnet gnoland-1 and pearl, checked 2026-09-28); a
+// chain that does not answers something this cannot parse, which is unknown
+// and never absent.
+func queryPkgStatus(rpc, pkgpath string) probe {
 	// Bound each query so an unreachable/slow RPC can't stall the job.
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "gnokey", "query", "vm/qfile", "--data", pkgpath, "--remote", rpc)
+	cmd := exec.CommandContext(ctx, "gnokey", "query", "vm/qpkgmeta_json", "--data", pkgpath, "--remote", rpc)
 	out, err := cmd.CombinedOutput()
-	s := strings.ToLower(string(out))
 	if err != nil {
-		if ctx.Err() != nil || containsAny(s, transportErrors) {
-			return probeUnknown
-		}
-		if containsAny(s, absentAnswers) {
-			return probeAbsent
-		}
-		return probeUnknown // an error we cannot classify is not evidence of absence
-	}
-	if containsAny(s, absentAnswers) {
-		return probeAbsent
-	}
-	if strings.TrimSpace(string(out)) == "" {
+		// Every failure is unknown, deliberately: an error we cannot classify
+		// is not evidence of absence, and the caller leaves the recorded value
+		// alone rather than inventing one.
 		return probeUnknown
 	}
-	return probePresent
+	meta, ok := parsePkgMeta(out)
+	if !ok {
+		return probeUnknown
+	}
+	switch meta.Status {
+	case "live":
+		return probePresent
+	case "inert":
+		return probeParked
+	case "absent":
+		return probeAbsent
+	}
+	return probeUnknown
+}
+
+// parsePkgMeta pulls the JSON object out of gnokey's query output, which is a
+// "height: 0" line followed by "data: {...}". Anything without a status field
+// is not an answer we can read.
+func parsePkgMeta(out []byte) (pkgMeta, bool) {
+	i := bytes.IndexByte(out, '{')
+	j := bytes.LastIndexByte(out, '}')
+	if i < 0 || j < i {
+		return pkgMeta{}, false
+	}
+	var m pkgMeta
+	if err := json.Unmarshal(out[i:j+1], &m); err != nil || m.Status == "" {
+		return pkgMeta{}, false
+	}
+	return m, true
 }
 
 // netReachable reports whether an RPC endpoint is answering at all, before any
@@ -149,13 +178,4 @@ func netReachable(rpc string) bool {
 	}
 	b, err := io.ReadAll(io.LimitReader(resp.Body, 4096))
 	return err == nil && strings.Contains(string(b), "\"result\"")
-}
-
-func containsAny(s string, subs []string) bool {
-	for _, sub := range subs {
-		if strings.Contains(s, sub) {
-			return true
-		}
-	}
-	return false
 }

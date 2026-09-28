@@ -69,21 +69,73 @@ func TestWriteLinesRoundTrip(t *testing.T) {
 	}
 }
 
-func TestProbeClassification(t *testing.T) {
-	if !containsAny("dial tcp: connection refused", transportErrors) {
-		t.Error("a refused connection is not classified as a transport error")
+// The three answers below are verbatim gnokey output, captured against
+// gnoland-1 on 2026-09-28. The parked one is the case a vm/qfile probe could
+// not see at all: it reported "not available", the same as a path nobody ever
+// published.
+func TestParsePkgMetaReadsTheThreeChainStates(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		out    string
+		status string
+		ok     bool
+	}{
+		{
+			name:   "live",
+			out:    "height: 0\ndata: {\"path\":\"gno.land/p/moul/md/v0\",\"status\":\"live\",\"creator\":\"g1manfred47kzduec920z88wfr64ylksmdcedlf5\"}\n",
+			status: "live", ok: true,
+		},
+		{
+			name:   "parked behind the submission policy",
+			out:    "height: 0\ndata: {\"path\":\"gno.land/r/x/bazaar/genesis\",\"status\":\"inert\",\"height\":344670,\"max_deposit\":\"40000000ugnot\",\"reason\":\"waiting for a package approver to enable it\",\"pending\":true}\n",
+			status: "inert", ok: true,
+		},
+		{
+			name:   "absent",
+			out:    "height: 0\ndata: {\"path\":\"gno.land/p/moul/nope/v0\",\"status\":\"absent\"}\n",
+			status: "absent", ok: true,
+		},
+		{name: "a chain that does not implement the query", out: "unknown request: vm/qpkgmeta_json\n"},
+		{name: "empty", out: ""},
+		{name: "json without a status field", out: "data: {\"path\":\"gno.land/p/moul/md/v0\"}"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m, ok := parsePkgMeta([]byte(tc.out))
+			if ok != tc.ok {
+				t.Fatalf("parsePkgMeta ok = %v, want %v", ok, tc.ok)
+			}
+			if m.Status != tc.status {
+				t.Fatalf("status = %q, want %q", m.Status, tc.status)
+			}
+		})
 	}
-	if containsAny("package not found", transportErrors) {
-		t.Error("a clean 'not found' answer classified as a transport error")
-	}
-	if !containsAny("query failed: package not found", absentAnswers) {
-		t.Error("'not found' not classified as an absent answer")
-	}
-	// The old implementation matched the bare word "error", which every
-	// transport failure also contains — that is how an unreachable chain came
-	// to be recorded as hosting nothing.
-	if containsAny("error: dial tcp 1.2.3.4:443: i/o timeout", absentAnswers) {
-		t.Error("a transport failure classified as proof of absence")
+}
+
+// Anything unparseable must read as unknown, never as absent: recording an
+// absence we did not observe is what wipes a network's whole column.
+func TestQueryPkgStatusMapsEveryState(t *testing.T) {
+	for out, want := range map[string]probe{
+		`data: {"path":"p","status":"live"}`:                 probePresent,
+		`data: {"path":"p","status":"inert","pending":true}`: probeParked,
+		`data: {"path":"p","status":"absent"}`:               probeAbsent,
+		`data: {"path":"p","status":"something-new"}`:        probeUnknown,
+		`unknown request`:                                    probeUnknown,
+	} {
+		m, ok := parsePkgMeta([]byte(out))
+		got := probeUnknown
+		if ok {
+			switch m.Status {
+			case "live":
+				got = probePresent
+			case "inert":
+				got = probeParked
+			case "absent":
+				got = probeAbsent
+			}
+		}
+		if got != want {
+			t.Errorf("%s -> %v, want %v", out, got, want)
+		}
 	}
 }
 
@@ -119,23 +171,38 @@ func TestNetReachableRejectsAnythingButAChainAnswer(t *testing.T) {
 
 func TestSetPublishedLabelsProvenance(t *testing.T) {
 	ours := &Contract{PkgPath: "gno.land/r/moul/hello/v0"}
-	ours.setPublished("mainnet", true)
+	ours.setPublished("mainnet", probePresent)
 	if got := ours.Published["mainnet"]; !got.Uploaded || got.Which != "ours" {
 		t.Fatalf("published = %+v, want uploaded/ours", got)
 	}
 	mirrored := &Contract{PkgPath: "gno.land/p/moul/md/v0", Upstream: "gno.land/p/moul/md"}
-	mirrored.setPublished("mainnet", true)
+	mirrored.setPublished("mainnet", probePresent)
 	if got := mirrored.Published["mainnet"]; got.Which != "monorepo" {
 		t.Fatalf("which = %q, want monorepo", got.Which)
 	}
-	mirrored.setPublished("mainnet", false)
-	if got := mirrored.Published["mainnet"]; got.Uploaded || got.Which != "" {
+	mirrored.setPublished("mainnet", probeAbsent)
+	if got := mirrored.Published["mainnet"]; got.Uploaded || got.Which != "" || got.State != "" {
 		t.Fatalf("published = %+v, want absent with no provenance", got)
+	}
+
+	// A parked package is not live, so it carries no provenance and no link,
+	// but it is emphatically not the same as never having been sent.
+	queued := &Contract{PkgPath: "gno.land/r/moul/queued/v0"}
+	queued.setPublished("mainnet", probeParked)
+	if got := queued.Published["mainnet"]; got.Uploaded || got.State != "inert" || got.Which != "" {
+		t.Fatalf("published = %+v, want a parked entry", got)
 	}
 }
 
 func TestProbeStatesAreDistinct(t *testing.T) {
 	if reflect.DeepEqual(probeAbsent, probeUnknown) {
 		t.Fatal("absent and unknown are the same value: the whole point is that they are not")
+	}
+	seen := map[probe]bool{}
+	for _, p := range []probe{probeAbsent, probePresent, probeUnknown, probeParked} {
+		if seen[p] {
+			t.Fatalf("two probe states share the value %d", p)
+		}
+		seen[p] = true
 	}
 }
