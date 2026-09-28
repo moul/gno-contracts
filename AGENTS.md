@@ -627,3 +627,55 @@ in each: [`.github/README.md`](./.github/README.md).
   noreply identity.
 - **Never hand-edit** the region between the README table markers, or the generated fields
   of `contracts.json` (`pkgpath`, `dir`, `kind`, `name`, `version`, `deps`).
+
+## Meta issues: the hubs, and the shape they share
+
+A `[meta]` issue is a **hub**: the one place for everything about one theme, so a narrow
+thought becomes a comment there rather than a fourteenth issue nobody finds again. Seven
+exist, they cross-link each other in an identical footer, and **GitHub pins at most three per
+repository**, which is why the footer carries all of them.
+
+| # | hub |
+|---|---|
+| [#97](https://github.com/moul/gno-contracts/issues/97) | port ideas: the backlog of structures, patterns and algorithms |
+| [#172](https://github.com/moul/gno-contracts/issues/172) | gnopm |
+| [#176](https://github.com/moul/gno-contracts/issues/176) | the `x/` experiments namespace |
+| [#177](https://github.com/moul/gno-contracts/issues/177) | on chain: publishing, and what is live |
+| [#178](https://github.com/moul/gno-contracts/issues/178) | render: how a realm shows itself |
+| [#179](https://github.com/moul/gno-contracts/issues/179) | cost: gas, storage deposit |
+| [#180](https://github.com/moul/gno-contracts/issues/180) | upstream: the `gnolang/gno` relationship |
+
+Write a new one only when a theme has outgrown being a comment on an existing hub. The shape,
+which every one of them follows:
+
+```
+[meta] <topic>, everything about <topic>
+
+<lede>          The one place for everything about X. Comment here rather than
+                opening a narrow issue, until a thread is big enough to deserve its own.
+## The goal              one bold sentence, then why it matters
+## Where it stands today measured numbers, dated, in a table
+## Where the code is     a path -> what table, linked
+## How it got here       optional: the merged PRs that built it
+---
+# Decisions     numbered, each leading with the constraint that forced it
+---
+# Roadmap       numbered sections of checkboxes, ordered by what unblocks what
+---
+# Inspiration   optional: prior art worth stealing, and what to steal from it
+# Principles    numbered, bold lead
+# Non-goals     bullets, the lines that are not up for discussion
+<footer>        the identical index of all seven
+```
+
+Three rules that matter more than the layout:
+
+1. **Every number is measured and dated.** "188 of the 339 live `gno.land/*` packages on
+   mainnet are ours, 2026-09-20" is worth writing down. "most of them" is not, and a figure
+   with no date rots without anyone noticing.
+2. **Nothing is claimed that was not run.** A command, a query path, a field name: run it
+   first, or leave it out.
+3. **No em dashes**, in the body or in any comment on it.
+
+Ticking a box means the pull request that closes it is **merged**, and the line gains its
+number: `- [x] ... (#123)`.
