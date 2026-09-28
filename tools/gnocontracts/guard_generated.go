@@ -9,7 +9,13 @@ import (
 // Generated paths a pull request must not carry. They are rewritten on `main`
 // after merge, so a PR that commits them only creates a conflict with the next
 // regeneration.
-var generatedPaths = []string{"contracts.json", "_assets"}
+// r/moul/home/content/packages.md is generated from contracts.json by
+// `gnohome packages`, and is listed here because it spent weeks NOT being
+// treated as generated: `make gen` did not write it and nothing rejected a
+// hand edit, so it was updated by whoever remembered. It drifted to 239
+// packages while the catalog said 245, and the realm served the stale number
+// to every visitor of /u/moul.
+var generatedPaths = []string{"contracts.json", "_assets", "r/moul/home/content/packages.md"}
 
 // README.md is the special case: part generated (the contracts table, the
 // dependency-graph section), part hand-written prose. Rejecting the whole file

@@ -117,9 +117,26 @@ the libraries and realms by name. `x/daily` is counted rather than listed:
 there are more of those than of everything else together.
 
 ```sh
-go -C tools tool gnohome packages > r/moul/home/content/packages.md
+make home-packages                 # regenerate it
 go -C tools tool gnohome status    # then push it like any other slot
 ```
+
+**It is regenerated on `main` by the regen workflow (`make gen`), and a pull
+request may not carry it** (`generatedPaths`, `tools/gnocontracts/guard_generated.go`).
+
+Both of those are recent, and they exist because neither was true for weeks.
+The paragraph above was already correct about the risk; nothing enforced it.
+`make gen` did not write this file and no guard rejected a hand edit, so it was
+updated by whoever remembered. It drifted to **239 packages and 169 daily
+experiments while the catalog said 245 and 173**, and the realm served the
+stale numbers to everyone who opened `/u/moul`, for as long as it took a human
+to read his own page and notice.
+
+The general rule it made explicit: **no count is typed by hand anywhere in
+`content/`.** `now.md` opened with "169 of them are on chain" and was wrong
+within a fortnight for exactly the same reason; it now points at this slot
+instead. A number a tool can derive belongs in the generated slot. Prose that
+cannot go stale belongs in the others.
 
 Output is deterministic for a given catalog, so regenerating without a catalog
 change leaves `status` quiet instead of proposing a no-op transaction.

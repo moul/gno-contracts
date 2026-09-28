@@ -104,10 +104,9 @@ the realm iterates the tree.
 | --- | --- |
 | `bio` | who I am, and what this page is, in the header column |
 | `social` | the links under it |
-| `now` | what I am working on, hand-written |
+| `now` | what I am working on, hand-written, and deliberately free of counts |
 | `stack` | the tools, one line |
-| `numbers` | a counted table, with the date it was counted |
-| `packages` | **generated**, see below |
+| `packages` | **generated** from contracts.json on `main`; a PR may not carry it |
 | `about` | a collapsed `> [!NOTE]-` explaining that this page is a realm |
 | `layout` | the template all of the above are filled into |
 

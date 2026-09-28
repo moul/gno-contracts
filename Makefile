@@ -23,7 +23,7 @@ HOME_TX      ?= /tmp/home.tx.json
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
 	guard-readmes guard-private guard-untrusted-render verify deps bump-deps manifest readme readmes gen check \
-	sync graph publish status home-push report preview site clean
+	sync graph publish status home-push home-packages report preview site clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^##@/{printf "\n%s\n",substr($$0,5)} /^[a-z][a-z-]*:.*?## /{printf "  %-14s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -84,7 +84,10 @@ readmes: ## refresh the generated footer of every package README
 graph: ## write per-package and global dependency graphs into _assets/ (svg/png need graphviz)
 	$(GNOCONTRACTS) graph
 
-gen: manifest readme readmes ## manifest + README table + package READMEs
+home-packages: ## regenerate r/moul/home's packages slot from contracts.json
+	@$(GNOHOME) packages > r/moul/home/content/packages.md
+
+gen: manifest readme readmes home-packages ## manifest + README table + package READMEs + the home packages slot
 
 check: ## fail if contracts.json or the README table is stale
 	$(GNOCONTRACTS) check
