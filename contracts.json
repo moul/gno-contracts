@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T20:28:22Z",
+  "status_checked_at": "2026-09-28T20:56:23Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -3003,6 +3003,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "3d9206ae5f4656e8c33bb775fd349fb656ff9c07",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3015,6 +3017,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/xmath/v1",
+      "dir": "p/moul/xmath",
+      "kind": "p",
+      "name": "xmath",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -8357,7 +8380,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false
