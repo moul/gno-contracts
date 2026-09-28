@@ -1,0 +1,24 @@
+# `gno.land/r/moul/x/daily/fenwickdemo/v0`
+
+**A gnoweb demo of the [`p/moul/x/daily/fenwick`](/p/moul/x/daily/fenwick/v0)
+library**: prefix sums, range queries, the internal ranges that make a Binary
+Indexed Tree legible, and the weighted draw that is the reason to use one.
+
+It holds no tree logic of its own and no state. Every figure on the page is
+computed from two fixed tables in the source, never from chain state, which is
+what lets `ExampleRender` pin the whole page: the pinned block is copied from
+what `gno` printed, so a change in the library shows up as a diff in the test
+rather than as prose nobody re-reads.
+
+The page is in five parts, and the last two are the ones worth reading:
+
+- **What the tree actually stores.** The array is not a copy of the values;
+  each node holds the sum of a run of them, and the run lengths are the powers
+  of two in the index. `Covers` turns that from a claim into a table.
+- **The weighted draw.** Five holders, one of them with a zero stake, and the
+  exact range of targets each one owns. Target `30` is the interesting row: it
+  is the first past the first holder's share and it skips the zero-stake holder
+  entirely, because a zero does not advance the prefix.
+
+Rendering is deterministic and costs no chain reads, so the page is the same on
+every node and at every height.
