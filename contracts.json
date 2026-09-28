@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T20:34:35Z",
+  "status_checked_at": "2026-09-28T21:20:24Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -514,6 +514,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/gnopm/v0",
+      "dir": "p/moul/gnopm",
+      "kind": "p",
+      "name": "gnopm",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -3003,6 +3026,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "3d9206ae5f4656e8c33bb775fd349fb656ff9c07",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3015,6 +3040,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/xmath/v1",
+      "dir": "p/moul/xmath",
+      "kind": "p",
+      "name": "xmath",
+      "version": "v1",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -3679,6 +3725,33 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/gnopm/registry/v0",
+      "dir": "r/moul/gnopm/registry",
+      "kind": "r",
+      "name": "gnopm/registry",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/gnopm/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/r/sys/users"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -8342,6 +8415,35 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/gsdash/v0",
+      "dir": "r/moul/x/gsdash",
+      "kind": "r",
+      "name": "x/gsdash",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/gnoswap/gnft",
+        "gno.land/r/gnoswap/gns",
+        "gno.land/r/gnoswap/gov/xgns",
+        "gno.land/r/gnoswap/position",
+        "gno.land/r/gnoswap/staker"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/moultest/v0",
       "dir": "r/moul/x/moultest",
       "kind": "r",
@@ -8357,7 +8459,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "pearl": {
           "uploaded": false

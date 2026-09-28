@@ -1,0 +1,299 @@
+package emission
+
+import (
+	"chain"
+	"chain/runtime"
+	"math"
+	"time"
+
+	gnsmath "gno.land/p/gnoswap/gnsmath/v1"
+	"gno.land/p/gnoswap/utils/v1"
+
+	"gno.land/r/gnoswap/access/v1"
+	"gno.land/r/gnoswap/gns"
+	"gno.land/r/gnoswap/halt/v1"
+)
+
+const (
+	totalDistributionDuration = 12 * 365 * 24 * 60 * 60 // 12 years
+
+	// DefaultInitialPoolTierPath is the canonical default initial pool that must
+	// exist before emission distribution can start. The pool contract registers a
+	// checker (SetDefaultInitialPoolChecker) that verifies this pool exists.
+	DefaultInitialPoolTierPath = "gno.land/r/gnoland/wugnot.wugnot:gno.land/r/gnoswap/gns.GNS:3000"
+)
+
+var (
+	// leftGNSAmount tracks undistributed GNS tokens from previous distributions
+	leftGNSAmount int64
+
+	// lastExecutedTimestamp stores the last timestamp when distribution was executed
+	lastExecutedTimestamp int64
+
+	// emissionAddr is the address of the emission realm
+	emissionAddr address
+
+	// distributionStartTimestamp is the timestamp from which emission distribution starts
+	// Default is 0, meaning distribution is not started until explicitly set
+	distributionStartTimestamp int64
+
+	// onDistributionPctChangeCallback is called when distribution percentages change
+	// This allows external contracts (like staker) to update their caches
+	onDistributionPctChangeCallback func(cur realm, emissionAmountPerSecond int64)
+
+	// defaultInitialPoolChecker verifies the canonical default initial pool exists.
+	// It is registered by pool/v1 at initialization time so that emission does not
+	// need a compile-time dependency on the pool realm.
+	defaultInitialPoolChecker func(poolPath string) bool
+)
+
+func init(cur realm) {
+	emissionAddr = cur.Address()
+}
+
+// setLeftGNSAmount updates the undistributed GNS token amount
+func setLeftGNSAmount(amount int64) {
+	if amount < 0 {
+		panic("left GNS amount cannot be negative")
+	}
+
+	leftGNSAmount = amount
+}
+
+// setLastExecutedTimestamp updates the timestamp of the last emission distribution execution.
+func setLastExecutedTimestamp(timestamp int64) {
+	if timestamp < 0 {
+		panic("last executed timestamp cannot be negative")
+	}
+
+	lastExecutedTimestamp = timestamp
+}
+
+// MintAndDistributeGns mints and distributes GNS tokens according to the emission schedule.
+//
+// This function is called automatically by protocol contracts during user interactions
+// to trigger periodic GNS emission. It mints new tokens based on elapsed time since
+// last distribution and distributes them to predefined targets (staker, devops, etc.).
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//
+// Returns:
+//   - distributedAmount: total amount of GNS distributed in this call
+//   - success: false only when emission is halted; true when processing completes, even if no tokens are distributed
+//
+// Note: Distribution only occurs if start timestamp is set and reached.
+// Any undistributed tokens from previous calls are carried forward.
+func MintAndDistributeGns(cur realm) (int64, bool) {
+	if halt.IsHaltedEmission() {
+		return 0, false
+	}
+
+	currentHeight := runtime.ChainHeight()
+	currentTimestamp := time.Now().Unix()
+
+	// Check if distribution start timestamp is set and if current timestamp has reached it
+	// If distributionStartTimestamp is 0 (default), skip distribution to prevent immediate start
+	// If current timestamp is below start timestamp, skip distribution
+	if distributionStartTimestamp == 0 || currentTimestamp < distributionStartTimestamp {
+		return 0, true
+	}
+
+	// Skip if we've already minted tokens at this timestamp
+	lastMintedTimestamp := gns.LastMintedTimestamp()
+	if currentTimestamp <= lastMintedTimestamp {
+		return 0, true
+	}
+
+	// Additional check to prevent re-entrancy
+	if lastExecutedTimestamp >= currentTimestamp {
+		// Skip if we've already processed this height in emission
+		return 0, true
+	}
+
+	// Mint new tokens and add any leftover amounts from previous distribution
+	mintedEmissionRewardAmount := gns.MintGns(cross(cur), emissionAddr)
+
+	// Validate minted amount
+	if mintedEmissionRewardAmount < 0 {
+		panic("minted emission reward amount cannot be negative")
+	}
+
+	distributableAmount := mintedEmissionRewardAmount
+	prevLeftAmount := GetLeftGNSAmount()
+
+	if leftGNSAmount > 0 {
+		// Check for overflow before addition
+		if distributableAmount > math.MaxInt64-prevLeftAmount {
+			panic("distributable amount would overflow")
+		}
+
+		distributableAmount += prevLeftAmount
+		setLeftGNSAmount(0)
+	}
+
+	distributable, leftAmount := calculateDistributableAmounts(distributableAmount)
+	totalDistAmount := gnsmath.SafeSubInt64(distributableAmount, leftAmount)
+	if leftAmount > 0 {
+		setLeftGNSAmount(leftAmount)
+	}
+	setLastExecutedTimestamp(currentTimestamp)
+
+	amountByAddress, err := applyDistribution(distributable)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := transferToTarget(0, cur, amountByAddress); err != nil {
+		panic(err)
+	}
+
+	stakerPct, err := GetDistributionBpsPct(LIQUIDITY_STAKER)
+	if err != nil {
+		panic(err)
+	}
+	stakerRewardPerSecond := GetEmissionAmountPerSecondBy(currentTimestamp, stakerPct)
+
+	govStakerPct, err := GetDistributionBpsPct(GOV_STAKER)
+	if err != nil {
+		panic(err)
+	}
+	govStakerRewardPerSecond := GetEmissionAmountPerSecondBy(currentTimestamp, govStakerPct)
+
+	previousRealm := cur.Previous()
+	chain.Emit(
+		"MintAndDistributeGns",
+		"prevAddr", previousRealm.Address().String(),
+		"prevRealm", previousRealm.PkgPath(),
+		"lastTimestamp", utils.FormatInt(lastExecutedTimestamp),
+		"currentTimestamp", utils.FormatInt(currentTimestamp),
+		"currentHeight", utils.FormatInt(currentHeight),
+		"mintedAmount", utils.FormatInt(mintedEmissionRewardAmount),
+		"prevLeftAmount", utils.FormatInt(prevLeftAmount),
+		"distributedAmount", utils.FormatInt(totalDistAmount),
+		"currentLeftAmount", utils.FormatInt(GetLeftGNSAmount()),
+		"gnsTotalSupply", utils.FormatInt(gns.TotalSupply()),
+		"stakerRewardPerSecond", utils.FormatInt(stakerRewardPerSecond),
+		"govStakerRewardPerSecond", utils.FormatInt(govStakerRewardPerSecond),
+	)
+
+	return totalDistAmount, true
+}
+
+// SetDistributionStartTime sets the timestamp when emission distribution starts.
+//
+// This function controls when GNS emission begins. Before the configured
+// timestamp is reached, an admin or governance caller may reschedule it. Once
+// the timestamp is reached, the start time is immutable.
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//   - startTimestamp: positive future Unix timestamp when emission should begin.
+//
+// Requirements:
+//   - Must be called before distribution starts.
+//   - Timestamp must be in the future and leave room for the 12-year schedule.
+//
+// Effects:
+//   - Sets global distribution start time.
+//   - Initializes GNS emission state if not already started.
+//   - Emission begins automatically when timestamp is reached.
+//
+// Only callable by admin or governance.
+func SetDistributionStartTime(cur realm, startTimestamp int64) {
+	halt.AssertIsNotHaltedEmission()
+
+	caller := cur.Previous().Address()
+	access.AssertIsAdminOrGovernance(caller)
+	assertDefaultInitialPoolExists()
+
+	if startTimestamp <= 0 {
+		panic("distribution start timestamp must be positive")
+	}
+
+	if startTimestamp > math.MaxInt64-totalDistributionDuration {
+		panic("distribution end timestamp must be before max int64 timestamp")
+	}
+
+	currentTimestamp := time.Now().Unix()
+
+	// Must be in the future.
+	if startTimestamp <= currentTimestamp {
+		panic("distribution start timestamp must be greater than current timestamp")
+	}
+
+	// Cannot change after distribution started.
+	if distributionStartTimestamp != 0 && distributionStartTimestamp <= currentTimestamp {
+		panic("distribution has already started, cannot change start timestamp")
+	}
+
+	prevStartTimestamp := distributionStartTimestamp
+
+	if gns.MintedEmissionAmount() == 0 {
+		currentHeight := runtime.ChainHeight()
+		gns.InitEmissionState(cross(cur), currentHeight, startTimestamp)
+	}
+
+	distributionStartTimestamp = startTimestamp
+
+	chain.Emit(
+		"SetDistributionStartTime",
+		"caller", caller.String(),
+		"prevStartTimestamp", utils.FormatInt(prevStartTimestamp),
+		"newStartTimestamp", utils.FormatInt(startTimestamp),
+		"height", utils.FormatInt(runtime.ChainHeight()),
+		"timestamp", utils.FormatInt(time.Now().Unix()),
+	)
+}
+
+// SetOnDistributionPctChangeCallback registers the optional callback invoked when
+// distribution percentages change. A nil callback clears the registration.
+// This allows external contracts (like staker) to update their internal caches
+// when governance or admin changes emission rates.
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//   - callback: nil to clear the callback, or a function receiving its callback
+//     realm context and the current staker GNS emission rate per second; a nonnil
+//     callback is invoked immediately after registration.
+func SetOnDistributionPctChangeCallback(cur realm, callback func(cur realm, emissionAmountPerSecond int64)) {
+	caller := cur.Previous().Address()
+	access.AssertIsStaker(caller)
+
+	if callback == nil {
+		onDistributionPctChangeCallback = nil
+		return
+	}
+
+	emissionAmountPerSecond, err := GetStakerEmissionAmountPerSecond()
+	if err != nil {
+		panic(err)
+	}
+
+	onDistributionPctChangeCallback = callback
+	onDistributionPctChangeCallback(cross(cur), emissionAmountPerSecond)
+}
+
+// SetDefaultInitialPoolChecker registers the callback that verifies the
+// canonical default initial pool exists before emission starts.
+//
+// The checker receives the pool path as a parameter so emission owns the
+// canonical path policy (DefaultInitialPoolTierPath) while pool supplies only
+// the generic "does this pool exist" capability.
+//
+// Parameters:
+//   - cur: Current realm context; callers use cross(cur) when crossing into this realm.
+//   - checker: nonnil function returning true when the supplied pool path exists;
+//     it is called with DefaultInitialPoolTierPath and nil causes a panic.
+//
+// Only callable by the pool contract.
+func SetDefaultInitialPoolChecker(cur realm, checker func(poolPath string) bool) {
+	caller := cur.Previous().Address()
+	access.AssertIsPool(caller)
+
+	if checker == nil {
+		panic(makeErrorWithDetails(errInvalidEmissionStart, "default initial pool checker cannot be nil"))
+	}
+
+	defaultInitialPoolChecker = checker
+}

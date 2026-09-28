@@ -49,7 +49,12 @@ ignores the path.
 plus what is committed here. Local `gno.land/{p,r}/moul/*` imports resolve through the
 workspace (`gnowork.toml`); external `gno.land/*` deps are vendored under `vendor/`.
 Never introduce a dependency that only resolves from `$GNOROOT/examples`: vendor it with
-`make deps`.
+`make deps`. A package that lives only on a chain and in no `examples/` (GnoSwap's
+`r/gnoswap/*` is the case that forced this) is vendored with `make deps-chain`, which
+falls back to `vm/qfile` over RPC for exactly those. `examples/` still wins whenever it
+has the package, so the two sources can never disagree about one. **`make bump-deps`
+wipes `vendor/` and re-reads `examples/` only**, so it drops the chain-sourced packages:
+run `make deps-chain` after it.
 
 **3. A pull request carries only source**, plus `gnomod.lock` when a version changed.
 `contracts.json`, the README contracts table, per-package README footers and `_assets/`

@@ -1,0 +1,494 @@
+package staker
+
+import (
+	"errors"
+
+	"gno.land/p/gnoswap/gnsmath/v1"
+	bptree "gno.land/p/nt/bptree/v0"
+
+	sr "gno.land/r/gnoswap/staker"
+)
+
+const (
+	AllTierCount = 4 // 0, 1, 2, 3
+	Tier1        = 1
+	Tier2        = 2
+	Tier3        = 3
+)
+
+// TierRatioFromCounts calculates the ratio distribution for each tier based on pool counts.
+//
+// Parameters:
+// - tier1Count (uint64): Number of pools in tier 1.
+// - tier2Count (uint64): Number of pools in tier 2.
+// - tier3Count (uint64): Number of pools in tier 3.
+//
+// Returns:
+// - TierRatio: The ratio distribution across tier 1, 2, and 3, scaled up by 100.
+func TierRatioFromCounts(tier1Count, tier2Count, tier3Count uint64) sr.TierRatio {
+	// tier1 always exists.
+	//
+	// TierRatio is declared in /r/gnoswap/staker; constructing it via a
+	// composite literal here (/r/gnoswap/staker/v1) trips the construction-time
+	// check ("cannot allocate ... in realm ..."). Route through the domain
+	// constructor sr.NewTierRatio so allocation happens in the declaring realm.
+	if tier2Count == 0 && tier3Count == 0 {
+		return sr.NewTierRatio(100, 0, 0)
+	}
+	if tier2Count == 0 {
+		return sr.NewTierRatio(80, 0, 20)
+	}
+	if tier3Count == 0 {
+		return sr.NewTierRatio(70, 30, 0)
+	}
+	return sr.NewTierRatio(50, 30, 20)
+}
+
+// PoolTier manages pool counts, ratios, and rewards for different tiers.
+//
+// Fields:
+// - membership: Tracks which tier a pool belongs to (poolPath -> blockNumber -> tier).
+//
+// Methods:
+// - CurrentCount: Returns the current count of pools in a tier at a specific timestamp.
+// - CurrentRatio: Returns the current ratio for a tier at a specific timestamp.
+// - CurrentTier: Returns the tier of a specific pool at a given timestamp.
+// - CurrentReward: Retrieves the reward for a tier at a specific timestamp.
+// - changeTier: Updates the tier of a pool and recalculates ratios.
+type PoolTier struct {
+	membership *bptree.BPTree // poolPath -> tier(1, 2, 3)
+
+	tierRatio sr.TierRatio
+
+	counts [AllTierCount]uint64
+
+	lastRewardCacheTimestamp int64
+
+	currentEmission int64
+
+	// returns current emission.
+	getEmission func() (int64, error)
+	// Returns a list of halving timestamps and their emission amounts within the interval [start, end) in ascending order.
+	// The first return value is a list of timestamps where halving occurs.
+	// The second return value is a list of emission amounts corresponding to each halving timestamp.
+	getHalvingBlocksInRange func(start, end int64) ([]int64, []int64, error)
+}
+
+// NewPoolTier creates a new PoolTier instance with single initial 1 tier pool.
+//
+// Parameters:
+// - pools: The pool collection.
+// - currentTime: The current block time.
+// - initialPoolPath: The path of the initial pool.
+// - getEmission: A function that returns the current emission to the staker contract.
+// - getHalvingBlocksInRange: A function that returns a list of halving blocks within the interval [start, end) in ascending order.
+//
+// Returns:
+// - *PoolTier: The new PoolTier instance.
+func NewPoolTier(pools *Pools, currentTime int64, initialPoolPath string, getEmission func() (int64, error), getHalvingBlocksInRange func(start, end int64) ([]int64, []int64, error)) *PoolTier {
+	currentEmission, err := getEmission()
+	if err != nil {
+		panic(err)
+	}
+
+	result := &PoolTier{
+		membership:               sr.NewBPTreeN(16),
+		tierRatio:                TierRatioFromCounts(1, 0, 0),
+		lastRewardCacheTimestamp: gnsmath.SafeAddInt64(currentTime, 1),
+		getEmission:              getEmission,
+		getHalvingBlocksInRange:  getHalvingBlocksInRange,
+		currentEmission:          currentEmission,
+	}
+
+	pools.set(initialPoolPath, sr.NewPool(initialPoolPath, currentTime+1))
+	result.changeTier(currentTime+1, pools, initialPoolPath, 1)
+	return result
+}
+
+// NewPoolTierBy reconstructs a PoolTier from persisted membership, ratios, counts, and callbacks.
+//
+// Parameters:
+//   - membership: Persisted pool-path-to-tier mapping.
+//   - tierRatio: Persisted reward-share ratio for each tier.
+//   - counts: Persisted number of pools in each tier index.
+//   - lastRewardCacheTimestamp: Timestamp through which reward caches have been materialized.
+//   - currentEmission: Emission rate currently used for reward accrual.
+//   - getEmission: Callback returning the current staker emission rate or an error.
+//   - getHalvingBlocksInRange: Callback returning halving timestamps and corresponding emissions in [start, end).
+//
+// Returns:
+//   - *PoolTier: Reconstructed tier manager using the supplied persisted state and callbacks.
+func NewPoolTierBy(
+	membership *bptree.BPTree,
+	tierRatio sr.TierRatio,
+	counts [AllTierCount]uint64,
+	lastRewardCacheTimestamp int64,
+	currentEmission int64,
+	getEmission func() (int64, error),
+	getHalvingBlocksInRange func(start, end int64) ([]int64, []int64, error),
+) *PoolTier {
+	return &PoolTier{
+		membership:               membership,
+		tierRatio:                tierRatio,
+		counts:                   counts,
+		lastRewardCacheTimestamp: lastRewardCacheTimestamp,
+		getEmission:              getEmission,
+		getHalvingBlocksInRange:  getHalvingBlocksInRange,
+		currentEmission:          currentEmission,
+	}
+}
+
+// CurrentReward returns the current per-pool reward for the given tier.
+// Parameters:
+//   - tier: Tier number whose current emission reward is requested.
+//
+// Returns:
+//   - int64: Current per-pool reward for the tier, or zero when the calculation cannot produce a reward.
+//   - error: Error from emission lookup, invalid-tier lookup, or reward calculation; nil when the reward calculation succeeds.
+func (self *PoolTier) CurrentReward(tier uint64) (int64, error) {
+	currentEmission, err := self.getEmission()
+	if err != nil {
+		return 0, err
+	}
+	tierRatio, err := self.tierRatio.Get(tier)
+	if err != nil {
+		return 0, makeErrorWithDetails(errInvalidPoolTier, err.Error())
+	}
+
+	tierRatioInt64 := int64(tierRatio)
+	count := int64(self.CurrentCount(tier))
+
+	return calculatePoolReward(currentEmission, tierRatioInt64, count)
+}
+
+// CurrentCount returns the current count of pools in the given tier.
+// Parameters:
+//   - tier: Tier index whose pool count is requested; out-of-range indexes return zero.
+//
+// Returns:
+//   - int: Number of pools currently assigned to tier.
+func (self *PoolTier) CurrentCount(tier uint64) int {
+	if tier >= AllTierCount {
+		return 0
+	}
+	return int(self.counts[tier])
+}
+
+// CurrentAllTierCounts returns the current count of pools in each tier.
+// Returns:
+//   - []uint64: Snapshot of pool counts for tier indexes 0 through AllTierCount-1.
+func (self *PoolTier) CurrentAllTierCounts() []uint64 {
+	out := make([]uint64, AllTierCount)
+	copy(out, self.counts[:])
+	return out // returning snapshot
+}
+
+// CurrentTier returns the tier of the given pool.
+// Parameters:
+//   - poolPath: Pool path whose current tier membership is requested.
+//
+// Returns:
+//   - tier: Current tier number, or zero when the pool is not in the membership tree.
+func (self *PoolTier) CurrentTier(poolPath string) (tier uint64) {
+	if tierI := self.membership.Get(poolPath); tierI == nil {
+		return 0
+	} else {
+		var ok bool
+		tier, ok = tierI.(uint64)
+		if !ok {
+			panic("failed to cast tier to uint64")
+		}
+		return tier
+	}
+}
+
+// changeTier updates the tier of a pool, recalculates ratios, and applies
+// updated per-pool reward to each of the pools.
+func (self *PoolTier) changeTier(currentTime int64, pools *Pools, poolPath string, nextTier uint64) map[uint64]int64 {
+	currentTier := self.CurrentTier(poolPath)
+	if currentTier == nextTier {
+		// no change, return
+		return make(map[uint64]int64)
+	}
+	assertTier1HasSparePool(currentTier, self.counts[Tier1])
+
+	self.cacheReward(currentTime, pools)
+
+	// decrement count from current tier if it exists
+	if currentTier > 0 {
+		if self.counts[currentTier] == 0 {
+			panic("counts underflow: removing from empty tier")
+		}
+		self.counts[currentTier]--
+	}
+
+	if nextTier == 0 {
+		// removed from the tier
+		self.membership.Remove(poolPath)
+		pool, ok := pools.Get(poolPath)
+		if !ok {
+			panic("changeTier: pool not found")
+		}
+		poolResolver := NewPoolResolver(pool)
+		// prevent new rewards from accumulating after tier removal
+		poolResolver.cacheReward(currentTime, 0)
+	} else {
+		// handle all move/add operations
+		self.membership.Set(poolPath, nextTier)
+		self.counts[nextTier]++
+	}
+
+	self.tierRatio = TierRatioFromCounts(self.counts[Tier1], self.counts[Tier2], self.counts[Tier3])
+	currentEmission, err := self.getEmission()
+	if err != nil {
+		panic(err)
+	}
+	tierRewards := self.computeTierRewards(currentEmission)
+
+	// Cache updated reward for each tiered pool
+	self.membership.Iterate("", "", func(key string, value any) bool {
+		pool, ok := pools.Get(key)
+		if !ok {
+			panic("changeTier: pool not found")
+		}
+		tier, ok := value.(uint64)
+		if !ok {
+			panic("failed to cast value to uint64")
+		}
+
+		poolReward, ok := tierRewards[tier]
+		if !ok {
+			return false // Skip if no pools in tier
+		}
+
+		poolResolver := NewPoolResolver(pool)
+		poolResolver.cacheReward(currentTime, poolReward)
+		return false
+	})
+
+	self.currentEmission = currentEmission
+
+	return tierRewards
+}
+
+// cacheReward MUST be called before calculating any position reward.
+// cacheReward updates the reward cache for each pool, accounting for any halving events
+// that occurred between the last cached timestamp and the current timestamp.
+// Note: Block height is used only for event tracking purposes.
+// tierContextOf returns the pool's tier and the ratio/count setting its current emission rate.
+func (self *PoolTier) tierContextOf(poolPath string) (uint64, uint64, uint64, error) {
+	tier := self.CurrentTier(poolPath)
+	if tier == 0 || tier >= AllTierCount {
+		return tier, 0, 0, nil
+	}
+
+	ratio, err := self.tierRatio.Get(tier)
+	if err != nil {
+		return 0, 0, 0, makeErrorWithDetails(errInvalidPoolTier, err.Error())
+	}
+
+	return tier, ratio, self.counts[tier], nil
+}
+
+func (self *PoolTier) cacheReward(currentTimestamp int64, pools *Pools) {
+	lastTimestamp := self.lastRewardCacheTimestamp
+
+	if currentTimestamp <= lastTimestamp {
+		// no need to check
+		return
+	}
+
+	// find halving blocks in range
+	halvingTimestamps, halvingEmissions, err := self.getHalvingBlocksInRange(lastTimestamp, currentTimestamp)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(halvingTimestamps) == 0 {
+		self.applyCacheToAllPools(pools, currentTimestamp, self.currentEmission)
+		self.lastRewardCacheTimestamp = currentTimestamp
+		return
+	}
+
+	for i, hvTimestamp := range halvingTimestamps {
+		emission := halvingEmissions[i]
+		// caching: [lastTimestamp, hvTimestamp)
+		self.applyCacheToAllPools(pools, hvTimestamp, emission)
+
+		// halve emissions when halvingBlock is reached
+		self.currentEmission = emission
+	}
+
+	// remaining range [lastTimestamp, currentTimestamp)
+	self.applyCacheToAllPools(pools, currentTimestamp, self.currentEmission)
+
+	self.lastRewardCacheTimestamp = currentTimestamp
+}
+
+// cacheRewardForPool caches internal reward/accumulators for a single pool only.
+// This avoids iterating all tiered pools on every position reward calculation.
+func (self *PoolTier) cacheRewardForPool(currentTimestamp int64, pools *Pools, poolPath string) {
+	pool, ok := pools.Get(poolPath)
+	if !ok {
+		return
+	}
+
+	tierNum := self.CurrentTier(poolPath)
+	// Pool not in the internal-incentive system.
+	if tierNum == 0 {
+		return
+	}
+
+	// Find the latest reward cache timestamp for this pool.
+	lastTimestamp := int64(0)
+	hasLast := false
+	pool.RewardCache().ReverseIterate(0, currentTimestamp, func(key int64, _ any) bool {
+		lastTimestamp = key
+		hasLast = true
+		return true
+	})
+
+	if !hasLast {
+		// Fallback to global tier cache cursor.
+		lastTimestamp = self.lastRewardCacheTimestamp
+	}
+
+	if currentTimestamp <= lastTimestamp {
+		return
+	}
+
+	// Determine halving boundaries since the pool's last cached reward timestamp.
+	halvingTimestamps, halvingEmissions, err := self.getHalvingBlocksInRange(lastTimestamp, currentTimestamp)
+	if err != nil {
+		panic(err)
+	}
+	poolResolver := NewPoolResolver(pool)
+
+	if len(halvingTimestamps) == 0 {
+		// No emission change within the range => use the live emission.
+		currentEmission, err := self.getEmission()
+		if err != nil {
+			panic(err)
+		}
+		self.applyCacheToPool(poolResolver, tierNum, currentTimestamp, currentEmission)
+		return
+	}
+
+	// Apply caching at every halving boundary.
+	currentEmission := int64(0)
+	for i, hvTimestamp := range halvingTimestamps {
+		currentEmission = halvingEmissions[i]
+		self.applyCacheToPool(poolResolver, tierNum, hvTimestamp, currentEmission)
+	}
+
+	// Remaining range [lastTimestamp, currentTimestamp).
+	self.applyCacheToPool(poolResolver, tierNum, currentTimestamp, currentEmission)
+}
+
+// applyCacheToPool applies the cached reward to all tiered pool.
+func (self *PoolTier) applyCacheToPool(poolResolver *PoolResolver, tierNum uint64, currentTimestamp, emissionInThisInterval int64) {
+	tierRewards := self.computeTierRewards(emissionInThisInterval)
+	poolReward, ok := tierRewards[tierNum]
+	if !ok {
+		return
+	}
+
+	poolResolver.cacheReward(currentTimestamp, poolReward)
+}
+
+// applyCacheToAllPools applies the cached reward to all tiered pools.
+func (self *PoolTier) applyCacheToAllPools(pools *Pools, currentTimestamp, emissionInThisInterval int64) {
+	// calculate denominator and number of pools in each tier
+	counts := self.CurrentAllTierCounts()
+	tierRewards := self.computeTierRewards(emissionInThisInterval)
+
+	// apply cache to all pools
+	self.membership.Iterate("", "", func(key string, value any) bool {
+		pool, ok := pools.Get(key)
+		if !ok {
+			return false
+		}
+
+		tierNum, ok := value.(uint64)
+		if !ok {
+			panic("failed to cast value to uint64")
+		}
+		// Skip pools with tier 0 (removed from tier system)
+		if tierNum == 0 {
+			return false
+		}
+
+		if counts[tierNum] == 0 {
+			return false // Skip if no pools in tier
+		}
+
+		poolReward, ok := tierRewards[tierNum]
+		if !ok {
+			return false
+		}
+
+		// accumulate the reward for the interval (startBlock to endBlock) in the Pool
+		poolResolver := NewPoolResolver(pool)
+		poolResolver.cacheReward(currentTimestamp, poolReward)
+		return false
+	})
+}
+
+// IsInternallyIncentivizedPool returns true if the pool is in a tier.
+// Parameters:
+//   - poolPath: Pool path whose membership is checked.
+//
+// Returns:
+//   - bool: True when poolPath belongs to a nonzero internal-incentive tier; false otherwise.
+func (self *PoolTier) IsInternallyIncentivizedPool(poolPath string) bool {
+	return self.CurrentTier(poolPath) > 0
+}
+
+// calculatePoolReward calculates the reward for a pool based on the emission, tier ratio, and tier count.
+//
+// Parameters:
+// - emission: The emission for the pool.
+// - tierRatio: The tier ratio for the pool.
+// - tierCount: The tier count for the pool.
+//
+// Returns:
+// - int64: The reward for the pool.
+// - error: An invalid calculation input.
+func calculatePoolReward(emission int64, tierRatio int64, tierCount int64) (int64, error) {
+	if emission < 0 || tierRatio < 0 || tierCount < 0 {
+		return 0, errors.New(errCalculationError)
+	}
+
+	if emission == 0 || tierRatio == 0 || tierCount == 0 {
+		return 0, nil
+	}
+
+	tierReward := gnsmath.SafeMulDivInt64(emission, tierRatio, 100)
+
+	return tierReward / tierCount, nil
+}
+
+// computeTierRewards caches per-tier pool rewards to avoid recalculating for each pool iteration.
+func (self *PoolTier) computeTierRewards(emission int64) map[uint64]int64 {
+	tierRewards := make(map[uint64]int64, AllTierCount-1)
+
+	for tierNum := uint64(1); tierNum < AllTierCount; tierNum++ {
+		tierCount := int64(self.counts[tierNum])
+		if tierCount == 0 {
+			continue
+		}
+
+		tierRatio, err := self.tierRatio.Get(tierNum)
+		if err != nil {
+			panic(makeErrorWithDetails(errInvalidPoolTier, err.Error()))
+		}
+
+		reward, err := calculatePoolReward(emission, int64(tierRatio), tierCount)
+		if err != nil {
+			panic(err)
+		}
+		tierRewards[tierNum] = reward
+	}
+
+	return tierRewards
+}

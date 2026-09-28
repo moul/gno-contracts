@@ -74,6 +74,10 @@ module = "gno.land/p/moul/fp/v0"
 source = { dir = "p/moul/fp" }
 
 [[module]]
+module = "gno.land/p/moul/gnopm/v0"
+source = { dir = "p/moul/gnopm" }
+
+[[module]]
 module = "gno.land/p/moul/grants/v0"
 source = { dir = "p/moul/grants" }
 
@@ -439,6 +443,11 @@ source = { dir = "p/moul/xdao" }
 
 [[module]]
 module = "gno.land/p/moul/xmath/v0"
+source = { commit = "3d9206ae5f4656e8c33bb775fd349fb656ff9c07", dir = "p/moul/xmath" }
+hash = "h1:1c5PgXNffXOodXBC66Gz/GkvwZCZNkRrA7cF2GJFQeg="
+
+[[module]]
+module = "gno.land/p/moul/xmath/v1"
 source = { dir = "p/moul/xmath" }
 
 [[module]]
@@ -534,6 +543,10 @@ source = { dir = "r/moul/faucet" }
 [[module]]
 module = "gno.land/r/moul/forge/v0"
 source = { dir = "r/moul/forge" }
+
+[[module]]
+module = "gno.land/r/moul/gnopm/registry/v0"
+source = { dir = "r/moul/gnopm/registry" }
 
 [[module]]
 module = "gno.land/r/moul/gns/v0"
@@ -1194,6 +1207,10 @@ source = { dir = "r/moul/x/grc20faucet" }
 [[module]]
 module = "gno.land/r/moul/x/grc20wrapdemo/v0"
 source = { dir = "r/moul/x/grc20wrapdemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/gsdash/v0"
+source = { dir = "r/moul/x/gsdash" }
 
 [[module]]
 module = "gno.land/r/moul/x/moultest/v0"
