@@ -1,6 +1,10 @@
 # moul/gno-contracts
 
 [![CI](https://github.com/moul/gno-contracts/actions/workflows/ci.yml/badge.svg)](https://github.com/moul/gno-contracts/actions/workflows/ci.yml)
+[![r/moul/home](https://gnoscope.com/_badges/shield/status/r/moul/home?network=mainnet&label=r%2Fmoul%2Fhome)](https://gnoscope.com/realm/r/moul/home)
+[![txs](https://gnoscope.com/_badges/shield/txs/r/moul/home?network=mainnet)](https://gnoscope.com/realm/r/moul/home)
+[![users](https://gnoscope.com/_badges/shield/users/r/moul/home?network=mainnet)](https://gnoscope.com/realm/r/moul/home)
+[![version](https://gnoscope.com/_badges/shield/version/r/moul/home?network=mainnet)](https://gnoscope.com/realm/r/moul/home)
 
 **moul's personal [gno.land](https://gno.land) contracts**: every `p/moul/*` package and
 `r/moul/*` realm, developed in one place, **versioned from day one**, **self-contained**
