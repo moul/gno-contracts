@@ -23,6 +23,7 @@ import (
 func cmdVendor(root string, args []string) error {
 	fs := flag.NewFlagSet("vendor", flag.ContinueOnError)
 	refresh := fs.Bool("refresh", false, "re-copy already-vendored packages from $GNOROOT/examples (bump the pinned snapshot)")
+	fromChain := fs.String("from-chain", "", "RPC endpoint to fall back to for deps absent from $GNOROOT/examples (e.g. https://rpc.gno.land)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -100,6 +101,16 @@ func cmdVendor(root string, args []string) error {
 		}
 	}
 
+	// Seed from what is ALREADY vendored as well, not only from our contracts.
+	// A vendored package is `provided`, so the walk below never opens it, and
+	// its own unvendored deps would stay invisible: an interrupted run would
+	// then report "nothing to do" on the next one, with the tree still missing
+	// packages. Hit while vendoring GnoSwap, where one 403 mid-closure was
+	// enough to produce exactly that.
+	if err := enqueueVendoredDeps(vendorDir, provided, enqueued, &queue); err != nil {
+		return err
+	}
+
 	var vendored []string
 	for len(queue) > 0 {
 		pkg := queue[0]
@@ -108,17 +119,29 @@ func cmdVendor(root string, args []string) error {
 			continue
 		}
 		src := filepath.Join(examples, filepath.FromSlash(pkg))
-		if !fileExists(src) {
-			return fmt.Errorf("dependency %q not found under %s (vendor from another source not yet supported)", pkg, examples)
-		}
 		dst := filepath.Join(vendorDir, filepath.FromSlash(pkg))
-		if err := copyGnoPackage(src, dst); err != nil {
-			return fmt.Errorf("vendor %s: %w", pkg, err)
+		// examples wins whenever it has the package, so a dep that exists both
+		// in the monorepo and on a chain is always vendored from the monorepo
+		// and the two sources cannot disagree about it. The chain is the
+		// fallback for what was only ever deployed.
+		depsDir := src
+		switch {
+		case fileExists(src):
+			if err := copyGnoPackage(src, dst); err != nil {
+				return fmt.Errorf("vendor %s: %w", pkg, err)
+			}
+		case *fromChain != "":
+			if err := vendorFromChain(*fromChain, pkg, dst); err != nil {
+				return fmt.Errorf("vendor %s from %s: %w", pkg, *fromChain, err)
+			}
+			depsDir = dst
+		default:
+			return fmt.Errorf("dependency %q not found under %s (pass -from-chain <rpc> to fetch a package that lives only on a chain)", pkg, examples)
 		}
 		provided[pkg] = true
 		vendored = append(vendored, pkg)
 		// enqueue transitive deps
-		deps, err := parseDeps(src)
+		deps, err := parseDeps(depsDir)
 		if err != nil {
 			return err
 		}
@@ -142,7 +165,13 @@ func cmdVendor(root string, args []string) error {
 }
 
 // workspaceModules returns the set of module paths already resolvable in the
-// workspace: our p/moul and r/moul contracts plus anything under vendor/.
+// workspace: our p/moul and r/moul contracts, anything under vendor/, and the
+// superseded versions gnopm materializes into .gnopm/.
+//
+// .gnopm/ counts because a contract that still imports .../humanize/v0 after
+// humanize was bumped resolves it from there, so vendoring it would be a second
+// copy of something the workspace already answers for. It is gitignored and
+// only exists after `gnopm sync`, so its absence is not an error.
 func workspaceModules(root string) (map[string]bool, error) {
 	set := map[string]bool{}
 	scanned, err := scanContracts(root)
@@ -152,24 +181,31 @@ func workspaceModules(root string) (map[string]bool, error) {
 	for _, c := range scanned {
 		set[c.PkgPath] = true
 	}
-	vendorDir := filepath.Join(root, "vendor")
-	if fileExists(vendorDir) {
-		err := filepath.Walk(vendorDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() && info.Name() == "gnomod.toml" {
-				if mod, err := parseModule(path); err == nil {
-					set[mod] = true
-				}
-			}
-			return nil
-		})
-		if err != nil {
+	for _, dir := range []string{"vendor", ".gnopm"} {
+		if err := collectModules(filepath.Join(root, dir), set); err != nil {
 			return nil, err
 		}
 	}
 	return set, nil
+}
+
+// collectModules adds every module path declared under dir to set. A missing
+// dir contributes nothing rather than failing.
+func collectModules(dir string, set map[string]bool) error {
+	if !fileExists(dir) {
+		return nil
+	}
+	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && info.Name() == "gnomod.toml" {
+			if mod, err := parseModule(path); err == nil {
+				set[mod] = true
+			}
+		}
+		return nil
+	})
 }
 
 // copyGnoPackage copies the .gno sources and gnomod.toml of a single package
@@ -210,4 +246,51 @@ func copyFile(src, dst string) error {
 	defer out.Close()
 	_, err = io.Copy(out, in)
 	return err
+}
+
+// vendorFromChain writes one deployed package into vendor/, the chain-sourced
+// counterpart of copyGnoPackage. It writes nothing until every file has been
+// fetched, so an endpoint that fails halfway leaves no half-vendored package
+// behind for the next run to mistake for a complete one.
+func vendorFromChain(rpc, pkgpath, dst string) error {
+	files, err := fetchChainPackage(rpc, pkgpath)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dst, 0o755); err != nil {
+		return err
+	}
+	for name, body := range files {
+		if err := os.WriteFile(filepath.Join(dst, name), []byte(body), 0o644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// enqueueVendoredDeps adds the still-missing dependencies of every package
+// already under vendor/ to the work queue.
+func enqueueVendoredDeps(vendorDir string, provided, enqueued map[string]bool, queue *[]string) error {
+	if !fileExists(vendorDir) {
+		return nil
+	}
+	return filepath.Walk(vendorDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() || info.Name() != "gnomod.toml" {
+			return nil
+		}
+		deps, err := parseDeps(filepath.Dir(path))
+		if err != nil {
+			return err
+		}
+		for _, d := range deps {
+			if !provided[d] && !enqueued[d] {
+				*queue = append(*queue, d)
+				enqueued[d] = true
+			}
+		}
+		return nil
+	})
 }

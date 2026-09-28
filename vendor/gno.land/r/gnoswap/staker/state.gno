@@ -1,0 +1,73 @@
+package staker
+
+import (
+	"errors"
+
+	prbac "gno.land/p/gnoswap/rbac/v1"
+	_ "gno.land/r/gnoswap/rbac/v1" // initialize readable contract role(s)
+
+	"gno.land/p/gnoswap/store/v1"
+	"gno.land/p/gnoswap/version_manager/v1"
+
+	"gno.land/r/gnoswap/access/v1"
+)
+
+const ErrSpoofedRealm = "rlm does not match the current crossing frame"
+
+var (
+	kvStore store.KVStore
+
+	versionManager version_manager.VersionManager
+	implementation IStaker
+)
+
+func init(cur realm) {
+	// Create a new KV store instance for this domain
+	kvStore = store.NewKVStore(cur.Address())
+	initRegisterWritableContract(cur)
+
+	// Initialize the initializers map to store implementation registration functions
+	versionManager = version_manager.NewVersionManager(
+		cur.PkgPath(),
+		kvStore,
+		initializeDomainStore,
+	)
+
+	implementation = nil
+}
+
+func initRegisterWritableContract(cur realm) {
+	poolAddr := access.MustGetAddress(prbac.ROLE_POOL.String())
+
+	if err := kvStore.AddAuthorizedCaller(0, cur, poolAddr, store.Write); err != nil {
+		panic(err)
+	}
+}
+
+func initializeDomainStore(_ int, rlm realm, kvStore store.KVStore) any {
+	return NewStakerStore(kvStore)
+}
+
+func getImplementation() IStaker {
+	if implementation == nil {
+		panic("implementation is not initialized")
+	}
+
+	return implementation
+}
+
+func updateImplementation() error {
+	result := versionManager.GetCurrentImplementation()
+	if result == nil {
+		return errors.New("implementation is not initialized")
+	}
+
+	impl, ok := result.(IStaker)
+	if !ok {
+		return errors.New("impl is not an IStaker")
+	}
+
+	implementation = impl
+
+	return nil
+}

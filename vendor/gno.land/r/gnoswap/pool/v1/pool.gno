@@ -1,0 +1,600 @@
+package pool
+
+import (
+	"chain"
+	"errors"
+
+	"gno.land/r/gnoswap/common"
+	"gno.land/r/gnoswap/halt/v1"
+	pl "gno.land/r/gnoswap/pool"
+
+	"gno.land/p/gnoswap/gnsmath/v1"
+	i256 "gno.land/p/gnoswap/int256/v1"
+	u256 "gno.land/p/gnoswap/uint256/v1"
+	"gno.land/p/gnoswap/utils/v1"
+	ufmt "gno.land/p/nt/ufmt/v0"
+
+	prabc "gno.land/p/gnoswap/rbac/v1"
+	_ "gno.land/r/gnoswap/rbac/v1"
+
+	"gno.land/r/gnoswap/access/v1"
+)
+
+// Mint adds liquidity to a pool position.
+//
+// Increases liquidity for a position within specified tick range.
+// Calculates required token amounts based on current pool price.
+// Updates tick state and transfers tokens atomically.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the pool proxy.
+//   - token0Path: Registered token contract path for token0.
+//   - token1Path: Registered token contract path for token1.
+//   - fee: Fee tier; supported tiers are 100, 500, 3000, and 10000 (0.01%, 0.05%, 0.3%, and 1%).
+//   - tickLower: Inclusive lower price-range tick; must be aligned to the pool tick spacing.
+//   - tickUpper: Exclusive upper price-range tick; must be aligned to the pool tick spacing.
+//   - liquidityAmount: Positive decimal string specifying liquidity to add; it is converted to uint256 and then int128.
+//   - positionCaller: Nonzero position-contract address that supplies tokens for this mint.
+//
+// Returns:
+//   - amount0: Token0 amount consumed, returned as a decimal string.
+//   - amount1: Token1 amount consumed, returned as a decimal string.
+//
+// Requirements:
+//   - Pool must exist for token pair and fee
+//   - Liquidity amount must be positive
+//   - Ticks must be valid and aligned to spacing
+//
+// Only callable by position contract.
+func (i *poolV1) Mint(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	tickLower int32,
+	tickUpper int32,
+	liquidityAmount string,
+	positionCaller address,
+) (string, string) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	i.assertPoolUnlocked()
+	halt.AssertIsNotHaltedPool()
+
+	caller := rlm.Previous().Address()
+	access.AssertIsPosition(caller)
+	access.AssertIsValidAddress(positionCaller)
+
+	i.lockPool(0, rlm)
+	defer i.unlockPool(0, rlm)
+
+	liquidity := u256.MustFromDecimal(liquidityAmount)
+	if liquidity.IsZero() {
+		panic(errors.New(errZeroLiquidity))
+	}
+
+	pool := i.mustGetPoolBy(token0Path, token1Path, fee)
+
+	tickSpacing := pool.TickSpacing()
+	checkTickSpacing(tickLower, tickSpacing)
+	checkTickSpacing(tickUpper, tickSpacing)
+
+	liquidityDelta := gnsmath.SafeConvertToInt128(liquidity)
+	positionParam := newModifyPositionParams(positionCaller, tickLower, tickUpper, liquidityDelta)
+	observations := i.mustGetObservations(pool.PoolPath())
+	_, amount0, amount1, err := modifyPosition(pool, observations, positionParam)
+	if err != nil {
+		panic(err)
+	}
+
+	poolAddr := access.MustGetAddress(prabc.ROLE_POOL.String())
+
+	if amount0.Gt(u256.Zero()) {
+		i.safeTransferFrom(0, rlm, pool, positionCaller, poolAddr, pool.Token0Path(), amount0, true)
+	}
+
+	if amount1.Gt(u256.Zero()) {
+		i.safeTransferFrom(0, rlm, pool, positionCaller, poolAddr, pool.Token1Path(), amount1, false)
+	}
+
+	// Save pool state after modifyPosition may have updated liquidity
+	err = i.savePool(0, rlm, pool)
+	if err != nil {
+		panic(err)
+	}
+
+	return amount0.ToString(), amount1.ToString()
+}
+
+// Burn removes liquidity from a pool position and credits principal as tokens
+// owed to that pool-level position entry.
+//
+// The pool operation itself does not transfer tokens; a subsequent Collect call
+// pays the credited principal. Position.DecreaseLiquidity wraps Burn and the
+// fee-free Collect call within one atomic public operation.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the pool proxy.
+//   - token0Path: Registered token contract path for token0.
+//   - token1Path: Registered token contract path for token1.
+//   - fee: Fee tier identifying the pool.
+//   - tickLower: Lower tick of the position's price range; must match pool spacing.
+//   - tickUpper: Upper tick of the position's price range; must match pool spacing.
+//   - liquidityAmount: Non-negative decimal liquidity amount, at most 2^127-1 after conversion to int128.
+//   - positionCaller: Nonzero position-contract address associated with the pool position.
+//
+// Returns:
+//   - amount0: Token0 principal credited to the pool position, as a decimal string.
+//   - amount1: Token1 principal credited to the pool position, as a decimal string.
+//
+// Note: Tokens remain in pool until Collect is called.
+// Only callable by position contract.
+func (i *poolV1) Burn(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	tickLower int32,
+	tickUpper int32,
+	liquidityAmount string, // parsed as uint256, then checked against int128
+	positionCaller address,
+) (string, string) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	i.assertPoolUnlocked()
+	halt.AssertIsNotHaltedWithdraw()
+
+	caller := rlm.Previous().Address()
+	access.AssertIsPosition(caller)
+	access.AssertIsValidAddress(positionCaller)
+
+	i.lockPool(0, rlm)
+	defer i.unlockPool(0, rlm)
+
+	liqAmount := u256.MustFromDecimal(liquidityAmount)
+	liqAmountInt256 := gnsmath.SafeConvertToInt128(liqAmount)
+	liqDelta := i256.Zero().Neg(liqAmountInt256)
+
+	posParams := newModifyPositionParams(positionCaller, tickLower, tickUpper, liqDelta)
+	pool := i.mustGetPoolBy(token0Path, token1Path, fee)
+	observations := i.mustGetObservations(pool.PoolPath())
+	position, amount0, amount1, err := modifyPosition(pool, observations, posParams)
+	if err != nil {
+		panic(err)
+	}
+
+	if amount0.Gt(u256.Zero()) || amount1.Gt(u256.Zero()) {
+		amount0 = toUint128(amount0)
+		amount1 = toUint128(amount1)
+
+		position.SetTokensOwed0(gnsmath.SafeAddInt64(position.TokensOwed0(), gnsmath.SafeConvertToInt64(amount0)))
+		position.SetTokensOwed1(gnsmath.SafeAddInt64(position.TokensOwed1(), gnsmath.SafeConvertToInt64(amount1)))
+	}
+
+	positionKey := getPositionKey(tickLower, tickUpper)
+
+	setPosition(pool, positionKey, position)
+
+	err = i.savePool(0, rlm, pool)
+	if err != nil {
+		panic(err)
+	}
+
+	// actual token transfer happens in Collect()
+	return amount0.ToString(), amount1.ToString()
+}
+
+// CollectSwapFee pays out accrued swap fees for a position.
+//
+// The withdrawal fee is deducted from the collected amount and settled to the
+// protocol fee realm; the remainder is transferred to recipient. Only accrued
+// swap fees belong on this path - principal returned by Burn is not fee
+// bearing and must go through Collect.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the pool proxy.
+//   - token0Path: Registered token contract path for token0.
+//   - token1Path: Registered token contract path for token1.
+//   - fee: Fee tier identifying the pool.
+//   - recipient: Nonzero address receiving the post-fee token amounts.
+//   - tickLower: Lower tick of the position's price range.
+//   - tickUpper: Upper tick of the position's price range.
+//   - amount0Requested: Non-negative decimal int64 amount of token0 requested; the int64 maximum requests all owed token0.
+//   - amount1Requested: Non-negative decimal int64 amount of token1 requested; the int64 maximum requests all owed token1.
+//
+// Returns:
+//   - amount0: Token0 amount collected before withdrawal-fee deduction, as a decimal string.
+//   - amount1: Token1 amount collected before withdrawal-fee deduction, as a decimal string.
+//   - fee0: Withdrawal fee withheld from token0, as a decimal string.
+//   - fee1: Withdrawal fee withheld from token1, as a decimal string.
+//
+// Only callable by position contract.
+func (i *poolV1) CollectSwapFee(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	recipient address,
+	tickLower int32,
+	tickUpper int32,
+	amount0Requested string,
+	amount1Requested string,
+) (amount0, amount1, fee0, fee1 string) {
+	collected0, collected1, withheld0, withheld1 := i.collect(
+		0, rlm,
+		token0Path, token1Path, fee,
+		recipient,
+		tickLower, tickUpper,
+		amount0Requested, amount1Requested,
+		true,
+	)
+
+	return utils.FormatInt(collected0), utils.FormatInt(collected1),
+		utils.FormatInt(withheld0), utils.FormatInt(withheld1)
+}
+
+// Collect pays out tokens owed to a position, transferring the full amount to
+// recipient.
+//
+// No withdrawal fee is charged: this path carries principal credited by Burn,
+// which the protocol does not tax. Accrued swap fees belong on CollectSwapFee.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the pool proxy.
+//   - token0Path: Registered token contract path for token0.
+//   - token1Path: Registered token contract path for token1.
+//   - fee: Fee tier identifying the pool.
+//   - recipient: Nonzero address receiving the owed token amounts.
+//   - tickLower: Lower tick of the position's price range.
+//   - tickUpper: Upper tick of the position's price range.
+//   - amount0Requested: Non-negative decimal int64 amount of token0 requested; the int64 maximum requests all owed token0.
+//   - amount1Requested: Non-negative decimal int64 amount of token1 requested; the int64 maximum requests all owed token1.
+//
+// Returns:
+//   - amount0: Token0 principal transferred to recipient, as a decimal string.
+//   - amount1: Token1 principal transferred to recipient, as a decimal string.
+//
+// Only callable by position contract.
+func (i *poolV1) Collect(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	recipient address,
+	tickLower int32,
+	tickUpper int32,
+	amount0Requested string,
+	amount1Requested string,
+) (amount0, amount1 string) {
+	collected0, collected1, _, _ := i.collect(
+		0, rlm,
+		token0Path, token1Path, fee,
+		recipient,
+		tickLower, tickUpper,
+		amount0Requested, amount1Requested,
+		false,
+	)
+
+	return utils.FormatInt(collected0), utils.FormatInt(collected1)
+}
+
+// collect settles the pool ledger for a position and pays the recipient.
+//
+// The payout is capped by the position's tokensOwed, never by a caller
+// supplied number, and the ledger is written before any token leaves the
+// realm. Both happen under a single pool lock, so the pool's accounting and
+// its token balance are never observably out of step.
+//
+// The collected amount is NOT capped by the pool's internal balance: a balance
+// short of the owed amount means the internal ledger has drifted, so the call
+// reverts rather than silently paying out less.
+//
+// applyWithdrawalFee selects the fee policy; pass false for a fee-free payout.
+// It is the entry point, not the configured rate, that decides whether the
+// protocol fee is settled: a rate of zero must still flush a backlog left
+// pending by an earlier halted settlement.
+func (i *poolV1) collect(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	recipient address,
+	tickLower int32,
+	tickUpper int32,
+	amount0Requested string,
+	amount1Requested string,
+	applyWithdrawalFee bool,
+) (amount0, amount1, fee0, fee1 int64) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	i.assertPoolUnlocked()
+	halt.AssertIsNotHaltedWithdraw()
+
+	caller := rlm.Previous().Address()
+	access.AssertIsPosition(caller)
+	access.AssertIsValidAddress(recipient)
+
+	i.lockPool(0, rlm)
+	defer i.unlockPool(0, rlm)
+
+	amount0Req := utils.SafeParseInt64(amount0Requested)
+	amount1Req := utils.SafeParseInt64(amount1Requested)
+
+	if amount0Req < 0 || amount1Req < 0 {
+		panic(errors.New(errInvalidInput))
+	}
+
+	pool := i.mustGetPoolBy(token0Path, token1Path, fee)
+	// The pool position key encodes only the lower and upper ticks. It is scoped
+	// to this pool, so NFTs sharing a range use the same aggregate pool entry.
+	positionKey := getPositionKey(tickLower, tickUpper)
+	position, err := pool.GetPosition(positionKey)
+	if err != nil {
+		panic(newErrorWithDetail(
+			errDataNotFound,
+			ufmt.Sprintf("positionKey(%s) does not exist", positionKey),
+		))
+	}
+
+	amount0 = minRequestedAmount(amount0Req, position.TokensOwed0())
+	amount1 = minRequestedAmount(amount1Req, position.TokensOwed1())
+
+	if amount0 > 0 {
+		tokenOwed0 := gnsmath.SafeSubInt64(position.TokensOwed0(), amount0)
+		token0Balance, err := updatePoolBalance(pool.BalanceToken0(), pool.BalanceToken1(), amount0, true)
+		if err != nil {
+			panic(err)
+		}
+
+		position.SetTokensOwed0(tokenOwed0)
+		pool.SetBalanceToken0(token0Balance)
+	}
+	if amount1 > 0 {
+		tokenOwed1 := gnsmath.SafeSubInt64(position.TokensOwed1(), amount1)
+		token1Balance, err := updatePoolBalance(pool.BalanceToken0(), pool.BalanceToken1(), amount1, false)
+		if err != nil {
+			panic(err)
+		}
+
+		position.SetTokensOwed1(tokenOwed1)
+		pool.SetBalanceToken1(token1Balance)
+	}
+
+	setPosition(pool, positionKey, position)
+
+	if err := i.savePool(0, rlm, pool); err != nil {
+		panic(err)
+	}
+
+	withdrawalFeeBPS := ZeroBps
+	if applyWithdrawalFee {
+		withdrawalFeeBPS = i.store.GetWithdrawalFeeBPS()
+	}
+
+	// Effects are persisted above; everything below leaves the realm.
+	fee0, amount0AfterFee := deductWithdrawalFee(amount0, withdrawalFeeBPS)
+	fee1, amount1AfterFee := deductWithdrawalFee(amount1, withdrawalFeeBPS)
+
+	if applyWithdrawalFee {
+		// Called even for a zero fee, and for a zero withdrawal fee rate, so that
+		// anything left pending for these tokens by an earlier halted settlement
+		// is flushed.
+		i.settleProtocolFee(0, rlm, token0Path, fee0)
+		i.settleProtocolFee(0, rlm, token1Path, fee1)
+	}
+
+	if amount0AfterFee > 0 {
+		common.SafeGRC20Transfer(0, rlm, token0Path, recipient, amount0AfterFee)
+	}
+	if amount1AfterFee > 0 {
+		common.SafeGRC20Transfer(0, rlm, token1Path, recipient, amount1AfterFee)
+	}
+
+	return amount0, amount1, fee0, fee1
+}
+
+// CollectProtocol collects accumulated protocol fees from swap operations.
+// Only callable by admin or governance.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the pool proxy.
+//   - token0Path: Registered token contract path for token0.
+//   - token1Path: Registered token contract path for token1.
+//   - fee: Fee tier identifying the pool.
+//   - recipient: Nonzero address receiving the collected protocol fees.
+//   - amount0Requested: Non-negative decimal amount of token0 protocol fees requested; capped at the available balance.
+//   - amount1Requested: Non-negative decimal amount of token1 protocol fees requested; capped at the available balance.
+//
+// Returns:
+//   - amount0: Token0 protocol fees transferred to recipient, as a decimal string.
+//   - amount1: Token1 protocol fees transferred to recipient, as a decimal string.
+func (i *poolV1) CollectProtocol(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	recipient address,
+	amount0Requested string, // uint128
+	amount1Requested string, // uint128
+) (string, string) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	i.assertPoolUnlocked()
+	halt.AssertIsNotHaltedWithdraw()
+
+	previousRealm := rlm.Previous()
+	caller := previousRealm.Address()
+	access.AssertIsAdminOrGovernance(caller)
+
+	common.MustRegistered(token0Path, token1Path)
+
+	i.lockPool(0, rlm)
+	defer i.unlockPool(0, rlm)
+
+	amount0, amount1 := i.collectProtocol(
+		0,
+		rlm,
+		token0Path,
+		token1Path,
+		fee,
+		recipient,
+		amount0Requested,
+		amount1Requested,
+	)
+
+	chain.Emit(
+		"CollectProtocol",
+		"prevAddr", caller.String(),
+		"prevRealm", previousRealm.PkgPath(),
+		"token0Path", token0Path,
+		"token1Path", token1Path,
+		"fee", utils.FormatUint(fee),
+		"recipient", recipient.String(),
+		"internal_amount0", amount0,
+		"internal_amount1", amount1,
+	)
+
+	return amount0, amount1
+}
+
+// collectProtocol performs the actual protocol fee collection.
+// It ensures requested amounts don't exceed available protocol fees.
+// Returns amount0, amount1 as strings representing collected fees.
+func (i *poolV1) collectProtocol(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	recipient address,
+	amount0Requested string,
+	amount1Requested string,
+) (string, string) {
+	pool := i.mustGetPoolBy(token0Path, token1Path, fee)
+
+	amount0Req := utils.SafeParseInt64(amount0Requested)
+	amount1Req := utils.SafeParseInt64(amount1Requested)
+
+	if amount0Req < 0 || amount1Req < 0 {
+		panic(errors.New(errInvalidInput))
+	}
+
+	amount0 := minRequestedAmount(amount0Req, pool.ProtocolFeesToken0())
+	amount1 := minRequestedAmount(amount1Req, pool.ProtocolFeesToken1())
+
+	amount0, amount1 = i.saveProtocolFees(pool, amount0, amount1)
+
+	newBalanceToken0, err := updatePoolBalance(pool.BalanceToken0(), pool.BalanceToken1(), amount0, true)
+	if err != nil {
+		panic(err)
+	}
+	pool.SetBalanceToken0(newBalanceToken0)
+
+	newBalanceToken1, err := updatePoolBalance(pool.BalanceToken0(), pool.BalanceToken1(), amount1, false)
+	if err != nil {
+		panic(err)
+	}
+	pool.SetBalanceToken1(newBalanceToken1)
+
+	err = i.savePool(0, rlm, pool)
+	if err != nil {
+		panic(err)
+	}
+
+	common.SafeGRC20Transfer(0, rlm, pool.Token0Path(), recipient, amount0)
+	common.SafeGRC20Transfer(0, rlm, pool.Token1Path(), recipient, amount1)
+
+	return utils.FormatInt(amount0), utils.FormatInt(amount1)
+}
+
+// saveProtocolFees updates the protocol fee balances after collection.
+// Returns amount0, amount1 representing the fees deducted from protocol reserves.
+func (i *poolV1) saveProtocolFees(pool *pl.Pool, amount0, amount1 int64) (int64, int64) {
+	if pool.ProtocolFeesToken0() < amount0 {
+		panic(errors.New(errUnderflow))
+	}
+	pool.SetProtocolFeesToken0(gnsmath.SafeSubInt64(pool.ProtocolFeesToken0(), amount0))
+
+	if pool.ProtocolFeesToken1() < amount1 {
+		panic(errors.New(errUnderflow))
+	}
+	pool.SetProtocolFeesToken1(gnsmath.SafeSubInt64(pool.ProtocolFeesToken1(), amount1))
+
+	return amount0, amount1
+}
+
+func minRequestedAmount(request, available int64) int64 {
+	if request > available {
+		return available
+	}
+
+	return request
+}
+
+// IncreaseObservationCardinalityNext schedules growth of a pool's circular observation buffer.
+//
+// Parameters:
+//   - _: Noncrossing implementation-call discriminator; pass 0.
+//   - rlm: Current realm context forwarded unchanged by the pool proxy.
+//   - token0Path: Registered token contract path for token0.
+//   - token1Path: Registered token contract path for token1.
+//   - fee: Fee tier identifying the pool.
+//   - cardinalityNext: Requested observation-buffer capacity; must not exceed the configured maximum.
+func (i *poolV1) IncreaseObservationCardinalityNext(
+	_ int,
+	rlm realm,
+	token0Path string,
+	token1Path string,
+	fee uint32,
+	cardinalityNext uint16,
+) {
+	access.AssertIsRlmCurrent(0, rlm)
+
+	i.assertPoolUnlocked()
+	halt.AssertIsNotHaltedPool()
+
+	pool := i.mustGetPoolBy(token0Path, token1Path, fee)
+	slot0Before := pool.Slot0()
+	observationCardinalityNextOld := slot0Before.ObservationCardinalityNext()
+
+	i.lockPool(0, rlm)
+	defer i.unlockPool(0, rlm)
+
+	observations := i.mustGetObservations(pool.PoolPath())
+	if cardinalityNext > maxObservationCardinality {
+		panic("observation cardinality next exceeds maximum")
+	}
+	observationCardinalityNextNew, err := grow(
+		observations,
+		slot0Before.ObservationCardinalityNext(),
+		cardinalityNext,
+	)
+	if err != nil {
+		panic(err)
+	}
+	slot0After := pool.Slot0()
+	slot0After.SetObservationCardinalityNext(observationCardinalityNextNew)
+	pool.SetSlot0(slot0After)
+
+	if observationCardinalityNextOld != observationCardinalityNextNew {
+		previousRealm := rlm.Previous()
+		chain.Emit(
+			"IncreaseObservationCardinalityNext",
+			"prevAddr", previousRealm.Address().String(),
+			"prevRealm", previousRealm.PkgPath(),
+			"poolPath", pool.PoolPath(),
+			"cardinalityNext", utils.FormatUint(observationCardinalityNextNew),
+		)
+	}
+}
