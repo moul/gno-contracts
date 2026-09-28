@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T22:31:40Z",
+  "status_checked_at": "2026-09-28T22:33:53Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -9065,6 +9065,100 @@
         "mainnet": {
           "uploaded": true,
           "which": "ours"
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/schema/facade/v0",
+      "dir": "r/moul/x/upgrade/schema/facade",
+      "kind": "r",
+      "name": "x/upgrade/schema/facade",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ownable/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/schema/impl/bad/v0",
+      "dir": "r/moul/x/upgrade/schema/impl/bad",
+      "kind": "r",
+      "name": "x/upgrade/schema/impl/bad",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/r/moul/x/upgrade/schema/facade/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/schema/impl/v0",
+      "dir": "r/moul/x/upgrade/schema/impl/gen0",
+      "kind": "r",
+      "name": "x/upgrade/schema/impl",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/r/moul/x/upgrade/schema/facade/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/schema/impl/v1",
+      "dir": "r/moul/x/upgrade/schema/impl/gen1",
+      "kind": "r",
+      "name": "x/upgrade/schema/impl",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/r/moul/x/upgrade/schema/facade/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
         },
         "pearl": {
           "uploaded": false

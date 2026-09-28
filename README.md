@@ -436,6 +436,10 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/upgrade/lazy/v1`](r/moul/x/upgrade/lazy/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/lazy/v1) | — | — | 3 |
 | [`r/moul/x/upgrade/lock/v0`](r/moul/x/upgrade/lock/gen0) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/lock/v0) | — | — | 2 |
 | [`r/moul/x/upgrade/lock/v1`](r/moul/x/upgrade/lock/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/lock/v1) | — | — | 2 |
+| [`r/moul/x/upgrade/schema/facade/v0`](r/moul/x/upgrade/schema/facade) 🏛️ | — | — | — | — | 3 |
+| [`r/moul/x/upgrade/schema/impl/bad/v0`](r/moul/x/upgrade/schema/impl/bad) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/schema/impl/v0`](r/moul/x/upgrade/schema/impl/gen0) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/schema/impl/v1`](r/moul/x/upgrade/schema/impl/gen1) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/upgrade/selfreg/facade/v0`](r/moul/x/upgrade/selfreg/facade) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/selfreg/facade/v0) | — | — | 1 |
 | [`r/moul/x/upgrade/selfreg/impl/v0`](r/moul/x/upgrade/selfreg/impl/gen0) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/selfreg/impl/v0) | — | — | 1 |
 | [`r/moul/x/upgrade/selfreg/impl/v1`](r/moul/x/upgrade/selfreg/impl/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/selfreg/impl/v1) | — | — | 1 |
@@ -453,7 +457,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-28T22:31:40Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-09-28T22:33:53Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
