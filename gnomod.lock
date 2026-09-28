@@ -232,6 +232,10 @@ module = "gno.land/p/moul/x/daily/disjointset/v0"
 source = { dir = "p/moul/x/daily/disjointset" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/fenwick/v0"
+source = { dir = "p/moul/x/daily/fenwick" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/flatmap/v0"
 source = { dir = "p/moul/x/daily/flatmap" }
 
@@ -747,6 +751,10 @@ source = { dir = "r/moul/x/daily/escrow" }
 [[module]]
 module = "gno.land/r/moul/x/daily/faucet/v0"
 source = { dir = "r/moul/x/daily/faucet" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/fenwickdemo/v0"
+source = { dir = "r/moul/x/daily/fenwickdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/flatmapdemo/v0"
