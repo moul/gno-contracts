@@ -89,9 +89,15 @@ type Contract struct {
 // WITHOUT a /vN on the genesis/older chains, so the status checker probes both
 // PkgPath and Upstream; Which records what was found.
 type Pub struct {
-	Uploaded bool   `json:"uploaded"`
-	Tx       string `json:"tx,omitempty"`
-	Which    string `json:"which,omitempty"` // "v1", "monorepo", or "both"
+	Uploaded bool `json:"uploaded"`
+	// State carries what Uploaded cannot: "inert" means the bytes reached the
+	// chain and are parked behind its code-submission policy, waiting for an
+	// approver. Empty means the plain case, live when Uploaded and never sent
+	// when not. A parked package is NOT uploaded: it cannot be imported,
+	// called or rendered.
+	State string `json:"state,omitempty"`
+	Tx    string `json:"tx,omitempty"`
+	Which string `json:"which,omitempty"` // "v1", "monorepo", or "both"
 }
 
 // defaultNetworks is the AUTHORITATIVE set of chains we track upload status

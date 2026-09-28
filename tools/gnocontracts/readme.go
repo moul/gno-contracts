@@ -139,7 +139,7 @@ func renderTable(m *Manifest) string {
 	b.WriteString(legend + "._\n")
 	b.WriteString("\n_Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._\n")
 	if m.StatusCheckedAt != "" {
-		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path)._\n")
+		b.WriteString("\n_On-chain status last checked: " + m.StatusCheckedAt + " (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._\n")
 	}
 	return b.String()
 }
@@ -182,6 +182,11 @@ func depBadge(deps []string) string {
 
 func publishedBadge(p Pub) string {
 	if !p.Uploaded {
+		// Parked is not live, but it is not nothing either: the bytes are on
+		// the chain, waiting for an approver to enable the package.
+		if p.State == "inert" {
+			return "⏳"
+		}
 		return "—"
 	}
 	switch p.Which {
