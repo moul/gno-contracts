@@ -44,6 +44,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/daily/cowsay/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/crc32/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/disjointset/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/fenwick/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/flatmap/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/fraction/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/heap/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -150,6 +151,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/erc721/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/escrow/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/faucet/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/fenwickdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/flatmapdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/fractiondemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/governor/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -415,6 +417,8 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/escrow/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/escrow/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/faucet/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/fenwickdemo/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/fenwickdemo/v0" -> "gno.land/p/moul/x/daily/fenwick/v0";
   "gno.land/r/moul/x/daily/flatmapdemo/v0" -> "gno.land/p/moul/x/daily/flatmap/v0";
   "gno.land/r/moul/x/daily/fractiondemo/v0" -> "gno.land/p/moul/x/daily/fraction/v0";
   "gno.land/r/moul/x/daily/governor/v1" -> "gno.land/p/moul/kit/store/v0";

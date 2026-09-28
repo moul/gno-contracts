@@ -176,6 +176,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/cowsay/v0`](p/moul/x/daily/cowsay) 📦 | — | [✅](https://gno.land/p/moul/x/daily/cowsay/v0) | — | — | — |
 | [`p/moul/x/daily/crc32/v0`](p/moul/x/daily/crc32) 📦 | — | [✅](https://gno.land/p/moul/x/daily/crc32/v0) | — | — | — |
 | [`p/moul/x/daily/disjointset/v0`](p/moul/x/daily/disjointset) 📦 | — | [✅](https://gno.land/p/moul/x/daily/disjointset/v0) | — | — | — |
+| [`p/moul/x/daily/fenwick/v0`](p/moul/x/daily/fenwick) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/flatmap/v0`](p/moul/x/daily/flatmap) 📦 | — | [✅](https://gno.land/p/moul/x/daily/flatmap/v0) | — | — | — |
 | [`p/moul/x/daily/fraction/v0`](p/moul/x/daily/fraction) 📦 | — | [✅](https://gno.land/p/moul/x/daily/fraction/v0) | — | — | — |
 | [`p/moul/x/daily/heap/v0`](p/moul/x/daily/heap) 📦 | — | [✅](https://gno.land/p/moul/x/daily/heap/v0) | — | — | — |
@@ -301,6 +302,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/escrow/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/escrow) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/escrow/v0) | — | — | 1 |
 | [`r/moul/x/daily/escrow/v1`](r/moul/x/daily/escrow) 🏛️ | [✅](https://pearl.testnets.gno.land/r/moul/x/daily/escrow/v1) | [✅](https://gno.land/r/moul/x/daily/escrow/v1) | — | — | 2 |
 | [`r/moul/x/daily/faucet/v0`](r/moul/x/daily/faucet) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/faucet/v0) | — | — | 1 |
+| [`r/moul/x/daily/fenwickdemo/v0`](r/moul/x/daily/fenwickdemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/flatmapdemo/v0`](r/moul/x/daily/flatmapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/flatmapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/fractiondemo/v0`](r/moul/x/daily/fractiondemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/fractiondemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/governor/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/governor) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/governor/v0) | — | — | 1 |
@@ -414,7 +416,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-28T09:46:28Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-09-28T10:04:01Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 

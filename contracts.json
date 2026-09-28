@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T09:46:28Z",
+  "status_checked_at": "2026-09-28T10:04:01Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -1632,6 +1632,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/fenwick/v0",
+      "dir": "p/moul/x/daily/fenwick",
+      "kind": "p",
+      "name": "x/daily/fenwick",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -5248,6 +5269,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/fenwickdemo/v0",
+      "dir": "r/moul/x/daily/fenwickdemo",
+      "kind": "r",
+      "name": "x/daily/fenwickdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/fenwick/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
