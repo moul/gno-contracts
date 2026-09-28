@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T21:13:21Z",
+  "status_checked_at": "2026-09-28T21:20:24Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -8407,6 +8407,35 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/gsdash/v0",
+      "dir": "r/moul/x/gsdash",
+      "kind": "r",
+      "name": "x/gsdash",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/gnoswap/gnft",
+        "gno.land/r/gnoswap/gns",
+        "gno.land/r/gnoswap/gov/xgns",
+        "gno.land/r/gnoswap/position",
+        "gno.land/r/gnoswap/staker"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
