@@ -58,11 +58,17 @@ func Bytes(n int64) string {
 
 // Comma inserts thousands separators: 1234567 -> "1,234,567".
 func Comma(n int64) string {
+	// The magnitude goes through uint64 rather than -n: -n on math.MinInt64 is
+	// math.MinInt64 again, so FormatInt emits its own sign and the neg branch
+	// below prepended a second one. v0 returned "--9,223,372,036,854,775,808".
 	neg := n < 0
+	var m uint64
 	if neg {
-		n = -n
+		m = uint64(-(n+1)) + 1
+	} else {
+		m = uint64(n)
 	}
-	s := strconv.FormatInt(n, 10)
+	s := strconv.FormatUint(m, 10)
 	var b strings.Builder
 	for i, c := range []byte(s) {
 		if i > 0 && (len(s)-i)%3 == 0 {

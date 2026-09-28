@@ -261,6 +261,11 @@ source = { dir = "p/moul/x/daily/hexdump" }
 
 [[module]]
 module = "gno.land/p/moul/x/daily/humanize/v0"
+source = { commit = "96f8aef268ca00444bde83349a6d95c021cb71bf", dir = "p/moul/x/daily/humanize" }
+hash = "h1:aUnlv51DsT3EGCHCwtXZigny4CqMK741j5ngN0+JczQ="
+
+[[module]]
+module = "gno.land/p/moul/x/daily/humanize/v1"
 source = { dir = "p/moul/x/daily/humanize" }
 
 [[module]]
@@ -393,6 +398,11 @@ source = { dir = "p/moul/x/plan9/synfs" }
 
 [[module]]
 module = "gno.land/p/moul/x/storagecost/v0"
+source = { commit = "96f8aef268ca00444bde83349a6d95c021cb71bf", dir = "p/moul/x/storagecost" }
+hash = "h1:aeV/DDJOCbvdbPvmPJwkOKUrUoL3i7hluggcTh2teDU="
+
+[[module]]
+module = "gno.land/p/moul/x/storagecost/v1"
 source = { dir = "p/moul/x/storagecost" }
 
 [[module]]
