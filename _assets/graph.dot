@@ -17,6 +17,7 @@ digraph gnocontracts {
   "gno.land/p/moul/helplink/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/kit/num/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/kit/store/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/kit/tally/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/kit/ui/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/md/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/mdlist/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -315,6 +316,7 @@ digraph gnocontracts {
   "gno.land/p/moul/helplink/v0" -> "gno.land/p/moul/txlink/v0";
   "gno.land/p/moul/kit/store/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/kit/store/v0" -> "gno.land/p/nt/seqid/v0";
+  "gno.land/p/moul/kit/tally/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/p/moul/kit/ui/v0" -> "gno.land/p/moul/helplink/v0";
   "gno.land/p/moul/kit/ui/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/p/moul/kit/ui/v0" -> "gno.land/p/nt/markdown/sanitize/v0";
@@ -430,6 +432,8 @@ digraph gnocontracts {
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/debug/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/fifo/v0";
+  "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/kit/num/v0";
+  "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/kit/tally/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/allinone/devtools/v0" -> "gno.land/p/moul/mygnoscan/v0";
