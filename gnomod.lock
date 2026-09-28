@@ -435,6 +435,11 @@ source = { dir = "p/moul/xdao" }
 
 [[module]]
 module = "gno.land/p/moul/xmath/v0"
+source = { commit = "3d9206ae5f4656e8c33bb775fd349fb656ff9c07", dir = "p/moul/xmath" }
+hash = "h1:1c5PgXNffXOodXBC66Gz/GkvwZCZNkRrA7cF2GJFQeg="
+
+[[module]]
+module = "gno.land/p/moul/xmath/v1"
 source = { dir = "p/moul/xmath" }
 
 [[module]]
