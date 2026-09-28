@@ -13,6 +13,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/grants/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/greet/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/helplink/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/kit/num/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/kit/store/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/kit/ui/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/md/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -50,7 +51,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/daily/fraction/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/heap/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/hexdump/v0" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/p/moul/x/daily/humanize/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/humanize/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/kmp/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/levenshtein/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/luhn/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -83,7 +84,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/plan9/ns/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/rc/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/plan9/synfs/v0" [style=filled, fillcolor="#cfe2ff"];
-  "gno.land/p/moul/x/storagecost/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/storagecost/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/vm/bf/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/vm/riscv/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/vm/vmkit/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -305,7 +306,8 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/plan9/rc/v0" -> "gno.land/p/moul/x/plan9/ns/v0";
   "gno.land/p/moul/x/plan9/synfs/v0" -> "gno.land/p/moul/x/plan9/ninep/v0";
   "gno.land/p/moul/x/plan9/synfs/v0" -> "gno.land/p/nt/avl/v0";
-  "gno.land/p/moul/x/storagecost/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/moul/x/storagecost/v1" -> "gno.land/p/moul/kit/num/v0";
+  "gno.land/p/moul/x/storagecost/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/x/vm/bf/v0" -> "gno.land/p/moul/x/vm/vmkit/v0";
   "gno.land/p/moul/x/vm/bf/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/p/moul/x/vm/riscv/v0" -> "gno.land/p/moul/x/vm/vmkit/v0";
@@ -451,7 +453,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/hangman/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/heapdemo/v0" -> "gno.land/p/moul/x/daily/heap/v0";
   "gno.land/r/moul/x/daily/hexdumpdemo/v0" -> "gno.land/p/moul/x/daily/hexdump/v0";
-  "gno.land/r/moul/x/daily/humanizedemo/v0" -> "gno.land/p/moul/x/daily/humanize/v0";
+  "gno.land/r/moul/x/daily/humanizedemo/v0" -> "gno.land/p/moul/x/daily/humanize/v1";
   "gno.land/r/moul/x/daily/kingofdice/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/kingofdice/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/kmpdemo/v0" -> "gno.land/p/moul/x/daily/kmp/v0";
@@ -578,7 +580,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/txlink/v0";
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/ulist/v1";
-  "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/x/storagecost/v0";
+  "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/moul/x/storagecost/v1";
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/nt/markdown/sanitize/v0";
   "gno.land/r/moul/x/reaper/v1" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/x/upgrade/adminreg/facade/v0" -> "gno.land/p/nt/avl/v0";
