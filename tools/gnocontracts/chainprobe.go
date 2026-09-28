@@ -179,3 +179,80 @@ func netReachable(rpc string) bool {
 	b, err := io.ReadAll(io.LimitReader(resp.Body, 4096))
 	return err == nil && strings.Contains(string(b), "\"result\"")
 }
+
+// chainIndex is every package path a chain holds, split by whether it is live
+// or parked behind the submission policy.
+//
+// The two sets are disjoint and together cover everything the chain holds, so
+// a path in neither is absent. That is what makes reading them worth it: a
+// 288-package catalog costs two queries instead of 288, and 288 is roughly the
+// number that gets rpc.gno.land's load balancer to answer 403 to everything
+// for the next few minutes.
+type chainIndex struct {
+	live   map[string]bool
+	parked map[string]bool
+}
+
+// queryChainIndex reads vm/qpaths and vm/qinertpaths, which between them name
+// every package on the chain. Reports false if either query fails, so the
+// caller can fall back to probing package by package: not every chain
+// implements them, and a wrong answer here would be wrong for the whole
+// catalog at once rather than for one row.
+//
+// vm/qpaths includes the stdlibs (`bufio`, `bytes`, `chain`, ...), which is
+// harmless because every lookup against this index is a full `gno.land/...`
+// package path and cannot collide with one.
+func queryChainIndex(rpc string) (chainIndex, bool) {
+	live, ok := queryPathSet(rpc, "vm/qpaths")
+	if !ok {
+		return chainIndex{}, false
+	}
+	parked, ok := queryPathSet(rpc, "vm/qinertpaths")
+	if !ok {
+		return chainIndex{}, false
+	}
+	return chainIndex{live: live, parked: parked}, true
+}
+
+// queryPathSet runs one whole-chain path query and reads its newline-separated
+// answer. gnokey prints "height: N" then "data: " followed by the first path,
+// with the rest on their own lines; an empty set is a "data:" line with
+// nothing after it, which is a real answer and not a failure.
+func queryPathSet(rpc, query string) (map[string]bool, bool) {
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	out, err := exec.CommandContext(ctx, "gnokey", "query", query, "--remote", rpc).CombinedOutput()
+	if err != nil {
+		return nil, false
+	}
+	return parsePathSet(string(out))
+}
+
+// parsePathSet reads the newline-separated body of a whole-chain path query.
+// Split out from the query so it can be tested against real gnokey output
+// without a chain.
+func parsePathSet(out string) (map[string]bool, bool) {
+	i := strings.Index(out, "data: ")
+	if i < 0 {
+		return nil, false
+	}
+	set := map[string]bool{}
+	for _, line := range strings.Split(out[i+len("data: "):], "\n") {
+		if p := strings.TrimSpace(line); p != "" {
+			set[p] = true
+		}
+	}
+	return set, true
+}
+
+// lookup classifies one package path against a whole-chain index.
+func (idx chainIndex) lookup(pkgpath string) probe {
+	switch {
+	case idx.live[pkgpath]:
+		return probePresent
+	case idx.parked[pkgpath]:
+		return probeParked
+	default:
+		return probeAbsent
+	}
+}

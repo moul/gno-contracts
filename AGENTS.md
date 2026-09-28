@@ -559,16 +559,36 @@ fee at 0.003 ugnot/gas against a chain floor of 0.001 (`auth/gasprice`). The fla
 `1800/byte` it carried until then under-funded 37% of that history and killed a real
 83-package run on a 4 KB package.
 
-### On-chain status, and chains that do not answer
+### On-chain status, and the two ways it asks
 
-`make status` probes every network with `gnokey query vm/qfile`. A
-query to a chain that is **down** fails exactly like a query for a package that was
-**never published**, and conflating the two used to write "not uploaded" for all 193
-packages of any unreachable network. So each network is probed once with an HTTP
-`/status` call first and skipped if it does not answer, a per-package query that fails for
-a transport reason leaves that entry alone, and only a clean "not found" records an
-absence. A skipped network keeps stale data rather than wrong data; the run says which
-ones it skipped and the `main` workflow warns instead of failing.
+`make status` refreshes what is live where. It reads each chain with **two whole-chain
+queries**, `vm/qpaths` and `vm/qinertpaths`, which between them name every package the chain
+holds. They are disjoint and jointly complete, so a path in neither is absent, and a
+288-contract catalog costs 2 queries per network instead of 288.
+
+That matters because `rpc.gno.land` sits behind a load balancer that starts answering `403`
+to every request, `/status` included, once queries arrive fast enough, and clears on its own
+a few minutes later. A per-package sweep trips it: one on 2026-09-28 got 93 answers and then
+195 refusals.
+
+A chain that does not answer `vm/qpaths` falls back to a query per package, paced, stopping
+after ten unanswered in a row rather than deepening a block. The run says which way it went.
+
+The per-package query is **`vm/qpkgmeta_json`**, not `vm/qfile`. Under an inert
+code-submission policy a successful `MsgAddPackage` parks the bytes and `vm/qfile` then
+answers "not available", character for character what it answers for a path nobody ever
+published, so a queued publish and a missing one were indistinguishable. `qpkgmeta_json`
+answers `live` / `inert` / `absent`, and the catalog carries all three: a parked package is
+`state: "inert"` with `uploaded: false`, and renders `⏳` in the README table.
+
+Two older failures this still has to avoid, both of which cost a whole column once:
+
+- **A chain that is down must not read as a chain that hosts nothing.** Each network is
+  probed once with an HTTP `/status` call and skipped if it does not answer, and a skipped
+  network keeps stale data rather than wrong data.
+- **Anything unparseable is unknown, never absent.** An answer the tool cannot read leaves
+  the recorded value alone. Inventing an absence is the one mistake that looks like a clean
+  result.
 
 ## The tools
 

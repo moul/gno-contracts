@@ -53,28 +53,33 @@ func cmdStatus(root string, args []string) error {
 			continue
 		}
 		nets++
+		// Two whole-chain reads answer for every contract at once. Falling
+		// back to a query each is correct but costs one per package, which
+		// is what the pacing and the circuit breaker below exist to survive.
+		idx, bulk := queryChainIndex(net.RPC)
 		up, parked, unknown, streak := 0, 0, 0, 0
 		for j := range m.Contracts {
 			c := &m.Contracts[j]
 			if c.Draft {
 				continue
 			}
-			// rpc.gno.land sits behind a load balancer that starts answering
-			// 403 to every request, /status included, once queries arrive fast
-			// enough. Probing 288 packages back to back trips it: a run on
-			// 2026-09-28 got 93 answers and then 195 refusals, and kept asking.
-			// Pace the queries, and stop asking a chain that has stopped
-			// answering rather than deepening the block.
-			if streak >= unansweredStreakLimit {
-				fmt.Printf("  %-12s stopped after %d unanswered in a row: the chain is refusing, not empty\n", net.Name, streak)
-				break
+			var state probe
+			if bulk {
+				state = idx.lookup(c.PkgPath)
+			} else {
+				// rpc.gno.land sits behind a load balancer that starts answering
+				// 403 to every request, /status included, once queries arrive fast
+				// enough. Probing a whole catalog back to back trips it: a run on
+				// 2026-09-28 got 93 answers and then 195 refusals, and kept asking.
+				// Pace the queries, and stop asking a chain that has stopped
+				// answering rather than deepening the block.
+				if streak >= unansweredStreakLimit {
+					fmt.Printf("  %-12s stopped after %d unanswered in a row: the chain is refusing, not empty\n", net.Name, streak)
+					break
+				}
+				time.Sleep(*pace)
+				state = queryPkgStatus(net.RPC, c.PkgPath)
 			}
-			time.Sleep(*pace)
-			// One probe is enough: since gnolang/gno#6162 a monorepo-origin
-			// package sits at OUR exact pkgpath, so a hit on a mirrored
-			// package is the genesis deployment and a hit on anything else
-			// was published from this repo.
-			state := queryPkgStatus(net.RPC, c.PkgPath)
 			switch state {
 			case probeUnknown:
 				// The chain answered for others but not for this one. Leave
@@ -92,6 +97,9 @@ func cmdStatus(root string, args []string) error {
 			checks++
 		}
 		note := ""
+		if !bulk {
+			note = "  (queried one by one: the chain did not answer vm/qpaths)"
+		}
 		if parked > 0 {
 			note = fmt.Sprintf("  (%d queued behind the submission policy)", parked)
 		}
