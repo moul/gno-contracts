@@ -1,0 +1,6 @@
+module = "gno.land/r/moul/x/nativereg/v0"
+gno = "0.9"
+
+# public: it exists to be imported. A realm registers the denom it issues by
+# calling Register from its own frame, which is the whole authorization model,
+# and a private realm cannot be imported at all.
