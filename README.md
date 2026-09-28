@@ -140,6 +140,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/grants/v0`](p/moul/grants) 📦 | — | [✅](https://gno.land/p/moul/grants/v0) | — | — | 3 |
 | [`p/moul/greet/v0`](p/moul/greet) 📦 | — | [✅](https://gno.land/p/moul/greet/v0) | — | — | — |
 | [`p/moul/helplink/v0`](p/moul/helplink) 📦 | — | [🗄️](https://gno.land/p/moul/helplink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink/v0) ≈ | 1 |
+| [`p/moul/kit/num/v0`](p/moul/kit/num) 📦 | — | — | — | — | — |
 | [`p/moul/kit/store/v0`](p/moul/kit/store) 📦 | — | [✅](https://gno.land/p/moul/kit/store/v0) | — | — | 2 |
 | [`p/moul/kit/ui/v0`](p/moul/kit/ui) 📦 | — | [✅](https://gno.land/p/moul/kit/ui/v0) | — | — | 3 |
 | [`p/moul/md/v0`](p/moul/md) 📦 | — | [🗄️](https://gno.land/p/moul/md/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/md/v0) ≈ | 1 |
@@ -434,7 +435,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-28T17:55:12Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-09-28T18:03:08Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
