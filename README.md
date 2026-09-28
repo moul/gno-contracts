@@ -398,6 +398,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/games/lastwords/v0`](r/moul/x/games/lastwords) 🏛️ | — | [✅](https://gno.land/r/moul/x/games/lastwords/v0) | — | — | 5 |
 | [`r/moul/x/grc20faucet/v0`](r/moul/x/grc20faucet) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20faucet/v0) | — | — | 4 |
 | [`r/moul/x/grc20wrapdemo/v0`](r/moul/x/grc20wrapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20wrapdemo/v0) | — | — | 6 |
+| [`r/moul/x/moultest/v0`](r/moul/x/moultest) 🏛️ | — | — | — | — | 4 |
 | [`r/moul/x/pairreg/v0`](r/moul/x/pairreg) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairreg/v0) | — | — | 3 |
 | [`r/moul/x/pairs/aaa/v0`](r/moul/x/pairs/aaa) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/aaa/v0) | — | — | 2 |
 | [`r/moul/x/pairs/aaabbb/v0`](r/moul/x/pairs/aaabbb) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/aaabbb/v0) | — | — | 5 |
@@ -407,6 +408,21 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/provable/v0`](r/moul/x/provable) 🏛️ | — | [✅](https://gno.land/r/moul/x/provable/v0) | — | — | 2 |
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
 | [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | [✅](https://gno.land/r/moul/x/reaper/v1) | — | — | 5 |
+| [`r/moul/x/upgrade/adminreg/facade/v0`](r/moul/x/upgrade/adminreg/facade) 🏛️ | — | — | — | — | 3 |
+| [`r/moul/x/upgrade/adminreg/impl/v0`](r/moul/x/upgrade/adminreg/impl/gen0) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/adminreg/impl/v1`](r/moul/x/upgrade/adminreg/impl/gen1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/lazy/v0`](r/moul/x/upgrade/lazy/gen0) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/x/upgrade/lazy/v1`](r/moul/x/upgrade/lazy/gen1) 🏛️ | — | — | — | — | 3 |
+| [`r/moul/x/upgrade/lock/v0`](r/moul/x/upgrade/lock/gen0) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/x/upgrade/lock/v1`](r/moul/x/upgrade/lock/gen1) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/x/upgrade/selfreg/facade/v0`](r/moul/x/upgrade/selfreg/facade) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/selfreg/impl/v0`](r/moul/x/upgrade/selfreg/impl/gen0) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/selfreg/impl/v1`](r/moul/x/upgrade/selfreg/impl/gen1) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/store/logic/v0`](r/moul/x/upgrade/store/logic/gen0) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/x/upgrade/store/logic/v1`](r/moul/x/upgrade/store/logic/gen1) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/x/upgrade/store/root/v0`](r/moul/x/upgrade/store/root) 🏛️ | — | — | — | — | 2 |
+| [`r/moul/x/upgrade/wrap/v0`](r/moul/x/upgrade/wrap/gen0) 🏛️ | — | — | — | — | 1 |
+| [`r/moul/x/upgrade/wrap/v1`](r/moul/x/upgrade/wrap/gen1) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/bfdemo/v0) | — | — | 6 |
 | [`r/moul/x/vm/riscvdemo/v0`](r/moul/x/vm/riscvdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/riscvdemo/v0) | — | — | 6 |
 | [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | — | [✅](https://gno.land/r/moul/x/wesh/v0) | — | — | 2 |
@@ -416,7 +432,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-28T16:36:43Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-09-28T17:38:07Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 

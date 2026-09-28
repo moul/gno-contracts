@@ -1162,6 +1162,10 @@ module = "gno.land/r/moul/x/grc20wrapdemo/v0"
 source = { dir = "r/moul/x/grc20wrapdemo" }
 
 [[module]]
+module = "gno.land/r/moul/x/moultest/v0"
+source = { dir = "r/moul/x/moultest" }
+
+[[module]]
 module = "gno.land/r/moul/x/pairreg/v0"
 source = { dir = "r/moul/x/pairreg" }
 
@@ -1197,6 +1201,66 @@ hash = "h1:xg0zO8jrplmDs08h8bapn//8jlz1uOWZpvUyqXHt8Zk="
 [[module]]
 module = "gno.land/r/moul/x/reaper/v1"
 source = { dir = "r/moul/x/reaper" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/adminreg/facade/v0"
+source = { dir = "r/moul/x/upgrade/adminreg/facade" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/adminreg/impl/v0"
+source = { dir = "r/moul/x/upgrade/adminreg/impl/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/adminreg/impl/v1"
+source = { dir = "r/moul/x/upgrade/adminreg/impl/gen1" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/lazy/v0"
+source = { dir = "r/moul/x/upgrade/lazy/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/lazy/v1"
+source = { dir = "r/moul/x/upgrade/lazy/gen1" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/lock/v0"
+source = { dir = "r/moul/x/upgrade/lock/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/lock/v1"
+source = { dir = "r/moul/x/upgrade/lock/gen1" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/selfreg/facade/v0"
+source = { dir = "r/moul/x/upgrade/selfreg/facade" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/selfreg/impl/v0"
+source = { dir = "r/moul/x/upgrade/selfreg/impl/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/selfreg/impl/v1"
+source = { dir = "r/moul/x/upgrade/selfreg/impl/gen1" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/store/logic/v0"
+source = { dir = "r/moul/x/upgrade/store/logic/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/store/logic/v1"
+source = { dir = "r/moul/x/upgrade/store/logic/gen1" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/store/root/v0"
+source = { dir = "r/moul/x/upgrade/store/root" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/wrap/v0"
+source = { dir = "r/moul/x/upgrade/wrap/gen0" }
+
+[[module]]
+module = "gno.land/r/moul/x/upgrade/wrap/v1"
+source = { dir = "r/moul/x/upgrade/wrap/gen1" }
 
 [[module]]
 module = "gno.land/r/moul/x/vm/bfdemo/v0"

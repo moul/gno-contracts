@@ -564,3 +564,51 @@ func TestExtraChangesIsSortedAndSkipsSeen(t *testing.T) {
 		t.Errorf("not slug-sorted: %s, %s", got[0].slug, got[1].slug)
 	}
 }
+
+// -print has to beat -run, and this is tested on txMode rather than through
+// run() on purpose: through run() a dead remote fails identically whichever way
+// the flags resolve, so the first version of this test passed with the
+// precedence deleted from main.go.
+func TestTxModePrintBeatsRun(t *testing.T) {
+	for _, tc := range []struct {
+		name         string
+		runTx, print bool
+		batch        string
+		wantRun      bool
+		wantBatch    string
+	}{
+		{"default describes", false, false, "", false, ""},
+		{"-run implies -batch", true, false, "", true, "/tmp/d.json"},
+		{"-run keeps an explicit -batch", true, false, "/x.json", true, "/x.json"},
+		{"-print disarms -run", true, true, "", false, ""},
+		{"-print alone still describes", false, true, "", false, ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			gotRun, gotBatch := txMode(tc.runTx, tc.print, tc.batch, "/tmp/d.json")
+			if gotRun != tc.wantRun {
+				t.Errorf("run = %v, want %v", gotRun, tc.wantRun)
+			}
+			if gotBatch != tc.wantBatch {
+				t.Errorf("batch = %q, want %q", gotBatch, tc.wantBatch)
+			}
+		})
+	}
+}
+
+// The spelling itself: every other tool here takes -print, and the one that does
+// not is the one a reader abandons for raw gnokey.
+func TestTxAcceptsThePrintFlag(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "bio.md"), []byte("hello"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	devnull, err := os.Open(os.DevNull)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer devnull.Close()
+	err = run([]string{"tx", "-content", dir, "-print", "-remote", "http://127.0.0.1:1"}, devnull)
+	if err != nil && strings.Contains(err.Error(), "flag provided but not defined") {
+		t.Fatalf("tx does not accept -print: %v", err)
+	}
+}

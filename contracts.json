@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T16:36:43Z",
+  "status_checked_at": "2026-09-28T17:38:07Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -8149,6 +8149,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/moultest/v0",
+      "dir": "r/moul/x/moultest",
+      "kind": "r",
+      "name": "x/moultest",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/pairreg/v0",
       "dir": "r/moul/x/pairreg",
       "kind": "r",
@@ -8411,6 +8437,362 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/adminreg/facade/v0",
+      "dir": "r/moul/x/upgrade/adminreg/facade",
+      "kind": "r",
+      "name": "x/upgrade/adminreg/facade",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ownable/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/adminreg/impl/v0",
+      "dir": "r/moul/x/upgrade/adminreg/impl/gen0",
+      "kind": "r",
+      "name": "x/upgrade/adminreg/impl",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/r/moul/x/upgrade/adminreg/facade/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/adminreg/impl/v1",
+      "dir": "r/moul/x/upgrade/adminreg/impl/gen1",
+      "kind": "r",
+      "name": "x/upgrade/adminreg/impl",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/r/moul/x/upgrade/adminreg/facade/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/lazy/v0",
+      "dir": "r/moul/x/upgrade/lazy/gen0",
+      "kind": "r",
+      "name": "x/upgrade/lazy",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/lazy/v1",
+      "dir": "r/moul/x/upgrade/lazy/gen1",
+      "kind": "r",
+      "name": "x/upgrade/lazy",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/moul/x/upgrade/lazy/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/lock/v0",
+      "dir": "r/moul/x/upgrade/lock/gen0",
+      "kind": "r",
+      "name": "x/upgrade/lock",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ownable/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/lock/v1",
+      "dir": "r/moul/x/upgrade/lock/gen1",
+      "kind": "r",
+      "name": "x/upgrade/lock",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/moul/x/upgrade/lock/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/selfreg/facade/v0",
+      "dir": "r/moul/x/upgrade/selfreg/facade",
+      "kind": "r",
+      "name": "x/upgrade/selfreg/facade",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/selfreg/impl/v0",
+      "dir": "r/moul/x/upgrade/selfreg/impl/gen0",
+      "kind": "r",
+      "name": "x/upgrade/selfreg/impl",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/r/moul/x/upgrade/selfreg/facade/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/selfreg/impl/v1",
+      "dir": "r/moul/x/upgrade/selfreg/impl/gen1",
+      "kind": "r",
+      "name": "x/upgrade/selfreg/impl",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/r/moul/x/upgrade/selfreg/facade/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/store/logic/v0",
+      "dir": "r/moul/x/upgrade/store/logic/gen0",
+      "kind": "r",
+      "name": "x/upgrade/store/logic",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/moul/x/upgrade/store/root/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/store/logic/v1",
+      "dir": "r/moul/x/upgrade/store/logic/gen1",
+      "kind": "r",
+      "name": "x/upgrade/store/logic",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/moul/x/upgrade/store/root/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/store/root/v0",
+      "dir": "r/moul/x/upgrade/store/root",
+      "kind": "r",
+      "name": "x/upgrade/store/root",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ownable/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/wrap/v0",
+      "dir": "r/moul/x/upgrade/wrap/gen0",
+      "kind": "r",
+      "name": "x/upgrade/wrap",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/upgrade/wrap/v1",
+      "dir": "r/moul/x/upgrade/wrap/gen1",
+      "kind": "r",
+      "name": "x/upgrade/wrap",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/moul/x/upgrade/wrap/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
