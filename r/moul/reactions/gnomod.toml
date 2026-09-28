@@ -1,0 +1,12 @@
+module = "gno.land/r/moul/reactions/v0"
+gno = "0.9"
+
+# public: the entire point of this realm is that other realms import it and call
+# RenderBlock() inside their own Render. A private realm cannot be imported at
+# all, so `private = true` here would delete the feature rather than trade
+# against it.
+#
+# What private would have bought, redeploy-in-place, is given up deliberately.
+# This path is permanent and the state under it belongs to everyone who reacted,
+# not to moul, so a fix ships as a v1 that keeps reading this one rather than as
+# a redeploy that silently wipes every tally.
