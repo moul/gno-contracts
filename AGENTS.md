@@ -108,14 +108,24 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   is a bug, and gno map iteration order is unspecified, so never iterate a map to build
   output.
 - **Every test function starts at block height 123; only realm state carries over.**
-  `testing.SkipHeights` is RELATIVE, there is no `testing.Height` and no absolute setter,
-  and a skip only moves the height *within* the test that called it: the next test starts
-  back at 123 while package-level state (an avl tree, a cooldown map) keeps whatever the
-  previous test wrote. So anything height-gated needs a fresh account per test, or its own
-  skip, or it fails on the second test to touch it. Never assert an absolute height or a
-  value derived from one, ask the realm instead (a `Day()` helper). Measured 2026-09-19
-  against gno master while writing `r/moul/x/grc20wrapdemo`; the claim that stood here
-  before, that height carries over between tests, was wrong.
+  `testing.SkipHeights` is RELATIVE; `testing.SetHeight` is the absolute setter, and it
+  moves backwards as happily as forwards. There is no `testing.Height` READER: ask the
+  chain with `runtime.ChainHeight()`. Either way the move lands only *within* the test that
+  made it: the next test starts back at 123 while package-level state (an avl tree, a
+  cooldown map) keeps whatever the previous test wrote. So anything height-gated needs a
+  fresh account per test, or its own skip, or it fails on the second test to touch it.
+  Never assert an absolute height you did not set, nor a value derived from one; ask the
+  realm instead (a `Day()` helper). Measured 2026-09-19 against gno master while writing
+  `r/moul/x/grc20wrapdemo` (the claim that stood here before, that height carries over
+  between tests, was wrong) and corrected 2026-09-28 while writing `r/moul/x/moultest`,
+  where "no absolute setter" turned out to be wrong too: `SetHeight` has been in
+  `gnovm/tests/stdlibs/testing` all along.
+- **The BANK does not carry over between test functions, though realm state does.** A
+  balance issued in one test is gone in the next, while the package-level counters that
+  recorded issuing it are not, so a realm's own view and the chain's can be made to
+  disagree by nothing more than a test boundary. `r/moul/x/moultest` renders
+  `issued: 1000000` beside `circulating: 0` for exactly this reason. Assert balances in
+  the test that created them, and assert DELTAS rather than totals.
 - **`testing.SetRealm` only governs the crossing calls made from the frame that called
   it.** Call it in a test helper that does not itself cross and it is silently ignored:
   the caller stays whoever it was, usually the realm's own address, and that surfaces much
