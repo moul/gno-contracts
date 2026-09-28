@@ -20,6 +20,10 @@
 
 ---
 
+:reactions:
+
+---
+
 [:realm:](/r/moul/home:slots) · rev :rev: · :chainid: @ :height:
 
 On mygnoscan: :scan.links:
