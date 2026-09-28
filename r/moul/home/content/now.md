@@ -8,3 +8,7 @@
   on-chain store, published by a transaction. Same trick as this page.
 - **Mainnet.** gno.land is launched. The interesting part is no longer the
   chain, it is what is running on it.
+- **[Bubble Rumble](https://bubblerumble.net/?ref=g1manfred47kzduec920z88wfr64ylksmdcedlf5).**
+  Jae Kwon's last-boop-wins pot game, real GNOT on mainnet, with a whole
+  multiplayer client grown around it in a week. That link is my invite: boop
+  through it and we both earn its BUBBLE token.
