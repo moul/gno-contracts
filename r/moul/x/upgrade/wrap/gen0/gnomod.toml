@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/upgrade/wrap/v0"
+gno = "0.9"
+# public: imported by .../wrap/v1, which reads its counter; that import IS the pattern

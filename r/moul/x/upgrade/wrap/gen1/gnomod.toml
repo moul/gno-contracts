@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/upgrade/wrap/v1"
+gno = "0.9"
+# public: a further version must be able to wrap it the same way v1 wraps v0
