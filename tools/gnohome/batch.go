@@ -129,8 +129,9 @@ func buildBatch(cfg config, changes []change, opt txOptions) (*txDoc, int64, err
 	return doc, gas, nil
 }
 
-// printBatch writes the document and the two commands that act on it.
-func printBatch(out *os.File, cfg config, changes []change, opt txOptions, path string) error {
+// printBatch writes the document and the two commands that act on it, or runs
+// them itself when run is set.
+func printBatch(out *os.File, cfg config, changes []change, opt txOptions, path string, run bool) error {
 	doc, gas, err := buildBatch(cfg, changes, opt)
 	if err != nil {
 		return err
@@ -187,5 +188,14 @@ func printBatch(out *os.File, cfg config, changes []change, opt txOptions, path 
 		return err
 	}
 	fmt.Fprintf(out, "#\n# Or, with nothing to paste: sh %s\n", script)
+
+	// The script and the printed commands are written either way, including
+	// under -run. A broadcast that fails halfway leaves the document signed and
+	// the sequence still valid, and the fastest way back is the script that was
+	// already on disk: regenerating it would re-read the account and could pick
+	// up a sequence the signature no longer matches.
+	if run {
+		return signAndBroadcast(out, cfg, path, acct)
+	}
 	return nil
 }

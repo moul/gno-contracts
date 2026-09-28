@@ -15,11 +15,15 @@
 
 GNOCONTRACTS ?= go -C tools tool gnocontracts
 GNOPM        ?= go -C tools tool gnopm
+GNOHOME      ?= go -C tools tool gnohome
+# Where `make home-push PRINT=1` writes the unsigned document. Without PRINT the
+# tool picks its own path, keyed by chain id so two chains cannot collide.
+HOME_TX      ?= /tmp/home.tx.json
 
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
 	guard-readmes guard-private guard-untrusted-render verify deps bump-deps manifest readme readmes gen check \
-	sync graph publish status report preview site clean
+	sync graph publish status home-push report preview site clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^##@/{printf "\n%s\n",substr($$0,5)} /^[a-z][a-z-]*:.*?## /{printf "  %-14s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -92,6 +96,9 @@ publish: ## publish what the chain is missing, in dependency order; PRINT=1 plan
 
 status: ## refresh on-chain upload status for every network; needs gnokey
 	$(GNOCONTRACTS) status $(if $(NET),-net $(NET),)
+
+home-push: ## push r/moul/home's slots: one transaction, one signature, signed and broadcast; PRINT=1 writes the document and the commands instead
+	$(GNOHOME) tx -all $(if $(PRINT),-batch $(HOME_TX),-run)
 
 sync: ## report drift vs the gnolang/gno monorepo (needs GNOROOT)
 	$(GNOCONTRACTS) sync

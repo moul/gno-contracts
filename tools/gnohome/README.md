@@ -72,6 +72,30 @@ This path also removes the `"$(/bin/cat …)"` problem entirely: in a document
 the body is a literal JSON string, so there is no shell to quote for, nothing
 eats the trailing newline, and `ARG_MAX` stops being a ceiling on slot size.
 
+### `-run`: and sign and broadcast it, which is what `make home-push` does
+
+```sh
+make home-push              # build the document, sign it, broadcast it
+make home-push PRINT=1      # build it and print the two commands, run nothing
+```
+
+`-run` implies `-batch`, and picks its own path under the temp dir keyed by
+chain id when none is named, so a staging document and a mainnet one cannot
+overwrite each other. It writes the same document and the same `.sh` first, so
+a run that fails halfway is reproducible by hand from what is already on disk.
+
+What it removes is the **paste**, not the review. The signature covers the
+account sequence, so the document is valid only until that key signs anything
+else, and the gap between reading the two commands and running them is exactly
+the gap in which that happens. Pasting is also how the wrong document gets
+broadcast, since `gnokey broadcast` does not check locally that a document was
+signed at all.
+
+gnohome still holds no key: it shells out to `gnokey`, which prompts for the
+passphrase exactly as it would if you had typed the command. The child inherits
+stdin for that reason, which is also why `make home-push` must not be piped
+into anything.
+
 ### Deploying is not here
 
 Publishing the realm is [`gnopm publish`](https://github.com/moul/gnopm), which
@@ -153,8 +177,12 @@ Re-adding the package resets realm state: `init()` runs again and the slot tree
 is empty. Push everything back without consulting the chain:
 
 ```sh
-go -C tools tool gnohome tx -all -batch /tmp/home.tx.json
+make home-push          # or: gnohome tx -all -batch /tmp/home.tx.json
 ```
+
+The redeploy that carried `scan.gno` landed at height 396749 and emptied the
+tree, which is what this path exists for: eight slots, one transaction, one
+signature.
 
 ## Bodies too large for one transaction
 
