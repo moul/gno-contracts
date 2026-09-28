@@ -194,6 +194,59 @@ func TestSetPublishedLabelsProvenance(t *testing.T) {
 	}
 }
 
+// gnokey prints "height: N" then "data: " followed by the FIRST path, with the
+// rest on their own lines. Captured from gnoland-1 on 2026-09-28.
+func TestQueryPathSetReadsGnokeyListOutput(t *testing.T) {
+	out := "height: 0\ndata: gno.land/p/moul/md/v0\ngno.land/r/moul/hello/v0\nbufio\n\n"
+	set, ok := parsePathSet(out)
+	if !ok {
+		t.Fatal("a well formed list read as a failure")
+	}
+	if len(set) != 3 {
+		t.Fatalf("got %d paths, want 3 (the stdlib entry is kept, it cannot collide with a full pkgpath)", len(set))
+	}
+	for _, want := range []string{"gno.land/p/moul/md/v0", "gno.land/r/moul/hello/v0", "bufio"} {
+		if !set[want] {
+			t.Errorf("%q missing from the set", want)
+		}
+	}
+
+	// An empty answer is a real answer: a chain with nothing parked returns a
+	// "data:" line with nothing after it, and that must not read as a failure,
+	// or every package on it would be recorded parked-unknown.
+	empty, ok := parsePathSet("height: 0\ndata: \n")
+	if !ok {
+		t.Fatal("an empty set read as a failure")
+	}
+	if len(empty) != 0 {
+		t.Fatalf("empty set has %d entries", len(empty))
+	}
+
+	// No data marker at all means the chain did not answer this query.
+	if _, ok := parsePathSet("--= Error =--\nunknown request\n"); ok {
+		t.Fatal("an error read as an answer: every contract would be classified from it")
+	}
+}
+
+// A chain index classifies from two disjoint sets, and anything in neither is
+// absent. That last case is the whole reason two queries can replace one per
+// package.
+func TestChainIndexLookupCoversAllThree(t *testing.T) {
+	idx := chainIndex{
+		live:   map[string]bool{"gno.land/p/moul/md/v0": true},
+		parked: map[string]bool{"gno.land/r/moul/queued/v0": true},
+	}
+	for path, want := range map[string]probe{
+		"gno.land/p/moul/md/v0":     probePresent,
+		"gno.land/r/moul/queued/v0": probeParked,
+		"gno.land/r/moul/never/v0":  probeAbsent,
+	} {
+		if got := idx.lookup(path); got != want {
+			t.Errorf("lookup(%s) = %v, want %v", path, got, want)
+		}
+	}
+}
+
 func TestProbeStatesAreDistinct(t *testing.T) {
 	if reflect.DeepEqual(probeAbsent, probeUnknown) {
 		t.Fatal("absent and unknown are the same value: the whole point is that they are not")
