@@ -35,7 +35,7 @@ Better still, use `-batch` and sign once. See below.
 | `slots` | the local slots: name, bytes, hash, path |
 | `preview` | render the page locally; `-out FILE` to write it |
 | `status` | diff `content/` against the chain manifest, one query, no bodies |
-| `tx` | print `gnokey maketx call` for each outdated slot |
+| `tx` | the plan: `Set` each outdated slot, and with `-prune` `Delete` each slot the chain has and `content/` does not |
 | `packages` | print the `packages` slot, generated from `contracts.json` |
 
 Shared flags: `-content` `-realm` `-remote` `-chainid` `-key` `-owner`.
@@ -55,7 +55,7 @@ sign` signs the document rather than the message. So the whole update can be
 one signature:
 
 ```sh
-go -C tools tool gnohome tx -all -batch /tmp/home.tx.json
+go -C tools tool gnohome tx -prune -batch /tmp/home.tx.json
 sh /tmp/home.tx.sh    # signs, then broadcasts, written next to the document
 ```
 
@@ -71,6 +71,23 @@ document is void.
 This path also removes the `"$(/bin/cat …)"` problem entirely: in a document
 the body is a literal JSON string, so there is no shell to quote for, nothing
 eats the trailing newline, and `ARG_MAX` stops being a ceiling on slot size.
+
+### `-all` and `-prune` compose, and once did not
+
+`-prune` adds a `Delete` for every slot on chain with no local file. `-all`
+pushes every local slot rather than only the outdated ones.
+
+Until 2026-09-28 `-all` built its plan from the local files **without fetching
+the manifest**, on the reasoning that a redeploy empties the store so there is
+nothing to ask about. True of the slots it pushed, false of the ones it did not:
+with no manifest there are no extras, so `-all -prune` emitted zero `Delete`
+messages, accepted the flag and warned about nothing. The document looked
+plausible, the page even rendered correctly, because a section disappears the
+moment the new `layout` is set, and the orphaned slots stayed in the store with
+their deposit locked. `TestAllChangesKeepsTheExtras` pins it.
+
+`tx` now fetches the manifest either way. `-all` selects which local slots are
+pushed; it no longer decides whether the chain is consulted.
 
 ### `-run`: and sign and broadcast it, which is what `make home-push` does
 
@@ -221,11 +238,16 @@ Use `-inline` to embed the literal instead (shell-quoted, apostrophes included).
 ## After a redeploy
 
 Re-adding the package resets realm state: `init()` runs again and the slot tree
-is empty. Push everything back without consulting the chain:
+is empty. Push everything back:
 
 ```sh
-make home-push          # or: gnohome tx -all -batch /tmp/home.tx.json
+make home-push          # or: gnohome tx -prune -batch /tmp/home.tx.json
 ```
+
+No special flag for it. An empty manifest makes every local slot `missing`, so
+the ordinary plan already pushes all of them. `-all` exists for the other case,
+re-sending a slot the chain already agrees with, which costs gas and changes
+nothing.
 
 The redeploy that carried `scan.gno` landed at height 396749 and emptied the
 tree, which is what this path exists for: eight slots, one transaction, one
