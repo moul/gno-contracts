@@ -94,6 +94,10 @@ module = "gno.land/p/moul/kit/store/v0"
 source = { dir = "p/moul/kit/store" }
 
 [[module]]
+module = "gno.land/p/moul/kit/tally/v0"
+source = { dir = "p/moul/kit/tally" }
+
+[[module]]
 module = "gno.land/p/moul/kit/ui/v0"
 source = { dir = "p/moul/kit/ui" }
 

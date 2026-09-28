@@ -1,11 +1,13 @@
 package devtools
 
 import (
+	"strings"
 	"testing"
 
 	"gno.land/p/moul/fifo/v0"
-	"gno.land/r/moul/config/v1"
+	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
+	"gno.land/r/moul/config/v1"
 )
 
 // reset puts the realm back to a just-deployed state. Realm globals live for
@@ -88,7 +90,7 @@ func ExampleRender() {
 	// Output:
 	// # allinone: devtools
 	//
-	// Eight packages, used together rather than one at a time. [source](https://mygnoscan.moul.p2p.team/realm/r/moul/x/allinone/devtools/v0)
+	// Ten packages, used together rather than one at a time. [source](https://mygnoscan.moul.p2p.team/realm/r/moul/x/allinone/devtools/v0)
 	//
 	// ## Notes
 	//
@@ -98,6 +100,12 @@ func ExampleRender() {
 	// - [clear them](/r/moul/x/allinone/devtools/v0$help&func=Reset)
 	// - [live chain values](/r/moul/x/allinone/devtools/v0:chain)
 	// - [toggle the debug panel](/r/moul/x/allinone/devtools/v0:?debug=1)
+	//
+	// ## Who has written the most
+	//
+	// *No notes yet, so nobody is on the board.*
+	//
+	// Storage deposit for the list: **0 GNOT**
 	//
 	// ## What each package does here
 	//
@@ -111,4 +119,36 @@ func ExampleRender() {
 	// | `p/moul/md` | every heading, link and list on the page |
 	// | `p/moul/txlink` | the call links above, relative to this realm |
 	// | `p/moul/fifo` | the note list, bounded so storage cannot grow forever |
+	// | `p/moul/kit/tally` | the note leaderboard, with ties ordered by address |
+	// | `p/moul/kit/num` | pricing the note list in GNOT instead of raw ugnot |
+}
+
+// TestBoardRanksAuthorsAndPricesTheList exercises the two kit packages this
+// realm adopted, because ExampleRender only ever sees the empty page.
+func TestBoardRanksAuthorsAndPricesTheList(cur realm, t *testing.T) {
+	Reset(cross(cur))
+
+	alice := testutils.TestAddress("alice")
+	bob := testutils.TestAddress("bob")
+
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Add(cross(cur), "one")
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Add(cross(cur), "two")
+	testing.SetRealm(testing.NewUserRealm(bob))
+	Add(cross(cur), "three")
+
+	uassert.Equal(t, int64(2), authors.Score(alice.String()))
+	uassert.Equal(t, int64(1), authors.Score(bob.String()))
+	uassert.Equal(t, 1, authors.Rank(alice.String()))
+	uassert.Equal(t, 2, authors.Rank(bob.String()))
+
+	// "one"+"two"+"three" is 11 bytes at 100 ugnot each, which num renders as
+	// GNOT rather than as 1100.
+	out := Render("")
+	uassert.True(t, strings.Contains(out, "0.0011 GNOT"))
+	uassert.True(t, strings.Contains(out, "## Who has written the most"))
+
+	Reset(cross(cur))
+	uassert.Equal(t, 0, authors.Len())
 }
