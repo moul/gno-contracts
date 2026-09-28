@@ -54,6 +54,19 @@ func TestProposeThenAccept(cur realm, t *testing.T) {
 		"- gno.land/r/moul/x/upgrade/adminreg/impl/v1\n", facade.Render(""))
 }
 
+// TestDispatchCost100 does 100 dispatches through this pattern's entry point,
+// so `gno test -print-runtime-metrics` prints a cycle count for a known
+// workload. Its twin is TestDispatchCost100 in schema/impl/gen1.
+//
+func TestDispatchCost100(cur realm, t *testing.T) {
+	// Runs after TestProposeThenAccept, which leaves v1 live, and before
+	// TestLadder, which freezes. Reads only, so it disturbs neither.
+	for i := 0; i < 100; i++ {
+		facade.Greet("world")
+	}
+	uassert.Equal(t, "HELLO, world!", facade.Greet("world"))
+}
+
 // TestLadder walks the three rungs and checks the ratchet refuses to loosen.
 //
 // Runs after TestProposeThenAccept on purpose: every rung is one-way, so the

@@ -14,7 +14,7 @@ functions, `chain`-era stdlibs, `p/nt/*`, and this repo's version-last path
 convention. The port is where most of the new findings came from, because
 several of the originals no longer mean what they meant.
 
-## The six
+## The catalogue
 
 | Dir | Was | Idea | Upgrade is | Data moves | One answer? |
 |---|---|---|---|---|---|
@@ -24,9 +24,12 @@ several of the originals no longer mean what they meant.
 | [`lazy`](./lazy) | `upgrade_d` | New layout, records converted on first touch | a deploy, nothing else | per record, on read | yes |
 | [`selfreg`](./selfreg) | `upgrade_e` | Permanent facade holds an interface; impl registers itself from `init` | a deploy, nothing else | never | yes |
 | [`adminreg`](./adminreg) | `upgrade_f` | Same, but nominating and accepting are separate transactions | a deploy + one `Accept` tx | never | yes |
+| [`schema`](./schema) | new | The API is **data** the handler declares, behind one `Call(verb, payload)` | a deploy + one `Accept` tx | never | yes |
 
 Read them in that order. `wrap` is the cheapest and weakest; each of the next
 buys one guarantee back and charges a transaction, a gate, or a realm for it.
+`schema` is the odd one out: it buys the same guarantee `adminreg` does and spends
+the type system instead of a realm.
 
 Choosing, very roughly:
 
@@ -37,6 +40,7 @@ Choosing, very roughly:
   `store` or `lock` can migrate lazily).
 - **Callers must not have to know a version exists** → `selfreg`.
 - **Same, but deploying must not be enough to take the realm over** → `adminreg`.
+- **The set of operations will keep growing, and callers should discover it** → `schema`.
 
 ## What the port changed
 
@@ -207,9 +211,11 @@ Open threads, roughly in order of interest:
    and frozen; Sui has two, and `dependency-only` has no analogue here yet. Is
    there a useful rung that says "the interface may not change but the
    implementation may"?
-2. **Schema dispatch as a seventh pattern**, built here rather than copied, to
-   measure what the string boundary actually costs against `adminreg`'s typed
-   one.
+2. **Separate the crossing from the string boundary** in `schema`'s cost table.
+   A dispatch costs ~182,000 gas there against ~9,400 through `adminreg`'s typed
+   entry point, 19.5x, and one realm crossing is inside that gap. Worth knowing
+   how much, because it decides whether the string boundary is the thing to
+   optimise or the crossing is.
 3. **Paged migration** next to `lazy`: an owner-driven `MigrateN(n)` that drains
    the predecessor in bounded batches, so the two-answer window closes instead
    of lasting forever.
