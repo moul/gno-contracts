@@ -1,0 +1,6 @@
+module = "gno.land/r/moul/x/pilotdemo/v0"
+gno = "0.9"
+
+# public: a pilot account persists the module object in its roster, and a
+# value of a type defined in a private realm cannot be persisted by anyone
+# else. Every pilot module has to be public for the same reason.
