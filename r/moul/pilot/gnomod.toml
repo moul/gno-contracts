@@ -1,0 +1,8 @@
+module = "gno.land/r/moul/pilot/v0"
+gno = "0.9"
+
+# public: a module realm must import this account and persist objects it owns
+# (a Purse, the Account handle), both of which a private realm refuses. And a
+# redeploy wipes every package-level var while keeping the coins, which for an
+# account means the owner, the roster and every budget vanish while the
+# treasury stays: the one realm that must never be replaceable.
