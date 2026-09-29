@@ -558,6 +558,10 @@ module = "gno.land/r/moul/forge/v0"
 source = { dir = "r/moul/forge" }
 
 [[module]]
+module = "gno.land/r/moul/gallery/v0"
+source = { dir = "r/moul/gallery" }
+
+[[module]]
 module = "gno.land/r/moul/gnopm/registry/v0"
 source = { dir = "r/moul/gnopm/registry" }
 
