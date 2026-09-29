@@ -2,7 +2,7 @@
 // log, issues, change requests and reviews, browsable through gnoweb and
 // writable only through signed transactions.
 //
-// It is the realm half of gno.land/p/moul/forge/v0, which holds the whole
+// It is the realm half of gno.land/p/moul/forge/v1, which holds the whole
 // domain model; this file is wiring. Every exported mutation is a crossing
 // function that resolves the caller, forwards to the library, aborts on error
 // (the only way to revert state in gno) and emits an event for indexers.
@@ -23,7 +23,7 @@ import (
 	"errors"
 	"strings"
 
-	fg "gno.land/p/moul/forge/v0"
+	fg "gno.land/p/moul/forge/v1"
 	"gno.land/r/sys/users"
 )
 
@@ -315,8 +315,95 @@ func MergeChange(cur realm, repoID string, changeID int64, expectedTargetOID, me
 }
 
 // ---------------------------------------------------------------------------
+// Packages and releases
+// ---------------------------------------------------------------------------
+
+// PublishPackage records that a repo publishes a deployed package path.
+//
+// The claim is not verified and cannot be: a realm cannot ask the chain who
+// deployed a path. What is guaranteed is that someone with write access to the
+// repo said it, under a namespace r/sys/users governs. A reader weighs it the
+// way they weigh a go.mod.
+//
+// ref, oid and tag may each be empty when unstated.
+func PublishPackage(cur realm, repoID, path, ref, oid, tag string) {
+	a := caller(cur)
+	p, err := f.PublishPackage(a, height(), repoID, path, ref, oid, tag)
+	must(err)
+	chain.Emit("PackagePublished",
+		"repo", repoID,
+		"path", p.Path,
+		"ref", p.Ref,
+		"oid", p.OID,
+		"tag", p.Tag,
+	)
+}
+
+// UnpublishPackage withdraws the claim. The package stays on chain; only the
+// repo's assertion about it goes away.
+func UnpublishPackage(cur realm, repoID, path string) {
+	a := caller(cur)
+	must(f.UnpublishPackage(a, repoID, path))
+	chain.Emit("PackageUnpublished", "repo", repoID, "path", path)
+}
+
+// CutRelease names a point in a repo's history. A tag cannot be re-cut: see
+// YankRelease for withdrawing one.
+func CutRelease(cur realm, repoID, tag, name, notes, oid, ref string, prerelease bool) {
+	a := caller(cur)
+	rel, err := repo(repoID).CutRelease(a, height(), tag, name, notes, oid, ref, prerelease)
+	must(err)
+	chain.Emit("ReleaseCut",
+		"repo", repoID,
+		"tag", rel.Tag,
+		"oid", rel.OID,
+		"prerelease", btoa(rel.Prerelease),
+	)
+}
+
+// YankRelease marks a release withdrawn. It stays visible: a version that
+// vanished reads as "never published" rather than "do not use this".
+func YankRelease(cur realm, repoID, tag, reason string) {
+	a := caller(cur)
+	must(repo(repoID).YankRelease(a, tag, reason))
+	chain.Emit("ReleaseYanked", "repo", repoID, "tag", tag, "reason", reason)
+}
+
+// ---------------------------------------------------------------------------
 // Read-only helpers, for other realms and for vm/qeval
 // ---------------------------------------------------------------------------
+
+// PackageRepo is the lookup an explorer makes: given a deployed package path,
+// which repo claims to publish it. Empty when nobody does.
+func PackageRepo(pkgPath string) string { return f.PackageRepo(pkgPath) }
+
+// PackageCount is how many package paths the whole forge claims.
+func PackageCount() int { return f.PackageCount() }
+
+// LatestReleaseTag is the most recently cut release of a repo that is neither a
+// prerelease nor yanked, or "". Most recently CUT, never highest version: tags
+// here are not required to be semver, so there is no order to sort by that
+// would not be wrong for somebody.
+func LatestReleaseTag(repoID string) string {
+	r := f.Repo(repoID)
+	if r == nil {
+		return ""
+	}
+	rel := r.LatestRelease()
+	if rel == nil {
+		return ""
+	}
+	return rel.Tag
+}
+
+// ReleaseCount is how many releases a repo has cut, yanked ones included.
+func ReleaseCount(repoID string) int {
+	r := f.Repo(repoID)
+	if r == nil {
+		return 0
+	}
+	return r.ReleaseCount()
+}
 
 // RefOID returns the object a ref points at, or "" if there is no such ref.
 func RefOID(repoID, name string) string {

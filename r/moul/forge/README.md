@@ -2,7 +2,7 @@
 
 An on-chain software forge, browsable in gnoweb and writable only through signed
 transactions. The domain model lives in
-[`gno.land/p/moul/forge/v0`](../../../../p/moul/forge/v0); this realm is the
+[`gno.land/p/moul/forge/v1`](../../../../p/moul/forge/v1); this realm is the
 wiring, the routes and the events.
 
 The code itself is not here. Git objects stay in git, behind whatever mirror a
@@ -59,6 +59,10 @@ Read paths are free. Browse the routes above, or query:
 ```sh
 gnokey query vm/qeval -data 'gno.land/r/moul/forge/v0.RefOID("moul/forge","refs/heads/main")' -remote <rpc>
 gnokey query vm/qeval -data 'gno.land/r/moul/forge/v0.LogHead("moul/forge")' -remote <rpc>
+
+# Which repo publishes a deployed package path, and what it last released.
+gnokey query vm/qeval -data 'gno.land/r/moul/forge/v0.PackageRepo("gno.land/r/moul/home")' -remote <rpc>
+gnokey query vm/qeval -data 'gno.land/r/moul/forge/v0.LatestReleaseTag("moul/forge")' -remote <rpc>
 ```
 
 `LogHead` is the digest of the last log entry, committing to every entry before
