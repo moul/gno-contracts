@@ -71,3 +71,9 @@ make guard-readmes LIST=1   # which packages are undocumented
 make sync                   # drift vs the gnolang/gno monorepo
 make publish PRINT=1        # what the chain is missing, as a plan you review
 ```
+- **`make audit-patterns` is a ratchet, and it fails in both directions.** The ten upstream
+  audit-pattern rules run over every contract against a per-package baseline: a new hit
+  fails, and a *fixed* one fails too until you `make audit-patterns-update`. A baseline row
+  is not a statement that the code is fine. The rules in `tools/auditpattern/` are a
+  byte-for-byte mirror of upstream's `internal/` package: **never hand-edit them**,
+  re-mirror and update the three constants at the top.

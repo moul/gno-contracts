@@ -1,0 +1,148 @@
+# Audit-pattern hits this tree already has, one row per (rule, package).
+#
+# Format: <rule> <package dir> <count>
+#
+# This is a RATCHET, not an allowlist. The count may not go up, and it may not
+# go down either without this file being re-recorded, so a fix cannot be quietly
+# undone and debt can only shrink. Regenerate with:
+#
+#   make audit-patterns-update
+#
+# A row here is NOT a statement that the code is fine. It is a statement that
+# the hit predates the guard. Every rule is a lexical approximation: read the
+# line before you believe it, and read it before you clear it. The ten families
+# and why each is a finding: EFFECTIVE_GNO.md section 5.7.
+#
+# Rules mirrored from gnolang/gno misc/audit-pattern-harness.
+
+current_guard p/moul/pilot 2
+current_guard p/moul/x/pair 3
+current_guard r/moul/agents/capwallet 3
+current_guard r/moul/agents/gnomem 5
+current_guard r/moul/agents/jury 3
+current_guard r/moul/agents/maintainer 3
+current_guard r/moul/agents/passport 2
+current_guard r/moul/agents/receipt 2
+current_guard r/moul/blog 1
+current_guard r/moul/config 3
+current_guard r/moul/gns 4
+current_guard r/moul/home 1
+current_guard r/moul/pilot 1
+current_guard r/moul/present 2
+current_guard r/moul/x/amm 3
+current_guard r/moul/x/compact 2
+current_guard r/moul/x/daily/asciiart 1
+current_guard r/moul/x/daily/ballot 4
+current_guard r/moul/x/daily/bullscows 1
+current_guard r/moul/x/daily/closestguess 1
+current_guard r/moul/x/daily/coinflipduel 3
+current_guard r/moul/x/daily/dutchauction 2
+current_guard r/moul/x/daily/handles 1
+current_guard r/moul/x/daily/qvote 3
+current_guard r/moul/x/daily/rpgroom 8
+current_guard r/moul/x/daily/rpsduel 5
+current_guard r/moul/x/daily/timecapsule 2
+current_guard r/moul/x/games/idle 4
+current_guard r/moul/x/games/lastwords 3
+current_guard r/moul/x/nativeify 3
+current_guard r/moul/x/nativereg 1
+current_guard r/moul/x/pairreg 1
+current_guard r/moul/x/pairs/aaa 1
+current_guard r/moul/x/pairs/bbb 1
+current_guard r/moul/x/pilotdemo 1
+current_guard r/moul/x/reaper 1
+current_guard r/moul/x/upgrade/adminreg/facade 3
+current_guard r/moul/x/upgrade/lock/gen0 1
+current_guard r/moul/x/upgrade/schema/facade 2
+current_guard r/moul/x/upgrade/selfreg/facade 2
+current_guard r/moul/x/upgrade/store/root 2
+current_guard r/moul/x/wiki 16
+exported_pointer_leak r/moul/config 1
+exported_pointer_leak r/moul/pilot 1
+exported_pointer_leak r/moul/x/nativeify 1
+exported_pointer_leak r/moul/x/pairreg 1
+exported_pointer_leak r/moul/x/upgrade/lazy/gen0 1
+exported_pointer_leak r/moul/x/upgrade/lazy/gen1 2
+interface_realm_param p/moul/pilot 1
+origin_caller_auth r/moul/demo/wikicoin 1
+payment_user_call r/moul/faucet 1
+payment_user_call r/moul/grant 1
+payment_user_call r/moul/x/moultest 1
+pkg_mutable_pointer r/moul/gns 7
+render_map_iteration r/moul/x/daily/erc20 1
+render_markdown_escape r/moul/agents/capwallet 1
+render_markdown_escape r/moul/agents/gnomem 1
+render_markdown_escape r/moul/agents/jury 1
+render_markdown_escape r/moul/agents/maintainer 1
+render_markdown_escape r/moul/agents/passport 1
+render_markdown_escape r/moul/blog 1
+render_markdown_escape r/moul/gns 3
+render_markdown_escape r/moul/home 2
+render_markdown_escape r/moul/pilot 1
+render_markdown_escape r/moul/reactions 2
+render_markdown_escape r/moul/x/across 1
+render_markdown_escape r/moul/x/amm 1
+render_markdown_escape r/moul/x/daily/asciiart 1
+render_markdown_escape r/moul/x/daily/blog 1
+render_markdown_escape r/moul/x/daily/coinflipduel 2
+render_markdown_escape r/moul/x/daily/connect4 1
+render_markdown_escape r/moul/x/daily/eggling 2
+render_markdown_escape r/moul/x/daily/escrow 1
+render_markdown_escape r/moul/x/daily/handles 1
+render_markdown_escape r/moul/x/daily/merkledrop 1
+render_markdown_escape r/moul/x/daily/qvote 2
+render_markdown_escape r/moul/x/daily/reactions 1
+render_markdown_escape r/moul/x/daily/rpgroom 1
+render_markdown_escape r/moul/x/daily/rpsduel 2
+render_markdown_escape r/moul/x/daily/rpsmatch 1
+render_markdown_escape r/moul/x/daily/rpsoracle 1
+render_markdown_escape r/moul/x/daily/streaks 1
+render_markdown_escape r/moul/x/daily/tamagotchi 1
+render_markdown_escape r/moul/x/daily/timecapsule 1
+render_markdown_escape r/moul/x/grc20wrapdemo 1
+render_markdown_escape r/moul/x/nativeify 1
+render_markdown_escape r/moul/x/nativereg 2
+render_markdown_escape r/moul/x/pairreg 1
+render_markdown_escape r/moul/x/pairs/aaabbb 1
+render_markdown_escape r/moul/x/provable 1
+render_markdown_escape r/moul/x/wesh 1
+unsafe_previous_realm r/moul/faucet 8
+unsafe_previous_realm r/moul/grant 8
+unsafe_previous_realm r/moul/reactions 2
+unsafe_previous_realm r/moul/vesting 2
+unsafe_previous_realm r/moul/x/allinone/devtools 1
+unsafe_previous_realm r/moul/x/daily/blog 1
+unsafe_previous_realm r/moul/x/daily/collatz 1
+unsafe_previous_realm r/moul/x/daily/connect4 2
+unsafe_previous_realm r/moul/x/daily/counter 1
+unsafe_previous_realm r/moul/x/daily/crowdfund 5
+unsafe_previous_realm r/moul/x/daily/eightball 1
+unsafe_previous_realm r/moul/x/daily/englishauction 3
+unsafe_previous_realm r/moul/x/daily/erc1155 2
+unsafe_previous_realm r/moul/x/daily/erc721 2
+unsafe_previous_realm r/moul/x/daily/escrow 3
+unsafe_previous_realm r/moul/x/daily/faucet 1
+unsafe_previous_realm r/moul/x/daily/governor 2
+unsafe_previous_realm r/moul/x/daily/kudos 1
+unsafe_previous_realm r/moul/x/daily/leaderboard 1
+unsafe_previous_realm r/moul/x/daily/linktree 3
+unsafe_previous_realm r/moul/x/daily/lottery 1
+unsafe_previous_realm r/moul/x/daily/merkledrop 3
+unsafe_previous_realm r/moul/x/daily/microblog 1
+unsafe_previous_realm r/moul/x/daily/multisig 1
+unsafe_previous_realm r/moul/x/daily/polls 2
+unsafe_previous_realm r/moul/x/daily/ratelimitdemo 1
+unsafe_previous_realm r/moul/x/daily/reactions 1
+unsafe_previous_realm r/moul/x/daily/rps 1
+unsafe_previous_realm r/moul/x/daily/semverdemo 1
+unsafe_previous_realm r/moul/x/daily/splitter 1
+unsafe_previous_realm r/moul/x/daily/staking 3
+unsafe_previous_realm r/moul/x/daily/tictactoe 2
+unsafe_previous_realm r/moul/x/daily/timelock 1
+unsafe_previous_realm r/moul/x/daily/urlshort 2
+unsafe_previous_realm r/moul/x/daily/vault 2
+unsafe_previous_realm r/moul/x/daily/wordle 1
+unsafe_previous_realm r/moul/x/daily/wrapped 3
+unsafe_previous_realm r/moul/x/plan9/dev 1
+unsafe_previous_realm r/moul/x/vm/bfdemo 2
+unsafe_previous_realm r/moul/x/vm/riscvdemo 2

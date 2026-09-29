@@ -15,6 +15,9 @@
 //	gno        lint / test / fmt every contract against a stdlib-only GNOROOT
 //	guard-*    the CI guards (examples, render, readmes, private, generated
 //	           artifacts)
+//	audit-patterns
+//	           the ten upstream audit-pattern rules, over this tree, against a
+//	           ratcheting baseline
 //
 // It is invoked from the repository root, typically via the Makefile
 // (`go run ./tools <cmd>`).
@@ -71,6 +74,8 @@ func main() {
 		err = cmdGuardPrivate(root)
 	case "guard-generated":
 		err = cmdGuardGenerated(root, args)
+	case "audit-patterns":
+		err = cmdAuditPatterns(root, args)
 	case "preview":
 		err = cmdPreview(root, args)
 	case "graph":
@@ -115,6 +120,8 @@ commands:
   guard-readmes    fail if a package ships a README that documents nothing
   guard-private    fail if a realm never answered the private question
   guard-generated  fail if a PR modifies generated artifacts
+  audit-patterns   run the upstream audit-pattern rules over every contract and
+                   fail on a hit the baseline does not already record
   graph      write per-package + global dependency graphs into _assets/
 `)
 }

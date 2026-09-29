@@ -1,0 +1,76 @@
+name: audit-patterns
+
+# The ten upstream audit-pattern rules, run over this repository's own contracts.
+#
+# gnolang/gno ships the harness at misc/audit-pattern-harness and runs it against
+# its own fixtures, which proves the rules still fire. Nothing in the ecosystem
+# runs them against real contracts. This job does, against a ratcheting baseline
+# (tools/gnocontracts/audit-pattern-baseline.txt): a count that goes up fails,
+# and a count that goes down fails too, asking to be re-recorded, so the debt can
+# only shrink.
+#
+# A dedicated workflow rather than a step in `ci`, deliberately. It is a separate
+# question from "does this build", it needs no gno toolchain (the rules are pure
+# Go text scanning, so this is seconds where `ci` is minutes), and a separate
+# check name is what makes "the security scan is red" legible in the PR list.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly, so an upstream change to the rules surfaces without waiting for
+    # somebody to open a pull request.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-patterns:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+
+      - name: Scan every contract
+        run: make audit-patterns
+
+      # The rules are MIRRORED (tools/auditpattern/run.go) because upstream's
+      # package is internal/ in a module of its own. A mirror nobody verifies is
+      # a fork with a misleading comment on top, so this re-hashes the upstream
+      # file on every run.
+      #
+      # -warn, not a failure: upstream moving is not this pull request's doing
+      # and blocking an unrelated author on it teaches people to ignore the
+      # check. The scheduled run is what makes sure somebody sees it.
+      - name: Check the mirror against gno master
+        run: |
+          set -euo pipefail
+          dir=/tmp/gnoref/misc/audit-pattern-harness/internal/auditpattern
+          mkdir -p "$dir"
+          curl -fsSL \
+            https://raw.githubusercontent.com/gnolang/gno/master/misc/audit-pattern-harness/internal/auditpattern/run.go \
+            -o "$dir/run.go"
+          go -C tools tool gnocontracts audit-patterns -drift /tmp/gnoref -warn \
+            | tee /tmp/drift.txt
+          if grep -q FAIL /tmp/drift.txt; then
+            echo "::warning title=audit-pattern mirror is stale::tools/auditpattern/run.go no longer matches gno master; re-mirror it"
+          fi
+
+      # Every hit, as JSON, for a reviewer or an agent to pick up. Uploaded even
+      # when the gate passed: the baseline rows are exactly the backlog.
+      - name: Collect the hits
+        if: always()
+        run: make audit-patterns ARGS=-json > /tmp/audit-pattern-hits.json || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-pattern-hits
+          path: /tmp/audit-pattern-hits.json
+          if-no-files-found: warn

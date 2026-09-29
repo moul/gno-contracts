@@ -22,7 +22,8 @@ HOME_TX      ?= /tmp/home.tx.json
 
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
-	guard-readmes guard-private guard-untrusted-render verify deps deps-chain bump-deps manifest readme readmes gen check \
+	guard-readmes guard-private guard-untrusted-render audit-patterns audit-patterns-update \
+	verify deps deps-chain bump-deps manifest readme readmes gen check \
 	sync graph publish status home-push home-packages report preview site clean
 
 help: ## show this help
@@ -58,6 +59,12 @@ guard-private: ## fail if a realm declares neither private = true nor why it is 
 
 guard-untrusted-render: ## fail if a realm renders a caller's string without escaping it
 	@$(GNOCONTRACTS) guard-untrusted-render
+
+audit-patterns: ## run the upstream audit-pattern rules over every contract; fails on a hit the baseline does not record
+	@$(GNOCONTRACTS) audit-patterns $(ARGS)
+
+audit-patterns-update: ## re-record the audit-pattern baseline from what the tree contains now
+	@$(GNOCONTRACTS) audit-patterns -update
 
 verify: ## fail if gnomod.lock is stale or a pinned version no longer reproduces
 	$(GNOPM) verify

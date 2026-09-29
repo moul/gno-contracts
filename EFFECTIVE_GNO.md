@@ -952,6 +952,12 @@ harness](https://github.com/gnolang/gno/tree/master/misc/audit-pattern-harness) 
 which is the closest thing the ecosystem has to a lint for this. Each one is a real finding
 shape, not a style preference.
 
+**This repository runs them on every pull request** (`make audit-patterns`), against a
+ratcheting baseline: a count that goes up fails, and a count that goes down fails too and
+asks to be re-recorded, so the debt can only shrink. The rules are mirrored verbatim in
+[`tools/auditpattern`](./tools/auditpattern), because upstream's package is `internal/` in a
+module of its own.
+
 | pattern | why it is a finding |
 |---|---|
 | `cur.Previous()` without `cur.IsCurrent()` | the realm token was never checked |
@@ -964,6 +970,15 @@ shape, not a style preference.
 | an exported pointer, or pointer getter, to mutable state | a live mutation handle, no checks |
 | an exported `*avl.Tree` field, var or return | the same, and the commonest shape of it |
 | `unsafe.PreviousRealm()` in a realm with crossing functions | §5.1 |
+
+**A hit is a line to read, not a proven bug.** Every rule is a lexical approximation and
+several are generous on purpose, because a scanner that misses is worse than one that asks.
+Eight of the ten are scanned in `r/` only, which is upstream's own framing ("accepted by a
+realm", "returned from a realm"): a `p/` iterator taking a callback and a `p/` constructor
+returning a pointer are those packages doing their job. `current_guard` and
+`interface_realm_param` are scanned everywhere, because a `p/` that threads `rlm realm` has
+exactly the question the first one asks, and an interface leaking `cur realm` is worst where
+the interfaces live.
 
 ---
 
