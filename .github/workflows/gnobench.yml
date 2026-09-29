@@ -45,6 +45,10 @@ jobs:
     name: what this pull request moved
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    # A pull request gets one size and one value shape. The full matrix is the
+    # weekly job's business; a review needs "did this move" in minutes, not
+    # every number again.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,18 +68,20 @@ jobs:
       - name: Which candidates does this touch
         id: scope
         run: |
-          set -euo pipefail
+          set -uo pipefail
           git diff --name-only \
             "${{ github.event.pull_request.base.sha }}" \
             "${{ github.event.pull_request.head.sha }}" > /tmp/changed.txt
-          set +e
           FILTER=$(./gnobench/gnobench affected -suite storage < /tmp/changed.txt)
           code=$?
-          set -e
           if [ "$code" = "3" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "No benched package changed." >> "$GITHUB_STEP_SUMMARY"
             exit 0
+          fi
+          if [ "$code" != "0" ]; then
+            echo "::error::gnobench affected failed with $code"
+            exit "$code"
           fi
           echo "skip=false" >> "$GITHUB_OUTPUT"
           echo "filter=$FILTER" >> "$GITHUB_OUTPUT"
@@ -94,9 +100,15 @@ jobs:
       - name: Measure
         if: steps.scope.outputs.skip != 'true'
         working-directory: gnobench
+        env:
+          FILTER: ${{ steps.scope.outputs.filter }}
         run: |
-          ./gnobench run -suite storage -n 100,1000 -value str -repeat 2 \
-            ${{ steps.scope.outputs.filter && format('-filter ''{0}''', steps.scope.outputs.filter) || '' }}
+          set -euo pipefail
+          if [ -n "$FILTER" ]; then
+            ./gnobench run -suite storage -n 1000 -value str -repeat 2 -filter "$FILTER"
+          else
+            ./gnobench run -suite storage -n 1000 -value str -repeat 2
+          fi
 
       - name: Report the delta
         if: steps.scope.outputs.skip != 'true'
@@ -111,6 +123,7 @@ jobs:
     name: re-measure against gno master
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 330
     permissions:
       contents: write
     steps:
@@ -131,6 +144,7 @@ jobs:
           ./gnobench run -suite storage \
             -n "${{ github.event.inputs.sizes || '100,1000' }}" \
             -value str,obj -repeat 2
+          ./gnobench run -suite digest -n 32,256,1024,8192 -value str -repeat 2
 
       - name: Regenerate the reports
         working-directory: gnobench
@@ -146,6 +160,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add gnobench/results gnobench/reports
-          git commit -m "chore(gnobench): re-measure the storage suite against gno master [skip ci]"
+          git commit -m "chore(gnobench): re-measure against gno master [skip ci]"
           git push
           git show --stat --oneline HEAD >> "$GITHUB_STEP_SUMMARY"
