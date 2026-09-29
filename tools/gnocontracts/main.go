@@ -72,6 +72,8 @@ func main() {
 		err = cmdGuardReadmes(root, args)
 	case "guard-private":
 		err = cmdGuardPrivate(root)
+	case "guard-tables":
+		err = cmdGuardTables(root, args)
 	case "guard-generated":
 		err = cmdGuardGenerated(root, args)
 	case "audit-patterns":
@@ -119,6 +121,7 @@ commands:
   guard-render     fail if a realm declares Render that no test calls
   guard-readmes    fail if a package ships a README that documents nothing
   guard-private    fail if a realm never answered the private question
+  guard-tables     fail if a package builds a markdown table by hand
   guard-generated  fail if a PR modifies generated artifacts
   audit-patterns   run the upstream audit-pattern rules over every contract and
                    fail on a hit the baseline does not already record

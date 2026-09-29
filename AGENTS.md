@@ -482,6 +482,61 @@ ships a fixed version, and a stale entry is itself a failure: it would silence a
 realm nobody is watching any more. Do not add to it by hand to quiet a failure,
 that is what the opt-out is for.
 
+## A markdown table is `ui.NewTable`, and `make guard-tables` enforces it
+
+The single most repeated mistake in this repository's history: **102 files built a markdown
+table by concatenating pipes**, and the package that tells everyone else not to,
+`p/moul/pilot`, is one of them. Present tense, because it cannot be fixed: `329 of the 331`
+contracts in the catalog are live on mainnet, `p/moul/pilot/v0` among them, and a public
+package path is immutable. That is the whole argument for the guard.
+
+Four things a hand-rolled table gets wrong, every time, none of them visible in a diff:
+
+| | |
+|---|---|
+| a cell containing a pipe | silently opens a column nobody asked for, which is the cheapest way for a caller's string to rewrite the page around it |
+| a row shorter than the header | silently drops its data instead of padding |
+| an empty table | renders as a header with no body, instead of a sentence |
+| the separator row | has to match the header count, and nothing checks it |
+
+[`p/moul/kit/ui`](./p/moul/kit/ui)'s `Table` does all four.
+
+`make guard-tables` detects **the separator row**, and only that, because it is the one part
+of a GFM table that cannot be anything else: a run of dashes and pipes is a table header or
+it is nothing. A bare `"| a | b |"` is genuinely ambiguous with prose, so it is not matched,
+and the cost of that choice is a table assembled without a separator, which does not render
+anyway.
+
+It is a **ratchet over a baseline**: 100 packages recorded the day it landed, a package not
+listed may not start, and a listed package that stops must leave the file or it hides the
+next one. **Nearly all 100 are permanent**, for the reason above: their `Render` can never be
+replaced at that path, so they are fixed in a `vN+1` and its importers, or not at all. This
+guard buys nothing retroactively. It is a **pre-deploy** gate and only that.
+
+> Learned the expensive way while writing it: `p/moul/pilot`'s `Render` was rewritten through
+> `ui.NewTable`, `ui.Addr` and `num.GNOTf`, green, with its pinned `TestRender` updated, before
+> `gnopm publish -print` said `8 live, nothing to do` and `gnopie INSPECT
+> gno.land/p/moul/pilot/v0` came back with 12,728 bytes of storage on mainnet. The edit was
+> reverted. **Ask the chain before editing anything, not after**, and remember that
+> `r/moul/pilot` is public *and* documented as the one realm that must never be replaceable,
+> so even a `p/moul/pilot/v1` would have no consumer able to adopt it.
+
+The opt-out is for dashes that are not a table:
+
+```gno
+// handrolled-table: ASCII art, the dashes are a cow's horn, no table here
+```
+
+20-character floor on the reason, and an opted-out package leaves the baseline entirely, so
+one package is never answered for by two mechanisms. The opt-out is read from **every** file
+including tests, while the separator is detected only outside them: asymmetric on purpose,
+because a package whose production source is already live can never be edited again, so its
+test file is the only place a true opt-out can still be written. `p/moul/x/daily/cowsay` is
+that case, and it is the first one.
+
+Five packages are exempt in code because emitting a separator correctly is what they are for:
+`kit/ui`, `mdtable`, `md`, `mdlist`, `template`.
+
 ## The audit patterns: somebody else's rules, on our contracts
 
 `gnolang/gno` ships an audit pattern harness at `misc/audit-pattern-harness`: ten finding
