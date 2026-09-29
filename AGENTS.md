@@ -370,17 +370,29 @@ one pull request orphaned.
 
 Rules that keep a companion small and safe:
 
-- **Standard library only.** No `gnoclient`, no cgo, no third `go.mod`. Read the chain
-  over plain JSON-RPC `abci_query`, about 60 lines, and the companion stays inside the
-  `tools` module where vet and test cover it.
-- **Print transactions, never sign them.** Emit `gnokey maketx …` commands to review and
-  paste. A companion holds no key and broadcasts nothing, so it can never surprise
-  anyone. Name moul's key `moul` in what it emits.
+- **Standard library only, for a companion.** No `gnoclient`, no cgo, no second module.
+  Read the chain over plain JSON-RPC `abci_query`, about 60 lines, and the companion stays
+  inside the `tools` module where vet and test cover it. This is a rule about
+  `tools/<name>/`, **not about the `tools` module as a whole**: `tools/go.mod` requires
+  `moul.io/gnopm`, and `tools/gnocontracts` imports `gnopm/pkg/gnomodlock` in `model.go`
+  and `report_lock.go` on purpose, because the lock format has exactly one owner.
+- **Never hold key material, and always keep a print path.** A companion emits the
+  `gnokey maketx …` commands, naming moul's key `moul`. Signing itself is allowed and two
+  companions do it: `gnohome tx -run` and `gnoblog` shell out to gnokey with the terminal
+  attached, so gnokey holds the key and prompts for a passphrase the process never sees.
+  Both write the same document and script first, so a half-finished run is reproducible by
+  hand, and both default to printing. **What is forbidden is a process that could sign
+  without being asked, or that ever sees a passphrase.** (Corrected 2026-09-29: this rule
+  read "print transactions, never sign them", which the two companions it governs had
+  already outgrown.)
 - **Mirror, and say so.** Anything duplicated from the realm (slug rules, reserved names,
   a default template) carries a comment naming the `.gno` file it mirrors, and a Go test
   pinning the two to the same behaviour.
-- **Table-driven tests, no network.** The chain-facing code is one function returning a
-  string; test the parsing, not the transport.
+- **Table-driven tests, no network, and transport separated from parsing.** Keep the
+  decoding in functions a test can call with a literal, so the tests never dial anything.
+  Not "one function returning a string": `gnohome` and `gnoblog` both have a
+  `fetchManifest` plus separate `qeval` and `abciQuery` helpers, which is the shape that
+  actually survives.
 - **Cross-link it** from the contract's README, since it no longer sits in the same
   directory. The gno toolchain ignores it: package discovery only finds directories
   holding a `gnomod.toml`, and `tools/` has none.
