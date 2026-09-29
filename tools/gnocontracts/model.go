@@ -111,17 +111,19 @@ type Pub struct {
 // same thing happened to portal-loop/test6 before).
 func defaultNetworks() []Network {
 	return []Network{
-		// pearl is the testnet. chain_id verified against the node's /status
-		// (2026-08-27); gno v1.0.0-rc.0.
+		// onyx is the testnet. chain_id verified against the node's /status
+		// (2026-09-29): onyx-1, gno v1.0.0-rc.0, height 47759 and advancing.
 		//
-		// sapphire was the second one, and is RETIRED: on 2026-09-22
-		// rpc.sapphire.testnets.gno.land had no DNS record at all, and moul
-		// confirmed it is gone for good on 2026-09-23. It is removed rather
-		// than left in place with a warning, because a name in this list is a
-		// publish target: `make upload NET=sapphire` would resolve it, build a
-		// script against a dead endpoint, and the failure would look like a
-		// network blip rather than a retired chain.
-		{Name: "pearl", ChainID: "pearl-1", RPC: "https://rpc.pearl.testnets.gno.land:443"},
+		// It REPLACES pearl, which went the same way sapphire did:
+		// rpc.pearl.testnets.gno.land has no DNS record at all and curl reports
+		// 000 (2026-09-29), which is a retired chain and not a blip. Both are
+		// removed rather than kept with a warning, because a name in this list
+		// is a publish target: `make upload NET=pearl` would resolve the row,
+		// build a script against a dead endpoint, and fail in a way that looks
+		// like a network problem rather than a chain that no longer exists.
+		//
+		// sapphire was the first to go, on 2026-09-22, same signature.
+		{Name: "onyx", ChainID: "onyx-1", RPC: "https://rpc.onyx.testnets.gno.land:443"},
 		// gno.land mainnet, launched 2026-09-12T15:00:00Z (gnolang/gno tag
 		// `chain/mainnet`, commit 9c8eb132e). It REPLACES the old betanet entry:
 		// betanet was chain-id `gnoland1` and mainnet is `gnoland-1` — a
