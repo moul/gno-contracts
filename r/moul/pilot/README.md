@@ -9,8 +9,13 @@ and why `Revoke` takes back a purse but never an identity. This realm is the ins
 
 A power to try it with: [`r/moul/x/pilotdemo`](../x/pilotdemo).
 
+**`Claim` is pinned to `g1manfred47kzduec920z88wfr64ylksmdcedlf5` in the source.** A deploy
+lands in one block and the claim is a second transaction, so taking the owner from whoever
+calls first is a race anyone on chain can win, and this path can never be redeployed to undo
+it.
+
 ```sh
-# once
+# once, and only this address can
 gnokey maketx call -pkgpath gno.land/r/moul/pilot/v0 -func Claim ... moul
 
 # authorise a path that does not have to exist yet

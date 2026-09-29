@@ -12,12 +12,21 @@ package pilot
 
 import "gno.land/p/moul/pilot/v0"
 
+// owner is pinned in the source rather than taken from whoever calls Claim
+// first. A deploy lands in its own block and the claim is a second
+// transaction, so an unpinned Claim is a race anyone on chain can win, and
+// this account can never be redeployed to undo it.
+const owner = "g1manfred47kzduec920z88wfr64ylksmdcedlf5"
+
 var acct *pilot.Pilot
 
-// Claim makes the first caller the owner. Once.
+// Claim arms the account. Once, and only by its owner.
 func Claim(cur realm) {
 	if acct != nil {
 		panic("pilot: already claimed")
+	}
+	if cur.Previous().Address() != owner {
+		panic("pilot: only " + owner + " can claim this account")
 	}
 	acct = pilot.New(0, cur)
 }
