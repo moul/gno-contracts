@@ -45,6 +45,12 @@ type Structure struct {
 	Skip map[string]string
 	// Values restricts the value shapes this container accepts.
 	Values []string
+	// MaxN is a declared capacity ceiling. A candidate that refuses writes
+	// past a documented cap is not failing, it is doing what it says; the
+	// report records the ceiling instead of an error.
+	MaxN int
+	// MaxNWhy explains the ceiling, and is what the report prints.
+	MaxNWhy string
 }
 
 func (s Structure) takesValue(v string) bool {

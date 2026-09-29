@@ -79,6 +79,11 @@ func Run(s *Suite, env Env, workdir string, ns []int, vals []string, repeat int,
 						jobs = append(jobs, job{row: r})
 						continue
 					}
+					if st.MaxN > 0 && n > st.MaxN {
+						r.Skip = st.MaxNWhy
+						jobs = append(jobs, job{row: r})
+						continue
+					}
 					if re != nil && !re.MatchString(st.Name+"/"+wl.Name) {
 						continue
 					}

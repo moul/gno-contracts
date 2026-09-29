@@ -247,12 +247,18 @@ func opOffset(off, count int) int { panic("unsupported") }`,
 	{
 		Name:    "p/moul/x/daily/orderedmap/v0",
 		Group:   "kv",
-		Note:    "a map plus a key slice: insertion order, positional access",
+		Note:    "a map plus a key slice: insertion order, positional access, capped at 4,096 entries",
 		Tags:    []string{"origin:p/moul", "order:insertion", "keys:string", "shape:single-object", "op:index", "op:delete"},
 		Imports: []string{`"gno.land/p/moul/x/daily/orderedmap/v0"`},
 		Values:  []string{"str"},
+		MaxN:    4096,
+		MaxNWhy: "declares MaxKeys = 4096 and Set returns false past it",
 		Decl:    `var t = orderedmap.New()`,
-		Ops: `func opSet(k string, v any) { t.Set(k, v.(string)) }
+		Ops: `func opSet(k string, v any) {
+	if !t.Set(k, v.(string)) {
+		panic("orderedmap: Set refused, MaxKeys reached")
+	}
+}
 func opGet(k string) bool   { _, ok := t.Get(k); return ok }
 func opDel(k string) bool   { return t.Delete(k) }
 func opSize() int           { return t.Len() }
@@ -276,12 +282,18 @@ func opOffset(off, count int) int {
 	{
 		Name:    "p/moul/x/daily/flatmap/v0",
 		Group:   "kv",
-		Note:    "two parallel sorted slices: key order and range without a tree",
+		Note:    "two parallel sorted slices: key order and range without a tree, capped at 4,096 entries",
 		Tags:    []string{"origin:p/moul", "order:key", "keys:string", "shape:single-object", "op:range", "op:index", "op:delete"},
 		Imports: []string{`"gno.land/p/moul/x/daily/flatmap/v0"`},
 		Values:  []string{"str"},
+		MaxN:    4096,
+		MaxNWhy: "declares MaxEntries = 4096 and Set returns false past it",
 		Decl:    `var t = flatmap.New()`,
-		Ops: `func opSet(k string, v any) { t.Set(k, v.(string)) }
+		Ops: `func opSet(k string, v any) {
+	if !t.Set(k, v.(string)) {
+		panic("flatmap: Set refused, MaxEntries reached")
+	}
+}
 func opGet(k string) bool   { _, ok := t.Get(k); return ok }
 func opDel(k string) bool   { return t.Delete(k) }
 func opSize() int           { return t.Len() }
