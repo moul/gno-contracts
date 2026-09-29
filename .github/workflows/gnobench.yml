@@ -75,10 +75,19 @@ jobs:
       - name: Which candidates does this touch
         id: scope
         run: |
-          set -uo pipefail
+          # +e on purpose: GitHub runs every `run:` under `bash -e`, so the
+          # assignment below would abort the step on gnobench's exit 3 before
+          # `code` is ever read, turning the intended skip into a job failure.
+          # `set -uo pipefail` does not disable -e. Every exit code here is
+          # checked by hand instead, immediately after the command.
+          set +e -uo pipefail
           git diff --name-only \
             "${{ github.event.pull_request.base.sha }}" \
             "${{ github.event.pull_request.head.sha }}" > /tmp/changed.txt
+          if [ $? != 0 ]; then
+            echo "::error::git diff failed"
+            exit 1
+          fi
           FILTER=$(./gnobench/gnobench affected -suite storage < /tmp/changed.txt)
           code=$?
           if [ "$code" = "3" ]; then
