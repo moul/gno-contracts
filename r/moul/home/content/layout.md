@@ -12,6 +12,10 @@
 
 :now:
 
+## Gallery
+
+:gallery:
+
 ## Packages
 
 :packages:
