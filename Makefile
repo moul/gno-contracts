@@ -21,7 +21,7 @@ GNOHOME      ?= go -C tools tool gnohome
 HOME_TX      ?= /tmp/home.tx.json
 
 .DEFAULT_GOAL := help
-.PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
+.PHONY: help lint test fmt guards toolcheck guard-examples guard-render bench bench-report \
 	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update \
 	verify deps deps-chain bump-deps manifest readme readmes gen check \
 	sync graph publish status home-push home-packages report preview site clean
@@ -74,6 +74,14 @@ guard-tables-update: ## re-record which packages still build tables by hand
 
 verify: ## fail if gnomod.lock is stale or a pinned version no longer reproduces
 	$(GNOPM) verify
+
+##@ Benchmarks
+
+bench: ## measure what a construct costs; see gnobench/README.md
+	$(MAKE) -C gnobench bench
+
+bench-report: ## regenerate gnobench/reports/ from the committed results
+	$(MAKE) -C gnobench report
 
 ##@ Dependencies
 

@@ -1,0 +1,151 @@
+name: gnobench
+
+# What a storage change costs, measured, and said out loud on the pull request
+# that makes it.
+#
+# Two triggers, two different jobs, because they answer different questions:
+#
+#   pull_request  "did this change move any number?" -> measure only the
+#                 candidates whose package the diff touched, compare against
+#                 the numbers already committed for this runner, and write the
+#                 delta into the job summary. It never commits and never fails
+#                 the build: a benchmark that blocks a merge on a 3% wobble
+#                 teaches everyone to ignore it.
+#
+#   schedule      "did the toolchain move any number?" -> re-measure the whole
+#                 suite against current gno master and commit the result. The
+#                 runner is its own machine, so it writes its own result file
+#                 and nobody's laptop numbers are overwritten.
+#
+# The runner is slower and noisier than a laptop, which is fine: gas and byte
+# counts are deterministic, and those are the columns anything is decided on.
+
+on:
+  pull_request:
+    paths:
+      - "p/**"
+      - "vendor/**"
+      - "gnobench/**"
+      - ".github/workflows/gnobench.yml"
+  schedule:
+    # 05:20 on Mondays.
+    - cron: "20 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      sizes:
+        description: "element counts, comma separated"
+        required: false
+        default: "100,1000"
+
+permissions:
+  contents: read
+
+jobs:
+  delta:
+    name: what this pull request moved
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-gno
+        with:
+          binaries: gno
+
+      - name: Build gnobench
+        run: go -C gnobench build -o gnobench .
+
+      # Only what the diff could have changed. A change under gnobench/ or
+      # vendor/ invalidates everything and prints an empty filter, which means
+      # "measure the whole suite"; a diff that touches no benched package exits
+      # 3 and the job stops here.
+      - name: Which candidates does this touch
+        id: scope
+        run: |
+          set -euo pipefail
+          git diff --name-only \
+            "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.pull_request.head.sha }}" > /tmp/changed.txt
+          set +e
+          FILTER=$(./gnobench/gnobench affected -suite storage < /tmp/changed.txt)
+          code=$?
+          set -e
+          if [ "$code" = "3" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No benched package changed." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "filter=$FILTER" >> "$GITHUB_OUTPUT"
+          echo "measuring: ${FILTER:-the whole suite}"
+
+      - name: Save the committed baseline for this runner
+        if: steps.scope.outputs.skip != 'true'
+        id: base
+        run: |
+          set -euo pipefail
+          ID=$(./gnobench/gnobench env -id)
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+          git show "${{ github.event.pull_request.base.sha }}:gnobench/results/storage/$ID.json" \
+            > /tmp/base.json 2>/dev/null || rm -f /tmp/base.json
+
+      - name: Measure
+        if: steps.scope.outputs.skip != 'true'
+        working-directory: gnobench
+        run: |
+          ./gnobench run -suite storage -n 100,1000 -value str -repeat 2 \
+            ${{ steps.scope.outputs.filter && format('-filter ''{0}''', steps.scope.outputs.filter) || '' }}
+
+      - name: Report the delta
+        if: steps.scope.outputs.skip != 'true'
+        run: |
+          ./gnobench/gnobench compare \
+            -base /tmp/base.json \
+            -head "gnobench/results/storage/${{ steps.base.outputs.id }}.json" \
+            -threshold 2 \
+            -title "gnobench: what this pull request moved" >> "$GITHUB_STEP_SUMMARY"
+
+  refresh:
+    name: re-measure against gno master
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-gno
+        with:
+          binaries: gno
+
+      - name: Build gnobench
+        run: go -C gnobench build -o gnobench .
+
+      - name: Measure the whole suite
+        working-directory: gnobench
+        run: |
+          ./gnobench run -suite storage \
+            -n "${{ github.event.inputs.sizes || '100,1000' }}" \
+            -value str,obj -repeat 2
+
+      - name: Regenerate the reports
+        working-directory: gnobench
+        run: ./gnobench report
+
+      - name: Commit if anything moved
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- gnobench/results gnobench/reports; then
+            echo "nothing moved" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gnobench/results gnobench/reports
+          git commit -m "chore(gnobench): re-measure the storage suite against gno master [skip ci]"
+          git push
+          git show --stat --oneline HEAD >> "$GITHUB_STEP_SUMMARY"
