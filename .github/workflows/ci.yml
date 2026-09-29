@@ -2,10 +2,17 @@ name: CI
 
 # The gate: the guards, then lint and test for every contract against a gno
 # built from master.
+#
+# workflow_dispatch is here because the push trigger has been observed to drop
+# a run: 2bbd2377 landed on main on 2026-09-29 and no push-triggered CI or main
+# run was ever created for it, while pull_request runs fired nine seconds later
+# on another branch. Without a manual trigger the gate simply could not be run
+# against that commit, which is the one situation where it matters most.
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch: {}
 
 jobs:
   contracts:
