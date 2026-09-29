@@ -21,10 +21,13 @@
 // # Use Glyphs for sprites, Ramp for photos
 //
 // The obvious conversion, a luminance ramp, produces mush for pixel art.
-// Measured on Settler #25 (a 24x32 sprite on mainnet): the light sand
-// background sits at luminance 0.87 and the mid-tone tunic at 0.55, so a
-// ten-step ramp drops the background and half the sprite into adjacent buckets
-// and the whole thing comes back as '%' and '.'.
+//
+// Measured on Settler #25, a 32x32 sprite on mainnet with 20 palette colours: a
+// ten-step luminance ramp resolves those 20 to 9, so eleven of the artist's
+// colours stop existing. The collisions are not between near-identical shades
+// either. The orange hat (#f08a2a, luminance 152) and the sky-blue tunic
+// (#3f8fd1, luminance 130) land in the same bucket and come out as the same
+// character, because luminance cannot tell a hue from a hue.
 //
 // Indexed art already carries its own segmentation, in the palette. So the right
 // rule for a sprite is one glyph per palette index ([Glyphs]), not one glyph per

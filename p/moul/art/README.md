@@ -49,8 +49,15 @@ carries **20 palette entries**:
 | luminance (`Ramp`, ten steps) | 9 of 20 |
 
 Eleven of the artist's twenty colours stop existing, and the shapes between them
-go with them. `settler_test.gno` pins that, and `TestRampCollapsesWhatGlyphsKeepsApart`
-pins the mechanism on a two-colour case small enough to read.
+go with them.
+
+The collisions are not between near-identical shades either, which is the part
+that is easy to miss: the orange hat (`#f08a2a`, luminance 152) and the sky-blue
+tunic (`#3f8fd1`, luminance 130) fall in the same bucket and come out as the
+same character. Luminance cannot tell a hue from a hue.
+
+`settler_test.gno` pins both, and `TestRampCollapsesWhatGlyphsKeepsApart` pins
+the mechanism on a two-colour case small enough to read.
 
 ## The five modes
 

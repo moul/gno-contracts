@@ -124,3 +124,29 @@ func TestSettler25TextIsSmallerThanItsPicture(t *testing.T) {
 	uassert.Equal(t, 1469, len(text), "glyph text size")
 	uassert.True(t, len(text) < len(settler25().SVG(8).String()), "text is the cheaper form")
 }
+
+// TestSettler25RampConfusesHueForBrightness is the part of the finding that is
+// easy to miss: the ramp's collisions are not between near-identical shades.
+// Two colours a human would never confuse, an orange hat and a sky-blue tunic,
+// come out as the same character, because luminance cannot tell a hue from a
+// hue.
+func TestSettler25RampConfusesHueForBrightness(t *testing.T) {
+	orange := settler25Pal.Color(4) // #f08a2a, the hat
+	blue := settler25Pal.Color(16)  // #3f8fd1, the tunic
+
+	uassert.Equal(t, 152, Luminance(orange), "orange hat")
+	uassert.Equal(t, 130, Luminance(blue), "sky tunic")
+	uassert.NotEqual(t, orange, blue, "they are different colours")
+	uassert.Equal(t, rampGlyph(orange), rampGlyph(blue), "and the same ramp glyph")
+
+	// Keyed on the palette index instead, they cannot collide: the indices are
+	// different, so the glyphs are.
+	uassert.NotEqual(t,
+		DefaultGlyphs[4%len(DefaultGlyphs)],
+		DefaultGlyphs[16%len(DefaultGlyphs)],
+		"glyphs keep them apart")
+}
+
+func rampGlyph(c int) rune {
+	return DefaultRamp[Luminance(c)*len(DefaultRamp)/256]
+}
