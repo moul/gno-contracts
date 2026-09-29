@@ -85,10 +85,14 @@ func Markdown(s *Suite, files []*File) string {
 	b.WriteString("> `results/" + s.Name + "/*.json`, which `gnobench run` writes.\n\n")
 
 	b.WriteString("## What produced these numbers\n\n")
-	b.WriteString("| machine | hardware | go | gno revision | rows | updated |\n|---|---|---|---|--:|---|\n")
+	b.WriteString("| machine | hardware | go | gno revision | gnobench | rows | updated |\n|---|---|---|---|---|--:|---|\n")
 	for _, f := range files {
-		fmt.Fprintf(&b, "| `%s` | %s | %s | `%s` | %d | %s |\n",
-			f.Env.ID, f.Env.Short(), f.Env.GoVer, f.Env.GnoShort(), len(f.Rows), f.UpdatedAt)
+		tool := f.Env.ToolVer
+		if tool == "" {
+			tool = "unknown"
+		}
+		fmt.Fprintf(&b, "| `%s` | %s | %s | `%s` | `%s` | %d | %s |\n",
+			f.Env.ID, f.Env.Short(), f.Env.GoVer, f.Env.GnoShort(), tool, len(f.Rows), f.UpdatedAt)
 	}
 	b.WriteString("\n")
 
@@ -139,6 +143,7 @@ phase deserialises every object it touches. A deployed realm is always cold.
 		if len(files) > 1 {
 			fmt.Fprintf(&b, "# Machine `%s`\n\n", f.Env.ID)
 		}
+		b.WriteString(winnersSection(s, v))
 		b.WriteString(txSection(s, v))
 		b.WriteString(warmColdSection(s, v))
 		b.WriteString(storageSection(s, v))
@@ -153,6 +158,81 @@ func trim(ss []string, k int) []string {
 		return ss
 	}
 	return append(ss[:k:k], "...")
+}
+
+// winnersSection is the answer, computed rather than written: for each size
+// and each single-operation transaction, which candidate is cheapest. Where the
+// winner changes between two sizes, that is a crossover, and it is called out,
+// because "use X" is only ever true up to some n.
+func winnersSection(s *Suite, v view) string {
+	var ops []Workload
+	for _, w := range s.Workloads {
+		if w.Light && w.Baseline != "" {
+			ops = append(ops, w)
+		}
+	}
+	if len(ops) == 0 {
+		return ""
+	}
+	sizes := v.sizes()
+	var b strings.Builder
+	b.WriteString("## Cheapest per size\n\n")
+	b.WriteString("One transaction, one operation, cold, string values. A candidate that wins at one\n")
+	b.WriteString("size and loses at the next is a crossover, and the note says so.\n\n")
+	for _, group := range s.Groups() {
+		rows := 0
+		var body strings.Builder
+		for _, w := range ops {
+			if w.Group != group {
+				continue
+			}
+			var cells []string
+			prev := ""
+			cross := ""
+			for _, n := range sizes {
+				best, bestV := "", 0.0
+				for _, st := range s.Structures {
+					if st.Group != group || !st.takesValue("str") {
+						continue
+					}
+					r, ok := v.get(st.Name, "str", w.mode(), w.Name, n)
+					if !ok || r.Ops == 0 {
+						continue
+					}
+					val := float64(r.DGas) / float64(r.Ops)
+					if best == "" || val < bestV {
+						best, bestV = st.Name, val
+					}
+				}
+				if best == "" {
+					cells = append(cells, "")
+					continue
+				}
+				cells = append(cells, fmt.Sprintf("`%s` (%s)", best, fmtN(bestV)))
+				if prev != "" && prev != best && cross == "" {
+					cross = fmt.Sprintf("changes hands before n = %s", addCommas(strconv.Itoa(n)))
+				}
+				prev = best
+			}
+			rows++
+			fmt.Fprintf(&body, "| %s | %s | %s |\n", w.Name, strings.Join(cells, " | "), cross)
+		}
+		if rows == 0 {
+			continue
+		}
+		fmt.Fprintf(&b, "### %s\n\n| operation |", group)
+		for _, n := range sizes {
+			fmt.Fprintf(&b, " n = %s |", addCommas(strconv.Itoa(n)))
+		}
+		b.WriteString(" |\n|---|")
+		for range sizes {
+			b.WriteString("---|")
+		}
+		b.WriteString("---|\n")
+		b.WriteString(body.String())
+		b.WriteString("\n")
+	}
+	return b.String()
 }
 
 // txSection is the headline: what ONE operation costs in ONE transaction

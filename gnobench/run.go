@@ -42,6 +42,16 @@ func Run(s *Suite, env Env, workdir string, ns []int, vals []string, repeat int,
 	if err := os.MkdirAll(workdir, 0o755); err != nil {
 		return nil, err
 	}
+	// Clear anything a previous run left behind. A killed run does not get to
+	// run its cleanup, and the loader type-checks every file in the directory,
+	// so stale scenarios cost load time on every run after the one that
+	// abandoned them.
+	if olds, _ := filepath.Glob(filepath.Join(workdir, "*_filetest.gno")); len(olds) > 0 {
+		for _, o := range olds {
+			os.Remove(o)
+		}
+		fmt.Fprintf(os.Stderr, "gnobench: cleared %d generated file(s) from a previous run\n", len(olds))
+	}
 	gnomod := filepath.Join(workdir, "gnomod.toml")
 	if err := os.WriteFile(gnomod, []byte("module = \"gno.land/r/scratch/bench\"\ngno = \"0.9\"\n"), 0o644); err != nil {
 		return nil, err

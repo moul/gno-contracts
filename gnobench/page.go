@@ -257,7 +257,7 @@ function header() {
   c.appendChild(el("h2", null, "What produced these numbers"));
   var t = el("table");
   var head = el("tr");
-  ["machine", "hardware", "go", "gno revision", "rows", "updated"].forEach(function (h) {
+  ["machine", "hardware", "go", "gno revision", "gnobench", "rows", "updated"].forEach(function (h) {
     head.appendChild(el("th", null, h));
   });
   t.appendChild(head);
@@ -268,7 +268,8 @@ function header() {
     if (f.env.gno_dirty) gno += " DIRTY";
     var hw = f.env.os + "/" + f.env.arch + ", " + (f.env.cpu || "?") + ", " + f.env.cpus + " cores" +
       (f.env.mem_gb ? ", " + f.env.mem_gb + " GB" : "");
-    [f.env.id, hw, f.env.go_version, gno, String(f.rows.length), (f.updated_at || "").slice(0, 10)]
+    [f.env.id, hw, f.env.go_version, gno, f.env.gnobench_commit || "unknown",
+      String(f.rows.length), (f.updated_at || "").slice(0, 10)]
       .forEach(function (v) { tr.appendChild(el("td", null, v)); });
     t.appendChild(tr);
   });

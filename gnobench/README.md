@@ -72,6 +72,15 @@ rows over 30 days old, rows that did not reproduce, rows that failed.
 `reports/<suite>.md` and `reports/<suite>.html` are **generated**. Never edit them; run
 `make report`.
 
+### Releasing
+
+There is no separate artefact to ship: **the committed reports are the release.** CI
+re-measures the whole suite weekly against gno master and commits `results/` and `reports/`
+when a number moves, so the files in this repository are always the current answer and their
+history is the record of how the answer changed. Every row carries the gno commit and the
+gnobench commit that produced it, so any figure can be traced back to the two revisions it
+depends on.
+
 ## Suites
 
 | suite | what it asks |
