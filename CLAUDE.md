@@ -54,6 +54,10 @@ irreversible.
 - **gno is not Go** in six ways that compile in your head and fail in CI. AGENTS.md
   § *Where gno differs from Go* names them, and takes the next one.
 - **Green before commit:** `make lint test`, with `GNOROOT` on a gnolang/gno checkout.
+- **A Copilot finding that is wrong is OUR bug, not noise.** The house rules live in
+  `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md`; every review
+  is digested into #280 with a box asking which line produced a false positive. Fix that line
+  in the same pull request. `gh pr edit <N> --add-reviewer @copilot` requests one.
 - **`make audit-patterns` is a ratchet, and it fails in both directions.** The ten upstream
   audit-pattern rules run over every contract against a per-package baseline: a new hit
   fails, and a *fixed* one fails too until you `make audit-patterns-update`. A baseline row

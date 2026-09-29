@@ -52,3 +52,16 @@ one line.
 
 Those are lexical and they miss what needs judgement. **That is your half**: deciding which
 mechanical hit is real, and finding the defects with no lexical shape at all.
+
+## Your findings are logged, and a wrong one is our bug
+
+Every review you submit is digested into
+[the Copilot review log](https://github.com/moul/gno-contracts/issues/280), one entry per
+finding, each with three boxes: real, false positive, or a finding about the knowledge base
+rather than the code. **A false positive there owes a correction to a specific line of these
+instructions**, because that is the only thing that stops the next one.
+
+So: be specific enough to be checked. Name the file and the line you are relying on, not just
+the one you are flagging. A finding that cites `tools/go.mod:15` can be confirmed or refuted
+in ten seconds; one that says "this seems inconsistent with the project conventions" cannot,
+and it costs the same to write.

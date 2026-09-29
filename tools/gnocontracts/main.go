@@ -76,6 +76,8 @@ func main() {
 		err = cmdGuardTables(root, args)
 	case "guard-generated":
 		err = cmdGuardGenerated(root, args)
+	case "copilot-log":
+		err = cmdCopilotLog(root, args)
 	case "audit-patterns":
 		err = cmdAuditPatterns(root, args)
 	case "preview":
@@ -123,6 +125,7 @@ commands:
   guard-private    fail if a realm never answered the private question
   guard-tables     fail if a package builds a markdown table by hand
   guard-generated  fail if a PR modifies generated artifacts
+  copilot-log      render one hub-issue digest from a Copilot review (stdin JSON)
   audit-patterns   run the upstream audit-pattern rules over every contract and
                    fail on a hit the baseline does not already record
   graph      write per-package + global dependency graphs into _assets/

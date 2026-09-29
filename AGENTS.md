@@ -549,6 +549,35 @@ that case, and it is the first one.
 Five packages are exempt in code because emitting a separator correctly is what they are for:
 `kit/ui`, `mdtable`, `md`, `mdlist`, `template`.
 
+## Copilot code review, and the log that makes it better
+
+The house rules live where GitHub already reads them:
+
+| file | scope |
+|---|---|
+| `.github/copilot-instructions.md` | repo-wide |
+| `.github/instructions/gno.instructions.md` | `**/*.gno` |
+| `.github/instructions/go.instructions.md` | `tools/**/*.go` |
+
+Request a review with `gh pr edit <N> --add-reviewer @copilot`, or the Copilot entry under
+Reviewers. Automatic review is a **repository ruleset**, not a workflow. No secret, no Actions
+minutes for the review itself, nothing metered per run.
+
+Custom instructions are read from the **head branch**, so a pull request can test its own
+instruction changes.
+
+**Every review is digested into [#280](https://github.com/moul/gno-contracts/issues/280)** by
+`copilot-review-log.yml` plus `gnocontracts copilot-log`, one entry per finding with three
+boxes: real, false positive, or a finding about the knowledge base. The false-positive box
+asks **which line of the instructions produced it**, and that is the whole design: a wrong
+finding here is not noise to be endured, it is a defect in a file in this repository with a
+line number.
+
+It works. The first review this repository ever got returned three findings, all three
+against the instructions file that had just been added, each with file and line evidence, and
+all three were real. Two of them were also findings about *this* file, and are why the
+Go-companion rules above now say "never hold key material" rather than "never sign".
+
 ## The audit patterns: somebody else's rules, on our contracts
 
 `gnolang/gno` ships an audit pattern harness at `misc/audit-pattern-harness`: ten finding
