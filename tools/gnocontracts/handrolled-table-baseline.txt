@@ -1,0 +1,118 @@
+# Packages that build a markdown table separator row by hand, and the first
+# line in each where they do.
+#
+# A RATCHET, not an allowlist. A package not listed here may not start; a
+# package listed here that stops must be removed, or it hides the next one.
+# Regenerate with:
+#
+#   make guard-tables-update
+#
+# The fix is p/moul/kit/ui: it pads a short row instead of dropping its data,
+# escapes a cell that would open a new column, and renders a sentence instead of
+# an empty header. Why each of those matters: EFFECTIVE_GNO.md section 3.2.
+#
+# Nearly all of these are already live on a chain, where a public path is
+# immutable and Render can never be replaced: 329 of the 331 contracts in the
+# catalog are on mainnet. So this file is a record, not a backlog. What the guard
+# buys is the next one, before it is deployed.
+
+p/moul/grants	p/moul/grants/render.gno:72
+p/moul/pilot	p/moul/pilot/pilot.gno:288
+p/moul/x/pair	p/moul/x/pair/pair.gno:364
+r/moul/agents/capwallet	r/moul/agents/capwallet/capwallet.gno:182
+r/moul/agents/gnomem	r/moul/agents/gnomem/gnomem.gno:224
+r/moul/agents/jury	r/moul/agents/jury/jury.gno:221
+r/moul/agents/maintainer	r/moul/agents/maintainer/maintainer.gno:204
+r/moul/agents/passport	r/moul/agents/passport/passport.gno:249
+r/moul/agents/receipt	r/moul/agents/receipt/receipt.gno:182
+r/moul/config	r/moul/config/settings.gno:259
+r/moul/faucet	r/moul/faucet/render.gno:39
+r/moul/forge	r/moul/forge/render.gno:75
+r/moul/gnopm/registry	r/moul/gnopm/registry/render.gno:110
+r/moul/gns	r/moul/gns/gns.gno:2319
+r/moul/home	r/moul/home/render.gno:135
+r/moul/vesting	r/moul/vesting/render.gno:125
+r/moul/x/amm	r/moul/x/amm/amm.gno:443
+r/moul/x/daily/b58demo	r/moul/x/daily/b58demo/b58demo.gno:46
+r/moul/x/daily/ballot	r/moul/x/daily/ballot/ballot.gno:239
+r/moul/x/daily/base32demo	r/moul/x/daily/base32demo/base32demo.gno:40
+r/moul/x/daily/bidimapdemo	r/moul/x/daily/bidimapdemo/bidimapdemo.gno:42
+r/moul/x/daily/bitsetdemo	r/moul/x/daily/bitsetdemo/bitsetdemo.gno:56
+r/moul/x/daily/bullscows	r/moul/x/daily/bullscows/bullscows.gno:201
+r/moul/x/daily/cliffvestingdemo	r/moul/x/daily/cliffvestingdemo/cliffvestingdemo.gno:32
+r/moul/x/daily/closestguess	r/moul/x/daily/closestguess/closestguess.gno:222
+r/moul/x/daily/collatz	r/moul/x/daily/collatz/collatz.gno:124
+r/moul/x/daily/commitrevealdemo	r/moul/x/daily/commitrevealdemo/commitrevealdemo.gno:36
+r/moul/x/daily/connect4	r/moul/x/daily/connect4/connect4.gno:223
+r/moul/x/daily/counter	r/moul/x/daily/counter/counter.gno:117
+r/moul/x/daily/countminsketchdemo	r/moul/x/daily/countminsketchdemo/countminsketchdemo.gno:52
+r/moul/x/daily/crc32demo	r/moul/x/daily/crc32demo/crc32demo.gno:37
+r/moul/x/daily/dutchauction	r/moul/x/daily/dutchauction/dutchauction.gno:236
+r/moul/x/daily/eggling	r/moul/x/daily/eggling/eggling.gno:279
+r/moul/x/daily/eightball	r/moul/x/daily/eightball/eightball.gno:90
+r/moul/x/daily/englishauction	r/moul/x/daily/englishauction/englishauction.gno:188
+r/moul/x/daily/erc1155	r/moul/x/daily/erc1155/erc1155.gno:122
+r/moul/x/daily/erc20	r/moul/x/daily/erc20/erc20.gno:183
+r/moul/x/daily/erc721	r/moul/x/daily/erc721/erc721.gno:143
+r/moul/x/daily/escrow	r/moul/x/daily/escrow/escrow.gno:149
+r/moul/x/daily/faucet	r/moul/x/daily/faucet/faucet.gno:119
+r/moul/x/daily/flatmapdemo	r/moul/x/daily/flatmapdemo/flatmapdemo.gno:45
+r/moul/x/daily/fractiondemo	r/moul/x/daily/fractiondemo/fractiondemo.gno:35
+r/moul/x/daily/governor	r/moul/x/daily/governor/governor.gno:200
+r/moul/x/daily/handles	r/moul/x/daily/handles/handles.gno:184
+r/moul/x/daily/heapdemo	r/moul/x/daily/heapdemo/heapdemo.gno:38
+r/moul/x/daily/humanizedemo	r/moul/x/daily/humanizedemo/humanizedemo.gno:28
+r/moul/x/daily/kingofdice	r/moul/x/daily/kingofdice/kingofdice.gno:187
+r/moul/x/daily/kmpdemo	r/moul/x/daily/kmpdemo/kmpdemo.gno:30
+r/moul/x/daily/kudos	r/moul/x/daily/kudos/kudos.gno:98
+r/moul/x/daily/leaderboard	r/moul/x/daily/leaderboard/leaderboard.gno:124
+r/moul/x/daily/levenshteindemo	r/moul/x/daily/levenshteindemo/levenshteindemo.gno:128
+r/moul/x/daily/life	r/moul/x/daily/life/life.gno:233
+r/moul/x/daily/lottery	r/moul/x/daily/lottery/lottery.gno:172
+r/moul/x/daily/lru	r/moul/x/daily/lru/lru.gno:162
+r/moul/x/daily/luhndemo	r/moul/x/daily/luhndemo/luhndemo.gno:45
+r/moul/x/daily/markovdemo	r/moul/x/daily/markovdemo/markovdemo.gno:125
+r/moul/x/daily/merkledrop	r/moul/x/daily/merkledrop/render.gno:72
+r/moul/x/daily/moodstone	r/moul/x/daily/moodstone/moodstone.gno:129
+r/moul/x/daily/multisetdemo	r/moul/x/daily/multisetdemo/multisetdemo.gno:33
+r/moul/x/daily/multisig	r/moul/x/daily/multisig/multisig.gno:203
+r/moul/x/daily/numguess	r/moul/x/daily/numguess/numguess.gno:222
+r/moul/x/daily/orderedmapdemo	r/moul/x/daily/orderedmapdemo/orderedmapdemo.gno:51
+r/moul/x/daily/piglatindemo	r/moul/x/daily/piglatindemo/piglatindemo.gno:47
+r/moul/x/daily/pixelcanvas	r/moul/x/daily/pixelcanvas/pixelcanvas.gno:210
+r/moul/x/daily/pullpaymentdemo	r/moul/x/daily/pullpaymentdemo/pullpaymentdemo.gno:81
+r/moul/x/daily/quizstreak	r/moul/x/daily/quizstreak/quizstreak.gno:190
+r/moul/x/daily/ratelimitdemo	r/moul/x/daily/ratelimitdemo/ratelimitdemo.gno:67
+r/moul/x/daily/ringbufferdemo	r/moul/x/daily/ringbufferdemo/ringbufferdemo.gno:31
+r/moul/x/daily/ringlog	r/moul/x/daily/ringlog/ringlog.gno:80
+r/moul/x/daily/rledemo	r/moul/x/daily/rledemo/rledemo.gno:38
+r/moul/x/daily/romannumdemo	r/moul/x/daily/romannumdemo/romannumdemo.gno:49
+r/moul/x/daily/rot13demo	r/moul/x/daily/rot13demo/rot13demo.gno:97
+r/moul/x/daily/rpgroom	r/moul/x/daily/rpgroom/rpgroom.gno:280
+r/moul/x/daily/rps	r/moul/x/daily/rps/rps.gno:187
+r/moul/x/daily/semverdemo	r/moul/x/daily/semverdemo/semverdemo.gno:67
+r/moul/x/daily/sievedemo	r/moul/x/daily/sievedemo/sievedemo.gno:111
+r/moul/x/daily/soundexdemo	r/moul/x/daily/soundexdemo/soundexdemo.gno:51
+r/moul/x/daily/sparklinedemo	r/moul/x/daily/sparklinedemo/sparklinedemo.gno:47
+r/moul/x/daily/splitter	r/moul/x/daily/splitter/splitter.gno:133
+r/moul/x/daily/staking	r/moul/x/daily/staking/staking.gno:164
+r/moul/x/daily/streak	r/moul/x/daily/streak/streak.gno:187
+r/moul/x/daily/streaks	r/moul/x/daily/streaks/streaks.gno:162
+r/moul/x/daily/tamagotchi	r/moul/x/daily/tamagotchi/tamagotchi.gno:304
+r/moul/x/daily/tictactoe	r/moul/x/daily/tictactoe/tictactoe.gno:212
+r/moul/x/daily/timelock	r/moul/x/daily/timelock/timelock.gno:174
+r/moul/x/daily/tipjar	r/moul/x/daily/tipjar/tipjar.gno:195
+r/moul/x/daily/trivia	r/moul/x/daily/trivia/trivia.gno:183
+r/moul/x/daily/urlshort	r/moul/x/daily/urlshort/urlshort.gno:147
+r/moul/x/daily/vault	r/moul/x/daily/vault/vault.gno:74
+r/moul/x/daily/vestoken	r/moul/x/daily/vestoken/vestoken.gno:196
+r/moul/x/daily/wrapped	r/moul/x/daily/wrapped/wrapped.gno:118
+r/moul/x/games/lastwords	r/moul/x/games/lastwords/render.gno:52
+r/moul/x/grc20faucet	r/moul/x/grc20faucet/faucet.gno:153
+r/moul/x/grc20wrapdemo	r/moul/x/grc20wrapdemo/render.gno:23
+r/moul/x/pairreg	r/moul/x/pairreg/pairreg.gno:150
+r/moul/x/pilotdemo	r/moul/x/pilotdemo/pilotdemo.gno:100
+r/moul/x/plan9/dev	r/moul/x/plan9/dev/dev.gno:168
+r/moul/x/plan9/ns	r/moul/x/plan9/ns/ns.gno:370
+r/moul/x/provable	r/moul/x/provable/render.gno:29
+r/moul/x/wesh	r/moul/x/wesh/render.gno:41

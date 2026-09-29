@@ -589,6 +589,21 @@ Four things the hand-rolled version gets wrong and the helper does not: a cell c
 empty table renders as a header with no body instead of a sentence; and the separator row
 has to match the header count, which nothing checks.
 
+This repository enforces it: `make guard-tables` fails a package that builds a table
+separator row by hand, against a baseline of the 100 that predate the guard. The opt-out is
+`// handrolled-table: <what the dashes really are>`, which exists because a cow's horn in
+ASCII art is `||----w |`.
+
+**And the baseline is permanent, which is the real lesson.** 329 of the 331 contracts here are
+live on mainnet, and a public package path is immutable: `AddPackage` refuses a path already
+occupied unless the live package is private. So a realm that shipped a hand-rolled table
+renders it forever, and the fix is a `vN+1` at a new path that every importer has to move to.
+`p/moul/pilot` is the worked example and the reason this section exists: its account page was
+rewritten through `ui.NewTable`, green, tests re-pinned, before anyone asked the chain, and
+`p/moul/pilot/v0` turned out to have been live with 12,728 bytes of state the whole time. The
+rewrite was reverted. **Get the table right before the first deploy, because there is no
+second one.**
+
 **Which table package.** Use [`ui.NewTable`](./p/moul/kit/ui) in anything that renders
 caller-supplied text, which is almost everything. [`p/moul/mdtable`](./p/moul/mdtable) is
 the older, simpler builder and is frozen as a byte-for-byte mirror of the copy in

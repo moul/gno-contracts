@@ -54,6 +54,19 @@ irreversible.
 - **gno is not Go** in six ways that compile in your head and fail in CI. AGENTS.md
   § *Where gno differs from Go* names them, and takes the next one.
 - **Green before commit:** `make lint test`, with `GNOROOT` on a gnolang/gno checkout.
+- **`make audit-patterns` is a ratchet, and it fails in both directions.** The ten upstream
+  audit-pattern rules run over every contract against a per-package baseline: a new hit
+  fails, and a *fixed* one fails too until you `make audit-patterns-update`. A baseline row
+  is not a statement that the code is fine. The rules in `tools/auditpattern/` are a
+  byte-for-byte mirror of upstream's `internal/` package: **never hand-edit them**,
+  re-mirror and update the three constants at the top.
+- **Never build a markdown table by concatenating pipes.** `ui.NewTable` pads a short row
+  instead of dropping its data, escapes a cell that would open a new column, and renders a
+  sentence instead of an empty header. `make guard-tables` is a ratchet over the 100 packages
+  that predate it, and it buys nothing retroactively: 329 of 331 contracts are live on
+  mainnet, where a public path is immutable. **Ask the chain (`gnopm publish -print`) before
+  editing any package, not after.** Opt-out: `// handrolled-table: <what the dashes are>`,
+  20 characters minimum, readable from a test file when production source is already live.
 
 ## Commits
 
@@ -71,9 +84,3 @@ make guard-readmes LIST=1   # which packages are undocumented
 make sync                   # drift vs the gnolang/gno monorepo
 make publish PRINT=1        # what the chain is missing, as a plan you review
 ```
-- **`make audit-patterns` is a ratchet, and it fails in both directions.** The ten upstream
-  audit-pattern rules run over every contract against a per-package baseline: a new hit
-  fails, and a *fixed* one fails too until you `make audit-patterns-update`. A baseline row
-  is not a statement that the code is fine. The rules in `tools/auditpattern/` are a
-  byte-for-byte mirror of upstream's `internal/` package: **never hand-edit them**,
-  re-mirror and update the three constants at the top.

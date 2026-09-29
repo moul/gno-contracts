@@ -1,5 +1,9 @@
 package cowsay
 
+// handrolled-table: the cow's horn line "||----w |" is ASCII art, not a GFM header
+// separator. This package renders no table at all, and its production source is live
+// on an immutable public path, so the opt-out has to live here.
+
 import (
 	"strings"
 	"testing"

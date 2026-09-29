@@ -22,7 +22,7 @@ HOME_TX      ?= /tmp/home.tx.json
 
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render \
-	guard-readmes guard-private guard-untrusted-render audit-patterns audit-patterns-update \
+	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update \
 	verify deps deps-chain bump-deps manifest readme readmes gen check \
 	sync graph publish status home-push home-packages report preview site clean
 
@@ -40,7 +40,7 @@ test: guards ## run the guards, then gno test every contract
 fmt: ## gno fmt every contract in place
 	$(GNOCONTRACTS) gno fmt $(ARGS) $(PKG)
 
-guards: toolcheck guard-examples guard-render guard-readmes guard-private guard-untrusted-render ## every guard CI enforces
+guards: toolcheck guard-examples guard-render guard-readmes guard-private guard-untrusted-render guard-tables ## every guard CI enforces
 
 toolcheck: ## fail if this gno skips example tests, which would make them false-green
 	@$(GNOCONTRACTS) gno toolcheck
@@ -65,6 +65,12 @@ audit-patterns: ## run the upstream audit-pattern rules over every contract; fai
 
 audit-patterns-update: ## re-record the audit-pattern baseline from what the tree contains now
 	@$(GNOCONTRACTS) audit-patterns -update
+
+guard-tables: ## fail if a package builds a markdown table by hand instead of using p/moul/kit/ui
+	@$(GNOCONTRACTS) guard-tables
+
+guard-tables-update: ## re-record which packages still build tables by hand
+	@$(GNOCONTRACTS) guard-tables -update
 
 verify: ## fail if gnomod.lock is stale or a pinned version no longer reproduces
 	$(GNOPM) verify
