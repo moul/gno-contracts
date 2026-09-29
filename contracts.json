@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-28T23:31:57Z",
+  "status_checked_at": "2026-09-29T00:02:26Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -477,6 +477,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "da79dcac66e3f2712c39ed0f8265373a9faf2eff",
       "published": {
         "mainnet": {
           "uploaded": true,
@@ -486,6 +488,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/forge/v1",
+      "dir": "p/moul/forge",
+      "kind": "p",
+      "name": "forge",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -3740,7 +3765,7 @@
       "version": "v0",
       "description": "",
       "deps": [
-        "gno.land/p/moul/forge/v0",
+        "gno.land/p/moul/forge/v1",
         "gno.land/p/moul/md/v0",
         "gno.land/p/moul/realmpath/v0",
         "gno.land/p/moul/txlink/v0",

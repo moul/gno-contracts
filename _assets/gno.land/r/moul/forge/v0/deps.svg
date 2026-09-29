@@ -15,15 +15,15 @@
 <polygon fill="#cfe2ff" stroke="black" points="189,-144 0,-144 0,-108 189,-108 189,-144"/>
 <text text-anchor="middle" x="94.5" y="-122.3" font-family="sans-serif" font-size="14.00">gno.land/r/moul/forge/v0</text>
 </g>
-<!-- gno.land/p/moul/forge/v0 -->
+<!-- gno.land/p/moul/forge/v1 -->
 <g id="node2" class="node">
-<title>gno.land/p/moul/forge/v0</title>
+<title>gno.land/p/moul/forge/v1</title>
 <polygon fill="none" stroke="black" points="434.5,-252 242.5,-252 242.5,-216 434.5,-216 434.5,-252"/>
-<text text-anchor="middle" x="338.5" y="-230.3" font-family="sans-serif" font-size="14.00">gno.land/p/moul/forge/v0</text>
+<text text-anchor="middle" x="338.5" y="-230.3" font-family="sans-serif" font-size="14.00">gno.land/p/moul/forge/v1</text>
 </g>
-<!-- gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v0 -->
+<!-- gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v1 -->
 <g id="edge1" class="edge">
-<title>gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v0</title>
+<title>gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v1</title>
 <path fill="none" stroke="black" d="M119.03,-144.02C144.05,-162.36 185.39,-190.38 225,-207 229.98,-209.09 235.15,-211.04 240.42,-212.85"/>
 <polygon fill="black" stroke="black" points="239.4,-216.2 250,-215.97 241.57,-209.54 239.4,-216.2"/>
 </g>

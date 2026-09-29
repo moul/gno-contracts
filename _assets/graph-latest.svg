@@ -195,15 +195,15 @@
 <polygon fill="#cfe2ff" stroke="black" points="1732,-1067 1553,-1067 1553,-1031 1732,-1031 1732,-1067"/>
 <text text-anchor="middle" x="1642.5" y="-1045.3" font-family="sans-serif" font-size="14.00">gno.land/p/moul/fifo/v0</text>
 </g>
-<!-- gno.land/p/moul/forge/v0 -->
+<!-- gno.land/p/moul/forge/v1 -->
 <g id="node9" class="node">
-<title>gno.land/p/moul/forge/v0</title>
+<title>gno.land/p/moul/forge/v1</title>
 <polygon fill="#cfe2ff" stroke="black" points="1395,-5740 1203,-5740 1203,-5704 1395,-5704 1395,-5740"/>
-<text text-anchor="middle" x="1299" y="-5718.3" font-family="sans-serif" font-size="14.00">gno.land/p/moul/forge/v0</text>
+<text text-anchor="middle" x="1299" y="-5718.3" font-family="sans-serif" font-size="14.00">gno.land/p/moul/forge/v1</text>
 </g>
-<!-- gno.land/p/moul/forge/v0&#45;&gt;gno.land/p/nt/avl/v0 -->
+<!-- gno.land/p/moul/forge/v1&#45;&gt;gno.land/p/nt/avl/v0 -->
 <g id="edge15" class="edge">
-<title>gno.land/p/moul/forge/v0&#45;&gt;gno.land/p/nt/avl/v0</title>
+<title>gno.land/p/moul/forge/v1&#45;&gt;gno.land/p/nt/avl/v0</title>
 <path fill="none" stroke="black" d="M1395.12,-5719.55C1423.34,-5723.65 1452.01,-5733.4 1472,-5754 1624.99,-5911.64 1639.9,-6661.08 1641.35,-6817.39"/>
 <polygon fill="black" stroke="black" points="1637.85,-6817.63 1641.43,-6827.6 1644.85,-6817.57 1637.85,-6817.63"/>
 </g>
@@ -1359,9 +1359,9 @@
 <polygon fill="#cfe2ff" stroke="black" points="1010.5,-2092 821.5,-2092 821.5,-2056 1010.5,-2056 1010.5,-2092"/>
 <text text-anchor="middle" x="916" y="-2070.3" font-family="sans-serif" font-size="14.00">gno.land/r/moul/forge/v0</text>
 </g>
-<!-- gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v0 -->
+<!-- gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v1 -->
 <g id="edge103" class="edge">
-<title>gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v0</title>
+<title>gno.land/r/moul/forge/v0&#45;&gt;gno.land/p/moul/forge/v1</title>
 <path fill="none" stroke="black" d="M1010.63,-2066.37C1040.29,-2069.13 1070.41,-2078.35 1090,-2101 1155.3,-2176.52 1060.73,-5619.45 1126,-5695 1142.75,-5714.38 1167.26,-5723.89 1192.55,-5727.94"/>
 <polygon fill="black" stroke="black" points="1192.28,-5731.44 1202.65,-5729.27 1193.2,-5724.5 1192.28,-5731.44"/>
 </g>

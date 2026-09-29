@@ -145,7 +145,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/entropy/v0`](p/moul/entropy) 📦 | — | [✅](https://gno.land/p/moul/entropy/v0) | — | — | — |
 | [`p/moul/errs/v0`](p/moul/errs) 📦 | — | [✅](https://gno.land/p/moul/errs/v0) | — | — | — |
 | [`p/moul/fifo/v0`](p/moul/fifo) 📦 | — | [🗄️](https://gno.land/p/moul/fifo/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/fifo/v0) ≈ | — |
-| [`p/moul/forge/v0`](p/moul/forge) 📦 | — | [✅](https://gno.land/p/moul/forge/v0) | — | — | 1 |
+| [`p/moul/forge/v0`](https://github.com/moul/gno-contracts/tree/da79dcac66e3f2712c39ed0f8265373a9faf2eff/p/moul/forge) 📦 🧊 | — | [✅](https://gno.land/p/moul/forge/v0) | — | — | 1 |
+| [`p/moul/forge/v1`](p/moul/forge) 📦 | — | — | — | — | 1 |
 | [`p/moul/fp/v0`](p/moul/fp) 📦 | — | [✅](https://gno.land/p/moul/fp/v0) | — | — | — |
 | [`p/moul/gnopm/v0`](p/moul/gnopm) 📦 | — | [✅](https://gno.land/p/moul/gnopm/v0) | — | — | 1 |
 | [`p/moul/grants/v0`](p/moul/grants) 📦 | — | [✅](https://gno.land/p/moul/grants/v0) | — | — | 3 |
@@ -463,7 +464,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-09-28T23:31:57Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-09-29T00:02:26Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
