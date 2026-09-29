@@ -68,6 +68,7 @@ p/moul/<name>/          packages            -> gno.land/p/moul/<name>/vN
 r/moul/<name>/          realms              -> gno.land/r/moul/<name>/vN
 vendor/gno.land/...     vendored deps (committed, autonomous)
 tools/                  the Go tools: gnocontracts, gnohome, gnoblog, pairgen
+gnobench/               the cost benchmarks: harness, per-machine results, generated reports
 contracts.json          the catalog, source of truth for the table below
 gnomod.lock             where every version's source is (committed, hand-owned)
 gnowork.toml            workspace marker (enables local package resolution)
@@ -105,6 +106,33 @@ pairs nothing across a copy, so the review diff of a version bump was a pile of 
 files with no content diff at all: precisely backwards, since a bump is by definition the
 change that most needs reviewing. One port of 25 realms landed as +11,103 / 0 across 112
 files. See [gnopm](https://github.com/moul/gnopm) for the format and the reasoning.
+
+### Benchmarks (`gnobench/`)
+
+What a construct costs on chain, measured rather than assumed:
+[`gnobench/`](./gnobench/README.md). Each *suite* is one themed comparison. `storage` asks
+where a realm should put its data, across 19 key/value and positional containers.
+
+The thing it does that a normal benchmark does not is measure **cold**: the container is built
+during package initialisation, which gnovm's filetest runner commits before `main` runs, so the
+measured phase deserialises every object it touches, exactly as a transaction against a
+deployed realm does. Built and read in one run instead, everything sits in the VM's
+per-transaction object cache and the numbers flatter whatever is being measured. A container
+held in one persisted object is O(1) warm and **O(n) cold**.
+
+```sh
+make -C gnobench bench     # measure, merging into this machine's result file
+make -C gnobench report    # regenerate gnobench/reports/ from whatever is on disk
+```
+
+Results are stored per machine, so re-running updates rows in place and a second machine keeps
+its own file. Every row records the date and the gno commit it was measured against, and the
+report computes its own staleness warnings from that. `reports/*.md` and `reports/*.html` are
+generated; never edit them.
+
+CI measures on pull requests that touch a benched package and writes the delta into the job
+summary, and re-measures the whole suite weekly against gno master
+([`.github/workflows/gnobench.yml`](./.github/workflows/gnobench.yml)).
 
 ### Autonomy (vendored dependencies)
 

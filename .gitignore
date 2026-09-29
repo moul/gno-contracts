@@ -36,3 +36,7 @@ tools/gnopublish/gnopublish
 # Published to moul/gno-contracts-previews, never committed here.
 /_preview/
 /_site/
+
+# The built gnobench binary. Linking gnolang/gno makes it ~50 MB, so a
+# committed binary is both useless and expensive: build it, never track it.
+gnobench/gnobench
