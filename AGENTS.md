@@ -4,6 +4,13 @@ moul's personal gno.land contracts, `p/moul/*` packages and `r/moul/*` realms, b
 tested, linted and published from a single clone. Read this file before changing anything.
 [CLAUDE.md](./CLAUDE.md) is the one-line-per-rule index of it.
 
+**This file is how to work in this repository. [EFFECTIVE_GNO.md](./EFFECTIVE_GNO.md) is how
+to write a contract**: which structure to store something in and what it costs, which package
+renders a table, who the caller is, what to do about money. When a task is "build X", read
+that one first and this one for the mechanics. When you learn a routing decision (this
+question, that package), it goes there; when you learn a repository rule or a toolchain trap,
+it goes here.
+
 ## The three rules
 
 **1. The version is the `module` line, and it never lives in a directory name.**

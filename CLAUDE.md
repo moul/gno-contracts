@@ -5,6 +5,12 @@ carries the reasoning, the worked examples, and every trap that has cost a red C
 page is its index, one line per rule, for the ones whose violation is silent or
 irreversible.
 
+- **[EFFECTIVE_GNO.md](./EFFECTIVE_GNO.md) decides what you write; AGENTS.md decides how you
+  ship it.** Storage structure, render helper, escaping, caller, money, the "do not hand-roll
+  this" index: it answers all of them and names the package. Read it before writing a contract,
+  and never hand-roll a markdown table, an amount formatter, a page picker or an id counter
+  when the row for it is already there.
+
 - **The version is the `module` line in `gnomod.toml`; the directory carries none.** A
   breaking change (removing or renaming an exported symbol, changing a signature or an
   on-chain behavior, swapping the backing storage) is `gnopm bump <name>`, then edit the

@@ -17,7 +17,9 @@ build, test, lint and publish everything.
 **Where to look:** [the catalog](#contracts), every package and realm with where it is
 published · [rendered previews](https://moul.github.io/gno-contracts-previews/main/) of what
 `main` looks like in gnoweb · [`r/moul/home` on chain](https://gnoscope.com/realm/r/moul/home)
-· [AGENTS.md](./AGENTS.md) for how the repo is worked on, and
+· [EFFECTIVE_GNO.md](./EFFECTIVE_GNO.md), the recipe book: which of these packages answers
+which contract-writing question, and what each choice costs ·
+[AGENTS.md](./AGENTS.md) for how the repo is worked on, and
 [`.github/ci-internals.md`](./.github/ci-internals.md) for what CI does.
 
 ## Features
