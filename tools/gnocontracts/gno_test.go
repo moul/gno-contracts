@@ -131,18 +131,18 @@ func TestEnsureViewRefusesItself(t *testing.T) {
 // expanded to nothing and produced a mainnet broadcast script.
 func TestLookupNetworkRejectsUnknown(t *testing.T) {
 	root := t.TempDir()
-	n, err := lookupNetwork(root, "pearl")
+	n, err := lookupNetwork(root, "onyx")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if n.ChainID != "pearl-1" {
-		t.Fatalf("lookupNetwork(pearl).ChainID = %q", n.ChainID)
+	if n.ChainID != "onyx-1" {
+		t.Fatalf("lookupNetwork(onyx).ChainID = %q", n.ChainID)
 	}
-	_, err = lookupNetwork(root, "perl")
+	_, err = lookupNetwork(root, "onix")
 	if err == nil {
 		t.Fatal("lookupNetwork accepted an unknown network")
 	}
-	for _, want := range []string{"perl", "mainnet", "pearl"} {
+	for _, want := range []string{"onix", "mainnet", "onyx"} {
 		if !strings.Contains(err.Error(), want) {
 			t.Errorf("error %q does not name %q", err, want)
 		}

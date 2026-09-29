@@ -652,15 +652,19 @@ whose first lives in `gnolang/gno`, while `p/moul/x/daily/b58/v0` only ever exis
 | name | chain-id | notes |
 |---|---|---|
 | `mainnet` | `gnoland-1` | `rpc.gno.land`, gnoweb at `gno.land`. Launched 2026-09-12T15:00:00Z from the `chain/mainnet` tag (commit `9c8eb132e`): a fresh chain, not a hardfork of betanet. |
-| `pearl` | `pearl-1` | testnet, gno `v1.0.0-rc.0`. **The** testnet. |
+| `onyx` | `onyx-1` | testnet, gno `v1.0.0-rc.0`. **The** testnet. |
 | `staging` | `staging` | `rpc.staging.gno.land`. |
 
-`sapphire` (`sapphire-1`) was the second testnet and is **retired**: its RPC host stopped
-resolving on 2026-09-22 and it is gone for good. It is removed from `defaultNetworks()`
+`pearl` (`pearl-1`) and `sapphire` (`sapphire-1`) were the testnets before it and are both
+**retired**, with the same signature each time: the RPC host simply stops resolving.
+`rpc.sapphire.testnets.gno.land` went on 2026-09-22, `rpc.pearl.testnets.gno.land` by
+2026-09-29 (no DNS record, curl reports `000`). Each is removed from `defaultNetworks()`
 rather than kept with a warning, because a name in that list is a publish target and
-`NET=sapphire` would have built a script against a dead endpoint.
+`NET=pearl` would have built a script against a dead endpoint and failed like a network blip.
+**Check the testnet still resolves before planning a publish against it**: this is the third
+one in five weeks.
 
-pearl exposes `rpc.<net>.testnets.gno.land`, gnoweb at
+onyx exposes `rpc.<net>.testnets.gno.land`, gnoweb at
 `<net>.testnets.gno.land`, and an agent faucet at `faucet-agent.<net>.testnets.gno.land`
 (`/fund` is POST-only; `/limits` reports the grant and the per-address window; the bare
 root has no index route and 404s, which says nothing about the faucet being up).
