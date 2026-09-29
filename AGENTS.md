@@ -482,6 +482,53 @@ ships a fixed version, and a stale entry is itself a failure: it would silence a
 realm nobody is watching any more. Do not add to it by hand to quiet a failure,
 that is what the opt-out is for.
 
+## The audit patterns: somebody else's rules, on our contracts
+
+`gnolang/gno` ships an audit pattern harness at `misc/audit-pattern-harness`: ten finding
+families distilled from real audit work, each with a vulnerable fixture, a fixed fixture,
+and a scanner that must flag the first and leave the second alone. Upstream runs it against
+those fixtures, which proves the rules still fire. **Nothing in the ecosystem runs them
+against real contracts.** `make audit-patterns` does.
+
+It is a **ratchet**, not a pass/fail. `tools/gnocontracts/audit-pattern-baseline.txt`
+records a count per (rule, package):
+
+| | |
+|---|---|
+| a count goes up, or a new pair appears | **fail.** Read the line. |
+| a count goes down, or a pair disappears | **fail**, asking to be re-recorded (`make audit-patterns-update`), so a fix cannot be quietly undone |
+| everything at baseline | pass |
+
+260 hits across 131 rows the day the guard landed. A baseline row is **not** a statement
+that the code is fine; it is a statement that the hit predates the guard, and the backlog is
+exactly that file. The families and why each is a finding:
+[EFFECTIVE_GNO.md § 5.7](./EFFECTIVE_GNO.md#57-the-anti-pattern-list).
+
+Three scoping decisions, each one stated in the code rather than discovered later:
+
+- **Eight of the ten rules are scanned in `r/` only.** That is upstream's own framing: its
+  expected records title them "accepted by a realm" and "returned from a realm", and its
+  fixtures are realms. A `p/` iterator taking a callback (`avl.Tree.Iterate`, `store.Each`,
+  `fp.Map`) and a `p/` constructor returning a pointer are those packages doing their job,
+  and flagging them buried 96 real rows under them. `current_guard` and
+  `interface_realm_param` stay tree-wide on purpose.
+- **Test files are skipped**, the same line `guard-untrusted-render` draws: a test is not
+  the deployed surface and its `cur.Previous()` is the author's own. The mirror scans every
+  `.gno` because upstream's fixture package *is* its test, so the filter lives on our side.
+- **The rules are a MIRROR, not an import.** Upstream's package is `internal/` inside a
+  module of its own, so nothing reaches it. `tools/auditpattern/run.go` carries the rule
+  functions and the `go/scanner` source reader byte for byte, with the upstream commit and
+  the file's SHA256 in its header, and `audit-patterns -drift <gnoroot>` re-hashes the
+  original. A mirror nobody verifies is a fork with a misleading comment on top. **Do not
+  hand-edit it; re-mirror.** The real fix is an upstream pull request exporting the package.
+
+CI runs it as its **own workflow** (`.github/workflows/audit-patterns.yml`), not a step in
+`ci`: it needs no gno toolchain, so it answers in seconds where `ci` takes minutes, and a
+separate check name is what makes "the security scan is red" legible in the pull request
+list. The drift check there is a `::warning::` rather than a failure, because upstream
+moving is not the pull request author's doing; the weekly scheduled run is what makes sure
+somebody sees it.
+
 ## A package README must say something, or not exist
 
 The rule is not "every package has a README". It is that **a README which exists must say
