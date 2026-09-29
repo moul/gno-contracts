@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-29T08:42:30Z",
+  "status_checked_at": "2026-09-29T09:33:52Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -1044,6 +1044,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/pilot/v0",
+      "dir": "p/moul/pilot",
+      "kind": "p",
+      "name": "pilot",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -3987,6 +4011,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/pilot/v0",
+      "dir": "r/moul/pilot",
+      "kind": "r",
+      "name": "pilot",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/pilot/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
@@ -8763,6 +8810,31 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/pilotdemo/v0",
+      "dir": "r/moul/x/pilotdemo",
+      "kind": "r",
+      "name": "x/pilotdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/pilot/v0",
+        "gno.land/p/nt/ufmt/v0",
+        "gno.land/r/moul/pilot/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "pearl": {
           "uploaded": false
         },
         "staging": {
