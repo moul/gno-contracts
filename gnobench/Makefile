@@ -14,7 +14,7 @@ VALUE   ?= str,obj
 REPEAT  ?= 2
 
 .DEFAULT_GOAL := help
-.PHONY: help bench bench-quick bench-full report list test install clean
+.PHONY: help bench bench-quick bench-full report report-check list test install clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^##@/{printf "\n%s\n",substr($$0,5)} /^[a-z][a-z-]*:.*?## /{printf "  %-13s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -33,8 +33,11 @@ bench-full: ## every size including 10k; slow, this is what CI runs on a schedul
 
 ##@ Output
 
-report: ## regenerate reports/ from every result file, measuring nothing
+report: ## regenerate reports/, the README charts and its results section, measuring nothing
 	go run . report
+
+report-check: ## fail if the README's generated region disagrees with results/
+	go run . report -check
 
 list: ## what suites, candidates and workloads exist
 	go run . list

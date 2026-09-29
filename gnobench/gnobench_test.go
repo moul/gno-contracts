@@ -237,3 +237,72 @@ func TestMarkdownHandlesASuiteWithNoStorage(t *testing.T) {
 		t.Error("digest suite report does not mention its own candidate")
 	}
 }
+
+// The README carries a generated region. Two things can go wrong with it: the
+// markers get removed by an edit, and the region drifts from the data. Both
+// are silent, so both get a test.
+func TestREADMEHasItsGeneratedRegion(t *testing.T) {
+	b, err := os.ReadFile("README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(b)
+	i, j := strings.Index(s, readmeBegin), strings.Index(s, readmeEnd)
+	if i < 0 || j < 0 {
+		t.Fatal("README.md lost its generated-region markers; `make report` would refuse to run")
+	}
+	if j < i {
+		t.Fatal("README.md's generated-region markers are out of order")
+	}
+}
+
+func TestREADMEIsUpToDateWithTheResults(t *testing.T) {
+	before, err := os.ReadFile("README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := updateREADME("."); err != nil {
+		t.Fatal(err)
+	}
+	after, err := os.ReadFile("README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(before) != string(after) {
+		os.WriteFile("README.md", before, 0o644)
+		t.Fatal("README.md's generated region does not match results/; run `make report` and commit")
+	}
+}
+
+// A chart with one value a thousand times another is unreadable as bars, so it
+// becomes a dot plot on a log axis instead. Getting that backwards produces a
+// chart where half the marks are invisible.
+func TestWideRangeChartsBecomeDotPlots(t *testing.T) {
+	narrow := []bar{{Label: "a", Value: 100}, {Label: "b", Value: 200}, {Label: "c", Value: 400}}
+	wide := []bar{{Label: "a", Value: 100}, {Label: "b", Value: 20000}, {Label: "c", Value: 400000}}
+	if svg := barChartSVG(svgThemes[0], "t", "c", narrow); !strings.Contains(svg, "<rect x=") {
+		t.Error("a narrow range should render as bars")
+	}
+	svg := barChartSVG(svgThemes[0], "t", "c", wide)
+	if strings.Contains(svg, "<rect x=") {
+		t.Error("a 4000x range rendered as bars; the small values are invisible")
+	}
+	if !strings.Contains(svg, "<circle") || !strings.Contains(svg, "Logarithmic scale") {
+		t.Error("a wide range should render as a dot plot and say that the axis is logarithmic")
+	}
+}
+
+// Both themes must produce the same geometry, or the <picture> swap makes the
+// page jump when the reader's theme changes.
+func TestBothThemesShareGeometry(t *testing.T) {
+	bars := []bar{{Label: "a", Value: 1}, {Label: "b", Value: 2}}
+	var dims []string
+	for _, th := range svgThemes {
+		s := barChartSVG(th, "title", "caption", bars)
+		i := strings.Index(s, `width=`)
+		dims = append(dims, s[i:i+40])
+	}
+	if dims[0] != dims[1] {
+		t.Fatalf("light and dark charts differ in size: %q vs %q", dims[0], dims[1])
+	}
+}

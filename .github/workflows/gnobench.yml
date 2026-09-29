@@ -61,6 +61,13 @@ jobs:
       - name: Build gnobench
         run: go -C gnobench build -o gnobench .
 
+      # Before measuring anything: does the committed README still match the
+      # committed results? Measuring first would make it legitimately stale and
+      # the check meaningless.
+      - name: Is the README's generated region up to date
+        working-directory: gnobench
+        run: ./gnobench report -check
+
       # Only what the diff could have changed. A change under gnobench/ or
       # vendor/ invalidates everything and prints an empty filter, which means
       # "measure the whole suite"; a diff that touches no benched package exits

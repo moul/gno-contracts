@@ -36,7 +36,7 @@ func usage() error {
 	fmt.Fprint(os.Stderr, `gnobench <command> [flags]
 
   run      measure a suite and merge the results into this machine's file
-  report   regenerate the markdown and the dashboard from every result file
+  report   regenerate the reports, the charts and the README region from every result file
   list     what suites, candidates and workloads exist
   compare  diff two result files and print what moved, as markdown
   affected read changed paths on stdin, print the -filter regexp they imply
@@ -152,7 +152,10 @@ func cmdRun(args []string) error {
 	}
 	fmt.Fprintf(os.Stderr, "gnobench: %s: %d new rows, %d updated, %d total\n",
 		mustRel(abs, f.path), added, replaced, len(f.Rows))
-	return generate(abs, s)
+	if err := generate(abs, s); err != nil {
+		return err
+	}
+	return refreshREADME(abs, false)
 }
 
 func cmdReport(args []string) error {
@@ -160,6 +163,7 @@ func cmdReport(args []string) error {
 	var (
 		suite = fs.String("suite", "", "which suite, or empty for all")
 		root  = fs.String("root", ".", "the gnobench directory")
+		check = fs.Bool("check", false, "write nothing: exit 1 if the README's generated region is stale")
 	)
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -168,6 +172,9 @@ func cmdReport(args []string) error {
 	if err != nil {
 		return err
 	}
+	if *check {
+		return refreshREADME(abs, true)
+	}
 	for _, name := range suiteNames() {
 		if *suite != "" && *suite != name {
 			continue
@@ -175,6 +182,38 @@ func cmdReport(args []string) error {
 		if err := generate(abs, suites[name]); err != nil {
 			return err
 		}
+	}
+	return refreshREADME(abs, false)
+}
+
+// refreshREADME rewrites the generated region, or in check mode reports that it
+// would have to. CI uses the check so a pull request cannot land a README that
+// disagrees with the results committed beside it.
+func refreshREADME(root string, check bool) error {
+	before, err := os.ReadFile(filepath.Join(root, "README.md"))
+	if err != nil {
+		return err
+	}
+	if err := updateREADME(root); err != nil {
+		return err
+	}
+	after, err := os.ReadFile(filepath.Join(root, "README.md"))
+	if err != nil {
+		return err
+	}
+	changed := string(before) != string(after)
+	if check {
+		if changed {
+			if err := os.WriteFile(filepath.Join(root, "README.md"), before, 0o644); err != nil {
+				return err
+			}
+			return fmt.Errorf("README.md is stale: its generated region does not match results/. Run `make report` and commit")
+		}
+		fmt.Fprintln(os.Stderr, "gnobench: README.md is up to date")
+		return nil
+	}
+	if changed {
+		fmt.Fprintln(os.Stderr, "gnobench: rewrote the generated region of README.md")
 	}
 	return nil
 }
