@@ -21,6 +21,10 @@ module = "gno.land/p/moul/agents/commit/v0"
 source = { dir = "p/moul/agents/commit" }
 
 [[module]]
+module = "gno.land/p/moul/art/v0"
+source = { dir = "p/moul/art" }
+
+[[module]]
 module = "gno.land/p/moul/authz/v0"
 source = { commit = "3d07a5b2cc02d7c3769caff0c17d884ac033bcfe", dir = "p/moul/authz/v0" }
 hash = "h1:xy1Bxzf36UskxiCm9Dt3KKVm+c9y6K2xaKDEGxwOP3M="
