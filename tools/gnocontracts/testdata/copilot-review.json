@@ -1,0 +1,258 @@
+{
+ "pr": {
+  "head": "901c57f0f760993ad123df075bff168c9b2d59c5",
+  "html_url": "https://github.com/moul/gno-contracts/pull/274",
+  "number": 274,
+  "title": "feat(copilot): teach Copilot code review the house rules, instead of paying an agent",
+  "user": "moul"
+ },
+ "review": {
+  "_links": {
+   "html": {
+    "href": "https://github.com/moul/gno-contracts/pull/274#pullrequestreview-5357551176"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/moul/gno-contracts/pulls/274"
+   }
+  },
+  "author_association": "NONE",
+  "body": "<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### \ud83d\udfe1 Changes recommended\n\nSeveral Go instructions contradict established tooling and would cause false-positive reviews.\n\n**Review effort:** Balanced  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [Standard-library rule incorrectly excludes approved tooling dependencies](#discussion_r4137622915) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [Invariant conflicts with established gnokey signing and broadcast flows](#discussion_r4137622975) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [Chain-function invariant mismatches existing transport and parsing design](#discussion_r4137623024) \u00b7 New\n</details>\n\n<details>\n<summary><strong>What changed in this PR</strong></summary>\n\nAdds GitHub Copilot review instructions tailored to the repository\u2019s immutable Gno contracts and tooling conventions.\n\n**Changes:**\n- Defines repository-wide review priorities and CI boundaries.\n- Adds Gno-specific correctness guidance.\n- Adds Go tooling review rules.\n\n| File | Description |\r\n| ---- | ----------- |\r\n| `.github/\u200bcopilot-instructions.md` | Defines repository-wide review expectations. |\r\n| `.github/\u200binstructions/\u200bgno.instructions.md` | Adds Gno contract review guidance. |\r\n| `.github/\u200binstructions/\u200bgo.instructions.md` | Adds Go tooling rules, but contains inaccurate constraints. |\n</details>\n\n---\n\n\ud83d\udca1 <a href=\"/moul/gno-contracts/new/main?filename=.github/skills/code-review/SKILL.md\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Add a `code-review` agent skill</a> or configure MCP servers for context-aware, tailored reviews. <a href=\"https://docs.github.com/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review?tool=webui#mcp-servers-and-agent-skills\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Learn more in the docs.</a>",
+  "commit_id": "3ee885f2b365c6373266f65fc368589b9b40c7c4",
+  "html_url": "https://github.com/moul/gno-contracts/pull/274#pullrequestreview-5357551176",
+  "id": 5357551176,
+  "node_id": "PRR_kwDOTg9xkM8AAAABP1W-SA",
+  "pull_request_url": "https://api.github.com/repos/moul/gno-contracts/pulls/274",
+  "state": "COMMENTED",
+  "submitted_at": "2026-09-29T19:46:11Z",
+  "user": {
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "events_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/events{/privacy}",
+   "followers_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/followers",
+   "following_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/following{/other_user}",
+   "gists_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "id": 175728472,
+   "login": "copilot-pull-request-reviewer[bot]",
+   "node_id": "BOT_kgDOCnlnWA",
+   "organizations_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/orgs",
+   "received_events_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/received_events",
+   "repos_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/subscriptions",
+   "type": "Bot",
+   "url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D",
+   "user_view_type": "public"
+  }
+ },
+ "comments": [
+  {
+   "_links": {
+    "html": {
+     "href": "https://github.com/moul/gno-contracts/pull/274#discussion_r4137622915"
+    },
+    "pull_request": {
+     "href": "https://api.github.com/repos/moul/gno-contracts/pulls/274"
+    },
+    "self": {
+     "href": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137622915"
+    }
+   },
+   "author_association": "NONE",
+   "body": "Because this file applies to every `tools/**/*.go`, the \u201cstandard library only\u201d rule is already false for `tools/gnocontracts`: `model.go:12` and `report_lock.go:8` intentionally import `moul.io/gnopm/pkg/gnomodlock`, which `tools/go.mod:15` requires. A review touching that integration would therefore produce a false violation. Scope this rule to contract companion commands or document the approved tooling dependency, and reconcile the authoritative `AGENTS.md` \u201cGo companions\u201d section at the same time.",
+   "commit_id": "3ee885f2b365c6373266f65fc368589b9b40c7c4",
+   "created_at": "2026-09-29T19:46:09Z",
+   "diff_hunk": "@@ -0,0 +1,24 @@\n+---\n+applyTo: \"tools/**/*.go\"\n+---\n+\n+# Reviewing the repository tooling\n+\n+`tools/` is the only Go module here. The repository root holds `vendor/gno.land`, and Go\n+treats a `vendor/` in a module root as Go vendoring, so a root module would refuse to build\n+and `go mod vendor` would delete the gno dependencies. **There is no Go module at the root\n+and there cannot be one.** Anything placed outside `tools/` is built and tested by nothing.\n+\n+- **Standard library only.** No third module, no cgo. Chain reads go over plain JSON-RPC.",
+   "html_url": "https://github.com/moul/gno-contracts/pull/274#discussion_r4137622915",
+   "id": 4137622915,
+   "line": null,
+   "node_id": "PRRC_kwDOTg9xkM72nx2D",
+   "original_commit_id": "3ee885f2b365c6373266f65fc368589b9b40c7c4",
+   "original_line": 12,
+   "original_position": 12,
+   "original_start_line": null,
+   "path": ".github/instructions/go.instructions.md",
+   "position": 1,
+   "pull_request_review_id": 5357551176,
+   "pull_request_url": "https://api.github.com/repos/moul/gno-contracts/pulls/274",
+   "reactions": {
+    "+1": 0,
+    "-1": 0,
+    "confused": 0,
+    "eyes": 0,
+    "heart": 0,
+    "hooray": 0,
+    "laugh": 0,
+    "rocket": 0,
+    "total_count": 0,
+    "url": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137622915/reactions"
+   },
+   "side": "RIGHT",
+   "start_line": null,
+   "start_side": null,
+   "subject_type": "line",
+   "updated_at": "2026-09-29T19:46:11Z",
+   "url": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137622915",
+   "user": {
+    "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+    "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+    "followers_url": "https://api.github.com/users/Copilot/followers",
+    "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+    "gravatar_id": "",
+    "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+    "id": 175728472,
+    "login": "Copilot",
+    "node_id": "BOT_kgDOCnlnWA",
+    "organizations_url": "https://api.github.com/users/Copilot/orgs",
+    "received_events_url": "https://api.github.com/users/Copilot/received_events",
+    "repos_url": "https://api.github.com/users/Copilot/repos",
+    "site_admin": false,
+    "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+    "type": "Bot",
+    "url": "https://api.github.com/users/Copilot",
+    "user_view_type": "public"
+   }
+  },
+  {
+   "_links": {
+    "html": {
+     "href": "https://github.com/moul/gno-contracts/pull/274#discussion_r4137622975"
+    },
+    "pull_request": {
+     "href": "https://api.github.com/repos/moul/gno-contracts/pulls/274"
+    },
+    "self": {
+     "href": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137622975"
+    }
+   },
+   "author_association": "NONE",
+   "body": "This invariant contradicts the companion tools it is meant to govern: `gnohome tx -run` and `gnoblog` deliberately invoke `gnokey` to sign and broadcast with the terminal attached (`tools/gnohome/main.go:9-22`, `tools/gnoblog/diff.go:210-220`). Copilot would flag changes to these established paths. State the actual safety boundary\u2014tools never handle key material and must preserve an explicit print/review path\u2014and update the conflicting `AGENTS.md` section.",
+   "commit_id": "3ee885f2b365c6373266f65fc368589b9b40c7c4",
+   "created_at": "2026-09-29T19:46:10Z",
+   "diff_hunk": "@@ -0,0 +1,24 @@\n+---\n+applyTo: \"tools/**/*.go\"\n+---\n+\n+# Reviewing the repository tooling\n+\n+`tools/` is the only Go module here. The repository root holds `vendor/gno.land`, and Go\n+treats a `vendor/` in a module root as Go vendoring, so a root module would refuse to build\n+and `go mod vendor` would delete the gno dependencies. **There is no Go module at the root\n+and there cannot be one.** Anything placed outside `tools/` is built and tested by nothing.\n+\n+- **Standard library only.** No third module, no cgo. Chain reads go over plain JSON-RPC.\n+- **Print transactions, never sign them.** A tool here holds no key and broadcasts nothing.",
+   "html_url": "https://github.com/moul/gno-contracts/pull/274#discussion_r4137622975",
+   "id": 4137622975,
+   "line": null,
+   "node_id": "PRRC_kwDOTg9xkM72nx2_",
+   "original_commit_id": "3ee885f2b365c6373266f65fc368589b9b40c7c4",
+   "original_line": 13,
+   "original_position": 13,
+   "original_start_line": null,
+   "path": ".github/instructions/go.instructions.md",
+   "position": 1,
+   "pull_request_review_id": 5357551176,
+   "pull_request_url": "https://api.github.com/repos/moul/gno-contracts/pulls/274",
+   "reactions": {
+    "+1": 0,
+    "-1": 0,
+    "confused": 0,
+    "eyes": 0,
+    "heart": 0,
+    "hooray": 0,
+    "laugh": 0,
+    "rocket": 0,
+    "total_count": 0,
+    "url": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137622975/reactions"
+   },
+   "side": "RIGHT",
+   "start_line": null,
+   "start_side": null,
+   "subject_type": "line",
+   "updated_at": "2026-09-29T19:46:11Z",
+   "url": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137622975",
+   "user": {
+    "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+    "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+    "followers_url": "https://api.github.com/users/Copilot/followers",
+    "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+    "gravatar_id": "",
+    "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+    "id": 175728472,
+    "login": "Copilot",
+    "node_id": "BOT_kgDOCnlnWA",
+    "organizations_url": "https://api.github.com/users/Copilot/orgs",
+    "received_events_url": "https://api.github.com/users/Copilot/received_events",
+    "repos_url": "https://api.github.com/users/Copilot/repos",
+    "site_admin": false,
+    "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+    "type": "Bot",
+    "url": "https://api.github.com/users/Copilot",
+    "user_view_type": "public"
+   }
+  },
+  {
+   "_links": {
+    "html": {
+     "href": "https://github.com/moul/gno-contracts/pull/274#discussion_r4137623024"
+    },
+    "pull_request": {
+     "href": "https://api.github.com/repos/moul/gno-contracts/pulls/274"
+    },
+    "self": {
+     "href": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137623024"
+    }
+   },
+   "author_association": "NONE",
+   "body": "The existing companion implementations do not have a single string-returning chain function: both `gnohome` and `gnoblog` use `fetchManifest` returning a map and error plus separate `qeval`, `abciQuery`, and transport functions (`tools/gnohome/chain.go:21-106`, `tools/gnoblog/chain.go:30-106`). This wording will create false findings whenever those tested boundaries change. Require network-free tests and separation of transport from parsing instead, then make the same correction in `AGENTS.md`.",
+   "commit_id": "3ee885f2b365c6373266f65fc368589b9b40c7c4",
+   "created_at": "2026-09-29T19:46:10Z",
+   "diff_hunk": "@@ -0,0 +1,24 @@\n+---\n+applyTo: \"tools/**/*.go\"\n+---\n+\n+# Reviewing the repository tooling\n+\n+`tools/` is the only Go module here. The repository root holds `vendor/gno.land`, and Go\n+treats a `vendor/` in a module root as Go vendoring, so a root module would refuse to build\n+and `go mod vendor` would delete the gno dependencies. **There is no Go module at the root\n+and there cannot be one.** Anything placed outside `tools/` is built and tested by nothing.\n+\n+- **Standard library only.** No third module, no cgo. Chain reads go over plain JSON-RPC.\n+- **Print transactions, never sign them.** A tool here holds no key and broadcasts nothing.\n+- **A Makefile target is one line**, so a flag belongs on the tool and not in a recipe.\n+- **`tools/auditpattern/run.go` is a byte-for-byte MIRROR** of `gnolang/gno`'s\n+  `misc/audit-pattern-harness/internal/auditpattern/run.go`. **Never hand-edit it.** Re-mirror\n+  and update the three constants at its top; `audit-patterns -drift <gnoroot>` re-hashes the\n+  original and is what keeps the copy honest.\n+- **Anything duplicated from a contract carries a comment naming the `.gno` file it mirrors**,\n+  and a test pinning the two to the same behaviour.\n+- **Table-driven tests, no network.** The chain-facing code is one function returning a\n+  string; test the parsing, not the transport.",
+   "html_url": "https://github.com/moul/gno-contracts/pull/274#discussion_r4137623024",
+   "id": 4137623024,
+   "line": null,
+   "node_id": "PRRC_kwDOTg9xkM72nx3w",
+   "original_commit_id": "3ee885f2b365c6373266f65fc368589b9b40c7c4",
+   "original_line": 22,
+   "original_position": 22,
+   "original_start_line": 21,
+   "path": ".github/instructions/go.instructions.md",
+   "position": 1,
+   "pull_request_review_id": 5357551176,
+   "pull_request_url": "https://api.github.com/repos/moul/gno-contracts/pulls/274",
+   "reactions": {
+    "+1": 0,
+    "-1": 0,
+    "confused": 0,
+    "eyes": 0,
+    "heart": 0,
+    "hooray": 0,
+    "laugh": 0,
+    "rocket": 0,
+    "total_count": 0,
+    "url": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137623024/reactions"
+   },
+   "side": "RIGHT",
+   "start_line": null,
+   "start_side": "RIGHT",
+   "subject_type": "line",
+   "updated_at": "2026-09-29T19:46:11Z",
+   "url": "https://api.github.com/repos/moul/gno-contracts/pulls/comments/4137623024",
+   "user": {
+    "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+    "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+    "followers_url": "https://api.github.com/users/Copilot/followers",
+    "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+    "gravatar_id": "",
+    "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+    "id": 175728472,
+    "login": "Copilot",
+    "node_id": "BOT_kgDOCnlnWA",
+    "organizations_url": "https://api.github.com/users/Copilot/orgs",
+    "received_events_url": "https://api.github.com/users/Copilot/received_events",
+    "repos_url": "https://api.github.com/users/Copilot/repos",
+    "site_admin": false,
+    "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+    "type": "Bot",
+    "url": "https://api.github.com/users/Copilot",
+    "user_view_type": "public"
+   }
+  }
+ ]
+}

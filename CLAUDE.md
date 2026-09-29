@@ -60,6 +60,10 @@ irreversible.
   is about to become permanent**, that is, a package not yet live on mainnet, plus any change
   to `.github/copilot-instructions.md` or `.github/instructions/`. Everything else is a path
   that cannot be fixed in place anyway. Request with `gh pr edit <N> --add-reviewer @copilot`.
+- **A Copilot finding that is wrong is OUR bug, not noise.** The house rules live in
+  `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md`; every review
+  is digested into #280 with a box asking which line produced a false positive. Fix that line
+  in the same pull request. `gh pr edit <N> --add-reviewer @copilot` requests one.
 - **`make audit-patterns` is a ratchet, and it fails in both directions.** The ten upstream
   audit-pattern rules run over every contract against a per-package baseline: a new hit
   fails, and a *fixed* one fails too until you `make audit-patterns-update`. A baseline row
