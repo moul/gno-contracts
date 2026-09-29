@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-29T21:32:27Z",
+  "status_checked_at": "2026-09-29T22:14:44Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -122,6 +122,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/art/v0",
+      "dir": "p/moul/art",
+      "kind": "p",
+      "name": "art",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/svg/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -4218,6 +4241,35 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/gallery/v0",
+      "dir": "r/moul/gallery",
+      "kind": "r",
+      "name": "gallery",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/art/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/r/moul/demo/gnoface/v0",
+        "gno.land/r/moul/demo/millipede/v0",
+        "gno.land/r/moul/sapin/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
