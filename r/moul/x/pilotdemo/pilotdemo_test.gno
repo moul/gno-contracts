@@ -14,7 +14,8 @@ import (
 const modPath = "gno.land/r/moul/x/pilotdemo/v0"
 
 var (
-	owner   = testutils.TestAddress("owner")
+	// r/moul/pilot pins Claim to this address, so the tests have to use it
+	owner   = address("g1manfred47kzduec920z88wfr64ylksmdcedlf5")
 	dest    = testutils.TestAddress("dest")
 	claimed bool
 )
