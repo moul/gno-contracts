@@ -6,6 +6,9 @@
   that was uploaded and is still waiting to be approved.
 - **[A blog that is a realm](/r/moul/blog).** Every post is an entry in an
   on-chain store, published by a transaction. Same trick as this page.
+- **[A gallery of ascii and pixel art](/r/moul/gallery/v0).** It stores
+  nothing: every piece lives in the realm its author put it in, and the
+  gallery renders the ones it can import.
 - **Mainnet.** gno.land is launched. The interesting part is no longer the
   chain, it is what is running on it.
 - **[Bubble Rumble](https://bubblerumble.net/?ref=g1manfred47kzduec920z88wfr64ylksmdcedlf5).**
