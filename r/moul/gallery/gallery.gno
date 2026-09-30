@@ -27,6 +27,17 @@ import (
 	"gno.land/p/moul/realmpath/v0"
 )
 
+// realmPath is this realm's own path, version included.
+//
+// gnoweb does NOT resolve an unversioned realm path to its latest version: it
+// serves /r/moul/gallery as a DIRECTORY INDEX and drops the :path and ?query
+// entirely. Measured 2026-09-30 on gnoland-1, where /r/moul/outfmt:?fmt=json
+// renders the index page while /r/moul/outfmt/v0:?fmt=json returns the JSON.
+// So every self-link has to carry the version, and stating it once is what
+// keeps the next one from being written without it. Only r/moul/home and
+// r/moul/blog are genuinely unversioned paths.
+const realmPath = "/r/moul/gallery/v0"
+
 func Render(path string) string {
 	req := realmpath.Parse(path)
 	text := req.Query.Get("fmt") == "txt"
@@ -71,7 +82,7 @@ func renderIndex(text bool) string {
 		}
 		d.Table([]string{"Piece", "Author", "Where", "Shown"}, rows)
 		d.Para(plural(live, "piece") + " rendered from source, " + plural(linked, "piece") + " linked.")
-		d.Para("Open one at /r/moul/gallery:piece/<slug>, with ?fmt=txt for this form.")
+		d.Para("Open one at " + realmPath + ":piece/<slug>, with ?fmt=txt for this form.")
 		return d.String()
 	}
 
@@ -87,7 +98,7 @@ func renderIndex(text bool) string {
 			shown = "rendered here"
 		}
 		t.Row(
-			md.Link(p.Title, "/r/moul/gallery:piece/"+p.Slug),
+			md.Link(p.Title, realmPath+":piece/"+p.Slug),
 			ui.Inline(p.Author),
 			md.InlineCode(p.Origin),
 			shown,
@@ -138,7 +149,7 @@ func renderPiece(slug string, text bool) string {
 	t.Row("Source", md.Link(p.Origin, "/"+p.Origin))
 	out += t.String()
 
-	out += "\n" + md.Link("< the gallery", "/r/moul/gallery") + "\n"
+	out += "\n" + md.Link("< the gallery", realmPath) + "\n"
 	return out
 }
 
