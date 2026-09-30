@@ -109,6 +109,7 @@ func pkgFooter(c Contract) string {
 	b.WriteString("Part of **[moul/gno-contracts](" + repoURL + ")** — moul's versioned " +
 		"gno.land contracts. See the repository for the full catalog, build/test " +
 		"tooling, and usage.\n\n")
+	b.WriteString(pkgBadges(c))
 	if len(c.Deps) > 0 {
 		// Embed the generated per-package dependency graph (regenerated on main
 		// by `make graph`; referenced by absolute raw URL so it resolves in the
@@ -140,4 +141,41 @@ func pkgFooter(c Contract) string {
 	b.WriteString("\n")
 	b.WriteString(pkgFooterEnd)
 	return b.String()
+}
+
+// explorerBase is the gnoscope instance the badges are drawn by. One constant
+// because these URLs end up in every realm README at once, and a repointing is
+// then a regeneration rather than a sweep.
+const explorerBase = "https://gnoscope.com"
+
+// pkgBadges renders a realm's live state as shields linking to its page on the
+// explorer: what the chain holds at that path right now, and what the index has
+// seen arrive there.
+//
+// Realms only. Transactions and unique callers are zero for the whole p/ half of
+// this directory by construction, because a pure package is imported and never
+// called, so a row of grey zeroes under every package would be noise shaped like
+// data. Archived versions are skipped for the same reason: `ignore = true` says
+// nobody should be reading that one for its current state.
+//
+// `absent` is an answer, not a failure. A realm in this repo that has not been
+// deployed says so, and turns green on the deploy with nothing here to edit,
+// which is the whole reason these are images rather than a generated table.
+func pkgBadges(c Contract) string {
+	if c.Kind != "r" || c.Ignored {
+		return ""
+	}
+	path := strings.TrimPrefix(c.PkgPath, "gno.land/")
+	page := explorerBase + "/realm/" + path
+	shield := func(kind, alt string) string {
+		return "[![" + alt + "](" + explorerBase + "/_badges/shield/" + kind + "/" + path +
+			"?network=mainnet)](" + page + ")"
+	}
+	// The alt text is what a screen reader and a broken-image placeholder get,
+	// so it says which measure it is rather than repeating the word "badge".
+	return "**On mainnet:** " +
+		shield("status", "deployment status") + " " +
+		shield("txs", "transactions") + " " +
+		shield("users", "unique callers") + " " +
+		shield("version", "deployed revision") + "\n\n"
 }
