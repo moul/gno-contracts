@@ -22,7 +22,8 @@ func ExampleRender() {
 	//
 	// 3 pieces rendered from source, 3 pieces linked.
 	//
-	// Open one at /r/moul/gallery:piece/<slug>, with ?fmt=txt for this form.
+	// Open one at /r/moul/gallery/v0:piece/<slug>, with ?fmt=txt for this
+	// form.
 }
 
 func ExampleRender_piece() {

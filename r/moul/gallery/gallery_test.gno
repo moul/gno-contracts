@@ -12,8 +12,11 @@ func TestRenderIndexMarkdown(t *testing.T) {
 	uassert.True(t, strings.Contains(out, "# moul's gallery"), "heading")
 	uassert.True(t, strings.Contains(out, "```"), "the banner is fenced in markdown")
 	uassert.True(t, strings.Contains(out, "| Piece |"), "a real markdown table")
+	// The path is spelled out rather than taken from realmPath: a test that
+	// reads the same constant the code does would pass with the version
+	// dropped, which is the exact regression this pins.
 	for _, p := range catalog() {
-		uassert.True(t, strings.Contains(out, "/r/moul/gallery:piece/"+p.Slug), p.Slug+" is linked")
+		uassert.True(t, strings.Contains(out, "/r/moul/gallery/v0:piece/"+p.Slug), p.Slug+" is linked")
 	}
 }
 
