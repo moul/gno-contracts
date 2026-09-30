@@ -120,7 +120,10 @@ func Markdown(s *Suite, files []*File) string {
 		}
 	}
 
-	b.WriteString(`## How to read this
+	if s.HowToRead != "" {
+		b.WriteString("## How to read this\n\n" + s.HowToRead + "\n")
+	} else {
+		b.WriteString(`## How to read this
 
 | axis | where it comes from | how far to trust it |
 |---|---|---|
@@ -137,12 +140,14 @@ package initialisation, which the filetest runner commits before ` + "`main`" + 
 phase deserialises every object it touches. A deployed realm is always cold.
 
 `)
+	}
 
 	for _, f := range files {
 		v := newView(f)
 		if len(files) > 1 {
 			fmt.Fprintf(&b, "# Machine `%s`\n\n", f.Env.ID)
 		}
+		b.WriteString(wiringSection(s, v))
 		b.WriteString(winnersSection(s, v))
 		b.WriteString(txSection(s, v))
 		b.WriteString(warmColdSection(s, v))
@@ -158,6 +163,59 @@ func trim(ss []string, k int) []string {
 		return ss
 	}
 	return append(ss[:k:k], "...")
+}
+
+// wiringSection is the whole point of the wiring suite: the same writes, the
+// same final state, the same deposit, and a write volume that differs by two
+// orders of magnitude depending only on how many transactions they arrived in.
+func wiringSection(s *Suite, v view) string {
+	if s.Name != "wiring" {
+		return ""
+	}
+	var b strings.Builder
+	b.WriteString("## Batched against one at a time\n\n")
+	b.WriteString("Both columns perform the same writes and end at the same state, so the **deposit is\n")
+	b.WriteString("identical**. `kv bytes` is what the key/value store was actually asked to write, which\n")
+	b.WriteString("is what the node's disk absorbs and what no meter here charges for.\n\n")
+	for _, n := range v.sizes() {
+		type row struct {
+			name            string
+			deposit         int64
+			oneKV, manyKV   int64
+			oneGas, manyGas int64
+			amp             float64
+		}
+		var rows []row
+		for _, c := range wiringCandidates {
+			one, ok1 := v.get(c.Name, "str", "cold", shapeOneTx, n)
+			many, ok2 := v.get(c.Name, "str", "cold", shapePerTx, n)
+			if !ok1 || !ok2 || one.KVSetBytes == 0 {
+				continue
+			}
+			rows = append(rows, row{
+				name: c.Name, deposit: one.Bytes,
+				oneKV: one.KVSetBytes, manyKV: many.KVSetBytes,
+				oneGas: one.Gas, manyGas: many.Gas,
+				amp: float64(many.KVSetBytes) / float64(one.KVSetBytes),
+			})
+		}
+		if len(rows) == 0 {
+			continue
+		}
+		sort.Slice(rows, func(i, j int) bool { return rows[i].manyKV < rows[j].manyKV })
+		fmt.Fprintf(&b, "### %s writes\n\n", addCommas(strconv.Itoa(n)))
+		b.WriteString("| candidate | deposit (both) | kv bytes, 1 tx | kv bytes, one tx each | amplification | gas, one tx each |\n")
+		b.WriteString("|---|--:|--:|--:|--:|--:|\n")
+		for _, r := range rows {
+			fmt.Fprintf(&b, "| `%s` | %s | %s | **%s** | %.1fx | %s |\n",
+				r.name, addCommas(strconv.FormatInt(r.deposit, 10)),
+				addCommas(strconv.FormatInt(r.oneKV, 10)),
+				addCommas(strconv.FormatInt(r.manyKV, 10)),
+				r.amp, addCommas(strconv.FormatInt(r.manyGas, 10)))
+		}
+		b.WriteString("\n")
+	}
+	return b.String()
 }
 
 // winnersSection is the answer, computed rather than written: for each size

@@ -103,6 +103,11 @@ func cmdRun(args []string) error {
 	if err != nil {
 		return err
 	}
+	if s.Name == "wiring" && *nlist == "100,1000,10000" {
+		// The default is the storage suite's. n transactions means n
+		// commits, so 10,000 here is a different order of work.
+		ns = []int{100, 1000}
+	}
 	var vals []string
 	for _, v := range strings.Split(*values, ",") {
 		v = strings.TrimSpace(v)
@@ -125,7 +130,14 @@ func cmdRun(args []string) error {
 	fmt.Fprintf(os.Stderr, "gnobench: suite %s on %s\n  env   %s\n  go    %s\n  gno   %s\n",
 		s.Name, env.ID, env.Short(), env.GoVer, env.GnoShort())
 
-	rows, err := Run(s, env, *workdir, ns, vals, *repeat, re, *verbose, *keep)
+	// The wiring suite cannot go through the filetest runner: a filetest
+	// commits once, and the whole question there is what many commits cost.
+	var rows []Row
+	if s.Name == "wiring" {
+		rows, err = RunWiring(s, env, *workdir, ns, *repeat, re, *verbose)
+	} else {
+		rows, err = Run(s, env, *workdir, ns, vals, *repeat, re, *verbose, *keep)
+	}
 	if err != nil {
 		return err
 	}

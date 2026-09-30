@@ -5,7 +5,23 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/gnolang/gno/tm2/pkg/db/memdb"
+	"github.com/gnolang/gno/tm2/pkg/store/dbadapter"
+	"github.com/gnolang/gno/tm2/pkg/store/types"
 )
+
+// commitAdapter gives a plain store the Committer methods countStore's
+// embedded CommitStore needs, so the counter can be tested without standing up
+// a whole gno store.
+type commitAdapter struct{ dbadapter.Store }
+
+func (commitAdapter) Commit() types.CommitID              { return types.CommitID{} }
+func (commitAdapter) LastCommitID() types.CommitID        { return types.CommitID{} }
+func (commitAdapter) GetStoreOptions() types.StoreOptions { return types.StoreOptions{} }
+func (commitAdapter) SetStoreOptions(types.StoreOptions)  {}
+func (commitAdapter) LoadLatestVersion() error            { return nil }
+func (commitAdapter) LoadVersion(int64) error             { return nil }
 
 // The harness is only worth trusting if its two pieces of arithmetic are:
 // baseline subtraction, and the percent change a pull request is judged on.
@@ -304,5 +320,68 @@ func TestBothThemesShareGeometry(t *testing.T) {
 	}
 	if dims[0] != dims[1] {
 		t.Fatalf("light and dark charts differ in size: %q vs %q", dims[0], dims[1])
+	}
+}
+
+// The counting store exists because the obvious wrapper counts nothing: if
+// CacheWrap delegates to the inner store, the flush bypasses the counter and
+// every figure reads zero. That happened, so it gets a test.
+func TestCountStoreSeesWritesThroughItsCacheWrap(t *testing.T) {
+	inner := dbadapter.Store{DB: memdb.NewMemDB()}
+	cs := &countStore{CommitStore: commitAdapter{inner}}
+	cw := cs.CacheWrap()
+	cw.Set(nil, []byte("k"), []byte("value"))
+	if cs.Sets != 0 {
+		t.Fatal("a write to the cache should not reach the counter before Write()")
+	}
+	cw.Write()
+	if cs.Sets != 1 {
+		t.Fatalf("after Write() the counter saw %d sets; want 1", cs.Sets)
+	}
+	if cs.SetBytes != 5 {
+		t.Fatalf("counter saw %d value bytes; want 5", cs.SetBytes)
+	}
+	if cs.KeyBytes != 1 {
+		t.Fatalf("counter saw %d key bytes; want 1", cs.KeyBytes)
+	}
+}
+
+// The wiring suite's whole claim is that both shapes reach the same state and
+// therefore the same deposit. If that ever stops holding, the comparison is
+// meaningless and every amplification figure is measuring two different things.
+func TestWiringShapesAgreeOnTheDeposit(t *testing.T) {
+	files, err := LoadAll(".", "wiring")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(files) == 0 {
+		t.Skip("no wiring results committed yet")
+	}
+	v := newView(files[0])
+	checked := 0
+	for _, n := range v.sizes() {
+		for _, c := range wiringCandidates {
+			one, ok1 := v.get(c.Name, "str", "cold", shapeOneTx, n)
+			many, ok2 := v.get(c.Name, "str", "cold", shapePerTx, n)
+			if !ok1 || !ok2 {
+				continue
+			}
+			checked++
+			if one.Bytes != many.Bytes {
+				t.Errorf("%s at n=%d: one transaction leaves %d realm bytes, %d transactions leave %d; "+
+					"the two shapes are not reaching the same state",
+					c.Name, n, one.Bytes, n, many.Bytes)
+			}
+			if many.Txs != n {
+				t.Errorf("%s at n=%d: the per-transaction shape committed %d times, want %d",
+					c.Name, n, many.Txs, n)
+			}
+			if one.Txs != 1 {
+				t.Errorf("%s at n=%d: the batched shape committed %d times, want 1", c.Name, n, one.Txs)
+			}
+		}
+	}
+	if checked == 0 {
+		t.Fatal("no wiring pair was checked; the suite's key scheme probably changed")
 	}
 }

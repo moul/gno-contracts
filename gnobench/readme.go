@@ -109,6 +109,13 @@ func suiteSummary(root string, s *Suite, files []*File) string {
 
 func bullet() string { return "-" }
 
+func max64(a, b int64) int64 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 // ratio formats a multiple: one decimal while it is small enough to matter,
 // thousands separators once it is not.
 func ratio(f float64) string {
@@ -163,6 +170,32 @@ func headlines(s *Suite, v view) []string {
 				"A `builtin map` read looks like %s gas warm and costs **%s gas** in a real transaction, **%sx** more, because the whole map is one persisted object and the first touch loads all of it.",
 				fmtN(warm), fmtN(cold), ratio(cold/warm)))
 		}
+	}
+	if s.Name == "wiring" {
+		var lo, hi *Row
+		var loName, hiName string
+		for _, c := range wiringCandidates {
+			r, ok := v.get(c.Name, "str", "cold", shapePerTx, big)
+			if !ok || r.KVSetBytes == 0 {
+				continue
+			}
+			rr := r
+			if lo == nil || rr.KVSetBytes < lo.KVSetBytes {
+				lo, loName = &rr, c.Name
+			}
+			if hi == nil || rr.KVSetBytes > hi.KVSetBytes {
+				hi, hiName = &rr, c.Name
+			}
+		}
+		if lo != nil && hi != nil && lo.KVSetBytes > 0 {
+			one, _ := v.get(hiName, "str", "cold", shapeOneTx, big)
+			out = append(out, fmt.Sprintf(
+				"%s writes arriving one transaction at a time, all ending at the same state and charged the same deposit: **`%s` makes the node write %s MB**, against `%s` at %s MB. The worst of them writes **%sx** what the same writes cost batched into one transaction.",
+				addCommas(itoa(big)), hiName, fmtN(float64(hi.KVSetBytes)/1e6),
+				loName, fmtN(float64(lo.KVSetBytes)/1e6),
+				ratio(float64(hi.KVSetBytes)/float64(max64(one.KVSetBytes, 1)))))
+		}
+		return out
 	}
 	if best, worst, ok := extremes(s, v, "digest", "str", "warm", "x64", big); ok {
 		out = append(out, fmt.Sprintf(

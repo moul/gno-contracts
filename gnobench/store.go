@@ -35,6 +35,15 @@ type Row struct {
 	DBytes  int64 `json:"d_bytes"`
 	DWallNs int64 `json:"d_wall_ns"`
 
+	// What the key/value store was actually asked to write. Only the wiring
+	// suite fills these: it is the one that commits more than once, and the
+	// one place the difference between "what the realm is charged" and
+	// "what the node writes" can be seen at all.
+	KVSets     int64 `json:"kv_sets,omitempty"`
+	KVSetBytes int64 `json:"kv_set_bytes,omitempty"`
+	KVKeyBytes int64 `json:"kv_key_bytes,omitempty"`
+	Txs        int   `json:"txs,omitempty"`
+
 	Stable bool   `json:"stable"`
 	Skip   string `json:"skip,omitempty"`
 	Err    string `json:"err,omitempty"`
