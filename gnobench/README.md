@@ -70,6 +70,20 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 
 [Full report](reports/storage.md) `·` [Dashboard, filterable](reports/storage.html) `·` [Raw rows](results/storage/)
 
+### `wiring`: What it costs to write one change at a time
+
+- **24** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-09-30.
+- 1,000 writes arriving one transaction at a time, all ending at the same state and charged the same deposit: **`builtin map[string]string` makes the node write 78 MB**, against `p/moul/ulist/v1` at 11 MB. The worst of them writes **505x** what the same writes cost batched into one transaction.
+
+<a href="reports/wiring.md#batched-against-one-at-a-time">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="reports/wiring-kv-bytes-dark.svg">
+    <img alt="Bytes the key/value store is asked to write" src="reports/wiring-kv-bytes-light.svg" width="860">
+  </picture>
+</a>
+
+[Full report](reports/wiring.md) `·` [Dashboard, filterable](reports/wiring.html) `·` [Raw rows](results/wiring/)
+
 <!-- END RESULTS -->
 
 ## What it measures
@@ -101,6 +115,21 @@ So each workload declares a mode:
 The difference is not a rounding error. A container held in **one** persisted object is O(1)
 warm and **O(n) cold**, because the first touch loads all of it. The `tx_*` workloads measure
 the realistic unit: one transaction, one operation, nothing cached.
+
+## Three different storage costs, and they rank containers differently
+
+There is no single "what does this cost". There are three, and a container that wins one can
+lose another by two orders of magnitude:
+
+| cost | what it is | who charges it |
+|---|---|---|
+| **deposit** | the realm's net state in bytes | the chain, at 100 ugnot/byte, refunded when freed |
+| **per-transaction gas** | loading and walking the container from a cold store | the chain, per call |
+| **write volume** | what the key/value store is asked to write, summed over every commit | nobody. The node's disk absorbs it |
+
+The `storage` suite measures the first two. The `wiring` suite measures the third, and it has
+to drive the VM directly one committed transaction at a time, because a filetest commits once
+and the whole question is what many commits cost.
 
 ## Why the numbers are comparable
 
@@ -147,6 +176,8 @@ depends on.
 | suite | what it asks |
 |---|---|
 | `storage` | where a realm should put its data: 19 key/value and positional containers |
+| `wiring` | what the same writes cost arriving one transaction at a time instead of batched |
+| `digest` | what hashing and encoding cost, where nothing persists |
 
 A second suite is a new file, not a new tool: a `Suite` value with its candidates, its
 workloads and its facets, registered from an `init`.
@@ -180,7 +211,11 @@ differently.
 | `store.go` | the per-machine result files and the staleness warnings |
 | `report.go` | the generated markdown |
 | `svg.go` | the static charts the README embeds, one file per theme |
+| `wiring.go` | the multi-transaction runner: deploy, then commit one call at a time |
+| `countstore.go` | the commit-store wrapper that counts what is actually written |
 | `readme.go` | the README's generated results region |
 | `html.go`, `page.go` | the generated dashboard |
 | `suite.go` | the generic suite shape |
 | `suite_storage.go`, `suite_storage_workloads.go` | the storage suite |
+| `suite_wiring.go` | the wiring suite |
+| `suite_digest.go` | the digest suite |

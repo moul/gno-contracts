@@ -27,9 +27,11 @@ bench: ## measure SUITE at N and merge into this machine's result file
 bench-quick: ## the fast pass: one size, strings only, no repeats
 	GNOROOT=$(GNOROOT) go run . run -suite $(SUITE) -n 1000 -value str -repeat 1 -v
 
-bench-full: ## every size including 10k; slow, this is what CI runs on a schedule
-	GNOROOT=$(GNOROOT) go run . run -suite $(SUITE) -n 100,1000 -value str,obj -repeat 2 -v
-	GNOROOT=$(GNOROOT) go run . run -suite $(SUITE) -n 10000 -value str -repeat 1 -v
+bench-full: ## every suite, every size; slow, this is what CI runs on a schedule
+	GNOROOT=$(GNOROOT) go run . run -suite storage -n 100,1000 -value str,obj -repeat 2 -v
+	GNOROOT=$(GNOROOT) go run . run -suite storage -n 10000 -value str -repeat 1 -v
+	GNOROOT=$(GNOROOT) go run . run -suite wiring -n 100,1000 -repeat 2 -v
+	GNOROOT=$(GNOROOT) go run . run -suite digest -n 32,256,1024,8192 -repeat 2 -v
 
 ##@ Output
 

@@ -295,7 +295,37 @@ func chartSpecs(s *Suite, v view) []chartSpec {
 			bars:    bars,
 		})
 	}
-	// 3. pure computation: gas per call at the largest input.
+	// 3. the wiring suite: what the node is actually asked to write.
+	if s.Name == "wiring" {
+		var bars []bar
+		for _, c := range wiringCandidates {
+			many, ok := v.get(c.Name, "str", "cold", shapePerTx, big)
+			one, ok2 := v.get(c.Name, "str", "cold", shapeOneTx, big)
+			if !ok || !ok2 || one.KVSetBytes == 0 {
+				continue
+			}
+			bars = append(bars, bar{
+				Label: c.Name, Value: float64(many.KVSetBytes),
+				Note: fmt.Sprintf("(%.0fx the batched write)", float64(many.KVSetBytes)/float64(one.KVSetBytes)),
+			})
+		}
+		sortBars(bars)
+		if len(bars) > 0 {
+			cap := fmt.Sprintf("%s writes arriving one transaction at a time. Every one of these ends at the same state and is charged the same deposit.",
+				addCommas(itoa(big)))
+			bars, cap = trimOutliers(bars, cap)
+			specs = append(specs, chartSpec{
+				slug:    "kv-bytes",
+				title:   "Bytes the key/value store is asked to write",
+				caption: cap,
+				anchor:  "batched-against-one-at-a-time",
+				bars:    bars,
+			})
+		}
+		return specs
+	}
+
+	// 4. pure computation: gas per call at the largest input.
 	if bars := collect(s, v, "digest", "str", "warm", "x64", big, "gas"); len(bars) > 0 {
 		cap := "amortised over 64 calls, so the input build is subtracted out"
 		bars, cap = trimOutliers(bars, cap)

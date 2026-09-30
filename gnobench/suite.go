@@ -20,6 +20,9 @@ type Suite struct {
 	SizeLabel string
 	// Unit is what one "op" is, for the per-op column.
 	OpLabel string
+	// HowToRead replaces the default axis table when a suite measures
+	// something the default description does not describe.
+	HowToRead string
 }
 
 type Facet struct {
