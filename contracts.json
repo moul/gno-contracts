@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-09-30T08:22:06Z",
+  "status_checked_at": "2026-09-30T08:29:52Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -142,7 +142,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -4267,7 +4268,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
