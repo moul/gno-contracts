@@ -61,6 +61,8 @@ gnokey maketx call -pkgpath gno.land/r/g12cs4cehujpffpjpywmkqj43m6u5ya53nj69sjz/
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/daily/life/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/life/v0) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/daily/life/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/life/v0) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/daily/life/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/life/v0) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/daily/life/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/life/v0)
+
 > 🧪 **Highly experimental — potentially vibe-coded.** Not audited; may break, change, or be removed at any time. Do not use with anything of value. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
 <!-- END GNOCONTRACTS FOOTER -->

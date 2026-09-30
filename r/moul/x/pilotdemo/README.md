@@ -23,6 +23,8 @@ script is what passes the handle; `MsgCall` cannot.
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/pilotdemo/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/pilotdemo/v0) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/pilotdemo/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/pilotdemo/v0) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/pilotdemo/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/pilotdemo/v0) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/pilotdemo/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/pilotdemo/v0)
+
 **Dependency graph:**
 
 ![gno.land/r/moul/x/pilotdemo/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/pilotdemo/v0/deps.png)

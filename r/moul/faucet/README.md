@@ -130,6 +130,8 @@ that bug could only ever be fixed at a new path.
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/faucet/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/faucet/v1) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/faucet/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/faucet/v1) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/faucet/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/faucet/v1) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/faucet/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/faucet/v1)
+
 **Dependency graph:**
 
 ![gno.land/r/moul/faucet/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/faucet/v1/deps.png)

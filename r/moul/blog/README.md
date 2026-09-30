@@ -103,6 +103,8 @@ nothing, for the case where the signing happens somewhere else.
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/blog?network=mainnet)](https://gnoscope.com/realm/r/moul/blog) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/blog?network=mainnet)](https://gnoscope.com/realm/r/moul/blog) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/blog?network=mainnet)](https://gnoscope.com/realm/r/moul/blog) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/blog?network=mainnet)](https://gnoscope.com/realm/r/moul/blog)
+
 **Dependency graph:**
 
 ![gno.land/r/moul/blog dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/blog/deps.png)

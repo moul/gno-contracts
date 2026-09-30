@@ -10,6 +10,8 @@ Original work here: https://gno.land/r/leon/fosdem25/microposts
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/demo/microposts/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/demo/microposts/v0) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/demo/microposts/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/demo/microposts/v0) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/demo/microposts/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/demo/microposts/v0) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/demo/microposts/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/demo/microposts/v0)
+
 > ⚠️ **Disclaimer:** provided as-is, without warranty; not security-audited. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
 <!-- END GNOCONTRACTS FOOTER -->

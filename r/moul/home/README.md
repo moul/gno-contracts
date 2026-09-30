@@ -350,6 +350,8 @@ gas price and the submission policy are chain parameters.
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/home?network=mainnet)](https://gnoscope.com/realm/r/moul/home) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/home?network=mainnet)](https://gnoscope.com/realm/r/moul/home) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/home?network=mainnet)](https://gnoscope.com/realm/r/moul/home) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/home?network=mainnet)](https://gnoscope.com/realm/r/moul/home)
+
 **Dependency graph:**
 
 ![gno.land/r/moul/home dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/home/deps.png)
