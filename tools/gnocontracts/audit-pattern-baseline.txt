@@ -19,7 +19,6 @@ current_guard p/moul/pilot 2
 current_guard p/moul/x/pair 3
 current_guard r/moul/agents/capwallet 3
 current_guard r/moul/agents/gnomem 5
-current_guard r/moul/agents/jury 3
 current_guard r/moul/agents/maintainer 3
 current_guard r/moul/agents/passport 2
 current_guard r/moul/agents/receipt 2
