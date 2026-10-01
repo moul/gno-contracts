@@ -121,12 +121,10 @@ unsafe_previous_realm r/moul/x/daily/faucet 1
 unsafe_previous_realm r/moul/x/daily/governor 2
 unsafe_previous_realm r/moul/x/daily/kudos 1
 unsafe_previous_realm r/moul/x/daily/leaderboard 1
-unsafe_previous_realm r/moul/x/daily/linktree 3
 unsafe_previous_realm r/moul/x/daily/lottery 1
 unsafe_previous_realm r/moul/x/daily/merkledrop 3
 unsafe_previous_realm r/moul/x/daily/microblog 1
 unsafe_previous_realm r/moul/x/daily/multisig 1
-unsafe_previous_realm r/moul/x/daily/polls 2
 unsafe_previous_realm r/moul/x/daily/ratelimitdemo 1
 unsafe_previous_realm r/moul/x/daily/reactions 1
 unsafe_previous_realm r/moul/x/daily/rps 1
@@ -136,7 +134,6 @@ unsafe_previous_realm r/moul/x/daily/staking 3
 unsafe_previous_realm r/moul/x/daily/tictactoe 2
 unsafe_previous_realm r/moul/x/daily/timelock 1
 unsafe_previous_realm r/moul/x/daily/urlshort 2
-unsafe_previous_realm r/moul/x/daily/vault 2
 unsafe_previous_realm r/moul/x/daily/wordle 1
 unsafe_previous_realm r/moul/x/daily/wrapped 3
 unsafe_previous_realm r/moul/x/plan9/dev 1

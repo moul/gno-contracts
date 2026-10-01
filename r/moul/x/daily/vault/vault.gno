@@ -2,7 +2,6 @@ package vault
 
 import (
 	"chain"
-	"chain/runtime/unsafe"
 	"strconv"
 	"strings"
 
@@ -29,19 +28,19 @@ func vaultFor(owner address) *avl.Tree {
 
 // Set stores value under key in the caller's own namespace.
 func Set(cur realm, key string, value string) {
+	who := caller(cur)
 	if key == "" {
 		panic("key must not be empty")
 	}
-	caller := unsafe.PreviousRealm().Address()
-	t := vaultFor(caller)
+	t := vaultFor(who)
 	t.Set(key, value)
-	chain.Emit("VaultSet", "owner", caller.String(), "key", key)
+	chain.Emit("VaultSet", "owner", who.String(), "key", key)
 }
 
 // Delete removes key from the caller's own namespace.
 func Delete(cur realm, key string) {
-	caller := unsafe.PreviousRealm().Address()
-	k := caller.String()
+	who := caller(cur)
+	k := who.String()
 	v := vaults.Get(k)
 	if v == nil {
 		panic("no vault for caller")
@@ -53,7 +52,7 @@ func Delete(cur realm, key string) {
 	if t.Size() == 0 {
 		vaults.Remove(k)
 	}
-	chain.Emit("VaultDelete", "owner", caller.String(), "key", key)
+	chain.Emit("VaultDelete", "owner", who.String(), "key", key)
 }
 
 // Render shows all vaults (root) or a single address's entries ("/<address>").
@@ -117,4 +116,13 @@ func renderAddress(addr string) string {
 	b.WriteString(strconv.Itoa(t.Size()))
 	b.WriteString("\n")
 	return b.String()
+}
+
+// caller is the address that crossed into this realm, after checking that the
+// realm token is this frame's own.
+func caller(cur realm) address {
+	if !cur.IsCurrent() {
+		panic("vault: spoofed realm")
+	}
+	return cur.Previous().Address()
 }

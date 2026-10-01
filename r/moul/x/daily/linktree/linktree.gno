@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"chain"
-	"chain/runtime/unsafe"
 
 	"gno.land/p/nt/avl/v0"
 )
@@ -32,7 +31,7 @@ var profiles avl.Tree
 
 // SetBio sets (or replaces) the calling address's bio.
 func SetBio(cur realm, bio string) {
-	addr := unsafe.PreviousRealm().Address()
+	addr := caller(cur)
 	p := getOrCreate(addr.String())
 	p.Bio = bio
 	chain.Emit("BioSet", "addr", addr.String())
@@ -40,13 +39,13 @@ func SetBio(cur realm, bio string) {
 
 // AddLink appends a labeled URL to the calling address's profile.
 func AddLink(cur realm, label string, url string) {
+	addr := caller(cur)
 	if label == "" {
 		panic("label must not be empty")
 	}
 	if url == "" {
 		panic("url must not be empty")
 	}
-	addr := unsafe.PreviousRealm().Address()
 	p := getOrCreate(addr.String())
 	p.Links = append(p.Links, link{Label: label, URL: url})
 	chain.Emit("LinkAdded", "addr", addr.String(), "label", label)
@@ -54,7 +53,7 @@ func AddLink(cur realm, label string, url string) {
 
 // RemoveLink deletes the link at index from the calling address's profile.
 func RemoveLink(cur realm, index int) {
-	addr := unsafe.PreviousRealm().Address()
+	addr := caller(cur)
 	key := addr.String()
 	v := profiles.Get(key)
 	if v == nil {
@@ -138,4 +137,13 @@ func renderProfile(addr string) string {
 		b.WriteString(")\n")
 	}
 	return b.String()
+}
+
+// caller is the address that crossed into this realm, after checking that the
+// realm token is this frame's own.
+func caller(cur realm) address {
+	if !cur.IsCurrent() {
+		panic("linktree: spoofed realm")
+	}
+	return cur.Previous().Address()
 }

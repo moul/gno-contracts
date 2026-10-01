@@ -227,7 +227,12 @@ func seedDemo() {
 
 // ResetDemo rebuilds the demo namespace. Anyone may call it: it is a demo, and
 // the alternative is a demo that the first visitor ruins for everybody.
-func ResetDemo(cur realm) { seedDemo() }
+func ResetDemo(cur realm) {
+	if !cur.IsCurrent() {
+		panic("resetdemo: cur is not the caller's live realm")
+	}
+	seedDemo()
+}
 
 // ---------------------------------------------------------------- shell
 

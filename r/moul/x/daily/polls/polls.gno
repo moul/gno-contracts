@@ -8,7 +8,6 @@ package polls
 
 import (
 	"chain"
-	"chain/runtime/unsafe"
 	"strconv"
 	"strings"
 
@@ -38,7 +37,7 @@ var (
 // entries are dropped. Returns the new poll's id. Crossing function: an EOA
 // invokes it via MsgCall; another realm via polls.CreatePoll(cross, q, opts).
 func CreatePoll(cur realm, question string, options string) int {
-	creator := unsafe.PreviousRealm().Address().String()
+	creator := caller(cur).String()
 
 	q := strings.TrimSpace(question)
 	if q == "" {
@@ -73,7 +72,7 @@ func CreatePoll(cur realm, question string, options string) int {
 // Vote casts one vote for optionIndex on poll pollID. Each caller address may
 // vote at most once per poll. Crossing function.
 func Vote(cur realm, pollID int, optionIndex int) {
-	voter := unsafe.PreviousRealm().Address().String()
+	voter := caller(cur).String()
 
 	p := getPoll(pollID)
 	if optionIndex < 0 || optionIndex >= len(p.Options) {
@@ -215,4 +214,13 @@ func Render(path string) string {
 		renderPoll(&b, p)
 	}
 	return b.String()
+}
+
+// caller is the address that crossed into this realm, after checking that the
+// realm token is this frame's own.
+func caller(cur realm) address {
+	if !cur.IsCurrent() {
+		panic("polls: spoofed realm")
+	}
+	return cur.Previous().Address()
 }
