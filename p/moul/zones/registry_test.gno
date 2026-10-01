@@ -85,6 +85,8 @@ func TestReviewTransitions(t *testing.T) {
 		{Pending, Approved, "", ""},
 		{Pending, Rejected, "duplicate of onyx", ""},
 		{Pending, Rejected, "", "needs a reason"},
+		{Pending, Rejected, "\u200b", "invisible or bidi"},
+		{Approved, Retired, "\u2066\u2069", "invisible or bidi"},
 		{Pending, Retired, "gone", "only an approved zone can be retired"},
 		{Pending, Pending, "", "already pending"},
 		{Approved, Retired, "the RPC stopped resolving", ""},

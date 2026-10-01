@@ -23,6 +23,8 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+
+	"gno.land/p/nt/markdown/sanitize/v0"
 )
 
 // Status is where a zone stands in curation.
@@ -338,7 +340,15 @@ var (
 
 // checkText bounds a free-text field by runes and refuses control characters,
 // newlines included: every free-text field here renders on one line.
+//
+// It also refuses bidi and zero-width characters, the ones ui.Inline and
+// ui.Cell strip when they render: counted here and gone on the page, a title
+// or a required reason made of nothing but U+200B would pass and show blank.
+// Refused rather than stripped, so what is stored is what is shown.
 func checkText(field, s string, min, max int) error {
+	if sanitize.StripBidiAndZeroWidth(s) != s {
+		return errors.New("zones: the " + field + " contains an invisible or bidi character")
+	}
 	n := 0
 	for _, r := range s {
 		if r < 0x20 || r == 0x7f {
