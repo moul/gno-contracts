@@ -162,6 +162,12 @@ func TestValidateInfo(t *testing.T) {
 	// The main RPC is what gnokey -remote gets, which dials http, https, tcp.
 	bad(func(in *Info) { in.RPCURL = "wss://rpc.onyx.testnets.gno.land/websocket" }, "rpc url scheme")
 	bad(func(in *Info) { in.RPCURL = "ws://rpc.onyx.testnets.gno.land/websocket" }, "rpc url scheme")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example/path" }, "no path")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example?x=1" }, "no path")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example:443#f" }, "no path")
+	slash := ok
+	slash.RPCURL = "https://rpc.onyx.testnets.gno.land:443/"
+	uassert.NoError(t, ValidateInfo(slash))
 	bad(func(in *Info) { in.GnowebURL = "gno.land" }, "gnoweb url needs a scheme")
 	bad(func(in *Info) { in.GenesisURL = "tcp://x" }, "genesis url scheme")
 

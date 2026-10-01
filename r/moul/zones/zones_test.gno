@@ -178,11 +178,17 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 // contain.
 func TestQueryCommandQuotesTheRemote(t *testing.T) {
 	reset()
+	// Two layers. The main RPC cannot carry shell syntax at all: its host is
+	// [A-Za-z0-9.-], its port digits, and a path, query or fragment is refused.
+	// And the printed remote is single-quoted anyway, in case a later version
+	// widens the validator.
 	z, _ := GetZone("moul-staging")
-	must(reg.Edit("moul-staging", zones.Info{ChainID: runtime.ChainID(), Title: z.Title, Kind: z.Kind,
-		RPCURL: "https://rpc.example/;id;#"}, Admin, 1, "test"))
+	in := zones.Info{ChainID: runtime.ChainID(), Title: z.Title, Kind: z.Kind, RPCURL: "https://rpc.example/;id;#"}
+	uassert.ErrorContains(t, reg.Edit("moul-staging", in, Admin, 1, "test"), "no path")
+	in.RPCURL = "https://rpc.example:443"
+	must(reg.Edit("moul-staging", in, Admin, 1, "test"))
 	got := queryCommand(`GetZone("onyx")`)
-	uassert.Equal(t, `gnokey query vm/qeval -remote 'https://rpc.example/;id;#' -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'`, got)
+	uassert.Equal(t, `gnokey query vm/qeval -remote 'https://rpc.example:443' -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'`, got)
 
 	// Two approved zones on the same chain id: no -remote, rather than a guess.
 	must(reg.Edit("staging", zones.Info{ChainID: runtime.ChainID(), Title: "S", Kind: zones.Devnet,
@@ -373,6 +379,8 @@ func TestRenderPaginates(t *testing.T) {
 	uassert.Equal(t, first, Render("?page=-1"))
 	uassert.Equal(t, last, Render("?page=99999999999999999"))
 	uassert.Equal(t, last, Render("?page=999999999999999999999999999999"), "past int is past the end, not page 1")
+	uassert.Equal(t, last, Render("?page=%2B999999999999999999999999999999"), "a + sign does not change that")
+	uassert.True(t, strings.Contains(Render("?page=%2B2"), "page 2 of 3"))
 	uassert.Equal(t, first, Render("?page=-999999999999999999999999999999"))
 	uassert.Equal(t, first, Render("?page=nope"))
 	uassert.True(t, strings.Contains(Render("?status=nope"), "No such list."))

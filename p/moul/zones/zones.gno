@@ -286,6 +286,13 @@ func ValidateInfo(in Info) error {
 	if err := checkURL("rpc url", in.RPCURL, primarySchemes); err != nil {
 		return err
 	}
+	// gnokey's -remote is <scheme>://<host>[:<port>] and reads anything after
+	// :// as the socket address, so a path, query or fragment on the main RPC
+	// prints a command that cannot dial. An rpc ENDPOINT may still carry one.
+	if _, rest, _ := strings.Cut(in.RPCURL, "://"); strings.IndexAny(strings.TrimSuffix(rest, "/"), "/?#") >= 0 {
+		return errors.New("zones: the rpc url is <scheme>://<host>[:<port>], what gnokey -remote takes, with no path: " +
+			strconv.Quote(in.RPCURL))
+	}
 	if in.GnowebURL != "" {
 		if err := checkURL("gnoweb url", in.GnowebURL, webSchemes); err != nil {
 			return err

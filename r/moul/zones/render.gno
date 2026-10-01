@@ -284,7 +284,7 @@ func pageNum(req *realmpath.Request, pages int) int {
 	raw := req.Query.Get("page")
 	if n, err := strconv.Atoi(raw); err == nil {
 		page = n
-	} else if raw != "" && strings.Trim(raw, "0123456789") == "" {
+	} else if digits := strings.TrimPrefix(raw, "+"); digits != "" && strings.Trim(digits, "0123456789") == "" {
 		// All digits and still unparseable: a positive number past int. It is
 		// past the last page too, so it lands there, as any big number does.
 		page = pages
@@ -334,12 +334,12 @@ func notFound(msg string) string { return md.H1("Not found") + ui.Empty(msg) }
 // guessed one, and so does a chain id two approved zones share (every gnodev
 // is "dev"): picking one would be the same guess.
 //
-// The remote is single-quoted because a reader pastes this into a shell, and a
-// URL may legally carry ; & # $, which a shell reads as syntax: an approved
-// zone whose RPC ended in ;id;# would otherwise run id on every reader's
-// machine. A single quote cannot occur inside it, because the URL validator
-// refuses one, so the quoting cannot be closed from within. The call is built
-// here from charset-checked slugs and literals only.
+// A reader pastes this into a shell, so the remote must never carry shell
+// syntax. Two layers make sure: the main RPC is validated down to
+// <scheme>://<host>[:<port>], host [A-Za-z0-9.-] and port digits, which leaves
+// nothing a shell reads as syntax; and it is single-quoted anyway, a quote being
+// the one character no URL here can contain, so a later, wider validator does
+// not reopen it. The call is built from charset-checked slugs and literals.
 func queryCommand(call string) string {
 	remote, matches := "", 0
 	for _, z := range reg.ZonesByChainID(runtime.ChainID()) {
