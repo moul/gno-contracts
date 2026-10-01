@@ -551,14 +551,33 @@ Five packages are exempt in code because emitting a separator correctly is what 
 
 ## When to spend a Copilot code review, and when not to
 
-**A Copilot code review costs 13 premium requests**, GitHub's published model multiplier for
-code review. The monthly allowance is 300 on Copilot Pro and 1,500 on Pro+, overage is $0.04
-a request, so one review is about **$0.52** at the margin.
+**A Copilot code review costs 13 AI credits**, GitHub's published model multiplier for code
+review. The real budget, read off the billing page on **2026-10-01** rather than from the
+docs:
+
+| | |
+|---|---|
+| plan | Copilot **Pro** |
+| included | **1,500 AI credits a month**, resets the 1st |
+| used that day | **1,211 of 1,500 (81%)** |
+| additional usage | **$0.00 of $0, NOT ENABLED** |
+
+Two things there are not what the docs implied, and both matter.
+
+**The Pro allowance is 1,500, not 300.** The 300 figure is the older premium-request unit and
+it is wrong for this account.
+
+**The failure mode is not a bill, it is silence.** Additional usage is disabled, so when the
+1,500 runs out Copilot code review simply **stops** until the reset. That inverts what this
+policy protects: not money, but the ability to get a review at the moment one is actually
+worth having. On 2026-10-01 that was 289 credits away, about **22 reviews**, with 31 days to
+go and the rest of the budget being spent by Copilot in the editor.
 
 This repository opened **more than 100 pull requests in the fourteen days to 2026-10-01**,
-roughly 215 a month. Reviewing all of them is **~2,800 premium requests a month**: nine times
-a Pro allowance, twice a Pro+ allowance. "Review everything" is not a policy this repository
-can hold, on any plan.
+roughly 215 a month. Reviewing all of them is **~2,800 AI credits a month** against an
+allowance of 1,500 that is already 81% spent on other things. "Review everything" does not
+mean a bigger bill, it means the reviews stop part-way through the month and the next one
+that mattered does not happen.
 
 So the rule is one sentence, and it falls out of this repository's central fact rather than
 out of restraint:
@@ -593,8 +612,12 @@ cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
 ```
 
 Backtested over the last 60 merged pull requests: **4 would be reviewed (6%)**, three for
-permanence and one for the config. **182 premium requests a month** projected, against ~2,800
-for reviewing everything, which fits inside the cheapest paid allowance with headroom.
+permanence and one for the config. **182 AI credits a month** projected, about **12% of the
+1,500 allowance**, against ~2,800 for reviewing everything.
+
+The 13-credits figure is GitHub's published multiplier and is **not verified against this
+account**: the billing page reports a total, not a per-feature breakdown, and its "View
+details" view is the only thing that would confirm it. Worth confirming once.
 
 **Once a diff qualifies, one pass is not the review: re-request after every push that fixed
 findings, until a pass adds nothing above low.** #289 (`p/moul/kit/index`, not yet live) took
