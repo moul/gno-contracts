@@ -233,7 +233,10 @@ func Fund(cur realm) {
 //
 // Filing costs the filer gas and nothing else, and moves no money.
 func Request(cur realm, to string, amount int64, reason string) int64 {
-	by := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	by := cur.Previous().Address()
 	dst := address(to)
 	if !dst.IsValid() {
 		panic("faucet: " + to + " is not a valid address")
@@ -282,7 +285,10 @@ func Request(cur realm, to string, amount int64, reason string) int64 {
 // guessed from [NextID] before either message is signed, and this call refuses
 // when the request sitting at that id is not the one the caller described.
 func Approve(cur realm, id int64, wantTo string, wantAmount int64) {
-	judge := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	judge := cur.Previous().Address()
 	mustApprove(judge)
 
 	r := find(id)
@@ -325,7 +331,10 @@ func Approve(cur realm, id int64, wantTo string, wantAmount int64) {
 // Deny closes a request unpaid, with a reason that goes on the page. The
 // reason is the whole value of denying in public rather than ignoring it.
 func Deny(cur realm, id int64, why string) {
-	judge := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	judge := cur.Previous().Address()
 	mustApprove(judge)
 
 	r := find(id)
@@ -355,7 +364,10 @@ func Deny(cur realm, id int64, why string) {
 
 // AddApprover lets addr approve and deny. Owner only.
 func AddApprover(cur realm, addr string) {
-	mustOwn(unsafe.PreviousRealm().Address())
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	mustOwn(cur.Previous().Address())
 	a := address(addr)
 	if !a.IsValid() {
 		panic("faucet: " + addr + " is not a valid address")
@@ -367,7 +379,10 @@ func AddApprover(cur realm, addr string) {
 // RemoveApprover revokes addr. Owner only, and the Owner cannot be removed:
 // a faucet with no approver is a faucet with a locked float.
 func RemoveApprover(cur realm, addr string) {
-	mustOwn(unsafe.PreviousRealm().Address())
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	mustOwn(cur.Previous().Address())
 	if addr == Owner.String() {
 		panic("faucet: the owner is always an approver")
 	}
@@ -381,7 +396,10 @@ func RemoveApprover(cur realm, addr string) {
 
 // SetMaxPerRequest changes the per-request cap, in ugnot. Owner only.
 func SetMaxPerRequest(cur realm, amount int64) {
-	mustOwn(unsafe.PreviousRealm().Address())
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	mustOwn(cur.Previous().Address())
 	if amount <= 0 {
 		panic("faucet: cap must be positive")
 	}
@@ -395,7 +413,10 @@ func SetMaxPerRequest(cur realm, amount int64) {
 // not payable to an arbitrary address: an approver who wanted to move money
 // somewhere has to file a request for it like everyone else.
 func Withdraw(cur realm, amount int64) {
-	mustOwn(unsafe.PreviousRealm().Address())
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	mustOwn(cur.Previous().Address())
 	if amount <= 0 {
 		panic("faucet: amount must be positive")
 	}

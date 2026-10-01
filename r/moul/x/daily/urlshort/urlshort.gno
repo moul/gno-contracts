@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"chain"
-	"chain/runtime/unsafe"
 
 	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
@@ -58,6 +57,9 @@ func isAlphanumeric(s string) bool {
 //   - if it is already claimed by the caller, the url/note are updated;
 //   - if it is claimed by someone else, the call aborts.
 func Shorten(cur realm, alias string, url string, note string) {
+	if !cur.IsCurrent() {
+		panic("urlshort: spoofed realm")
+	}
 	if !isAlphanumeric(alias) {
 		panic("alias must be non-empty and alphanumeric")
 	}
@@ -65,7 +67,7 @@ func Shorten(cur realm, alias string, url string, note string) {
 		panic("url must be non-empty")
 	}
 
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 
 	if v := aliases.Get(alias); v != nil {
 		e := v.(*entry)
@@ -86,12 +88,15 @@ func Shorten(cur realm, alias string, url string, note string) {
 // Remove deletes an alias owned by the caller. Aborts if the alias does not
 // exist or the caller is not the owner.
 func Remove(cur realm, alias string) {
+	if !cur.IsCurrent() {
+		panic("urlshort: spoofed realm")
+	}
 	v := aliases.Get(alias)
 	if v == nil {
 		panic("alias not found")
 	}
 	e := v.(*entry)
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 	if e.owner != caller {
 		panic("only the owner can remove an alias")
 	}

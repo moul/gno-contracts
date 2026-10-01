@@ -11,7 +11,6 @@ import (
 
 	"chain"
 	"chain/runtime"
-	"chain/runtime/unsafe"
 
 	"gno.land/p/moul/kit/store/v0"
 )
@@ -37,6 +36,9 @@ var posts = store.Named("post")
 // Publish creates a new post authored by the caller and returns its id.
 // It is a state-mutating exported function, so it takes `cur realm`.
 func Publish(cur realm, title string, body string) int {
+	if !cur.IsCurrent() {
+		panic("blog: spoofed realm")
+	}
 	title = strings.TrimSpace(title)
 	body = strings.TrimSpace(body)
 	if title == "" {
@@ -46,7 +48,7 @@ func Publish(cur realm, title string, body string) int {
 		panic("blog: body must not be empty")
 	}
 
-	author := unsafe.PreviousRealm().Address()
+	author := cur.Previous().Address()
 	id := posts.Add(&Post{
 		Title:  title,
 		Body:   body,

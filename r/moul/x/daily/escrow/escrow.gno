@@ -2,7 +2,6 @@ package escrow
 
 import (
 	"chain"
-	"chain/runtime/unsafe"
 	"errors"
 	"strconv"
 	"strings"
@@ -48,10 +47,13 @@ var (
 // given counterparty, governed by a free-form terms string. Returns the
 // new deal id. Panics on invalid input (cross-realm abort).
 func Create(cur realm, counterparty address, terms string) int {
+	if !cur.IsCurrent() {
+		panic("escrow: spoofed realm")
+	}
 	if !counterparty.IsValid() {
 		panic(errBadAddr)
 	}
-	creator := unsafe.PreviousRealm().Address()
+	creator := cur.Previous().Address()
 	if counterparty == creator {
 		panic(errSelfDeal)
 	}
@@ -76,11 +78,14 @@ func Create(cur realm, counterparty address, terms string) int {
 // Confirm records confirmation by whichever party is calling. Once both
 // parties have confirmed, the deal transitions to Settled.
 func Confirm(cur realm, id int) {
+	if !cur.IsCurrent() {
+		panic("escrow: spoofed realm")
+	}
 	d := mustGet(id)
 	if d.State != StateOpen {
 		panic(errNotOpen)
 	}
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 
 	switch caller {
 	case d.Creator:
@@ -102,11 +107,14 @@ func Confirm(cur realm, id int) {
 // Cancel voids an open deal. Only the creator may cancel, and only
 // before the deal has settled.
 func Cancel(cur realm, id int) {
+	if !cur.IsCurrent() {
+		panic("escrow: spoofed realm")
+	}
 	d := mustGet(id)
 	if d.State != StateOpen {
 		panic(errNotOpen)
 	}
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 	if caller != d.Creator {
 		panic(errNotCreator)
 	}
