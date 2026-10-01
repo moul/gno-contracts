@@ -64,6 +64,12 @@ irreversible.
   `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md`; every review
   is digested into #280 with a box asking which line produced a false positive. Fix that line
   in the same pull request. `gh pr edit <N> --add-reviewer @copilot` requests one.
+- **When a review finds something, write the rule.** `tools/gnovet` holds this repo's own
+  house rules and every one of them was a real defect here before it was a rule, with the
+  review cited in `Finding`. A review costs 13 premium requests and finds a thing once; a rule
+  costs nothing and finds it forever. Fix first, then add the rule with a `Bad` that fires and
+  a `Good` that does not, then `make gnovet-update`. Opt-out:
+  `//gnovet:ignore <rule-id> <why>`, 20 characters minimum.
 - **`make audit-patterns` is a ratchet, and it fails in both directions.** The ten upstream
   audit-pattern rules run over every contract against a per-package baseline: a new hit
   fails, and a *fixed* one fails too until you `make audit-patterns-update`. A baseline row

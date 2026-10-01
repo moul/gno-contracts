@@ -1,0 +1,117 @@
+# House-rule hits this tree already has, one row per (rule, file).
+#
+# Format: <rule> <file> <count>
+#
+# A RATCHET. The count may not go up, and it may not go down either without
+# this file being re-recorded, so a fix cannot be quietly undone. Regenerate:
+#
+#   make gnovet-update
+#
+# A row here is NOT a statement that the code is fine. It is a statement that
+# the hit predates the rule, and almost all of it is unfixable in place: 331 of
+# 333 contracts are live on mainnet and a public path is immutable. What this
+# file buys is the next one, before it ships.
+#
+# Every rule was a real defect found in this repository before it became a rule.
+# `make gnovet ARGS=-rules` prints each one with the review that found it.
+
+avl-in-new-code p/moul/forge/change.gno 1
+avl-in-new-code p/moul/forge/forge.gno 1
+avl-in-new-code p/moul/forge/issue.gno 1
+avl-in-new-code p/moul/gnopm/registry.gno 1
+avl-in-new-code p/moul/grants/grants.gno 1
+avl-in-new-code p/moul/kit/store/store.gno 1
+avl-in-new-code p/moul/kit/tally/tally.gno 1
+avl-in-new-code p/moul/pilot/pilot.gno 1
+avl-in-new-code p/moul/reactions/reactions.gno 1
+avl-in-new-code p/moul/x/daily/markov/markov.gno 1
+avl-in-new-code p/moul/x/daily/ratelimit/ratelimit.gno 1
+avl-in-new-code p/moul/x/pair/pair.gno 1
+avl-in-new-code p/moul/x/plan9/memfs/memfs.gno 1
+avl-in-new-code p/moul/x/plan9/ns/ns.gno 1
+avl-in-new-code p/moul/x/plan9/synfs/synfs.gno 1
+avl-in-new-code p/moul/x/vm/vmkit/instance.gno 1
+avl-in-new-code p/moul/x/vm/vmkit/testhost.gno 1
+avl-in-new-code p/moul/x/wiki/talk.gno 1
+avl-in-new-code p/moul/x/wiki/wiki.gno 1
+avl-in-new-code r/moul/agents/passport/passport.gno 1
+avl-in-new-code r/moul/blog/blog.gno 1
+avl-in-new-code r/moul/config/proxy.gno 1
+avl-in-new-code r/moul/config/settings.gno 1
+avl-in-new-code r/moul/demo/importdemo/contract.gno 1
+avl-in-new-code r/moul/demo/wikicoin/contract.gno 1
+avl-in-new-code r/moul/faucet/faucet.gno 1
+avl-in-new-code r/moul/gns/gns.gno 1
+avl-in-new-code r/moul/home/home.gno 1
+avl-in-new-code r/moul/present/present.gno 2
+avl-in-new-code r/moul/vesting/vesting.gno 1
+avl-in-new-code r/moul/x/amm/amm.gno 1
+avl-in-new-code r/moul/x/daily/ballot/ballot.gno 1
+avl-in-new-code r/moul/x/daily/coinflipduel/coinflipduel.gno 1
+avl-in-new-code r/moul/x/daily/collatz/collatz.gno 1
+avl-in-new-code r/moul/x/daily/crowdfund/crowdfund.gno 1
+avl-in-new-code r/moul/x/daily/dice/dice.gno 1
+avl-in-new-code r/moul/x/daily/dutchauction/dutchauction.gno 1
+avl-in-new-code r/moul/x/daily/eggling/eggling.gno 1
+avl-in-new-code r/moul/x/daily/englishauction/englishauction.gno 1
+avl-in-new-code r/moul/x/daily/erc1155/erc1155.gno 1
+avl-in-new-code r/moul/x/daily/erc721/erc721.gno 1
+avl-in-new-code r/moul/x/daily/escrow/escrow.gno 1
+avl-in-new-code r/moul/x/daily/faucet/faucet.gno 1
+avl-in-new-code r/moul/x/daily/governor/governor.gno 1
+avl-in-new-code r/moul/x/daily/handles/handles.gno 1
+avl-in-new-code r/moul/x/daily/hangman/hangman.gno 1
+avl-in-new-code r/moul/x/daily/kingofdice/kingofdice.gno 1
+avl-in-new-code r/moul/x/daily/kudos/kudos.gno 1
+avl-in-new-code r/moul/x/daily/leaderboard/leaderboard.gno 1
+avl-in-new-code r/moul/x/daily/linktree/linktree.gno 1
+avl-in-new-code r/moul/x/daily/lottery/lottery.gno 1
+avl-in-new-code r/moul/x/daily/merkledrop/merkledrop.gno 1
+avl-in-new-code r/moul/x/daily/merkledrop/render.gno 1
+avl-in-new-code r/moul/x/daily/multisig/multisig.gno 1
+avl-in-new-code r/moul/x/daily/numguess/numguess.gno 1
+avl-in-new-code r/moul/x/daily/pixelcanvas/pixelcanvas.gno 1
+avl-in-new-code r/moul/x/daily/polls/polls.gno 1
+avl-in-new-code r/moul/x/daily/quizstreak/quizstreak.gno 1
+avl-in-new-code r/moul/x/daily/qvote/qvote.gno 1
+avl-in-new-code r/moul/x/daily/reactions/reactions.gno 1
+avl-in-new-code r/moul/x/daily/rpgroom/rpgroom.gno 1
+avl-in-new-code r/moul/x/daily/rps/rps.gno 1
+avl-in-new-code r/moul/x/daily/rpsduel/rpsduel.gno 1
+avl-in-new-code r/moul/x/daily/rpsmatch/rpsmatch.gno 1
+avl-in-new-code r/moul/x/daily/rpsoracle/rpsoracle.gno 1
+avl-in-new-code r/moul/x/daily/semverdemo/semverdemo.gno 1
+avl-in-new-code r/moul/x/daily/staking/staking.gno 1
+avl-in-new-code r/moul/x/daily/streak/streak.gno 1
+avl-in-new-code r/moul/x/daily/streaks/streaks.gno 1
+avl-in-new-code r/moul/x/daily/tamagotchi/tamagotchi.gno 1
+avl-in-new-code r/moul/x/daily/timelock/timelock.gno 1
+avl-in-new-code r/moul/x/daily/tipjar/tipjar.gno 1
+avl-in-new-code r/moul/x/daily/trivia/trivia.gno 1
+avl-in-new-code r/moul/x/daily/urlshort/urlshort.gno 1
+avl-in-new-code r/moul/x/daily/vault/vault.gno 1
+avl-in-new-code r/moul/x/daily/wrapped/wrapped.gno 1
+avl-in-new-code r/moul/x/games/idle/idle.gno 1
+avl-in-new-code r/moul/x/games/lastwords/lastwords.gno 1
+avl-in-new-code r/moul/x/grc20faucet/faucet.gno 1
+avl-in-new-code r/moul/x/grc20wrapdemo/wrapdemo.gno 1
+avl-in-new-code r/moul/x/moultest/moultest.gno 1
+avl-in-new-code r/moul/x/nativeify/nativeify.gno 1
+avl-in-new-code r/moul/x/nativereg/nativereg.gno 1
+avl-in-new-code r/moul/x/pairreg/pairreg.gno 1
+avl-in-new-code r/moul/x/plan9/ns/ns.gno 1
+avl-in-new-code r/moul/x/upgrade/adminreg/facade/facade.gno 1
+avl-in-new-code r/moul/x/upgrade/lazy/gen0/lazy.gno 1
+avl-in-new-code r/moul/x/upgrade/lazy/gen1/lazy.gno 1
+avl-in-new-code r/moul/x/upgrade/schema/facade/facade.gno 1
+avl-in-new-code r/moul/x/vm/bfdemo/bfdemo.gno 1
+avl-in-new-code r/moul/x/vm/riscvdemo/riscvdemo.gno 1
+avl-in-new-code r/moul/x/wesh/wesh.gno 1
+avl-in-new-code r/moul/x/wiki/wiki.gno 1
+ceil-div-overflow p/moul/kit/store/store.gno 1
+ceil-div-overflow p/moul/x/storagecost/storagecost.gno 1
+ceil-div-overflow r/moul/forge/render.gno 1
+ceil-div-overflow r/moul/vesting/render.gno 1
+ceil-div-overflow r/moul/x/daily/microblog/microblog.gno 1
+slice-inplace-remove p/moul/x/daily/orderedmap/orderedmap.gno 1
+slice-inplace-remove r/moul/x/daily/linktree/linktree.gno 1

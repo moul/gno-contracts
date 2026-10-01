@@ -628,6 +628,67 @@ against the instructions file that had just been added, each with file and line 
 all three were real. Two of them were also findings about *this* file, and are why the
 Go-companion rules above now say "never hold key material" rather than "never sign".
 
+## `gnovet`: our own rules, and the loop that writes them
+
+**A code review costs 13 premium requests and finds a defect once. A rule costs nothing and
+finds it every time.** `make gnovet` is where the second kind lives, and its defining property
+is where the rules come from:
+
+> Every rule here was a **finding first**. Something noticed a real defect in real code in
+> this repository, the defect was fixed, and then the shape of it was written down so the next
+> instance is caught for free, forever.
+
+```
+review finds it  ->  fix it  ->  write the rule  ->  never pay for it twice
+```
+
+A rule carries its provenance in the source. `Finding` names the pull request and the review
+comment it came from, so a reader can go and check the original argument instead of taking the
+rule on faith, and a rule that turns out to be wrong can be traced back to the reasoning that
+produced it. **`make gnovet ARGS=-rules` prints all of them with that citation.** A rule
+without one does not compile past the test suite.
+
+### It paid for itself on the first run
+
+Three rules, seeded from the #289 review and the storage benchmark. Pointed at the tree they
+found **seven more instances of the two bugs Copilot had found once**, in packages nobody had
+reviewed, plus the 93 `avl` imports we already knew about:
+
+| rule | found | the one that stings |
+|---|--:|---|
+| `ceil-div-overflow` | 5 | `p/moul/kit/store/store.gno:287` has the identical `(n + size - 1) / size` I had just fixed in `kit/index` |
+| `slice-inplace-remove` | 2 | `p/moul/x/daily/orderedmap`, which is a data structure whose whole job is this |
+| `avl-in-new-code` | 93 | the ecosystem default, at 2,029 B/entry against a map's 153 |
+
+**All seven are on live, immutable paths and none can be fixed in place.** That is not a
+disappointment, it is the argument: the rule is a pre-deploy gate, and these shipped before it
+existed.
+
+### Adding one
+
+1. **Fix the defect first.** A rule for a bug still in the tree is a baseline row, not a rule.
+2. Add a `Rule` to `tools/gnovet/rules.go` with `What`, `Why` (in gno terms, on this chain,
+   with the number if there is one), `Fix`, and `Finding` citing the review.
+3. Ship a `Bad` that fires and a `Good` that does not. The test suite asserts both, which is
+   the only thing that stops a rule from quietly matching nothing after a refactor.
+4. `make gnovet-update`, and read the new rows before committing them.
+
+Use `f.Code` for anything matching an expression: comments and string contents are blanked
+there, so a rule looking for `append(` does not match a doc comment explaining the rule, which
+is the trap a regexp over raw source falls into in a repository whose comments discuss its own
+lints. Use `f.Raw` only for what genuinely lives in a string, which in practice means import
+paths.
+
+The opt-out is `//gnovet:ignore <rule-id> <why>`, 20-character floor, on the line or the one
+above it.
+
+### Why it is a separate package
+
+`tools/gnovet` imports nothing from this repository: the engine takes a directory, the rules
+read source text. If it ever becomes useful to anybody else it lifts out as a module without a
+rewrite. That is deliberate, and it is **not yet a promise**: these rules were learned from one
+repository's mistakes and have been run against one repository's code.
+
 ## The audit patterns: somebody else's rules, on our contracts
 
 `gnolang/gno` ships an audit pattern harness at `misc/audit-pattern-harness`: ten finding
