@@ -9,6 +9,13 @@ import (
 	"gno.land/p/moul/realmpath/v0"
 )
 
+// realmURL is this realm as gnoweb serves it. Links are absolute because the
+// path ends in /v0: a relative "./kitindexdemo:tag/x" resolves against the
+// parent directory to .../kitindexdemo/kitindexdemo:tag/x, which does not
+// exist. Not derived at runtime: a Render has no cur, and CurrentRealm there
+// is the caller. TestRealmURLMatchesTheModule pins it to the module line.
+const realmURL = "/r/moul/x/kitindexdemo/v0"
+
 // Render is the whole public surface. Three pages: the tag list, one tag, one
 // author.
 //
@@ -47,7 +54,7 @@ func renderIndex(req *realmpath.Request) string {
 	t := ui.NewTable("tag", "notes")
 	for _, e := range byTag.Page(page, PageSize) {
 		t.Row(
-			md.Link(e.Key, "./kitindexdemo:tag/"+e.Key),
+			md.Link(e.Key, realmURL+":tag/"+e.Key),
 			strconv.Itoa(len(e.IDs)),
 		)
 	}
@@ -111,11 +118,11 @@ func pager(page, pages int) string {
 	}
 	out := ""
 	if page > 1 {
-		out += md.Link("previous", "./kitindexdemo:?page="+strconv.Itoa(page-1)) + " "
+		out += md.Link("previous", realmURL+":?page="+strconv.Itoa(page-1)) + " "
 	}
 	out += "page " + strconv.Itoa(page) + " of " + strconv.Itoa(pages)
 	if page < pages {
-		out += " " + md.Link("next", "./kitindexdemo:?page="+strconv.Itoa(page+1))
+		out += " " + md.Link("next", realmURL+":?page="+strconv.Itoa(page+1))
 	}
 	return out
 }

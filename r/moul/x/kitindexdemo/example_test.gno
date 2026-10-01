@@ -44,8 +44,8 @@ func TestRenderRoot(t *testing.T) {
 
 | tag | notes |
 | --- | --- |
-| [gno](./kitindexdemo:tag/gno) | 2 |
-| [storage](./kitindexdemo:tag/storage) | 1 |
+| [gno](/r/moul/x/kitindexdemo/v0:tag/gno) | 2 |
+| [storage](/r/moul/x/kitindexdemo/v0:tag/storage) | 1 |
 
 [Post a note](/r/moul/x/kitindexdemo/v0$help&func=Post&body=&tag=)
 

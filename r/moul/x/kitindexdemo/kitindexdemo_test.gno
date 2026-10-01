@@ -215,3 +215,26 @@ func TestRenderClampsThePageNumber(cur realm, t *testing.T) {
 	uassert.Equal(t, last, Render("?page=999"))
 	uassert.True(t, strings.Contains(last, "page 2 of 2"))
 }
+
+// Links are absolute. gnoweb serves this realm at .../kitindexdemo/v0, so a
+// "./kitindexdemo:tag/x" link resolves to .../kitindexdemo/kitindexdemo:tag/x,
+// a package that does not exist.
+func TestRenderLinksAreAbsolute(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	for i := 0; i <= PageSize; i++ {
+		if i == MaxPerAuthor {
+			testing.SetRealm(testing.NewUserRealm(bob))
+		}
+		Post(cross(cur), "t"+strconv.Itoa(i), "x")
+	}
+	out := Render("")
+	uassert.True(t, strings.Contains(out, "](/r/moul/x/kitindexdemo/v0:tag/t0)"), out)
+	uassert.True(t, strings.Contains(out, "](/r/moul/x/kitindexdemo/v0:?page=2)"), out)
+	uassert.False(t, strings.Contains(out, "](./"), out)
+}
+
+// realmURL must follow the module line, or a version bump ships dead links.
+func TestRealmURLMatchesTheModule(cur realm, t *testing.T) {
+	uassert.Equal(t, "gno.land"+realmURL, cur.PkgPath())
+}
