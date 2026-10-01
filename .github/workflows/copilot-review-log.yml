@@ -1,0 +1,87 @@
+name: copilot-review-log
+
+# Every Copilot code review, digested into one hub issue, so the reviewer gets
+# better instead of merely being tolerated.
+#
+# Copilot code review comments on a pull request and cannot post anywhere else,
+# so "have it share its thinking on a meta issue" is not something an
+# instructions file can ask for. This is the mechanical half: take what it
+# actually wrote, and append a digest with one checkbox set per finding.
+#
+# The point is the false-positive box. A wrong finding here is not noise to be
+# endured, it is a defect in .github/copilot-instructions.md or
+# .github/instructions/*.instructions.md with a line number, and the log asks
+# which line every single time.
+#
+# Costs Actions seconds. No AI, no key, nothing metered.
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  log:
+    # Only Copilot's own reviews. A human review is not this log's business, and
+    # the formatter refuses one anyway, so this is the cheap gate in front of it.
+    if: github.event.review.user.login == 'copilot-pull-request-reviewer[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+
+      # The two API calls live here and nowhere else: `gnocontracts copilot-log`
+      # is network-free on purpose, which is what lets it be table-tested against
+      # a real captured review instead of a mock.
+      #
+      # A review's inline comments are not in the webhook payload, so they are
+      # fetched and filtered by pull_request_review_id. The page size is capped
+      # at 100, which is far above any review this repository will produce; a
+      # bigger one would be truncated, and that is the right failure, because a
+      # 100-finding review is a config problem before it is a paging problem.
+      - name: Digest the review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REVIEW_ID: ${{ github.event.review.id }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api "/repos/$REPO/pulls/$PR/reviews/$REVIEW_ID" > /tmp/review.json
+          gh api --paginate "/repos/$REPO/pulls/$PR/comments?per_page=100" \
+            --jq "[.[] | select(.pull_request_review_id == $REVIEW_ID)]" > /tmp/comments.json
+          gh api "/repos/$REPO/pulls/$PR" \
+            --jq '{number, title, html_url, user: .user.login}' > /tmp/pr.json
+          jq -n \
+            --slurpfile pr /tmp/pr.json \
+            --slurpfile review /tmp/review.json \
+            --slurpfile comments /tmp/comments.json \
+            '{pr: $pr[0], review: $review[0], comments: $comments[0]}' > /tmp/payload.json
+          go -C tools tool gnocontracts copilot-log < /tmp/payload.json > /tmp/digest.md
+          wc -c < /tmp/digest.md
+
+      # An empty digest means the formatter decided this was not a Copilot
+      # review after all. Say nothing rather than posting an empty comment, and
+      # do not fail: a skipped log is not a broken pull request.
+      - name: Append it to the log
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          # The hub. Same shape as the other meta issues here, hardcoded for the
+          # same reason: a repository variable is one more thing to set up and
+          # one more thing to be wrong.
+          LOG_ISSUE: "280"
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/digest.md ]; then
+            echo "::notice::not a Copilot review, nothing logged"
+            exit 0
+          fi
+          gh issue comment "$LOG_ISSUE" -R "$REPO" --body-file /tmp/digest.md
