@@ -22,19 +22,26 @@ type wiringCandidate struct {
 	Note string
 	Tags []string
 	Src  string
+	// ByIndex is true for the positional containers, whose Get and Put take
+	// an int index where the keyed ones take a string.
+	ByIndex bool
 }
 
 var wiringCandidates = []wiringCandidate{
 	{
-		Name: "builtin []string",
-		Note: "one persisted array: every append rewrites all of it",
-		Tags: []string{"origin:builtin", "shape:single-object", "order:index"},
+		Name:    "builtin []string",
+		Note:    "one persisted array: every append rewrites all of it",
+		Tags:    []string{"origin:builtin", "shape:single-object", "order:index"},
+		ByIndex: true,
 		Src: `package wire
 
 var t []string
 
 func Set(cur realm, k, v string) { t = append(t, v) }
 func Size(cur realm) int         { return len(t) }
+func Get(cur realm, i int) string { return t[i] }
+func Put(cur realm, i int, v string) { t[i] = v }
+func Noop(cur realm) int         { return 1 }
 `,
 	},
 	{
@@ -47,6 +54,9 @@ var t = map[string]string{}
 
 func Set(cur realm, k, v string) { t[k] = v }
 func Size(cur realm) int         { return len(t) }
+func Get(cur realm, k string) string { return t[k] }
+func Put(cur realm, k, v string) { t[k] = v }
+func Noop(cur realm) int         { return 1 }
 `,
 	},
 	{
@@ -61,6 +71,9 @@ var t = avl.NewTree()
 
 func Set(cur realm, k, v string) { t.Set(k, v) }
 func Size(cur realm) int         { return t.Size() }
+func Get(cur realm, k string) string { s, _ := t.Get(k).(string); return s }
+func Put(cur realm, k, v string) { t.Set(k, v) }
+func Noop(cur realm) int         { return 1 }
 `,
 	},
 	{
@@ -75,6 +88,9 @@ var t = bptree.NewBPTree32()
 
 func Set(cur realm, k, v string) { t.Set(k, v) }
 func Size(cur realm) int         { return t.Size() }
+func Get(cur realm, k string) string { s, _ := t.Get(k).(string); return s }
+func Put(cur realm, k, v string) { t.Set(k, v) }
+func Noop(cur realm) int         { return 1 }
 `,
 	},
 	{
@@ -89,12 +105,16 @@ var t = bptree.NewBPTreeN(128)
 
 func Set(cur realm, k, v string) { t.Set(k, v) }
 func Size(cur realm) int         { return t.Size() }
+func Get(cur realm, k string) string { s, _ := t.Get(k).(string); return s }
+func Put(cur realm, k, v string) { t.Set(k, v) }
+func Noop(cur realm) int         { return 1 }
 `,
 	},
 	{
-		Name: "p/moul/ulist/v1",
-		Note: "an append-only tree: a write touches a path, not the list",
-		Tags: []string{"origin:p/moul", "shape:per-entry", "order:index"},
+		Name:    "p/moul/ulist/v1",
+		Note:    "an append-only tree: a write touches a path, not the list",
+		Tags:    []string{"origin:p/moul", "shape:per-entry", "order:index"},
+		ByIndex: true,
 		Src: `package wire
 
 import "gno.land/p/moul/ulist/v1"
@@ -103,6 +123,9 @@ var t = ulist.New()
 
 func Set(cur realm, k, v string) { t.Append(v) }
 func Size(cur realm) int         { return t.Size() }
+func Get(cur realm, i int) string { s, _ := t.MustGet(i).(string); return s }
+func Put(cur realm, i int, v string) { t.MustSet(i, v) }
+func Noop(cur realm) int         { return 1 }
 `,
 	},
 }
@@ -113,6 +136,21 @@ const (
 	shapeOneTx = "one_tx"
 	shapePerTx = "tx_each"
 )
+
+// The single-operation shapes. The storage suite measures these too, but its
+// filetest harness commits package init with BeginTransaction(nil, nil, nil,
+// nil), so its "cold" boundary is the VM's object cache and the key/value
+// store is never touched: KV reads there stay at 7 to 8 whether the container
+// holds 100 entries or 10,000. These shapes build the container, COMMIT, and
+// then run one more real transaction, which is the only way to see what a
+// single Render() or Call() asks of the store.
+const (
+	shapeOp1Base  = "op_base"  // the baseline: a transaction that never touches the container
+	shapeOp1Read  = "op_read"  // ONE read, from cold
+	shapeOp1Write = "op_write" // ONE overwrite of an existing key, from cold
+)
+
+var wiringOpShapes = []string{shapeOp1Base, shapeOp1Read, shapeOp1Write}
 
 func init() {
 	register(&Suite{

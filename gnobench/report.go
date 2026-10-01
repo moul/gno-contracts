@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	types "github.com/gnolang/gno/tm2/pkg/store/types"
 )
 
 func fmtN(v float64) string {
@@ -186,6 +188,8 @@ func wiringSection(s *Suite, v view) string {
 		addCommas(strconv.FormatInt(int64(cfg.WriteCostFlat), 10)), cfg.WriteCostPerByte,
 		float64(cfg.FixedGetReadDepth100)/100, float64(cfg.FixedSetReadDepth100)/100,
 		float64(cfg.FixedWriteDepth100)/100)
+	b.WriteString(wiringOpSection(v, cfg))
+
 	for _, n := range v.sizes() {
 		type row struct {
 			name            string
@@ -640,4 +644,80 @@ func shortDate(s string) string {
 		return s[:10]
 	}
 	return s
+}
+
+// wiringOpSection prices ONE transaction doing ONE operation, the shape a
+// Render() or a Call() actually has, on both meters at once.
+//
+// This is the section that answers the question the storage suite could only
+// half-answer. That suite measures the same operations, but its filetest
+// harness never touches the key/value store, so its numbers are VM gas alone
+// and the ranking they give is not the ranking a chain charges.
+func wiringOpSection(v view, cfg types.GasConfig) string {
+	sizes := v.sizes()
+	if len(sizes) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	b.WriteString("## One transaction, one operation, both meters\n\n")
+	b.WriteString("What a `Render()` showing one item, or a `Call()` editing one record, asks of a\n")
+	b.WriteString("node. Built, committed, and then measured in a further transaction that starts\n")
+	b.WriteString("with an empty object cache and an untouched store. Each figure is\n")
+	b.WriteString("baseline-subtracted against a call into the same realm whose body never mentions\n")
+	b.WriteString("the container.\n\n")
+	b.WriteString("**The two meters rank these differently, and the total is what gets charged.** A\n")
+	b.WriteString("tree pays the flat read cost once per object on its path; a single-object\n")
+	b.WriteString("container pays the per-byte cost on all of itself. Neither is strictly better.\n\n")
+
+	for _, w := range []struct{ shape, title string }{
+		{shapeOp1Read, "One read"},
+		{shapeOp1Write, "One overwrite of an existing key"},
+	} {
+		rows := false
+		var t strings.Builder
+		t.WriteString("| n | candidate | kv reads | kv writes | kv deletes | VM gas | store gas | **total** |\n")
+		t.WriteString("|--:|---|--:|--:|--:|--:|--:|--:|\n")
+		for _, n := range sizes {
+			type line struct {
+				name  string
+				r     Row
+				total int64
+			}
+			var ls []line
+			for _, c := range wiringCandidates {
+				r, ok := v.get(c.Name, "str", "cold", w.shape, n)
+				if !ok {
+					continue
+				}
+				ls = append(ls, line{c.Name, r, r.DGas + r.DChainGas(cfg)})
+			}
+			if len(ls) == 0 {
+				continue
+			}
+			rows = true
+			sort.Slice(ls, func(i, j int) bool { return ls[i].total < ls[j].total })
+			for i, l := range ls {
+				nc := ""
+				if i == 0 {
+					nc = addCommas(strconv.Itoa(n))
+				}
+				total := addCommas(strconv.FormatInt(l.total, 10))
+				if i == 0 {
+					total = "**" + total + "**"
+				}
+				fmt.Fprintf(&t, "| %s | `%s` | %s | %s | %s | %s | %s | %s |\n",
+					nc, l.name,
+					addCommas(strconv.FormatInt(l.r.DKVGets, 10)),
+					addCommas(strconv.FormatInt(l.r.DKVSets, 10)),
+					addCommas(strconv.FormatInt(l.r.DKVDels, 10)),
+					addCommas(strconv.FormatInt(l.r.DGas, 10)),
+					addCommas(strconv.FormatInt(l.r.DChainGas(cfg), 10)),
+					total)
+			}
+		}
+		if rows {
+			fmt.Fprintf(&b, "### %s\n\n%s\n", w.title, t.String())
+		}
+	}
+	return b.String()
 }
