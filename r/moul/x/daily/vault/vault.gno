@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"gno.land/p/moul/kit/ui/v0"
 	"chain"
 	"strconv"
 	"strings"
@@ -106,9 +107,9 @@ func renderAddress(addr string) string {
 	b.WriteString("|---|---|\n")
 	t.Iterate("", "", func(k string, val interface{}) bool {
 		b.WriteString("| ")
-		b.WriteString(k)
+		b.WriteString(ui.Cell(k))
 		b.WriteString(" | ")
-		b.WriteString(val.(string))
+		b.WriteString(ui.Cell(val.(string)))
 		b.WriteString(" |\n")
 		return false
 	})

@@ -6,6 +6,7 @@
 package blog
 
 import (
+	"gno.land/p/moul/kit/ui/v0"
 	"strconv"
 	"strings"
 
@@ -69,18 +70,6 @@ func PostCount() int {
 	return posts.Len()
 }
 
-// snippet returns a short one-line preview of the body.
-func snippet(body string) string {
-	// collapse newlines so the preview stays on a single markdown line
-	s := strings.ReplaceAll(body, "\n", " ")
-	s = strings.TrimSpace(s)
-	const max = 140
-	if len(s) > max {
-		return s[:max] + "…"
-	}
-	return s
-}
-
 // Render lists all posts newest-first at the root, or a single post's full
 // text at path "/<id>". Render is NOT a crossing function.
 func Render(path string) string {
@@ -113,7 +102,7 @@ func renderList() string {
 	posts.EachReverse(func(id store.ID, v any) {
 		p := v.(*Post)
 		b.WriteString("## [")
-		b.WriteString(p.Title)
+		b.WriteString(ui.Inline(p.Title))
 		b.WriteString("](" + selfPath + ":/")
 		b.WriteString(id.String())
 		b.WriteString(")\n\n")
@@ -122,7 +111,7 @@ func renderList() string {
 		b.WriteString("` · height ")
 		b.WriteString(strconv.FormatInt(p.Height, 10))
 		b.WriteString("\n\n")
-		b.WriteString(snippet(p.Body))
+		b.WriteString(ui.Excerpt(strings.TrimSpace(p.Body), 140))
 		b.WriteString("\n\n---\n\n")
 	})
 	return b.String()
@@ -131,14 +120,21 @@ func renderList() string {
 func renderPost(p *Post) string {
 	var b strings.Builder
 	b.WriteString("# ")
-	b.WriteString(p.Title)
+	b.WriteString(ui.Inline(p.Title))
 	b.WriteString("\n\n")
 	b.WriteString("by `")
 	b.WriteString(p.Author.String())
 	b.WriteString("` · height ")
 	b.WriteString(strconv.FormatInt(p.Height, 10))
 	b.WriteString("\n\n")
-	b.WriteString(p.Body)
+	// Anyone may publish, so the body is the caller's text, not this realm's
+	// markdown: each line is escaped, and a blank line still breaks a paragraph.
+	for i, line := range strings.Split(p.Body, "\n") {
+		if i > 0 {
+			b.WriteString("  \n")
+		}
+		b.WriteString(ui.Inline(line))
+	}
 	b.WriteString("\n\n---\n\n[← back to all posts](" + selfPath + ")\n")
 	return b.String()
 }

@@ -1,6 +1,7 @@
 package linktree
 
 import (
+	"gno.land/p/moul/kit/ui/v0"
 	"strconv"
 	"strings"
 
@@ -45,6 +46,12 @@ func AddLink(cur realm, label string, url string) {
 	}
 	if url == "" {
 		panic("url must not be empty")
+	}
+	// The URL becomes a markdown link destination as written, so it is
+	// checked here rather than escaped there: http(s) only, and nothing that
+	// could close the destination or start another.
+	if !safeURL(url) {
+		panic("url must be http:// or https:// with no spaces, parentheses or angle brackets")
 	}
 	p := getOrCreate(addr.String())
 	p.Links = append(p.Links, link{Label: label, URL: url})
@@ -119,7 +126,7 @@ func renderProfile(addr string) string {
 	p := v.(*profile)
 
 	if p.Bio != "" {
-		b.WriteString(p.Bio)
+		b.WriteString(ui.Inline(p.Bio))
 		b.WriteString("\n\n")
 	}
 
@@ -131,7 +138,7 @@ func renderProfile(addr string) string {
 	b.WriteString("## Links\n\n")
 	for _, l := range p.Links {
 		b.WriteString("- [")
-		b.WriteString(l.Label)
+		b.WriteString(ui.Inline(l.Label))
 		b.WriteString("](")
 		b.WriteString(l.URL)
 		b.WriteString(")\n")
@@ -146,4 +153,13 @@ func caller(cur realm) address {
 		panic("linktree: spoofed realm")
 	}
 	return cur.Previous().Address()
+}
+
+// safeURL reports whether u can be written into a markdown link destination
+// unescaped.
+func safeURL(u string) bool {
+	if !strings.HasPrefix(u, "https://") && !strings.HasPrefix(u, "http://") {
+		return false
+	}
+	return !strings.ContainsAny(u, " \t\r\n()<>[]`\\")
 }

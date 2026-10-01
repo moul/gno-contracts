@@ -207,7 +207,7 @@ func renderHandle(handle string) string {
 	b.WriteString("# 🪪 @" + r.handle + "\n\n")
 	b.WriteString("**Owner:** " + r.owner.String() + "\n\n")
 	if r.bio != "" {
-		b.WriteString("**Bio:** " + r.bio + "\n\n")
+		b.WriteString("**Bio:** " + ui.Inline(r.bio) + "\n\n")
 	}
 	b.WriteString("**Registered at block:** " + strconv.Itoa(int(r.sinceBlk)) + "\n\n")
 	b.WriteString("[← all handles](" + selfPath + ")\n")

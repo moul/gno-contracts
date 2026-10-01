@@ -66,6 +66,11 @@ func Shorten(cur realm, alias string, url string, note string) {
 	if url == "" {
 		panic("url must be non-empty")
 	}
+	// The URL is rendered as an <autolink>, so it is checked here rather than
+	// escaped there: http(s) only, and nothing that could close the brackets.
+	if !safeURL(url) {
+		panic("url must be http:// or https:// with no spaces or angle brackets")
+	}
 
 	caller := cur.Previous().Address()
 
@@ -135,7 +140,7 @@ func Render(path string) string {
 	b.WriteString("**Target:** <" + e.url + ">\n\n")
 	b.WriteString("**Owner:** " + e.owner.String() + "\n\n")
 	if e.note != "" {
-		b.WriteString("**Note:** " + e.note + "\n\n")
+		b.WriteString("**Note:** " + ui.Inline(e.note) + "\n\n")
 	}
 	b.WriteString("**Clicks:** " + itoa(e.clicks) + "\n\n")
 	b.WriteString("[← all aliases](" + selfPath + ")\n")
@@ -186,4 +191,12 @@ func itoa(n int) string {
 		buf[i] = '-'
 	}
 	return string(buf[i:])
+}
+
+// safeURL reports whether u can be written into a markdown autolink unescaped.
+func safeURL(u string) bool {
+	if !strings.HasPrefix(u, "https://") && !strings.HasPrefix(u, "http://") {
+		return false
+	}
+	return !strings.ContainsAny(u, " \t\r\n<>`\\")
 }

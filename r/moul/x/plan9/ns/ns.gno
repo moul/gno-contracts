@@ -31,6 +31,7 @@
 package ns
 
 import (
+	"gno.land/p/moul/md/v0"
 	"chain/runtime"
 	"errors"
 	"strconv"
@@ -355,11 +356,13 @@ func renderCmd(key, line, title string) string {
 	b.WriteString("namespace: `" + key + "`\n\n")
 	out, err := Run(key, line)
 	if err != nil {
-		b.WriteString("```\n" + err.Error() + "\n```\n")
+		b.WriteString(md.CodeBlock(err.Error()))
 	} else if out == "" {
 		b.WriteString("_(no output)_\n")
 	} else {
-		b.WriteString("```\n" + out + "```\n")
+		// The output is a user's file contents: a line of backticks in it
+		// would close a hand-written fence, and md.CodeBlock picks one it cannot.
+		b.WriteString(md.CodeBlock(strings.TrimSuffix(out, "\n")))
 	}
 	b.WriteString("\n[namespace](/r/moul/x/plan9/ns/v1:ns?u=" + key + ") · [root](/r/moul/x/plan9/ns/v1:ls?u=" + key +
 		") · [home](/r/moul/x/plan9/ns/v1)\n")
@@ -390,7 +393,7 @@ func renderHome(key string) string {
 	}
 
 	b.WriteString("## The demo namespace\n\n")
-	b.WriteString("```\n" + Namespace(DemoKey) + "```\n\n")
+	b.WriteString(md.CodeBlock(strings.TrimSuffix(Namespace(DemoKey), "\n")) + "\n")
 	b.WriteString("`/bin` is a union: the system `/bin` first, then `/usr/glenda/bin`, ")
 	b.WriteString("with `-c` so new files land in the second. Listing it shows both members ")
 	b.WriteString("because a Plan 9 union is a concatenation, so shadowing stays visible.\n\n")

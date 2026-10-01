@@ -215,3 +215,16 @@ func TestRenderRefusesANonAddressNamespace(t *testing.T) {
 	uassert.True(t, strings.Contains(out, "# 404"), out)
 	uassert.False(t, strings.Contains(out, "[evil](https://example)"), out)
 }
+
+// A file's contents are its owner's text. A line of backticks in one used to
+// close the hand-written fence around `cat`'s output, and everything after it
+// rendered as live markdown on the realm's own page.
+func TestCatOutputCannotCloseItsFence(cur realm, t *testing.T) {
+	who := testutils.TestAddress("fencer")
+	testing.SetRealm(testing.NewUserRealm(who))
+	Exec(cross(cur), "echo '```' > /tmp/f; echo '[claim](https://evil.example)' >> /tmp/f")
+	out := Render("cat/tmp/f?u=" + who.String())
+	// md.CodeBlock picks a fence longer than any run of backticks inside, so
+	// the user's three backticks and the link after them stay inside the block.
+	uassert.True(t, strings.Contains(out, "````\n```\n[claim](https://evil.example)\n````\n"), out)
+}

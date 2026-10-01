@@ -7,6 +7,7 @@
 package polls
 
 import (
+	"gno.land/p/moul/kit/ui/v0"
 	"chain"
 	"strconv"
 	"strings"
@@ -156,13 +157,13 @@ func renderPoll(b *strings.Builder, p *Poll) {
 	b.WriteString("## Poll #")
 	b.WriteString(strconv.Itoa(p.ID))
 	b.WriteString(": ")
-	b.WriteString(p.Question)
+	b.WriteString(ui.Inline(p.Question))
 	b.WriteString("\n\n")
 
 	for i, opt := range p.Options {
 		c := p.Tallies[i]
 		b.WriteString("- **")
-		b.WriteString(opt)
+		b.WriteString(ui.Inline(opt))
 		b.WriteString("** `")
 		b.WriteString(bar(c, sum))
 		b.WriteString("` ")
