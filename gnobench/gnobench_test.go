@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -383,5 +384,59 @@ func TestWiringShapesAgreeOnTheDeposit(t *testing.T) {
 	}
 	if checked == 0 {
 		t.Fatal("no wiring pair was checked; the suite's key scheme probably changed")
+	}
+}
+
+// The scoping decision used to be signalled with an exit code, and a non-zero
+// exit for "nothing to measure" failed the job on every pull request that
+// touched no benched package: the runner invokes the step as `bash -e`, and
+// `FOO=$(cmd)` where cmd exits non-zero kills the shell before the handler
+// runs. It is a printed decision now, and these are the only three it may
+// print, because the workflow switches on them.
+func TestAffectedDecisionHasExactlyThreeAnswers(t *testing.T) {
+	s := suites["storage"]
+	for _, tt := range []struct {
+		name  string
+		paths []string
+		want  string
+	}{
+		{"nothing benched", []string{"README.md", "r/moul/home/home.gno"}, "skip"},
+		{"no paths at all", nil, "skip"},
+		{"the harness itself", []string{"gnobench/run.go"}, "all"},
+		{"a vendored dependency", []string{"vendor/gno.land/p/nt/avl/v0/tree.gno"}, "all"},
+		{"harness wins over a candidate", []string{"p/moul/ulist/ulist.gno", "gnobench/svg.go"}, "all"},
+		{"one candidate", []string{"p/moul/ulist/ulist.gno"}, "filter:^(p/moul/ulist/v1)/"},
+	} {
+		got := AffectedDecision(s, tt.paths)
+		if got != tt.want {
+			t.Errorf("%s: got %q, want %q", tt.name, got, tt.want)
+		}
+	}
+}
+
+func TestAffectedDecisionFilterIsAUsableRegexp(t *testing.T) {
+	s := suites["storage"]
+	d := AffectedDecision(s, []string{"p/nt/avl/v0/tree.gno", "p/moul/ulist/ulist.gno"})
+	if !strings.HasPrefix(d, "filter:") {
+		t.Fatalf("got %q, want a filter", d)
+	}
+	re, err := regexp.Compile(strings.TrimPrefix(d, "filter:"))
+	if err != nil {
+		t.Fatalf("the filter does not compile: %v", err)
+	}
+	// It must select the candidates it named and nothing else. The names
+	// contain regexp metacharacters ("[]", "/"), which is why they are quoted.
+	for _, tt := range []struct {
+		name string
+		want bool
+	}{
+		{"p/nt/avl/v0/insert_rand", true},
+		{"p/moul/ulist/v1/append_n", true},
+		{"builtin map[string]any/insert_rand", false},
+		{"p/nt/bptree/v0 fanout=32/insert_rand", false},
+	} {
+		if got := re.MatchString(tt.name); got != tt.want {
+			t.Errorf("filter %q matched %q = %v, want %v", d, tt.name, got, tt.want)
+		}
 	}
 }

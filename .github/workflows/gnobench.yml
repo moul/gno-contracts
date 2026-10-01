@@ -68,40 +68,40 @@ jobs:
         working-directory: gnobench
         run: ./gnobench report -check
 
-      # Only what the diff could have changed. A change under gnobench/ or
-      # vendor/ invalidates everything and prints an empty filter, which means
-      # "measure the whole suite"; a diff that touches no benched package exits
-      # 3 and the job stops here.
+      # Only what the diff could have changed. `affected` prints one of
+      # "skip", "all" or "filter:<regexp>" and always exits 0 for all three:
+      # signalling "nothing to measure" with a non-zero exit used to fail this
+      # job on every pull request that touched no benched package, because the
+      # runner invokes the step as `bash -e` and an assignment from a failing
+      # command kills the shell before any handler runs.
       - name: Which candidates does this touch
         id: scope
         run: |
-          # +e on purpose: GitHub runs every `run:` under `bash -e`, so the
-          # assignment below would abort the step on gnobench's exit 3 before
-          # `code` is ever read, turning the intended skip into a job failure.
-          # `set -uo pipefail` does not disable -e. Every exit code here is
-          # checked by hand instead, immediately after the command.
-          set +e -uo pipefail
+          set -euo pipefail
           git diff --name-only \
             "${{ github.event.pull_request.base.sha }}" \
             "${{ github.event.pull_request.head.sha }}" > /tmp/changed.txt
-          if [ $? != 0 ]; then
-            echo "::error::git diff failed"
-            exit 1
-          fi
-          FILTER=$(./gnobench/gnobench affected -suite storage < /tmp/changed.txt)
-          code=$?
-          if [ "$code" = "3" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "No benched package changed." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          if [ "$code" != "0" ]; then
-            echo "::error::gnobench affected failed with $code"
-            exit "$code"
-          fi
-          echo "skip=false" >> "$GITHUB_OUTPUT"
-          echo "filter=$FILTER" >> "$GITHUB_OUTPUT"
-          echo "measuring: ${FILTER:-the whole suite}"
+          DECISION=$(./gnobench/gnobench affected -suite storage < /tmp/changed.txt)
+          case "$DECISION" in
+            skip)
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "No benched package changed." >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            all)
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+              echo "filter=" >> "$GITHUB_OUTPUT"
+              echo "measuring the whole suite"
+              ;;
+            filter:*)
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+              echo "filter=${DECISION#filter:}" >> "$GITHUB_OUTPUT"
+              echo "measuring ${DECISION#filter:}"
+              ;;
+            *)
+              echo "::error::gnobench affected printed an unexpected decision: $DECISION"
+              exit 1
+              ;;
+          esac
 
       - name: Save the committed baseline for this runner
         if: steps.scope.outputs.skip != 'true'

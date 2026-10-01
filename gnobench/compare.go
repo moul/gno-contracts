@@ -158,10 +158,24 @@ func sign(p float64) string {
 	return fmt.Sprintf("%.1f%%", p)
 }
 
-// cmdAffected turns a list of changed file paths into a -filter regexp, so a
-// pull request measures the candidates it could actually have changed instead
-// of the whole suite. Paths come on stdin, one per line, as `git diff --name-only`
-// prints them.
+// cmdAffected turns a list of changed file paths into a decision about what to
+// measure. Paths come on stdin, one per line, as `git diff --name-only` prints
+// them.
+//
+// It prints exactly one line and exits 0 for all three normal answers:
+//
+//	skip             nothing a benched candidate depends on changed
+//	all              measure the whole suite
+//	filter:<regexp>  measure only these candidates
+//
+// It used to signal "nothing to measure" with exit code 3. That is a trap in a
+// GitHub Actions step: the runner invokes the script as `bash -e`, `set +e` in
+// the script body does not undo a `-e` given on the command line for the
+// purposes most people expect, and `FOO=$(cmd)` where cmd exits non-zero kills
+// the shell before any handler runs. The result was that every pull request
+// touching no benched package FAILED this job, which is precisely what the
+// workflow's own comment says must never happen. A non-zero exit now means a
+// real error and nothing else.
 func cmdAffected(args []string) error {
 	fs := flag.NewFlagSet("affected", flag.ExitOnError)
 	suite := fs.String("suite", "storage", "which suite")
@@ -179,21 +193,27 @@ func cmdAffected(args []string) error {
 			paths = append(paths, p)
 		}
 	}
+	if err := sc.Err(); err != nil {
+		return err
+	}
+	fmt.Println(AffectedDecision(s, paths))
+	return nil
+}
+
+// AffectedDecision is the whole of the logic, separated from the printing so a
+// test can hold it to each of its three answers.
+func AffectedDecision(s *Suite, paths []string) string {
 	// A change to the harness itself, or to the vendored dependencies,
-	// invalidates everything: measure the lot.
+	// invalidates everything.
 	for _, p := range paths {
 		if strings.HasPrefix(p, "gnobench/") || strings.HasPrefix(p, "vendor/") {
-			fmt.Println("")
-			return nil
+			return "all"
 		}
 	}
 	var hit []string
 	for _, st := range s.Structures {
 		for _, imp := range st.Imports {
-			mod := strings.Trim(imp, `"`)
-			// "gno.land/p/moul/ulist/v1" -> the repository path "p/moul/ulist"
-			rel := strings.TrimPrefix(mod, "gno.land/")
-			rel = trimVersion(rel)
+			rel := trimVersion(strings.TrimPrefix(strings.Trim(imp, `"`), "gno.land/"))
 			for _, p := range paths {
 				if strings.HasPrefix(p, rel+"/") || p == rel {
 					hit = append(hit, regexp.QuoteMeta(st.Name))
@@ -203,13 +223,10 @@ func cmdAffected(args []string) error {
 	}
 	hit = dedupe(hit)
 	if len(hit) == 0 {
-		// Nothing a candidate depends on changed. Exit 3 so a workflow can
-		// tell "measure nothing" apart from "measure everything".
-		os.Exit(3)
+		return "skip"
 	}
 	sort.Strings(hit)
-	fmt.Println("^(" + strings.Join(hit, "|") + ")/")
-	return nil
+	return "filter:^(" + strings.Join(hit, "|") + ")/"
 }
 
 var versionSuffix = regexp.MustCompile(`/v[0-9]+$`)
