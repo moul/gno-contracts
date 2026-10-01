@@ -93,7 +93,11 @@ var copilotVerdictRe = regexp.MustCompile(`(?m)^###\s+(.+?)\s*$`)
 // that produced it. Without this the log silently mixes two different products
 // and any cost-per-review figure derived from it is an average over an unknown
 // mix, which is exactly the mistake that put a 13 in these files for a day.
-var copilotEffortRe = regexp.MustCompile(`Review effort:\*\*\s*([A-Za-z]+)`)
+// Anchored to the START OF A LINE, which is where Copilot puts the metadata.
+// Unanchored it also matches the phrase quoted inside a finding, and a review
+// that discusses effort levels would have its own effort read out of somebody
+// else's prose. Caught by Copilot on #313, whose body quotes the phrase twice.
+var copilotEffortRe = regexp.MustCompile(`(?m)^\*\*Review effort:\*\*\s*([A-Za-z]+)`)
 
 // htmlTagRe strips the inline <picture>/<img> severity badges out of the
 // overview. They are 400 characters each and say nothing in a plain-text digest.

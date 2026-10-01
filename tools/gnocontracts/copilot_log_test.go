@@ -336,6 +336,24 @@ func TestCopilotEffortIsNotGuessed(t *testing.T) {
 	if got := copilotEffort("**Review effort:** Max  \n"); got != "Max" {
 		t.Errorf("want Max, got %q", got)
 	}
+
+	// The phrase quoted inside a finding is PROSE, not the metadata line, and
+	// an unanchored match reads it as the effort. This pull request's own body
+	// quotes "**Review effort:** Lite" while explaining the feature, so the
+	// failure is not hypothetical.
+	prose := "### 🟡 Changes recommended\n\n" +
+		"The digest prints `**Review effort:** Lite` which is wrong here.\n"
+	if got := copilotEffort(prose); got != "unstated" {
+		t.Errorf("a quoted phrase is not the metadata line: got %q", got)
+	}
+
+	// And the real shape still wins when both are present: the metadata line
+	// comes first, on its own line.
+	both := "### 🟡 Changes recommended\n\n**Review effort:** Balanced  \n\n" +
+		"a finding quoting `**Review effort:** Lite` in passing\n"
+	if got := copilotEffort(both); got != "Balanced" {
+		t.Errorf("the metadata line wins, got %q", got)
+	}
 }
 
 // The Lite review found nothing, which is the first clean review in this
