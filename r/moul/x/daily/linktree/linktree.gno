@@ -30,9 +30,22 @@ type profile struct {
 // avl.Tree keeps iteration deterministic for Render.
 var profiles avl.Tree
 
+// The bounds on what a caller may store. Anyone may create a profile, and the
+// root page lists every profile while a profile page lists every link.
+const (
+	MaxProfiles = 1000
+	MaxLinks    = 20
+	MaxBioLen   = 280
+	MaxLabelLen = 64
+	MaxURLLen   = 512
+)
+
 // SetBio sets (or replaces) the calling address's bio.
 func SetBio(cur realm, bio string) {
 	addr := caller(cur)
+	if len(bio) > MaxBioLen {
+		panic("bio too long")
+	}
 	p := getOrCreate(addr.String())
 	p.Bio = bio
 	chain.Emit("BioSet", "addr", addr.String())
@@ -53,7 +66,13 @@ func AddLink(cur realm, label string, url string) {
 	if !safeURL(url) {
 		panic("url must be http:// or https:// with no spaces, parentheses or angle brackets")
 	}
+	if len(label) > MaxLabelLen || len(url) > MaxURLLen {
+		panic("label or url too long")
+	}
 	p := getOrCreate(addr.String())
+	if len(p.Links) >= MaxLinks {
+		panic("a profile holds at most " + strconv.Itoa(MaxLinks) + " links")
+	}
 	p.Links = append(p.Links, link{Label: label, URL: url})
 	chain.Emit("LinkAdded", "addr", addr.String(), "label", label)
 }
@@ -70,7 +89,12 @@ func RemoveLink(cur realm, index int) {
 	if index < 0 || index >= len(p.Links) {
 		panic("index out of range")
 	}
-	p.Links = append(p.Links[:index], p.Links[index+1:]...)
+	// A fresh slice, not append(s[:i], s[i+1:]...): the in-place form keeps the
+	// old backing array, so the deposit for a removed link never comes back.
+	kept := make([]link, 0, len(p.Links)-1)
+	kept = append(kept, p.Links[:index]...)
+	kept = append(kept, p.Links[index+1:]...)
+	p.Links = kept
 	chain.Emit("LinkRemoved", "addr", key, "index", strconv.Itoa(index))
 }
 
@@ -78,6 +102,9 @@ func RemoveLink(cur realm, index int) {
 func getOrCreate(key string) *profile {
 	if v := profiles.Get(key); v != nil {
 		return v.(*profile)
+	}
+	if profiles.Size() >= MaxProfiles {
+		panic("linktree is full at " + strconv.Itoa(MaxProfiles) + " profiles")
 	}
 	p := &profile{}
 	profiles.Set(key, p)

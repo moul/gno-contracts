@@ -16,11 +16,23 @@ const selfPath = "/r/moul/x/daily/vault/v1"
 // vaults maps address string -> *avl.Tree (key string -> value string).
 var vaults avl.Tree
 
+// The bounds on what a caller may store. Anyone may open a vault, the root
+// page lists every vault, and a vault's page lists every entry.
+const (
+	MaxVaults   = 1000
+	MaxEntries  = 100 // per vault
+	MaxKeyLen   = 64
+	MaxValueLen = 512
+)
+
 // vaultFor returns the caller's namespace tree, creating it if needed.
 func vaultFor(owner address) *avl.Tree {
 	k := owner.String()
 	if v := vaults.Get(k); v != nil {
 		return v.(*avl.Tree)
+	}
+	if vaults.Size() >= MaxVaults {
+		panic("vault is full at " + strconv.Itoa(MaxVaults) + " vaults")
 	}
 	t := &avl.Tree{}
 	vaults.Set(k, t)
@@ -33,7 +45,13 @@ func Set(cur realm, key string, value string) {
 	if key == "" {
 		panic("key must not be empty")
 	}
+	if len(key) > MaxKeyLen || len(value) > MaxValueLen {
+		panic("key or value too long")
+	}
 	t := vaultFor(who)
+	if !t.Has(key) && t.Size() >= MaxEntries {
+		panic("a vault holds at most " + strconv.Itoa(MaxEntries) + " entries")
+	}
 	t.Set(key, value)
 	chain.Emit("VaultSet", "owner", who.String(), "key", key)
 }

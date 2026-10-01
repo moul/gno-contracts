@@ -45,9 +45,23 @@ func CreatePoll(cur realm, question string, options string) int {
 		panic("question must not be empty")
 	}
 
+	if len(q) > MaxQuestionLen {
+		panic("question too long")
+	}
 	opts := parseOptions(options)
 	if len(opts) < 2 {
 		panic("a poll needs at least 2 options")
+	}
+	if len(opts) > MaxOptions {
+		panic("a poll takes at most " + strconv.Itoa(MaxOptions) + " options")
+	}
+	for _, o := range opts {
+		if len(o) > MaxOptionLen {
+			panic("option too long")
+		}
+	}
+	if len(polls) >= MaxPolls {
+		panic("polls is full at " + strconv.Itoa(MaxPolls) + " polls")
 	}
 
 	id := nextID
@@ -120,6 +134,16 @@ func PollCount() int {
 }
 
 const barWidth = 20
+
+// The bounds on what a creator may store. Anyone may create a poll, and the
+// root page renders the newest ones.
+const (
+	MaxPolls       = 500
+	MaxQuestionLen = 200
+	MaxOptions     = 10
+	MaxOptionLen   = 64
+	IndexRecent    = 20 // polls the root page shows, newest first
+)
 
 // bar renders a proportional ▓░ bar of fixed width for count out of total.
 func bar(count, total int) string {
@@ -210,9 +234,12 @@ func Render(path string) string {
 
 	b.WriteString("Total polls: ")
 	b.WriteString(strconv.Itoa(len(polls)))
+	if len(polls) > IndexRecent {
+		b.WriteString(", the " + strconv.Itoa(IndexRecent) + " newest shown")
+	}
 	b.WriteString("\n\n")
-	for _, p := range polls {
-		renderPoll(&b, p)
+	for i := len(polls) - 1; i >= 0 && i >= len(polls)-IndexRecent; i-- {
+		renderPoll(&b, polls[i])
 	}
 	return b.String()
 }

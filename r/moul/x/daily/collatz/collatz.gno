@@ -18,6 +18,10 @@ const selfPath = "/r/moul/x/daily/collatz/v1"
 // forever on-chain. No known n stays below this bound and fails to reach 1.
 const maxIters = 1000000
 
+// MaxResults bounds the leaderboard's state: anyone may Compute, and each new
+// n is a new entry the root page sorts.
+const MaxResults = 1000
+
 // maxSeqLen caps how many terms Render("/<n>") will print.
 const maxSeqLen = 500
 
@@ -84,6 +88,9 @@ func Compute(cur realm, n int) {
 
 	res := Result{N: nn, Steps: steps, Peak: peak, Who: caller}
 	key := strconv.FormatInt(nn, 10)
+	if !results.Has(key) && results.Size() >= MaxResults {
+		panic("collatz: the leaderboard is full at " + strconv.Itoa(MaxResults) + " entries")
+	}
 	results.Set(key, res)
 
 	chain.Emit(
