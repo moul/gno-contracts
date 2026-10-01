@@ -596,6 +596,15 @@ Backtested over the last 60 merged pull requests: **4 would be reviewed (6%)**, 
 permanence and one for the config. **182 premium requests a month** projected, against ~2,800
 for reviewing everything, which fits inside the cheapest paid allowance with headroom.
 
+**Once a diff qualifies, one pass is not the review: re-request after every push that fixed
+findings, until a pass adds nothing above low.** #289 (`p/moul/kit/index`, not yet live) took
+six passes. Passes two to five each found one to three more real defects, every one in a
+package one merge from frozen: a copied `Index` that splits its counter from its tree, every
+tag link dead, an untested global storage cap. Five extra passes cost 65 premium requests,
+about $2.60; any one of those defects shipped would have cost a new version at a new path.
+The "finish the file" instruction is the attempt to make pass one enough. Until the log shows
+it working, the second pass is the cheap one.
+
 Two things it does not do, deliberately. It does not look at diff size, because a one-line
 change to an unpublished package is exactly as permanent as a thousand-line one. And it does
 not review `tools/`, because tooling has tests, has CI, and can be fixed any time.
@@ -617,11 +626,18 @@ Custom instructions are read from the **head branch**, so a pull request can tes
 instruction changes.
 
 **Every review is digested into [#280](https://github.com/moul/gno-contracts/issues/280)** by
-`copilot-review-log.yml` plus `gnocontracts copilot-log`, one entry per finding with three
+`copilot-review-log.yml` (an hourly sweep, because a run triggered by Copilot's review waits
+for an approval nothing can give it) plus `gnocontracts copilot-log`, one entry per finding,
+"Previously missed" ones included, with three
 boxes: real, false positive, or a finding about the knowledge base. The false-positive box
 asks **which line of the instructions produced it**, and that is the whole design: a wrong
 finding here is not noise to be endured, it is a defect in a file in this repository with a
 line number.
+
+**Answering a pass**: reply on each thread (`Confirmed and fixed in <sha>`, or why it is a
+false positive), then resolve it. A re-review resolves a thread only when its anchored lines
+changed, so a fix that landed in another file stays open until you resolve it by hand. A
+"Previously missed" finding has no thread at all: answer it in one PR comment.
 
 It works. The first review this repository ever got returned three findings, all three
 against the instructions file that had just been added, each with file and line evidence, and

@@ -42,6 +42,22 @@ In priority order. Each item is a real defect class, not a preference.
   cannot have a value of a type it defines retained by anyone else; the last two are a runtime
   panic, invisible to lint. A redeploy **wipes every package-level variable** and keeps the
   coins.
+- **A relative link that repeats the realm's name is dead in a versioned realm.** gnoweb
+  serves it at `.../name/v0`, so `./name:tag/x` resolves against the parent to
+  `.../name/name:tag/x`. `./v0:tag/x` does resolve, and is not a finding, but goes stale on
+  the next version; absolute (`/r/moul/x/name/v0:tag/x`) is the convention here. A test that
+  pins the `Render` output pins the dead link too.
+- **A new `p/` package's v0 API is the thing that cannot be edited later**, so read its edge
+  cases as contract, not polish:
+  - a value type holding a pointer **and** a scalar (a tree plus a counter) splits when
+    copied: the copies share the tree and not the count. State goes behind one pointer.
+  - page and offset arithmetic on a number that arrives from a `Render` path, at the integer
+    limit. `(page-1)*size` wraps, and `bptree.IterateByOffset` clamps a negative offset to 0,
+    so an overflow returns page 1 instead of nothing.
+  - the same out-of-range condition answered two ways (`nil` here, an empty slice there).
+  - a callback handed out during iteration that can write to the tree being walked. The
+    walk holds a position inside a leaf, so a removal skips the next key; the doc comment
+    has to forbid it or the method has to snapshot.
 - A breaking change to a published package needs a new version, not an edit. Removing or
   renaming an exported symbol, changing a signature, changing on-chain behaviour, swapping
   the backing storage.
