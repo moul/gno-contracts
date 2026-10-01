@@ -114,6 +114,10 @@ func TestValidateEndpoint(t *testing.T) {
 		{Seed, nodeID + "@seed_1.gno.land:26656", "DNS name"},
 		{Seed, nodeID + "@[::1]:26656", "DNS name"},
 
+		{RPC, "HTTPS://rpc.gno.land", ""},
+		{Gnoweb, "Https://gno.land", ""},
+		{" rpc ", "not a url", "unknown endpoint kind"},
+		{"RPC", "https://rpc.gno.land", "unknown endpoint kind"},
 		{"", "https://gno.land", "needs a kind"},
 		{"grpc", "https://gno.land", "unknown endpoint kind"},
 	}

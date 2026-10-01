@@ -310,8 +310,11 @@ func ValidateEndpoint(kind EndpointKind, addr string) error {
 	case "":
 		return errors.New("zones: an endpoint needs a kind")
 	}
-	_, err := ParseEndpointKind(string(kind))
-	return err
+	// Exact values only. The Parse functions trim a caller's string, so an
+	// EndpointKind(" rpc ") would parse, be stored as written, and then match
+	// no filter: refused here rather than normalised behind the caller's back.
+	return errors.New("zones: unknown endpoint kind " + strconv.Quote(string(kind)) +
+		", want rpc, gnoweb, seed, peer, indexer, faucet or explorer")
 }
 
 // ValidateLabel accepts an optional single line of up to 64 characters.
@@ -375,9 +378,11 @@ func checkURL(field, s string, schemes []string) error {
 	if !ok {
 		return errors.New("zones: the " + field + " needs a scheme (" + strings.Join(schemes, ", ") + "): " + strconv.Quote(s))
 	}
+	// A scheme is case-insensitive, so HTTPS:// is https://; Canonical lowercases
+	// it the same way, which is what makes the two one endpoint.
 	known := false
 	for _, sc := range schemes {
-		if scheme == sc {
+		if strings.ToLower(scheme) == sc {
 			known = true
 			break
 		}

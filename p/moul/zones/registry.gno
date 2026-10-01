@@ -336,11 +336,14 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, by address, at int6
 	if err := ValidateReason(reason); err != nil {
 		return err
 	}
-	if to == "" {
+	switch to {
+	case Unverified, Verified, Flagged:
+	case "":
 		return errors.New("zones: a review needs a verdict")
-	}
-	if _, err := ParseVerification(string(to)); err != nil {
-		return err
+	default:
+		// Exact values only: ParseVerification trims, and a " verified " stored
+		// as written would match no filter and count as unverified forever.
+		return errors.New("zones: unknown verification " + strconv.Quote(string(to)) + ", want verified, unverified or flagged")
 	}
 	if e.Status == to {
 		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " is already " + string(to))
