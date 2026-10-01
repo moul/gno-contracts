@@ -264,3 +264,24 @@ func TestCopilotDigestNeverLetsAStringWriteMarkdown(t *testing.T) {
 		})
 	}
 }
+
+// A review Copilot could not run is not a clean review. Logged as one, it
+// would inflate the clean rate the log exists to measure. Body captured from
+// #295, 2026-10-01, when the requester ran out of premium requests.
+func TestCopilotDigestDoesNotCountAFailedReviewAsClean(t *testing.T) {
+	var p copilotPayload
+	p.PR.Number, p.PR.Title, p.PR.HTMLURL = 295, "t", "u"
+	p.Review.HTMLURL = "r"
+	p.Review.User.Login = "copilot-pull-request-reviewer[bot]"
+	p.Review.Body = "Copilot was unable to review this pull request because the user who requested the review has reached their quota limit."
+	got, ok := copilotDigest(p)
+	if !ok {
+		t.Fatal("still logged, so the gap is visible")
+	}
+	if strings.Contains(got, "clean review") || strings.Contains(got, "finding(s)") {
+		t.Errorf("a failed review must not read as clean:\n%s", got)
+	}
+	if !strings.Contains(got, "**not reviewed**") || !strings.Contains(got, "quota limit") {
+		t.Errorf("want the verdict and Copilot's reason:\n%s", got)
+	}
+}
