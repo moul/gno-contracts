@@ -72,7 +72,7 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 
 ### `wiring`: What it costs to write one change at a time
 
-- **24** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-09-30.
+- **24** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-10-01.
 - 1,000 writes arriving one transaction at a time, all ending at the same state and charged the same deposit: **`builtin map[string]string` makes the node write 78 MB**, against `p/moul/ulist/v1` at 11 MB. The worst of them writes **505x** what the same writes cost batched into one transaction.
 
 <a href="reports/wiring.md#batched-against-one-at-a-time">
