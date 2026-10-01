@@ -177,6 +177,18 @@ func copilotDigest(p copilotPayload) (string, bool) {
 
 	var b strings.Builder
 	fmt.Fprintf(&b, "## [#%d](%s) %s\n\n", p.PR.Number, p.PR.HTMLURL, copilotInline(p.PR.Title))
+
+	// A review Copilot could not run (quota, an error) is NOT a clean review,
+	// and counting it as one would inflate the very clean rate this log exists
+	// to measure. It is logged, so the gap is visible, with Copilot's reason.
+	if strings.Contains(p.Review.Body, "was unable to review") {
+		fmt.Fprintf(&b, "**not reviewed** · [the attempt](%s)", p.Review.HTMLURL)
+		if p.Review.SubmittedAt != "" {
+			fmt.Fprintf(&b, " · %s", p.Review.SubmittedAt)
+		}
+		fmt.Fprintf(&b, "\n\n> %s\n", copilotInline(strings.TrimSpace(htmlTagRe.ReplaceAllString(p.Review.Body, ""))))
+		return b.String(), true
+	}
 	fmt.Fprintf(&b, "**%s** · [the review](%s)", copilotVerdict(p.Review.Body), p.Review.HTMLURL)
 	if p.Review.SubmittedAt != "" {
 		fmt.Fprintf(&b, " · %s", p.Review.SubmittedAt)
