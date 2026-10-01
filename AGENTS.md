@@ -551,33 +551,42 @@ Five packages are exempt in code because emitting a separator correctly is what 
 
 ## When to spend a Copilot code review, and when not to
 
-**A Copilot code review costs 13 AI credits**, GitHub's published model multiplier for code
-review. The real budget, read off the billing page on **2026-10-01** rather than from the
-docs:
+**A Copilot code review costs about 76 AI credits, measured.** GitHub publishes 13 as the
+model multiplier; the billing page charges roughly six times that. The measurement wins.
+
+From the AI usage page's per-model breakdown, **2026-10-01**:
 
 | | |
 |---|---|
 | plan | Copilot **Pro** |
 | included | **1,500 AI credits a month**, resets the 1st |
-| used that day | **1,211 of 1,500 (81%)** |
+| used | **1,211 of 1,500 (81%)**, on the **first day of the cycle** |
+| of which | **1,210.74 is the Code Review model.** Essentially all of it |
 | additional usage | **$0.00 of $0, NOT ENABLED** |
+| credit price | $0.01 |
 
-Two things there are not what the docs implied, and both matter.
+Divide by the **16 Copilot reviews** requested that day (#274 x1, #289 x6, #295 x8, #296 x1,
+and zero in any other repository) and a review is `1210.74 / 16 =` **~75.7 credits, about
+$0.76**.
 
-**The Pro allowance is 1,500, not 300.** The 300 figure is the older premium-request unit and
-it is wrong for this account.
+Three things follow, and the third is the one that actually matters.
 
-**The failure mode is not a bill, it is silence.** Additional usage is disabled, so when the
-1,500 runs out Copilot code review simply **stops** until the reset. That inverts what this
-policy protects: not money, but the ability to get a review at the moment one is actually
-worth having. On 2026-10-01 that was 289 credits away, about **22 reviews**, with 31 days to
-go and the rest of the budget being spent by Copilot in the editor.
+**1. The Pro allowance is 1,500, not 300.** The 300 figure is the older premium-request unit.
 
-This repository opened **more than 100 pull requests in the fourteen days to 2026-10-01**,
-roughly 215 a month. Reviewing all of them is **~2,800 AI credits a month** against an
-allowance of 1,500 that is already 81% spent on other things. "Review everything" does not
-mean a bigger bill, it means the reviews stop part-way through the month and the next one
-that mattered does not happen.
+**2. The failure mode is silence, not a bill.** Additional usage is disabled, so when the
+1,500 runs out Copilot code review simply **stops** until the reset. What this policy protects
+is not money, which is capped at zero by construction, but the ability to get a review at the
+moment one is worth having. On 2026-10-01 that was 289 credits, **under four reviews**, with
+31 days to go.
+
+**3. Re-reviews are the cost.** Fourteen of those sixteen reviews were third and later passes
+on two pull requests. **Choosing which pull requests deserve a review would have saved nothing
+on the day that spent the month's budget.** Capping passes per pull request is what saves it:
+the first review, plus one after the findings are fixed. Beyond that, read the diff yourself.
+
+At ~76 credits the whole allowance is **twenty reviews a month**. This repository opens ~215
+pull requests a month, so reviewing all of them is not nine times the budget, it is eighty
+times it.
 
 So the rule is one sentence, and it falls out of this repository's central fact rather than
 out of restraint:
@@ -612,12 +621,13 @@ cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
 ```
 
 Backtested over the last 60 merged pull requests: **4 would be reviewed (6%)**, three for
-permanence and one for the config. **182 AI credits a month** projected, about **12% of the
-1,500 allowance**, against ~2,800 for reviewing everything.
+permanence and one for the config. At ~76 credits that is **303 credits a month for first
+passes, 20% of the allowance**, and **71% if each one averages the three-and-a-half passes
+the two expensive pull requests took**.
 
-The 13-credits figure is GitHub's published multiplier and is **not verified against this
-account**: the billing page reports a total, not a per-feature breakdown, and its "View
-details" view is the only thing that would confirm it. Worth confirming once.
+So the budget is tight either way, and the honest framing is a standing cap of about twenty
+reviews a month rather than a comfortable margin. The triage picks the pull requests; the
+two-pass rule is what keeps the picking from being undone.
 
 **Once a diff qualifies, one pass is not the review: re-request after every push that fixed
 findings, until a pass adds nothing above low.** #289 (`p/moul/kit/index`, not yet live) took
