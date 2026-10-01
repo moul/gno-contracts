@@ -349,17 +349,21 @@ loading), which fanout cannot touch.
 
 **Except on removal, where high fanout costs you.** Removing a key shifts every later value
 in its leaf down one slot, and since each value is its own boxed object, every shifted one is
-rewritten. That is about **90k gas per later entry in the leaf**, so the cost of a removal
+rewritten. That is about **90k gas per later entry in the leaf for a scalar value, and about
+230k for a pointer** (a `*struct`, which is what a record store holds), so the cost of a removal
 depends on where the key sits, and a full fanout-128 leaf makes its first key the most
 expensive thing in the tree to delete. Measured 2026-10-02 on a real node (integration
 txtar, one transaction per step, so store reads and writes are priced), `gnolang/gno` master
-`3cc494ec4`, 120 string keys inserted in order:
+`3cc494ec4`, 120 string keys inserted in order, `int` values:
 
 | tree | insert all 120 | remove the last key | the middle | the first |
 |---|--:|--:|--:|--:|
 | `bptree` fanout 128 (one leaf) | 19.2M | 5.1M | 10.4M | **15.8M** |
 | `bptree` fanout 32 (four leaves) | 21.4M | 4.8M | 5.0M | 7.5M |
 | `avl` | 55.8M | 6.6M | 6.6M | 6.5M |
+
+With `*struct` values in the same fanout-128 leaf, the last key costs 5.2M and the first
+**32.3M**.
 
 So fanout 128 is right for a tree that only grows, a log or an index of things never
 deleted. A tree whose keys are removed at arbitrary positions (a queue with expiry, a
