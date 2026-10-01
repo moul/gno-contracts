@@ -41,7 +41,7 @@ gnokey query vm/qeval -remote https://rpc.gno.land \
 | `ListEndpoints(slug, kind, status)` | one zone's endpoints, oldest first; the slug is required |
 | `ListAddresses(slug, kind, status)` | the same, reduced to the address strings a config file wants |
 | `GetEndpoint(id)` | one endpoint, and whether it exists |
-| `IsCurator(addr)`, `Curators()` | who curates |
+| `IsCurator(addr)`, `Curators()`, `IsInvited(addr)` | who curates, and who has been invited to |
 
 Turning these into a node's `config.toml` is deliberately not this realm's job.
 It is public (`gnomod.toml` says why) so that a separate realm can import it and
@@ -58,7 +58,7 @@ do that.
 | `RemoveEndpoint(id)` | its registrant or a curator |
 | `ApproveZone`, `RejectZone`, `RetireZone` | a curator |
 | `VerifyEndpoint`, `FlagEndpoint`, `UnverifyEndpoint` | a curator |
-| `AddCurator`, `RemoveCurator` | a curator; the last one cannot be removed |
+| `AddCurator`, `RemoveCurator` | a curator; an add is an invitation the address must take up with `AcceptCurator`, and the last curator cannot be removed |
 
 ## Pages
 

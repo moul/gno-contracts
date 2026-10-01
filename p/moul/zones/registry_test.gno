@@ -454,6 +454,13 @@ func TestPagesAndCounts(t *testing.T) {
 	uassert.Equal(t, "", page(r.ZonePage(Approved, 1, 0)))
 	uassert.Equal(t, "", page(r.ZonePage(Approved, 1<<62, 1<<10)), "no overflow into a small offset")
 	uassert.Equal(t, "z0 z2 z4 z6 ", page(r.ZonePage(Pending, 1, 10)))
+	// "" is every status, consistent with ZoneCount("") and ZoneFilter{}.
+	uassert.Equal(t, "z0 z1 z2 ", page(r.ZonePage("", 1, 3)))
+	uassert.Equal(t, "z6 ", page(r.ZonePage("", 3, 3)))
+	uassert.Equal(t, "", page(r.ZonePage("", 4, 3)))
+	uassert.Equal(t, "", page(r.ZonePage("", 0, 3)))
+	uassert.Equal(t, "", page(r.ZonePage("", 1<<62, 1<<10)), "no overflow into a small offset")
+	uassert.Equal(t, "z0 z1 z2 z3 z4 z5 z6 ", page(r.ZonePage("", 1, 1<<40)))
 	// The status index follows a review and a removal.
 	uassert.NoError(t, r.ReviewZone("z0", Rejected, curator, 3, "dup"))
 	uassert.NoError(t, r.RemoveZone("z2"))

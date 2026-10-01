@@ -446,6 +446,22 @@ func (r *Registry) ZoneCount(status Status) int {
 // vm/qrender's 3,000,000,000 ceiling.
 func (r *Registry) ZonePage(status Status, page, size int) []Zone {
 	out := []Zone{}
+	if status == "" {
+		// Every status, as ZoneCount("") counts and ZoneFilter{} matches.
+		// store.Page multiplies before it checks, so the same overflow guard as
+		// pageOf goes first, and size is capped at what exists.
+		n := r.zones.Len()
+		if page < 1 || size < 1 || page-1 > n/size {
+			return out
+		}
+		if size > n {
+			size = n
+		}
+		for _, e := range r.zones.Page(page, size) {
+			out = append(out, *e.Value.(*Zone))
+		}
+		return out
+	}
 	for _, id := range pageOf(r.byStatus.Lookup(string(status)), page, size) {
 		out = append(out, *r.zones.MustGet(id).(*Zone))
 	}

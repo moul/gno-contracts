@@ -33,12 +33,14 @@ import (
 	"gno.land/p/moul/zones/v0"
 )
 
-// Admin is the first curator. More can be added with AddCurator.
+// Admin is the first curator. More are invited with AddCurator and become
+// curators when they accept.
 const Admin address = "g1manfred47kzduec920z88wfr64ylksmdcedlf5"
 
 var (
 	reg      = zones.NewRegistry()
 	curators addrset.Set
+	invited  addrset.Set // invited by a curator, not yet accepted
 )
 
 func init() {
@@ -167,21 +169,44 @@ func RemoveEndpoint(cur realm, id int64) {
 
 // ---- curators
 
-// AddCurator lets another address curate. Only a curator may.
+// AddCurator invites another address to curate. Only a curator may. The
+// address becomes a curator when it calls AcceptCurator itself.
+//
+// Two steps, deliberately: a curator set is the one thing a mistake here can
+// lose for good. With a one-step add, a sole curator who invites a mistyped
+// address and then steps down leaves a registry nobody controls; accepting is
+// the proof that somebody holds the key.
 func AddCurator(cur realm, addr address) {
 	assertCurator(caller(cur))
 	if !addr.IsValid() {
 		panic("zones: not a valid address: " + addr.String())
 	}
-	if !curators.Add(addr) {
+	if curators.Has(addr) {
 		panic("zones: " + addr.String() + " is already a curator")
+	}
+	if !invited.Add(addr) {
+		panic("zones: " + addr.String() + " is already invited")
 	}
 }
 
-// RemoveCurator revokes a curator. Only a curator may, and the last one cannot
-// be removed: a registry nobody can curate can never retire a dead zone.
+// AcceptCurator makes the caller a curator, if a curator invited it.
+func AcceptCurator(cur realm) {
+	who := caller(cur)
+	if !invited.Has(who) {
+		panic("zones: " + who.String() + " has no curator invitation")
+	}
+	invited.Remove(who)
+	curators.Add(who)
+}
+
+// RemoveCurator revokes a curator, or withdraws an invitation. Only a curator
+// may, and the last curator cannot be removed: a registry nobody can curate
+// can never retire a dead zone.
 func RemoveCurator(cur realm, addr address) {
 	assertCurator(caller(cur))
+	if invited.Remove(addr) {
+		return
+	}
 	if !curators.Has(addr) {
 		panic("zones: " + addr.String() + " is not a curator")
 	}
@@ -231,6 +256,10 @@ func ListAddresses(slug, kind, status string) []string {
 	}
 	return out
 }
+
+// IsInvited reports whether addr holds a curator invitation it has not
+// accepted yet.
+func IsInvited(addr address) bool { return invited.Has(addr) }
 
 // IsCurator reports whether addr may curate.
 func IsCurator(addr address) bool { return curators.Has(addr) }

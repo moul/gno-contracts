@@ -28,6 +28,7 @@ const nodeID = "g15rcv5yqef3kvnmueqvkyw8y05sd40jz9p3n5su"
 func reset() {
 	reg = zones.NewRegistry()
 	curators = addrset.Set{}
+	invited = addrset.Set{}
 	curators.Add(Admin)
 	seed()
 }
@@ -264,6 +265,24 @@ func TestCurators(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	uassert.AbortsContains(t, cur, "is the last curator", func() { RemoveCurator(cross(cur), Admin) })
 	AddCurator(cross(cur), alice)
+	uassert.AbortsContains(t, cur, "already invited", func() { AddCurator(cross(cur), alice) })
+	// An invitation is not a seat: until alice accepts, the admin is still the
+	// last curator, so a mistyped invite cannot strand the registry.
+	uassert.True(t, IsInvited(alice))
+	uassert.False(t, IsCurator(alice))
+	uassert.Equal(t, 1, len(Curators()))
+	uassert.AbortsContains(t, cur, "is the last curator", func() { RemoveCurator(cross(cur), Admin) })
+	// Withdrawing an invitation works, and a withdrawn one cannot be accepted.
+	AddCurator(cross(cur), bob)
+	RemoveCurator(cross(cur), bob)
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "has no curator invitation", func() { AcceptCurator(cross(cur)) })
+
+	testing.SetRealm(testing.NewUserRealm(alice))
+	AcceptCurator(cross(cur))
+	uassert.True(t, IsCurator(alice))
+	uassert.False(t, IsInvited(alice))
+	testing.SetRealm(testing.NewUserRealm(Admin))
 	uassert.AbortsContains(t, cur, "already a curator", func() { AddCurator(cross(cur), alice) })
 	uassert.Equal(t, 2, len(Curators()))
 
