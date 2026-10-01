@@ -73,7 +73,7 @@ section if you need the reasoning.
 | a fixed-size recent-N buffer | [`p/moul/fifo`](./p/moul/fifo) or [`x/daily/ringbuffer`](./p/moul/x/daily/ringbuffer) | [2.8](#28-sets-queues-and-dedup) |
 | a queue you only ever scan | a plain `[]T`, **not** `deque` | [2.8](#28-sets-queues-and-dedup) |
 | a scoreboard, ranked | [`p/moul/kit/tally`](./p/moul/kit/tally) | [2.9](#29-scoreboards-are-kittally) |
-| records with more than one lookup key | hand-rolled parallel indexes, for now | [2.10](#210-more-than-one-index) |
+| records with more than one lookup key | the store, plus one [`p/moul/kit/index`](./p/moul/kit/index) per key | [2.10](#210-more-than-one-index) |
 | an expensive computation you repeat | [`p/moul/memo`](./p/moul/memo) | [2.11](#211-caching-and-snapshots) |
 | a snapshot of a tree you can diff against | [`p/moul/cow`](./p/moul/cow) | [2.11](#211-caching-and-snapshots) |
 | state you intend to delete and get the deposit back for | a map or a tree. **Never a slice** | [2.12](#212-deleting-and-the-refund) |
@@ -475,9 +475,31 @@ is not the right answer: 2,080 B/entry with one extra unique index, and an **upd
 `Update` removes and re-adds every index entry for every index without first checking
 whether the indexed value changed.
 
-Until that is fixed, a record store with two lookup keys is two containers and a small
-amount of discipline: the records in one, `key -> id` in the other, both written in the
-same function. It is more code and a third of the cost.
+A record store with two lookup keys is two containers and a small amount of discipline: the
+records in a [`kit/store`](./p/moul/kit/store), `key -> id` in a
+[`kit/index`](./p/moul/kit/index), **both written in the same function**. A third of the
+cost, and the realm can see what it is paying for.
+
+```gno
+var notes = store.Named("note")
+var byTag index.Index // the zero value is an empty, usable index
+
+func Post(cur realm, tag, body string) int64 {
+	id := notes.Add(&note{Tag: tag, Body: body})
+	if err := byTag.Add(tag, id); err != nil {
+		panic(err) // the store write is not committed either: same frame
+	}
+	return int64(id)
+}
+```
+
+The discipline is the one line that matters: **every write touches the store and every index
+in one function**, so an abort anywhere leaves none of them applied. That is the whole
+correctness argument for keeping them apart, and it is why the library deliberately does not
+try to own the store. Worked example: [`r/moul/x/kitindexdemo`](./r/moul/x/kitindexdemo).
+
+`kit/index` is a B+ tree at fanout 128, keeps the ids under a key ascending so a `Lookup`
+does not depend on insertion order, and hands out a copy rather than its stored slice.
 
 ### 2.11 Caching and snapshots
 
@@ -1178,6 +1200,7 @@ live. If you are about to write a helper, look here first.
 | an amount formatter for ugnot | [`kit/num`](./p/moul/kit/num) |
 | a zero-padding helper, because `ufmt` has no width flags | [`kit/num`](./p/moul/kit/num) `Pad` |
 | an auto-incrementing id plus a padded avl key | [`kit/store`](./p/moul/kit/store) |
+| a `key -> id` lookup beside a store | [`kit/index`](./p/moul/kit/index) |
 | a `Len`/`Swap`/`Less` for a leaderboard | [`kit/tally`](./p/moul/kit/tally) |
 | a query-string parser for `Render` | [`realmpath`](./p/moul/realmpath) |
 | a page picker | [`pageable`](./p/moul/pageable), or `kit/store`'s `Page` |

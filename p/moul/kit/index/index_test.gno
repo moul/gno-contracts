@@ -262,3 +262,66 @@ func TestManyIDsUnderOneKey(t *testing.T) {
 		uassert.Equal(t, store.ID(i+1).String(), id.String())
 	}
 }
+
+// maxInt is the largest int, which is where unchecked arithmetic in Page and
+// Pages goes wrong.
+const maxInt = int(^uint(0) >> 1)
+
+// A removed id must drop the old backing array, not merely shorten it.
+//
+// In gno a slice is ONE persisted object, and the deposit comes back when the
+// object is dropped and at no other time (EFFECTIVE_GNO.md section 2.12).
+// Shortening in place keeps the peak allocation charged until the whole key
+// goes, so a key that grew to 1,000 ids and shrank to 1 would still be paying
+// for 1,000.
+//
+// Not observable through the API, so this reads the entry directly: same
+// package, and the invariant is worth more than the encapsulation.
+func TestRemoveReleasesTheBackingArray(t *testing.T) {
+	ix := New()
+	for n := uint64(1); n <= 16; n++ {
+		urequire.NoError(t, ix.Add("gno", store.ID(n)))
+	}
+	for n := uint64(1); n <= 15; n++ {
+		uassert.True(t, ix.Remove("gno", store.ID(n)))
+	}
+
+	e, _ := ix.tree.Get("gno").(*entry)
+	urequire.True(t, e != nil)
+	uassert.Equal(t, 1, len(e.ids))
+	uassert.Equal(t, 1, cap(e.ids),
+		"the shrunk bucket still owns its peak allocation, so the deposit never comes back")
+}
+
+// Page's contract is that a page past the end is nil. Unchecked
+// (page-1)*size wraps negative at the limit, and bptree.IterateByOffset
+// normalises a negative offset to 0, so the caller silently gets page 1.
+func TestPageDoesNotWrapAtTheIntegerLimit(t *testing.T) {
+	ix := New()
+	for _, k := range []string{"a", "b", "c"} {
+		urequire.NoError(t, ix.Add(k, 1))
+	}
+	uassert.Equal(t, 0, len(ix.Page(maxInt, 2)),
+		"a page past the end is nil, including when the offset would overflow")
+	uassert.Equal(t, 0, len(ix.Page(maxInt/2+2, 2)))
+}
+
+// A huge size must not reserve a huge slice for three keys.
+func TestPageCapsItsAllocationToWhatExists(t *testing.T) {
+	ix := New()
+	for _, k := range []string{"a", "b", "c"} {
+		urequire.NoError(t, ix.Add(k, 1))
+	}
+	got := ix.Page(1, maxInt)
+	urequire.Equal(t, 3, len(got))
+	uassert.True(t, cap(got) <= 3, "the capacity follows the keys, not the requested size")
+}
+
+// Pages documents "at least 1". The ceiling n+size-1 wraps when size is the
+// limit, and the division then returns 0.
+func TestPagesNeverReturnsZeroAtTheIntegerLimit(t *testing.T) {
+	ix := New()
+	urequire.NoError(t, ix.Add("a", 1))
+	urequire.NoError(t, ix.Add("b", 1))
+	uassert.Equal(t, 1, ix.Pages(maxInt))
+}

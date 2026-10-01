@@ -157,12 +157,23 @@ func (ix *Index) Remove(key string, id store.ID) bool {
 	if !found {
 		return false
 	}
-	e.ids = append(e.ids[:pos], e.ids[pos+1:]...)
 	ix.pairs--
-	if len(e.ids) == 0 {
+	if len(e.ids) == 1 {
 		ix.tree.Remove(key)
 		return true
 	}
+	// A fresh slice, not append(ids[:pos], ids[pos+1:]...).
+	//
+	// In gno a slice is ONE persisted object and the storage deposit comes back
+	// when that object is dropped, at no other time: shortening in place keeps
+	// the peak allocation charged until the whole key goes, so a key that grew
+	// to 1,000 ids and shrank to 1 would still be paying for 1,000. Allocating
+	// the exact size drops the old array and refunds the difference. Same O(n)
+	// as the memmove it replaces.
+	trimmed := make([]store.ID, 0, len(e.ids)-1)
+	trimmed = append(trimmed, e.ids[:pos]...)
+	trimmed = append(trimmed, e.ids[pos+1:]...)
+	e.ids = trimmed
 	ix.tree.Set(key, e)
 	return true
 }
@@ -277,8 +288,27 @@ func (ix *Index) Page(page, size int) []Entry {
 	if ix.tree == nil || page < 1 || size < 1 {
 		return nil
 	}
-	out := make([]Entry, 0, size)
-	ix.tree.IterateByOffset((page-1)*size, size, func(k string, v any) bool {
+	// The offset is computed in a way that cannot wrap, because
+	// bptree.IterateByOffset normalises a NEGATIVE offset to 0: an overflowed
+	// (page-1)*size would silently hand back page 1 for a page past the end,
+	// which is the opposite of this method's contract.
+	keys := ix.tree.Size()
+	if page-1 > keys/size {
+		return nil
+	}
+	offset := (page - 1) * size
+
+	// The capacity follows what exists, not what was asked for, so Page(1,
+	// maxInt) over three keys reserves three slots and not two billion.
+	room := keys - offset
+	if room > size {
+		room = size
+	}
+	if room < 0 {
+		room = 0
+	}
+	out := make([]Entry, 0, room)
+	ix.tree.IterateByOffset(offset, size, func(k string, v any) bool {
 		e := v.(*entry)
 		ids := make([]store.ID, len(e.ids))
 		copy(ids, e.ids)
@@ -298,7 +328,11 @@ func (ix *Index) Pages(size int) int {
 	if n == 0 {
 		return 1
 	}
-	return (n + size - 1) / size
+	// 1 + (n-1)/size rather than (n+size-1)/size: the second overflows when
+	// size is near the integer limit, wraps negative, and divides to 0, which
+	// contradicts the "at least 1" this method promises and divides a page
+	// picker by zero.
+	return 1 + (n-1)/size
 }
 
 // Entry is one key and the ids carrying it, as returned by [Index.Page].

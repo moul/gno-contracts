@@ -1,6 +1,7 @@
 package kitindexdemo
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
@@ -157,4 +158,40 @@ func TestRenderOfAnUnknownPage(t *testing.T) {
 	uassert.True(t, strings.Contains(Render("nope"), "Not found"))
 	uassert.True(t, strings.Contains(Render("tag"), "No tag given."))
 	uassert.True(t, strings.Contains(Render("author"), "No author given."))
+}
+
+// MaxBody bounds one write. These bound the bill, which is the thing the realm
+// actually pays.
+func TestPerAuthorCap(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	for i := 0; i < MaxPerAuthor; i++ {
+		Post(cross(cur), "gno", "note "+strconv.Itoa(i))
+	}
+	uassert.AbortsContains(t, cur, "the limit is 20", func() {
+		Post(cross(cur), "gno", "one too many")
+	})
+
+	// Another address is unaffected, which is the whole reason the cap is
+	// per author and not only global.
+	testing.SetRealm(testing.NewUserRealm(bob))
+	Post(cross(cur), "gno", "bob still fits")
+	uassert.Equal(t, MaxPerAuthor+1, notes.Len())
+}
+
+// Retracting frees a slot, so the cap is not a one-way door.
+func TestRetractingFreesASlot(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	first := Post(cross(cur), "gno", "note 0")
+	for i := 1; i < MaxPerAuthor; i++ {
+		Post(cross(cur), "gno", "note "+strconv.Itoa(i))
+	}
+	uassert.AbortsContains(t, cur, "the limit is 20", func() {
+		Post(cross(cur), "gno", "blocked")
+	})
+
+	Retract(cross(cur), first)
+	Post(cross(cur), "gno", "now it fits")
+	uassert.Equal(t, MaxPerAuthor, notes.Len())
 }

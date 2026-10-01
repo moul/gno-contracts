@@ -39,6 +39,26 @@ const MaxTagLen = 24
 // PageSize is how many tags the root page shows.
 const PageSize = 20
 
+// MaxNotes and MaxPerAuthor bound the WHOLE board, which MaxBody does not.
+//
+// A per-call length limit bounds one write and nothing else: a caller posting
+// one-byte notes in a loop grows the store and both indexes without limit,
+// and the storage deposit for every one of those bytes is locked against this
+// realm's address. "An unbounded container a third party can grow is an
+// unbounded storage deposit someone is paying for" is a rule this realm exists
+// to demonstrate, so it had better obey it.
+//
+// Two caps rather than one, because a single global cap is filled by whoever
+// gets there first: the per-author cap is what keeps the board open to the
+// twenty-first address. Retracting frees a slot, so neither is a one-way door.
+//
+// MaxPerAuthor is answered by byAuthor.Count, which is the index doing the job
+// it was added for.
+const (
+	MaxNotes     = 1000
+	MaxPerAuthor = 20
+)
+
 type note struct {
 	Author address
 	Tag    string
@@ -61,6 +81,7 @@ func Post(cur realm, tag, body string) int64 {
 	who := caller(cur)
 	tag = normaliseTag(tag)
 	assertBody(body)
+	assertRoom(who)
 
 	id := notes.Add(&note{
 		Author: who,
@@ -128,6 +149,20 @@ func normaliseTag(tag string) string {
 		}
 	}
 	return tag
+}
+
+// assertRoom refuses a write the board has no room for, globally or for this
+// address. Checked before the store write, so a refusal costs the caller the
+// gas of three reads and nothing is half-applied.
+func assertRoom(who address) {
+	if notes.Len() >= MaxNotes {
+		panic("kitindexdemo: the board is full at " + strconv.Itoa(MaxNotes) +
+			" notes; retract one to free a slot")
+	}
+	if n := byAuthor.Count(who.String()); n >= MaxPerAuthor {
+		panic("kitindexdemo: " + who.String() + " already has " + strconv.Itoa(n) +
+			" notes, the limit is " + strconv.Itoa(MaxPerAuthor))
+	}
 }
 
 func assertBody(body string) {
