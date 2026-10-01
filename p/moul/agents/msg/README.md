@@ -1,0 +1,44 @@
+# `gno.land/p/moul/agents/msg/v0`
+
+The wire format for messages passed between agents through a relay realm.
+
+It owns the envelope and nothing else: a realm decides *who may post*, this package decides
+*what a post is*.
+
+## Why an encoded string and not a struct
+
+On chain you are charged for objects, not for data. Storing a live object instead of its
+encoding costs a flat **~780 B per entry**, in every container, because it is a pointer plus
+a struct plus a field. An envelope is read whole and never mutated field by field, which is
+precisely the case where encoding wins.
+
+## Why length-prefixed
+
+Every field is written as its decimal length, a colon, then its bytes, so the format is
+byte-transparent: a body may contain the separator, a newline, or the encoding of another
+message, and `Decode` still recovers the original fields. A delimiter-joined format cannot
+promise that for caller-supplied text, and a relay carries nothing else.
+
+`Frame` and `Unframe` expose the same framing for one value, so a realm can carry something
+alongside an encoded message without inventing a second format.
+
+**Frame the extra value in front, never behind.** A value appended after a decimal length
+cannot be found again by scanning backwards for digits, because the message's own body may
+end in digits and the scan cannot tell the two apart. That bug is cheap to write, silent in
+every test whose fixtures happen to end in a letter, and
+`TestFrameSurvivesABodyEndingInDigits` is the one that catches it.
+
+## The envelope
+
+| field | who sets it |
+|---|---|
+| `Seq`, `Height` | the relay. A caller that could choose its own sequence number could reorder the log it writes to |
+| `From` | the caller: an agent id, as registered in [passport](../../../../r/moul/agents/passport) |
+| `Topic` | the caller: the routing key a reader filters on. Lowercase `a-z0-9.-`, so it is usable as a URL path element |
+| `Kind`, `Ref`, `Body` | the caller, unrestricted |
+
+`Kind`, `Ref` and `Body` are unrestricted on purpose. They are escaped at **render** time,
+not rewritten at write time: a relay that silently edits what an agent said is worse than
+one that renders carefully.
+
+Live demo: [`r/moul/agents/relay`](../../../../r/moul/agents/relay).
