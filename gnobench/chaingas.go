@@ -66,3 +66,12 @@ func (r Row) ChainGas(cfg types.GasConfig) int64 {
 	}
 	return chainStoreGas(cfg, r.KVGets, r.KVGetBytes, r.KVSets, r.KVSetBytes, r.KVDels)
 }
+
+// DChainGas prices the baseline-subtracted counters: the I/O of the measured
+// operation alone, with building the container taken back out.
+func (r Row) DChainGas(cfg types.GasConfig) int64 {
+	if r.DKVSets == 0 && r.DKVGets == 0 && r.DKVDels == 0 {
+		return 0
+	}
+	return chainStoreGas(cfg, r.DKVGets, r.DKVGetBytes, r.DKVSets, r.DKVSetBytes, r.DKVDels)
+}

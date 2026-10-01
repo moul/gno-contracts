@@ -100,3 +100,53 @@ func TestChainStoreGasMatchesCacheCharging(t *testing.T) {
 		}
 	})
 }
+
+// The single-operation wiring shapes exist because the storage suite's filetest
+// harness never touches the key/value store. This asserts the new shapes
+// actually do: a cold read of a container must grow its KV traffic with the
+// container, which is precisely what the filetest path fails to do (there, KV
+// reads stay at 7 to 8 from n=100 to n=10,000).
+//
+// It reads the committed result file rather than measuring, so it stays cheap
+// and still fails if a change makes the harness stop reaching the store.
+func TestWiringOpShapesActuallyReachTheStore(t *testing.T) {
+	files, err := LoadAll(".", "wiring")
+	if err != nil || len(files) == 0 {
+		t.Skip("no wiring results committed for any machine")
+	}
+	type key struct {
+		structure string
+		n         int
+	}
+	got := map[key]Row{}
+	for _, f := range files {
+		for _, r := range f.Rows {
+			if r.Workload == shapeOp1Read {
+				got[key{r.Structure, r.N}] = r
+			}
+		}
+	}
+	if len(got) == 0 {
+		t.Skip("no op_read rows committed yet")
+	}
+	for k, r := range got {
+		if r.DKVGets <= 0 {
+			t.Errorf("%s at n=%d: op_read reached the store %d times; the shape is "+
+				"measuring nothing, which is the filetest harness's failure mode",
+				k.structure, k.n, r.DKVGets)
+		}
+		if r.DKVGetBytes <= 0 {
+			t.Errorf("%s at n=%d: op_read read %d bytes from the store",
+				k.structure, k.n, r.DKVGetBytes)
+		}
+	}
+	// And the whole point: the traffic must depend on how much is stored.
+	small, okS := got[key{"builtin map[string]string", 100}]
+	big, okB := got[key{"builtin map[string]string", 2000}]
+	if okS && okB && big.DKVGetBytes <= small.DKVGetBytes*4 {
+		t.Errorf("a map's cold read moved %d bytes at n=100 and %d at n=2000; "+
+			"a single-object container must read all of itself, so the second "+
+			"should be roughly twenty times the first",
+			small.DKVGetBytes, big.DKVGetBytes)
+	}
+}

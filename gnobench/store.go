@@ -45,7 +45,16 @@ type Row struct {
 	KVGets     int64 `json:"kv_gets,omitempty"`
 	KVGetBytes int64 `json:"kv_get_bytes,omitempty"`
 	KVDels     int64 `json:"kv_dels,omitempty"`
-	Txs        int   `json:"txs,omitempty"`
+
+	// Baseline-subtracted counters, for the shapes that have a baseline. The
+	// raw ones above include building the container; these are the measured
+	// operation alone, and they are what DChainGas prices.
+	DKVGets     int64 `json:"d_kv_gets,omitempty"`
+	DKVGetBytes int64 `json:"d_kv_get_bytes,omitempty"`
+	DKVSets     int64 `json:"d_kv_sets,omitempty"`
+	DKVSetBytes int64 `json:"d_kv_set_bytes,omitempty"`
+	DKVDels     int64 `json:"d_kv_dels,omitempty"`
+	Txs         int   `json:"txs,omitempty"`
 
 	Stable bool   `json:"stable"`
 	Skip   string `json:"skip,omitempty"`
