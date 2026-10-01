@@ -456,7 +456,7 @@ func (r *Registry) endpoint(id int64) (*Endpoint, error) {
 	return v.(*Endpoint), nil
 }
 
-// removeEndpoint unwinds the store and all three indexes together.
+// removeEndpoint unwinds the store and all four of its indexes together.
 func (r *Registry) removeEndpoint(id store.ID) {
 	v, ok := r.endpoints.Remove(id)
 	if !ok {

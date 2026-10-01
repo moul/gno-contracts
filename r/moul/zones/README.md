@@ -52,7 +52,7 @@ do that.
 |---|---|
 | `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody |
 | `EditZone(..., reason)` | a curator, or the proposer while pending; on an approved zone the reason is required and replaces the review on record, and a new chain id sends its verified endpoints back to unverified; a rejected or retired zone is not editable |
-| `RemoveZone(slug)` | a curator or the proposer, on a pending or rejected zone; one that was ever official is kept |
+| `RemoveZone(slug)` | a curator, or the proposer while every endpoint on it is theirs, on a pending or rejected zone; one that was ever official is kept |
 | `RegisterEndpoint(slug, kind, addr, label)` | anybody, on a pending or approved zone |
 | `RemoveEndpoint(id)` | its registrant or a curator |
 | `ApproveZone`, `RejectZone`, `RetireZone` | a curator |

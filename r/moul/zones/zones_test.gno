@@ -186,6 +186,9 @@ func TestRejectAndWithdraw(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(bob))
 	ProposeZone(cross(cur), "fake-mainnet", "gnoland-1", "Mainnet (faster!)", "",
 		"mainnet", "", "https://rpc.fake.example", "")
+	RegisterEndpoint(cross(cur), "fake-mainnet", "rpc", "https://bob.example", "")
+	testing.SetRealm(testing.NewUserRealm(alice))
+	theirs := RegisterEndpoint(cross(cur), "fake-mainnet", "rpc", "https://alice.example", "")
 
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	uassert.AbortsContains(t, cur, "needs a reason", func() { RejectZone(cross(cur), "fake-mainnet", "  ") })
@@ -195,7 +198,13 @@ func TestRejectAndWithdraw(cur realm, t *testing.T) {
 	uassert.Equal(t, "fake-mainnet", slugs(ListZones("rejected", "")))
 	uassert.Equal(t, "mainnet onyx staging moul-staging", slugs(ListZones("approved", "")))
 
-	// The proposer can take a rejected proposal down, which frees the slug.
+	// The proposer can take a rejected proposal down, which frees the slug, but
+	// not while it carries somebody else's endpoint: the deposit refund would
+	// go to the proposer.
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "must be removed first", func() { RemoveZone(cross(cur), "fake-mainnet") })
+	testing.SetRealm(testing.NewUserRealm(alice))
+	RemoveEndpoint(cross(cur), theirs)
 	testing.SetRealm(testing.NewUserRealm(bob))
 	RemoveZone(cross(cur), "fake-mainnet")
 	_, ok := GetZone("fake-mainnet")

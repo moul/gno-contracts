@@ -76,6 +76,7 @@ official zone or a verified endpoint; a curator clears it with `RemoveZone` /
 only admission price a permissionless list has. Removing a zone removes its
 endpoints and gives the deposit back.
 
-Storage is a [`kit/store`](../kit/store) for each record type plus five
+Storage is a [`kit/store`](../kit/store) for each record type plus six
 [`kit/index`](../kit/index) lookups (slug, pending-by-proposer, zone, dedup key,
-registrant), every one written in the same method as its record.
+registrant, unverified-by-zone), every one written in the same method as its
+record.

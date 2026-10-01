@@ -102,6 +102,19 @@ func RemoveZone(cur realm, slug string) {
 	if !curators.Has(who) && !own {
 		panic("zones: only a curator, or the proposer while it is pending or rejected, may remove " + slug)
 	}
+	// The storage deposit comes back to whoever signs the transaction that
+	// frees it, so a proposer removing a zone that carries somebody else's
+	// endpoints would collect the deposits those registrants paid. They take
+	// back only what they alone put there; anything else waits for its
+	// registrants, or for a curator.
+	if !curators.Has(who) {
+		for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug}) {
+			if e.Registrant != who {
+				panic("zones: " + slug + " carries endpoint #" + strconv.FormatInt(e.ID, 10) +
+					" registered by " + e.Registrant.String() + "; it must be removed first")
+			}
+		}
+	}
 	must(reg.RemoveZone(slug))
 }
 
