@@ -404,3 +404,73 @@ func TestZonesFilterAndOrder(t *testing.T) {
 	uassert.Equal(t, "onyx ", slugs(r.Zones(ZoneFilter{Status: Approved, Kind: Testnet})))
 	uassert.Equal(t, "", slugs(r.Zones(ZoneFilter{Kind: Local})))
 }
+
+func TestPagesAndCounts(t *testing.T) {
+	r := NewRegistry()
+	for i := 0; i < 7; i++ {
+		uassert.NoError(t, r.Propose(testAddr(i), 1, "z"+strconv.Itoa(i), onyx()))
+	}
+	uassert.NoError(t, r.ReviewZone("z1", Approved, curator, 2, ""))
+	uassert.NoError(t, r.ReviewZone("z3", Approved, curator, 2, ""))
+	uassert.NoError(t, r.ReviewZone("z5", Approved, curator, 2, ""))
+	uassert.Equal(t, 3, r.ZoneCount(Approved))
+	uassert.Equal(t, 4, r.ZoneCount(Pending))
+	uassert.Equal(t, 7, r.ZoneCount(""))
+
+	page := func(zs []Zone) string {
+		out := ""
+		for _, z := range zs {
+			out += z.Slug + " "
+		}
+		return out
+	}
+	uassert.Equal(t, "z1 z3 ", page(r.ZonePage(Approved, 1, 2)))
+	uassert.Equal(t, "z5 ", page(r.ZonePage(Approved, 2, 2)))
+	uassert.Equal(t, "", page(r.ZonePage(Approved, 3, 2)))
+	uassert.Equal(t, "", page(r.ZonePage(Approved, 0, 2)))
+	uassert.Equal(t, "", page(r.ZonePage(Approved, 1, 0)))
+	uassert.Equal(t, "", page(r.ZonePage(Approved, 1<<62, 1<<10)), "no overflow into a small offset")
+	uassert.Equal(t, "z0 z2 z4 z6 ", page(r.ZonePage(Pending, 1, 10)))
+	// The status index follows a review and a removal.
+	uassert.NoError(t, r.ReviewZone("z0", Rejected, curator, 3, "dup"))
+	uassert.NoError(t, r.RemoveZone("z2"))
+	uassert.Equal(t, "z4 z6 ", page(r.ZonePage(Pending, 1, 10)))
+	uassert.Equal(t, "z0 ", page(r.ZonePage(Rejected, 1, 10)))
+	uassert.Equal(t, "z1 z3 z5 ", page(r.Zones(ZoneFilter{Status: Approved})))
+
+	// Chain ids are not unique, and the chain index follows an edit.
+	uassert.Equal(t, 6, len(r.ZonesByChainID("onyx-1")))
+	in := onyx()
+	in.ChainID = "onyx-2"
+	uassert.NoError(t, r.Edit("z1", in, curator, 4, "relaunched"))
+	uassert.Equal(t, "z1 ", page(r.ZonesByChainID("onyx-2")))
+	uassert.Equal(t, 5, len(r.ZonesByChainID("onyx-1")))
+	uassert.NoError(t, r.RemoveZone("z0"))
+	uassert.Equal(t, 4, len(r.ZonesByChainID("onyx-1")))
+
+	// Endpoints: counts from the indexes, pages by kind.
+	for i := 0; i < 5; i++ {
+		_, err := r.Register(alice, 5, "z3", RPC, "https://e"+strconv.Itoa(i)+".example", "")
+		uassert.NoError(t, err)
+	}
+	pid, err := r.Register(alice, 5, "z3", Peer, nodeID+"@p.example:26656", "")
+	uassert.NoError(t, err)
+	uassert.NoError(t, r.ReviewEndpoint(pid, Verified, curator, 6, ""))
+	v, total := r.Count("z3")
+	uassert.Equal(t, 1, v)
+	uassert.Equal(t, 6, total)
+	uassert.Equal(t, 5, r.EndpointCount("z3", RPC))
+	uassert.Equal(t, 1, r.EndpointCount("z3", Peer))
+	uassert.Equal(t, 0, r.EndpointCount("z3", Faucet))
+	uassert.Equal(t, 6, r.EndpointCount("z3", ""))
+	uassert.Equal(t, 1, len(r.EndpointPage("z3", RPC, 3, 2))) // page 3 of 5 rpcs at 2 a page holds one
+	uassert.Equal(t, "https://e4.example", r.EndpointPage("z3", RPC, 3, 2)[0].Address)
+	uassert.Equal(t, nodeID+"@p.example:26656", r.EndpointPage("z3", Peer, 1, 10)[0].Address)
+	uassert.Equal(t, 6, len(r.EndpointPage("z3", "", 1, 10)))
+	uassert.Equal(t, 1, len(r.Endpoints(EndpointFilter{Zone: "z3", Kind: Peer})))
+	uassert.NoError(t, r.RemoveEndpoint(pid))
+	uassert.Equal(t, 0, r.EndpointCount("z3", Peer))
+	v, total = r.Count("z3")
+	uassert.Equal(t, 0, v)
+	uassert.Equal(t, 5, total)
+}

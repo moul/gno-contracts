@@ -10,8 +10,9 @@
 //
 // Curation is the point. Anybody may propose a zone and register endpoints on
 // it; a curator approves or rejects a proposal, retires a zone that stopped
-// running, and verifies or flags an endpoint, and every one of those decisions
-// carries a reason the public reads on the zone's page. Nothing is hidden while
+// running, and verifies or flags an endpoint. Every decision is recorded with
+// who made it and when, and a rejection, a retirement, a flag or an edit to an
+// approved zone must also say why, on the zone's page. Nothing is hidden while
 // it waits: proposals and unverified endpoints are listed, and labelled.
 //
 // This realm only manages the information and answers questions about it. The

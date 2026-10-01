@@ -7,7 +7,7 @@ func ExampleRender() {
 	// Output:
 	// # Zones
 	//
-	// A curated registry of gno.land networks and the endpoints that reach them. Anybody can propose a zone or register an endpoint; a curator approves, rejects, verifies or flags it, and every decision carries a public reason.
+	// A curated registry of gno.land networks and the endpoints that reach them. Anybody can propose a zone or register an endpoint; a curator approves, rejects, retires, verifies or flags it, and every rejection, retirement and flag says why, in public.
 	//
 	// ## Official
 	//
@@ -22,7 +22,7 @@ func ExampleRender() {
 	//
 	// ## Read it from a node
 	//
-	// Every list is a plain function, so a node operator or a script can ask for it directly. An empty argument matches anything.
+	// Every list is a plain function, so a node operator or a script can ask for it directly. An empty kind or status matches anything.
 	//
 	// ```
 	// gnokey query vm/qeval -data 'gno.land/r/moul/zones/v0.ListAddresses("onyx", "peer", "verified")'
@@ -57,42 +57,17 @@ func ExampleRender_zone() {
 	//
 	// ## Endpoints
 	//
-	// ### rpc
+	// **all (7)** · [rpc \(1\)](/r/moul/zones/v0:zone/onyx?kind=rpc) · [gnoweb \(1\)](/r/moul/zones/v0:zone/onyx?kind=gnoweb) · [peer \(2\)](/r/moul/zones/v0:zone/onyx?kind=peer) · [indexer \(1\)](/r/moul/zones/v0:zone/onyx?kind=indexer) · [faucet \(1\)](/r/moul/zones/v0:zone/onyx?kind=faucet) · [explorer \(1\)](/r/moul/zones/v0:zone/onyx?kind=explorer)
 	//
-	// | # | address | label | status | registered by |
-	// | --- | --- | --- | --- | --- |
-	// | 7 | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	//
-	// ### gnoweb
-	//
-	// | # | address | label | status | registered by |
-	// | --- | --- | --- | --- | --- |
-	// | 8 | `https://onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	//
-	// ### peer
-	//
-	// | # | address | label | status | registered by |
-	// | --- | --- | --- | --- | --- |
-	// | 9 | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	// | 10 | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	//
-	// ### indexer
-	//
-	// | # | address | label | status | registered by |
-	// | --- | --- | --- | --- | --- |
-	// | 11 | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	//
-	// ### faucet
-	//
-	// | # | address | label | status | registered by |
-	// | --- | --- | --- | --- | --- |
-	// | 12 | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	//
-	// ### explorer
-	//
-	// | # | address | label | status | registered by |
-	// | --- | --- | --- | --- | --- |
-	// | 13 | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | # | kind | address | label | status | registered by |
+	// | --- | --- | --- | --- | --- | --- |
+	// | 7 | rpc | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 8 | gnoweb | `https://onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 9 | peer | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 10 | peer | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 11 | indexer | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 12 | faucet | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 13 | explorer | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
 	//
 	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&slug=onyx)
 	//
@@ -123,11 +98,25 @@ func ExampleRender_proposals() {
 	// | --- | --- | --- | --- | --- |
 	// | [Alice's devnet](/r/moul/zones/v0:zone/alice-dev) | `alicedev-1` | devnet | `g1v9kxjc…40gh` | [Approve](/r/moul/zones/v0$help&func=ApproveZone&reason=&slug=alice-dev) · [Reject](/r/moul/zones/v0$help&func=RejectZone&reason=&slug=alice-dev) |
 	//
+	// [1 rejected](/r/moul/zones/v0:proposals?status=rejected) · [All zones](/r/moul/zones/v0)
+}
+
+// ExampleRender_rejected pins the rejected list, which carries the reasons.
+func ExampleRender_rejected() {
+	reset()
+	must(reg.Propose(bob, 201, "fake-mainnet", info("gnoland-1", "Mainnet (faster!)", "", "mainnet", "", "https://rpc.fake.example", "")))
+	must(reg.ReviewZone("fake-mainnet", "rejected", Admin, 202, "not the mainnet RPC"))
+	print(Render("proposals?status=rejected"))
+	// Output:
+	// # Proposals
+	//
+	// Zones somebody proposed and no curator has approved. Only an approved zone is official.
+	//
 	// ## Rejected
 	//
 	// | zone | chain id | proposed by | why |
 	// | --- | --- | --- | --- |
 	// | [Mainnet \(faster\!\)](/r/moul/zones/v0:zone/fake-mainnet) | `gnoland-1` | `g1vfhkyh…vdhu` | not the mainnet RPC |
 	//
-	// [All zones](/r/moul/zones/v0)
+	// [pending](/r/moul/zones/v0:proposals) · [All zones](/r/moul/zones/v0)
 }

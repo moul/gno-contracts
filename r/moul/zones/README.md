@@ -3,8 +3,9 @@
 A curated registry of gno.land networks and the endpoints that reach them:
 mainnet, the testnets, staging chains, anybody's gnodev. Anybody proposes a zone
 or registers an endpoint on one; a curator approves, rejects, retires, verifies
-or flags it, and every decision carries a reason the public reads on the zone's
-page. Nothing is hidden while it waits: proposals and unverified endpoints are
+or flags it. Every decision is recorded with who made it and when, and a
+rejection, a retirement, a flag or an edit to an approved zone must also say
+why, on the zone's page. Nothing is hidden while it waits: proposals and unverified endpoints are
 listed, and labelled.
 
 The model, validation and state machine are [`p/moul/zones`](../../../p/moul/zones).
@@ -61,8 +62,11 @@ do that.
 
 ## Pages
 
+Every list is 25 rows a page (`?page=`), and a page reads only its own rows:
+`vm/qrender` is gas-metered, and a Render that outgrows it stops answering.
+
 | path | shows |
 |---|---|
-| `` | the official zones, the retired ones, how to read it |
-| `zone/<slug>` | one zone: its facts, its review, its endpoints grouped by kind |
-| `proposals` | pending proposals, and rejected ones with the reason |
+| `` | the official zones; `?status=retired` for the retired ones |
+| `zone/<slug>` | one zone: its facts, its last review, its endpoints; `?kind=peer` narrows them |
+| `proposals` | pending proposals; `?status=rejected` for rejected ones, with the reason |

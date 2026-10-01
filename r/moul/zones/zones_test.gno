@@ -2,6 +2,7 @@ package zones
 
 import (
 	"chain/runtime"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -305,4 +306,45 @@ func TestRenderPagesAnswer(t *testing.T) {
 	uassert.True(t, strings.Contains(Render("nope"), "No such page."))
 	uassert.True(t, strings.Contains(Render("proposals"), "Nothing waiting for review."))
 	uassert.True(t, strings.Contains(Render("zone/staging"), "unverified"))
+}
+
+// Every list is paginated and clamps a reader's ?page=, and a page reads only
+// its own rows: what keeps a full registry inside vm/qrender's gas.
+func TestRenderPaginates(t *testing.T) {
+	reset()
+	for i := 0; i < 2*PageSize; i++ {
+		slug := "z" + strconv.Itoa(i)
+		must(reg.Propose(alice, 1, slug, info("c-"+strconv.Itoa(i), "Zone "+strconv.Itoa(i), "", "devnet", "", "https://r"+strconv.Itoa(i)+".example", "")))
+		must(reg.ReviewZone(slug, zones.Approved, Admin, 2, ""))
+	}
+	// 4 seeded + 50 = 54 approved, so 3 pages of 25.
+	first := Render("")
+	uassert.True(t, strings.Contains(first, "page 1 of 3"))
+	uassert.True(t, strings.Contains(first, "Zone 20"))
+	uassert.False(t, strings.Contains(first, "Zone 21"), "row 26 is on page 2")
+	last := Render("?page=3")
+	uassert.True(t, strings.Contains(last, "Zone 49"))
+	uassert.False(t, strings.Contains(last, "Zone 45]"))
+	uassert.True(t, strings.Contains(last, "page 3 of 3"))
+	uassert.Equal(t, first, Render("?page=-1"))
+	uassert.Equal(t, last, Render("?page=99999999999999999"))
+	uassert.Equal(t, first, Render("?page=nope"))
+	uassert.True(t, strings.Contains(Render("?status=nope"), "No such list."))
+
+	for i := 0; i < PageSize+3; i++ {
+		_, err := reg.Register(alice, 3, "z0", zones.RPC, "https://e"+strconv.Itoa(i)+".example", "")
+		must(err)
+	}
+	_, err := reg.Register(alice, 3, "z0", zones.Peer, nodeID+"@p.example:26656", "")
+	must(err)
+	zp := Render("zone/z0")
+	uassert.True(t, strings.Contains(zp, "page 1 of 2"))
+	uassert.True(t, strings.Contains(zp, "**all (29)**"))
+	uassert.True(t, strings.Contains(zp, `[rpc \(28\)](/r/moul/zones/v0:zone/z0?kind=rpc)`))
+	peers := Render("zone/z0?kind=peer")
+	uassert.True(t, strings.Contains(peers, "p.example"))
+	uassert.False(t, strings.Contains(peers, "e0.example"))
+	uassert.False(t, strings.Contains(peers, "page 1 of"), "one page needs no pager")
+	uassert.True(t, strings.Contains(Render("zone/z0?kind=rpc&page=2"), "[previous](/r/moul/zones/v0:zone/z0?kind=rpc&page=1)"))
+	uassert.True(t, strings.Contains(Render("zone/z0?kind=grpc"), "No such endpoint kind."))
 }

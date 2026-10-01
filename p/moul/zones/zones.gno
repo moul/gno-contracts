@@ -6,8 +6,9 @@
 // testnet, a staging chain, somebody's gnodev. An endpoint is one way in: an
 // RPC, a gnoweb, a seed or persistent peer, an indexer, a faucet, an explorer.
 // Anybody may propose a zone or register an endpoint; a curator decides which
-// zones are official and which endpoints are verified, always with a reason
-// the public can read.
+// zones are official and which endpoints are verified. Every decision is
+// recorded with who made it and when; a rejection, a retirement, a flag and an
+// edit to an approved zone also require a reason, which the public reads.
 //
 // The package decides nothing about WHO may act. Every write takes the acting
 // address and the height as arguments, and the realm holding the [Registry]

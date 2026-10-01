@@ -40,11 +40,14 @@ type Registry struct {
 	zones      *store.Store
 	bySlug     *index.Index // slug -> zone id, unique
 	byProposer *index.Index // proposer -> ids of their PENDING zones
+	byStatus   *index.Index // status -> zone ids, so a page reads only its rows
+	byChain    *index.Index // chain id -> zone ids; not unique, chain ids collide
 
 	endpoints *store.Store
 	byZone    *index.Index // slug -> endpoint ids
 	byAddress *index.Index // slug|kind|address -> endpoint id, unique
 	byOwner   *index.Index // slug|registrant -> endpoint ids
+	byKind    *index.Index // slug|kind -> endpoint ids, so a page reads only its rows
 	unchecked *index.Index // slug -> ids of endpoints that are not Verified
 }
 
@@ -54,10 +57,13 @@ func NewRegistry() *Registry {
 		zones:      store.Named("zone"),
 		bySlug:     index.Unique(),
 		byProposer: index.New(),
+		byStatus:   index.New(),
+		byChain:    index.New(),
 		endpoints:  store.Named("endpoint"),
 		byZone:     index.New(),
 		byAddress:  index.Unique(),
 		byOwner:    index.New(),
+		byKind:     index.New(),
 		unchecked:  index.New(),
 	}
 }
@@ -93,6 +99,12 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 	if err := r.bySlug.Add(slug, id); err != nil {
 		return err
 	}
+	if err := r.byStatus.Add(string(Pending), id); err != nil {
+		return err
+	}
+	if err := r.byChain.Add(in.ChainID, id); err != nil {
+		return err
+	}
 	return r.byProposer.Add(by.String(), id)
 }
 
@@ -110,7 +122,7 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 // against the old one goes back to unverified, because what was verified was
 // that it answered for a chain this zone no longer names.
 func (r *Registry) Edit(slug string, in Info, by address, at int64, reason string) error {
-	z, _, err := r.zone(slug)
+	z, zid, err := r.zone(slug)
 	if err != nil {
 		return err
 	}
@@ -147,6 +159,12 @@ func (r *Registry) Edit(slug string, in Info, by address, at int64, reason strin
 			}
 		}
 		z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
+	}
+	if in.ChainID != z.ChainID {
+		r.byChain.Remove(z.ChainID, zid)
+		if err := r.byChain.Add(in.ChainID, zid); err != nil {
+			return err
+		}
 	}
 	z.setInfo(in)
 	return nil
@@ -206,6 +224,10 @@ func (r *Registry) ReviewZone(slug string, to Status, by address, at int64, reas
 	if z.Status == Pending {
 		r.byProposer.Remove(z.Proposer.String(), id)
 	}
+	r.byStatus.Remove(string(z.Status), id)
+	if err := r.byStatus.Add(string(to), id); err != nil {
+		return err
+	}
 	z.Status = to
 	z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
 	return nil
@@ -233,6 +255,8 @@ func (r *Registry) RemoveZone(slug string) error {
 		r.byProposer.Remove(z.Proposer.String(), id)
 	}
 	r.bySlug.Remove(slug, id)
+	r.byStatus.Remove(string(z.Status), id)
+	r.byChain.Remove(z.ChainID, id)
 	r.zones.Remove(id)
 	return nil
 }
@@ -286,6 +310,9 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 		return 0, err
 	}
 	if err := r.byOwner.Add(okey, id); err != nil {
+		return 0, err
+	}
+	if err := r.byKind.Add(slug+"|"+string(kind), id); err != nil {
 		return 0, err
 	}
 	if err := r.unchecked.Add(slug, id); err != nil {
@@ -373,14 +400,54 @@ func (f ZoneFilter) Match(z Zone) bool {
 }
 
 // Zones returns copies of the zones passing f, in the order they were
-// proposed, which is the order a curator seeded them in.
+// proposed, which is the order a curator seeded them in. With a status set it
+// reads that status's zones only.
 func (r *Registry) Zones(f ZoneFilter) []Zone {
 	out := []Zone{}
+	if f.Status != "" {
+		for _, id := range r.byStatus.Lookup(string(f.Status)) {
+			if z := r.zones.MustGet(id).(*Zone); f.Match(*z) {
+				out = append(out, *z)
+			}
+		}
+		return out
+	}
 	r.zones.Each(func(_ store.ID, v any) {
 		if z := v.(*Zone); f.Match(*z) {
 			out = append(out, *z)
 		}
 	})
+	return out
+}
+
+// ZoneCount returns how many zones have that status, without reading any.
+func (r *Registry) ZoneCount(status Status) int {
+	if status == "" {
+		return r.zones.Len()
+	}
+	return r.byStatus.Count(string(status))
+}
+
+// ZonePage returns page (1-based) of the zones with that status, size per
+// page, in proposal order. It reads only the zones on the page, which is what
+// lets a Render stay inside a query's gas however full the registry is. A page
+// past the end is empty.
+func (r *Registry) ZonePage(status Status, page, size int) []Zone {
+	out := []Zone{}
+	for _, id := range pageOf(r.byStatus.Lookup(string(status)), page, size) {
+		out = append(out, *r.zones.MustGet(id).(*Zone))
+	}
+	return out
+}
+
+// ZonesByChainID returns the zones naming that chain id, in proposal order.
+// Usually one, but chain ids are not unique across networks (every gnodev is
+// "dev"), so it is a list.
+func (r *Registry) ZonesByChainID(chainID string) []Zone {
+	out := []Zone{}
+	for _, id := range r.byChain.Lookup(chainID) {
+		out = append(out, *r.zones.MustGet(id).(*Zone))
+	}
 	return out
 }
 
@@ -411,7 +478,11 @@ func (r *Registry) Endpoints(f EndpointFilter) []Endpoint {
 		}
 	}
 	if f.Zone != "" {
-		for _, id := range r.byZone.Lookup(f.Zone) {
+		ids := r.byZone.Lookup(f.Zone)
+		if f.Kind != "" {
+			ids = r.byKind.Lookup(f.Zone + "|" + string(f.Kind))
+		}
+		for _, id := range ids {
 			v, _ := r.endpoints.Get(id)
 			keep(v)
 		}
@@ -422,16 +493,54 @@ func (r *Registry) Endpoints(f EndpointFilter) []Endpoint {
 }
 
 // Count returns how many endpoints a zone has, and how many of them are
-// verified, without copying any of them.
+// verified, from the index counts: no endpoint is read.
 func (r *Registry) Count(slug string) (verified, total int) {
-	for _, id := range r.byZone.Lookup(slug) {
-		v, _ := r.endpoints.Get(id)
-		total++
-		if v.(*Endpoint).Status == Verified {
-			verified++
-		}
+	total = r.byZone.Count(slug)
+	return total - r.unchecked.Count(slug), total
+}
+
+// EndpointCount returns how many endpoints of that kind a zone has; "" is
+// every kind. No endpoint is read.
+func (r *Registry) EndpointCount(slug string, kind EndpointKind) int {
+	if kind == "" {
+		return r.byZone.Count(slug)
 	}
-	return verified, total
+	return r.byKind.Count(slug + "|" + string(kind))
+}
+
+// EndpointPage returns page (1-based) of a zone's endpoints of that kind, ""
+// for every kind, size per page, oldest first. Like [Registry.ZonePage] it
+// reads only what is on the page.
+func (r *Registry) EndpointPage(slug string, kind EndpointKind, page, size int) []Endpoint {
+	ids := r.byZone.Lookup(slug)
+	if kind != "" {
+		ids = r.byKind.Lookup(slug + "|" + string(kind))
+	}
+	out := []Endpoint{}
+	for _, id := range pageOf(ids, page, size) {
+		v, _ := r.endpoints.Get(id)
+		out = append(out, *v.(*Endpoint))
+	}
+	return out
+}
+
+// pageOf slices ids to one page, 1-based. Out of range is empty, never a
+// panic: page and size usually come from a reader's query string.
+func pageOf(ids []store.ID, page, size int) []store.ID {
+	// The division comes first so a page number near MaxInt cannot overflow
+	// the multiplication into a small positive offset.
+	if page < 1 || size < 1 || page-1 > len(ids)/size {
+		return nil
+	}
+	start := (page - 1) * size
+	if start >= len(ids) {
+		return nil
+	}
+	end := len(ids)
+	if len(ids)-start > size {
+		end = start + size
+	}
+	return ids[start:end]
 }
 
 // Len returns how many zones the registry holds, whatever their status.
@@ -456,7 +565,7 @@ func (r *Registry) endpoint(id int64) (*Endpoint, error) {
 	return v.(*Endpoint), nil
 }
 
-// removeEndpoint unwinds the store and all four of its indexes together.
+// removeEndpoint unwinds the store and all five of its indexes together.
 func (r *Registry) removeEndpoint(id store.ID) {
 	v, ok := r.endpoints.Remove(id)
 	if !ok {
@@ -466,6 +575,7 @@ func (r *Registry) removeEndpoint(id store.ID) {
 	r.byZone.Remove(e.Zone, id)
 	r.byAddress.Remove(addressKey(e.Zone, e.Kind, e.Address), id)
 	r.byOwner.Remove(e.Zone+"|"+e.Registrant.String(), id)
+	r.byKind.Remove(e.Zone+"|"+string(e.Kind), id)
 	r.unchecked.Remove(e.Zone, id)
 }
 
