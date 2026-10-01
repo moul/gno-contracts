@@ -236,7 +236,23 @@ func copilotAtLine(c copilotComment) string {
 
 // copilotInline neutralises the markdown in a PR title, which is a string a
 // contributor chose. Same rule the realms follow for a caller's string.
+//
+// The BACKSLASH is escaped first, and it is the one that matters. Escaping "["
+// to "\[" without it turns a title already containing `\[click\](http://evil)`
+// into `\\[click\\](http://evil)`, and CommonMark reads each `\\` as an escaped
+// backslash, leaving the brackets ACTIVE: a contributor-chosen live link in the
+// hub issue. strings.NewReplacer makes one left-to-right pass and never
+// reprocesses its own output, so listing it first is sufficient.
+//
+// Angle brackets go too, because <http://host> is an autolink and <b> is inline
+// HTML, neither of which a title should be able to produce.
 func copilotInline(s string) string {
-	r := strings.NewReplacer("[", "\\[", "]", "\\]", "`", "\\`", "*", "\\*", "_", "\\_", "\n", " ")
+	r := strings.NewReplacer(
+		"\\", "\\\\",
+		"[", "\\[", "]", "\\]",
+		"<", "\\<", ">", "\\>",
+		"`", "\\`", "*", "\\*", "_", "\\_",
+		"\n", " ",
+	)
 	return r.Replace(s)
 }

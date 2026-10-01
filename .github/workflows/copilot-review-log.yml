@@ -28,7 +28,15 @@ jobs:
   log:
     # Only Copilot's own reviews. A human review is not this log's business, and
     # the formatter refuses one anyway, so this is the cheap gate in front of it.
-    if: github.event.review.user.login == 'copilot-pull-request-reviewer[bot]'
+    # Same-repository pull requests only. A fork PR gets a READ-ONLY GITHUB_TOKEN,
+    # so `issues: write` buys nothing there and the final `gh issue comment`
+    # would fail the job on every forked contribution while never reaching the
+    # log. `pr.yml` already draws this line for the same reason. The trusted
+    # alternative, an unprivileged collector plus a `workflow_run` writer, is
+    # real but is a lot of machinery for a repository with no fork traffic.
+    if: >-
+      github.event.review.user.login == 'copilot-pull-request-reviewer[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,8 +63,14 @@ jobs:
         run: |
           set -euo pipefail
           gh api "/repos/$REPO/pulls/$PR/reviews/$REVIEW_ID" > /tmp/review.json
+          # `gh api --paginate` with `--jq` emits ONE ARRAY PER PAGE, so a bare
+          # --slurpfile would give [page1, page2, ...] and taking [0] would
+          # silently drop every later page: past 100 comments on a pull request,
+          # a review whose findings landed on page two would be logged as clean.
+          # `jq -s add` merges the pages into one array first.
           gh api --paginate "/repos/$REPO/pulls/$PR/comments?per_page=100" \
-            --jq "[.[] | select(.pull_request_review_id == $REVIEW_ID)]" > /tmp/comments.json
+            --jq "[.[] | select(.pull_request_review_id == $REVIEW_ID)]" \
+            | jq -s 'add // []' > /tmp/comments.json
           gh api "/repos/$REPO/pulls/$PR" \
             --jq '{number, title, html_url, user: .user.login}' > /tmp/pr.json
           jq -n \

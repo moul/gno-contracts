@@ -136,3 +136,45 @@ func TestCopilotDigestNeutralisesThePRTitle(t *testing.T) {
 		t.Errorf("want the escaped title, got:\n%s", got)
 	}
 }
+
+// A pre-escaped title must not become a live link in the hub issue.
+//
+// Escaping "[" to "\[" without also escaping "\" turns a title containing
+// `\[click\](http://evil)` into `\\[click\\](http://evil)`, and CommonMark
+// reads each `\\` as an escaped backslash, leaving the brackets ACTIVE. The
+// digest goes into an issue body, so that is a contributor-chosen live link in
+// #280.
+func TestCopilotDigestEscapesPreEscapedTitles(t *testing.T) {
+	p := realReview(t)
+	p.PR.Title = `fix \[click\](http://evil.example) and <http://evil.example>`
+	got, _ := copilotDigest(p)
+
+	// The dangerous rendering is `\\[` : an escaped BACKSLASH followed by a live
+	// bracket. The safe one is `\\\[` : an escaped backslash followed by an
+	// escaped bracket.
+	if strings.Contains(got, `\\[click`) && !strings.Contains(got, `\\\[click`) {
+		t.Errorf("a doubled backslash leaves the bracket active:\n%s", got)
+	}
+	if !strings.Contains(got, `\\\[click\\\](http://evil.example)`) {
+		t.Errorf("want the bracket escaped behind the escaped backslash:\n%s", got)
+	}
+	if strings.Contains(got, "<http://evil.example>") {
+		t.Errorf("an autolink must not survive:\n%s", got)
+	}
+}
+
+func TestCopilotInline(t *testing.T) {
+	for _, tc := range []struct{ name, in, want string }{
+		{"plain", "fix the thing", "fix the thing"},
+		{"brackets", "fix [x](y)", `fix \[x\](y)`},
+		{"a backslash already there", `a \[b\]`, `a \\\[b\\\]`},
+		{"angle brackets", "a <b> c", `a \<b\> c`},
+		{"a newline", "a\nb", "a b"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := copilotInline(tc.in); got != tc.want {
+				t.Errorf("copilotInline(%q) = %q, want %q", tc.in, got, tc.want)
+			}
+		})
+	}
+}
