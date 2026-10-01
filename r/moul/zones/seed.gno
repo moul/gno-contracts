@@ -12,9 +12,9 @@ import (
 const seedReason = "seeded at deploy; probed 2026-10-01"
 
 // seedZone is one zone the realm starts with, approved, plus the endpoints it
-// starts with. Every seeded endpoint carries the probe's verdict: verified with
-// seedReason when it answered, flagged with failed, the observed failure, when
-// it did not. Flagged rather than left unverified, because "probed and down"
+// starts with. Every seeded endpoint carries the probe's verdict, which is per
+// zone: verified with seedReason when the zone's endpoints answered, flagged
+// with failed, the observed failure, when they did not. Flagged rather than left unverified, because "probed and down"
 // and "nobody looked" are different facts and only a review can say which.
 type seedZone struct {
 	slug      string

@@ -93,8 +93,9 @@ func renderIndex(req *realmpath.Request) string {
 	return ui.Join("\n",
 		md.H1("Zones"),
 		para("A curated registry of gno.land networks and the endpoints that reach them. "+
-			"Anybody can propose a zone or register an endpoint; a curator approves, rejects, "+
-			"retires, verifies or flags it, and every rejection, retirement and flag says why, in public."),
+			"Anybody can propose a zone, and register endpoints on an official one; a curator approves, "+
+			"rejects or retires a zone and verifies or flags its endpoints, and every rejection, "+
+			"retirement and flag says why, in public."),
 		md.H2(heading),
 		table,
 		pager("", query, pageNum(req, pages), pages),
@@ -132,7 +133,7 @@ func zoneTable(status zones.Status, req *realmpath.Request, empty string) (strin
 		switch status {
 		case zones.Approved:
 			verified, total := reg.Count(z.Slug)
-			t.Row(zoneLink(z), md.InlineCode(z.ChainID), string(z.Kind), md.InlineCode(z.RPCURL),
+			t.Row(zoneLink(z), md.InlineCode(z.ChainID), string(z.Kind), md.InlineCode(z.RPCURL)+rpcFlag(z),
 				strconv.Itoa(verified)+" verified of "+strconv.Itoa(total))
 		case zones.Pending:
 			// Review on the zone page, which shows what is being approved; the
@@ -141,7 +142,7 @@ func zoneTable(status zones.Status, req *realmpath.Request, empty string) (strin
 				md.Link("review", realmURL+":zone/"+z.Slug))
 		case zones.Rejected:
 			t.Row(zoneLink(z), md.InlineCode(z.ChainID), ui.Addr(z.Proposer), cell(z.Reason),
-				action("Remove", "RemoveZone", "slug", z.Slug))
+				action("Remove", "RemoveZone", "slug", z.Slug, "revision", revStr(z)))
 		default:
 			t.Row(zoneLink(z), md.InlineCode(z.ChainID), ui.Addr(z.Proposer), cell(z.Reason))
 		}
@@ -165,7 +166,7 @@ func renderZone(slug string, req *realmpath.Request) string {
 	facts := []string{
 		md.Bold("chain id") + ": " + md.InlineCode(z.ChainID),
 		md.Bold("kind") + ": " + string(z.Kind),
-		md.Bold("rpc") + ": " + md.InlineCode(z.RPCURL),
+		md.Bold("rpc") + ": " + md.InlineCode(z.RPCURL) + rpcFlag(z),
 	}
 	if z.GnowebURL != "" {
 		facts = append(facts, md.Bold("gnoweb")+": "+urlFact(z, z.GnowebURL))
@@ -228,23 +229,29 @@ func renderZone(slug string, req *realmpath.Request) string {
 	parts = append(parts, t.OrEmpty(empty), pager("zone/"+z.Slug, query, pageNum(req, pages), pages))
 
 	actions := []string{}
-	if z.Status == zones.Pending || z.Status == zones.Approved {
+	switch z.Status {
+	case zones.Approved:
 		actions = append(actions, action("Register an endpoint", "RegisterEndpoint",
+			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
+	case zones.Pending:
+		actions = append(actions, action("Register an endpoint (proposer or curator)", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	}
 	// Approve carries the revision this page was rendered from, so approving
 	// what you read here fails if the zone changed after you read it.
-	approve := action("Approve revision "+strconv.FormatInt(z.Revision, 10), "ApproveZone",
-		"slug", z.Slug, "revision", strconv.FormatInt(z.Revision, 10), "reason", "")
+	// Every decision carries the revision this page was rendered from, so acting
+	// on what you read here fails if the zone changed after you read it.
+	rev := revStr(z)
+	approve := action("Approve revision "+rev, "ApproveZone", "slug", z.Slug, "revision", rev, "reason", "")
+	remove := action("Remove", "RemoveZone", "slug", z.Slug, "revision", rev)
 	switch z.Status {
 	case zones.Pending:
 		actions = append(actions, approve,
-			action("Reject", "RejectZone", "slug", z.Slug, "reason", ""),
-			action("Remove", "RemoveZone", "slug", z.Slug))
+			action("Reject", "RejectZone", "slug", z.Slug, "revision", rev, "reason", ""), remove)
 	case zones.Approved:
-		actions = append(actions, action("Retire", "RetireZone", "slug", z.Slug, "reason", ""))
+		actions = append(actions, action("Retire", "RetireZone", "slug", z.Slug, "revision", rev, "reason", ""))
 	case zones.Rejected:
-		actions = append(actions, approve, action("Remove", "RemoveZone", "slug", z.Slug))
+		actions = append(actions, approve, remove)
 	case zones.Retired:
 		actions = append(actions, approve)
 	}
@@ -370,12 +377,10 @@ func notFound(msg string) string { return md.H1("Not found") + ui.Empty(msg) }
 // not reopen it. The call is built from charset-checked slugs and literals.
 func queryCommand(call string) string {
 	remote := ""
-	if zs := reg.ApprovedByChainID(runtime.ChainID()); len(zs) == 1 {
+	if z, ok := reg.SoleApproved(runtime.ChainID()); ok && !rpcFlagged(z) {
 		// Not one the same page flags: printing a remote the endpoint table says
 		// not to use would contradict the page.
-		if e, ok := reg.EndpointByAddress(zs[0].Slug, zones.RPC, zs[0].RPCURL); !ok || e.Status != zones.Flagged {
-			remote = " -remote '" + zs[0].RPCURL + "'"
-		}
+		remote = " -remote '" + z.RPCURL + "'"
 	}
 	return "gnokey query vm/qeval" + remote + " -data '" + pkgPath + "." + call + "'"
 }
@@ -406,14 +411,44 @@ func urlFact(z zones.Zone, url string) string {
 }
 
 // prose and cell escape a caller's free text for a sentence and a table cell,
-// plus one thing ui.Inline and ui.Cell leave alone: an @, which gnoweb turns
-// into a user-profile link with an icon, so "run by @gnocore" would vouch for
-// an account the registrant chose.
+// plus what ui.Inline and ui.Cell leave alone: gnoweb turns an @name, and a
+// bare g1 address after a space or at the start, into a user-profile link with
+// an icon, so "run by @gnocore" or "run by g1…" would vouch for an account the
+// registrant chose.
 func prose(s string) string { return escapeMentions(ui.Inline(s)) }
 
 func cell(s string) string { return escapeMentions(ui.Cell(s)) }
 
-func escapeMentions(s string) string { return strings.ReplaceAll(s, "@", "\\@") }
+// escapeMentions backslash-escapes every @, and writes the 1 of every g1 as a
+// character reference. It runs after ui.Inline or ui.Cell, which escape every
+// & the caller typed, so the only reference in the output is this one; goldmark
+// decodes it back to "1" after the mention parser has looked and not matched.
+func escapeMentions(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(s, "@", "\\@"), "g1", "g&#49;")
+}
+
+// rpcFlag marks a zone's main RPC when the endpoint table flags it, so the
+// table, the zone page and the printed command never disagree.
+func rpcFlag(z zones.Zone) string {
+	if rpcFlagged(z) {
+		return " ⚠️ flagged"
+	}
+	return ""
+}
+
+// rpcFlagged reports whether the endpoint listing the zone's main RPC is
+// flagged, under its own spelling or, for tcp://, the http:// one gnokey reads
+// it as.
+func rpcFlagged(z zones.Zone) bool {
+	for _, u := range []string{z.RPCURL, "http" + strings.TrimPrefix(z.RPCURL, "tcp")} {
+		if e, ok := reg.EndpointByAddress(z.Slug, zones.RPC, u); ok && e.Status == zones.Flagged {
+			return true
+		}
+	}
+	return false
+}
+
+func revStr(z zones.Zone) string { return strconv.FormatInt(z.Revision, 10) }
 
 func isKind(k zones.EndpointKind) bool {
 	for _, x := range zones.EndpointKinds() {

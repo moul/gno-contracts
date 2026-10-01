@@ -7,7 +7,7 @@ func ExampleRender() {
 	// Output:
 	// # Zones
 	//
-	// A curated registry of gno.land networks and the endpoints that reach them. Anybody can propose a zone or register an endpoint; a curator approves, rejects, retires, verifies or flags it, and every rejection, retirement and flag says why, in public.
+	// A curated registry of gno.land networks and the endpoints that reach them. Anybody can propose a zone, and register endpoints on an official one; a curator approves, rejects or retires a zone and verifies or flags its endpoints, and every rejection, retirement and flag says why, in public.
 	//
 	// ## Official
 	//
@@ -15,7 +15,7 @@ func ExampleRender() {
 	// | --- | --- | --- | --- | --- |
 	// | [gno\.land mainnet](/r/moul/zones/v0:zone/mainnet) | `gnoland-1` | mainnet | `https://rpc.gno.land` | 6 verified of 6 |
 	// | [Onyx testnet](/r/moul/zones/v0:zone/onyx) | `onyx-1` | testnet | `https://rpc.onyx.testnets.gno.land` | 7 verified of 7 |
-	// | [gno\.land staging](/r/moul/zones/v0:zone/staging) | `staging` | devnet | `https://rpc.staging.gno.land` | 0 verified of 2 |
+	// | [gno\.land staging](/r/moul/zones/v0:zone/staging) | `staging` | devnet | `https://rpc.staging.gno.land` ⚠️ flagged | 0 verified of 2 |
 	// | [moul's gnodev staging](/r/moul/zones/v0:zone/moul-staging) | `moulstaging-1` | devnet | `https://rpc.gno-staging.moul.p2p.team` | 3 verified of 3 |
 	//
 	// [0 proposal\(s\) waiting for review](/r/moul/zones/v0:proposals) · [Propose a zone](/r/moul/zones/v0$help&func=ProposeZone&chainID=&description=&genesisURL=&gnowebURL=&kind=testnet&rpcURL=&slug=&title=)
@@ -71,7 +71,7 @@ func ExampleRender_zone() {
 	// | 12 | faucet | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
 	// | 13 | explorer | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
 	//
-	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&slug=onyx)
+	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&revision=2&slug=onyx)
 	//
 	// ```
 	// gnokey query vm/qeval -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'
@@ -118,7 +118,7 @@ func ExampleRender_rejected() {
 	//
 	// | zone | chain id | proposed by | why |  |
 	// | --- | --- | --- | --- | --- |
-	// | [Mainnet \(faster\!\)](/r/moul/zones/v0:zone/fake-mainnet) | `gnoland-1` | `g1vfhkyh…vdhu` | not the mainnet RPC | [Remove](/r/moul/zones/v0$help&func=RemoveZone&slug=fake-mainnet) |
+	// | [Mainnet \(faster\!\)](/r/moul/zones/v0:zone/fake-mainnet) | `gnoland-1` | `g1vfhkyh…vdhu` | not the mainnet RPC | [Remove](/r/moul/zones/v0$help&func=RemoveZone&revision=5&slug=fake-mainnet) |
 	//
 	// [pending](/r/moul/zones/v0:proposals) · [All zones](/r/moul/zones/v0)
 }

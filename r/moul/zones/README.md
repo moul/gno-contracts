@@ -43,7 +43,7 @@ gnokey query vm/qeval -remote https://rpc.gno.land \
 | `ListAddresses(slug, kind, status)` | the same, reduced to the address strings a config file wants |
 | `GetEndpoint(id)` | one endpoint, and whether it exists |
 | `IsCurator(addr)`, `Curators()` | who curates |
-| `IsInvited(addr)`, `Invited()` | who has an open invitation to |
+| `IsInvited(addr)`, `Invited()` | who has an open invitation to curate |
 
 Turning these into a node's `config.toml` is deliberately not this realm's job.
 It is public (`gnomod.toml` says why) so that a separate realm can import it and
@@ -54,10 +54,10 @@ do that.
 | function | who |
 |---|---|
 | `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody |
-| `EditZone(..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. A rejected or retired zone is not editable |
-| `ApproveZone(slug, revision, reason)` | a curator, naming the revision they read; it fails if the zone changed since |
-| `RejectZone(slug, reason)`, `RetireZone(slug, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified |
-| `RemoveZone(slug)` | a curator, or the proposer while every endpoint on it is theirs, on a pending or rejected zone; one that was ever official is kept |
+| `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. A rejected or retired zone is not editable |
+| `ApproveZone(slug, revision, reason)` | a curator |
+| `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified |
+| `RemoveZone(slug, revision)` | a curator, or the proposer while every endpoint on it is theirs and none carries a curator's verdict, on a pending or rejected zone. One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
 | `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator |
 | `VerifyEndpoint(id, revision, reason)` | a curator, naming the zone revision they checked it against |
 | `FlagEndpoint(id, reason)`, `UnverifyEndpoint(id, reason)` | a curator; a flag needs a reason |
@@ -65,6 +65,11 @@ do that.
 | `AddCurator(addr)` | a curator; it is an invitation, at most 16 curators and invitations together |
 | `AcceptCurator()` | the invited address, to take up the invitation |
 | `RemoveCurator(addr)` | a curator; it withdraws an invitation, or removes a curator along with every invitation they sent. The last curator cannot be removed |
+
+Every function that acts on a zone takes its `revision`, the one you read (the
+zone page shows it, and its action links carry it): if the zone changed since,
+the call fails and you read it again. The `$help` links on each page fill it
+in.
 
 **Curators are equals**: any one may remove any other, the admin included. That
 is the trust a curator set is, and it is why there are few of them.
@@ -85,5 +90,8 @@ Paths are exact; anything else is Not found.
 | `zone/<slug>` | one zone: its facts and revision, its last review, its endpoints; `?kind=peer` narrows them |
 | `proposals` | pending proposals; `?status=rejected` for rejected ones, with the reason |
 
-A proposal's URLs show as code, to copy and check; only an official zone's are
-links. Free text has `@` escaped, so a label cannot turn into a profile link.
+An official zone's gnoweb and genesis URLs are links; a proposal's show as
+code, to copy and check, and RPCs and endpoint addresses are always code. Free
+text has `@` and bare `g1` addresses neutralised, so a label cannot turn into a
+profile link. A main RPC whose endpoint is flagged is marked so wherever it is
+shown, and the printed `gnokey` line leaves it out.

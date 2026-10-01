@@ -5,11 +5,11 @@
 // Package zones is a curated registry of gno.land networks: mainnet, the
 // testnets, staging chains, anybody's gnodev. Each zone carries what a node or a
 // wallet needs to join it (chain id, RPC, gnoweb, genesis) plus a growing list of
-// endpoints that anyone can register: RPCs, seeds and peers, indexers, faucets,
-// explorers.
+// endpoints: RPCs, seeds and peers, indexers, faucets, explorers.
 //
 // Curation is the point. Anybody may propose a zone and register endpoints on
-// it; a curator approves or rejects a proposal, retires a zone that stopped
+// an approved one (on a pending one, its proposer or a curator); a curator
+// approves or rejects a proposal, retires a zone that stopped
 // running, and verifies or flags an endpoint. Every decision is recorded with
 // who made it and when, and a rejection, a retirement, a flag or an edit to an
 // approved zone must also say why, on the zone's page. Nothing is hidden while
@@ -71,20 +71,21 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 
 // EditZone replaces a zone's Info, every field but its slug and status. A
 // curator may edit any pending or approved zone; the proposer may edit their
-// own while it is pending. Every edit bumps the zone's revision, so an
-// approval prepared against the old one fails. On a pending zone the reason
+// own while it is pending. revision is the zone's Revision the edit was
+// written against: it fails if somebody edited in between. Every edit bumps
+// the revision, so a decision prepared against the old one fails too. On a pending zone the reason
 // must be empty; on an approved one it is required and replaces the review on
 // record, so the page names who changed the values, and why. A new chain id
 // sends the zone's verified endpoints back to unverified. A rejected or retired
 // zone cannot be edited.
-func EditZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
+func EditZone(cur realm, slug string, revision int64, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
 	z := mustZone(slug)
 	if !curators.Has(who) && !(z.Status == zones.Pending && z.Proposer == who) {
 		panic("zones: only a curator, or the proposer while it is pending, may edit " + slug)
 	}
-	must(reg.Edit(slug, info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL),
+	must(reg.Edit(slug, revision, info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL),
 		who, runtime.ChainHeight(), reason))
 }
 
@@ -96,24 +97,29 @@ func ApproveZone(cur realm, slug string, revision int64, reason string) {
 }
 
 // RejectZone turns a proposal down. The reason is required, and public.
-func RejectZone(cur realm, slug, reason string) {
-	review(cur, slug, zones.Rejected, 0, reason)
+// revision is the zone's Revision you read, as for ApproveZone.
+func RejectZone(cur realm, slug string, revision int64, reason string) {
+	review(cur, slug, zones.Rejected, revision, reason)
 }
 
 // RetireZone marks an official zone as no longer running, and sends its
 // verified endpoints back to unverified. The reason is required: it is what an
-// operator still holding the chain id will read.
-func RetireZone(cur realm, slug, reason string) {
-	review(cur, slug, zones.Retired, 0, reason)
+// operator still holding the chain id will read. revision is the zone's
+// Revision you read.
+func RetireZone(cur realm, slug string, revision int64, reason string) {
+	review(cur, slug, zones.Retired, revision, reason)
 }
 
-// RemoveZone deletes a pending or rejected zone and its endpoints. A curator
-// may remove any. The proposer may remove their own only while every endpoint
-// on it is theirs: the storage deposit is refunded to whoever signs the
-// removal, so removing somebody else's endpoints would collect what they paid.
-// A zone that was ever official is never removed, by anybody: an approved one
-// is retired, and a retired one is kept on record.
-func RemoveZone(cur realm, slug string) {
+// RemoveZone deletes a pending or rejected zone and its endpoints. revision is
+// the zone's Revision you read: a removal meant for one proposal fails on
+// another proposed again under the same slug. A curator may remove any. The
+// proposer may remove their own only while every endpoint on it is theirs (the
+// storage deposit is refunded to whoever signs the removal, so removing
+// somebody else's endpoints would collect what they paid) and none carries a
+// curator's verdict (removing and proposing it again would wipe a flag). A
+// zone that was ever official is never removed this way: an approved one is
+// retired, and a retired one is kept until newer retirements push it out.
+func RemoveZone(cur realm, slug string, revision int64) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
 	z := mustZone(slug)
@@ -121,12 +127,19 @@ func RemoveZone(cur realm, slug string) {
 		if z.Proposer != who || (z.Status != zones.Pending && z.Status != zones.Rejected) {
 			panic("zones: only a curator, or the proposer while it is pending or rejected, may remove " + slug)
 		}
-		// From the index counts: nothing is read to answer it.
+		// From the index counts first: nothing is read to answer it.
 		if _, total := reg.Count(slug); reg.OwnerCount(slug, who) != total {
 			panic("zones: " + slug + " carries endpoints somebody else registered; they must be removed first")
 		}
+		// Every endpoint is the proposer's, so at most MaxEndpointsPerAddress.
+		for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug}) {
+			if e.Status != zones.Unverified {
+				panic("zones: " + slug + " carries endpoint #" + strconv.FormatInt(e.ID, 10) + ", " +
+					string(e.Status) + " by a curator; only a curator may remove the zone now")
+			}
+		}
 	}
-	must(reg.RemoveZone(slug))
+	must(reg.RemoveZone(slug, revision))
 }
 
 // ---- registering and curating endpoints

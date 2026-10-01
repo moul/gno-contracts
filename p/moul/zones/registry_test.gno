@@ -72,7 +72,7 @@ func TestPendingCapPerProposer(t *testing.T) {
 	uassert.NoError(t, r.ReviewZone("z0", Approved, rev(r, "z0"), curator, 2, ""))
 	uassert.NoError(t, r.Propose(alice, 3, "one-more", onyx()))
 	// So does a removed one.
-	uassert.NoError(t, r.RemoveZone("z1"))
+	uassert.NoError(t, r.RemoveZone("z1", rev(r, "z1")))
 	uassert.NoError(t, r.Propose(alice, 3, "and-another", onyx()))
 }
 
@@ -134,16 +134,16 @@ func TestEdit(t *testing.T) {
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
 	in := onyx()
 	in.GenesisURL = "https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json"
-	uassert.ErrorContains(t, r.Edit("onyx", in, "", 2, ""), "editor is not a valid lowercase address")
-	uassert.NoError(t, r.Edit("onyx", in, alice, 2, ""))
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), in, "", 2, ""), "editor is not a valid lowercase address")
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), in, alice, 2, ""))
 	z, _ := r.Zone("onyx")
 	uassert.Equal(t, in.GenesisURL, z.GenesisURL)
 	uassert.False(t, z.Reviewed()) // pending: just an edit
 
 	bad := in
 	bad.RPCURL = ""
-	uassert.ErrorContains(t, r.Edit("onyx", bad, alice, 2, ""), "rpc url is empty")
-	uassert.ErrorContains(t, r.Edit("nope", in, alice, 2, ""), "no zone")
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), bad, alice, 2, ""), "rpc url is empty")
+	uassert.ErrorContains(t, r.Edit("nope", rev(r, "nope"), in, alice, 2, ""), "no zone")
 	z, _ = r.Zone("onyx")
 	uassert.Equal(t, "https://rpc.onyx.testnets.gno.land", z.RPCURL) // unchanged by the refused edit
 
@@ -151,12 +151,12 @@ func TestEdit(t *testing.T) {
 	// it replaces the review on record.
 	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 3, "probed"))
 	in.RPCURL = "https://rpc2.onyx.example"
-	uassert.ErrorContains(t, r.Edit("onyx", in, curator, 4, ""), "an edit needs a reason")
-	uassert.ErrorContains(t, r.Edit("onyx", in, "", 4, "moved"), "editor is not a valid lowercase address")
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), in, curator, 4, ""), "an edit needs a reason")
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), in, "", 4, "moved"), "editor is not a valid lowercase address")
 	z, _ = r.Zone("onyx")
 	uassert.Equal(t, "https://rpc.onyx.testnets.gno.land", z.RPCURL)
 	uassert.Equal(t, "probed", z.Reason)
-	uassert.NoError(t, r.Edit("onyx", in, bob, 5, "rpc moved"))
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), in, bob, 5, "rpc moved"))
 	z, _ = r.Zone("onyx")
 	uassert.Equal(t, "https://rpc2.onyx.example", z.RPCURL)
 	uassert.Equal(t, bob.String(), z.ReviewedBy.String())
@@ -166,13 +166,13 @@ func TestEdit(t *testing.T) {
 
 	// A retired zone is a record: its retirement reason is not editable away.
 	uassert.NoError(t, r.ReviewZone("onyx", Retired, rev(r, "onyx"), curator, 6, "testnet ended"))
-	uassert.ErrorContains(t, r.Edit("onyx", in, curator, 7, "typo"), "only a pending or approved zone can be edited")
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), in, curator, 7, "typo"), "only a pending or approved zone can be edited")
 	z, _ = r.Zone("onyx")
 	uassert.Equal(t, "testnet ended", z.Reason)
 	// Nor is a rejected one.
 	uassert.NoError(t, r.Propose(alice, 8, "nope", onyx()))
 	uassert.NoError(t, r.ReviewZone("nope", Rejected, rev(r, "nope"), curator, 9, "dup"))
-	uassert.ErrorContains(t, r.Edit("nope", onyx(), alice, 10, ""), "only a pending or approved zone can be edited")
+	uassert.ErrorContains(t, r.Edit("nope", rev(r, "nope"), onyx(), alice, 10, ""), "only a pending or approved zone can be edited")
 }
 
 // What was verified is that an endpoint answered for the zone's chain id, so
@@ -190,11 +190,11 @@ func TestChainIDEditUnverifiesEndpoints(t *testing.T) {
 
 	in := onyx()
 	in.RPCURL = "https://rpc2.onyx.example"
-	uassert.NoError(t, r.Edit("onyx", in, curator, 4, "rpc moved"))
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), in, curator, 4, "rpc moved"))
 	uassert.Equal(t, 2, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
 
 	in.ChainID = "onyx-2"
-	uassert.NoError(t, r.Edit("onyx", in, curator, 5, "relaunched as onyx-2"))
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), in, curator, 5, "relaunched as onyx-2"))
 	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
 	e, _ := r.Endpoint(a)
 	uassert.Equal(t, string(Unverified), string(e.Status))
@@ -215,7 +215,7 @@ func TestChainIDEditUnverifiesEndpoints(t *testing.T) {
 	// retired network's hosts may be somebody else's by the time anyone reads
 	// them. Approving it again does not restore anything.
 	uassert.NoError(t, r.ReviewEndpoint(b, Verified, erev(r, b), curator, 6, ""))
-	uassert.NoError(t, r.ReviewZone("onyx", Retired, 0, curator, 6, "stopped"))
+	uassert.NoError(t, r.ReviewZone("onyx", Retired, rev(r, "onyx"), curator, 6, "stopped"))
 	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
 	e, _ = r.Endpoint(b)
 	uassert.Equal(t, ZoneRetired, e.Reason)
@@ -232,7 +232,7 @@ func TestChainIDEditUnverifiesEndpoints(t *testing.T) {
 	uassert.NoError(t, r.ReviewEndpoint(pid, Verified, erev(r, pid), curator, 8, ""))
 	other := onyx()
 	other.ChainID = "elsewhere-1"
-	uassert.NoError(t, r.Edit("pend", other, alice, 9, ""))
+	uassert.NoError(t, r.Edit("pend", rev(r, "pend"), other, alice, 9, ""))
 	e, _ = r.Endpoint(pid)
 	uassert.Equal(t, string(Unverified), string(e.Status))
 	// The reset is the registry's doing, not a verdict: the proposer is not a
@@ -352,9 +352,9 @@ func TestRemoveZone(t *testing.T) {
 	_, err := r.Register(bob, 2, "onyx", RPC, "https://a.example", "")
 	uassert.NoError(t, err)
 	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 3, ""))
-	uassert.ErrorContains(t, r.RemoveZone("onyx"), "retire it instead")
+	uassert.ErrorContains(t, r.RemoveZone("onyx", rev(r, "onyx")), "retire it instead")
 	uassert.NoError(t, r.ReviewZone("onyx", Retired, rev(r, "onyx"), curator, 4, "testnet ended"))
-	uassert.ErrorContains(t, r.RemoveZone("onyx"), "kept on record")
+	uassert.ErrorContains(t, r.RemoveZone("onyx", rev(r, "onyx")), "kept on record")
 	_, ok := r.Zone("onyx")
 	uassert.True(t, ok)
 
@@ -363,12 +363,12 @@ func TestRemoveZone(t *testing.T) {
 	_, err = r.Register(bob, 5, "spam", RPC, "https://a.example", "")
 	uassert.NoError(t, err)
 	uassert.NoError(t, r.ReviewZone("spam", Rejected, rev(r, "spam"), curator, 6, "not a network"))
-	uassert.NoError(t, r.RemoveZone("spam"))
+	uassert.NoError(t, r.RemoveZone("spam", rev(r, "spam")))
 	_, ok = r.Zone("spam")
 	uassert.False(t, ok)
 	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{Zone: "spam"})))
 	uassert.Equal(t, 1, r.Len())
-	uassert.ErrorContains(t, r.RemoveZone("spam"), "no zone")
+	uassert.ErrorContains(t, r.RemoveZone("spam", rev(r, "spam")), "no zone")
 	// The slug and the address are free again.
 	uassert.NoError(t, r.Propose(bob, 7, "spam", onyx()))
 	_, err = r.Register(bob, 8, "spam", RPC, "https://a.example", "")
@@ -487,7 +487,7 @@ func TestPagesAndCounts(t *testing.T) {
 	uassert.Equal(t, "z0 z1 z2 z3 z4 z5 z6 ", page(r.ZonePage("", 1, 1<<40)))
 	// The status index follows a review and a removal.
 	uassert.NoError(t, r.ReviewZone("z0", Rejected, rev(r, "z0"), curator, 3, "dup"))
-	uassert.NoError(t, r.RemoveZone("z2"))
+	uassert.NoError(t, r.RemoveZone("z2", rev(r, "z2")))
 	uassert.Equal(t, "z4 z6 ", page(r.ZonePage(Pending, 1, 10)))
 	uassert.Equal(t, "z0 ", page(r.ZonePage(Rejected, 1, 10)))
 	uassert.Equal(t, "z1 z3 z5 ", page(r.Zones(ZoneFilter{Status: Approved})))
@@ -498,12 +498,12 @@ func TestPagesAndCounts(t *testing.T) {
 	uassert.Equal(t, "z1 z3 z5 ", page(r.ApprovedByChainID("onyx-1")))
 	in := onyx()
 	in.ChainID = "onyx-2"
-	uassert.NoError(t, r.Edit("z1", in, curator, 4, "relaunched"))
+	uassert.NoError(t, r.Edit("z1", rev(r, "z1"), in, curator, 4, "relaunched"))
 	uassert.Equal(t, "z1 ", page(r.ApprovedByChainID("onyx-2")))
 	uassert.Equal(t, "z3 z5 ", page(r.ApprovedByChainID("onyx-1")))
-	uassert.NoError(t, r.Edit("z4", in, alice, 4, "")) // pending: not indexed
+	uassert.NoError(t, r.Edit("z4", rev(r, "z4"), in, alice, 4, "")) // pending: not indexed
 	uassert.Equal(t, "z1 ", page(r.ApprovedByChainID("onyx-2")))
-	uassert.NoError(t, r.ReviewZone("z5", Retired, 0, curator, 4, "gone"))
+	uassert.NoError(t, r.ReviewZone("z5", Retired, rev(r, "z5"), curator, 4, "gone"))
 	uassert.Equal(t, "z3 ", page(r.ApprovedByChainID("onyx-1")))
 
 	// Endpoints: counts from the indexes, pages by kind.
@@ -559,7 +559,7 @@ func TestApprovalBindsToRevision(t *testing.T) {
 
 	swapped := onyx()
 	swapped.RPCURL = "https://attacker.example"
-	uassert.NoError(t, r.Edit("onyx", swapped, alice, 2, ""))
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), swapped, alice, 2, ""))
 	uassert.ErrorContains(t, r.ReviewZone("onyx", Approved, read, curator, 3, ""), "changed since you read it")
 	z, _ := r.Zone("onyx")
 	uassert.Equal(t, string(Pending), string(z.Status))
@@ -567,7 +567,7 @@ func TestApprovalBindsToRevision(t *testing.T) {
 	uassert.Equal(t, int64(2), z.EditedAt)
 
 	// Removed and proposed again under the same slug: a new revision, never the old one.
-	uassert.NoError(t, r.RemoveZone("onyx"))
+	uassert.NoError(t, r.RemoveZone("onyx", rev(r, "onyx")))
 	uassert.NoError(t, r.Propose(alice, 4, "onyx", onyx()))
 	uassert.ErrorContains(t, r.ReviewZone("onyx", Approved, read, curator, 5, ""), "changed since you read it")
 	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 5, ""))
@@ -578,7 +578,7 @@ func TestApprovalBindsToRevision(t *testing.T) {
 	checked := rev(r, "onyx")
 	moved := onyx()
 	moved.ChainID = "onyx-2"
-	uassert.NoError(t, r.Edit("onyx", moved, curator, 7, "relaunch"))
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), moved, curator, 7, "relaunch"))
 	uassert.ErrorContains(t, r.ReviewEndpoint(id, Verified, checked, curator, 8, ""), "changed since you checked it")
 	uassert.NoError(t, r.ReviewEndpoint(id, Verified, rev(r, "onyx"), curator, 8, ""))
 	// Flagging and unverifying need no revision: they withdraw trust, never grant it.
@@ -588,13 +588,13 @@ func TestApprovalBindsToRevision(t *testing.T) {
 func TestPendingEditTakesNoReason(t *testing.T) {
 	r := NewRegistry()
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
-	uassert.ErrorContains(t, r.Edit("onyx", onyx(), alice, 2, "fixed a typo"), "takes no reason")
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), onyx(), alice, 2, "fixed a typo"), "takes no reason")
 	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 3, ""))
-	uassert.ErrorContains(t, r.Edit("onyx", onyx(), curator, 4, "​"), "invisible")
-	uassert.ErrorContains(t, r.Edit("onyx", onyx(), curator, 4, ""), "needs a reason")
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), onyx(), curator, 4, "​"), "invisible")
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), onyx(), curator, 4, ""), "needs a reason")
 	in := onyx()
 	in.Title = "Onyx"
-	uassert.NoError(t, r.Edit("onyx", in, curator, 4, "retitled"))
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), in, curator, 4, "retitled"))
 }
 
 // Rejected and retired zones are kept for the record, each up to a cap of its
@@ -605,7 +605,7 @@ func TestRecordsNeverFillTheRegistry(t *testing.T) {
 	for i := 0; i < MaxRejected+3; i++ {
 		slug := "rej" + strconv.Itoa(i)
 		uassert.NoError(t, r.Propose(testAddr(i), 1, slug, onyx()))
-		uassert.NoError(t, r.ReviewZone(slug, Rejected, 0, curator, 2, "spam"))
+		uassert.NoError(t, r.ReviewZone(slug, Rejected, rev(r, slug), curator, 2, "spam"))
 	}
 	uassert.Equal(t, MaxRejected, r.ZoneCount(Rejected))
 	// The three proposed longest ago made room.
@@ -619,7 +619,7 @@ func TestRecordsNeverFillTheRegistry(t *testing.T) {
 		slug := "ret" + strconv.Itoa(i)
 		uassert.NoError(t, r.Propose(curator, 3, slug, onyx()))
 		uassert.NoError(t, r.ReviewZone(slug, Approved, rev(r, slug), curator, 3, ""))
-		uassert.NoError(t, r.ReviewZone(slug, Retired, 0, curator, 4, "stopped"))
+		uassert.NoError(t, r.ReviewZone(slug, Retired, rev(r, slug), curator, 4, "stopped"))
 	}
 	uassert.Equal(t, MaxRetired, r.ZoneCount(Retired))
 	_, ok = r.Zone("ret0")
@@ -639,11 +639,11 @@ func TestEvictionUnwindsEverything(t *testing.T) {
 	uassert.NoError(t, r.Propose(alice, 1, "first", onyx()))
 	_, err := r.Register(alice, 1, "first", RPC, "https://f.example", "")
 	uassert.NoError(t, err)
-	uassert.NoError(t, r.ReviewZone("first", Rejected, 0, curator, 2, "dup"))
+	uassert.NoError(t, r.ReviewZone("first", Rejected, rev(r, "first"), curator, 2, "dup"))
 	for i := 0; i < MaxRejected; i++ {
 		slug := "rej" + strconv.Itoa(i)
 		uassert.NoError(t, r.Propose(testAddr(i), 3, slug, onyx()))
-		uassert.NoError(t, r.ReviewZone(slug, Rejected, 0, curator, 4, "spam"))
+		uassert.NoError(t, r.ReviewZone(slug, Rejected, rev(r, slug), curator, 4, "spam"))
 	}
 	_, ok := r.Zone("first")
 	uassert.False(t, ok)
@@ -661,7 +661,7 @@ func TestEvictionUnwindsEverything(t *testing.T) {
 func TestReviveRespectsTheLiveCap(t *testing.T) {
 	r := NewRegistry()
 	uassert.NoError(t, r.Propose(alice, 1, "back", onyx()))
-	uassert.NoError(t, r.ReviewZone("back", Rejected, 0, curator, 1, "not yet"))
+	uassert.NoError(t, r.ReviewZone("back", Rejected, rev(r, "back"), curator, 1, "not yet"))
 	for i := 0; i < MaxZones; i++ {
 		slug := "z" + strconv.Itoa(i)
 		uassert.NoError(t, r.Propose(curator, 2, slug, onyx()))
@@ -670,7 +670,7 @@ func TestReviveRespectsTheLiveCap(t *testing.T) {
 	uassert.Equal(t, MaxZones, r.Live())
 	uassert.ErrorContains(t, r.ReviewZone("back", Approved, rev(r, "back"), curator, 3, ""), "full at")
 	uassert.ErrorContains(t, r.Propose(bob, 3, "more", onyx()), "full at")
-	uassert.NoError(t, r.ReviewZone("z0", Retired, 0, curator, 3, "stopped"))
+	uassert.NoError(t, r.ReviewZone("z0", Retired, rev(r, "z0"), curator, 3, "stopped"))
 	uassert.NoError(t, r.ReviewZone("back", Approved, rev(r, "back"), curator, 4, ""))
 }
 
@@ -710,11 +710,125 @@ func TestRejectUnverifies(t *testing.T) {
 	id, err := r.Register(alice, 1, "onyx", RPC, "https://a.example", "")
 	uassert.NoError(t, err)
 	uassert.NoError(t, r.ReviewEndpoint(id, Verified, rev(r, "onyx"), curator, 2, ""))
-	uassert.NoError(t, r.ReviewZone("onyx", Rejected, 0, curator, 3, "not a gno chain"))
+	uassert.NoError(t, r.ReviewZone("onyx", Rejected, rev(r, "onyx"), curator, 3, "not a gno chain"))
 	e, _ := r.Endpoint(id)
 	uassert.Equal(t, string(Unverified), string(e.Status))
 	uassert.Equal(t, ZoneRejected, e.Reason)
 	uassert.Equal(t, curator.String(), e.ReviewedBy.String())
 	v, _ := r.Count("onyx")
 	uassert.Equal(t, 0, v)
+}
+
+// Eviction goes by when a zone entered its state, not when it was proposed: a
+// long-lived network retired today is not the next record to go.
+func TestEvictionIsByEntryOrder(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(curator, 1, "mainnet", onyx())) // proposed first
+	uassert.NoError(t, r.ReviewZone("mainnet", Approved, rev(r, "mainnet"), curator, 1, ""))
+	for i := 0; i < MaxRetired; i++ {
+		slug := "ret" + strconv.Itoa(i)
+		uassert.NoError(t, r.Propose(curator, 2, slug, onyx()))
+		uassert.NoError(t, r.ReviewZone(slug, Approved, rev(r, slug), curator, 2, ""))
+		uassert.NoError(t, r.ReviewZone(slug, Retired, rev(r, slug), curator, 3, "stopped"))
+	}
+	// Retiring mainnet now drops ret0, the zone retired longest ago.
+	uassert.NoError(t, r.ReviewZone("mainnet", Retired, rev(r, "mainnet"), curator, 4, "end of an era"))
+	_, ok := r.Zone("ret0")
+	uassert.False(t, ok)
+	// And the next retirement drops ret1, not mainnet.
+	uassert.NoError(t, r.Propose(curator, 5, "next", onyx()))
+	uassert.NoError(t, r.ReviewZone("next", Approved, rev(r, "next"), curator, 5, ""))
+	uassert.NoError(t, r.ReviewZone("next", Retired, rev(r, "next"), curator, 6, "stopped"))
+	_, ok = r.Zone("mainnet")
+	uassert.True(t, ok)
+	_, ok = r.Zone("ret1")
+	uassert.False(t, ok)
+}
+
+// Every decision on a zone names the revision it was made on.
+func TestEveryZoneDecisionIsRevisionBound(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	old := rev(r, "onyx")
+	uassert.NoError(t, r.Edit("onyx", old, onyx(), alice, 2, ""))
+	uassert.ErrorContains(t, r.Edit("onyx", old, onyx(), curator, 3, ""), "changed since you read it")
+	uassert.ErrorContains(t, r.ReviewZone("onyx", Rejected, old, curator, 3, "spam"), "changed since you read it")
+	uassert.ErrorContains(t, r.RemoveZone("onyx", old), "changed since you read it")
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 3, ""))
+	uassert.ErrorContains(t, r.ReviewZone("onyx", Retired, old, curator, 4, "gone"), "changed since you read it")
+	uassert.NoError(t, r.ReviewZone("onyx", Retired, rev(r, "onyx"), curator, 4, "gone"))
+}
+
+func TestRound2Validation(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	// A peer's host loses its terminal dot, so the two spellings are one peer.
+	_, err := r.Register(alice, 1, "onyx", Peer, nodeID+"@seed-1.onyx.example:26656", "")
+	uassert.NoError(t, err)
+	_, err = r.Register(alice, 1, "onyx", Peer, nodeID+"@seed-1.onyx.example.:26656", "")
+	uassert.ErrorContains(t, err, "already lists that peer")
+	// An IPv4 host with a terminal dot is refused: Go's dialer cannot use it.
+	uassert.ErrorContains(t, ValidateEndpoint(RPC, "http://1.2.3.4.:26657"), "DNS name or an IPv4")
+	uassert.ErrorContains(t, ValidateEndpoint(Peer, nodeID+"@1.2.3.4.:26656"), "DNS name or an IPv4")
+	// A loopback or private host is a local zone's only.
+	_, err = r.Register(alice, 1, "onyx", RPC, "http://127.0.0.1:26657", "")
+	uassert.ErrorContains(t, err, "loopback or private")
+	_, err = r.Register(alice, 1, "onyx", Peer, nodeID+"@10.1.2.3:26656", "")
+	uassert.ErrorContains(t, err, "loopback or private")
+	local := onyx()
+	local.Kind, local.RPCURL = Local, "http://127.0.0.1:26657"
+	uassert.NoError(t, r.Propose(alice, 1, "mine", local))
+	_, err = r.Register(alice, 1, "mine", Peer, nodeID+"@127.0.0.1:26656", "")
+	uassert.NoError(t, err)
+	// Equivalent URL spellings are one endpoint.
+	for _, pair := range [][2]string{
+		{"https://h.example/path", "https://h.example/path?"},
+		{"https://h.example?a=1", "https://h.example/?a=1"},
+		{"https://h.example/%2F", "https://h.example/%2f"},
+	} {
+		uassert.Equal(t, Canonical(Indexer, pair[0]), Canonical(Indexer, pair[1]), pair[0])
+	}
+	uassert.ErrorContains(t, ValidateEndpoint(Indexer, "https://h.example/%7e"), "needs no escaping")
+	uassert.ErrorContains(t, ValidateEndpoint(Indexer, "https://h.example/%41"), "needs no escaping")
+	// Look-alike badges and characters that draw nothing.
+	in := onyx()
+	for _, title := range []string{"✔ official", "☑ mainnet", "\U0001D159", "main\U000E0100net", "x", "᠋", "͸"} {
+		in.Title = title
+		uassert.Error(t, ValidateInfo(in), title)
+	}
+}
+
+// The per-proposer and per-registrant caps are counts, and they follow every
+// way a zone or an endpoint leaves.
+func TestCountersFollowRemovals(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	a, _ := r.Register(alice, 1, "onyx", RPC, "https://a.example", "")
+	_, _ = r.Register(alice, 1, "onyx", RPC, "https://b.example", "")
+	uassert.Equal(t, 2, r.OwnerCount("onyx", alice))
+	uassert.NoError(t, r.RemoveEndpoint(a))
+	uassert.Equal(t, 1, r.OwnerCount("onyx", alice))
+	uassert.NoError(t, r.RemoveZone("onyx", rev(r, "onyx")))
+	uassert.Equal(t, 0, r.OwnerCount("onyx", alice))
+	for i := 0; i < MaxPendingPerProposer; i++ {
+		uassert.NoError(t, r.Propose(alice, 2, "p"+strconv.Itoa(i), onyx()))
+	}
+	uassert.ErrorContains(t, r.Propose(alice, 2, "over", onyx()), "pending proposals")
+	uassert.NoError(t, r.ReviewZone("p0", Approved, rev(r, "p0"), curator, 3, ""))
+	uassert.NoError(t, r.Propose(alice, 3, "over", onyx()))
+}
+
+func TestSoleApproved(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(curator, 1, "za", onyx()))
+	_, ok := r.SoleApproved("onyx-1")
+	uassert.False(t, ok, "pending is not approved")
+	uassert.NoError(t, r.ReviewZone("za", Approved, rev(r, "za"), curator, 1, ""))
+	z, ok := r.SoleApproved("onyx-1")
+	uassert.True(t, ok)
+	uassert.Equal(t, "za", z.Slug)
+	uassert.NoError(t, r.Propose(curator, 1, "zb", onyx()))
+	uassert.NoError(t, r.ReviewZone("zb", Approved, rev(r, "zb"), curator, 1, ""))
+	_, ok = r.SoleApproved("onyx-1")
+	uassert.False(t, ok, "two approved zones share it: no guess")
 }

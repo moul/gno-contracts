@@ -2,7 +2,6 @@ package zones
 
 import (
 	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"strconv"
 	"strings"
@@ -16,19 +15,23 @@ import (
 //
 // The LIVE registry, pending and approved zones, has a hard cap. Rejected and
 // retired zones are kept for the record but do not count against it: each has
-// a cap of its own, and when it is reached the zone proposed longest ago in
-// that state is dropped to make room. So nothing a proposer or a curator does,
-// and no amount of time, can fill the registry for good: a cap that only ever
-// fills is a lifetime cap, and on an immutable path that is a brick.
+// a cap of its own, and when it is reached the zone that has been in that state
+// longest is dropped to make room (by when it entered the state, not when it
+// was proposed, so a long-lived network retired today is not the next to go).
+// So nothing a proposer or a curator does, and no amount of time, can fill the
+// registry for good: a cap that only ever fills is a lifetime cap, and on an
+// immutable path that is a brick.
 //
 // The per-address caps make one address cheap to ignore. Neither stops a flood
-// from many addresses, because an address is not an identity, so the review
-// queue has a ceiling of its own (MaxPending zones, MaxUnverifiedPerZone
+// from many addresses, because an address is not an identity, so admission to
+// the review queue has a gate of its own (MaxPending zones, MaxUnverifiedPerZone
 // endpoints), well under the hard caps: a flood fills the queue and never
-// crowds out an approved zone or a verified endpoint. Clearing the queue is
-// RemoveZone, RemoveEndpoint and rejection. Each entry costs its sender a
-// storage deposit, refunded to whoever signs the transaction that frees it, so
-// a flooder who withdraws first gets it back: a bond, not a fee.
+// crowds out an approved zone or a verified endpoint. The gate is checked where
+// something enters (Propose, Register); a curator's own review can push a count
+// past it, and never fails for it. The queue clears through approval,
+// verification, rejection, RemoveZone and RemoveEndpoint. Each entry costs its
+// sender a storage deposit, refunded to whoever signs the transaction that
+// frees it, so a flooder who withdraws first gets it back: a bond, not a fee.
 const (
 	MaxZones               = 256 // pending and approved zones together
 	MaxPending             = 64  // zones awaiting review, all proposers together
@@ -41,8 +44,10 @@ const (
 )
 
 // The reasons an endpoint carries when its zone changed under it and sent it
-// back to unverified. Such a reset is the registry's doing, not a curator's
-// verdict, so it records no reviewer: ReviewedBy is empty and Reason says why.
+// back to unverified. A reset caused by a curator's decision (a rejection, a
+// retirement, an edit to an approved zone) records that curator as the
+// reviewer; one caused by a proposer's edit to a pending zone records nobody,
+// because a proposer is not a reviewer: ReviewedBy is empty and Reason says why.
 const (
 	ChainIDChanged = "the zone's chain id changed; verify again"
 	ZoneRetired    = "the zone was retired; verify again if it returns"
@@ -50,7 +55,7 @@ const (
 )
 
 // fanout is the B+ tree fanout for every container this package builds itself:
-// 128, the cheapest point EFFECTIVE_GNO.md measured (592 B per entry).
+// 128, the cheapest fanout EFFECTIVE_GNO.md measured (592 B per entry).
 const fanout = 128
 
 // Registry holds the zones and their endpoints. The zero value is not usable:
@@ -64,18 +69,20 @@ const fanout = 128
 // the atomicity guarantee.
 type Registry struct {
 	rev uint64 // last Revision handed out, registry-wide, so never reused
+	seq uint64 // last status-entry sequence handed out, for eviction order
 
 	zones      *table
 	bySlug     *unique      // slug -> zone id
 	byStatus   *index.Index // status -> zone ids, so a page reads only its rows
-	byProposer *index.Index // proposer -> ids of their PENDING zones
+	entered    *unique      // status|entry sequence -> zone id: who has been in a state longest
+	byProposer *counter     // proposer -> how many PENDING zones they have
 	approved   *index.Index // chain id -> ids of APPROVED zones naming it
 
 	endpoints *table
 	byAddress *unique      // slug|kind|hash(canonical address) -> endpoint id
 	byZone    *index.Index // slug -> endpoint ids
 	byKind    *index.Index // slug|kind -> endpoint ids, so a page reads only its rows
-	byOwner   *index.Index // slug|registrant -> endpoint ids
+	byOwner   *counter     // slug|registrant -> how many endpoints they registered
 	unchecked *index.Index // slug -> ids of endpoints that are not Verified
 }
 
@@ -85,13 +92,14 @@ func NewRegistry() *Registry {
 		zones:      newTable(),
 		bySlug:     newUnique(),
 		byStatus:   index.New(),
-		byProposer: index.New(),
+		entered:    newUnique(),
+		byProposer: newCounter(),
 		approved:   index.New(),
 		endpoints:  newTable(),
 		byAddress:  newUnique(),
 		byZone:     index.New(),
 		byKind:     index.New(),
-		byOwner:    index.New(),
+		byOwner:    newCounter(),
 		unchecked:  index.New(),
 	}
 }
@@ -114,10 +122,10 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 	if r.Live() >= MaxZones {
 		return errors.New("zones: the registry is full at " + strconv.Itoa(MaxZones) + " pending and approved zones")
 	}
-	if r.byProposer.Len() >= MaxPending {
+	if r.byStatus.Count(string(Pending)) >= MaxPending {
 		return errors.New("zones: " + strconv.Itoa(MaxPending) + " proposals are already waiting for review; try again once a curator has cleared some")
 	}
-	if n := r.byProposer.Count(by.String()); n >= MaxPendingPerProposer {
+	if n := r.byProposer.count(by.String()); n >= MaxPendingPerProposer {
 		return errors.New("zones: " + by.String() + " already has " + strconv.Itoa(n) +
 			" pending proposals, the limit is " + strconv.Itoa(MaxPendingPerProposer))
 	}
@@ -126,11 +134,32 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 	z.setInfo(in)
 	id := r.zones.add(z)
 	r.bySlug.set(slug, id)
-	if err := r.byStatus.Add(string(Pending), id); err != nil {
-		return err
-	}
-	return r.byProposer.Add(by.String(), id)
+	r.byProposer.inc(by.String())
+	return r.enter(z, id, Pending)
 }
+
+// enter files a zone under a status: the status index, and the entry order
+// eviction reads. The caller has already taken it out of its old status.
+func (r *Registry) enter(z *Zone, id store.ID, to Status) error {
+	r.seq++
+	z.Status, z.Entered = to, int64(r.seq)
+	r.entered.set(enteredKey(to, z.Entered), id)
+	return r.byStatus.Add(string(to), id)
+}
+
+// leave takes a zone out of its current status.
+func (r *Registry) leave(z *Zone, id store.ID) {
+	r.byStatus.Remove(string(z.Status), id)
+	r.entered.remove(enteredKey(z.Status, z.Entered))
+	if z.Status == Pending {
+		r.byProposer.dec(z.Proposer.String())
+	}
+	if z.Status == Approved {
+		r.approved.Remove(z.ChainID, id)
+	}
+}
+
+func enteredKey(st Status, seq int64) string { return string(st) + "|" + store.ID(seq).Key() }
 
 // Edit replaces a zone's Info: every field but the slug and the status.
 //
@@ -148,9 +177,15 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 // against the old one goes back to unverified: what was verified was that it
 // answered for a chain this zone no longer names. On a pending zone that reset
 // records no reviewer, because the proposer is not one.
-func (r *Registry) Edit(slug string, in Info, by address, at int64, reason string) error {
+//
+// An edit names the revision it was written against, like an approval does, so
+// two editors working from the same reading cannot silently undo each other.
+func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int64, reason string) error {
 	z, zid, err := r.zone(slug)
 	if err != nil {
+		return err
+	}
+	if err := stale(z, revision); err != nil {
 		return err
 	}
 	if z.Status != Pending && z.Status != Approved {
@@ -200,13 +235,14 @@ func (r *Registry) Edit(slug string, in Info, by address, at int64, reason strin
 //
 // The transitions are the curation policy, and they are deliberately few:
 //
-//	approve  from pending, rejected or retired   reason optional, revision REQUIRED
+//	approve  from pending, rejected or retired   reason optional
 //	reject   from pending                        reason REQUIRED
 //	retire   from approved                       reason REQUIRED
 //
-// An approval names the zone's Revision the curator read, and fails if the zone
-// changed since: otherwise a proposer's edit landing just before the approval
-// would become official under the curator's name.
+// Every decision names the zone's Revision the curator read, and fails if the
+// zone changed since: otherwise a proposer's edit landing just before an
+// approval would become official under the curator's name, and a rejection's
+// public reason would describe text the curator never saw.
 //
 // Rejecting or retiring sends every verified endpoint back to unverified: a
 // rejected zone was never vouched for, and a retired network's peers may be
@@ -230,16 +266,14 @@ func (r *Registry) ReviewZone(slug string, to Status, revision int64, by address
 	if err := ValidateReason(reason); err != nil {
 		return err
 	}
+	if err := stale(z, revision); err != nil {
+		return err
+	}
 	if z.Status == to {
 		return errors.New("zones: " + slug + " is already " + string(to))
 	}
 	switch to {
 	case Approved:
-		if revision != z.Revision {
-			return errors.New("zones: " + slug + " changed since you read it: it is at revision " +
-				strconv.FormatInt(z.Revision, 10) + ", you approved revision " + strconv.FormatInt(revision, 10) +
-				"; read it again")
-		}
 		if z.Status != Pending && r.Live() >= MaxZones {
 			return errors.New("zones: the registry is full at " + strconv.Itoa(MaxZones) + " pending and approved zones")
 		}
@@ -272,44 +306,56 @@ func (r *Registry) ReviewZone(slug string, to Status, revision int64, by address
 		}
 		r.makeRoom(Retired, MaxRetired)
 	}
-	if z.Status == Pending {
-		r.byProposer.Remove(z.Proposer.String(), id)
-	}
-	if z.Status == Approved {
-		r.approved.Remove(z.ChainID, id)
-	}
+	r.leave(z, id)
 	if to == Approved {
 		if err := r.approved.Add(z.ChainID, id); err != nil {
 			return err
 		}
 	}
-	r.byStatus.Remove(string(z.Status), id)
-	if err := r.byStatus.Add(string(to), id); err != nil {
+	if err := r.enter(z, id, to); err != nil {
 		return err
 	}
-	z.Status = to
 	z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
 	return nil
 }
 
-// makeRoom drops the zone proposed longest ago in that state when the state is
-// at its cap, so the one about to enter fits.
+// stale refuses a decision written against a revision the zone has moved past.
+func stale(z *Zone, revision int64) error {
+	if revision != z.Revision {
+		return errors.New("zones: " + z.Slug + " changed since you read it: it is at revision " +
+			strconv.FormatInt(z.Revision, 10) + ", you acted on revision " + strconv.FormatInt(revision, 10) +
+			"; read it again")
+	}
+	return nil
+}
+
+// makeRoom drops the zone that has been in that state longest, when the state
+// is at its cap, so the one about to enter fits.
 func (r *Registry) makeRoom(status Status, max int) {
 	for r.byStatus.Count(string(status)) >= max {
-		ids := r.byStatus.Lookup(string(status))
-		v, _ := r.zones.get(ids[0])
-		r.removeZone(v.(*Zone), ids[0])
+		var oldest store.ID
+		r.entered.tree.Iterate(string(status)+"|", string(status)+"}", func(_ string, v any) bool {
+			oldest = v.(store.ID)
+			return true
+		})
+		v, _ := r.zones.get(oldest)
+		r.removeZone(v.(*Zone), oldest)
 	}
 }
 
 // RemoveZone deletes a pending or rejected zone and every endpoint registered
-// on it, freeing their storage deposit to whoever signs the removal. A zone
-// that has ever been official cannot be removed: an approved one is retired,
-// and a retired one is kept, so whoever still holds its chain id can find out
-// what happened to it.
-func (r *Registry) RemoveZone(slug string) error {
+// on it, freeing their storage deposit to whoever signs the removal. It names
+// the revision it was decided on, so a removal meant for one proposal cannot
+// land on another proposed again under the same slug. A zone that has ever
+// been official cannot be removed this way: an approved one is retired, and a
+// retired one is kept until MaxRetired newer retirements push it out, so
+// whoever still holds its chain id can find out what happened to it.
+func (r *Registry) RemoveZone(slug string, revision int64) error {
 	z, id, err := r.zone(slug)
 	if err != nil {
+		return err
+	}
+	if err := stale(z, revision); err != nil {
 		return err
 	}
 	if z.Status == Approved {
@@ -334,21 +380,15 @@ func (r *Registry) removeZone(z *Zone, id store.ID) {
 		}
 		e := v.(*Endpoint)
 		r.byAddress.remove(addressKey(slug, e.Kind, e.Address))
-		r.byOwner.Remove(ownerKey(slug, e.Registrant), eid)
+		r.byOwner.dec(ownerKey(slug, e.Registrant))
 	}
 	r.byZone.RemoveKey(slug)
 	r.unchecked.RemoveKey(slug)
 	for _, k := range EndpointKinds() {
 		r.byKind.RemoveKey(kindKey(slug, k))
 	}
-	if z.Status == Pending {
-		r.byProposer.Remove(z.Proposer.String(), id)
-	}
-	if z.Status == Approved {
-		r.approved.Remove(z.ChainID, id)
-	}
+	r.leave(z, id)
 	r.bySlug.remove(slug)
-	r.byStatus.Remove(string(z.Status), id)
 	r.zones.remove(id)
 }
 
@@ -372,9 +412,13 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 		return 0, err
 	}
 	if kind == Seed || kind == Peer {
-		addr = strings.ToLower(addr)
+		addr = Canonical(kind, addr) // lowercase, no terminal dot: what tm2 dials
 	} else {
 		addr = lowerScheme(addr)
+	}
+	if z.Kind != Local && IsPrivateHost(HostOf(kind, addr)) {
+		return 0, errors.New("zones: " + slug + " is a " + string(z.Kind) + " zone, and " + addr +
+			" is a loopback or private address; only a local zone lists those")
 	}
 	if err := ValidateLabel(label); err != nil {
 		return 0, err
@@ -394,7 +438,7 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 			" endpoints waiting for review; try again once a curator has cleared some")
 	}
 	okey := ownerKey(slug, by)
-	if n := r.byOwner.Count(okey); n >= MaxEndpointsPerAddress {
+	if n := r.byOwner.count(okey); n >= MaxEndpointsPerAddress {
 		return 0, errors.New("zones: " + by.String() + " already registered " + strconv.Itoa(n) +
 			" endpoints on " + slug + ", the limit is " + strconv.Itoa(MaxEndpointsPerAddress))
 	}
@@ -408,9 +452,7 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 	if err := r.byKind.Add(kindKey(slug, kind), id); err != nil {
 		return 0, err
 	}
-	if err := r.byOwner.Add(okey, id); err != nil {
-		return 0, err
-	}
+	r.byOwner.inc(okey)
 	if err := r.unchecked.Add(slug, id); err != nil {
 		return 0, err
 	}
@@ -530,7 +572,7 @@ func (r *Registry) removeEndpoint(id store.ID) {
 	r.byAddress.remove(addressKey(e.Zone, e.Kind, e.Address))
 	r.byZone.Remove(e.Zone, id)
 	r.byKind.Remove(kindKey(e.Zone, e.Kind), id)
-	r.byOwner.Remove(ownerKey(e.Zone, e.Registrant), id)
+	r.byOwner.dec(ownerKey(e.Zone, e.Registrant))
 	r.unchecked.Remove(e.Zone, id)
 }
 
@@ -655,6 +697,18 @@ func (r *Registry) ApprovedByChainID(chainID string) []Zone {
 	return out
 }
 
+// SoleApproved returns the approved zone naming that chain id when there is
+// exactly one, which is the only case a reader can be pointed at it without a
+// guess. It counts first and reads one record at most.
+func (r *Registry) SoleApproved(chainID string) (Zone, bool) {
+	if r.approved.Count(chainID) != 1 {
+		return Zone{}, false
+	}
+	id, _ := r.approved.First(chainID)
+	v, _ := r.zones.get(id)
+	return *v.(*Zone), true
+}
+
 // EndpointFilter selects endpoints. A zero field matches anything.
 type EndpointFilter struct {
 	Zone       string
@@ -677,9 +731,11 @@ func (f EndpointFilter) Match(e Endpoint) bool {
 // endpoint in the registry: bound it yourself.
 func (r *Registry) Endpoints(f EndpointFilter) []Endpoint {
 	if f.Zone != "" {
-		ids := r.byZone.Lookup(f.Zone)
+		var ids []store.ID
 		if f.Kind != "" {
 			ids = r.byKind.Lookup(kindKey(f.Zone, f.Kind))
+		} else {
+			ids = r.byZone.Lookup(f.Zone)
 		}
 		out := make([]Endpoint, 0, len(ids))
 		for _, id := range ids {
@@ -718,7 +774,7 @@ func (r *Registry) EndpointCount(slug string, kind EndpointKind) int {
 // OwnerCount returns how many endpoints that address registered on a zone. No
 // endpoint is read.
 func (r *Registry) OwnerCount(slug string, who address) int {
-	return r.byOwner.Count(ownerKey(slug, who))
+	return r.byOwner.count(ownerKey(slug, who))
 }
 
 // EndpointPage returns page (1-based) of a zone's endpoints of that kind, ""
@@ -726,9 +782,11 @@ func (r *Registry) OwnerCount(slug string, who address) int {
 // the records on the page only, and the bucket's id list (at most
 // MaxEndpointsPerZone ids) whole.
 func (r *Registry) EndpointPage(slug string, kind EndpointKind, page, size int) []Endpoint {
-	ids := r.byZone.Lookup(slug)
+	var ids []store.ID
 	if kind != "" {
 		ids = r.byKind.Lookup(kindKey(slug, kind))
+	} else {
+		ids = r.byZone.Lookup(slug)
 	}
 	ids = pageOf(ids, page, size)
 	out := make([]Endpoint, 0, len(ids))
@@ -782,13 +840,15 @@ func (r *Registry) endpoint(id int64) (*Endpoint, error) {
 }
 
 // addressKey is the dedup key: the zone, the kind, and a hash of the address
-// in [Canonical] form. Hashed so the key is 32 bytes whatever the URL's length,
-// instead of a second copy of up to MaxURLLen bytes the record already holds.
-// Truncated to 128 bits, which no accidental collision reaches and which only
-// lets a deliberate one refuse its own registration.
+// in [Canonical] form. Hashed so the key is 16 bytes whatever the URL's length,
+// instead of a second copy of up to MaxURLLen bytes the record already holds,
+// and kept raw rather than hex: it is a key, never shown. Truncated to 128
+// bits, which no accidental collision reaches and which only lets a deliberate
+// one refuse its own registration. It is the last field, so a byte that happens
+// to be "|" cannot be mistaken for a separator.
 func addressKey(slug string, kind EndpointKind, addr string) string {
 	sum := sha256.Sum256([]byte(Canonical(kind, addr)))
-	return slug + "|" + string(kind) + "|" + hex.EncodeToString(sum[:16])
+	return slug + "|" + string(kind) + "|" + string(sum[:16])
 }
 
 func kindKey(slug string, kind EndpointKind) string { return slug + "|" + string(kind) }
@@ -813,10 +873,10 @@ func trimInfo(in Info) Info {
 
 // table is numbered records in a B+ tree at fanout 128: kit/store's shape (an
 // id that is never reused, keyed by its seqid encoding so the tree iterates in
-// id order) on the container EFFECTIVE_GNO.md measured cheapest. kit/store/v0
-// sits on an avl, about 1.4 KB more per entry and about six times the object
-// reads to walk a zone's endpoints, and on an immutable path that choice is
-// permanent.
+// id order) on the ordered container EFFECTIVE_GNO.md measured cheapest.
+// kit/store/v0 sits on an avl, which it measured at 2,029 B per entry against
+// 592, and about six times the gas per entry iterated, and on an immutable path
+// that choice is permanent.
 type table struct {
 	tree *bptree.BPTree
 	last uint64
@@ -855,8 +915,8 @@ func (t *table) page(offset, count int, fn func(v any)) {
 }
 
 // unique is a key -> id map in a B+ tree that holds the id itself. kit/index
-// wraps every key's ids in a pointer to a struct holding a slice, which for a
-// key that only ever has one id is about 1.2 KB of structure to say so.
+// stores every key as three objects (a box, an entry struct, an ids array), and
+// for a key that only ever has one id two of them say nothing.
 type unique struct{ tree *bptree.BPTree }
 
 func newUnique() *unique { return &unique{tree: bptree.NewBPTreeN(fanout)} }
@@ -874,3 +934,29 @@ func (u *unique) get(key string) (store.ID, bool) {
 func (u *unique) set(key string, id store.ID) { u.tree.Set(key, id) }
 
 func (u *unique) remove(key string) { u.tree.Remove(key) }
+
+// counter is a key -> count map in a B+ tree, one object per key. The two caps
+// it answers (pending proposals per proposer, endpoints per registrant per
+// zone) only ever ask how many, so keeping the ids would be two more objects
+// per key, written and deleted for nothing.
+type counter struct{ tree *bptree.BPTree }
+
+func newCounter() *counter { return &counter{tree: bptree.NewBPTreeN(fanout)} }
+
+func (c *counter) count(key string) int {
+	v := c.tree.Get(key)
+	if v == nil {
+		return 0
+	}
+	return v.(int)
+}
+
+func (c *counter) inc(key string) { c.tree.Set(key, c.count(key)+1) }
+
+func (c *counter) dec(key string) {
+	if n := c.count(key) - 1; n > 0 {
+		c.tree.Set(key, n)
+	} else {
+		c.tree.Remove(key)
+	}
+}

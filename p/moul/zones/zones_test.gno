@@ -149,9 +149,22 @@ func TestValidateEndpoint(t *testing.T) {
 func TestValidateInfo(t *testing.T) {
 	ok := Info{ChainID: "onyx-1", Title: "Onyx", Kind: Testnet, RPCURL: "https://rpc.onyx.testnets.gno.land"}
 	uassert.NoError(t, ValidateInfo(ok))
+	// A loopback main RPC is a local zone's, and only a local zone's: it names a
+	// different machine for every reader.
 	tcp := ok
 	tcp.RPCURL = "tcp://127.0.0.1:26657"
+	uassert.ErrorContains(t, ValidateInfo(tcp), "loopback or private")
+	tcp.Kind = Local
 	uassert.NoError(t, ValidateInfo(tcp))
+	for _, h := range []string{"http://localhost:26657", "http://10.0.0.1:26657", "http://192.168.1.2", "http://172.20.0.1",
+		"http://169.254.169.254", "http://100.64.0.1", "http://0.0.0.0:26657", "http://api.localhost"} {
+		in := ok
+		in.RPCURL = h
+		uassert.ErrorContains(t, ValidateInfo(in), "loopback or private", h)
+	}
+	pub := ok
+	pub.RPCURL = "http://172.32.0.1"
+	uassert.NoError(t, ValidateInfo(pub))
 
 	bad := func(mut func(*Info), want string) {
 		in := ok

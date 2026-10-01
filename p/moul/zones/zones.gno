@@ -42,7 +42,7 @@ const (
 	Rejected Status = "rejected"
 	// Retired is a zone that was official and no longer runs. It stays
 	// listed, because a node operator holding its chain id deserves to find
-	// out why nothing answers.
+	// out why nothing answers, until MaxRetired newer retirements push it out.
 	Retired Status = "retired"
 )
 
@@ -142,14 +142,15 @@ type Zone struct {
 	Proposer   address
 	ProposedAt int64
 
-	// Revision changes on every write to the description, and is never reused,
+	// Revision changes on every edit of the zone's Info, and is never reused,
 	// not even by a zone removed and proposed again under the same slug. A
-	// curator approving a zone names the revision they read, so an edit that
-	// lands between their reading and their approval makes the approval fail
-	// instead of making somebody else's text official under their name.
+	// curator acting on a zone names the revision they read, so an edit that
+	// lands between their reading and their decision makes the decision fail
+	// instead of attaching their name to text they never saw.
 	Revision int64
-	EditedBy address // who last edited the description; empty if nobody has
+	EditedBy address // who last edited the Info; empty if nobody has
 	EditedAt int64
+	Entered  int64 // when it entered its current status, in registry order: eviction goes oldest first
 
 	// The latest curator decision, empty until there is one. A curator's edit
 	// to an approved zone is a decision too, and replaces these.
@@ -319,7 +320,64 @@ func ValidateInfo(in Info) error {
 			return err
 		}
 	}
+	// A loopback or private address names a different machine for every
+	// reader. Fine for a local zone, which is exactly that; on any other kind
+	// it points a config generator at whatever answers inside the reader's own
+	// network.
+	if in.Kind != Local {
+		for _, u := range []string{in.RPCURL, in.GnowebURL, in.GenesisURL} {
+			if u != "" && IsPrivateHost(HostOf(RPC, u)) {
+				return errors.New("zones: " + strconv.Quote(u) + " is a loopback or private address; only a local zone lists those")
+			}
+		}
+	}
 	return nil
+}
+
+// HostOf returns the host of an endpoint address: the part between :// and
+// the port or path of a URL, or between @ and the port of a peer. It assumes
+// an address that already passed validation.
+func HostOf(kind EndpointKind, addr string) string {
+	if kind == Seed || kind == Peer {
+		_, hostport, _ := strings.Cut(addr, "@")
+		if i := strings.LastIndexByte(hostport, ':'); i >= 0 {
+			return hostport[:i]
+		}
+		return hostport
+	}
+	_, rest, _ := strings.Cut(addr, "://")
+	if i := strings.IndexAny(rest, "/?"); i >= 0 {
+		rest = rest[:i]
+	}
+	if i := strings.LastIndexByte(rest, ':'); i >= 0 {
+		rest = rest[:i]
+	}
+	return rest
+}
+
+// IsPrivateHost reports whether host names a machine that is different for
+// every reader: localhost, or an IPv4 address in a loopback, private,
+// link-local, carrier-grade NAT or "this network" range.
+func IsPrivateHost(host string) bool {
+	h := strings.ToLower(strings.TrimSuffix(host, "."))
+	if h == "localhost" || strings.HasSuffix(h, ".localhost") {
+		return true
+	}
+	if checkIPv4(h) != nil {
+		return false
+	}
+	o := strings.Split(h, ".")
+	a, _ := strconv.Atoi(o[0])
+	b, _ := strconv.Atoi(o[1])
+	switch {
+	case a == 0, a == 10, a == 127:
+		return true
+	case a == 169 && b == 254, a == 192 && b == 168:
+		return true
+	case a == 172 && b >= 16 && b <= 31, a == 100 && b >= 64 && b <= 127:
+		return true
+	}
+	return false
 }
 
 // ValidateEndpoint checks an endpoint's address against the shape its kind
@@ -384,21 +442,30 @@ func HasVisible(s string) bool {
 }
 
 // isBlankFiller is the handful of characters that are letters or symbols by
-// category and still draw nothing: the Hangul fillers and the blank Braille
-// cell. Unicode does not class them as format characters, so they need naming.
+// category and still draw nothing: the Hangul fillers, the blank Braille cell,
+// the musical null notehead. Unicode does not class them as format
+// characters, so they need naming.
 func isBlankFiller(r rune) bool {
 	switch r {
-	case 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800:
+	case 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800, 0x1D159:
 		return true
 	}
 	return false
 }
 
-// isBadge is the status glyphs Render draws itself, refused in free text so a
-// title cannot claim "✅ official" beside a pending badge.
+// isSelector is the variation selectors, all three blocks: invisible on their
+// own, and an invisible difference between two spellings of a name.
+func isSelector(r rune) bool {
+	return (r >= 0xFE00 && r <= 0xFE0F) || (r >= 0xE0100 && r <= 0xE01EF) || (r >= 0x180B && r <= 0x180F)
+}
+
+// isBadge is the status glyphs Render draws, and their look-alikes, refused in
+// free text so a title cannot claim "✔ official" beside a pending badge.
 func isBadge(r rune) bool {
 	switch r {
-	case 0x2705, 0x26A0, 0x23F3, 0x274C, 0x23F9: // ✅ ⚠ ⏳ ❌ ⏹
+	case 0x2705, 0x26A0, 0x23F3, 0x274C, 0x23F9, // ✅ ⚠ ⏳ ❌ ⏹, what Render draws
+		0x2713, 0x2714, 0x2611, 0x1F5F8, 0x1F5F9, // check marks
+		0x2716, 0x2717, 0x2718, 0x1F6AB, 0x26D4: // crosses and no-entry signs
 		return true
 	}
 	return false
@@ -407,13 +474,15 @@ func isBadge(r rune) bool {
 // checkText bounds a free-text field by runes (so at most four times as many
 // bytes) and keeps it to one line of text that shows what it stores:
 //
-//   - no control character: C0, DEL, C1 (NEL included), U+2028, U+2029. Each
-//     is a line break somewhere, and ui.Inline folds them to a space.
-//   - no invisible character: every format character (Unicode Cf, which covers
-//     the bidi controls and isolates, the zero-width characters, U+061C, word
-//     joiners, tags), the blank fillers, variation selectors, the combining
-//     grapheme joiner. ui.Inline strips some of these and gnoweb draws none, so
-//     a title made of them would pass the length check and render blank.
+//   - no control character: C0, DEL, C1, U+2028, U+2029. Several are line
+//     breaks that ui.Inline folds to a space, the rest draw nothing; either
+//     way the text shown would not be the text stored.
+//   - no invisible or undrawable character: every format character (Unicode
+//     Cf, which covers the bidi controls and isolates, the zero-width
+//     characters, U+061C, word joiners, tags), every character that is not
+//     graphic (private use, unassigned, noncharacters), the blank fillers, the
+//     variation selectors, the combining grapheme joiner. A title made of them
+//     would pass the length check and render blank or as a box.
 //   - no run of more than two combining marks, which stack over neighbouring
 //     lines, and none of the status glyphs this realm draws.
 //   - valid UTF-8, because the page would show U+FFFD for a byte stored raw.
@@ -433,7 +502,8 @@ func checkText(field, s string, min, max int) error {
 		if r < 0x20 || (r >= 0x7f && r <= 0x9f) || r == 0x2028 || r == 0x2029 {
 			return errors.New("zones: the " + field + " contains a control character")
 		}
-		if unicode.Is(unicode.Cf, r) || isBlankFiller(r) || r == 0x034F || (r >= 0xFE00 && r <= 0xFE0F) {
+		if unicode.Is(unicode.Cf, r) || isBlankFiller(r) || r == 0x034F || isSelector(r) ||
+			(!unicode.IsGraphic(r) && !unicode.IsSpace(r)) {
 			return errors.New("zones: the " + field + " contains an invisible or bidi character")
 		}
 		if isBadge(r) {
@@ -487,6 +557,11 @@ func checkURL(field, s string, schemes []string) error {
 		}
 		if c == '%' && (i+2 >= len(s) || !isHex(s[i+1]) || !isHex(s[i+2])) {
 			return errors.New("zones: the " + field + " has a % that is not followed by two hex digits: " + strconv.Quote(s))
+		}
+		if c == '%' && isUnreserved(unhex(s[i+1])<<4|unhex(s[i+2])) {
+			// %7E and ~ are the same URL (RFC 3986): one spelling, so two
+			// listings cannot be the same endpoint.
+			return errors.New("zones: the " + field + " escapes a character that needs no escaping: " + strconv.Quote(s))
 		}
 		if c == '&' && isEntity(s[i+1:]) {
 			return errors.New("zones: the " + field + " contains an HTML entity shape: " + strconv.Quote(s))
@@ -549,6 +624,11 @@ func checkHost(host string) error {
 	labels := strings.Split(name, ".")
 	last := strings.ToLower(labels[len(labels)-1])
 	if strings.Trim(last, "0123456789") == "" || strings.HasPrefix(last, "0x") {
+		// No terminal dot on an address: browsers accept 1.2.3.4. but Go's
+		// dialer, so gnokey and tm2, look it up as a name and fail.
+		if name != host {
+			return errors.New("bad ipv4")
+		}
 		return checkIPv4(name)
 	}
 	for _, label := range labels {
@@ -599,6 +679,22 @@ func isHex(c byte) bool {
 	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
 }
 
+func unhex(c byte) byte {
+	switch {
+	case c >= '0' && c <= '9':
+		return c - '0'
+	case c >= 'a' && c <= 'f':
+		return c - 'a' + 10
+	}
+	return c - 'A' + 10
+}
+
+// isUnreserved is RFC 3986's unreserved set: what a URL never needs to escape.
+func isUnreserved(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
+		c == '-' || c == '.' || c == '_' || c == '~'
+}
+
 // isEntity reports whether s starts with what an HTML entity would follow an
 // ampersand with: a run of [A-Za-z0-9#] closed by a semicolon.
 func isEntity(s string) bool {
@@ -629,13 +725,22 @@ func lowerScheme(addr string) string {
 // Canonical is the form two addresses are compared in, so one endpoint cannot
 // be listed twice under two spellings: the scheme and the host lowercased (both
 // are case-insensitive), the host's terminal dot dropped, the scheme's default
-// port dropped (:443 for https and wss, :80 for http and ws), and a bare "/" or
-// "?" with nothing after it dropped. A path or a query that says something is
-// kept as typed: those are case-sensitive and name different resources. A peer
-// is lowercased whole: its node id is lowercase bech32 and its host is a name.
+// port dropped (:443 for https and wss, :80 for http and ws), an empty path
+// before a query dropped, a trailing lone "?" or "/" dropped, and the hex
+// digits of every %XX escape uppercased. A path or a query that says something
+// is kept as typed: those are case-sensitive and name different resources. A
+// peer is lowercased whole and loses its host's terminal dot: its node id is
+// lowercase bech32 and its host is a name.
 func Canonical(kind EndpointKind, addr string) string {
 	if kind == Seed || kind == Peer {
-		return strings.ToLower(addr)
+		id, hostport, ok := strings.Cut(strings.ToLower(addr), "@")
+		if !ok {
+			return strings.ToLower(addr)
+		}
+		if i := strings.LastIndexByte(hostport, ':'); i >= 0 {
+			hostport = strings.TrimSuffix(hostport[:i], ".") + hostport[i:]
+		}
+		return id + "@" + hostport
 	}
 	scheme, rest, ok := strings.Cut(addr, "://")
 	if !ok {
@@ -660,10 +765,36 @@ func Canonical(kind EndpointKind, addr string) string {
 	if port != "" {
 		host += ":" + port
 	}
-	if tail == "/" || tail == "?" || tail == "/?" {
+	tail = strings.TrimSuffix(tail, "?")
+	if strings.HasPrefix(tail, "/?") {
+		tail = tail[1:]
+	}
+	if tail == "/" {
 		tail = ""
 	}
-	return scheme + "://" + host + tail
+	return scheme + "://" + host + upperEscapes(tail)
+}
+
+// upperEscapes uppercases the two hex digits of every %XX in s.
+func upperEscapes(s string) string {
+	if !strings.Contains(s, "%") {
+		return s
+	}
+	b := []byte(s)
+	for i := 0; i+2 < len(b); i++ {
+		if b[i] == '%' {
+			b[i+1] = toUpperHex(b[i+1])
+			b[i+2] = toUpperHex(b[i+2])
+		}
+	}
+	return string(b)
+}
+
+func toUpperHex(c byte) byte {
+	if c >= 'a' && c <= 'f' {
+		return c - 'a' + 'A'
+	}
+	return c
 }
 
 // checkPeer accepts a tm2 p2p address: <node id>@<host>:<port>, where the node
