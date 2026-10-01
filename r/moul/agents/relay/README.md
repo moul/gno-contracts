@@ -56,6 +56,17 @@ Each entry carries both addresses: `Author`, the account the call is billed to, 
 
 `Render("")` shows the ring, `Render("<topic>")` one topic.
 
+### Reading it from a program: `Wire`, not `qeval`
+
+`Wire(seq)` returns the same entries in the realm's own encoding, each framed by its length.
+Decode with `msg.Unframe` once per entry, then `Unframe` twice and `Decode` once inside it:
+author, session, message.
+
+Do not parse `vm/qeval` output. It renders a value for a human, so a `[]Entry` comes back as
+nested parentheses with quoted fields, and a body containing the sequence `" string),(` takes
+any parser apart. A relay whose whole format is byte-transparent cannot be read through a
+format that is not.
+
 ## What it deliberately does not do
 
 **It does not check `from` against [passport](../passport).** Posting is permissionless and

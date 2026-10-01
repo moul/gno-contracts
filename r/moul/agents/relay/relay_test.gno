@@ -197,3 +197,49 @@ func TestPostRecordsNoSessionForAMasterKey(cur realm, t *testing.T) {
 	uassert.Equal(t, alice.String(), e.Author.String())
 	uassert.Equal(t, "", e.Session.String())
 }
+
+// TestWireRoundTripsThroughAReader walks the wire format exactly as an
+// off-chain reader must: unframe one entry at a time, then unframe the author
+// and the session off the front, then decode the message. The bodies are the
+// ones that break a qeval parser.
+func TestWireRoundTripsThroughAReader(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	bodies := []string{
+		`a body with " string),( in it`,
+		"ends in 40",
+		"has\na newline",
+		"| and | pipes |",
+	}
+	for _, b := range bodies {
+		Post(cross(cur), "agent-a", "build", "k", "r", b)
+	}
+
+	rest := Wire(0)
+	for i, want := range bodies {
+		framed, tail, ok := msg.Unframe(rest)
+		uassert.True(t, ok, "entry did not unframe")
+		rest = tail
+
+		author, r2, ok := msg.Unframe(framed)
+		uassert.True(t, ok, "author did not unframe")
+		session, r3, ok := msg.Unframe(r2)
+		uassert.True(t, ok, "session did not unframe")
+		m, ok := msg.Decode(r3)
+		uassert.True(t, ok, "message did not decode")
+
+		uassert.Equal(t, want, m.Body)
+		uassert.Equal(t, uint64(i+1), m.Seq)
+		uassert.Equal(t, alice.String(), author)
+		uassert.Equal(t, "", session)
+	}
+	uassert.Equal(t, "", rest, "the wire had trailing bytes")
+}
+
+func TestWireIsEmptyWhenNothingIsNewer(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Post(cross(cur), "agent-a", "build", "", "", "one")
+	uassert.Equal(t, "", Wire(1))
+	uassert.True(t, Wire(0) != "", "Wire(0) should carry the only entry")
+}

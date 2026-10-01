@@ -178,6 +178,25 @@ func Since(seq uint64) []Entry {
 	return out
 }
 
+// Wire returns every entry after seq in the realm's own encoding, oldest
+// first, each one framed by its length so a reader can split them apart.
+//
+// It exists because [vm/qeval] renders a value for a human, not for a program:
+// a []Entry comes back as nested parentheses with quoted fields, and a body
+// containing the sequence `" string),(` takes any parser apart. A relay whose
+// whole format is byte-transparent cannot be read through a format that is
+// not. Decode with [gno.land/p/moul/agents/msg.Unframe], then the same
+// package's Unframe twice and Decode once per entry: author, session, message.
+//
+// Empty when nothing is newer than seq.
+func Wire(seq uint64) string {
+	var sb strings.Builder
+	for _, e := range Since(seq) {
+		sb.WriteString(msg.Frame(encode(e)))
+	}
+	return sb.String()
+}
+
 func Render(path string) string {
 	req := realmpath.Parse(path)
 	if t := req.PathPart(0); t != "" {
