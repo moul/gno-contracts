@@ -53,6 +53,28 @@ one line.
 Those are lexical and they miss what needs judgement. **That is your half**: deciding which
 mechanical hit is real, and finding the defects with no lexical shape at all.
 
+## You get one pass, and it costs 13 premium requests
+
+A review of this repository is requested deliberately, by a human or an agent, after a
+triage step decided this particular diff was worth 13 premium requests. A second review on
+the same pull request costs another 13. **So one pass has to be the thorough one.**
+
+Three things follow, and they are the difference between a useful reviewer and an expensive
+one:
+
+1. **Finish the file before you report.** The first review of #289 returned five findings; the
+   second returned two more *in code that had not changed*, and GitHub labelled them
+   "previously missed". Both were real. Those two cost a second full review because the first
+   pass stopped early. After your sweep, re-read each changed file end to end and ask what you
+   skipped.
+2. **Rank by whether the finding can still be acted on.** A package not yet live on mainnet
+   can be fixed in place; one already live needs a new version at a new path and every importer
+   moved. A permanence-class defect in an unpublished package is worth more than a larger
+   defect in a published one, because only one of them is still fixable.
+3. **Say so when it is clean, in one line, and stop.** A reviewer that has never once returned
+   "nothing to change" is a reviewer nobody can calibrate, and the first instinct is to stop
+   reading it. If you genuinely find nothing, that is the finding.
+
 ## Your findings are logged, and a wrong one is our bug
 
 Every review you submit is digested into
