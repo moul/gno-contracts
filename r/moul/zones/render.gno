@@ -190,11 +190,18 @@ func renderProposals() string {
 // running on, so the command a reader copies points at the chain they are
 // reading. A chain the registry does not list gets no -remote, rather than a
 // guessed one.
+//
+// The remote is single-quoted because a reader pastes this into a shell, and a
+// URL may legally carry ; & # $, which a shell reads as syntax: an approved
+// zone whose RPC ended in ;id;# would otherwise run id on every reader's
+// machine. A single quote cannot occur inside it, because the URL validator
+// refuses one, so the quoting cannot be closed from within. The call is built
+// here from charset-checked slugs and literals only.
 func queryCommand(call string) string {
 	remote := ""
 	for _, z := range reg.Zones(zones.ZoneFilter{Status: zones.Approved}) {
 		if z.ChainID == runtime.ChainID() {
-			remote = " -remote " + z.RPCURL
+			remote = " -remote '" + z.RPCURL + "'"
 			break
 		}
 	}
@@ -233,7 +240,7 @@ func endpointStatus(e zones.Endpoint) string {
 	default:
 		s = "unverified"
 	}
-	if e.Reason != "" && e.Status != zones.Verified {
+	if e.Reason != "" {
 		s += ": " + ui.Cell(e.Reason)
 	}
 	return s

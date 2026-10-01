@@ -9,14 +9,24 @@ import (
 	"gno.land/p/moul/kit/store/v0"
 )
 
-// Bounds on what the registry holds. Two kinds of cap, because a single global
-// one is filled by whoever gets there first: the per-address caps are what keep
-// the registry open to the next proposer once a stranger has spammed it.
+// Bounds on what the registry holds, in three layers.
+//
+// The hard caps bound the storage. The per-address caps make one address
+// cheap to ignore. Neither stops a flood from many addresses, because an
+// address is not an identity, so the middle layer is what keeps a flood from
+// mattering: unreviewed entries have a ceiling of their own, well under the
+// hard cap, and the room above it can only be reached through a curator's
+// review. A flood can fill the review queue; it can never crowd out an
+// official zone or a verified endpoint. Clearing the queue is RemoveZone and
+// RemoveEndpoint, and every entry a flood writes costs its sender a storage
+// deposit, which is the only admission price a permissionless list has.
 const (
 	MaxZones               = 256 // every zone, whatever its status
+	MaxPending             = 64  // zones awaiting review, all proposers together
 	MaxPendingPerProposer  = 4   // open proposals one address may have at once
 	MaxEndpointsPerZone    = 512
-	MaxEndpointsPerAddress = 32 // endpoints one address may register on one zone
+	MaxUnverifiedPerZone   = 128 // endpoints on one zone no curator has verified
+	MaxEndpointsPerAddress = 32  // endpoints one address may register on one zone
 )
 
 // Registry holds the zones and their endpoints. The zero value is not usable:
@@ -35,6 +45,7 @@ type Registry struct {
 	byZone    *index.Index // slug -> endpoint ids
 	byAddress *index.Index // slug|kind|address -> endpoint id, unique
 	byOwner   *index.Index // slug|registrant -> endpoint ids
+	unchecked *index.Index // slug -> ids of endpoints that are not Verified
 }
 
 // NewRegistry returns an empty registry.
@@ -47,6 +58,7 @@ func NewRegistry() *Registry {
 		byZone:     index.New(),
 		byAddress:  index.Unique(),
 		byOwner:    index.New(),
+		unchecked:  index.New(),
 	}
 }
 
@@ -67,6 +79,9 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 	}
 	if r.zones.Len() >= MaxZones {
 		return errors.New("zones: the registry is full at " + strconv.Itoa(MaxZones) + " zones")
+	}
+	if r.byProposer.Len() >= MaxPending {
+		return errors.New("zones: " + strconv.Itoa(MaxPending) + " proposals are already waiting for review; try again once a curator has cleared some")
 	}
 	if n := r.byProposer.Count(by.String()); n >= MaxPendingPerProposer {
 		return errors.New("zones: " + by.String() + " already has " + strconv.Itoa(n) +
@@ -112,6 +127,9 @@ func (r *Registry) ReviewZone(slug string, to Status, by address, at int64, reas
 	if err != nil {
 		return err
 	}
+	if !by.IsValid() {
+		return errors.New("zones: the reviewer is not a valid address")
+	}
 	reason = strings.TrimSpace(reason)
 	if err := ValidateReason(reason); err != nil {
 		return err
@@ -147,9 +165,10 @@ func (r *Registry) ReviewZone(slug string, to Status, by address, at int64, reas
 	return nil
 }
 
-// RemoveZone deletes a zone and every endpoint registered on it, which gives
-// the storage deposit back. An approved zone cannot be removed: retire it, so
-// the record of it having been official survives.
+// RemoveZone deletes a pending or rejected zone and every endpoint registered
+// on it, which gives the storage deposit back. A zone that has ever been
+// official cannot be removed: an approved one is retired, and a retired one is
+// kept, so whoever still holds its chain id can find out what happened to it.
 func (r *Registry) RemoveZone(slug string) error {
 	z, id, err := r.zone(slug)
 	if err != nil {
@@ -157,6 +176,9 @@ func (r *Registry) RemoveZone(slug string) error {
 	}
 	if z.Status == Approved {
 		return errors.New("zones: " + slug + " is approved; retire it instead of removing it")
+	}
+	if z.Status == Retired {
+		return errors.New("zones: " + slug + " is retired, and a retired zone is kept on record")
 	}
 	for _, eid := range r.byZone.Lookup(slug) {
 		r.removeEndpoint(eid)
@@ -199,6 +221,10 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 	if n := r.byZone.Count(slug); n >= MaxEndpointsPerZone {
 		return 0, errors.New("zones: " + slug + " is full at " + strconv.Itoa(MaxEndpointsPerZone) + " endpoints")
 	}
+	if n := r.unchecked.Count(slug); n >= MaxUnverifiedPerZone {
+		return 0, errors.New("zones: " + slug + " already has " + strconv.Itoa(n) +
+			" endpoints waiting for review; try again once a curator has cleared some")
+	}
 	okey := slug + "|" + by.String()
 	if n := r.byOwner.Count(okey); n >= MaxEndpointsPerAddress {
 		return 0, errors.New("zones: " + by.String() + " already registered " + strconv.Itoa(n) +
@@ -216,6 +242,9 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 	if err := r.byOwner.Add(okey, id); err != nil {
 		return 0, err
 	}
+	if err := r.unchecked.Add(slug, id); err != nil {
+		return 0, err
+	}
 	return e.ID, nil
 }
 
@@ -226,6 +255,9 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, by address, at int6
 	e, err := r.endpoint(id)
 	if err != nil {
 		return err
+	}
+	if !by.IsValid() {
+		return errors.New("zones: the reviewer is not a valid address")
 	}
 	reason = strings.TrimSpace(reason)
 	if err := ValidateReason(reason); err != nil {
@@ -242,6 +274,14 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, by address, at int6
 	}
 	if to == Flagged && reason == "" {
 		return errors.New("zones: flagging an endpoint needs a reason")
+	}
+	sid := store.ID(id)
+	if to == Verified {
+		r.unchecked.Remove(e.Zone, sid)
+	} else if e.Status == Verified {
+		if err := r.unchecked.Add(e.Zone, sid); err != nil {
+			return err
+		}
 	}
 	e.Status = to
 	e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, reason
@@ -380,13 +420,13 @@ func (r *Registry) removeEndpoint(id store.ID) {
 	r.byZone.Remove(e.Zone, id)
 	r.byAddress.Remove(addressKey(e.Zone, e.Kind, e.Address), id)
 	r.byOwner.Remove(e.Zone+"|"+e.Registrant.String(), id)
+	r.unchecked.Remove(e.Zone, id)
 }
 
-// addressKey is the dedup key. Lowercased, because a DNS name is
-// case-insensitive and the same RPC registered twice under two spellings is
-// still one RPC.
+// addressKey is the dedup key, on the [Canonical] form: the same RPC under two
+// spellings of its host is one RPC, and two paths on one host are two.
 func addressKey(slug string, kind EndpointKind, addr string) string {
-	return slug + "|" + string(kind) + "|" + strings.ToLower(addr)
+	return slug + "|" + string(kind) + "|" + Canonical(kind, addr)
 }
 
 func trimInfo(in Info) Info {

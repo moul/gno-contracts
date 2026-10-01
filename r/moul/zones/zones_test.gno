@@ -1,6 +1,7 @@
 package zones
 
 import (
+	"chain/runtime"
 	"strings"
 	"testing"
 
@@ -143,10 +144,24 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	// Retired, it is a record the curators keep: the proposer cannot erase it.
 	testing.SetRealm(testing.NewUserRealm(alice))
 	uassert.AbortsContains(t, cur, "while it is pending or rejected", func() { RemoveZone(cross(cur), "alice-dev") })
+	// Nor can a curator: a retired zone is kept on record.
 	testing.SetRealm(testing.NewUserRealm(Admin))
-	RemoveZone(cross(cur), "alice-dev")
+	uassert.AbortsContains(t, cur, "kept on record", func() { RemoveZone(cross(cur), "alice-dev") })
 	_, ok = GetZone("alice-dev")
-	uassert.False(t, ok)
+	uassert.True(t, ok)
+}
+
+// The printed command is pasted into a shell, so the remote is quoted: a URL may
+// carry ; & # $, and only a single quote could break out, which no URL here can
+// contain.
+func TestQueryCommandQuotesTheRemote(t *testing.T) {
+	reset()
+	z, _ := GetZone("moul-staging")
+	must(reg.Edit("moul-staging", zones.Info{ChainID: runtime.ChainID(), Title: z.Title, Kind: z.Kind,
+		RPCURL: "https://rpc.example/;id;#"}))
+	got := queryCommand(`GetZone("onyx")`)
+	uassert.Equal(t, `gnokey query vm/qeval -remote 'https://rpc.example/;id;#' -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'`, got)
+	uassert.ErrorContains(t, zones.ValidateEndpoint(zones.RPC, "https://rpc.example/'x"), "contains")
 }
 
 func TestRejectAndWithdraw(cur realm, t *testing.T) {

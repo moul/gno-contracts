@@ -61,38 +61,38 @@ func ExampleRender_zone() {
 	//
 	// | # | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- |
-	// | 7 | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified | `g1manfre…dlf5` |
+	// | 7 | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
 	//
 	// ### gnoweb
 	//
 	// | # | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- |
-	// | 8 | `https://onyx.testnets.gno.land` | gno core | ✅ verified | `g1manfre…dlf5` |
+	// | 8 | `https://onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
 	//
 	// ### peer
 	//
 	// | # | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- |
-	// | 9 | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified | `g1manfre…dlf5` |
-	// | 10 | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified | `g1manfre…dlf5` |
+	// | 9 | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 10 | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
 	//
 	// ### indexer
 	//
 	// | # | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- |
-	// | 11 | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified | `g1manfre…dlf5` |
+	// | 11 | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
 	//
 	// ### faucet
 	//
 	// | # | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- |
-	// | 12 | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified | `g1manfre…dlf5` |
+	// | 12 | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
 	//
 	// ### explorer
 	//
 	// | # | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- |
-	// | 13 | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified | `g1manfre…dlf5` |
+	// | 13 | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
 	//
 	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&slug=onyx)
 	//

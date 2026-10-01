@@ -376,17 +376,72 @@ func checkURL(field, s string, schemes []string) error {
 		return errors.New("zones: the " + field + " scheme is " + strconv.Quote(scheme) + ", want one of " +
 			strings.Join(schemes, ", "))
 	}
-	host := rest
-	if i := strings.IndexAny(host, "/?#"); i >= 0 {
-		host = host[:i]
+	authority := rest
+	if i := strings.IndexAny(authority, "/?#"); i >= 0 {
+		authority = authority[:i]
 	}
-	if strings.Contains(host, "@") {
+	if strings.Contains(authority, "@") {
 		return errors.New("zones: the " + field + " carries credentials: " + strconv.Quote(s))
+	}
+	host, port := authority, ""
+	if i := strings.LastIndexByte(authority, ':'); i >= 0 {
+		host, port = authority[:i], authority[i+1:]
+		if err := checkPort(port); err != nil {
+			return errors.New("zones: the " + field + "'s port is 1 to 65535, got " + strconv.Quote(port))
+		}
 	}
 	if host == "" {
 		return errors.New("zones: the " + field + " has no host: " + strconv.Quote(s))
 	}
+	if err := checkHost(host); err != nil {
+		return errors.New("zones: the " + field + "'s host is a DNS name or an IPv4 address, got " + strconv.Quote(host))
+	}
 	return nil
+}
+
+// checkHost accepts a DNS name or a dotted IPv4 address: [A-Za-z0-9.-].
+// Bracketed IPv6 is refused, deliberately: it is the one host shape that needs
+// characters every other field here refuses, and no zone needs it yet.
+func checkHost(host string) error {
+	if len(host) > MaxURLLen {
+		return errors.New("host too long")
+	}
+	for _, r := range host {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '.', r == '-':
+		default:
+			return errors.New("bad host")
+		}
+	}
+	return nil
+}
+
+// checkPort accepts 1 to 65535, in decimal, with no leading zero.
+func checkPort(port string) error {
+	p, err := strconv.Atoi(port)
+	if err != nil || p < 1 || p > 65535 || port[0] == '0' {
+		return errors.New("bad port")
+	}
+	return nil
+}
+
+// Canonical is the form two addresses are compared in: the scheme and the
+// host lowercased, because both are case-insensitive, and everything after the
+// host kept as typed, because a path and a query are not. A peer's node id is
+// bech32, already lowercase, so a peer lowercases whole.
+func Canonical(kind EndpointKind, addr string) string {
+	if kind == Seed || kind == Peer {
+		return strings.ToLower(addr)
+	}
+	scheme, rest, ok := strings.Cut(addr, "://")
+	if !ok {
+		return addr
+	}
+	i := strings.IndexAny(rest, "/?#")
+	if i < 0 {
+		i = len(rest)
+	}
+	return strings.ToLower(scheme) + "://" + strings.ToLower(rest[:i]) + rest[i:]
 }
 
 // checkPeer accepts a tm2 p2p address: <node id>@<host>:<port>, where the node
@@ -404,19 +459,11 @@ func checkPeer(s string) error {
 		return errors.New("zones: a peer needs a port: " + strconv.Quote(s))
 	}
 	host, port := hostport[:i], hostport[i+1:]
-	p, err := strconv.Atoi(port)
-	if err != nil || p < 1 || p > 65535 || port[0] == '0' {
+	if err := checkPort(port); err != nil {
 		return errors.New("zones: a peer's port is 1 to 65535, got " + strconv.Quote(port))
 	}
-	if len(host) > MaxURLLen {
-		return errors.New("zones: a peer's host is longer than " + strconv.Itoa(MaxURLLen) + " bytes")
-	}
-	for _, r := range host {
-		switch {
-		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '.', r == '-':
-		default:
-			return errors.New("zones: a peer's host is a DNS name or an IPv4 address, got " + strconv.Quote(host))
-		}
+	if err := checkHost(host); err != nil {
+		return errors.New("zones: a peer's host is a DNS name or an IPv4 address, got " + strconv.Quote(host))
 	}
 	return nil
 }

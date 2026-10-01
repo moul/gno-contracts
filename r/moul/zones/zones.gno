@@ -86,10 +86,10 @@ func RetireZone(cur realm, slug, reason string) {
 	review(cur, slug, zones.Retired, reason)
 }
 
-// RemoveZone deletes a zone and its endpoints. A curator may remove any zone
-// that is not approved. The proposer may take back their own while it is
-// pending or rejected, but not once it has been official: a retired zone is a
-// record the curators keep. An approved zone is retired, never removed.
+// RemoveZone deletes a pending or rejected zone and its endpoints: a curator
+// may remove any, the proposer their own. A zone that was ever official is
+// never removed, by anybody: an approved one is retired, and a retired one is
+// kept on record.
 func RemoveZone(cur realm, slug string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)

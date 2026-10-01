@@ -163,6 +163,13 @@ func TestRegisterAndFilter(t *testing.T) {
 	// Dedup is case-insensitive: the same host under another spelling.
 	_, err = r.Register(bob, 7, "onyx", RPC, "https://RPC.onyx.testnets.gno.land", "")
 	uassert.ErrorContains(t, err, "already lists that rpc")
+	// ...but a path is case-sensitive, so another path is another endpoint.
+	_, err = r.Register(bob, 7, "onyx", Indexer, "https://indexer.example/API", "")
+	uassert.NoError(t, err)
+	_, err = r.Register(bob, 7, "onyx", Indexer, "https://INDEXER.example/API", "")
+	uassert.ErrorContains(t, err, "already lists that indexer")
+	_, err = r.Register(bob, 7, "onyx", Indexer, "https://indexer.example/api", "")
+	uassert.NoError(t, err)
 	// The same address under another kind is a different endpoint.
 	_, err = r.Register(bob, 7, "onyx", Gnoweb, "https://rpc.onyx.testnets.gno.land", "")
 	uassert.NoError(t, err)
@@ -174,9 +181,9 @@ func TestRegisterAndFilter(t *testing.T) {
 	_, err = r.Register(bob, 7, "onyx", RPC, "https://x.y", "two\nlines")
 	uassert.ErrorContains(t, err, "control character")
 
-	uassert.Equal(t, 3, len(r.Endpoints(EndpointFilter{Zone: "onyx"})))
+	uassert.Equal(t, 5, len(r.Endpoints(EndpointFilter{Zone: "onyx"})))
 	uassert.Equal(t, 1, len(r.Endpoints(EndpointFilter{Zone: "onyx", Kind: Peer})))
-	uassert.Equal(t, 2, len(r.Endpoints(EndpointFilter{Registrant: bob})))
+	uassert.Equal(t, 4, len(r.Endpoints(EndpointFilter{Registrant: bob})))
 	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
 
 	uassert.NoError(t, r.ReviewEndpoint(rpc, Verified, curator, 8, "answers onyx-1"))
@@ -185,7 +192,7 @@ func TestRegisterAndFilter(t *testing.T) {
 	uassert.Equal(t, "answers onyx-1", vs[0].Reason)
 	v, total := r.Count("onyx")
 	uassert.Equal(t, 1, v)
-	uassert.Equal(t, 3, total)
+	uassert.Equal(t, 5, total)
 
 	uassert.ErrorContains(t, r.ReviewEndpoint(rpc, Verified, curator, 8, ""), "already verified")
 	uassert.ErrorContains(t, r.ReviewEndpoint(peer, Flagged, curator, 8, ""), "needs a reason")
@@ -238,18 +245,78 @@ func TestRemoveZone(t *testing.T) {
 	uassert.NoError(t, r.ReviewZone("onyx", Approved, curator, 3, ""))
 	uassert.ErrorContains(t, r.RemoveZone("onyx"), "retire it instead")
 	uassert.NoError(t, r.ReviewZone("onyx", Retired, curator, 4, "testnet ended"))
-
-	uassert.NoError(t, r.RemoveZone("onyx"))
+	uassert.ErrorContains(t, r.RemoveZone("onyx"), "kept on record")
 	_, ok := r.Zone("onyx")
+	uassert.True(t, ok)
+
+	// A rejected zone is removable, endpoints and all.
+	uassert.NoError(t, r.Propose(alice, 5, "spam", onyx()))
+	_, err = r.Register(bob, 5, "spam", RPC, "https://a.example", "")
+	uassert.NoError(t, err)
+	uassert.NoError(t, r.ReviewZone("spam", Rejected, curator, 6, "not a network"))
+	uassert.NoError(t, r.RemoveZone("spam"))
+	_, ok = r.Zone("spam")
 	uassert.False(t, ok)
-	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{})))
-	uassert.Equal(t, 0, r.Len())
-	uassert.ErrorContains(t, r.RemoveZone("onyx"), "no zone")
+	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{Zone: "spam"})))
+	uassert.Equal(t, 1, r.Len())
+	uassert.ErrorContains(t, r.RemoveZone("spam"), "no zone")
 	// The slug and the address are free again.
-	uassert.NoError(t, r.Propose(bob, 5, "onyx", onyx()))
-	_, err = r.Register(bob, 6, "onyx", RPC, "https://a.example", "")
+	uassert.NoError(t, r.Propose(bob, 7, "spam", onyx()))
+	_, err = r.Register(bob, 8, "spam", RPC, "https://a.example", "")
 	uassert.NoError(t, err)
 }
+
+func TestReviewNeedsAReviewer(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	uassert.ErrorContains(t, r.ReviewZone("onyx", Approved, "", 2, ""), "reviewer is not a valid address")
+	z, _ := r.Zone("onyx")
+	uassert.Equal(t, string(Pending), string(z.Status))
+	id, err := r.Register(alice, 2, "onyx", RPC, "https://a.example", "")
+	uassert.NoError(t, err)
+	uassert.ErrorContains(t, r.ReviewEndpoint(id, Verified, "", 3, ""), "reviewer is not a valid address")
+}
+
+// A flood from many addresses fills the review queue and nothing above it.
+func TestFloodCannotCrowdOutReviewedEntries(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(curator, 1, "onyx", onyx()))
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, curator, 1, ""))
+	for i := 0; i < MaxPending; i++ {
+		uassert.NoError(t, r.Propose(testAddr(i), 2, "flood-"+strconv.Itoa(i), onyx()))
+	}
+	uassert.ErrorContains(t, r.Propose(bob, 3, "honest", onyx()), "waiting for review")
+	uassert.Equal(t, MaxPending+1, r.Len())
+	// Clearing one makes room.
+	uassert.NoError(t, r.ReviewZone("flood-0", Rejected, curator, 4, "spam"))
+	uassert.NoError(t, r.Propose(bob, 5, "honest", onyx()))
+
+	// Endpoints: unverified ones have their own ceiling, and verifying frees it.
+	ids := []int64{}
+	for i := 0; i < MaxUnverifiedPerZone; i++ {
+		id, err := r.Register(testAddr(i/MaxEndpointsPerAddress), 6, "onyx", RPC, "https://n"+strconv.Itoa(i)+".example", "")
+		uassert.NoError(t, err)
+		ids = append(ids, id)
+	}
+	_, err := r.Register(bob, 7, "onyx", RPC, "https://honest.example", "")
+	uassert.ErrorContains(t, err, "waiting for review")
+	uassert.NoError(t, r.ReviewEndpoint(ids[0], Verified, curator, 8, ""))
+	_, err = r.Register(bob, 9, "onyx", RPC, "https://honest.example", "")
+	uassert.NoError(t, err)
+	// Flagging puts it back under the ceiling's count, which is now one over:
+	// a review is never refused for the queue being full, a registration is.
+	uassert.NoError(t, r.ReviewEndpoint(ids[0], Flagged, curator, 10, "spam"))
+	_, err = r.Register(bob, 11, "onyx", RPC, "https://honest2.example", "")
+	uassert.ErrorContains(t, err, "waiting for review")
+	uassert.NoError(t, r.RemoveEndpoint(ids[1]))
+	_, err = r.Register(bob, 12, "onyx", RPC, "https://honest2.example", "")
+	uassert.ErrorContains(t, err, "waiting for review")
+	uassert.NoError(t, r.RemoveEndpoint(ids[2]))
+	_, err = r.Register(bob, 13, "onyx", RPC, "https://honest2.example", "")
+	uassert.NoError(t, err)
+}
+
+func testAddr(i int) address { return testutils.TestAddress("flood" + strconv.Itoa(i)) }
 
 func TestZonesFilterAndOrder(t *testing.T) {
 	r := NewRegistry()

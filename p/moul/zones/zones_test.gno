@@ -80,6 +80,14 @@ func TestValidateEndpoint(t *testing.T) {
 		{Gnoweb, "https://gno.land/é", "contains"},
 		{Gnoweb, "https://gno.land/" + strings.Repeat("a", MaxURLLen), "longer than"},
 
+		{RPC, "https://:26657", "has no host"},
+		{RPC, "https://host:not-a-port", "port is 1 to 65535"},
+		{RPC, "https://host:99999", "port is 1 to 65535"},
+		{RPC, "https://host:", "port is 1 to 65535"},
+		{RPC, "https://ho_st", "DNS name"},
+		{RPC, "https://[::1]:26657", "contains"},
+		{RPC, "https://rpc.gno.land:443/path?x=1#f", ""},
+
 		{Peer, "seed-1.gno.land:26656", "<node id>@"},
 		{Peer, "nope@seed-1.gno.land:26656", "g1 address"},
 		{Peer, nodeID + "@seed-1.gno.land", "needs a port"},
@@ -129,6 +137,13 @@ func TestValidateInfo(t *testing.T) {
 	in := ok
 	in.Title = strings.Repeat("é", MaxTitleLen)
 	uassert.NoError(t, ValidateInfo(in))
+}
+
+func TestCanonical(t *testing.T) {
+	uassert.Equal(t, "https://rpc.gno.land/API?Q=1", Canonical(RPC, "HTTPS://RPC.Gno.Land/API?Q=1"))
+	uassert.Equal(t, "https://rpc.gno.land", Canonical(RPC, "https://RPC.gno.land"))
+	uassert.Equal(t, "https://rpc.gno.land:443#Frag", Canonical(Gnoweb, "https://rpc.GNO.land:443#Frag"))
+	uassert.Equal(t, nodeID+"@seed-1.gno.land:26656", Canonical(Peer, nodeID+"@SEED-1.gno.land:26656"))
 }
 
 func TestParse(t *testing.T) {
