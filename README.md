@@ -164,7 +164,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/addrset/v0`](https://github.com/moul/gno-contracts/tree/3d07a5b2cc02d7c3769caff0c17d884ac033bcfe/p/moul/addrset/v0) 📦 🧊 | [🗄️](https://onyx.testnets.gno.land/p/moul/addrset/v0) | [🗄️](https://gno.land/p/moul/addrset/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/addrset/v0) ≈ | 1 |
 | [`p/moul/addrset/v1`](p/moul/addrset) 📦 | — | [✅](https://gno.land/p/moul/addrset/v1) | — | — | 1 |
 | [`p/moul/agents/commit/v0`](p/moul/agents/commit) 📦 | — | [✅](https://gno.land/p/moul/agents/commit/v0) | — | — | — |
-| [`p/moul/agents/msg/v0`](p/moul/agents/msg) 📦 | — | — | — | — | — |
+| [`p/moul/agents/msg/v0`](p/moul/agents/msg) 📦 | — | [✅](https://gno.land/p/moul/agents/msg/v0) | — | — | — |
 | [`p/moul/art/v0`](p/moul/art) 📦 | — | [✅](https://gno.land/p/moul/art/v0) | — | — | 1 |
 | [`p/moul/authz/v0`](https://github.com/moul/gno-contracts/tree/3d07a5b2cc02d7c3769caff0c17d884ac033bcfe/p/moul/authz/v0) 📦 🧊 | [🗄️](https://onyx.testnets.gno.land/p/moul/authz/v0) | [🗄️](https://gno.land/p/moul/authz/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/authz/v0) ≈ | 5 |
 | [`p/moul/authz/v1`](p/moul/authz) 📦 | — | [✅](https://gno.land/p/moul/authz/v1) | — | — | 3 |
@@ -280,7 +280,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/agents/maintainer/v0`](r/moul/agents/maintainer) 🏛️ | — | [✅](https://gno.land/r/moul/agents/maintainer/v0) | — | — | 1 |
 | [`r/moul/agents/passport/v0`](r/moul/agents/passport) 🏛️ | — | [✅](https://gno.land/r/moul/agents/passport/v0) | — | — | 2 |
 | [`r/moul/agents/receipt/v0`](r/moul/agents/receipt) 🏛️ | — | [✅](https://gno.land/r/moul/agents/receipt/v0) | — | — | 1 |
-| [`r/moul/agents/relay/v0`](r/moul/agents/relay) 🏛️ | — | — | — | — | 5 |
+| [`r/moul/agents/relay/v0`](r/moul/agents/relay) 🏛️ | — | [✅](https://gno.land/r/moul/agents/relay/v0) | — | — | 5 |
 | [`r/moul/blog`](r/moul/blog) 🏛️ | — | [✅](https://gno.land/r/moul/blog) | — | — | 3 |
 | [`r/moul/config/v0`](https://github.com/moul/gno-contracts/tree/bd1ff5de0053958282ac81f08ed8bfcb2081982c/r/moul/config) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
 | [`r/moul/config/v1`](r/moul/config) 🏛️ | — | [✅](https://gno.land/r/moul/config/v1) | — | — | 4 |
@@ -501,7 +501,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-01T13:43:01Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-01T13:56:30Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
