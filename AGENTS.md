@@ -575,7 +575,7 @@ Three things follow, and the third is the one that actually matters.
 
 **2. The failure mode was silence, not a bill.** With additional usage disabled, running out
 simply **stopped** code review until the reset. **That changed the same day**: a $100 budget
-is now enabled, so the total is ~11,500 credits, about 152 reviews a month, and the stop moves
+is now enabled, so the total is ~11,500 credits, about 151 reviews a month, and the stop moves
 to $100 rather than to zero. The reasoning below is what the budget was sized against. What this policy protects
 is not money, which is capped at zero by construction, but the ability to get a review at the
 moment one is worth having. On 2026-10-01 that was 289 credits, **under four reviews**, with
@@ -628,7 +628,8 @@ why:
   - gno.land/p/moul/kit/index/v0 is NOT yet live on mainnet: this is the last
     moment a finding can be acted on in place
 
-cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
+cost if requested: ~76 AI credits (measured) of 1500 included plus a $100
+additional-usage budget, so about 151 reviews a month in total.
 
   gh pr edit <N> --add-reviewer @copilot
 ```
@@ -636,7 +637,7 @@ cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
 ### What it costs, with the budget moul enabled on 2026-10-01
 
 1,500 included credits, plus a **$100 additional-usage budget** at $0.01 a credit, is 11,500
-credits a month: **about 152 reviews**.
+credits a month: **about 151 reviews**.
 
 Backtested over the last 60 merged pull requests, scaled to this repository's ~215 a month at
 1.5 passes each:
@@ -720,7 +721,7 @@ Go-companion rules above now say "never hold key material" rather than "never si
 
 ## `gnovet`: our own rules, and the loop that writes them
 
-**A code review costs 13 premium requests and finds a defect once. A rule costs nothing and
+**A code review costs ~76 AI credits and finds a defect once. A rule costs nothing and
 finds it every time.** `make gnovet` is where the second kind lives, and its defining property
 is where the rules come from:
 
@@ -754,6 +755,17 @@ reviewed, plus the 93 `avl` imports we already knew about:
 disappointment, it is the argument: the rule is a pre-deploy gate, and these shipped before it
 existed.
 
+Six more on 2026-10-01, each a shape a review had found and the tree still carried. The last three came from an agent sweep of every package with these instructions:
+
+| rule | found | the one that stings |
+|---|--:|---|
+| `page-offset-overflow` | 6, one already bounded | `p/moul/kit/store/store.gno:266`, the same unbounded `(page - 1) * size` #289 fixed in `kit/index`, and #311 found a third time |
+| `placeholder-path` | 6 | three live daily realms linking to `/r/REPLACE_ADDR/...`, a generator token nobody substituted |
+| `root-relative-link` | 10 | `daily/{handles,urlshort,vault,collatz,connect4}` link to `gno.land/moul` and `gno.land/r:42`; collatz and connect4 were not in the hand-made list, and `x/across:222` is a hit the rule cannot tell from the bug: its computed target does start with `r/`, but so would a broken one, lexically |
+| `uncallable-crossing-arg` | 14 | `r/moul/gns` `Register(cur realm, request RegisterRequest)`: `MsgCall` decodes primitives and `[]byte` and nothing else, so **no name can be registered on mainnet**. Also `agents/jury` `OpenCase(..., []address)`. `pairreg`, `pilotdemo`, `config`, `plan9/ns` and the three `x/upgrade` facades take a pointer or interface on purpose, from other realms |
+| `origin-send-unguarded` | 4 | `r/moul/grant` `Fund`: a realm the user called keeps the coins and calls `Fund` five times, so the board shows 5 GNOT raised and the treasury holds 0. Also `faucet`, `nativeify`, `moultest` |
+| `colon-relative-link` | 8 | every navigation link on `x/plan9/ns` and `plan9/dev`, which gnoweb renders as `<!-- invalid link -->` |
+
 ### Adding one
 
 1. **Fix the defect first.** A rule for a bug still in the tree is a baseline row, not a rule.
@@ -766,8 +778,8 @@ existed.
 Use `f.Code` for anything matching an expression: comments and string contents are blanked
 there, so a rule looking for `append(` does not match a doc comment explaining the rule, which
 is the trap a regexp over raw source falls into in a repository whose comments discuss its own
-lints. Use `f.Raw` only for what genuinely lives in a string, which in practice means import
-paths.
+lints. Use `f.Literal` (comments blanked, strings kept) for what genuinely lives in a string,
+such as a rendered link, and `f.Raw` only for import paths.
 
 The opt-out is `//gnovet:ignore <rule-id> <why>`, 20-character floor, on the line or the one
 above it.

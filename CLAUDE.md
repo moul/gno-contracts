@@ -58,7 +58,7 @@ irreversible.
 - **Green before commit:** `make lint test`, with `GNOROOT` on a gnolang/gno checkout.
 - **Run `make review-advice BASE=origin/main` before requesting a Copilot review, and follow
   it.** A review costs **~76 AI credits measured** (GitHub publishes 13; the bill says
-  otherwise), against 1,500 included plus a **$100 additional-usage budget**, so about **152
+  otherwise), against 1,500 included plus a **$100 additional-usage budget**, so about **151
   reviews a month**. **Two passes per PR** (the first, and one after the fixes land) for
   tooling and config, but **keep going until a pass adds nothing when the package is not yet
   live**, because there a miss is permanent. Re-reviews are most of the spend. Three triggers: **what is about to
@@ -72,7 +72,7 @@ irreversible.
   in the same pull request. `gh pr edit <N> --add-reviewer @copilot` requests one.
 - **When a review finds something, write the rule.** `tools/gnovet` holds this repo's own
   house rules and every one of them was a real defect here before it was a rule, with the
-  review cited in `Finding`. A review costs 13 premium requests and finds a thing once; a rule
+  review cited in `Finding`. A review costs ~76 AI credits and finds a thing once; a rule
   costs nothing and finds it forever. Fix first, then add the rule with a `Bad` that fires and
   a `Good` that does not, then `make gnovet-update`. Opt-out:
   `//gnovet:ignore <rule-id> <why>`, 20 characters minimum.

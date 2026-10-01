@@ -13,7 +13,7 @@ import (
 
 // The loop this closes.
 //
-// A Copilot code review costs 13 premium requests and finds a defect once. A
+// A Copilot code review costs ~76 AI credits and finds a defect once. A
 // rule costs nothing and finds it every time. So every confirmed finding worth
 // generalising becomes a rule in tools/gnovet, with the pull request and the
 // review comment cited in its source, and the thing stops being discoverable by

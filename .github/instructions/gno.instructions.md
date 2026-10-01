@@ -19,6 +19,15 @@ In priority order. Each item is a real defect class, not a preference.
 - **A read with no `cur realm` sees the CALLER as `unsafe.CurrentRealm()`, not itself**, and
   that reverses silently the moment the function grows a `cur realm` parameter. Never branch
   on it for authorization in either direction.
+- **`txlink.Call`, `ui.Action` and `helplink.Func` with no explicit realm resolve their target
+  through `unsafe.CurrentRealm()`**, which during a borrowed read is the IMPORTING realm. When
+  another realm embeds this one's `Render` (an aggregator, an embeddable block), every action
+  link calls the importer instead. It is a finding when the `Render` is meant to be embedded
+  or another realm in the tree already imports it; the fix is the explicit path
+  (`ui.ActionIn(realmPath, …)`, `txlink.Realm(realmPath).Call(…)`), as `r/moul/reactions` does.
+- **A required actor or reason accepted empty.** A library method taking `by address` or
+  `reason string` for a state change has to refuse the zero value, or a consumer records an
+  approval with no approver (#311: `ReviewZone` with `by == ""`).
 
 ## 2. Value
 
@@ -31,6 +40,15 @@ In priority order. Each item is a real defect class, not a preference.
 - Integer overflow before a division. `xmath.MulDiv` refuses rather than returning a wrong
   number; a hand-rolled `a*b/c` does not.
 - **Rounding direction.** Say which way it rounds and in whose favour, or it is a finding.
+- **Who receives the refund.** Deleting an entry returns its storage deposit to whoever signs
+  the deleting transaction, not to whoever paid for it. A path where one party deletes
+  another's entries is a path where they collect someone else's deposit (`EFFECTIVE_GNO.md`
+  § 2.12; #311).
+- **Per-address caps are not a bound.** Addresses cost nothing, so "four per address" stops
+  nobody: on #311, about 63 fresh addresses at four proposals each filled the global cap and
+  every honest call failed after that.
+  A limit that protects availability needs a global cap plus something an attacker cannot
+  mint for free (a deposit, an allowlist, curator-reserved capacity).
 
 ## 3. Permanence: the mistakes that cannot be undone
 
@@ -60,6 +78,16 @@ In priority order. Each item is a real defect class, not a preference.
   - a callback handed out during iteration that can write to the tree being walked. The
     walk holds a position inside a leaf, so a removal skips the next key; the doc comment
     has to forbid it or the method has to snapshot.
+- **A placeholder in a rendered string** (`/r/REPLACE_ADDR/...`) is a dead link forever.
+  `gnovet` catches the literal token; a link to a path that does not exist in the tree is
+  your half.
+- **A rendered shell command interpolating a stored string unquoted** (`gnokey query ...
+  -remote ` + url) is a copy-paste command injection on every visitor who runs it. Quote it,
+  or validate the value down to a character set that cannot break out (#311).
+- **A state machine whose edit path forgets the derived state.** An edit to a reviewed or
+  verified record has to invalidate the review and the verification it no longer matches,
+  and an edit to a terminal record (retired, rejected) must not overwrite the reason it
+  became terminal. #311 had both, in four places.
 - A breaking change to a published package needs a new version, not an edit. Removing or
   renaming an exported symbol, changing a signature, changing on-chain behaviour, swapping
   the backing storage.
@@ -82,6 +110,10 @@ In priority order. Each item is a real defect class, not a preference.
 - A `deque` that anything renders **by index** is quadratic: `Get(i)` walks from the head.
 - Storing a live object instead of an encoded string costs a flat +780 bytes per entry, in
   every container.
+- **A `Render` or getter that materializes a whole bucket, then slices it.** `vm/qrender`
+  runs under a gas limit, so a list that grows past it stops rendering at all; a page that
+  collects every match before taking ten is the same bug at a smaller size. Iterate the
+  window (`IterateByOffset`) and stop early (#311 drew five findings of this shape).
 - `p/nt/avl` is 2,029 bytes per entry against a map's 153 and a B+ tree at fanout 128's 592.
   New code reaching for `avl` is worth a question.
 

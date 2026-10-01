@@ -201,3 +201,28 @@ func TestByID(t *testing.T) {
 		t.Error("an unknown rule must not")
 	}
 }
+
+// A Bad that fires at all is not enough when one fixture carries several
+// shapes: each of these was a gap a review found, and each must fire on its
+// own, or a regression in one hides behind the others.
+func TestEveryShapeInAMultiShapeBadFires(t *testing.T) {
+	for _, tc := range []struct {
+		rule Rule
+		want int
+	}{
+		// []address, a struct, a named slice, a multiline signature
+		{uncallableCrossingArg, 4},
+		// no guard at all, and a guard that comes after the read
+		{originSendUnguarded, 2},
+		// (page - 1) * size, and the other operand order
+		{pageOffsetOverflow, 2},
+	} {
+		hits, err := RunRules(write(t, "bad.gno", tc.rule.Bad), []Rule{tc.rule})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(hits) != tc.want {
+			t.Errorf("%s: %d hit(s) on its Bad, want %d: %v", tc.rule.ID, len(hits), tc.want, hits)
+		}
+	}
+}
