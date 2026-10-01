@@ -12,20 +12,21 @@ import (
 const seedReason = "seeded at deploy; probed 2026-10-01"
 
 // seedZone is one zone the realm starts with, approved, plus the endpoints it
-// starts with. verified says whether those endpoints answered when the seed was
-// written: an endpoint that did not is still listed, as unverified, because the
-// curator's word is the only thing seeding may not make up.
+// starts with. Every seeded endpoint carries the probe's verdict: verified with
+// seedReason when it answered, flagged with failed, the observed failure, when
+// it did not. Flagged rather than left unverified, because "probed and down"
+// and "nobody looked" are different facts and only a review can say which.
 type seedZone struct {
 	slug      string
 	info      zones.Info
-	verified  bool
+	failed    string      // empty when every endpoint answered the probe
 	endpoints [][3]string // kind, address, label
 }
 
 // seeds are the four zones this registry opens with. Every address below was
 // probed on 2026-10-01: each RPC's /status answered with the chain id given
 // here, except staging, whose RPC answered "temporarily unavailable" and whose
-// gnoweb answered 503, which is why its endpoints are seeded unverified. The
+// gnoweb answered 503, which is why its endpoints are seeded flagged with that. The
 // peers are the persistent_peers each network's VALIDATOR.md publishes in the
 // gnolang/gno monorepo, under misc/deployments.
 var seeds = []seedZone{
@@ -40,7 +41,6 @@ var seeds = []seedZone{
 			RPCURL:      "https://rpc.gno.land",
 			GenesisURL:  "https://github.com/gnolang/gno/releases/download/chain/mainnet/genesis.json",
 		},
-		verified: true,
 		endpoints: [][3]string{
 			{"rpc", "https://rpc.gno.land", "gno core"},
 			{"gnoweb", "https://gno.land", "gno core"},
@@ -61,7 +61,6 @@ var seeds = []seedZone{
 			RPCURL:      "https://rpc.onyx.testnets.gno.land",
 			GenesisURL:  "https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json",
 		},
-		verified: true,
 		endpoints: [][3]string{
 			{"rpc", "https://rpc.onyx.testnets.gno.land", "gno core"},
 			{"gnoweb", "https://onyx.testnets.gno.land", "gno core"},
@@ -82,7 +81,7 @@ var seeds = []seedZone{
 			GnowebURL:   "https://staging.gno.land",
 			RPCURL:      "https://rpc.staging.gno.land",
 		},
-		verified: false,
+		failed: "did not answer when probed 2026-10-01: the RPC said temporarily unavailable, gnoweb 503",
 		endpoints: [][3]string{
 			{"rpc", "https://rpc.staging.gno.land", "gno core"},
 			{"gnoweb", "https://staging.gno.land", "gno core"},
@@ -98,7 +97,6 @@ var seeds = []seedZone{
 			GnowebURL:   "https://gno-staging.moul.p2p.team",
 			RPCURL:      "https://rpc.gno-staging.moul.p2p.team",
 		},
-		verified: true,
 		endpoints: [][3]string{
 			{"rpc", "https://rpc.gno-staging.moul.p2p.team", "moul"},
 			{"gnoweb", "https://gno-staging.moul.p2p.team", "moul"},
@@ -120,8 +118,10 @@ func seed() {
 			must(err)
 			id, err := reg.Register(Admin, at, s.slug, k, e[1], e[2])
 			must(err)
-			if s.verified {
+			if s.failed == "" {
 				must(reg.ReviewEndpoint(id, zones.Verified, Admin, at, seedReason))
+			} else {
+				must(reg.ReviewEndpoint(id, zones.Flagged, Admin, at, s.failed))
 			}
 		}
 	}

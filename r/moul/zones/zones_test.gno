@@ -66,7 +66,10 @@ func TestSeeded(t *testing.T) {
 	// staging did not answer when the seed was written, so nothing on it is
 	// verified, but it is all listed.
 	uassert.Equal(t, 0, len(ListEndpoints("staging", "", "verified")))
-	uassert.Equal(t, 2, len(ListEndpoints("staging", "", "unverified")))
+	flagged := ListEndpoints("staging", "", "flagged")
+	uassert.Equal(t, 2, len(flagged))
+	uassert.True(t, strings.Contains(flagged[0].Reason, "probed 2026-10-01"))
+	uassert.Equal(t, Admin.String(), flagged[0].ReviewedBy.String())
 
 	// Every seed endpoint is filed under its own zone, and only there.
 	for _, s := range seeds {
@@ -346,7 +349,7 @@ func TestRenderPagesAnswer(t *testing.T) {
 	uassert.True(t, strings.Contains(Render("zone/nope"), "No such zone."))
 	uassert.True(t, strings.Contains(Render("nope"), "No such page."))
 	uassert.True(t, strings.Contains(Render("proposals"), "Nothing waiting for review."))
-	uassert.True(t, strings.Contains(Render("zone/staging"), "unverified"))
+	uassert.True(t, strings.Contains(Render("zone/staging"), "⚠️ flagged: did not answer when probed 2026\\-10\\-01"))
 }
 
 // Every list is paginated and clamps a reader's ?page=, and a page reads only

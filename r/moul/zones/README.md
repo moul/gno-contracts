@@ -21,7 +21,7 @@ monorepo.
 |---|---|---|
 | `mainnet` | `gnoland-1` | rpc, gnoweb, 2 peers, indexer, explorer, all verified |
 | `onyx` | `onyx-1` | rpc, gnoweb, 2 peers, indexer, faucet, explorer, all verified |
-| `staging` | `staging` | rpc, gnoweb, **unverified**: neither answered when seeded |
+| `staging` | `staging` | rpc, gnoweb, **flagged**: neither answered when seeded, and the flag says what each returned |
 | `moul-staging` | `moulstaging-1` | rpc, gnoweb, faucet, all verified |
 
 ## Read it from a node
