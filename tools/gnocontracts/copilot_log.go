@@ -94,16 +94,48 @@ var htmlTagRe = regexp.MustCompile(`<[^>]+>`)
 // Those titles are better than anything derivable from the comment body, which
 // opens with the evidence rather than the claim, so the digest prefers them and
 // only falls back to a first sentence when the overview has none.
-var copilotTitleRe = regexp.MustCompile(`\[([^\]]+)\]\(#discussion_r(\d+)\)`)
+var copilotTitleRe = regexp.MustCompile(`(?m)^-[^\n]*?(?:copilot-code-review/(high|medium|low)-v2[^\n]*?</picture>)?\s*\[([^\n]+)\]\(#discussion_r(\d+)\)`)
+
+// copilotMissedRe is one "Previously missed" finding: a summary carrying a
+// severity badge and a headline, then its location in backticks. These exist
+// ONLY in the overview body, with no thread and no inline comment, so a digest
+// built from comments alone drops them: 7 of #289's 12 findings were this kind.
+var copilotMissedRe = regexp.MustCompile("(?s)<summary><picture>.*?copilot-code-review/(high|medium|low)-v2.*?</picture>\\s*(.*?)</summary>\\s*`([^`]+)`")
 
 // copilotTitles maps comment id to Copilot's own headline for it.
-func copilotTitles(overview string) map[string]string {
-	out := map[string]string{}
+// copilotTitle is Copilot's own headline for a thread, and the severity badge
+// next to it when the overview carries one.
+type copilotTitle struct{ Title, Severity string }
+
+// copilotTitles maps a thread id to its overview headline. The headline runs
+// to the LAST "](#discussion_r" on its line, because a code-shaped headline
+// ("Bounds-check items[i]") carries brackets of its own.
+func copilotTitles(overview string) map[string]copilotTitle {
+	out := map[string]copilotTitle{}
 	for _, m := range copilotTitleRe.FindAllStringSubmatch(overview, -1) {
-		title := strings.TrimSpace(htmlTagRe.ReplaceAllString(m[1], ""))
+		title := strings.TrimSpace(htmlTagRe.ReplaceAllString(m[2], ""))
 		if title != "" {
-			out[m[2]] = title
+			out[m[3]] = copilotTitle{Title: title, Severity: m[1]}
 		}
+	}
+	return out
+}
+
+// copilotMissed is a "Previously missed" finding from the overview body.
+type copilotMissed struct{ Title, Severity, Where string }
+
+func copilotMissedFindings(overview string) []copilotMissed {
+	i := strings.Index(overview, "Previously missed")
+	if i < 0 {
+		return nil
+	}
+	var out []copilotMissed
+	for _, m := range copilotMissedRe.FindAllStringSubmatch(overview[i:], -1) {
+		out = append(out, copilotMissed{
+			Title:    strings.TrimSpace(htmlTagRe.ReplaceAllString(m[2], "")),
+			Severity: m[1],
+			Where:    strings.ReplaceAll(m[3], "\u200b", ""), // GitHub breaks paths with zero-width spaces
+		})
 	}
 	return out
 }
@@ -152,28 +184,76 @@ func copilotDigest(p copilotPayload) (string, bool) {
 	b.WriteString("\n\n")
 
 	findings := copilotFindings(p.Comments)
-	if len(findings) == 0 {
+	missed := copilotMissedFindings(p.Review.Body)
+	if len(findings) == 0 && len(missed) == 0 {
 		b.WriteString("No inline findings. A clean review is a data point too: it is what says\n" +
 			"the reviewer is not simply always finding something.\n")
 		return b.String(), true
 	}
 
 	fmt.Fprintf(&b, "%d finding(s). **Tick one per finding**, and a false positive owes a\n"+
-		"config change, because that is the only thing that stops the next one.\n\n", len(findings))
+		"config change, because that is the only thing that stops the next one.\n\n", len(findings)+len(missed))
 
 	titles := copilotTitles(p.Review.Body)
 	for _, c := range findings {
-		headline := titles[strconv.FormatInt(c.ID, 10)]
-		if headline == "" {
-			headline = copilotHeadline(c.Body)
+		t := titles[strconv.FormatInt(c.ID, 10)]
+		if t.Title == "" {
+			t.Title = copilotHeadline(c.Body)
 		}
-		fmt.Fprintf(&b, "### %s\n\n", headline)
-		fmt.Fprintf(&b, "`%s`%s · [comment](%s)\n\n", c.Path, copilotAtLine(c), c.HTMLURL)
-		b.WriteString("- [ ] real, and fixed\n")
-		b.WriteString("- [ ] false positive. Which line of the instructions produced it: \n")
-		b.WriteString("- [ ] a finding about `EFFECTIVE_GNO.md` or `AGENTS.md`, not about the code\n\n")
+		fmt.Fprintf(&b, "### %s\n\n", copilotHeading(t.Title, t.Severity, false))
+		fmt.Fprintf(&b, "%s%s · [comment](%s)\n\n", copilotCodeSpan(c.Path), copilotAtLine(c), c.HTMLURL)
+		copilotBoxes(&b)
+	}
+	for _, m := range missed {
+		fmt.Fprintf(&b, "### %s\n\n", copilotHeading(m.Title, m.Severity, true))
+		fmt.Fprintf(&b, "%s · in the overview, no thread\n\n", copilotCodeSpan(m.Where))
+		copilotBoxes(&b)
 	}
 	return b.String(), true
+}
+
+// copilotHeading is the escaped headline, flagged when it came from the
+// "Previously missed" section, with the severity badge as a word. Copilot's
+// headline is escaped like the title: it quotes code, and code carries
+// brackets, underscores and the odd @.
+func copilotHeading(title, severity string, missed bool) string {
+	h := copilotInline(title)
+	if missed {
+		h = "Previously missed: " + h
+	}
+	if severity != "" {
+		h += " (" + severity + ")"
+	}
+	return h
+}
+
+func copilotBoxes(b *strings.Builder) {
+	b.WriteString("- [ ] real, and fixed\n")
+	b.WriteString("- [ ] false positive. Which line of the instructions produced it: \n")
+	b.WriteString("- [ ] a finding about `EFFECTIVE_GNO.md` or `AGENTS.md`, not about the code\n\n")
+}
+
+// copilotCodeSpan renders s as one inline code span whatever it holds. A path
+// is the pull request's to choose, and one carrying a backtick and a newline
+// would otherwise close the span and write its own markdown into the hub
+// issue. Line breaks fold to spaces, and the fence is one backtick longer than
+// the longest run inside, which is how CommonMark nests them.
+func copilotCodeSpan(s string) string {
+	s = strings.Join(strings.FieldsFunc(s, func(r rune) bool { return r == '\n' || r == '\r' }), " ")
+	longest, run := 0, 0
+	for _, r := range s {
+		if r == '`' {
+			run++
+			longest = max(longest, run)
+		} else {
+			run = 0
+		}
+	}
+	fence := strings.Repeat("`", longest+1)
+	if longest > 0 {
+		return fence + " " + s + " " + fence
+	}
+	return fence + s + fence
 }
 
 // copilotFindings keeps Copilot's own top-level inline comments, dropping
@@ -245,7 +325,8 @@ func copilotAtLine(c copilotComment) string {
 // reprocesses its own output, so listing it first is sufficient.
 //
 // Angle brackets go too, because <http://host> is an autolink and <b> is inline
-// HTML, neither of which a title should be able to produce.
+// HTML, neither of which a title should be able to produce. And an @ is broken
+// up, because the hub issue would otherwise notify whoever a title names.
 func copilotInline(s string) string {
 	r := strings.NewReplacer(
 		"\\", "\\\\",
@@ -253,6 +334,12 @@ func copilotInline(s string) string {
 		"<", "\\<", ">", "\\>",
 		"`", "\\`", "*", "\\*", "_", "\\_",
 		"\n", " ",
+		// A backslash does not stop a mention, and the bot reposting
+		// "@org/team" would notify that team. A zero-width space does.
+		"@", "@\u200b",
+		// GFM autolinks a bare URL with no <...> around it, so a title saying
+		// https://host would be a live link in a bot-authored comment.
+		"://", ":\u200b//", "www.", "www\u200b.",
 	)
 	return r.Replace(s)
 }

@@ -1,43 +1,53 @@
 name: copilot-review-log
 
-# Every Copilot code review, digested into one hub issue, so the reviewer gets
-# better instead of merely being tolerated.
+# Every Copilot code review, digested into one hub issue (#280), so the
+# reviewer gets better instead of merely being tolerated. One entry per finding
+# with three boxes; the false-positive box asks which line of
+# .github/copilot-instructions.md or .github/instructions/* produced it.
 #
-# Copilot code review comments on a pull request and cannot post anywhere else,
-# so "have it share its thinking on a meta issue" is not something an
-# instructions file can ask for. This is the mechanical half: take what it
-# actually wrote, and append a digest with one checkbox set per finding.
+# A SWEEP on a clock, not a `pull_request_review` trigger, and that is measured
+# rather than preferred. A run triggered by Copilot's review is held as
+# `action_required` (Copilot counts as a first-time contributor), the approve
+# endpoint refuses it ("not from a fork pull request"), and a re-run by hand
+# re-evaluates the original payload, where the job's login gate skipped. Seen on
+# #295, 2026-10-01, run 36870684808: an event-driven log needs a click per
+# review, so it logs nothing. A sweep needs no approval.
 #
-# The point is the false-positive box. A wrong finding here is not noise to be
-# endured, it is a defect in .github/copilot-instructions.md or
-# .github/instructions/*.instructions.md with a line number, and the log asks
-# which line every single time.
+# Idempotent: a review is skipped when a comment by the owner or this bot on
+# the hub already links `#pullrequestreview-<id>`, which also covers digests
+# written by hand. Only those two count, because anyone can comment on the hub
+# and a pasted link would suppress that digest.
 #
 # Costs Actions seconds. No AI, no key, nothing metered.
-
 on:
-  pull_request_review:
-    types: [submitted]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      since_hours:
+        description: "look at pull requests updated in the last N hours"
+        default: "48"
 
 permissions:
   contents: read
   pull-requests: read
-  issues: write
+  issues: write # the digest comments on the hub
+
+concurrency:
+  group: copilot-review-log
+  cancel-in-progress: false
+
+env:
+  HUB: 280
 
 jobs:
   log:
-    # Only Copilot's own reviews. A human review is not this log's business, and
-    # the formatter refuses one anyway, so this is the cheap gate in front of it.
-    # Same-repository pull requests only. A fork PR gets a READ-ONLY GITHUB_TOKEN,
-    # so `issues: write` buys nothing there and the final `gh issue comment`
-    # would fail the job on every forked contribution while never reaching the
-    # log. `pr.yml` already draws this line for the same reason. The trusted
-    # alternative, an unprivileged collector plus a `workflow_run` writer, is
-    # real but is a lot of machinery for a repository with no fork traffic.
-    if: >-
-      github.event.review.user.login == 'copilot-pull-request-reviewer[bot]' &&
-      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      OWNER: ${{ github.repository_owner }}
+      SINCE_HOURS: ${{ inputs.since_hours || '48' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -45,57 +55,39 @@ jobs:
         with:
           go-version-file: tools/go.mod
 
-      # The two API calls live here and nowhere else: `gnocontracts copilot-log`
-      # is network-free on purpose, which is what lets it be table-tested against
-      # a real captured review instead of a mock.
+      # The API calls live here and nowhere else: `gnocontracts copilot-log` is
+      # network-free on purpose, which is what lets it be table-tested against
+      # real captured reviews instead of a mock.
       #
-      # A review's inline comments are not in the webhook payload, so they are
-      # fetched and filtered by pull_request_review_id. The page size is capped
-      # at 100, which is far above any review this repository will produce; a
-      # bigger one would be truncated, and that is the right failure, because a
-      # 100-finding review is a config problem before it is a paging problem.
-      - name: Digest the review
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR: ${{ github.event.pull_request.number }}
-          REVIEW_ID: ${{ github.event.review.id }}
-          REPO: ${{ github.repository }}
+      # Every API call is assigned before it is used, so `set -e` stops the run
+      # on a failure. `for x in $(cmd)` and a trailing `|| true` both swallow
+      # one, and an empty "already logged" set would repost every digest.
+      #
+      # `gh api --paginate` with `--jq` emits ONE ARRAY PER PAGE, so the
+      # comments go through `jq -s 'add // []'` to merge the pages first.
+      - name: Digest every Copilot review not yet on the hub
         run: |
           set -euo pipefail
-          gh api "/repos/$REPO/pulls/$PR/reviews/$REVIEW_ID" > /tmp/review.json
-          # `gh api --paginate` with `--jq` emits ONE ARRAY PER PAGE, so a bare
-          # --slurpfile would give [page1, page2, ...] and taking [0] would
-          # silently drop every later page: past 100 comments on a pull request,
-          # a review whose findings landed on page two would be logged as clean.
-          # `jq -s add` merges the pages into one array first.
-          gh api --paginate "/repos/$REPO/pulls/$PR/comments?per_page=100" \
-            --jq "[.[] | select(.pull_request_review_id == $REVIEW_ID)]" \
-            | jq -s 'add // []' > /tmp/comments.json
-          gh api "/repos/$REPO/pulls/$PR" \
-            --jq '{number, title, html_url, user: .user.login}' > /tmp/pr.json
-          jq -n \
-            --slurpfile pr /tmp/pr.json \
-            --slurpfile review /tmp/review.json \
-            --slurpfile comments /tmp/comments.json \
-            '{pr: $pr[0], review: $review[0], comments: $comments[0]}' > /tmp/payload.json
-          go -C tools tool gnocontracts copilot-log < /tmp/payload.json > /tmp/digest.md
-          wc -c < /tmp/digest.md
-
-      # An empty digest means the formatter decided this was not a Copilot
-      # review after all. Say nothing rather than posting an empty comment, and
-      # do not fail: a skipped log is not a broken pull request.
-      - name: Append it to the log
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          # The hub. Same shape as the other meta issues here, hardcoded for the
-          # same reason: a repository variable is one more thing to set up and
-          # one more thing to be wrong.
-          LOG_ISSUE: "280"
-        run: |
-          set -euo pipefail
-          if [ ! -s /tmp/digest.md ]; then
-            echo "::notice::not a Copilot review, nothing logged"
-            exit 0
-          fi
-          gh issue comment "$LOG_ISSUE" -R "$REPO" --body-file /tmp/digest.md
+          bodies=$(gh api --paginate "repos/$REPO/issues/$HUB/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" or .user.login == env.OWNER) | .body')
+          logged=$(grep -o 'pullrequestreview-[0-9]*' <<<"$bodies" | cut -d- -f2 | sort -u || [ $? = 1 ])
+          since=$(date -u -d "-$SINCE_HOURS hours" +%Y-%m-%dT%H:%M:%SZ)
+          prs=$(gh pr list -R "$REPO" --state all --search "updated:>=$since" \
+            --limit 1000 --json number --jq '.[].number' | sort -n)
+          for pr in $prs; do
+            rids=$(gh api --paginate "repos/$REPO/pulls/$pr/reviews" \
+              --jq '.[] | select(.user.login == "copilot-pull-request-reviewer[bot]") | .id')
+            for rid in $rids; do
+              if grep -qx "$rid" <<<"$logged"; then continue; fi
+              pr_json=$(gh api "repos/$REPO/pulls/$pr" --jq '{number, title, html_url, user: .user.login}')
+              review=$(gh api "repos/$REPO/pulls/$pr/reviews/$rid")
+              comments=$(gh api --paginate "repos/$REPO/pulls/$pr/comments?per_page=100" \
+                --jq "[.[] | select(.pull_request_review_id == $rid)]" | jq -s 'add // []')
+              jq -n --argjson pr "$pr_json" --argjson review "$review" --argjson comments "$comments" \
+                '{pr: $pr, review: $review, comments: $comments}' \
+                | go -C tools tool gnocontracts copilot-log > digest.md
+              if [ ! -s digest.md ]; then continue; fi
+              gh issue comment "$HUB" -R "$REPO" --body-file digest.md
+              echo "logged #$pr review $rid"
+            done
+          done

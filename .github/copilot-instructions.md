@@ -34,9 +34,10 @@ and name the section, rather than quietly applying a different standard.
 - **why it matters here**: the consequence on this chain, not in general
 - **the fix**: the smallest change, or the package in `EFFECTIVE_GNO.md` that already does it
 
-"This could be unsafe" is not a finding. **At most five findings**, most severe first; a
-review that always finds something is a review nobody reads. If nothing is wrong, say so in
-one line.
+"This could be unsafe" is not a finding. **Report every finding that meets this bar, most
+severe first, and nothing that does not.** The bar keeps a review short, not a count: #289's
+first pass returned exactly five, the old cap, and the next four passes each found one to
+three more real defects in code it had already read. If nothing is wrong, say so in one line.
 
 ## What is already checked for free, so do not repeat it
 

@@ -155,7 +155,8 @@ func TestCopilotDigestEscapesPreEscapedTitles(t *testing.T) {
 	if strings.Contains(got, `\\[click`) && !strings.Contains(got, `\\\[click`) {
 		t.Errorf("a doubled backslash leaves the bracket active:\n%s", got)
 	}
-	if !strings.Contains(got, `\\\[click\\\](http://evil.example)`) {
+	// "://" also carries a zero-width space now, so a bare URL cannot autolink.
+	if !strings.Contains(got, `\\\[click\\\](http:`+"\u200b"+`//evil.example)`) {
 		t.Errorf("want the bracket escaped behind the escaped backslash:\n%s", got)
 	}
 	if strings.Contains(got, "<http://evil.example>") {
@@ -174,6 +175,91 @@ func TestCopilotInline(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			if got := copilotInline(tc.in); got != tc.want {
 				t.Errorf("copilotInline(%q) = %q, want %q", tc.in, got, tc.want)
+			}
+		})
+	}
+}
+
+// The third review of #289, captured 2026-10-01, has no inline comment at all:
+// both of its findings are "Previously missed", which exist only in the
+// overview body. A digest built from comments alone logged it as clean.
+func TestCopilotDigestKeepsPreviouslyMissedFindings(t *testing.T) {
+	b, err := os.ReadFile(filepath.Join("testdata", "copilot-review-missed.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var p copilotPayload
+	if err := json.Unmarshal(b, &p); err != nil {
+		t.Fatal(err)
+	}
+	got, ok := copilotDigest(p)
+	if !ok {
+		t.Fatal("a Copilot review must render")
+	}
+	for _, want := range []string{
+		"2 finding(s)",
+		"### Previously missed: Clamp page input to the valid pagination range (medium)",
+		"`r/moul/x/kitindexdemo/render.gno:36` · in the overview, no thread",
+		"### Previously missed: Correct the inaccurate nil result contract documentation (low)",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("digest is missing %q\n---\n%s", want, got)
+		}
+	}
+	if strings.Contains(got, "No inline findings") || strings.Contains(got, "​") {
+		t.Errorf("logged as clean, or a zero-width space survived\n---\n%s", got)
+	}
+}
+
+func TestCopilotDigestNeverLetsAStringWriteMarkdown(t *testing.T) {
+	for _, tc := range []struct {
+		name, body, path, title string
+		want, notWant           string
+	}{
+		{
+			name:  "a headline with brackets keeps its title and severity",
+			body:  "- <picture><img src=\"x/copilot-code-review/high-v2-light.png\"></picture> [Bounds-check items[i] before access](#discussion_r9) · New",
+			path:  "a.gno",
+			title: "t",
+			want:  "### Bounds-check items\\[i\\] before access (high)",
+		},
+		{
+			name:    "a path cannot close its code span",
+			path:    "a`\n## injected",
+			title:   "t",
+			want:    "`` a` ## injected ``:2",
+			notWant: "\n## injected",
+		},
+		{
+			name:    "a bare URL in the title is not a live link",
+			path:    "a.gno",
+			title:   "see https://evil.example and www.evil.example",
+			want:    "see https:\u200b//evil.example and www\u200b.evil.example",
+			notWant: "https://evil",
+		},
+		{
+			name:    "a mention in the title notifies nobody",
+			path:    "a.gno",
+			title:   "ping @org/team",
+			want:    "ping @​org/team",
+			notWant: "@org",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var p copilotPayload
+			p.PR.Number, p.PR.Title, p.PR.HTMLURL = 7, tc.title, "u"
+			p.Review.Body, p.Review.HTMLURL = tc.body, "r"
+			p.Review.User.Login = "Copilot"
+			line := 2
+			c := copilotComment{ID: 9, Path: tc.path, OriginalLine: &line, HTMLURL: "c", Body: "Evidence first. More."}
+			c.User.Login = "Copilot"
+			p.Comments = []copilotComment{c}
+			got, _ := copilotDigest(p)
+			if !strings.Contains(got, tc.want) {
+				t.Errorf("missing %q\n---\n%s", tc.want, got)
+			}
+			if tc.notWant != "" && strings.Contains(got, tc.notWant) {
+				t.Errorf("unexpected %q\n---\n%s", tc.notWant, got)
 			}
 		})
 	}
