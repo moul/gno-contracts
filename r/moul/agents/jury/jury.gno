@@ -79,7 +79,9 @@ const (
 // parameter made this function unreachable from any wallet.
 func OpenCase(cur realm, subject, jurorsCSV string) uint64 {
 	opener := caller(cur)
-	assert(subject != "", "empty subject")
+	// Checked after sanitizing: a subject of only zero-width runes is not empty
+	// as bytes, and renders as nothing.
+	assert(strings.TrimSpace(ui.Inline(subject)) != "", "empty subject")
 	assert(len(subject) <= MaxSubject, "subject too long")
 	assert(len(cases) < MaxCases, "the jury is full")
 	jurors := parseJurors(jurorsCSV)

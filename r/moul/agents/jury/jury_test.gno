@@ -150,3 +150,15 @@ func TestOpenCaseIsBounded(cur realm, t *testing.T) {
 	uassert.True(t, strings.Contains(idx, ufmt.Sprintf("The %d most recent of %d cases", IndexRecent, len(cases))), idx)
 	uassert.Equal(t, IndexRecent, strings.Count(idx, "](/r/moul/agents/jury/v0:"))
 }
+
+// The case count is bounded, and a subject that sanitizes to nothing is empty.
+func TestCaseCountIsBoundedAndBlankSubjectRefused(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(opener))
+	uassert.AbortsContains(t, cur, "empty subject", func() { OpenCase(cross(cur), "​", j1.String()) })
+	before := len(cases)
+	for len(cases) < MaxCases {
+		cases = append(cases, &Case{ID: uint64(len(cases) + 1), Subject: "filler", Phase: PhaseCommit})
+	}
+	defer func() { cases = cases[:before] }()
+	uassert.AbortsContains(t, cur, "the jury is full", func() { OpenCase(cross(cur), "one more", j1.String()) })
+}

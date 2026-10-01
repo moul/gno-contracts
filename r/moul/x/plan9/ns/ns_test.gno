@@ -1,6 +1,7 @@
 package ns
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
@@ -246,4 +247,33 @@ func TestServiceNameIsTableSafe(cur realm, t *testing.T) {
 	defer services.Remove(name)
 	out := Render("")
 	uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
+}
+
+// A path route reads what it names: the rest of the path is one quoted
+// argument, so a ";" in it is part of the file name and runs nothing.
+func TestPathRouteIsOneArgument(t *testing.T) {
+	// Unquoted, rc would cat /tmp/greeting and then run the second command;
+	// quoted, it looks for one file with a ";" in its name and finds none.
+	out := Render("cat/tmp/greeting;echo")
+	uassert.True(t, strings.Contains(out, "cat: file does not exist"), out)
+	uassert.Equal(t, "'/a;b'", quote("/a;b"))
+}
+
+// Namespaces and services are bounded, and the home page lists a fixed number.
+func TestNamespacesAndServicesAreBounded(cur realm, t *testing.T) {
+	var added []string
+	for i := 0; spaces.Size() < MaxNamespaces; i++ {
+		k := testutils.TestAddress("ns" + strconv.Itoa(i)).String()
+		if spaces.Get(k) == nil {
+			spaces.Set(k, newSpace(k))
+			added = append(added, k)
+		}
+	}
+	defer func() {
+		for _, k := range added {
+			spaces.Remove(k)
+		}
+	}()
+	uassert.PanicsContains(t, cur, "full at", func() { spaceFor(testutils.TestAddress("one-more").String()) })
+	uassert.Equal(t, HomeRecent, strings.Count(Render(""), "](/r/moul/x/plan9/ns/v1:ns?u="))
 }

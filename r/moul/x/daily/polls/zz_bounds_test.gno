@@ -19,3 +19,14 @@ func TestPollsAreBounded(cur realm, t *testing.T) {
 	}
 	uassert.Equal(t, IndexRecent, strings.Count(Render(""), "## Poll #"))
 }
+
+// The poll count is bounded globally.
+func TestPollCountIsBounded(cur realm, t *testing.T) {
+	before := len(polls)
+	for len(polls) < MaxPolls {
+		polls = append(polls, &Poll{ID: len(polls), Question: "q", Options: []string{"a", "b"}, Tallies: []int{0, 0}})
+	}
+	defer func() { polls = polls[:before] }()
+	testing.SetRealm(testing.NewUserRealm(testutils.TestAddress("latecomer")))
+	uassert.AbortsContains(t, cur, "polls is full", func() { CreatePoll(cross(cur), "one more", "a,b") })
+}

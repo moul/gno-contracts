@@ -52,6 +52,14 @@ import (
 // plain string rather than an address so it can never collide with one.
 const DemoKey = "demo"
 
+// The bounds on what callers can create. Any realm may Post a service and any
+// account gets a namespace on its first Exec; the home page lists both.
+const (
+	MaxServices   = 64
+	MaxNamespaces = 1000
+	HomeRecent    = 50 // namespaces the home page lists
+)
+
 type service struct {
 	file  ninep.File
 	owner string  // pkgpath of the realm that posted it
@@ -137,6 +145,9 @@ func Post(cur realm, name string, f ninep.File) {
 		panic("post: nil file server")
 	}
 	prev := cur.Previous()
+	if services.Get(name) == nil && services.Size() >= MaxServices {
+		panic("post: /srv is full at " + strconv.Itoa(MaxServices) + " services")
+	}
 	if existing := services.Get(name); existing != nil {
 		if existing.(*service).owner != prev.PkgPath() {
 			panic("post: " + name + " is already posted by " + existing.(*service).owner)
@@ -199,6 +210,9 @@ func newSpace(owner string) *space {
 func spaceFor(key string) *space {
 	if v := spaces.Get(key); v != nil {
 		return v.(*space)
+	}
+	if spaces.Size() >= MaxNamespaces {
+		panic("ns: full at " + strconv.Itoa(MaxNamespaces) + " namespaces")
 	}
 	sp := newSpace(key)
 	spaces.Set(key, sp)
@@ -411,6 +425,10 @@ func renderHome(key string) string {
 
 	b.WriteString("## Namespaces\n\n")
 	keys := Keys()
+	if len(keys) > HomeRecent {
+		b.WriteString(strconv.Itoa(len(keys)) + " namespaces, the first " + strconv.Itoa(HomeRecent) + " listed.\n\n")
+		keys = keys[:HomeRecent]
+	}
 	for _, k := range keys {
 		b.WriteString("- [`" + k + "`](/r/moul/x/plan9/ns/v1:ns?u=" + k + ")\n")
 	}
@@ -427,8 +445,8 @@ func renderHome(key string) string {
 
 // quote wraps a path for rc if it needs it.
 func quote(s string) string {
-	if !strings.ContainsAny(s, " \t'") {
-		return s
-	}
+	// Always quoted: the path comes from the URL, and a route like
+	// cat/tmp/f;echo must read one file, not run a second command. The shell
+	// is read-only either way, but a path is data.
 	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
 }

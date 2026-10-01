@@ -23,3 +23,22 @@ func TestLinksAreBounded(cur realm, t *testing.T) {
 	uassert.Equal(t, MaxLinks-1, len(p.Links))
 	uassert.Equal(t, "https://e.example/x", p.Links[0].URL)
 }
+
+// The profile count is bounded globally, not just per address.
+func TestProfileCountIsBounded(cur realm, t *testing.T) {
+	var added []string
+	for i := 0; profiles.Size() < MaxProfiles; i++ {
+		k := testutils.TestAddress("p" + strings.Repeat("x", i%7) + string(rune('a'+i%26)) + string(rune('a'+i/26%26)) + string(rune('a'+i/676%26))).String()
+		if profiles.Get(k) == nil {
+			profiles.Set(k, &profile{})
+			added = append(added, k)
+		}
+	}
+	defer func() {
+		for _, k := range added {
+			profiles.Remove(k)
+		}
+	}()
+	testing.SetRealm(testing.NewUserRealm(testutils.TestAddress("latecomer")))
+	uassert.AbortsContains(t, cur, "linktree is full", func() { SetBio(cross(cur), "hi") })
+}
