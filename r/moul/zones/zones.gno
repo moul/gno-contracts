@@ -16,9 +16,10 @@
 // it waits: proposals and unverified endpoints are listed, and labelled.
 //
 // This realm only manages the information and answers questions about it. The
-// read helpers (GetZone, ListZones, ListEndpoints, ListAddresses) take plain
-// strings so they work from `gnokey query vm/qeval` as well as from another
-// realm, and turning them into a node's config.toml is a separate realm's job.
+// read helpers (GetZone, ListZones, GetEndpoint, ListEndpoints, ListAddresses,
+// IsCurator, Curators, IsInvited, Invited) take plain values so they work from
+// `gnokey query vm/qeval` as well as from another realm, and turning them into a
+// node's config.toml is a separate realm's job.
 //
 // The model, its validation and its state machine are p/moul/zones. This realm
 // owns only who may write.
@@ -37,10 +38,16 @@ import (
 // curators when they accept.
 const Admin address = "g1manfred47kzduec920z88wfr64ylksmdcedlf5"
 
+// MaxCurators bounds curators and open invitations together. The curator list
+// renders on the index page, and only curators can grow it, but a bound costs
+// nothing and an unbounded list on a public page is a page someone can break.
+const MaxCurators = 16
+
 var (
 	reg      = zones.NewRegistry()
 	curators addrset.Set
-	invited  addrset.Set // invited by a curator, not yet accepted
+	invited  addrset.Set             // invited by a curator, not yet accepted
+	inviter  = map[address]address{} // invitee -> the curator who invited them; lookups only
 )
 
 func init() {
@@ -54,18 +61,22 @@ func init() {
 // proposal until a curator approves or rejects it.
 //
 // kind is mainnet, testnet, devnet or local. gnowebURL and genesisURL may be
-// empty; rpcURL may not.
+// empty; rpcURL may not, and is <scheme>://<host>[:<port>] with no path, which
+// is what gnokey -remote takes.
 func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL string) {
 	who := caller(cur)
 	in := info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)
 	must(reg.Propose(who, runtime.ChainHeight(), strings.TrimSpace(slug), in))
 }
 
-// EditZone replaces a zone's description. A curator may edit any zone; the
-// proposer may edit their own while it is still pending. Once a curator has
-// approved the zone, an edit needs a reason, and it replaces the review on
-// record: the page then names who changed the values, and why. A rejected or
-// retired zone cannot be edited.
+// EditZone replaces a zone's Info, every field but its slug and status. A
+// curator may edit any pending or approved zone; the proposer may edit their
+// own while it is pending. Every edit bumps the zone's revision, so an
+// approval prepared against the old one fails. On a pending zone the reason
+// must be empty; on an approved one it is required and replaces the review on
+// record, so the page names who changed the values, and why. A new chain id
+// sends the zone's verified endpoints back to unverified. A rejected or retired
+// zone cannot be edited.
 func EditZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
@@ -77,45 +88,42 @@ func EditZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpc
 		who, runtime.ChainHeight(), reason))
 }
 
-// ApproveZone makes a zone official. The reason is optional.
-func ApproveZone(cur realm, slug, reason string) {
-	review(cur, slug, zones.Approved, reason)
+// ApproveZone makes a zone official. revision is the zone's Revision as you
+// read it (the zone page's Approve link carries it): if the zone was edited
+// since, the approval fails and you read it again. The reason is optional.
+func ApproveZone(cur realm, slug string, revision int64, reason string) {
+	review(cur, slug, zones.Approved, revision, reason)
 }
 
 // RejectZone turns a proposal down. The reason is required, and public.
 func RejectZone(cur realm, slug, reason string) {
-	review(cur, slug, zones.Rejected, reason)
+	review(cur, slug, zones.Rejected, 0, reason)
 }
 
-// RetireZone marks an official zone as no longer running. The reason is
-// required: it is what an operator still holding the chain id will read.
+// RetireZone marks an official zone as no longer running, and sends its
+// verified endpoints back to unverified. The reason is required: it is what an
+// operator still holding the chain id will read.
 func RetireZone(cur realm, slug, reason string) {
-	review(cur, slug, zones.Retired, reason)
+	review(cur, slug, zones.Retired, 0, reason)
 }
 
-// RemoveZone deletes a pending or rejected zone and its endpoints: a curator
-// may remove any, the proposer their own. A zone that was ever official is
-// never removed, by anybody: an approved one is retired, and a retired one is
-// kept on record.
+// RemoveZone deletes a pending or rejected zone and its endpoints. A curator
+// may remove any. The proposer may remove their own only while every endpoint
+// on it is theirs: the storage deposit is refunded to whoever signs the
+// removal, so removing somebody else's endpoints would collect what they paid.
+// A zone that was ever official is never removed, by anybody: an approved one
+// is retired, and a retired one is kept on record.
 func RemoveZone(cur realm, slug string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
 	z := mustZone(slug)
-	own := z.Proposer == who && (z.Status == zones.Pending || z.Status == zones.Rejected)
-	if !curators.Has(who) && !own {
-		panic("zones: only a curator, or the proposer while it is pending or rejected, may remove " + slug)
-	}
-	// The storage deposit comes back to whoever signs the transaction that
-	// frees it, so a proposer removing a zone that carries somebody else's
-	// endpoints would collect the deposits those registrants paid. They take
-	// back only what they alone put there; anything else waits for its
-	// registrants, or for a curator.
 	if !curators.Has(who) {
-		for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug}) {
-			if e.Registrant != who {
-				panic("zones: " + slug + " carries endpoint #" + strconv.FormatInt(e.ID, 10) +
-					" registered by " + e.Registrant.String() + "; it must be removed first")
-			}
+		if z.Proposer != who || (z.Status != zones.Pending && z.Status != zones.Rejected) {
+			panic("zones: only a curator, or the proposer while it is pending or rejected, may remove " + slug)
+		}
+		// From the index counts: nothing is read to answer it.
+		if _, total := reg.Count(slug); reg.OwnerCount(slug, who) != total {
+			panic("zones: " + slug + " carries endpoints somebody else registered; they must be removed first")
 		}
 	}
 	must(reg.RemoveZone(slug))
@@ -123,46 +131,64 @@ func RemoveZone(cur realm, slug string) {
 
 // ---- registering and curating endpoints
 
-// RegisterEndpoint lists an endpoint on a pending or approved zone and returns
-// its id. Anybody may; it shows as unverified until a curator checks it.
+// RegisterEndpoint lists an endpoint on a zone and returns its id. On an
+// approved zone anybody may; on a pending one only the proposer or a curator,
+// so a stranger cannot pin a proposal the proposer then cannot withdraw. It
+// shows as unverified until a curator checks it.
 //
 // kind is rpc, gnoweb, seed, peer, indexer, faucet or explorer. addr is a
 // URL, or <node id>@<host>:<port> for a seed or a peer. label is optional:
 // who runs it, in your words.
 func RegisterEndpoint(cur realm, slug, kind, addr, label string) int64 {
 	who := caller(cur)
+	slug = strings.TrimSpace(slug)
+	z := mustZone(slug)
+	if z.Status == zones.Pending && z.Proposer != who && !curators.Has(who) {
+		panic("zones: " + slug + " is pending; only its proposer or a curator may register on it")
+	}
 	k, err := zones.ParseEndpointKind(kind)
 	must(err)
-	id, err := reg.Register(who, runtime.ChainHeight(), strings.TrimSpace(slug), k, addr, label)
+	id, err := reg.Register(who, runtime.ChainHeight(), slug, k, addr, label)
 	must(err)
 	return id
 }
 
-// VerifyEndpoint marks an endpoint as checked. The reason is optional.
-func VerifyEndpoint(cur realm, id int64, reason string) {
-	reviewEndpoint(cur, id, zones.Verified, reason)
+// VerifyEndpoint marks an endpoint as checked against its zone. revision is the
+// zone's Revision you checked it against: if the zone was edited since (its
+// chain id, say), the verdict fails. The reason is optional.
+func VerifyEndpoint(cur realm, id int64, revision int64, reason string) {
+	reviewEndpoint(cur, id, zones.Verified, revision, reason)
 }
 
 // FlagEndpoint tells readers not to use an endpoint. The reason is required.
 func FlagEndpoint(cur realm, id int64, reason string) {
-	reviewEndpoint(cur, id, zones.Flagged, reason)
+	reviewEndpoint(cur, id, zones.Flagged, 0, reason)
 }
 
 // UnverifyEndpoint puts an endpoint back to unverified, for one that changed
 // hands or needs checking again.
 func UnverifyEndpoint(cur realm, id int64, reason string) {
-	reviewEndpoint(cur, id, zones.Unverified, reason)
+	reviewEndpoint(cur, id, zones.Unverified, 0, reason)
 }
 
-// RemoveEndpoint deletes an endpoint. Its registrant or a curator may.
+// RemoveEndpoint deletes an endpoint. A curator may remove any. Its registrant
+// may remove it only while it is unverified: a verified endpoint is a record
+// other people rely on, and a flagged one is a warning, and removing and
+// registering it again would wipe either one.
 func RemoveEndpoint(cur realm, id int64) {
 	who := caller(cur)
 	e, ok := reg.Endpoint(id)
 	if !ok {
 		panic("zones: no endpoint #" + strconv.FormatInt(id, 10))
 	}
-	if !curators.Has(who) && e.Registrant != who {
-		panic("zones: only a curator or its registrant may remove endpoint #" + strconv.FormatInt(id, 10))
+	if !curators.Has(who) {
+		if e.Registrant != who {
+			panic("zones: only a curator or its registrant may remove endpoint #" + strconv.FormatInt(id, 10))
+		}
+		if e.Status != zones.Unverified {
+			panic("zones: endpoint #" + strconv.FormatInt(id, 10) + " is " + string(e.Status) +
+				"; only a curator may remove it now")
+		}
 	}
 	must(reg.RemoveEndpoint(id))
 }
@@ -175,18 +201,25 @@ func RemoveEndpoint(cur realm, id int64) {
 // Two steps, deliberately: a curator set is the one thing a mistake here can
 // lose for good. With a one-step add, a sole curator who invites a mistyped
 // address and then steps down leaves a registry nobody controls; accepting is
-// the proof that somebody holds the key.
+// the proof that somebody holds the key. An invitation dies with its inviter:
+// removing a curator withdraws every invitation they sent.
 func AddCurator(cur realm, addr address) {
-	assertCurator(caller(cur))
-	if !addr.IsValid() {
-		panic("zones: not a valid address: " + addr.String())
+	who := caller(cur)
+	assertCurator(who)
+	if !zones.ValidAddress(addr) {
+		panic("zones: not a valid lowercase address: " + addr.String())
 	}
 	if curators.Has(addr) {
 		panic("zones: " + addr.String() + " is already a curator")
 	}
-	if !invited.Add(addr) {
+	if invited.Has(addr) {
 		panic("zones: " + addr.String() + " is already invited")
 	}
+	if curators.Size()+invited.Size() >= MaxCurators {
+		panic("zones: " + strconv.Itoa(MaxCurators) + " curators and invitations already; remove one first")
+	}
+	invited.Add(addr)
+	inviter[addr] = who
 }
 
 // AcceptCurator makes the caller a curator, if a curator invited it.
@@ -196,15 +229,20 @@ func AcceptCurator(cur realm) {
 		panic("zones: " + who.String() + " has no curator invitation")
 	}
 	invited.Remove(who)
+	delete(inviter, who)
 	curators.Add(who)
 }
 
-// RemoveCurator revokes a curator, or withdraws an invitation. Only a curator
-// may, and the last curator cannot be removed: a registry nobody can curate
-// can never retire a dead zone.
+// RemoveCurator revokes a curator, along with every invitation they sent, or
+// withdraws one invitation. Only a curator may, and the last curator cannot be
+// removed: a registry nobody can curate can never retire a dead zone.
+//
+// Curators are equals: any one may remove any other, the admin included. That
+// is the trust a curator set is, and it is why there are few of them.
 func RemoveCurator(cur realm, addr address) {
 	assertCurator(caller(cur))
 	if invited.Remove(addr) {
+		delete(inviter, addr)
 		return
 	}
 	if !curators.Has(addr) {
@@ -214,13 +252,19 @@ func RemoveCurator(cur realm, addr address) {
 		panic("zones: " + addr.String() + " is the last curator")
 	}
 	curators.Remove(addr)
+	for _, a := range Invited() {
+		if inviter[a] == addr {
+			invited.Remove(a)
+			delete(inviter, a)
+		}
+	}
 }
 
 // ---- reads: plain arguments, so `gnokey query vm/qeval` can call them
 
 // GetZone returns the zone under slug, and whether there is one.
 func GetZone(slug string) (zones.Zone, bool) {
-	return reg.Zone(slug)
+	return reg.Zone(strings.TrimSpace(slug))
 }
 
 // ListZones returns the zones with that status and kind, in the order they
@@ -250,8 +294,9 @@ func ListEndpoints(slug, kind, status string) []zones.Endpoint {
 // ListAddresses is ListEndpoints reduced to the addresses, which is what a
 // config file wants: ListAddresses("onyx", "peer", "verified").
 func ListAddresses(slug, kind, status string) []string {
-	out := []string{}
-	for _, e := range reg.Endpoints(endpointFilter(slug, kind, status)) {
+	es := reg.Endpoints(endpointFilter(slug, kind, status))
+	out := make([]string, 0, len(es))
+	for _, e := range es {
 		out = append(out, e.Address)
 	}
 	return out
@@ -265,9 +310,14 @@ func IsInvited(addr address) bool { return invited.Has(addr) }
 func IsCurator(addr address) bool { return curators.Has(addr) }
 
 // Curators returns every curator, in address order.
-func Curators() []address {
-	out := []address{}
-	curators.IterateByOffset(0, curators.Size(), func(a address) bool {
+func Curators() []address { return members(&curators) }
+
+// Invited returns every open curator invitation, in address order.
+func Invited() []address { return members(&invited) }
+
+func members(set *addrset.Set) []address {
+	out := make([]address, 0, set.Size())
+	set.IterateByOffset(0, set.Size(), func(a address) bool {
 		out = append(out, a)
 		return false
 	})
@@ -276,16 +326,16 @@ func Curators() []address {
 
 // ---- helpers
 
-func review(cur realm, slug string, to zones.Status, reason string) {
+func review(cur realm, slug string, to zones.Status, revision int64, reason string) {
 	who := caller(cur)
 	assertCurator(who)
-	must(reg.ReviewZone(strings.TrimSpace(slug), to, who, runtime.ChainHeight(), reason))
+	must(reg.ReviewZone(strings.TrimSpace(slug), to, revision, who, runtime.ChainHeight(), reason))
 }
 
-func reviewEndpoint(cur realm, id int64, to zones.Verification, reason string) {
+func reviewEndpoint(cur realm, id int64, to zones.Verification, revision int64, reason string) {
 	who := caller(cur)
 	assertCurator(who)
-	must(reg.ReviewEndpoint(id, to, who, runtime.ChainHeight(), reason))
+	must(reg.ReviewEndpoint(id, to, revision, who, runtime.ChainHeight(), reason))
 }
 
 func endpointFilter(slug, kind, status string) zones.EndpointFilter {

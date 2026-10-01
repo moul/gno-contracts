@@ -32,10 +32,9 @@ func action(title, fn string, args ...string) string {
 
 // PageSize is how many rows any table here shows at once. Every list is
 // paginated and every page reads only its own records, because vm/qrender is
-// gas-metered and a Render that outgrows it stops answering instead of slowing
-// down. At the registry's caps (256 zones, 512 endpoints on one zone) a zone
-// page plus an endpoint page measured about 7.5M gas of the 3B ceiling; see
-// zones.Registry.ZonePage.
+// gas-metered (3B per query) and a Render that outgrows it stops answering
+// instead of slowing down. At the caps a page reads about 25 records and a few
+// index nodes, so it stays a small fraction of that ceiling.
 const PageSize = 25
 
 // Render is the whole public surface, three pages: the zone list (official,
@@ -44,13 +43,22 @@ const PageSize = 25
 // takes ?page=.
 func Render(path string) string {
 	req := realmpath.Parse(path)
+	// Exact paths only: a page that also answers zone/x/approved-by-gno-core
+	// lends its content to whatever the extra segment claims.
+	parts := len(req.PathParts())
 	switch req.PathPart(0) {
 	case "":
-		return renderIndex(req)
+		if parts <= 1 {
+			return renderIndex(req)
+		}
 	case "zone":
-		return renderZone(req.PathPart(1), req)
+		if parts == 2 {
+			return renderZone(req.PathPart(1), req)
+		}
 	case "proposals":
-		return renderProposals(req)
+		if parts == 1 {
+			return renderProposals(req)
+		}
 	}
 	return notFound("No such page.")
 }
@@ -115,6 +123,8 @@ func zoneTable(status zones.Status, req *realmpath.Request, empty string) (strin
 		t = ui.NewTable("zone", "chain id", "kind", "rpc", "endpoints")
 	case zones.Pending:
 		t = ui.NewTable("zone", "chain id", "kind", "proposed by", "review")
+	case zones.Rejected:
+		t = ui.NewTable("zone", "chain id", "proposed by", "why", "")
 	default:
 		t = ui.NewTable("zone", "chain id", "proposed by", "why")
 	}
@@ -125,11 +135,15 @@ func zoneTable(status zones.Status, req *realmpath.Request, empty string) (strin
 			t.Row(zoneLink(z), md.InlineCode(z.ChainID), string(z.Kind), md.InlineCode(z.RPCURL),
 				strconv.Itoa(verified)+" verified of "+strconv.Itoa(total))
 		case zones.Pending:
+			// Review on the zone page, which shows what is being approved; the
+			// Approve link there carries the revision it was rendered from.
 			t.Row(zoneLink(z), md.InlineCode(z.ChainID), string(z.Kind), ui.Addr(z.Proposer),
-				action("Approve", "ApproveZone", "slug", z.Slug, "reason", "")+" · "+
-					action("Reject", "RejectZone", "slug", z.Slug, "reason", ""))
+				md.Link("review", realmURL+":zone/"+z.Slug))
+		case zones.Rejected:
+			t.Row(zoneLink(z), md.InlineCode(z.ChainID), ui.Addr(z.Proposer), cell(z.Reason),
+				action("Remove", "RemoveZone", "slug", z.Slug))
 		default:
-			t.Row(zoneLink(z), md.InlineCode(z.ChainID), ui.Addr(z.Proposer), ui.Cell(z.Reason))
+			t.Row(zoneLink(z), md.InlineCode(z.ChainID), ui.Addr(z.Proposer), cell(z.Reason))
 		}
 	}
 	if empty == "" {
@@ -143,8 +157,8 @@ func renderZone(slug string, req *realmpath.Request) string {
 	if !ok {
 		return notFound("No such zone.")
 	}
-	kind, err := zones.ParseEndpointKind(req.Query.Get("kind"))
-	if err != nil {
+	kind := zones.EndpointKind(req.Query.Get("kind"))
+	if kind != "" && !isKind(kind) {
 		return notFound("No such endpoint kind.")
 	}
 
@@ -154,22 +168,26 @@ func renderZone(slug string, req *realmpath.Request) string {
 		md.Bold("rpc") + ": " + md.InlineCode(z.RPCURL),
 	}
 	if z.GnowebURL != "" {
-		facts = append(facts, md.Bold("gnoweb")+": "+md.Link(z.GnowebURL, z.GnowebURL))
+		facts = append(facts, md.Bold("gnoweb")+": "+urlFact(z, z.GnowebURL))
 	}
 	if z.GenesisURL != "" {
-		facts = append(facts, md.Bold("genesis")+": "+md.Link("genesis.json", z.GenesisURL))
+		facts = append(facts, md.Bold("genesis")+": "+urlFact(z, z.GenesisURL))
 	}
 	facts = append(facts, md.Bold("proposed")+" by "+ui.Addr(z.Proposer)+" at block "+strconv.FormatInt(z.ProposedAt, 10))
+	if z.EditedBy != "" {
+		facts = append(facts, md.Bold("edited")+" by "+ui.Addr(z.EditedBy)+" at block "+strconv.FormatInt(z.EditedAt, 10))
+	}
+	facts = append(facts, md.Bold("revision")+": "+strconv.FormatInt(z.Revision, 10))
 	if z.Reviewed() {
 		facts = append(facts, md.Bold("last reviewed")+" "+reviewText(z.ReviewedBy, z.ReviewedAt, z.Reason))
 	}
 
 	parts := []string{
-		md.H1(ui.Inline(z.Title)),
+		md.H1(prose(z.Title)),
 		para(statusBadge(z.Status) + " · " + md.InlineCode(z.Slug)),
 	}
 	if z.Description != "" {
-		parts = append(parts, para(ui.Inline(z.Description)))
+		parts = append(parts, para(prose(z.Description)))
 	}
 	parts = append(parts, md.BulletList(facts), md.H2("Endpoints"))
 
@@ -194,7 +212,7 @@ func renderZone(slug string, req *realmpath.Request) string {
 			strconv.FormatInt(e.ID, 10),
 			string(e.Kind),
 			md.InlineCode(e.Address),
-			ui.Cell(e.Label),
+			cell(e.Label),
 			endpointStatus(e),
 			ui.Addr(e.Registrant),
 		)
@@ -203,22 +221,32 @@ func renderZone(slug string, req *realmpath.Request) string {
 	if kind != "" {
 		query = "kind=" + string(kind) + "&"
 	}
-	parts = append(parts, t.OrEmpty("No endpoint registered yet."), pager("zone/"+z.Slug, query, pageNum(req, pages), pages))
+	empty := "No endpoint registered yet."
+	if kind != "" {
+		empty = "No " + string(kind) + " endpoint registered yet."
+	}
+	parts = append(parts, t.OrEmpty(empty), pager("zone/"+z.Slug, query, pageNum(req, pages), pages))
 
 	actions := []string{}
 	if z.Status == zones.Pending || z.Status == zones.Approved {
 		actions = append(actions, action("Register an endpoint", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	}
+	// Approve carries the revision this page was rendered from, so approving
+	// what you read here fails if the zone changed after you read it.
+	approve := action("Approve revision "+strconv.FormatInt(z.Revision, 10), "ApproveZone",
+		"slug", z.Slug, "revision", strconv.FormatInt(z.Revision, 10), "reason", "")
 	switch z.Status {
 	case zones.Pending:
-		actions = append(actions,
-			action("Approve", "ApproveZone", "slug", z.Slug, "reason", ""),
-			action("Reject", "RejectZone", "slug", z.Slug, "reason", ""))
+		actions = append(actions, approve,
+			action("Reject", "RejectZone", "slug", z.Slug, "reason", ""),
+			action("Remove", "RemoveZone", "slug", z.Slug))
 	case zones.Approved:
 		actions = append(actions, action("Retire", "RetireZone", "slug", z.Slug, "reason", ""))
-	case zones.Rejected, zones.Retired:
-		actions = append(actions, action("Approve", "ApproveZone", "slug", z.Slug, "reason", ""))
+	case zones.Rejected:
+		actions = append(actions, approve, action("Remove", "RemoveZone", "slug", z.Slug))
+	case zones.Retired:
+		actions = append(actions, approve)
 	}
 	parts = append(parts,
 		para(strings.Join(actions, " · ")),
@@ -341,15 +369,13 @@ func notFound(msg string) string { return md.H1("Not found") + ui.Empty(msg) }
 // the one character no URL here can contain, so a later, wider validator does
 // not reopen it. The call is built from charset-checked slugs and literals.
 func queryCommand(call string) string {
-	remote, matches := "", 0
-	for _, z := range reg.ZonesByChainID(runtime.ChainID()) {
-		if z.Status == zones.Approved {
-			remote = " -remote '" + z.RPCURL + "'"
-			matches++
+	remote := ""
+	if zs := reg.ApprovedByChainID(runtime.ChainID()); len(zs) == 1 {
+		// Not one the same page flags: printing a remote the endpoint table says
+		// not to use would contradict the page.
+		if e, ok := reg.EndpointByAddress(zs[0].Slug, zones.RPC, zs[0].RPCURL); !ok || e.Status != zones.Flagged {
+			remote = " -remote '" + zs[0].RPCURL + "'"
 		}
-	}
-	if matches != 1 {
-		remote = ""
 	}
 	return "gnokey query vm/qeval" + remote + " -data '" + pkgPath + "." + call + "'"
 }
@@ -364,7 +390,38 @@ func para(s string) string { return s + "\n" }
 // zone table. ui.Cell escapes the pipe too; the destination is a constant plus
 // a slug checked to [a-z0-9-] at write time.
 func zoneLink(z zones.Zone) string {
-	return "[" + ui.Cell(z.Title) + "](" + realmURL + ":zone/" + z.Slug + ")"
+	return "[" + cell(z.Title) + "](" + realmURL + ":zone/" + z.Slug + ")"
+}
+
+// urlFact shows a zone's URL as its own text, never behind a label, so a
+// reader sees where it goes: a proposal's "genesis.json" link could otherwise
+// open anything, a pre-filled transaction form included, right under the
+// Approve button. Only an approved zone's URLs are links; a proposal's are
+// code, to copy and check, not to click.
+func urlFact(z zones.Zone, url string) string {
+	if z.Status == zones.Approved {
+		return md.Link(url, url)
+	}
+	return md.InlineCode(url)
+}
+
+// prose and cell escape a caller's free text for a sentence and a table cell,
+// plus one thing ui.Inline and ui.Cell leave alone: an @, which gnoweb turns
+// into a user-profile link with an icon, so "run by @gnocore" would vouch for
+// an account the registrant chose.
+func prose(s string) string { return escapeMentions(ui.Inline(s)) }
+
+func cell(s string) string { return escapeMentions(ui.Cell(s)) }
+
+func escapeMentions(s string) string { return strings.ReplaceAll(s, "@", "\\@") }
+
+func isKind(k zones.EndpointKind) bool {
+	for _, x := range zones.EndpointKinds() {
+		if k == x {
+			return true
+		}
+	}
+	return false
 }
 
 func statusBadge(s zones.Status) string {
@@ -392,7 +449,10 @@ func endpointStatus(e zones.Endpoint) string {
 		s = "unverified"
 	}
 	if e.Reason != "" {
-		s += ": " + ui.Cell(e.Reason)
+		s += ": " + cell(e.Reason)
+	}
+	if e.ReviewedBy != "" {
+		s += " (" + ui.Addr(e.ReviewedBy) + ", block " + strconv.FormatInt(e.ReviewedAt, 10) + ")"
 	}
 	return s
 }
@@ -400,7 +460,7 @@ func endpointStatus(e zones.Endpoint) string {
 func reviewText(by address, at int64, reason string) string {
 	s := "by " + ui.Addr(by) + " at block " + strconv.FormatInt(at, 10)
 	if reason != "" {
-		s += ": " + ui.Cell(reason)
+		s += ": " + prose(reason)
 	}
 	return s
 }

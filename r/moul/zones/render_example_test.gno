@@ -36,7 +36,8 @@ func ExampleRender() {
 	// Curated by `g1manfre…dlf5`.
 }
 
-// ExampleRender_zone pins one zone's page, endpoints grouped by kind.
+// ExampleRender_zone pins one zone's page: its facts, a link per endpoint kind,
+// and its endpoints in id order.
 func ExampleRender_zone() {
 	reset()
 	print(Render("zone/onyx"))
@@ -51,8 +52,9 @@ func ExampleRender_zone() {
 	// - **kind**: testnet
 	// - **rpc**: `https://rpc.onyx.testnets.gno.land`
 	// - **gnoweb**: [https://onyx\.testnets\.gno\.land](https://onyx.testnets.gno.land)
-	// - **genesis**: [genesis\.json](https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json)
+	// - **genesis**: [https://github\.com/gnolang/gno/releases/download/chain/onyx/genesis\.json](https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json)
 	// - **proposed** by `g1manfre…dlf5` at block 123
+	// - **revision**: 2
 	// - **last reviewed** by `g1manfre…dlf5` at block 123: seeded at deploy; probed 2026\-10\-01
 	//
 	// ## Endpoints
@@ -61,13 +63,13 @@ func ExampleRender_zone() {
 	//
 	// | # | kind | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- | --- |
-	// | 7 | rpc | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	// | 8 | gnoweb | `https://onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	// | 9 | peer | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	// | 10 | peer | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	// | 11 | indexer | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	// | 12 | faucet | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
-	// | 13 | explorer | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 | `g1manfre…dlf5` |
+	// | 7 | rpc | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
+	// | 8 | gnoweb | `https://onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
+	// | 9 | peer | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
+	// | 10 | peer | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
+	// | 11 | indexer | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
+	// | 12 | faucet | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
+	// | 13 | explorer | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
 	//
 	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&slug=onyx)
 	//
@@ -85,7 +87,7 @@ func ExampleRender_proposals() {
 	reset()
 	must(reg.Propose(alice, 200, "alice-dev", info("alicedev-1", "Alice's devnet", "", "devnet", "", "https://rpc.alice.example", "")))
 	must(reg.Propose(bob, 201, "fake-mainnet", info("gnoland-1", "Mainnet (faster!)", "", "mainnet", "", "https://rpc.fake.example", "")))
-	must(reg.ReviewZone("fake-mainnet", "rejected", Admin, 202, "not the mainnet RPC"))
+	must(reg.ReviewZone("fake-mainnet", "rejected", zrev("fake-mainnet"), Admin, 202, "not the mainnet RPC"))
 	print(Render("proposals"))
 	// Output:
 	// # Proposals
@@ -96,7 +98,7 @@ func ExampleRender_proposals() {
 	//
 	// | zone | chain id | kind | proposed by | review |
 	// | --- | --- | --- | --- | --- |
-	// | [Alice's devnet](/r/moul/zones/v0:zone/alice-dev) | `alicedev-1` | devnet | `g1v9kxjc…40gh` | [Approve](/r/moul/zones/v0$help&func=ApproveZone&reason=&slug=alice-dev) · [Reject](/r/moul/zones/v0$help&func=RejectZone&reason=&slug=alice-dev) |
+	// | [Alice's devnet](/r/moul/zones/v0:zone/alice-dev) | `alicedev-1` | devnet | `g1v9kxjc…40gh` | [review](/r/moul/zones/v0:zone/alice-dev) |
 	//
 	// [1 rejected](/r/moul/zones/v0:proposals?status=rejected) · [All zones](/r/moul/zones/v0)
 }
@@ -105,7 +107,7 @@ func ExampleRender_proposals() {
 func ExampleRender_rejected() {
 	reset()
 	must(reg.Propose(bob, 201, "fake-mainnet", info("gnoland-1", "Mainnet (faster!)", "", "mainnet", "", "https://rpc.fake.example", "")))
-	must(reg.ReviewZone("fake-mainnet", "rejected", Admin, 202, "not the mainnet RPC"))
+	must(reg.ReviewZone("fake-mainnet", "rejected", zrev("fake-mainnet"), Admin, 202, "not the mainnet RPC"))
 	print(Render("proposals?status=rejected"))
 	// Output:
 	// # Proposals
@@ -114,9 +116,9 @@ func ExampleRender_rejected() {
 	//
 	// ## Rejected
 	//
-	// | zone | chain id | proposed by | why |
-	// | --- | --- | --- | --- |
-	// | [Mainnet \(faster\!\)](/r/moul/zones/v0:zone/fake-mainnet) | `gnoland-1` | `g1vfhkyh…vdhu` | not the mainnet RPC |
+	// | zone | chain id | proposed by | why |  |
+	// | --- | --- | --- | --- | --- |
+	// | [Mainnet \(faster\!\)](/r/moul/zones/v0:zone/fake-mainnet) | `gnoland-1` | `g1vfhkyh…vdhu` | not the mainnet RPC | [Remove](/r/moul/zones/v0$help&func=RemoveZone&slug=fake-mainnet) |
 	//
 	// [pending](/r/moul/zones/v0:proposals) · [All zones](/r/moul/zones/v0)
 }

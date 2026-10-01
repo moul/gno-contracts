@@ -86,7 +86,21 @@ func TestValidateEndpoint(t *testing.T) {
 		{RPC, "https://host:", "port is 1 to 65535"},
 		{RPC, "https://ho_st", "DNS name"},
 		{RPC, "https://[::1]:26657", "contains"},
-		{RPC, "https://rpc.gno.land:443/path?x=1#f", ""},
+		{RPC, "https://rpc.gno.land:443/path?x=1", ""},
+		{RPC, "https://rpc.gno.land:443/path?x=1#f", "contains"}, // a fragment is never sent: no second listing
+		{RPC, "https://rpc.gno.land:+443", "port is 1 to 65535"},
+		{Gnoweb, "https://gno.land/%zz", "two hex digits"},
+		{Gnoweb, "https://gno.land/%2", "two hex digits"},
+		{Gnoweb, "https://gno.land/%2F", ""},
+		{Gnoweb, "https://gno.land/?a=1&b=2", ""},
+		{Gnoweb, "https://gno.land/?a=1&amp;b=2", "entity"},
+		{Gnoweb, "https://0x7f.1", "DNS name"},
+		{Gnoweb, "https://a.1", "DNS name"},
+		{Gnoweb, "https://foo.123", "DNS name"},
+		{Gnoweb, "https://1.2.3.4", ""},
+		{Peer, "G15RCV5YQEF3KVNMUEQVKYW8Y05SD40JZ9P3N5SU@seed-1.gno.land:26656", "lowercase g1 address"},
+		{Peer, nodeID + "@seed-1.gno.land:+26656", "1 to 65535"},
+		{Peer, nodeID + "@" + strings.Repeat("a.", 120) + "example:26656", "longer than"},
 		{RPC, "https://rpc.gno.land.", ""},
 		{RPC, "http://10.0.0.1:26657", ""},
 		{RPC, "http://localhost:26657", ""},
@@ -149,6 +163,16 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.Title = strings.Repeat("x", MaxTitleLen+1) }, "title is 1 to 64")
 	bad(func(in *Info) { in.Title = "two\nlines" }, "control character")
 	bad(func(in *Info) { in.Title = "\u200b" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "\u2060" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "\u3164" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "\u061cOnyx" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "Onyx\ufe0f" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "Onyx\U000e0041" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "\u2800" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "\u2705 official mainnet" }, "status glyph")
+	bad(func(in *Info) { in.Title = "Z\u0301\u0301\u0301" }, "combining marks")
+	bad(func(in *Info) { in.Title = "\u0301" }, "nothing visible")
+	bad(func(in *Info) { in.Title = "bad\xffbyte" }, "not valid UTF-8")
 	bad(func(in *Info) { in.Title = "alpha\u2028beta" }, "control character")
 	bad(func(in *Info) { in.Title = "alpha\u2029beta" }, "control character")
 	bad(func(in *Info) { in.Title = "alpha\u0085beta" }, "control character")
@@ -164,10 +188,12 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.RPCURL = "ws://rpc.onyx.testnets.gno.land/websocket" }, "rpc url scheme")
 	bad(func(in *Info) { in.RPCURL = "https://rpc.example/path" }, "no path")
 	bad(func(in *Info) { in.RPCURL = "https://rpc.example?x=1" }, "no path")
-	bad(func(in *Info) { in.RPCURL = "https://rpc.example:443#f" }, "no path")
-	slash := ok
-	slash.RPCURL = "https://rpc.onyx.testnets.gno.land:443/"
-	uassert.NoError(t, ValidateInfo(slash))
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example:443#f" }, "contains")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example/" }, "no path")
+	bad(func(in *Info) { in.Kind = " testnet " }, "unknown kind")
+	port := ok
+	port.RPCURL = "https://rpc.onyx.testnets.gno.land:443"
+	uassert.NoError(t, ValidateInfo(port))
 	bad(func(in *Info) { in.GnowebURL = "gno.land" }, "gnoweb url needs a scheme")
 	bad(func(in *Info) { in.GenesisURL = "tcp://x" }, "genesis url scheme")
 
@@ -180,7 +206,14 @@ func TestValidateInfo(t *testing.T) {
 func TestCanonical(t *testing.T) {
 	uassert.Equal(t, "https://rpc.gno.land/API?Q=1", Canonical(RPC, "HTTPS://RPC.Gno.Land/API?Q=1"))
 	uassert.Equal(t, "https://rpc.gno.land", Canonical(RPC, "https://RPC.gno.land"))
-	uassert.Equal(t, "https://rpc.gno.land:443#Frag", Canonical(Gnoweb, "https://rpc.GNO.land:443#Frag"))
+	// One endpoint, one key: every spelling below is the same server.
+	for _, same := range []string{"https://rpc.gno.land", "https://rpc.gno.land/", "https://rpc.gno.land.",
+		"https://rpc.gno.land:443", "https://rpc.gno.land?", "HTTPS://RPC.gno.land.:443/"} {
+		uassert.Equal(t, "https://rpc.gno.land", Canonical(RPC, same), same)
+	}
+	uassert.Equal(t, "http://h.example", Canonical(Gnoweb, "http://h.example:80"))
+	uassert.Equal(t, "http://h.example:443", Canonical(Gnoweb, "http://h.example:443")) // not http's default
+	uassert.Equal(t, "https://h.example/api", Canonical(Indexer, "https://h.example:443/api"))
 	uassert.Equal(t, nodeID+"@seed-1.gno.land:26656", Canonical(Peer, nodeID+"@SEED-1.gno.land:26656"))
 }
 

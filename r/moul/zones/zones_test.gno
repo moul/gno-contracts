@@ -72,9 +72,15 @@ func TestSeeded(t *testing.T) {
 	uassert.Equal(t, Admin.String(), flagged[0].ReviewedBy.String())
 
 	// Every seed endpoint is filed under its own zone, and only there.
-	for _, s := range seeds {
+	n := 0
+	for _, s := range seeds() {
 		uassert.Equal(t, len(s.endpoints), len(ListEndpoints(s.slug, "", "")), s.slug)
+		for _, e := range ListEndpoints(s.slug, "", "") {
+			uassert.Equal(t, s.slug, e.Zone)
+		}
+		n += len(s.endpoints)
 	}
+	uassert.Equal(t, n, len(reg.Endpoints(zones.EndpointFilter{})))
 }
 
 func TestReadsRefuseUnknownFilters(cur realm, t *testing.T) {
@@ -113,7 +119,7 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	uassert.False(t, z.Reviewed()) // a pending edit is just an edit
 
 	// Nobody but a curator approves, and bob cannot touch alice's proposal.
-	uassert.AbortsContains(t, cur, "is not a curator", func() { ApproveZone(cross(cur), "alice-dev", "") })
+	uassert.AbortsContains(t, cur, "is not a curator", func() { ApproveZone(cross(cur), "alice-dev", zrev("alice-dev"), "") })
 	testing.SetRealm(testing.NewUserRealm(bob))
 	uassert.AbortsContains(t, cur, "only a curator, or the proposer", func() {
 		EditZone(cross(cur), "alice-dev", "x", "x", "", "devnet", "", "https://x.example", "", "")
@@ -124,11 +130,11 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	uassert.AbortsContains(t, cur, "only a curator or its registrant", func() {
 		RemoveEndpoint(cross(cur), id)
 	})
-	uassert.AbortsContains(t, cur, "is not a curator", func() { VerifyEndpoint(cross(cur), id, "") })
+	uassert.AbortsContains(t, cur, "is not a curator", func() { VerifyEndpoint(cross(cur), id, erev(id), "") })
 
 	testing.SetRealm(testing.NewUserRealm(Admin))
-	ApproveZone(cross(cur), "alice-dev", "checked the node answers")
-	VerifyEndpoint(cross(cur), id, "")
+	ApproveZone(cross(cur), "alice-dev", zrev("alice-dev"), "checked the node answers")
+	VerifyEndpoint(cross(cur), id, erev(id), "")
 	z, _ = GetZone("alice-dev")
 	uassert.Equal(t, string(zones.Approved), string(z.Status))
 	uassert.Equal(t, "checked the node answers", z.Reason)
@@ -173,9 +179,8 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	uassert.True(t, ok)
 }
 
-// The printed command is pasted into a shell, so the remote is quoted: a URL may
-// carry ; & # $, and only a single quote could break out, which no URL here can
-// contain.
+// The printed command is pasted into a shell. The main RPC cannot carry shell
+// syntax at all; the quote is defense in depth.
 func TestQueryCommandQuotesTheRemote(t *testing.T) {
 	reset()
 	// Two layers. The main RPC cannot carry shell syntax at all: its host is
@@ -183,7 +188,7 @@ func TestQueryCommandQuotesTheRemote(t *testing.T) {
 	// And the printed remote is single-quoted anyway, in case a later version
 	// widens the validator.
 	z, _ := GetZone("moul-staging")
-	in := zones.Info{ChainID: runtime.ChainID(), Title: z.Title, Kind: z.Kind, RPCURL: "https://rpc.example/;id;#"}
+	in := zones.Info{ChainID: runtime.ChainID(), Title: z.Title, Kind: z.Kind, RPCURL: "https://rpc.example/;id;"}
 	uassert.ErrorContains(t, reg.Edit("moul-staging", in, Admin, 1, "test"), "no path")
 	in.RPCURL = "https://rpc.example:443"
 	must(reg.Edit("moul-staging", in, Admin, 1, "test"))
@@ -203,10 +208,15 @@ func TestRejectAndWithdraw(cur realm, t *testing.T) {
 	ProposeZone(cross(cur), "fake-mainnet", "gnoland-1", "Mainnet (faster!)", "",
 		"mainnet", "", "https://rpc.fake.example", "")
 	RegisterEndpoint(cross(cur), "fake-mainnet", "rpc", "https://bob.example", "")
+	// A stranger cannot pin a pending proposal with an endpoint of their own.
 	testing.SetRealm(testing.NewUserRealm(alice))
-	theirs := RegisterEndpoint(cross(cur), "fake-mainnet", "rpc", "https://alice.example", "")
-
+	uassert.AbortsContains(t, cur, "only its proposer or a curator may register", func() {
+		RegisterEndpoint(cross(cur), "fake-mainnet", "rpc", "https://alice.example", "")
+	})
+	// A curator can.
 	testing.SetRealm(testing.NewUserRealm(Admin))
+	theirs := RegisterEndpoint(cross(cur), "fake-mainnet", "rpc", "https://curator.example", "")
+
 	uassert.AbortsContains(t, cur, "needs a reason", func() { RejectZone(cross(cur), "fake-mainnet", "  ") })
 	RejectZone(cross(cur), "fake-mainnet", "not the mainnet RPC")
 	z, _ := GetZone("fake-mainnet")
@@ -219,7 +229,7 @@ func TestRejectAndWithdraw(cur realm, t *testing.T) {
 	// go to the proposer.
 	testing.SetRealm(testing.NewUserRealm(bob))
 	uassert.AbortsContains(t, cur, "must be removed first", func() { RemoveZone(cross(cur), "fake-mainnet") })
-	testing.SetRealm(testing.NewUserRealm(alice))
+	testing.SetRealm(testing.NewUserRealm(Admin))
 	RemoveEndpoint(cross(cur), theirs)
 	testing.SetRealm(testing.NewUserRealm(bob))
 	RemoveZone(cross(cur), "fake-mainnet")
@@ -257,10 +267,20 @@ func TestEndpointLifecycle(cur realm, t *testing.T) {
 	uassert.Equal(t, string(zones.Flagged), string(e.Status))
 	uassert.Equal(t, 1, len(ListEndpoints("onyx", "rpc", "flagged")))
 	UnverifyEndpoint(cross(cur), id, "bob fixed it")
-	VerifyEndpoint(cross(cur), id, "")
+	VerifyEndpoint(cross(cur), id, erev(id), "")
 	uassert.Equal(t, 2, len(ListAddresses("onyx", "rpc", "verified")))
 
-	// Its registrant can take it down.
+	// Verified, it is a record other people rely on: its registrant cannot take
+	// it down (and so cannot wipe a curator's verdict by registering it again).
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "only a curator may remove it now", func() { RemoveEndpoint(cross(cur), id) })
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	FlagEndpoint(cross(cur), id, "serves the wrong chain")
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "only a curator may remove it now", func() { RemoveEndpoint(cross(cur), id) })
+	// Back to unverified, it is the registrant's to take down again.
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	UnverifyEndpoint(cross(cur), id, "re-checking")
 	testing.SetRealm(testing.NewUserRealm(bob))
 	RemoveEndpoint(cross(cur), id)
 	_, ok = GetEndpoint(id)
@@ -303,7 +323,7 @@ func TestCurators(cur realm, t *testing.T) {
 	// A curator added by the admin curates on equal terms, the admin included.
 	testing.SetRealm(testing.NewUserRealm(alice))
 	ProposeZone(cross(cur), "alice-dev", "alicedev-1", "Alice's devnet", "", "devnet", "", "https://rpc.alice.example", "")
-	ApproveZone(cross(cur), "alice-dev", "")
+	ApproveZone(cross(cur), "alice-dev", zrev("alice-dev"), "")
 	RemoveCurator(cross(cur), Admin)
 	uassert.False(t, IsCurator(Admin))
 	uassert.AbortsContains(t, cur, "is not a curator", func() { RemoveCurator(cross(cur), bob) })
@@ -336,7 +356,9 @@ func TestRenderEscapesCallerText(cur realm, t *testing.T) {
 	z, _ := GetZone("upper")
 	uassert.Equal(t, "https://Upper.example/Web", z.GnowebURL)
 	uassert.Equal(t, "https://rpc.upper.example", z.RPCURL)
-	uassert.True(t, strings.Contains(Render("zone/upper"), "(https://Upper.example/Web)"))
+	// A proposal's URL is shown as code, to copy and check, not as a link.
+	uassert.True(t, strings.Contains(Render("zone/upper"), "`https://Upper.example/Web`"))
+	uassert.False(t, strings.Contains(Render("zone/upper"), "](https://Upper.example/Web)"))
 	id := RegisterEndpoint(cross(cur), "upper", "faucet", "HTTP://f.upper.example", "")
 	e, _ := GetEndpoint(id)
 	uassert.Equal(t, "http://f.upper.example", e.Address)
@@ -365,7 +387,7 @@ func TestRenderPaginates(t *testing.T) {
 	for i := 0; i < 2*PageSize; i++ {
 		slug := "z" + strconv.Itoa(i)
 		must(reg.Propose(alice, 1, slug, info("c-"+strconv.Itoa(i), "Zone "+strconv.Itoa(i), "", "devnet", "", "https://r"+strconv.Itoa(i)+".example", "")))
-		must(reg.ReviewZone(slug, zones.Approved, Admin, 2, ""))
+		must(reg.ReviewZone(slug, zones.Approved, zrev(slug), Admin, 2, ""))
 	}
 	// 4 seeded + 50 = 54 approved, so 3 pages of 25.
 	first := Render("")
@@ -386,7 +408,8 @@ func TestRenderPaginates(t *testing.T) {
 	uassert.True(t, strings.Contains(Render("?status=nope"), "No such list."))
 
 	for i := 0; i < PageSize+3; i++ {
-		_, err := reg.Register(alice, 3, "z0", zones.RPC, "https://e"+strconv.Itoa(i)+".example", "")
+		who := testutils.TestAddress("reg" + strconv.Itoa(i/10))
+		_, err := reg.Register(who, 3, "z0", zones.RPC, "https://e"+strconv.Itoa(i)+".example", "")
 		must(err)
 	}
 	_, err := reg.Register(alice, 3, "z0", zones.Peer, nodeID+"@p.example:26656", "")
@@ -401,4 +424,83 @@ func TestRenderPaginates(t *testing.T) {
 	uassert.False(t, strings.Contains(peers, "page 1 of"), "one page needs no pager")
 	uassert.True(t, strings.Contains(Render("zone/z0?kind=rpc&page=2"), "[previous](/r/moul/zones/v0:zone/z0?kind=rpc&page=1)"))
 	uassert.True(t, strings.Contains(Render("zone/z0?kind=grpc"), "No such endpoint kind."))
+}
+
+// zrev is a zone's current revision, what a curator who just read it approves.
+func zrev(slug string) int64 {
+	z, _ := GetZone(slug)
+	return z.Revision
+}
+
+// erev is the revision of an endpoint's zone, what a curator verifies against.
+func erev(id int64) int64 {
+	e, ok := GetEndpoint(id)
+	if !ok {
+		return 0
+	}
+	return zrev(e.Zone)
+}
+
+// An invitation dies with its inviter, can be listed, and the set is bounded.
+func TestCuratorInvitations(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	upper := address(strings.ToUpper(alice.String()))
+	uassert.AbortsContains(t, cur, "lowercase", func() { AddCurator(cross(cur), upper) })
+
+	AddCurator(cross(cur), alice)
+	testing.SetRealm(testing.NewUserRealm(alice))
+	AcceptCurator(cross(cur))
+	// alice invites bob, then is removed: bob's invitation goes with her.
+	AddCurator(cross(cur), bob)
+	uassert.Equal(t, bob.String(), Invited()[0].String())
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	RemoveCurator(cross(cur), alice)
+	uassert.False(t, IsInvited(bob))
+	uassert.Equal(t, 0, len(Invited()))
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "has no curator invitation", func() { AcceptCurator(cross(cur)) })
+
+	// Curators and open invitations together stop at MaxCurators.
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	for i := 1; i < MaxCurators; i++ {
+		AddCurator(cross(cur), testutils.TestAddress("c"+strconv.Itoa(i)))
+	}
+	uassert.AbortsContains(t, cur, "remove one first", func() { AddCurator(cross(cur), bob) })
+	RemoveCurator(cross(cur), testutils.TestAddress("c1"))
+	AddCurator(cross(cur), bob)
+}
+
+func TestRenderRoutesAreExact(t *testing.T) {
+	reset()
+	uassert.True(t, strings.Contains(Render("zone/onyx/approved-by-gno-core"), "No such page."))
+	uassert.True(t, strings.Contains(Render("proposals/x"), "No such page."))
+	uassert.True(t, strings.Contains(Render("zone"), "No such page."))
+	uassert.True(t, strings.Contains(Render("zone/onyx?kind=%20rpc"), "No such endpoint kind."))
+	uassert.True(t, strings.Contains(Render("zone/onyx?kind=seed"), "No seed endpoint registered yet."))
+	uassert.True(t, strings.Contains(Render("zone/onyx"), "Approve revision") == false, "an approved zone offers no Approve")
+}
+
+// gnoweb turns an @name into a user-profile link with an icon; free text
+// carries a backslash before every @ so a label cannot vouch for an account.
+func TestMentionsAreEscaped(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	RegisterEndpoint(cross(cur), "onyx", "rpc", "https://m.example", "run by @gnocore")
+	page := Render("zone/onyx?kind=rpc")
+	uassert.True(t, strings.Contains(page, `run by \@gnocore`))
+	uassert.False(t, strings.Contains(page, "run by @gnocore"))
+}
+
+// The printed -remote is never one the same page flags.
+func TestQueryCommandSkipsAFlaggedRemote(cur realm, t *testing.T) {
+	reset()
+	z, _ := GetZone("moul-staging")
+	in := zones.Info{ChainID: runtime.ChainID(), Title: z.Title, Kind: z.Kind, RPCURL: z.RPCURL, GnowebURL: z.GnowebURL}
+	must(reg.Edit("moul-staging", in, Admin, 1, "test"))
+	uassert.True(t, strings.Contains(queryCommand("X()"), "-remote 'https://rpc.gno-staging.moul.p2p.team'"))
+	e, ok := reg.EndpointByAddress("moul-staging", zones.RPC, z.RPCURL)
+	urequire.True(t, ok)
+	must(reg.ReviewEndpoint(e.ID, zones.Flagged, 0, Admin, 2, "down"))
+	uassert.False(t, strings.Contains(queryCommand("X()"), "-remote"))
 }

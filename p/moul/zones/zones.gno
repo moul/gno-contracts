@@ -10,8 +10,9 @@
 // recorded with who made it and when; a rejection, a retirement, a flag and an
 // edit to an approved zone also require a reason, which the public reads.
 //
-// The package decides nothing about WHO may act. Every write takes the acting
-// address and the height as arguments, and the realm holding the [Registry]
+// The package decides nothing about WHO may act. Every write that records a
+// decision takes the acting address and the height as arguments (the two
+// removals take neither), and the realm holding the [Registry]
 // decides whether that address is a curator, the proposer, or nobody. That is
 // the split that lets the same model move under a different authority later (a
 // DAO, a system realm) without a line changing here.
@@ -23,6 +24,8 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"gno.land/p/nt/markdown/sanitize/v0"
 )
@@ -58,7 +61,7 @@ const (
 type EndpointKind string
 
 const (
-	RPC      EndpointKind = "rpc"      // a tm2 JSON-RPC, what gnokey -remote takes
+	RPC      EndpointKind = "rpc"      // a tm2 JSON-RPC: http(s) and tcp for gnokey, ws(s) for a subscriber
 	Gnoweb   EndpointKind = "gnoweb"   // a gnoweb frontend
 	Seed     EndpointKind = "seed"     // a p2p seed, for p2p.seeds
 	Peer     EndpointKind = "peer"     // a p2p node, for p2p.persistent_peers
@@ -139,8 +142,17 @@ type Zone struct {
 	Proposer   address
 	ProposedAt int64
 
+	// Revision changes on every write to the description, and is never reused,
+	// not even by a zone removed and proposed again under the same slug. A
+	// curator approving a zone names the revision they read, so an edit that
+	// lands between their reading and their approval makes the approval fail
+	// instead of making somebody else's text official under their name.
+	Revision int64
+	EditedBy address // who last edited the description; empty if nobody has
+	EditedAt int64
+
 	// The latest curator decision, empty until there is one. A curator's edit
-	// to a zone already reviewed is a decision too, and replaces these.
+	// to an approved zone is a decision too, and replaces these.
 	ReviewedBy address
 	ReviewedAt int64
 	Reason     string
@@ -277,20 +289,24 @@ func ValidateInfo(in Info) error {
 	if err := checkText("description", in.Description, 0, MaxDescriptionLen); err != nil {
 		return err
 	}
-	if in.Kind == "" {
+	// Exact values only: ParseKind trims, and a Kind(" testnet ") stored as
+	// written would match no filter.
+	switch in.Kind {
+	case Mainnet, Testnet, Devnet, Local:
+	case "":
 		return errors.New("zones: a zone needs a kind: mainnet, testnet, devnet or local")
-	}
-	if _, err := ParseKind(string(in.Kind)); err != nil {
-		return err
+	default:
+		return errors.New("zones: unknown kind " + strconv.Quote(string(in.Kind)) + ", want mainnet, testnet, devnet or local")
 	}
 	if err := checkURL("rpc url", in.RPCURL, primarySchemes); err != nil {
 		return err
 	}
 	// gnokey's -remote is <scheme>://<host>[:<port>] and reads anything after
-	// :// as the socket address, so a path, query or fragment on the main RPC
-	// prints a command that cannot dial. An rpc ENDPOINT may still carry one.
-	if _, rest, _ := strings.Cut(in.RPCURL, "://"); strings.IndexAny(strings.TrimSuffix(rest, "/"), "/?#") >= 0 {
-		return errors.New("zones: the rpc url is <scheme>://<host>[:<port>], what gnokey -remote takes, with no path: " +
+	// :// as the socket address: a path, a query, a fragment, even a lone
+	// trailing slash, prints a command that cannot dial (https://host/ dials
+	// "host/:443"). An rpc ENDPOINT may still carry a path.
+	if _, rest, _ := strings.Cut(in.RPCURL, "://"); strings.IndexAny(rest, "/?#") >= 0 {
+		return errors.New("zones: the rpc url is <scheme>://<host>[:<port>], what gnokey -remote takes, with no path, not even a trailing slash: " +
 			strconv.Quote(in.RPCURL))
 	}
 	if in.GnowebURL != "" {
@@ -345,24 +361,91 @@ var (
 	webSchemes     = []string{"https", "http"}
 )
 
-// checkText bounds a free-text field by runes and refuses control characters,
-// newlines included: every free-text field here renders on one line.
+// ValidAddress reports whether a is a valid g1 address in the one spelling the
+// chain uses for it: lowercase. bech32 also decodes an all-uppercase string, so
+// IsValid accepts G1ABC…, but every comparison here (curators, proposers,
+// registrants, node ids) is on the string, and an uppercase spelling of a real
+// address would be a second identity for it.
+func ValidAddress(a address) bool {
+	return a.IsValid() && string(a) == strings.ToLower(string(a))
+}
+
+// HasVisible reports whether s has at least one character a reader can see:
+// not a space, not a combining mark, not an invisible format character. A
+// required title or reason must, or it passes the "needs a reason" check and
+// renders blank.
+func HasVisible(s string) bool {
+	for _, r := range s {
+		if !unicode.IsSpace(r) && !unicode.IsMark(r) && !unicode.Is(unicode.Cf, r) && !isBlankFiller(r) {
+			return true
+		}
+	}
+	return false
+}
+
+// isBlankFiller is the handful of characters that are letters or symbols by
+// category and still draw nothing: the Hangul fillers and the blank Braille
+// cell. Unicode does not class them as format characters, so they need naming.
+func isBlankFiller(r rune) bool {
+	switch r {
+	case 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800:
+		return true
+	}
+	return false
+}
+
+// isBadge is the status glyphs Render draws itself, refused in free text so a
+// title cannot claim "✅ official" beside a pending badge.
+func isBadge(r rune) bool {
+	switch r {
+	case 0x2705, 0x26A0, 0x23F3, 0x274C, 0x23F9: // ✅ ⚠ ⏳ ❌ ⏹
+		return true
+	}
+	return false
+}
+
+// checkText bounds a free-text field by runes (so at most four times as many
+// bytes) and keeps it to one line of text that shows what it stores:
 //
-// It also refuses bidi and zero-width characters, the ones ui.Inline and
-// ui.Cell strip when they render: counted here and gone on the page, a title
-// or a required reason made of nothing but U+200B would pass and show blank.
+//   - no control character: C0, DEL, C1 (NEL included), U+2028, U+2029. Each
+//     is a line break somewhere, and ui.Inline folds them to a space.
+//   - no invisible character: every format character (Unicode Cf, which covers
+//     the bidi controls and isolates, the zero-width characters, U+061C, word
+//     joiners, tags), the blank fillers, variation selectors, the combining
+//     grapheme joiner. ui.Inline strips some of these and gnoweb draws none, so
+//     a title made of them would pass the length check and render blank.
+//   - no run of more than two combining marks, which stack over neighbouring
+//     lines, and none of the status glyphs this realm draws.
+//   - valid UTF-8, because the page would show U+FFFD for a byte stored raw.
+//
 // Refused rather than stripped, so what is stored is what is shown.
 func checkText(field, s string, min, max int) error {
 	if sanitize.StripBidiAndZeroWidth(s) != s {
 		return errors.New("zones: the " + field + " contains an invisible or bidi character")
 	}
-	n := 0
-	for _, r := range s {
-		// C0, DEL, C1 (NEL included) and the two Unicode separators: each one
-		// is a line break somewhere, and ui.Inline folds them to a space, so the
-		// stored text would not be the text shown.
+	n, marks := 0, 0
+	for i, r := range s {
+		if r == utf8.RuneError {
+			if _, size := utf8.DecodeRuneInString(s[i:]); size <= 1 {
+				return errors.New("zones: the " + field + " is not valid UTF-8")
+			}
+		}
 		if r < 0x20 || (r >= 0x7f && r <= 0x9f) || r == 0x2028 || r == 0x2029 {
 			return errors.New("zones: the " + field + " contains a control character")
+		}
+		if unicode.Is(unicode.Cf, r) || isBlankFiller(r) || r == 0x034F || (r >= 0xFE00 && r <= 0xFE0F) {
+			return errors.New("zones: the " + field + " contains an invisible or bidi character")
+		}
+		if isBadge(r) {
+			return errors.New("zones: the " + field + " contains a status glyph this page draws itself: " + strconv.Quote(string(r)))
+		}
+		if unicode.IsMark(r) {
+			marks++
+			if marks > 2 {
+				return errors.New("zones: the " + field + " stacks more than two combining marks")
+			}
+		} else {
+			marks = 0
 		}
 		n++
 	}
@@ -374,13 +457,22 @@ func checkText(field, s string, min, max int) error {
 		return errors.New("zones: the " + field + " is at most " + strconv.Itoa(max) +
 			" characters, got " + strconv.Itoa(n))
 	}
+	if min > 0 && !HasVisible(s) {
+		return errors.New("zones: the " + field + " has nothing visible in it")
+	}
 	return nil
 }
 
-// checkURL accepts scheme://host[:port][/path], printable ASCII only, with no
-// character that could close a markdown link or open a new construct around
-// it. Narrower than RFC 3986 on purpose: these URLs are rendered as links and
-// copied into config files, and neither wants a quote or a bracket.
+// checkURL accepts scheme://host[:port][/path][?query], in visible ASCII (no
+// space, no control), with no character that could close a markdown link or
+// open a new construct around it. Narrower than RFC 3986 on purpose: these
+// URLs are rendered as links and copied into config files, and neither wants
+// a quote or a bracket. Also refused:
+//
+//   - a fragment (#): it is never sent to the server, so every #1, #2 would be
+//     another listing of the same endpoint.
+//   - a % not followed by two hex digits, and an &name; shape: the link
+//     sanitizer re-encodes both, so the href would differ from the text shown.
 func checkURL(field, s string, schemes []string) error {
 	if s == "" {
 		return errors.New("zones: the " + field + " is empty")
@@ -390,8 +482,14 @@ func checkURL(field, s string, schemes []string) error {
 	}
 	for i := 0; i < len(s); i++ {
 		c := s[i]
-		if c <= ' ' || c >= 0x7f || strings.IndexByte("<>\"'`()[]{}|\\^", c) >= 0 {
+		if c <= ' ' || c >= 0x7f || strings.IndexByte("<>\"'`()[]{}|\\^#", c) >= 0 {
 			return errors.New("zones: the " + field + " contains " + strconv.Quote(string(c)) + ": " + strconv.Quote(s))
+		}
+		if c == '%' && (i+2 >= len(s) || !isHex(s[i+1]) || !isHex(s[i+2])) {
+			return errors.New("zones: the " + field + " has a % that is not followed by two hex digits: " + strconv.Quote(s))
+		}
+		if c == '&' && isEntity(s[i+1:]) {
+			return errors.New("zones: the " + field + " contains an HTML entity shape: " + strconv.Quote(s))
 		}
 	}
 	scheme, rest, ok := strings.Cut(s, "://")
@@ -437,20 +535,23 @@ func checkURL(field, s string, schemes []string) error {
 // checkHost accepts a DNS name or a dotted IPv4 address.
 //
 // A DNS name is labels of 1 to 63 characters of [A-Za-z0-9-], alphanumeric at
-// both ends, at most 253 characters in all, with one optional terminal dot. A
-// host made only of digits and dots must be a valid IPv4 address, so 1.2.3 and
-// 300.1.1.1 are refused rather than read as names. Bracketed IPv6 is refused,
-// deliberately: it is the one host shape that needs characters every other
-// field here refuses, and no zone needs it yet.
+// both ends, at most 253 characters in all, with one optional terminal dot.
+// Anything a browser would parse as IPv4 must BE a valid dotted-quad address:
+// under the WHATWG URL parser a host whose last label is numeric (decimal, or
+// 0x hex) is an IPv4 address, so 0x7f.1 opens 127.0.0.1 and a.1 is no URL at
+// all. Bracketed IPv6 is refused, deliberately: it is the one host shape that
+// needs characters every other field here refuses, and no zone needs it yet.
 func checkHost(host string) error {
 	name := strings.TrimSuffix(host, ".")
 	if name == "" || len(name) > 253 {
 		return errors.New("bad host")
 	}
-	if strings.Trim(name, "0123456789.") == "" {
+	labels := strings.Split(name, ".")
+	last := strings.ToLower(labels[len(labels)-1])
+	if strings.Trim(last, "0123456789") == "" || strings.HasPrefix(last, "0x") {
 		return checkIPv4(name)
 	}
-	for _, label := range strings.Split(name, ".") {
+	for _, label := range labels {
 		if label == "" || len(label) > 63 || label[0] == '-' || label[len(label)-1] == '-' {
 			return errors.New("bad host")
 		}
@@ -471,21 +572,47 @@ func checkIPv4(s string) error {
 		return errors.New("bad ipv4")
 	}
 	for _, p := range parts {
-		n, err := strconv.Atoi(p)
-		if err != nil || n < 0 || n > 255 || len(p) > 3 || (len(p) > 1 && p[0] == '0') {
+		if p == "" || len(p) > 3 || strings.Trim(p, "0123456789") != "" || (len(p) > 1 && p[0] == '0') {
+			return errors.New("bad ipv4")
+		}
+		if n, _ := strconv.Atoi(p); n > 255 {
 			return errors.New("bad ipv4")
 		}
 	}
 	return nil
 }
 
-// checkPort accepts 1 to 65535, in decimal, with no leading zero.
+// checkPort accepts 1 to 65535, decimal digits only, no leading zero. Digits
+// only because strconv.Atoi takes a sign, and +443 is no port to url.Parse,
+// to a browser, or to tm2's peer parser.
 func checkPort(port string) error {
-	p, err := strconv.Atoi(port)
-	if err != nil || p < 1 || p > 65535 || port[0] == '0' {
+	if port == "" || strings.Trim(port, "0123456789") != "" || port[0] == '0' || len(port) > 5 {
+		return errors.New("bad port")
+	}
+	if p, _ := strconv.Atoi(port); p > 65535 {
 		return errors.New("bad port")
 	}
 	return nil
+}
+
+func isHex(c byte) bool {
+	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
+}
+
+// isEntity reports whether s starts with what an HTML entity would follow an
+// ampersand with: a run of [A-Za-z0-9#] closed by a semicolon.
+func isEntity(s string) bool {
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case c == ';':
+			return i > 0
+		case (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '#':
+		default:
+			return false
+		}
+	}
+	return false
 }
 
 // lowerScheme lowercases a URL's scheme and leaves the rest as typed. Stored
@@ -499,10 +626,13 @@ func lowerScheme(addr string) string {
 	return strings.ToLower(scheme) + "://" + rest
 }
 
-// Canonical is the form two addresses are compared in: the scheme and the
-// host lowercased, because both are case-insensitive, and everything after the
-// host kept as typed, because a path and a query are not. A peer's node id is
-// bech32, already lowercase, so a peer lowercases whole.
+// Canonical is the form two addresses are compared in, so one endpoint cannot
+// be listed twice under two spellings: the scheme and the host lowercased (both
+// are case-insensitive), the host's terminal dot dropped, the scheme's default
+// port dropped (:443 for https and wss, :80 for http and ws), and a bare "/" or
+// "?" with nothing after it dropped. A path or a query that says something is
+// kept as typed: those are case-sensitive and name different resources. A peer
+// is lowercased whole: its node id is lowercase bech32 and its host is a name.
 func Canonical(kind EndpointKind, addr string) string {
 	if kind == Seed || kind == Peer {
 		return strings.ToLower(addr)
@@ -511,11 +641,29 @@ func Canonical(kind EndpointKind, addr string) string {
 	if !ok {
 		return addr
 	}
-	i := strings.IndexAny(rest, "/?#")
+	scheme = strings.ToLower(scheme)
+	i := strings.IndexAny(rest, "/?")
 	if i < 0 {
 		i = len(rest)
 	}
-	return strings.ToLower(scheme) + "://" + strings.ToLower(rest[:i]) + rest[i:]
+	authority, tail := strings.ToLower(rest[:i]), rest[i:]
+	host, port := authority, ""
+	if j := strings.LastIndexByte(authority, ':'); j >= 0 {
+		host, port = authority[:j], authority[j+1:]
+	}
+	host = strings.TrimSuffix(host, ".")
+	switch {
+	case port == "443" && (scheme == "https" || scheme == "wss"),
+		port == "80" && (scheme == "http" || scheme == "ws"):
+		port = ""
+	}
+	if port != "" {
+		host += ":" + port
+	}
+	if tail == "/" || tail == "?" || tail == "/?" {
+		tail = ""
+	}
+	return scheme + "://" + host + tail
 }
 
 // checkPeer accepts a tm2 p2p address: <node id>@<host>:<port>, where the node
@@ -525,8 +673,13 @@ func checkPeer(s string) error {
 	if !ok {
 		return errors.New("zones: a peer is <node id>@<host>:<port>, got " + strconv.Quote(s))
 	}
-	if !address(id).IsValid() {
-		return errors.New("zones: a peer's node id is a g1 address, got " + strconv.Quote(id))
+	if len(s) > MaxURLLen {
+		return errors.New("zones: a peer is longer than " + strconv.Itoa(MaxURLLen) + " bytes")
+	}
+	// Lowercase only: bech32 also decodes an all-uppercase id, but tm2 compares
+	// node ids byte for byte when it dials, so an uppercase one never connects.
+	if !ValidAddress(address(id)) {
+		return errors.New("zones: a peer's node id is a lowercase g1 address, got " + strconv.Quote(id))
 	}
 	i := strings.LastIndexByte(hostport, ':')
 	if i <= 0 {

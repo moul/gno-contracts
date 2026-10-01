@@ -8,80 +8,119 @@
 import "gno.land/p/moul/zones/v0"
 
 r := zones.NewRegistry()
-err := r.Propose(caller, height, "onyx", zones.Info{ChainID: "onyx-1", Title: "Onyx", Kind: zones.Testnet,
-	RPCURL: "https://rpc.onyx.testnets.gno.land"})
-err = r.ReviewZone("onyx", zones.Approved, curator, height, "")
-id, err := r.Register(caller, height, "onyx", zones.Peer,
+must(r.Propose(proposer, height, "onyx", zones.Info{ChainID: "onyx-1", Title: "Onyx",
+	Kind: zones.Testnet, RPCURL: "https://rpc.onyx.testnets.gno.land"}))
+z, _ := r.Zone("onyx")
+must(r.ReviewZone("onyx", zones.Approved, z.Revision, curator, height, ""))
+id, err := r.Register(proposer, height, "onyx", zones.Peer,
 	"g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656", "gno core")
-err = r.ReviewEndpoint(id, zones.Verified, curator, height, "answers onyx-1")
-r.Endpoints(zones.EndpointFilter{Zone: "onyx", Kind: zones.Peer, Status: zones.Verified}) // → that one peer
+must(err)
+must(r.ReviewEndpoint(id, zones.Verified, z.Revision, curator, height, "answers onyx-1"))
+r.Endpoints(zones.EndpointFilter{Zone: "onyx", Kind: zones.Peer, Status: zones.Verified}) // that one peer
 ```
 
 A **zone** is one network: chain id, title, description, kind (`mainnet`,
 `testnet`, `devnet`, `local`), its main RPC, gnoweb and genesis URLs. An
 **endpoint** is one way into a zone: `rpc`, `gnoweb`, `seed`, `peer`, `indexer`,
-`faucet` or `explorer`, registered by anybody and `unverified` until a curator
-says otherwise.
+`faucet` or `explorer`, `unverified` until a curator says otherwise.
 
 The live registry is [`r/moul/zones`](../../../r/moul/zones), which holds one
 `Registry` and decides who may write to it.
 
-**It decides nothing about who may act, deliberately.** Every write takes the
-acting address and the height as arguments. Whether that address is a curator,
-the proposer, or nobody is the holding realm's call, so the same model can move
-under a DAO or a system realm later without a line changing here.
+**It decides nothing about who may act, deliberately.** Every write that
+records a decision takes the acting address and the height as arguments (the
+two removals take neither: who may remove is the holder's call). Whether that
+address is a curator, the proposer, or nobody is the holding realm's call, so
+the same model can move under a DAO or a system realm later without a line
+changing here.
 
-The curation policy, which is the part worth reading before you hold one:
+## The curation policy
 
-| decision | from | reason |
-|---|---|---|
-| approve | pending, rejected, retired | optional |
-| reject | pending | **required** |
-| retire | approved | **required** |
-| verify / unverify an endpoint | any other verdict | optional |
-| flag an endpoint | any other verdict | **required** |
+| decision | from | reason | also |
+|---|---|---|---|
+| approve | pending, rejected, retired | optional | must name the zone's current `Revision` |
+| reject | pending | **required** | verified endpoints go back to unverified |
+| retire | approved | **required** | verified endpoints go back to unverified |
+| verify an endpoint | any other verdict | optional | must name the zone's current `Revision`; zone pending or approved |
+| unverify an endpoint | any other verdict | optional | |
+| flag an endpoint | any other verdict | **required** | |
 
-- **Only a pending or approved zone is editable.** Editing an approved one is
-  a curator decision: the reason is required and replaces the review on record.
-  A changed chain id, on any zone, sends every verified endpoint back to
-  unverified, because what was verified was that it answered for the old one.
+- **An approval binds to what the curator read.** Every edit bumps the zone's
+  `Revision`, registry-wide and never reused (not even by a zone removed and
+  proposed again under the same slug). Approving names it, so an edit that lands
+  between the reading and the approval makes the approval fail, instead of making
+  text the curator never saw official under their name. Verifying an endpoint
+  binds the same way, to the chain id it was checked against.
+- **Only a pending or approved zone is editable.** An edit before review takes
+  no reason. An edit to an approved zone is a curator decision: the reason is
+  required and replaces the review on record. A changed chain id, on any zone,
+  sends every verified endpoint back to unverified, because what was verified
+  was that it answered for the old one. A reset the registry makes on its own
+  records no reviewer: `ReviewedBy` is empty and `Reason` says why.
 - **Nothing goes back to pending.** A proposer who disagrees with a rejection
   removes the zone and proposes it again.
-- **A zone that was ever official is never removed.** An approved one is
-  retired, and a retired one is kept. The record of it having been official
-  survives, which is what a node operator still holding its
-  chain id needs to find.
-- **Slugs, chain ids, URLs and peer addresses are validated at write time**, not
-  escaped at render time. They are also index keys, URL segments and config file
-  lines, so a pipe, a bracket or a quote in one would break more than the page.
-  URLs are printable ASCII with no `<>"'`()[]{}|\^`, no credentials, a host
-  that is a DNS name or IPv4 address, an optional port in 1..65535, and a scheme
-  from a short list. A zone's main RPC is `http`, `https` or `tcp` with no
-  path, query or fragment, which is what `gnokey -remote` dials; an `rpc` endpoint also takes `ws` and `wss`. A peer is
-  `<g1 node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes.
-- **Free text (title, description, label, reason) is one line, rune-bounded**,
-  and must be escaped by whoever renders it.
-- **Endpoint dedup compares the `Canonical` form**: scheme and host lowercased,
-  path and query kept as typed, because only the first two are case-insensitive.
-  The same address under two kinds is two endpoints.
+- **A zone that was ever official is never removed by a caller.** An approved
+  one is retired, and a retired one is kept, so whoever still holds its chain id
+  can find out what happened to it.
 
-Bounded in three layers. **Hard caps** bound the storage: 256 zones, 512
-endpoints per zone. **Per-address caps** make one address cheap to ignore: 4
-pending proposals, 32 endpoints per zone. Neither stops a flood from many
-addresses, because an address is not an identity, so **the review queue has a
-ceiling of its own**: 64 pending zones in all, 128 unverified endpoints per
-zone. A flood can fill the queue and nothing above it, so it never crowds out an
-official zone or a verified endpoint; a curator clears it with `RemoveZone` /
-`RemoveEndpoint`, and the storage deposit every entry costs its sender is the
-only admission price a permissionless list has. Removing a zone removes its
-endpoints and gives the deposit back.
+## What a field accepts
 
-Storage is a [`kit/store`](../kit/store) for each record type plus nine
-[`kit/index`](../kit/index) lookups, every one written in the same method as its
-record. Zones: slug, pending-by-proposer, status, chain id. Endpoints: zone,
-dedup key, registrant, zone-and-kind, unverified-by-zone. The status and
-zone-and-kind indexes are what let `ZonePage` and `EndpointPage` read only the
-records on a page (the bucket's id list, at most 512 ids, is read whole), and
-the counts come from the indexes without reading a record. Measured at the full
-caps, 256 approved zones and 512 endpoints on one zone: one `ZonePage` plus one
-`EndpointPage` of 25 costs about 7.5M gas, against `vm/qrender`'s 3B ceiling.
+Validated at write time, not escaped at render time, for everything that is
+also an index key, a URL segment or a config-file line:
+
+- **Slug**: 2 to 32 of `[a-z0-9-]`, alphanumeric at both ends.
+- **Chain id**: 1 to 50 of `[A-Za-z0-9._-]`.
+- **URL**: visible ASCII with none of `` <>"'`()[]{}|\^# ``, no credentials,
+  no `%` without two hex digits after it, no `&name;` shape, a host that is a
+  DNS name or an IPv4 address (anything a browser would read as IPv4, like
+  `0x7f.1`, must be a valid dotted quad), an optional port of 1 to 65535 in
+  digits, and a scheme from a short list. A zone's main RPC is `http`, `https`
+  or `tcp` with no path, query or trailing slash, which is what `gnokey -remote`
+  dials; an `rpc` endpoint also takes `ws`, `wss` and a path.
+- **Peer**: `<node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes,
+  the node id a lowercase g1 address (tm2 compares node ids byte for byte).
+- **Address** (proposer, registrant, reviewer): a valid g1 address in lowercase.
+  bech32 also decodes the uppercase form, and here it would be a second identity.
+- **Free text** (title, description, label, reason): one line, bounded in
+  characters (so at most four times as many bytes), valid UTF-8, with no control
+  character, no invisible or format character, no more than two stacked
+  combining marks, none of the status glyphs a Render draws, and, where it is
+  required, something visible. Refused rather than stripped, so what is stored
+  is what is shown. It must still be escaped by whoever renders it.
+
+An endpoint is stored in canonical spelling (scheme lowercased, a peer
+lowercased whole) and deduplicated on `Canonical`: scheme and host lowercased,
+a terminal dot, a default port and an empty path or query dropped, anything
+meaningful after the host kept as typed. The same address under two kinds is two
+endpoints.
+
+## Bounds
+
+The **live registry**, pending and approved zones together, holds at most 256.
+Rejected and retired zones are kept for the record but do not count against it:
+each state keeps at most 64 and 128, and the next one in drops the zone proposed
+longest ago in that state, endpoints and all. So no flood, no curator and no
+amount of time fills the registry for good.
+
+**Per-address caps** make one address cheap to ignore: 4 pending proposals, 16
+endpoints per zone. Neither stops a flood from many addresses, so **the review
+queue has a ceiling of its own**: 64 pending zones in all, 64 endpoints per zone
+that are not verified (unverified or flagged), under a hard 128 per zone. A
+flood fills the queue and never crowds out an approved zone or a verified
+endpoint. Each entry costs its sender a storage deposit, refunded to whoever
+signs the transaction that frees it, so a flooder who withdraws first gets it
+back: a bond, not a fee.
+
+## Storage
+
+Records live in a B+ tree at fanout 128, the container EFFECTIVE_GNO measures
+cheapest, with ids that are never reused. `kit/store` has that shape on an avl
+tree, about 1.4 KB more per entry, and on an immutable path the choice is
+permanent. The two unique lookups (slug, and the endpoint dedup key, a 128-bit
+hash of the canonical address rather than a second copy of it) hold the id
+itself in a B+ tree. The other seven are [`kit/index`](../kit/index): status,
+pending-by-proposer, approved-by-chain-id, and for endpoints zone,
+zone-and-kind, registrant and not-verified. Every one is written in the same
+method as its record; counts come from the indexes without reading a record, and
+a page reads the records on it only (the bucket's id list, at most 256 or 128
+ids, is read whole).
