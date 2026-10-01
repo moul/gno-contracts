@@ -119,11 +119,29 @@ func TestAdviseReviewsAChangeToTheReviewConfig(t *testing.T) {
 	}
 }
 
-// A workflow or an unrelated .github file is not the reviewer's configuration.
-func TestAdviseDoesNotTreatEveryGithubFileAsConfig(t *testing.T) {
-	a := analysis([]string{".github/workflows/ci.yml", ".github/ci-internals.md"}, nil, nil)
-	if v := adviseReview(a); v.review {
-		t.Fatalf("want SKIP for an unrelated .github file, got REVIEW: %v", v.reasons)
+// A workflow is not the reviewer's CONFIG, though it is tooling.
+//
+// The distinction matters because the two triggers give different reasons, and
+// the reason is what a reader acts on: a config change is "this governs every
+// later review", a workflow change is "this runs unattended".
+func TestAWorkflowIsToolingAndNotConfig(t *testing.T) {
+	v := adviseReview(analysis([]string{".github/workflows/ci.yml"}, nil, nil))
+	if !v.review {
+		t.Fatalf("a workflow is tooling and earns a review: %v", v.skips)
+	}
+	joined := strings.Join(v.reasons, "\n")
+	if strings.Contains(joined, "governs every later review") {
+		t.Errorf("a workflow is not the reviewer's config: %v", v.reasons)
+	}
+	if !strings.Contains(joined, "tooling file(s) changed") {
+		t.Errorf("want the tooling reason, got %v", v.reasons)
+	}
+}
+
+// An unrelated .github document is neither.
+func TestAdviseSkipsAnUnrelatedGithubDoc(t *testing.T) {
+	if v := adviseReview(analysis([]string{".github/ci-internals.md"}, nil, nil)); v.review {
+		t.Fatalf("want SKIP for a .github document, got REVIEW: %v", v.reasons)
 	}
 }
 
@@ -138,5 +156,39 @@ func TestAnAbsentCatalogEntryIsNotLive(t *testing.T) {
 	}
 	if !liveOnMainnet(&Contract{Published: map[string]Pub{"mainnet": {Uploaded: true}}}) {
 		t.Fatal("an uploaded package is live")
+	}
+}
+
+// The tooling trigger exists because of evidence, not symmetry: every finding
+// on #296 was in tooling, and the tests had caught none of them.
+func TestAdviseReviewsAToolingChange(t *testing.T) {
+	for _, path := range []string{
+		"tools/gnocontracts/copilot_log.go",
+		"tools/gnovet/rules.go",
+		".github/workflows/copilot-review-log.yml",
+	} {
+		t.Run(path, func(t *testing.T) {
+			v := adviseReview(analysis([]string{path}, nil, nil))
+			if !v.review {
+				t.Fatalf("want REVIEW when %s changes, got SKIP: %v", path, v.skips)
+			}
+		})
+	}
+}
+
+// A tooling TEST is where the bad shape is written on purpose, and a markdown
+// file under tools/ is not code.
+func TestAdviseDoesNotTreatEveryToolsFileAsCode(t *testing.T) {
+	for _, path := range []string{
+		"tools/gnocontracts/copilot_log_test.go",
+		"tools/go.sum",
+		"tools/gnovet/README.md",
+		".github/ci-internals.md",
+	} {
+		t.Run(path, func(t *testing.T) {
+			if v := adviseReview(analysis([]string{path}, nil, nil)); v.review {
+				t.Fatalf("want SKIP for %s, got REVIEW: %v", path, v.reasons)
+			}
+		})
 	}
 }

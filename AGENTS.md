@@ -599,10 +599,20 @@ it needs a new version at a new path and every importer moved, which is a human 
 review does not unblock. A package **not yet live** is one merge from being frozen forever,
 and that is the only moment a review changes the outcome.
 
-One other trigger, and it is there because of a counterexample rather than for symmetry:
-**a change to `.github/copilot-instructions.md` or `.github/instructions/`**. A wrong
+**Two other triggers**, each there because of a counterexample rather than for symmetry.
+
+**A change to `.github/copilot-instructions.md` or `.github/instructions/`.** A wrong
 instruction does not produce one wrong finding, it produces wrong findings on every later
 review until somebody notices, which is a permanence of its own.
+
+**A change to `tools/**/*.go` or a workflow.** This policy used to skip tooling on the grounds
+that it has tests, has CI, and is fixable any time. The first two are true and the third made
+it look cheap to drop. Then #296's review returned four findings and **every one was in
+tooling or docs**: a markdown escaper that let a contributor put a live link in the hub issue,
+a `gh api --paginate` that silently dropped every page but the first, a workflow that would
+fail on any fork, and an index carrying a rule an earlier review had already disproved. None
+of that is caught by tests, because none of it was wrong in a way anybody had thought to
+test.
 
 `make review-advice BASE=origin/main` answers it, reading `contracts.json` rather than the
 chain, and prints the reason. It is **advice and never a gate**: it exits 0 and a human or an
@@ -620,14 +630,24 @@ cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
   gh pr edit <N> --add-reviewer @copilot
 ```
 
-Backtested over the last 60 merged pull requests: **4 would be reviewed (6%)**, three for
-permanence and one for the config. At ~76 credits that is **303 credits a month for first
-passes, 20% of the allowance**, and **71% if each one averages the three-and-a-half passes
-the two expensive pull requests took**.
+### What it costs, with the budget moul enabled on 2026-10-01
 
-So the budget is tight either way, and the honest framing is a standing cap of about twenty
-reviews a month rather than a comfortable margin. The triage picks the pull requests; the
-two-pass rule is what keeps the picking from being undone.
+1,500 included credits, plus a **$100 additional-usage budget** at $0.01 a credit, is 11,500
+credits a month: **about 152 reviews**.
+
+Backtested over the last 60 merged pull requests, scaled to this repository's ~215 a month at
+1.5 passes each:
+
+| rule set | PRs | reviews/mo | overage |
+|---|--:|--:|--:|
+| permanence + config | 6/60 | 32 | **$9** |
+| **+ tooling (what ships)** | **17/60** | **91** | **$54** |
+| + every `.gno` pull request | 39/60 | 210 | $144, **over** |
+
+So tooling is affordable and every `.gno` change is not, which is the line drawn above. The
+two-pass cap is what keeps the picking from being undone: it is **not** a cost rule any more,
+it is that the third and later passes on #289 and #295 were 14 of 16 reviews that day and
+found proportionally much less than the first two.
 
 **Once a diff qualifies, one pass is not the review: re-request after every push that fixed
 findings, until a pass adds nothing above low.** #289 (`p/moul/kit/index`, not yet live) took
@@ -638,9 +658,10 @@ about $2.60; any one of those defects shipped would have cost a new version at a
 The "finish the file" instruction is the attempt to make pass one enough. Until the log shows
 it working, the second pass is the cheap one.
 
-Two things it does not do, deliberately. It does not look at diff size, because a one-line
-change to an unpublished package is exactly as permanent as a thousand-line one. And it does
-not review `tools/`, because tooling has tests, has CI, and can be fixed any time.
+Two things it still does not do, deliberately. It does not look at diff size, because a
+one-line change to an unpublished package is exactly as permanent as a thousand-line one. And
+it does not review every `.gno` pull request, because at ~76 credits a review that is about
+$144 a month against a $100 budget.
 ## Copilot code review, and the log that makes it better
 
 The house rules live where GitHub already reads them:
