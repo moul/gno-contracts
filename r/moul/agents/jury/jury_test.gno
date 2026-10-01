@@ -114,3 +114,15 @@ func TestSubjectIsEscaped(cur realm, t *testing.T) {
 	uassert.False(t, strings.Contains(idx, "[claim](https://evil.example)"), idx)
 	uassert.False(t, strings.Contains(page, "[claim](https://evil.example)"), page)
 }
+
+// An even panel is allowed; a split vote closes as a tie rather than
+// stalling or picking a side.
+func TestEvenPanelSplitIsATie(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(opener))
+	id := OpenCase(cross(cur), "even", j1.String()+","+j2.String())
+	commitAs(cur, j1, id, true, "t1")
+	commitAs(cur, j2, id, false, "t2")
+	revealAs(cur, j1, id, true, "t1")
+	revealAs(cur, j2, id, false, "t2")
+	uassert.Equal(t, "tie", Outcome(id))
+}
