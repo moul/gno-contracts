@@ -286,7 +286,7 @@ func TestRemoveReleasesTheBackingArray(t *testing.T) {
 		uassert.True(t, ix.Remove("gno", store.ID(n)))
 	}
 
-	e, _ := ix.tree.Get("gno").(*entry)
+	e, _ := ix.s.tree.Get("gno").(*entry)
 	urequire.True(t, e != nil)
 	uassert.Equal(t, 1, len(e.ids))
 	uassert.Equal(t, 1, cap(e.ids),
@@ -324,4 +324,44 @@ func TestPagesNeverReturnsZeroAtTheIntegerLimit(t *testing.T) {
 	urequire.NoError(t, ix.Add("a", 1))
 	urequire.NoError(t, ix.Add("b", 1))
 	uassert.Equal(t, 1, ix.Pages(maxInt))
+}
+
+// An Index is a handle. A copy taken after the first write must see every
+// later write through either copy, or Len (a counter) and Keys (the tree)
+// disagree about what the index holds.
+func TestCopiesAfterTheFirstWriteShareOneIndex(t *testing.T) {
+	var a Index
+	urequire.NoError(t, a.Add("a", 1))
+	b := a
+	urequire.NoError(t, b.Add("b", 2))
+	uassert.Equal(t, 2, a.Keys())
+	uassert.Equal(t, 2, a.Len(), "the copy wrote a pair the original does not count")
+	uassert.True(t, b.Remove("a", 1))
+	uassert.Equal(t, 1, a.Len())
+
+	u := *Unique()
+	v := u
+	urequire.NoError(t, v.Add("k", 1))
+	uassert.ErrorIs(t, u.Add("k", 2), ErrDuplicateKey)
+	uassert.Equal(t, 1, u.Len())
+}
+
+// Every out-of-range page is nil, including the one that starts exactly at
+// the end and the first page of an index that has been emptied.
+func TestPagePastTheEndIsAlwaysNil(t *testing.T) {
+	ix := New()
+	for _, k := range []string{"a", "b", "c", "d"} {
+		urequire.NoError(t, ix.Add(k, 1))
+	}
+	uassert.True(t, ix.Page(2, 2) != nil)
+	uassert.True(t, ix.Page(3, 2) == nil, "a page starting exactly at the end is past the end")
+	uassert.True(t, ix.Page(4, 2) == nil)
+
+	for _, k := range []string{"a", "b", "c", "d"} {
+		uassert.Equal(t, 1, ix.RemoveKey(k))
+	}
+	uassert.True(t, ix.Page(1, 2) == nil, "an emptied index has no first page")
+
+	var zero Index
+	uassert.True(t, zero.Page(1, 2) == nil)
 }

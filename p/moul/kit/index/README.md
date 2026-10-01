@@ -70,6 +70,10 @@ every caller a writer: an assignment into it corrupts the index with no write
 path having been called. A realm that passes the result onward is passing its
 own data, not a handle to ours.
 
+**The `Index` itself is a handle.** Its state sits behind one pointer, so a copy
+taken after the first write (or of anything `Unique()` returned) is the same
+index, and `Len` can never disagree with `Keys` about what it holds.
+
 ## API
 
 | | |
@@ -79,7 +83,7 @@ own data, not a handle to ours.
 | `Remove(key, id) bool`, `RemoveKey(key) int` | a key whose last id goes is removed with it |
 | `Lookup(key) []store.ID`, `First(key) (store.ID, bool)` | ascending; a copy |
 | `Has`, `Count(key)`, `Keys()`, `Len()`, `IsUnique()` | `Keys` counts keys, `Len` counts pairs, and the difference is the fan-out |
-| `Each(fn) bool` | ascending by key; true means stop, matching `bptree` and `kit/store` |
+| `Each(fn) bool` | ascending by key; true means stop, matching `bptree` and `kit/store`. `fn` must not write to the index |
 | `Page(page, size) []Entry`, `Pages(size) int` | 1-based, a page past the end is nil, `Pages` is never 0 |
 
 `Add` returns an error rather than aborting, because a `p/` package does not

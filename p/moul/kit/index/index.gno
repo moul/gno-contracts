@@ -68,7 +68,18 @@ var (
 // The zero value is an empty, usable, non-unique index: a realm declares
 // `var byTag index.Index` and writes to it, exactly as it does with a
 // [store.Store]. Use [Unique] when at most one id may carry a key.
+//
+// An Index is a handle, like the [store.Store] it sits next to: copies taken
+// after the first write, or of anything [Unique] returned, are the same index,
+// and a write through one is seen through all of them. A copy of a zero value
+// that was never written is a separate empty index.
 type Index struct {
+	s *state
+}
+
+// state is everything an Index holds, behind one pointer so that a copy of the
+// handle cannot split the tree from the counter that describes it.
+type state struct {
 	tree   *bptree.BPTree
 	unique bool
 	pairs  int
@@ -85,7 +96,9 @@ func New() *Index { return &Index{} }
 // Unique is a constructor rather than a field or a setter because flipping it
 // on a populated index would have to either reject the duplicates already in it
 // or silently keep them, and both are worse than not offering the operation.
-func Unique() *Index { return &Index{unique: true} }
+func Unique() *Index {
+	return &Index{s: &state{tree: bptree.NewBPTreeN(Fanout), unique: true}}
+}
 
 // entry is the value stored at a key: the ids carrying it, ascending.
 //
@@ -96,11 +109,12 @@ type entry struct {
 	ids []store.ID
 }
 
-// init materialises the tree. Called by every mutating method, so the zero
-// value works without a constructor.
+// init materialises the state. Called by every mutating method, so the zero
+// value works without a constructor. The tree is created with the state, so a
+// non-nil state always has one.
 func (ix *Index) init() {
-	if ix.tree == nil {
-		ix.tree = bptree.NewBPTreeN(Fanout)
+	if ix.s == nil {
+		ix.s = &state{tree: bptree.NewBPTreeN(Fanout)}
 	}
 }
 
@@ -121,24 +135,24 @@ func (ix *Index) Add(key string, id store.ID) error {
 	}
 	ix.init()
 
-	e, _ := ix.tree.Get(key).(*entry)
+	e, _ := ix.s.tree.Get(key).(*entry)
 	if e == nil {
-		ix.tree.Set(key, &entry{ids: []store.ID{id}})
-		ix.pairs++
+		ix.s.tree.Set(key, &entry{ids: []store.ID{id}})
+		ix.s.pairs++
 		return nil
 	}
 	pos, found := e.find(id)
 	if found {
 		return nil
 	}
-	if ix.unique {
+	if ix.s.unique {
 		return ErrDuplicateKey
 	}
 	e.ids = append(e.ids, 0)
 	copy(e.ids[pos+1:], e.ids[pos:])
 	e.ids[pos] = id
-	ix.tree.Set(key, e)
-	ix.pairs++
+	ix.s.tree.Set(key, e)
+	ix.s.pairs++
 	return nil
 }
 
@@ -146,10 +160,10 @@ func (ix *Index) Add(key string, id store.ID) error {
 // whose last id is removed is removed with it, so [Index.Keys] never counts an
 // empty bucket.
 func (ix *Index) Remove(key string, id store.ID) bool {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return false
 	}
-	e, _ := ix.tree.Get(key).(*entry)
+	e, _ := ix.s.tree.Get(key).(*entry)
 	if e == nil {
 		return false
 	}
@@ -157,9 +171,9 @@ func (ix *Index) Remove(key string, id store.ID) bool {
 	if !found {
 		return false
 	}
-	ix.pairs--
+	ix.s.pairs--
 	if len(e.ids) == 1 {
-		ix.tree.Remove(key)
+		ix.s.tree.Remove(key)
 		return true
 	}
 	// A fresh slice, not append(ids[:pos], ids[pos+1:]...).
@@ -174,21 +188,21 @@ func (ix *Index) Remove(key string, id store.ID) bool {
 	trimmed = append(trimmed, e.ids[:pos]...)
 	trimmed = append(trimmed, e.ids[pos+1:]...)
 	e.ids = trimmed
-	ix.tree.Set(key, e)
+	ix.s.tree.Set(key, e)
 	return true
 }
 
 // RemoveKey detaches every id from key and reports how many it detached.
 func (ix *Index) RemoveKey(key string) int {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return 0
 	}
-	v, removed := ix.tree.Remove(key)
+	v, removed := ix.s.tree.Remove(key)
 	if !removed {
 		return 0
 	}
 	n := len(v.(*entry).ids)
-	ix.pairs -= n
+	ix.s.pairs -= n
 	return n
 }
 
@@ -200,10 +214,10 @@ func (ix *Index) RemoveKey(key string) int {
 // called. A realm that returns this value onward is returning its own data,
 // not a handle to ours.
 func (ix *Index) Lookup(key string) []store.ID {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return nil
 	}
-	e, _ := ix.tree.Get(key).(*entry)
+	e, _ := ix.s.tree.Get(key).(*entry)
 	if e == nil {
 		return nil
 	}
@@ -215,10 +229,10 @@ func (ix *Index) Lookup(key string) []store.ID {
 // First returns the lowest id carrying key. On a [Unique] index it is the only
 // one, which is the usual reason to call it.
 func (ix *Index) First(key string) (store.ID, bool) {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return 0, false
 	}
-	e, _ := ix.tree.Get(key).(*entry)
+	e, _ := ix.s.tree.Get(key).(*entry)
 	if e == nil || len(e.ids) == 0 {
 		return 0, false
 	}
@@ -227,18 +241,18 @@ func (ix *Index) First(key string) (store.ID, bool) {
 
 // Has reports whether any id carries key.
 func (ix *Index) Has(key string) bool {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return false
 	}
-	return ix.tree.Has(key)
+	return ix.s.tree.Has(key)
 }
 
 // Count returns how many ids carry key.
 func (ix *Index) Count(key string) int {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return 0
 	}
-	e, _ := ix.tree.Get(key).(*entry)
+	e, _ := ix.s.tree.Get(key).(*entry)
 	if e == nil {
 		return 0
 	}
@@ -247,30 +261,41 @@ func (ix *Index) Count(key string) int {
 
 // Keys returns the number of distinct keys.
 func (ix *Index) Keys() int {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return 0
 	}
-	return ix.tree.Size()
+	return ix.s.tree.Size()
 }
 
 // Len returns the number of (key, id) pairs, which is what the index actually
 // costs. It is NOT [Index.Keys], and the two differ by exactly the amount of
 // fan-out a realm has.
-func (ix *Index) Len() int { return ix.pairs }
+func (ix *Index) Len() int {
+	if ix.s == nil {
+		return 0
+	}
+	return ix.s.pairs
+}
 
 // IsUnique reports whether this index was built by [Unique].
-func (ix *Index) IsUnique() bool { return ix.unique }
+func (ix *Index) IsUnique() bool { return ix.s != nil && ix.s.unique }
 
 // Each visits every key in ascending order with a copy of its ids, and stops
 // when fn returns true. It reports whether it stopped early.
 //
 // True means stop, matching bptree.IterCbFn and kit/store's EachUntil exactly,
 // so a callback moved between them keeps its meaning.
+//
+// fn must not call [Index.Add], [Index.Remove] or [Index.RemoveKey] on this
+// index. The walk is the B+ tree's own, which holds a position inside a leaf:
+// removing the key being visited shifts the next one into that slot and the
+// walk steps over it, and inserting one ahead of it is visited twice. Collect
+// what to change, then change it after Each returns.
 func (ix *Index) Each(fn func(key string, ids []store.ID) bool) bool {
-	if ix.tree == nil {
+	if ix.s == nil {
 		return false
 	}
-	return ix.tree.Iterate("", "", func(k string, v any) bool {
+	return ix.s.tree.Iterate("", "", func(k string, v any) bool {
 		e := v.(*entry)
 		ids := make([]store.ID, len(e.ids))
 		copy(ids, e.ids)
@@ -285,15 +310,20 @@ func (ix *Index) Each(fn func(key string, ids []store.ID) bool) bool {
 // matching [store.Store.Page] exactly, because the page number usually arrives
 // from a Render path and is user input.
 func (ix *Index) Page(page, size int) []Entry {
-	if ix.tree == nil || page < 1 || size < 1 {
+	if ix.s == nil || page < 1 || size < 1 {
 		return nil
 	}
 	// The offset is computed in a way that cannot wrap, because
 	// bptree.IterateByOffset normalises a NEGATIVE offset to 0: an overflowed
 	// (page-1)*size would silently hand back page 1 for a page past the end,
 	// which is the opposite of this method's contract.
-	keys := ix.tree.Size()
-	if page-1 > keys/size {
+	//
+	// page <= 1+(keys-1)/size bounds (page-1)*size by keys-1, so the product
+	// cannot overflow, and it also rejects the page that starts exactly at the
+	// end, which would otherwise come back as an empty non-nil slice while
+	// every later page is nil.
+	keys := ix.s.tree.Size()
+	if keys == 0 || page > 1+(keys-1)/size {
 		return nil
 	}
 	offset := (page - 1) * size
@@ -304,11 +334,8 @@ func (ix *Index) Page(page, size int) []Entry {
 	if room > size {
 		room = size
 	}
-	if room < 0 {
-		room = 0
-	}
 	out := make([]Entry, 0, room)
-	ix.tree.IterateByOffset(offset, size, func(k string, v any) bool {
+	ix.s.tree.IterateByOffset(offset, size, func(k string, v any) bool {
 		e := v.(*entry)
 		ids := make([]store.ID, len(e.ids))
 		copy(ids, e.ids)
