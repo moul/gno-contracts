@@ -156,7 +156,8 @@ var pageOffsetOverflow = Rule{
 	Finding: "gno-contracts#289, Copilot review comment 4154919693, 2026-10-01; " +
 		"the same defect again in gno-contracts#311 (\"Overflowing page numbers " +
 		"incorrectly reset to page 1\"), 2026-10-01",
-	Bad: "package x\n\nfunc f(page, size int) int {\n\treturn (page - 1) * size\n}\n",
+	Bad: "package x\n\nfunc f(page, size int) int {\n\treturn (page - 1) * size\n}\n\n" +
+		"func g(pageNumber, size int) int {\n\treturn size * (pageNumber - 1)\n}\n",
 	// The Good is silent because it SAYS it is bounded, not because it found a
 	// spelling the regexp misses: the rule cannot see a bound, so a bounded
 	// multiply carries the ignore, as p/moul/kit/index does.
@@ -258,13 +259,48 @@ var rootRelativeLink = Rule{
 // ---------------------------------------------------------------------------
 
 // crossingFuncRe matches an exported top-level crossing function, capturing
-// its parameter list. Single-line signatures only, which is what gofmt leaves.
+// its parameter list. The list is first joined across lines (see joinParams),
+// because a long signature is written one parameter per line.
 var crossingFuncRe = regexp.MustCompile(`^func\s+[A-Z]\w*\s*\(\s*\w+\s+realm\b([^)]*)\)`)
 
-// structDeclRe finds the struct types a file declares, so a parameter of one
-// can be told apart from a parameter of a named string or integer type, which
-// the VM does decode.
-var structDeclRe = regexp.MustCompile(`^type\s+([A-Za-z_]\w*)\s+struct\b`)
+// joinParams returns line i with the rest of its parameter list folded in,
+// up to the parenthesis that closes it.
+func joinParams(code []string, i int) string {
+	ln := code[i]
+	open := strings.Index(ln, "(")
+	if open < 0 {
+		return ln
+	}
+	depth := 0
+	var b strings.Builder
+	for j := i; j < len(code); j++ {
+		seg := code[j]
+		if j == i {
+			seg = seg[open:]
+			b.WriteString(ln[:open])
+		}
+		for k := 0; k < len(seg); k++ {
+			c := seg[k]
+			b.WriteByte(c)
+			switch c {
+			case '(':
+				depth++
+			case ')':
+				depth--
+				if depth == 0 {
+					return b.String()
+				}
+			}
+		}
+		b.WriteByte(' ')
+	}
+	return b.String()
+}
+
+// typeDeclRe finds the named types a file declares that the VM cannot decode
+// either: a struct, and a named slice, map, pointer, func or interface. A
+// named string or integer type (type Mode string) is decoded, and not listed.
+var typeDeclRe = regexp.MustCompile(`^type\s+([A-Za-z_]\w*)\s+(struct\b|interface\b|func\b|map\[|\*|\[\](\s*\w+)?)`)
 
 // encodable is every parameter type MsgCall can carry, by the switch in
 // gno.land/pkg/sdk/vm/convert.go.
@@ -295,6 +331,23 @@ func unencodable(typ string, structs map[string]bool) string {
 	return ""
 }
 
+// undecodable lists the named types in a file that unencodable must refuse.
+// A named []byte stays decodable, as the VM decodes its base type.
+func undecodable(code []string) map[string]bool {
+	out := map[string]bool{}
+	for _, ln := range code {
+		m := typeDeclRe.FindStringSubmatch(ln)
+		if m == nil {
+			continue
+		}
+		if elt := strings.TrimSpace(m[3]); elt == "byte" || elt == "uint8" {
+			continue
+		}
+		out[m[1]] = true
+	}
+	return out
+}
+
 var uncallableCrossingArg = Rule{
 	ID:   "uncallable-crossing-arg",
 	What: "an exported crossing function takes a struct, pointer, slice or map, which no wallet can encode",
@@ -312,22 +365,22 @@ var uncallableCrossingArg = Rule{
 		"refused by simulation on gnoland-1 while seeding the agent realms, 2026-09-30; " +
 		"r/moul/gns Register(cur realm, request RegisterRequest), found by the agent " +
 		"review sweep, 2026-10-01",
-	Bad: "package x\n\ntype Req struct{ Name string }\n\n" +
+	Bad: "package x\n\ntype Req struct{ Name string }\n\ntype Panel []address\n\n" +
 		"func OpenCase(cur realm, subject string, jurors []address) uint64 {\n\treturn 0\n}\n\n" +
-		"func Register(cur realm, r Req) {}\n",
-	Good: "package x\n\ntype Mode string\n\n" +
+		"func Register(cur realm, r Req) {}\n\nfunc Seat(cur realm, p Panel) {}\n\n" +
+		"func Long(\n\tcur realm,\n\tjurors []address,\n) {\n}\n",
+	Good: "package x\n\ntype Mode string\n\ntype Blob []byte\n\n" +
 		"func OpenCase(cur realm, subject, jurorsCSV string) uint64 {\n\treturn 0\n}\n\n" +
-		"func SetRecord(cur realm, name string, value []byte, m Mode) {}\n\nfunc helper(xs []address) {}\n",
+		"func SetRecord(cur realm, name string, value []byte, m Mode, b Blob) {}\n\nfunc helper(xs []address) {}\n\n" +
+		"func Long(\n\tcur realm,\n\tsubject string,\n) {\n}\n",
 	Check: func(f File) []int {
-		structs := map[string]bool{}
-		for _, ln := range f.Code {
-			if m := structDeclRe.FindStringSubmatch(ln); m != nil {
-				structs[m[1]] = true
-			}
-		}
+		structs := undecodable(f.Code)
 		var out []int
 		for i, ln := range f.Code {
-			m := crossingFuncRe.FindStringSubmatch(ln)
+			if !strings.HasPrefix(ln, "func ") {
+				continue
+			}
+			m := crossingFuncRe.FindStringSubmatch(joinParams(f.Code, i))
 			if m == nil {
 				continue
 			}
@@ -366,7 +419,9 @@ var originSendUnguarded = Rule{
 		"realm's own balance delta instead.",
 	Finding: "r/moul/grant Fund, reproduced by a scratch test in the agent review sweep " +
 		"of 2026-10-01; the same shape in r/moul/faucet Fund and r/moul/x/nativeify Unwrap",
-	Bad: "package x\n\nfunc Fund(cur realm) {\n\tsent := unsafe.OriginSend()\n\t_ = sent\n}\n",
+	Bad: "package x\n\nfunc Fund(cur realm) {\n\tsent := unsafe.OriginSend()\n\t_ = sent\n}\n\n" +
+		"func Late(cur realm) {\n\tsent := unsafe.OriginSend()\n\tcredit(sent)\n\t" +
+		"if !cur.Previous().IsUserCall() {\n\t\tpanic(\"late\")\n\t}\n}\n",
 	Good: "package x\n\nfunc Fund(cur realm) {\n\tif !cur.Previous().IsUserCall() {\n\t\t" +
 		"panic(\"users only\")\n\t}\n\tsent := unsafe.OriginSend()\n\t_ = sent\n}\n\n" +
 		"func Amount(denom string) int64 {\n\treturn unsafe.OriginSend().AmountOf(denom)\n}\n",
@@ -383,9 +438,13 @@ var originSendUnguarded = Rule{
 			for end < len(f.Code) && !strings.HasPrefix(f.Code[end], "func ") {
 				end++
 			}
+			// The guard has to come BEFORE the first read: a check after
+			// the coins were credited guards nothing.
 			body := strings.Join(f.Code[i:end], "\n")
-			if originSendRe.MatchString(body) && !strings.Contains(body, "IsUserCall") {
-				out = append(out, i)
+			if loc := originSendRe.FindStringIndex(body); loc != nil {
+				if g := strings.Index(body, "IsUserCall"); g < 0 || g > loc[0] {
+					out = append(out, i)
+				}
 			}
 			i = end - 1
 		}

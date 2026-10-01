@@ -68,16 +68,17 @@ type Rule struct {
 
 	// Check reports the 0-based line indices that violate the rule.
 	//
-	// It is given both views of the file. Use Code for anything matching
+	// It is given three views of the file. Use Code for anything matching
 	// EXPRESSIONS: comments and string contents are blanked there, so a rule
 	// looking for append( does not match a doc comment explaining the rule,
 	// which is the trap a regexp over raw source falls into in a repository
-	// whose comments discuss its own lints. Use Raw only for what genuinely
-	// lives in a string, which in practice means import paths.
+	// whose comments discuss its own lints. Use Literal for what lives in a
+	// string (a rendered link): comments are blanked there, strings kept. Use
+	// Raw only for import paths.
 	Check func(f File) []int
 }
 
-// File is one source file in both views.
+// File is one source file in three views.
 type File struct {
 	// Code has comments and string contents blanked to spaces, line numbers
 	// preserved.

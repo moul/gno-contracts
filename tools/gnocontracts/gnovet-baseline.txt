@@ -140,3 +140,6 @@ uncallable-crossing-arg r/moul/gns/gns.gno 6
 uncallable-crossing-arg r/moul/x/pairreg/pairreg.gno 1
 uncallable-crossing-arg r/moul/x/pilotdemo/pilotdemo.gno 1
 uncallable-crossing-arg r/moul/x/plan9/ns/ns.gno 1
+uncallable-crossing-arg r/moul/x/upgrade/adminreg/facade/facade.gno 1
+uncallable-crossing-arg r/moul/x/upgrade/schema/facade/facade.gno 1
+uncallable-crossing-arg r/moul/x/upgrade/selfreg/facade/facade.gno 1

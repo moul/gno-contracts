@@ -755,14 +755,14 @@ reviewed, plus the 93 `avl` imports we already knew about:
 disappointment, it is the argument: the rule is a pre-deploy gate, and these shipped before it
 existed.
 
-Seven more on 2026-10-01, each a shape a review had found and the tree still carried. The last three came from an agent sweep of every package with these instructions:
+Six more on 2026-10-01, each a shape a review had found and the tree still carried. The last three came from an agent sweep of every package with these instructions:
 
 | rule | found | the one that stings |
 |---|--:|---|
 | `page-offset-overflow` | 6, one already bounded | `p/moul/kit/store/store.gno:266`, the same unbounded `(page - 1) * size` #289 fixed in `kit/index`, and #311 found a third time |
 | `placeholder-path` | 6 | three live daily realms linking to `/r/REPLACE_ADDR/...`, a generator token nobody substituted |
-| `root-relative-link` | 10 | `daily/{handles,urlshort,vault,collatz,connect4}` link to `gno.land/moul` and `gno.land/r:42`; collatz and connect4 were not in the hand-made list, and `x/across` is a true negative (its computed target starts with `r/`) |
-| `uncallable-crossing-arg` | 11 | `r/moul/gns` `Register(cur realm, request RegisterRequest)`: `MsgCall` decodes primitives and `[]byte` and nothing else, so **no name can be registered on mainnet**. Also `agents/jury` `OpenCase(..., []address)`. `pairreg`, `pilotdemo`, `config` and `plan9/ns` take a pointer or interface on purpose, from other realms |
+| `root-relative-link` | 10 | `daily/{handles,urlshort,vault,collatz,connect4}` link to `gno.land/moul` and `gno.land/r:42`; collatz and connect4 were not in the hand-made list, and `x/across:222` is a hit the rule cannot tell from the bug: its computed target does start with `r/`, but so would a broken one, lexically |
+| `uncallable-crossing-arg` | 14 | `r/moul/gns` `Register(cur realm, request RegisterRequest)`: `MsgCall` decodes primitives and `[]byte` and nothing else, so **no name can be registered on mainnet**. Also `agents/jury` `OpenCase(..., []address)`. `pairreg`, `pilotdemo`, `config`, `plan9/ns` and the three `x/upgrade` facades take a pointer or interface on purpose, from other realms |
 | `origin-send-unguarded` | 4 | `r/moul/grant` `Fund`: a realm the user called keeps the coins and calls `Fund` five times, so the board shows 5 GNOT raised and the treasury holds 0. Also `faucet`, `nativeify`, `moultest` |
 | `colon-relative-link` | 8 | every navigation link on `x/plan9/ns` and `plan9/dev`, which gnoweb renders as `<!-- invalid link -->` |
 
