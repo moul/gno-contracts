@@ -57,10 +57,11 @@ irreversible.
   § *Where gno differs from Go* names them, and takes the next one.
 - **Green before commit:** `make lint test`, with `GNOROOT` on a gnolang/gno checkout.
 - **Run `make review-advice BASE=origin/main` before requesting a Copilot review, and follow
-  it.** A review costs 13 AI credits of a 1,500-a-month Copilot Pro allowance that was 81%
-  spent on 2026-10-01, with additional usage DISABLED, so running out does not bill, it stops
-  the reviews. This repo opens ~215 PRs a month, so reviewing everything is ~2,800. The rule:
-  **review exactly what
+  it.** A review costs **~76 AI credits measured** (GitHub publishes 13; the bill says
+  otherwise) of a 1,500-a-month allowance, so the whole budget is **twenty reviews a month**,
+  and additional usage is DISABLED so running out stops the reviews rather than billing.
+  **At most two passes per PR**: the first, and one after the fixes land. Re-reviews are what
+  actually spend the budget. The rule: **review exactly what
   is about to become permanent**, that is, a package not yet live on mainnet, plus any change
   to `.github/copilot-instructions.md` or `.github/instructions/`. Everything else is a path
   that cannot be fixed in place anyway. Request with `gh pr edit <N> --add-reviewer @copilot`.
