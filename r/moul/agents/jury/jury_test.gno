@@ -162,3 +162,14 @@ func TestCaseCountIsBoundedAndBlankSubjectRefused(cur realm, t *testing.T) {
 	defer func() { cases = cases[:before] }()
 	uassert.AbortsContains(t, cur, "the jury is full", func() { OpenCase(cross(cur), "one more", j1.String()) })
 }
+
+// A commitment is a hash, and a juror cannot store an arbitrary blob as one.
+func TestCommitmentIsBounded(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(opener))
+	id := OpenCase(cross(cur), "sized", j1.String())
+	testing.SetRealm(testing.NewUserRealm(j1))
+	uassert.AbortsContains(t, cur, "commitment too long", func() {
+		Commit(cross(cur), id, strings.Repeat("a", MaxCommitment+1))
+	})
+	uassert.Equal(t, 64, len(commit.Verdict(true, "s")))
+}

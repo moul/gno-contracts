@@ -68,6 +68,8 @@ const (
 	MaxJurors   = 25
 	MaxSubject  = 200 // bytes
 	IndexRecent = 50  // cases the index lists, newest first
+
+	MaxCommitment = 128 // bytes; commit.Verdict returns 64
 )
 
 // OpenCase starts a dispute with a fixed panel of jurors, given as
@@ -118,6 +120,9 @@ func Commit(cur realm, caseID uint64, commitment string) {
 	c := mustCase(caseID)
 	assert(c.Phase == PhaseCommit, "not in commit phase")
 	assert(commitment != "", "empty commitment")
+	// commit.Verdict is a hex sha256; anything longer is not one, and would be
+	// stored and compared on every later Commit in the case.
+	assert(len(commitment) <= MaxCommitment, "commitment too long")
 	j := mustJuror(c, who)
 	assert(!j.Committed, "already committed")
 	// Every commitment is public through Get, so without this a juror could
