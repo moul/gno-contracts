@@ -41,6 +41,10 @@ The curation policy, which is the part worth reading before you hold one:
 | verify / unverify an endpoint | any other verdict | optional |
 | flag an endpoint | any other verdict | **required** |
 
+- **Only a pending or approved zone is editable.** Editing an approved one is
+  a curator decision: the reason is required and replaces the review on record,
+  and a changed chain id sends every verified endpoint back to unverified,
+  because what was verified was that it answered for the old one.
 - **Nothing goes back to pending.** A proposer who disagrees with a rejection
   removes the zone and proposes it again.
 - **A zone that was ever official is never removed.** An approved one is
@@ -52,7 +56,8 @@ The curation policy, which is the part worth reading before you hold one:
   lines, so a pipe, a bracket or a quote in one would break more than the page.
   URLs are printable ASCII with no `<>"'`()[]{}|\^`, no credentials, a host
   that is a DNS name or IPv4 address, an optional port in 1..65535, and a scheme
-  from a short list (`rpc` also takes `ws`, `wss` and `tcp`). A peer is
+  from a short list. A zone's main RPC is `http`, `https` or `tcp`, what
+  `gnokey -remote` dials; an `rpc` endpoint also takes `ws` and `wss`. A peer is
   `<g1 node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes.
 - **Free text (title, description, label, reason) is one line, rune-bounded**,
   and must be escaped by whoever renders it.

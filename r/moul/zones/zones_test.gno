@@ -79,6 +79,9 @@ func TestReadsRefuseUnknownFilters(cur realm, t *testing.T) {
 	uassert.PanicsContains(t, cur, "unknown kind", func() { ListZones("", "betanet") })
 	uassert.PanicsContains(t, cur, "unknown endpoint kind", func() { ListEndpoints("onyx", "grpc", "") })
 	uassert.PanicsContains(t, cur, "unknown verification", func() { ListAddresses("onyx", "", "trusted") })
+	// Every zone at once is not a read a node should be asked for.
+	uassert.PanicsContains(t, cur, "name a zone", func() { ListEndpoints("", "", "") })
+	uassert.PanicsContains(t, cur, "name a zone", func() { ListAddresses("  ", "rpc", "") })
 	_, ok := GetZone("nope")
 	uassert.False(t, ok)
 	_, ok = GetEndpoint(9999)

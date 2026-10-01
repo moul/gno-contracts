@@ -60,8 +60,9 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 
 // EditZone replaces a zone's description. A curator may edit any zone; the
 // proposer may edit their own while it is still pending. Once a curator has
-// reviewed the zone, an edit needs a reason, and it replaces the review on
-// record: the page then names who changed the values, and why.
+// approved the zone, an edit needs a reason, and it replaces the review on
+// record: the page then names who changed the values, and why. A rejected or
+// retired zone cannot be edited.
 func EditZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
@@ -199,8 +200,10 @@ func GetEndpoint(id int64) (zones.Endpoint, bool) {
 }
 
 // ListEndpoints returns a zone's endpoints of that kind and verification,
-// oldest first. "" matches any, so ("onyx", "", "") is everything on onyx and
-// ("onyx", "peer", "verified") is what a cautious node should dial.
+// oldest first. "" matches any kind or verdict, so ("onyx", "", "") is
+// everything on onyx and ("onyx", "peer", "verified") is what a cautious node
+// should dial. The zone is required: one zone is at most MaxEndpointsPerZone
+// rows, every zone together is a response no node should be asked for.
 func ListEndpoints(slug, kind, status string) []zones.Endpoint {
 	return reg.Endpoints(endpointFilter(slug, kind, status))
 }
@@ -243,11 +246,15 @@ func reviewEndpoint(cur realm, id int64, to zones.Verification, reason string) {
 }
 
 func endpointFilter(slug, kind, status string) zones.EndpointFilter {
+	slug = strings.TrimSpace(slug)
+	if slug == "" {
+		panic("zones: name a zone; ListZones lists them")
+	}
 	k, err := zones.ParseEndpointKind(kind)
 	must(err)
 	v, err := zones.ParseVerification(status)
 	must(err)
-	return zones.EndpointFilter{Zone: strings.TrimSpace(slug), Kind: k, Status: v}
+	return zones.EndpointFilter{Zone: slug, Kind: k, Status: v}
 }
 
 func info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL string) zones.Info {

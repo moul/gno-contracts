@@ -37,7 +37,7 @@ gnokey query vm/qeval -remote https://rpc.gno.land \
 |---|---|
 | `ListZones(status, kind)` | the zones, in the order they were proposed; `approved` is the official list |
 | `GetZone(slug)` | one zone, and whether it exists |
-| `ListEndpoints(slug, kind, status)` | a zone's endpoints, oldest first |
+| `ListEndpoints(slug, kind, status)` | one zone's endpoints, oldest first; the slug is required |
 | `ListAddresses(slug, kind, status)` | the same, reduced to the address strings a config file wants |
 | `GetEndpoint(id)` | one endpoint, and whether it exists |
 | `IsCurator(addr)`, `Curators()` | who curates |
@@ -51,7 +51,7 @@ do that.
 | function | who |
 |---|---|
 | `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody |
-| `EditZone(..., reason)` | a curator, or the proposer while it is pending; once reviewed, the reason is required and replaces the review on record |
+| `EditZone(..., reason)` | a curator, or the proposer while pending; on an approved zone the reason is required and replaces the review on record, and a new chain id sends its verified endpoints back to unverified; a rejected or retired zone is not editable |
 | `RemoveZone(slug)` | a curator or the proposer, on a pending or rejected zone; one that was ever official is kept |
 | `RegisterEndpoint(slug, kind, addr, label)` | anybody, on a pending or approved zone |
 | `RemoveEndpoint(id)` | its registrant or a curator |

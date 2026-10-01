@@ -131,6 +131,9 @@ func TestValidateEndpoint(t *testing.T) {
 func TestValidateInfo(t *testing.T) {
 	ok := Info{ChainID: "onyx-1", Title: "Onyx", Kind: Testnet, RPCURL: "https://rpc.onyx.testnets.gno.land"}
 	uassert.NoError(t, ValidateInfo(ok))
+	tcp := ok
+	tcp.RPCURL = "tcp://127.0.0.1:26657"
+	uassert.NoError(t, ValidateInfo(tcp))
 
 	bad := func(mut func(*Info), want string) {
 		in := ok
@@ -145,6 +148,9 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.Kind = "" }, "needs a kind")
 	bad(func(in *Info) { in.Kind = "betanet" }, "unknown kind")
 	bad(func(in *Info) { in.RPCURL = "" }, "rpc url is empty")
+	// The main RPC is what gnokey -remote gets, which dials http, https, tcp.
+	bad(func(in *Info) { in.RPCURL = "wss://rpc.onyx.testnets.gno.land/websocket" }, "rpc url scheme")
+	bad(func(in *Info) { in.RPCURL = "ws://rpc.onyx.testnets.gno.land/websocket" }, "rpc url scheme")
 	bad(func(in *Info) { in.GnowebURL = "gno.land" }, "gnoweb url needs a scheme")
 	bad(func(in *Info) { in.GenesisURL = "tcp://x" }, "genesis url scheme")
 

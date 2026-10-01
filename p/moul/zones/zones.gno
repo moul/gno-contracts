@@ -280,7 +280,7 @@ func ValidateInfo(in Info) error {
 	if _, err := ParseKind(string(in.Kind)); err != nil {
 		return err
 	}
-	if err := checkURL("rpc url", in.RPCURL, rpcSchemes); err != nil {
+	if err := checkURL("rpc url", in.RPCURL, primarySchemes); err != nil {
 		return err
 	}
 	if in.GnowebURL != "" {
@@ -321,8 +321,15 @@ func ValidateLabel(s string) error { return checkText("label", s, 0, MaxLabelLen
 func ValidateReason(s string) error { return checkText("reason", s, 0, MaxReasonLen) }
 
 var (
+	// rpcSchemes is what an rpc ENDPOINT may be: a websocket subscriber is a
+	// real consumer of one.
 	rpcSchemes = []string{"https", "http", "wss", "ws", "tcp"}
-	webSchemes = []string{"https", "http"}
+	// primarySchemes is what a zone's main RPC may be, narrower on purpose: it
+	// is what every tool is pointed at first, gnokey's -remote included, and
+	// gnokey's query client dials http, https and tcp only, so a wss:// main
+	// RPC would print a command that cannot run.
+	primarySchemes = []string{"https", "http", "tcp"}
+	webSchemes     = []string{"https", "http"}
 )
 
 // checkText bounds a free-text field by runes and refuses control characters,

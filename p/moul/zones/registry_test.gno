@@ -159,6 +159,49 @@ func TestEdit(t *testing.T) {
 	uassert.Equal(t, int64(5), z.ReviewedAt)
 	uassert.Equal(t, "rpc moved", z.Reason)
 	uassert.Equal(t, string(Approved), string(z.Status))
+
+	// A retired zone is a record: its retirement reason is not editable away.
+	uassert.NoError(t, r.ReviewZone("onyx", Retired, curator, 6, "testnet ended"))
+	uassert.ErrorContains(t, r.Edit("onyx", in, curator, 7, "typo"), "only a pending or approved zone can be edited")
+	z, _ = r.Zone("onyx")
+	uassert.Equal(t, "testnet ended", z.Reason)
+	// Nor is a rejected one.
+	uassert.NoError(t, r.Propose(alice, 8, "nope", onyx()))
+	uassert.NoError(t, r.ReviewZone("nope", Rejected, curator, 9, "dup"))
+	uassert.ErrorContains(t, r.Edit("nope", onyx(), alice, 10, ""), "only a pending or approved zone can be edited")
+}
+
+// What was verified is that an endpoint answered for the zone's chain id, so
+// changing the chain id un-verifies them; changing only the RPC does not.
+func TestChainIDEditUnverifiesEndpoints(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(curator, 1, "onyx", onyx()))
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, curator, 1, ""))
+	a, _ := r.Register(alice, 2, "onyx", RPC, "https://a.example", "")
+	b, _ := r.Register(alice, 2, "onyx", Peer, nodeID+"@b.example:26656", "")
+	f, _ := r.Register(alice, 2, "onyx", RPC, "https://f.example", "")
+	uassert.NoError(t, r.ReviewEndpoint(a, Verified, curator, 3, ""))
+	uassert.NoError(t, r.ReviewEndpoint(b, Verified, curator, 3, ""))
+	uassert.NoError(t, r.ReviewEndpoint(f, Flagged, curator, 3, "down"))
+
+	in := onyx()
+	in.RPCURL = "https://rpc2.onyx.example"
+	uassert.NoError(t, r.Edit("onyx", in, curator, 4, "rpc moved"))
+	uassert.Equal(t, 2, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
+
+	in.ChainID = "onyx-2"
+	uassert.NoError(t, r.Edit("onyx", in, curator, 5, "relaunched as onyx-2"))
+	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
+	e, _ := r.Endpoint(a)
+	uassert.Equal(t, string(Unverified), string(e.Status))
+	uassert.Equal(t, ChainIDChanged, e.Reason)
+	uassert.Equal(t, int64(5), e.ReviewedAt)
+	e, _ = r.Endpoint(f)
+	uassert.Equal(t, string(Flagged), string(e.Status)) // a flag is not undone by an edit
+	uassert.Equal(t, "down", e.Reason)
+	// And they count against the review queue again: verifying one frees it.
+	uassert.NoError(t, r.ReviewEndpoint(a, Verified, curator, 6, "answers onyx-2"))
+	uassert.Equal(t, 1, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
 }
 
 func TestRegisterAndFilter(t *testing.T) {

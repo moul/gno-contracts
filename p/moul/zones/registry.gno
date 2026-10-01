@@ -98,15 +98,24 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 
 // Edit replaces a zone's description. Its slug and status stay.
 //
-// Editing a zone that is still pending is just an edit. Editing one a curator
-// has already decided is a curator decision of its own: the reviewed values
-// changed, so the review on record is replaced by this one, with a reason
-// required. Otherwise the page would show a new chain id or RPC under the
-// name, height and reason of whoever approved the old ones.
+// Only a pending or an approved zone can be edited. A rejected one is removed
+// and proposed again, or approved first; a retired one is a record, and its
+// retirement reason is the thing it is kept for.
+//
+// Editing a pending zone is just an edit. Editing an approved one is a curator
+// decision of its own: the reviewed values changed, so the review on record is
+// replaced by this one, with a reason required. Otherwise the page would show
+// a new chain id or RPC under the name, height and reason of whoever approved
+// the old ones. And when the chain id itself changes, every endpoint verified
+// against the old one goes back to unverified, because what was verified was
+// that it answered for a chain this zone no longer names.
 func (r *Registry) Edit(slug string, in Info, by address, at int64, reason string) error {
 	z, _, err := r.zone(slug)
 	if err != nil {
 		return err
+	}
+	if z.Status != Pending && z.Status != Approved {
+		return errors.New("zones: " + slug + " is " + string(z.Status) + "; only a pending or approved zone can be edited")
 	}
 	in = trimInfo(in)
 	if err := ValidateInfo(in); err != nil {
@@ -116,18 +125,36 @@ func (r *Registry) Edit(slug string, in Info, by address, at int64, reason strin
 	if err := ValidateReason(reason); err != nil {
 		return err
 	}
-	if z.Status != Pending {
+	if z.Status == Approved {
 		if !by.IsValid() {
 			return errors.New("zones: the editor is not a valid address")
 		}
 		if reason == "" {
-			return errors.New("zones: " + slug + " is " + string(z.Status) + ", so an edit needs a reason")
+			return errors.New("zones: " + slug + " is approved, so an edit needs a reason")
+		}
+		if in.ChainID != z.ChainID {
+			for _, id := range r.byZone.Lookup(slug) {
+				v, _ := r.endpoints.Get(id)
+				e := v.(*Endpoint)
+				if e.Status != Verified {
+					continue
+				}
+				if err := r.unchecked.Add(slug, id); err != nil {
+					return err
+				}
+				e.Status = Unverified
+				e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, ChainIDChanged
+			}
 		}
 		z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
 	}
 	z.setInfo(in)
 	return nil
 }
+
+// ChainIDChanged is the reason an endpoint carries when an edit to its zone's
+// chain id sent it back to unverified.
+const ChainIDChanged = "the zone's chain id changed; verify again"
 
 // ReviewZone records a curator's decision on a zone.
 //
