@@ -39,7 +39,7 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 
 ### `storage`: Where a realm puts its data
 
-- **1,478** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-09-29.
+- **1,698** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-10-01.
 - One cold read against 10,000 entries: **`p/nt/avl/v0` at 253,035 gas**, against `builtin map[string]string` at 5,594,956. A **22.1x** spread.
 - Storage per entry, keyed containers: **`builtin map[string]any` at 153 bytes**, against `p/moul/cow/v0` at 2,054. At 100k entries that is 1,530 GNOT of deposit against 20,536.
 - A `builtin map` read looks like 4,239 gas warm and costs **5,594,926 gas** in a real transaction, **1,320x** more, because the whole map is one persisted object and the first touch loads all of it.
@@ -60,13 +60,13 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 
 **Cheapest per size**, one cold transaction, one operation, gas:
 
-| operation | n = 100 | n = 1,000 | n = 10,000 | changes hands |
-|---|---|---|---|---|
-| tx_read | `builtin map[string]any`<br>62,642 | `p/nt/avl/v0`<br>209,978 | `p/nt/avl/v0`<br>253,035 | before 1,000 |
-| tx_write | `builtin map[string]any`<br>118,396 | `p/nt/bptree/v0 fanout=8`<br>283,170 | `p/nt/bptree/v0 fanout=32`<br>340,196 | before 1,000 |
-| tx_insert | `builtin map[string]any`<br>119,327 | `p/nt/bptree/v0 fanout=8`<br>313,337 | `p/moul/cow/v0`<br>513,349 | before 1,000 |
-| tx_delete | `builtin map[string]any`<br>122,650 | `p/nt/bptree/v0 fanout=8`<br>340,377 | `p/nt/bptree/v0 fanout=32`<br>405,677 | before 1,000 |
-| tx_page10 | `builtin []struct, sorted`<br>13,310 | `p/nt/bptree/v0 fanout=128`<br>36,455 | `p/nt/bptree/v0 fanout=32`<br>39,414 | before 1,000 |
+| operation | n = 100 | n = 150 | n = 220 | n = 280 | n = 300 | n = 320 | n = 340 | n = 360 | n = 400 | n = 470 | n = 680 | n = 1,000 | n = 10,000 | changes hands |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| tx_read | `builtin map[string]any`<br>62,642 | `builtin map[string]string`<br>90,495 | `builtin map[string]string`<br>129,473 | `builtin map[string]string`<br>162,970 | `builtin map[string]string`<br>174,136 | `builtin map[string]string`<br>185,302 | `p/nt/avl/v0`<br>195,717 | `p/nt/avl/v0`<br>187,803 | `p/nt/avl/v0`<br>172,572 | `p/nt/bptree/v0 fanout=32`<br>203,037 | `p/nt/avl/v0`<br>185,957 | `p/nt/avl/v0`<br>209,978 | `p/nt/avl/v0`<br>253,035 | before 150 |
+| tx_write | `builtin map[string]any`<br>118,396 | `builtin map[string]string`<br>169,464 | `builtin map[string]string`<br>240,572 | `p/nt/bptree/v0 fanout=32`<br>243,696 | `p/nt/bptree/v0 fanout=32`<br>260,535 | `p/nt/bptree/v0 fanout=32`<br>254,238 | `p/nt/bptree/v0 fanout=32`<br>262,541 | `p/nt/bptree/v0 fanout=32`<br>248,892 | `p/nt/bptree/v0 fanout=32`<br>259,161 | `p/nt/bptree/v0 fanout=32`<br>256,407 | `p/nt/bptree/v0 fanout=32`<br>286,639 | `p/nt/bptree/v0 fanout=8`<br>283,170 | `p/nt/bptree/v0 fanout=32`<br>340,196 | before 150 |
+| tx_insert | `builtin map[string]any`<br>119,327 |  |  |  |  |  |  |  |  |  |  | `p/nt/bptree/v0 fanout=8`<br>313,337 | `p/moul/cow/v0`<br>513,349 | before 1,000 |
+| tx_delete | `builtin map[string]any`<br>122,650 |  |  |  |  |  |  |  |  |  |  | `p/nt/bptree/v0 fanout=8`<br>340,377 | `p/nt/bptree/v0 fanout=32`<br>405,677 | before 1,000 |
+| tx_page10 | `builtin []struct, sorted`<br>13,310 | `builtin []struct, sorted`<br>15,930 | `builtin []struct, sorted`<br>19,608 | `builtin []struct, sorted`<br>22,749 | `builtin []struct, sorted`<br>23,796 | `builtin []struct, sorted`<br>24,843 | `builtin []struct, sorted`<br>25,889 | `builtin []struct, sorted`<br>26,936 | `builtin []struct, sorted`<br>29,030 | `builtin []struct, sorted`<br>32,703 | `p/nt/bptree/v0 fanout=32`<br>32,592 | `p/nt/bptree/v0 fanout=128`<br>36,455 | `p/nt/bptree/v0 fanout=32`<br>39,414 | before 680 |
 
 [Full report](reports/storage.md) `·` [Dashboard, filterable](reports/storage.html) `·` [Raw rows](results/storage/)
 
