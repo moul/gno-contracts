@@ -31,9 +31,13 @@ import (
 // warning instead of having to delete it to make room. The gate is checked
 // where something enters (Propose, Register); a review or a reset can push a
 // count past it, and never fails for it. The queue clears through approval,
-// verification, rejection, RemoveZone and RemoveEndpoint. Each entry costs its
+// verification, a flag, rejection, RemoveZone and RemoveEndpoint. Flagged
+// endpoints still count toward MaxEndpointsPerZone: a flood a curator flags
+// rather than removes can fill a zone, and removing it is the answer. Each entry costs its
 // sender a storage deposit, refunded to whoever signs the transaction that
-// frees it, so a flooder who withdraws first gets it back: a bond, not a fee.
+// frees it (on a chain where ugnot is not transfer-locked; on one that is, the
+// refund goes to the storage fee collector), so a flooder who withdraws first
+// gets it back: a bond, not a fee.
 const (
 	MaxZones               = 256 // pending and approved zones together
 	MaxPending             = 64  // zones awaiting review, all proposers together
@@ -49,19 +53,32 @@ const (
 // back to unverified. A reset caused by a curator (a rejection, a retirement,
 // an edit) records that curator as the reviewer; one caused by the proposer's
 // own edit to their pending zone records nobody, because a proposer is not a
-// reviewer: ReviewedBy is empty and Reason says why.
+// reviewer there: ReviewedBy is empty and Reason says why.
 const (
 	ChainIDChanged = "the zone's chain id changed; verify again"
 	ZoneRetired    = "the zone was retired; verify again if it returns"
 	ZoneRejected   = "the zone was rejected"
 )
 
+// sequences are the registry-wide counters: the last Revision handed out (so
+// none is reused) and the last status-entry sequence (the eviction order).
+type sequences struct{ rev, seq uint64 }
+
 // fanout is the B+ tree fanout for every container this package builds itself:
-// 128, the cheapest fanout EFFECTIVE_GNO.md measured (592 B per entry).
-const fanout = 128
+// 32, not the 128 EFFECTIVE_GNO.md measured cheapest in memory. Every value in
+// a B+ tree leaf is a boxed object of its own, and removing (or inserting) a
+// key shifts every later value in the leaf, each shift a store write. Measured
+// on a node, one transaction per step (gno master 3cc494ec4): removing the
+// first of 119 keys in one fanout-128 leaf cost 15.8M gas, the last 5.1M,
+// about 90k gas per entry shifted; at fanout 32 it is the same 90k on a leaf a
+// quarter the size. Endpoints are removed and their dedup keys inserted at
+// arbitrary positions, so the smaller leaf is worth its larger node overhead
+// (671 B per entry against 592).
+const fanout = 32
 
 // Registry holds the zones and their endpoints. The zero value is not usable:
-// call [NewRegistry].
+// call [NewRegistry]. All its state is behind pointers, so a copy of the value
+// is the same registry, not a second one sharing half of it.
 //
 // Every write touches its record and all of that record's indexes in one
 // method. The index writes cannot fail as written: every key is validated
@@ -70,8 +87,11 @@ const fanout = 128
 // realm's abort undoes the half-applied write; that abort, not this method, is
 // the atomicity guarantee.
 type Registry struct {
-	rev uint64 // last Revision handed out, registry-wide, so never reused
-	seq uint64 // last status-entry sequence handed out, for eviction order
+	// The two sequences live behind a pointer like every container here, so a
+	// copied Registry value shares them: with them inline, r2 := *r1 would
+	// share every zone but count revisions on its own, and hand out a revision
+	// r1 had already used, which a stale decision would then pass.
+	ids *sequences
 
 	zones      *table
 	bySlug     *unique      // slug -> zone id
@@ -92,6 +112,7 @@ type Registry struct {
 // NewRegistry returns an empty registry.
 func NewRegistry() *Registry {
 	return &Registry{
+		ids:        &sequences{},
 		zones:      newTable(),
 		bySlug:     newUnique(),
 		byStatus:   index.New(),
@@ -147,9 +168,9 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 // evict read the entry order, so only they write it. The caller has already
 // taken the zone out of its old status.
 func (r *Registry) enter(z *Zone, id store.ID, to Status) error {
-	r.seq++
-	r.rev++
-	z.Status, z.Entered, z.Revision = to, int64(r.seq), int64(r.rev)
+	r.ids.seq++
+	r.ids.rev++
+	z.Status, z.Entered, z.Revision = to, int64(r.ids.seq), int64(r.ids.rev)
 	if evicts(to) {
 		r.entered.set(enteredKey(to, z.Entered), id)
 	}
@@ -259,8 +280,8 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 	if z.Status == Approved {
 		z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
 	}
-	r.rev++
-	z.Revision = int64(r.rev)
+	r.ids.rev++
+	z.Revision = int64(r.ids.rev)
 	z.EditedBy, z.EditedAt = by, at
 	z.setInfo(in)
 	return nil
@@ -478,7 +499,7 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 	if n := r.byZone.Count(slug); n >= MaxEndpointsPerZone {
 		return 0, errors.New("zones: " + slug + " is full at " + strconv.Itoa(MaxEndpointsPerZone) + " endpoints")
 	}
-	if n := r.unchecked.Count(slug) - r.flagged.count(slug); n >= MaxUnverifiedPerZone {
+	if n := r.Awaiting(slug); n >= MaxUnverifiedPerZone {
 		return 0, errors.New("zones: " + slug + " already has " + strconv.Itoa(n) +
 			" endpoints waiting for review; try again once a curator has cleared some")
 	}
@@ -825,6 +846,12 @@ func (r *Registry) EndpointCount(slug string, kind EndpointKind) int {
 	return r.byKind.Count(kindKey(slug, kind))
 }
 
+// Awaiting returns how many of a zone's endpoints are waiting for a verdict,
+// what MaxUnverifiedPerZone gates. No endpoint is read.
+func (r *Registry) Awaiting(slug string) int {
+	return r.unchecked.Count(slug) - r.flagged.count(slug)
+}
+
 // OwnerCount returns how many endpoints that address registered on a zone. No
 // endpoint is read.
 func (r *Registry) OwnerCount(slug string, who address) int {
@@ -926,13 +953,13 @@ func trimInfo(in Info) Info {
 	return in
 }
 
-// table is numbered records in a B+ tree at fanout 128: kit/store's shape (an
+// table is numbered records in a B+ tree: kit/store's shape (an
 // id that is never reused, keyed by its seqid encoding so the tree iterates in
-// id order) on the keyed, ordered container EFFECTIVE_GNO.md recommends for
-// iteration and pagination.
-// kit/store/v0 sits on an avl, which it measured at 2,029 B per entry against
-// 592, and about six times the gas per entry iterated, and on an immutable path
-// that choice is permanent.
+// id order) on a B+ tree, the keyed, ordered container EFFECTIVE_GNO.md
+// recommends for iteration and pagination. kit/store/v0 sits on an avl, which
+// it measured at 2,029 B per entry against a B+ tree's 592 to 671, and about
+// six times the gas per entry iterated, and on an immutable path that choice
+// is permanent.
 type table struct {
 	tree *bptree.BPTree
 	last uint64
@@ -991,10 +1018,11 @@ func (u *unique) set(key string, id store.ID) { u.tree.Set(key, id) }
 
 func (u *unique) remove(key string) { u.tree.Remove(key) }
 
-// counter is a key -> count map in a B+ tree, one object per key. The two caps
-// it answers (pending proposals per proposer, endpoints per registrant per
-// zone) only ever ask how many, so keeping the ids would be two more objects
-// per key, written and deleted for nothing.
+// counter is a key -> count map in a B+ tree, one object per key. What it
+// answers (pending proposals per proposer and endpoints per registrant per
+// zone for the caps, flagged endpoints per zone for the admission gate) only
+// ever asks how many, so keeping the ids would be two more objects per key,
+// written and deleted for nothing.
 type counter struct{ tree *bptree.BPTree }
 
 func newCounter() *counter { return &counter{tree: bptree.NewBPTreeN(fanout)} }

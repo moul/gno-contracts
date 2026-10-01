@@ -885,10 +885,13 @@ func TestResetNamesACuratorEditor(t *testing.T) {
 func TestPrivateHostsAndURLForms(t *testing.T) {
 	for _, h := range []string{"validator", "node", "printer.local", "metadata.google.internal", "router.home.arpa",
 		"foo.localdomain", "a.localhost", "192.0.0.1", "198.18.0.1", "198.19.255.255", "224.0.0.1", "255.255.255.255",
-		"127.1", "0x7f.1", "2130706433"} {
+		"127.1", "0x7f.1", "2130706433",
+		"rpc.test", "node.lan", "nas.home", "dc.corp", "wiki.intranet", "box.private", "x.onion", "y.alt",
+		"192.0.2.1", "198.51.100.7", "203.0.113.255"} {
 		uassert.True(t, IsPrivateHost(h), h)
 	}
-	for _, h := range []string{"rpc.gno.land", "1.1.1.1", "198.20.0.1", "172.32.0.1", "gno.land."} {
+	for _, h := range []string{"rpc.gno.land", "1.1.1.1", "198.20.0.1", "172.32.0.1", "gno.land.",
+		"a.latest", "my.salt", "192.0.3.1", "198.51.101.1", "203.0.114.1"} {
 		uassert.False(t, IsPrivateHost(h), h)
 	}
 	// tcp:// and http:// are one rpc endpoint, the way gnokey dials them.
@@ -906,4 +909,23 @@ func TestPrivateHostsAndURLForms(t *testing.T) {
 		in.Title = title
 		uassert.ErrorContains(t, ValidateInfo(in), "status glyph", title)
 	}
+}
+
+// A copied Registry value is the same registry: it shares the revision
+// counter with the zones it shares, so no revision is handed out twice. With
+// the counter inline, an edit through the copy and then one through the
+// original would both produce the same revision number, and a decision made on
+// the first content would pass against the second.
+func TestCopiedRegistryIsTheSameRegistry(t *testing.T) {
+	r1 := NewRegistry()
+	uassert.NoError(t, r1.Propose(alice, 1, "onyx", onyx()))
+	r2 := *r1
+	in := onyx()
+	in.Title = "via the copy"
+	uassert.NoError(t, r2.Edit("onyx", rev(r1, "onyx"), in, alice, 2, ""))
+	seen := rev(r1, "onyx") // what a curator read: the copy's content
+	in.Title = "via the original"
+	uassert.NoError(t, r1.Edit("onyx", seen, in, alice, 3, ""))
+	uassert.True(t, rev(r1, "onyx") != seen, "a new content, a new revision")
+	uassert.ErrorContains(t, r1.ReviewZone("onyx", Approved, seen, curator, 4, ""), "changed since you read it")
 }

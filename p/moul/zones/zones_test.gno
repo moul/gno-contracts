@@ -183,7 +183,13 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.Title = "Onyx\U000e0041" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "\u2800" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "\u2705 official mainnet" }, "status glyph")
-	bad(func(in *Info) { in.Title = "Z\u0301\u0301\u0301" }, "combining marks")
+	bad(func(in *Info) { in.Title = "Z\u0301\u0301\u0301\u0301\u0301" }, "combining marks")
+	// A spacing mark is not a stack, so real words in these scripts pass.
+	for _, word := range []string{"ज़िंदगी", "ਜ਼ਿੰਦਗੀ", "ကြိုး", "སྒྲུབ"} {
+		good := ok
+		good.Title = word
+		uassert.NoError(t, ValidateInfo(good), word)
+	}
 	bad(func(in *Info) { in.Title = "\u0301" }, "nothing visible")
 	bad(func(in *Info) { in.Title = "bad\xffbyte" }, "not valid UTF-8")
 	bad(func(in *Info) { in.Title = "alpha\u2028beta" }, "control character")

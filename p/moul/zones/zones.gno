@@ -143,7 +143,8 @@ type Zone struct {
 	Proposer   address
 	ProposedAt int64
 
-	// Revision changes on every edit of the zone's Info, and is never reused,
+	// Revision changes on every edit of the zone's Info and on every status
+	// change, and is never reused,
 	// not even by a zone removed and proposed again under the same slug. A
 	// curator acting on a zone names the revision they read, so an edit that
 	// lands between their reading and their decision makes the decision fail
@@ -360,11 +361,14 @@ func HostOf(kind EndpointKind, addr string) string {
 // every reader, or no machine at all:
 //
 //   - a name with no dot (resolved through the reader's own search domain), or
-//     one under a suffix reserved for local use: .localhost, .local (mDNS),
-//     .internal, .home.arpa, .localdomain, and the loopback names hosts files
-//     carry (localhost4, localhost6, ip6-localhost, ip6-loopback);
+//     one under a suffix reserved for local or private use, or that public DNS
+//     does not delegate: .localhost, .local (mDNS), .internal, .home.arpa,
+//     .localdomain, .test, .lan, .home, .corp, .intranet, .private, .onion,
+//     .alt (hosts files' localhost4, localhost6, ip6-localhost and ip6-loopback
+//     have no dot and are caught by the first rule);
 //   - an IPv4 address in a loopback, private, link-local, carrier-grade NAT,
-//     "this network", IETF-protocol, benchmarking, multicast or reserved range;
+//     "this network", IETF-protocol, documentation, benchmarking, multicast or
+//     reserved range;
 //   - anything else shaped like a number but not a valid dotted quad, so an
 //     outside caller is not told 127.1 is public (validation refuses it anyway).
 //
@@ -375,7 +379,8 @@ func IsPrivateHost(host string) bool {
 	if !strings.Contains(h, ".") {
 		return true
 	}
-	for _, suffix := range []string{".localhost", ".local", ".internal", ".home.arpa", ".localdomain"} {
+	for _, suffix := range []string{".localhost", ".local", ".internal", ".home.arpa", ".localdomain",
+		".test", ".lan", ".home", ".corp", ".intranet", ".private", ".onion", ".alt"} {
 		if strings.HasSuffix(h, suffix) {
 			return true
 		}
@@ -401,6 +406,8 @@ func IsPrivateHost(host string) bool {
 		return true
 	case a == 192 && b == 0 && c == 0, a == 198 && (b == 18 || b == 19):
 		return true
+	case a == 192 && b == 0 && c == 2, a == 198 && b == 51 && c == 100, a == 203 && b == 0 && c == 113:
+		return true // documentation ranges
 	}
 	return false
 }
@@ -510,8 +517,10 @@ func isBadge(r rune) bool {
 //     graphic (private use, unassigned, noncharacters), the blank fillers, the
 //     variation selectors, the combining grapheme joiner. A title made of them
 //     would pass the length check and render blank or as a box.
-//   - no run of more than two combining marks, which stack over neighbouring
-//     lines, and none of the status glyphs this realm draws.
+//   - no run of more than four nonspacing or enclosing marks, which stack over
+//     neighbouring lines (a spacing mark takes its own width and ends a run,
+//     so Devanagari, Gurmukhi, Burmese and Tibetan words pass), and none of
+//     the status glyphs a Render draws.
 //   - valid UTF-8, because the page would show U+FFFD for a byte stored raw.
 //
 // Refused rather than stripped, so what is stored is what is shown.
@@ -539,17 +548,20 @@ func checkText(field, s string, min, max int) error {
 			return errors.New("zones: the " + field + " contains an invisible or bidi character")
 		}
 		if isBadge(r) {
-			return errors.New("zones: the " + field + " contains a status glyph this page draws itself: " + strconv.Quote(string(r)))
+			return errors.New("zones: the " + field + " contains a status glyph a Render draws: " + strconv.Quote(string(r)))
 		}
-		if unicode.IsMark(r) {
+		if unicode.In(r, unicode.Mn, unicode.Me) {
 			marks++
-			if marks > 2 {
-				return errors.New("zones: the " + field + " stacks more than two combining marks")
+			if marks > 4 {
+				return errors.New("zones: the " + field + " stacks more than four combining marks")
 			}
 		} else {
 			marks = 0
 		}
 		n++
+		if n > max {
+			break // refused below; no need to classify the rest
+		}
 	}
 	if n < min || n > max {
 		if min > 0 {

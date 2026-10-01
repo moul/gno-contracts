@@ -57,11 +57,11 @@ do that.
 | `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. A rejected or retired zone is not editable |
 | `ApproveZone(slug, revision, reason)` | a curator |
 | `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified |
-| `RemoveZone(slug, revision)` | a curator, or the proposer while every endpoint on it is theirs and none is verified or flagged, on a pending or rejected zone. One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
+| `RemoveZone(slug, revision)` | a curator, on a pending or rejected zone; or its proposer, on a pending one, while every endpoint on it is theirs and none is verified or flagged. One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
 | `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator |
 | `VerifyEndpoint(id, revision, reason)` | a curator, naming the zone revision they checked it against |
 | `FlagEndpoint(id, reason)`, `UnverifyEndpoint(id, reason)` | a curator; a flag needs a reason |
-| `RemoveEndpoint(id)` | a curator, or its registrant while it is unverified: a verified or flagged endpoint is a record, and only a curator removes it |
+| `RemoveEndpoint(id)` | a curator, or its registrant while it is unverified and 100 blocks after registering it: a verified or flagged endpoint is a record, and only a curator removes it |
 | `AddCurator(addr)` | a curator; it is an invitation, at most 16 curators and invitations together |
 | `AcceptCurator()` | the invited address, to take up the invitation |
 | `RemoveCurator(addr)` | a curator; it withdraws an invitation, or removes a curator along with every invitation they sent. The last curator cannot be removed |
@@ -70,8 +70,10 @@ Every decision on a zone (edit, approve, reject, retire, remove) and every
 verification takes its `revision`, the one you read (the zone page shows it,
 and its action links carry it): if the zone changed since, its content or its
 status, the call fails and you read it again. The `$help` links on each page
-fill it in. A proposer waits 100 blocks between their own edits, so a zone
-cannot be kept out of a curator's reach by editing it faster than they read.
+fill it in. A proposer edits or withdraws a pending zone only 100 blocks after it was
+proposed or last edited (by anybody), and a registrant withdraws an endpoint
+only 100 blocks after registering it, so neither can keep an entry out of a
+curator's reach by changing it faster than they read.
 
 **Curators are equals**: any one may remove any other, the admin included. That
 is the trust a curator set is, and it is why there are few of them.
@@ -82,7 +84,7 @@ and why a curator's removal collects what the remover did not pay.
 
 ## Pages
 
-Every list is 25 rows a page (`?page=`), and a page reads only its own records:
+Every list is 25 rows a page (`?page=`), and a page reads only the records it shows:
 `vm/qrender` is gas-metered, and a Render that outgrows it stops answering.
 Paths are exact; anything else is Not found.
 
@@ -93,7 +95,10 @@ Paths are exact; anything else is Not found.
 | `proposals` | pending proposals; `?status=rejected` for rejected ones, with the reason |
 
 An official zone's gnoweb and genesis URLs are links; a proposal's show as
-code, to copy and check, and RPCs and endpoint addresses are always code. Free
+code, to copy and check, and so does one the zone also lists as a flagged web
+endpoint, marked. RPCs and endpoint addresses are always code. An action link
+is shown only when the call could pass the caps: no Propose with the queue
+full, no Approve with the live registry full. Free
 text has `@` and bare `g1` addresses neutralised, so a label cannot turn into a
 profile link. A main RPC whose endpoint is flagged is marked so wherever it is
 shown, and the printed `gnokey` line leaves it out.

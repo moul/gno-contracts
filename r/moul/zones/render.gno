@@ -86,10 +86,15 @@ func renderIndex(req *realmpath.Request) string {
 		links = append(links, md.Link(strconv.Itoa(n)+" retired zone(s)", realmURL+":?status=retired"))
 	}
 	links = append(links,
-		md.Link(strconv.Itoa(reg.ZoneCount(zones.Pending))+" proposal(s) waiting for review", realmURL+":proposals"),
-		action("Propose a zone", "ProposeZone",
+		md.Link(strconv.Itoa(reg.ZoneCount(zones.Pending))+" proposal(s) waiting for review", realmURL+":proposals"))
+	// Offered only while it can succeed: a link certain to fail is a dead end.
+	if reg.ZoneCount(zones.Pending) < zones.MaxPending && reg.Live() < zones.MaxZones {
+		links = append(links, action("Propose a zone", "ProposeZone",
 			"slug", "", "chainID", "", "title", "", "description", "", "kind", "testnet",
 			"gnowebURL", "", "rpcURL", "", "genesisURL", ""))
+	} else {
+		links = append(links, "proposals are full until a curator clears some")
+	}
 
 	return ui.Join("\n",
 		md.H1("Zones"),
@@ -173,11 +178,13 @@ func renderZone(slug string, req *realmpath.Request) string {
 		facts = append(facts, md.Bold("gnoweb")+": "+urlFact(z, zones.Gnoweb, z.GnowebURL))
 	}
 	if z.GenesisURL != "" {
-		facts = append(facts, md.Bold("genesis")+": "+urlFact(z, "", z.GenesisURL))
+		facts = append(facts, md.Bold("genesis")+": "+urlFact(z, zones.Explorer, z.GenesisURL))
 	}
-	facts = append(facts, md.Bold("proposed")+" by "+ui.Addr(z.Proposer)+" at block "+strconv.FormatInt(z.ProposedAt, 10))
+	// Addresses in full here: an 8+4 shortening is about 50 bits, within reach
+	// of a vanity grinder who wants to look like a curator.
+	facts = append(facts, md.Bold("proposed")+" by "+ui.AddrFull(z.Proposer)+" at block "+strconv.FormatInt(z.ProposedAt, 10))
 	if z.EditedBy != "" {
-		facts = append(facts, md.Bold("edited")+" by "+ui.Addr(z.EditedBy)+" at block "+strconv.FormatInt(z.EditedAt, 10))
+		facts = append(facts, md.Bold("edited")+" by "+ui.AddrFull(z.EditedBy)+" at block "+strconv.FormatInt(z.EditedAt, 10))
 	}
 	facts = append(facts, md.Bold("revision")+": "+strconv.FormatInt(z.Revision, 10))
 	if z.Reviewed() {
@@ -216,7 +223,7 @@ func renderZone(slug string, req *realmpath.Request) string {
 			md.InlineCode(e.Address),
 			cell(e.Label),
 			endpointStatus(e),
-			ui.Addr(e.Registrant),
+			ui.AddrFull(e.Registrant),
 		)
 	}
 	query := ""
@@ -230,11 +237,14 @@ func renderZone(slug string, req *realmpath.Request) string {
 	parts = append(parts, t.OrEmpty(empty), pager("zone/"+z.Slug, query, pageNum(req, pages), pages))
 
 	actions := []string{}
-	switch z.Status {
-	case zones.Approved:
+	roomy := reg.EndpointCount(z.Slug, "") < zones.MaxEndpointsPerZone && reg.Awaiting(z.Slug) < zones.MaxUnverifiedPerZone
+	switch {
+	case !roomy && (z.Status == zones.Approved || z.Status == zones.Pending):
+		actions = append(actions, "endpoints are full until a curator reviews some")
+	case z.Status == zones.Approved:
 		actions = append(actions, action("Register an endpoint", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
-	case zones.Pending:
+	case z.Status == zones.Pending:
 		actions = append(actions, action("Register an endpoint (proposer or curator)", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	}
@@ -249,10 +259,14 @@ func renderZone(slug string, req *realmpath.Request) string {
 			action("Reject", "RejectZone", "slug", z.Slug, "revision", rev, "reason", ""), remove)
 	case zones.Approved:
 		actions = append(actions, action("Retire", "RetireZone", "slug", z.Slug, "revision", rev, "reason", ""))
-	case zones.Rejected:
-		actions = append(actions, approve, remove)
-	case zones.Retired:
-		actions = append(actions, approve)
+	case zones.Rejected, zones.Retired:
+		// Back into the live registry only while it has room.
+		if reg.Live() < zones.MaxZones {
+			actions = append(actions, approve)
+		}
+		if z.Status == zones.Rejected {
+			actions = append(actions, remove)
+		}
 	}
 	parts = append(parts,
 		para(strings.Join(actions, " · ")),
@@ -406,7 +420,7 @@ func zoneLink(z zones.Zone) string {
 // A URL the zone also lists as a flagged endpoint is code and marked, never a
 // link: the page does not offer what its own endpoint table says not to use.
 func urlFact(z zones.Zone, kind zones.EndpointKind, url string) string {
-	if kind != "" && flagged(z, kind, url) {
+	if kind != "" && flaggedWeb(z, url) {
 		return md.InlineCode(url) + " ⚠️ flagged"
 	}
 	if z.Status == zones.Approved {
@@ -435,19 +449,24 @@ func escapeMentions(s string) string {
 	if !strings.Contains(s, "@") && !strings.Contains(s, "g1") {
 		return s
 	}
+	// Copy the runs between matches in one piece each: a byte at a time costs a
+	// native call per byte, every page, on text a stranger chose.
 	var b strings.Builder
-	n := len(s)
+	n, last := len(s), 0
 	for i := 0; i < n; i++ {
 		switch {
 		case s[i] == '@':
+			b.WriteString(s[last:i])
 			b.WriteString("\\@")
+			last = i + 1
 		case s[i] == 'g' && i+1 < n && s[i+1] == '1':
+			b.WriteString(s[last:i])
 			b.WriteString("g&#49;")
 			i++
-		default:
-			b.WriteByte(s[i])
+			last = i + 1
 		}
 	}
+	b.WriteString(s[last:])
 	return b.String()
 }
 
@@ -461,6 +480,18 @@ func rpcFlag(z zones.Zone) string {
 }
 
 func rpcFlagged(z zones.Zone) bool { return flagged(z, zones.RPC, z.RPCURL) }
+
+// flaggedWeb reports whether a web URL the zone shows (its gnoweb, its genesis)
+// is flagged under any web endpoint kind it could have been registered as: the
+// dedup key includes the kind, so a curator may have flagged it as a faucet.
+func flaggedWeb(z zones.Zone, url string) bool {
+	for _, k := range []zones.EndpointKind{zones.Gnoweb, zones.Indexer, zones.Faucet, zones.Explorer} {
+		if flagged(z, k, url) {
+			return true
+		}
+	}
+	return false
+}
 
 // flagged reports whether the zone lists url as an endpoint of that kind and a
 // curator flagged it. The lookup compares in Canonical form, which reads an rpc

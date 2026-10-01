@@ -116,14 +116,14 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	id := RegisterEndpoint(cross(cur), "alice-dev", "peer", nodeID+"@alice.example:26656", "alice")
 	// A proposer waits between their own edits: every edit bumps the revision a
 	// curator's decision must name, and curators need a window to make one.
-	uassert.AbortsContains(t, cur, "may edit again in", func() {
+	uassert.AbortsContains(t, cur, "may act on it again in", func() {
 		EditZone(cross(cur), "alice-dev", zrev("alice-dev"), "alicedev-1", "Alice's devnet", "for trying things",
 			"devnet", "https://alice.example", "https://rpc.alice.example", "", "")
 	})
 	testing.SkipHeights(ProposerEditCooldown)
 	EditZone(cross(cur), "alice-dev", zrev("alice-dev"), "alicedev-1", "Alice's devnet", "for trying things",
 		"devnet", "https://alice.example", "https://rpc.alice.example", "", "")
-	uassert.AbortsContains(t, cur, "may edit again in", func() {
+	uassert.AbortsContains(t, cur, "may act on it again in", func() {
 		EditZone(cross(cur), "alice-dev", zrev("alice-dev"), "alicedev-1", "Alice's devnet", "for trying more",
 			"devnet", "https://alice.example", "https://rpc.alice.example", "", "")
 	})
@@ -137,7 +137,7 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	uassert.AbortsContains(t, cur, "only a curator, or the proposer", func() {
 		EditZone(cross(cur), "alice-dev", zrev("alice-dev"), "x", "x", "", "devnet", "", "https://x.example", "", "")
 	})
-	uassert.AbortsContains(t, cur, "only a curator, or the proposer while it is pending or rejected", func() {
+	uassert.AbortsContains(t, cur, "only a curator, or the proposer while it is pending", func() {
 		RemoveZone(cross(cur), "alice-dev", zrev("alice-dev"))
 	})
 	uassert.AbortsContains(t, cur, "only a curator or its registrant", func() {
@@ -173,7 +173,7 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	// Nor hers to remove; and not even a curator removes an approved zone: it is
 	// retired instead.
-	uassert.AbortsContains(t, cur, "while it is pending or rejected", func() { RemoveZone(cross(cur), "alice-dev", zrev("alice-dev")) })
+	uassert.AbortsContains(t, cur, "while it is pending, may remove", func() { RemoveZone(cross(cur), "alice-dev", zrev("alice-dev")) })
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	uassert.AbortsContains(t, cur, "retire it instead", func() { RemoveZone(cross(cur), "alice-dev", zrev("alice-dev")) })
 	uassert.AbortsContains(t, cur, "needs a reason", func() { RetireZone(cross(cur), "alice-dev", zrev("alice-dev"), "") })
@@ -185,7 +185,7 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 
 	// Retired, it is a record the curators keep: the proposer cannot erase it.
 	testing.SetRealm(testing.NewUserRealm(alice))
-	uassert.AbortsContains(t, cur, "while it is pending or rejected", func() { RemoveZone(cross(cur), "alice-dev", zrev("alice-dev")) })
+	uassert.AbortsContains(t, cur, "while it is pending, may remove", func() { RemoveZone(cross(cur), "alice-dev", zrev("alice-dev")) })
 	// Nor can a curator: a retired zone is kept on record.
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	uassert.AbortsContains(t, cur, "kept on record", func() { RemoveZone(cross(cur), "alice-dev", zrev("alice-dev")) })
@@ -238,16 +238,46 @@ func TestRejectAndWithdraw(cur realm, t *testing.T) {
 	uassert.Equal(t, "fake-mainnet", slugs(ListZones("rejected", "")))
 	uassert.Equal(t, "mainnet onyx staging moul-staging", slugs(ListZones("approved", "")))
 
-	// The proposer can take a rejected proposal down, which frees the slug, but
-	// not while it carries somebody else's endpoint: the deposit refund would
-	// go to the proposer.
+	// A rejected zone is the curators' record: its proposer cannot take it down
+	// (and so cannot collect the deposit the curator paid to record the
+	// rejection). A curator can.
 	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsContains(t, cur, "must be removed first", func() { RemoveZone(cross(cur), "fake-mainnet", zrev("fake-mainnet")) })
+	uassert.AbortsContains(t, cur, "while it is pending, may remove", func() {
+		RemoveZone(cross(cur), "fake-mainnet", zrev("fake-mainnet"))
+	})
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	RemoveEndpoint(cross(cur), theirs)
-	testing.SetRealm(testing.NewUserRealm(bob))
 	RemoveZone(cross(cur), "fake-mainnet", zrev("fake-mainnet"))
 	_, ok := GetZone("fake-mainnet")
+	uassert.False(t, ok)
+
+	// A proposer withdrawing a PENDING zone waits out the cooldown, and cannot
+	// while it carries somebody else's endpoint: the refund would go to them.
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ProposeZone(cross(cur), "bob-again", "bob-1", "Bob again", "", "devnet", "", "https://rpc.bob.example", "")
+	uassert.AbortsContains(t, cur, "may act on it again in", func() {
+		RemoveZone(cross(cur), "bob-again", zrev("bob-again"))
+	})
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	RegisterEndpoint(cross(cur), "bob-again", "rpc", "https://curator2.example", "")
+	testing.SkipHeights(ProposerEditCooldown)
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "must be removed first", func() {
+		RemoveZone(cross(cur), "bob-again", zrev("bob-again"))
+	})
+}
+
+// A registrant withdraws their endpoint only after the cooldown: removing and
+// registering again every block would give it a new id faster than a curator
+// could flag the old one.
+func TestRegistrantWithdrawalWaits(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	id := RegisterEndpoint(cross(cur), "onyx", "rpc", "https://cycle.example", "")
+	uassert.AbortsContains(t, cur, "may withdraw it in", func() { RemoveEndpoint(cross(cur), id) })
+	testing.SkipHeights(ProposerEditCooldown)
+	RemoveEndpoint(cross(cur), id)
+	_, ok := GetEndpoint(id)
 	uassert.False(t, ok)
 }
 
@@ -292,10 +322,12 @@ func TestEndpointLifecycle(cur realm, t *testing.T) {
 	FlagEndpoint(cross(cur), id, "serves the wrong chain")
 	testing.SetRealm(testing.NewUserRealm(bob))
 	uassert.AbortsContains(t, cur, "only a curator may remove it now", func() { RemoveEndpoint(cross(cur), id) })
-	// Back to unverified, it is the registrant's to take down again.
+	// Back to unverified, and once the cooldown has passed, it is the
+	// registrant's to take down again.
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	UnverifyEndpoint(cross(cur), id, "re-checking")
 	testing.SetRealm(testing.NewUserRealm(bob))
+	testing.SkipHeights(ProposerEditCooldown)
 	RemoveEndpoint(cross(cur), id)
 	_, ok = GetEndpoint(id)
 	uassert.False(t, ok)
@@ -529,6 +561,7 @@ func TestProposerCannotRemoveOverAVerdict(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	FlagEndpoint(cross(cur), id, "malicious peer")
 	testing.SetRealm(testing.NewUserRealm(bob))
+	testing.SkipHeights(ProposerEditCooldown)
 	uassert.AbortsContains(t, cur, "only a curator may remove the zone now", func() {
 		RemoveZone(cross(cur), "bobs", zrev("bobs"))
 	})
@@ -575,4 +608,48 @@ func TestFlaggedRPCMatchesAcrossTcpAndHttp(cur realm, t *testing.T) {
 		GnowebURL: z.GnowebURL, RPCURL: "http://rpc.tcp.example:26657", GenesisURL: z.GenesisURL}
 	must(reg.Edit("onyx", zrev("onyx"), in, Admin, 1, "moved"))
 	uassert.True(t, strings.Contains(Render("zone/onyx"), "`http://rpc.tcp.example:26657` ⚠️ flagged"))
+
+	id = RegisterEndpoint(cross(cur), "onyx", "rpc", "http://rpc.http.example:26657", "")
+	FlagEndpoint(cross(cur), id, "down")
+	in.RPCURL = "tcp://rpc.http.example:26657"
+	must(reg.Edit("onyx", zrev("onyx"), in, Admin, 2, "moved back"))
+	uassert.True(t, strings.Contains(Render("zone/onyx"), "`tcp://rpc.http.example:26657` ⚠️ flagged"))
+}
+
+// A page offers an action only while it can succeed: Propose disappears when
+// the review queue is full, and Approve on a rejected zone when the live
+// registry is.
+func TestFullQueuesHideTheirActions(t *testing.T) {
+	reset()
+	in := func(i int) zones.Info {
+		return zones.Info{ChainID: "fill-" + strconv.Itoa(i), Title: "Fill", Kind: zones.Testnet,
+			RPCURL: "https://rpc" + strconv.Itoa(i) + ".example"}
+	}
+	slug := func(i int) string { return "fill-" + strconv.Itoa(i) }
+	who := func(i int) address { return testutils.TestAddress("p" + strconv.Itoa(i/zones.MaxPendingPerProposer)) }
+
+	must(reg.Propose(alice, 1, "nope", in(-1)))
+	must(reg.ReviewZone("nope", zones.Rejected, zrev("nope"), Admin, 1, "no"))
+	uassert.True(t, strings.Contains(Render("zone/nope"), "Approve revision"))
+
+	for i := 0; i < zones.MaxPending; i++ {
+		must(reg.Propose(who(i), 2, slug(i), in(i)))
+	}
+	uassert.False(t, strings.Contains(Render(""), "func=ProposeZone"))
+	uassert.True(t, strings.Contains(Render(""), "proposals are full"))
+
+	// Approve the queue away, then keep proposing and approving until the live
+	// registry is full: no proposal is waiting, so Propose is hidden by the
+	// live cap alone.
+	for i := 0; i < zones.MaxPending; i++ {
+		must(reg.ReviewZone(slug(i), zones.Approved, zrev(slug(i)), Admin, 3, ""))
+	}
+	uassert.True(t, strings.Contains(Render(""), "func=ProposeZone"))
+	for i := zones.MaxPending; reg.Live() < zones.MaxZones; i++ {
+		must(reg.Propose(who(i), 4, slug(i), in(i)))
+		must(reg.ReviewZone(slug(i), zones.Approved, zrev(slug(i)), Admin, 4, ""))
+	}
+	uassert.Equal(t, 0, reg.ZoneCount(zones.Pending))
+	uassert.False(t, strings.Contains(Render("zone/nope"), "Approve revision"))
+	uassert.False(t, strings.Contains(Render(""), "func=ProposeZone"))
 }

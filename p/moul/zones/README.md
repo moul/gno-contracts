@@ -12,6 +12,7 @@ must(r.Propose(proposer, height, "onyx", zones.Info{ChainID: "onyx-1", Title: "O
 	Kind: zones.Testnet, RPCURL: "https://rpc.onyx.testnets.gno.land"}))
 z, _ := r.Zone("onyx")
 must(r.ReviewZone("onyx", zones.Approved, z.Revision, curator, height, ""))
+z, _ = r.Zone("onyx") // the approval bumped the revision
 id, err := r.Register(proposer, height, "onyx", zones.Peer,
 	"g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656", "gno core")
 must(err)
@@ -88,8 +89,10 @@ also an index key, a URL segment or a config-file line:
   escapes a character that needs no escaping, and a path has no `.` or `..`
   segment, so a URL has one spelling. A host that names a different machine
   for every reader is refused except on a `local` zone: a name with no dot,
-  `.localhost`, `.local`, `.internal`, `.home.arpa`, `.localdomain`, and IPv4
-  loopback, private, link-local, CGNAT, multicast and reserved ranges. A zone
+  `.localhost`, `.local`, `.internal`, `.home.arpa`, `.localdomain`, `.test`,
+  `.lan`, `.home`, `.corp`, `.intranet`, `.private`, `.onion`, `.alt`, and IPv4
+  loopback, private, link-local, CGNAT, documentation, multicast and reserved
+  ranges. A zone
   cannot leave the `local` kind while it lists one.
 - **Peer**: `<node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes,
   the node id a lowercase g1 address (tm2 compares node ids byte for byte), and
@@ -99,9 +102,8 @@ also an index key, a URL segment or a config-file line:
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no
-  variation selector, no more than two stacked combining marks, none of the
-  status glyphs a Render draws nor their look-alikes, and, where it is
-  required, something visible. Refused rather than stripped, so what is stored
+  variation selector, no run of more than four combining marks, none of the
+  status glyphs a Render draws nor their look-alikes, and, where it is required, something visible. Refused rather than stripped, so what is stored
   is what is shown. It must still be escaped by whoever renders it.
 
 An endpoint is stored in canonical spelling (scheme lowercased, a peer
@@ -122,25 +124,27 @@ amount of time fills the registry for good.
 
 **Per-address caps** make one address cheap to ignore: 4 pending proposals, 16
 endpoints per zone. Neither stops a flood from many addresses, so **the review
-queue has an admission gate of its own**: 64 pending zones in all, 64
-endpoints per zone waiting for a verdict, under a hard 128 per zone. A flagged
-endpoint has its verdict and leaves the queue, so curators keep warnings
-instead of deleting them to make room. The gate is checked where something
-enters, so a review or a reset can push a count past it. A flood fills the queue and never crowds out an
-approved zone or a verified endpoint. Each entry costs its sender a storage deposit, refunded to whoever
-signs the transaction that frees it, so a flooder who withdraws first gets it
-back: a bond, not a fee.
+queue has an admission gate of its own**: 64 pending zones in all, 64 endpoints
+per zone waiting for a verdict, under a hard 128 per zone. A flagged endpoint
+has its verdict and leaves the queue, so curators keep warnings instead of
+deleting them to make room. The gate is checked where something enters, so a
+review or a reset can push a count past it. A flood fills the queue and never
+crowds out an approved zone or a verified endpoint. Each entry costs its sender
+a storage deposit, refunded to whoever signs the transaction that frees it, so a
+flooder who withdraws first gets it back: a bond, not a fee.
 
 ## Storage
 
-Records live in a B+ tree at fanout 128, the keyed, ordered container
-EFFECTIVE_GNO recommends for iteration and pagination (592 B per entry), with
-ids that are never reused. `kit/store`
+Records live in a B+ tree, the keyed, ordered container EFFECTIVE_GNO
+recommends for iteration and pagination (592 B per entry), with ids that are
+never reused. Every tree here is at fanout 32, not 128: a removal shifts every
+later value in its leaf, and each shifted value is rewritten, about 90k gas
+apiece on a real node, so a smaller leaf bounds what one removal costs. `kit/store`
 has that shape on an avl tree (2,029 B), and on an immutable path the choice is
 permanent. Three B+ trees hold an id per key: slug, the endpoint dedup key (a
 128-bit hash of the canonical address rather than a second copy of it), and the
-order zones entered their state. Two hold a count per key: pending proposals
-per proposer, endpoints per registrant. The other five are
+order zones entered their state. Three hold a count per key: pending
+proposals per proposer, endpoints per registrant, flagged endpoints per zone. The other five are
 [`kit/index`](../kit/index): status, approved-by-chain-id, and for endpoints
 zone, zone-and-kind and not-verified. Every one is written in the same
 method as its record; counts come from the indexes without reading a record, and

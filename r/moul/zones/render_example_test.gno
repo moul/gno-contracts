@@ -53,7 +53,7 @@ func ExampleRender_zone() {
 	// - **rpc**: `https://rpc.onyx.testnets.gno.land`
 	// - **gnoweb**: [https://onyx\.testnets\.gno\.land](https://onyx.testnets.gno.land)
 	// - **genesis**: [https://github\.com/gnolang/gno/releases/download/chain/onyx/genesis\.json](https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json)
-	// - **proposed** by `g1manfre…dlf5` at block 123
+	// - **proposed** by `g1manfred47kzduec920z88wfr64ylksmdcedlf5` at block 123
 	// - **revision**: 4
 	// - **last reviewed** by `g1manfre…dlf5` at block 123: seeded at deploy; probed 2026\-10\-01
 	//
@@ -63,13 +63,13 @@ func ExampleRender_zone() {
 	//
 	// | # | kind | address | label | status | registered by |
 	// | --- | --- | --- | --- | --- | --- |
-	// | 7 | rpc | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
-	// | 8 | gnoweb | `https://onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
-	// | 9 | peer | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
-	// | 10 | peer | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
-	// | 11 | indexer | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
-	// | 12 | faucet | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
-	// | 13 | explorer | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
+	// | 7 | rpc | `https://rpc.onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfred47kzduec920z88wfr64ylksmdcedlf5` |
+	// | 8 | gnoweb | `https://onyx.testnets.gno.land` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfred47kzduec920z88wfr64ylksmdcedlf5` |
+	// | 9 | peer | `g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656` | seed\-1, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfred47kzduec920z88wfr64ylksmdcedlf5` |
+	// | 10 | peer | `g1grq5zswt0dlwwe7clr4359w70k2ewgse0gcwck@seed-2.onyx.testnets.gno.land:26656` | seed\-2, gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfred47kzduec920z88wfr64ylksmdcedlf5` |
+	// | 11 | indexer | `https://indexer.onyx.testnets.gno.land/graphql/query` | gno core tx\-indexer | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfred47kzduec920z88wfr64ylksmdcedlf5` |
+	// | 12 | faucet | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfred47kzduec920z88wfr64ylksmdcedlf5` |
+	// | 13 | explorer | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfred47kzduec920z88wfr64ylksmdcedlf5` |
 	//
 	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&revision=4&slug=onyx)
 	//
