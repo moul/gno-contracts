@@ -82,6 +82,19 @@ type copilotPayload struct {
 // Copilot writes as a level-3 heading ("### 🟡 Changes recommended").
 var copilotVerdictRe = regexp.MustCompile(`(?m)^###\s+(.+?)\s*$`)
 
+// copilotEffortRe pulls the effort level out of the overview, which Copilot
+// writes as "**Review effort:** Lite".
+//
+// Recorded because the effort is NOT reliably what the account default says.
+// On 2026-10-01 the default was switched to Lite; the review on #312 at
+// 19:00:02 ran Lite, and two reviews on #311 at 19:00:34 and 19:10:06 ran
+// Balanced. Something per-pull-request beats the default, so the only honest
+// way to know which effort produced a finding is to read it back off the review
+// that produced it. Without this the log silently mixes two different products
+// and any cost-per-review figure derived from it is an average over an unknown
+// mix, which is exactly the mistake that put a 13 in these files for a day.
+var copilotEffortRe = regexp.MustCompile(`Review effort:\*\*\s*([A-Za-z]+)`)
+
 // htmlTagRe strips the inline <picture>/<img> severity badges out of the
 // overview. They are 400 characters each and say nothing in a plain-text digest.
 var htmlTagRe = regexp.MustCompile(`<[^>]+>`)
@@ -189,7 +202,8 @@ func copilotDigest(p copilotPayload) (string, bool) {
 		fmt.Fprintf(&b, "\n\n> %s\n", copilotInline(strings.TrimSpace(htmlTagRe.ReplaceAllString(p.Review.Body, ""))))
 		return b.String(), true
 	}
-	fmt.Fprintf(&b, "**%s** · [the review](%s)", copilotVerdict(p.Review.Body), p.Review.HTMLURL)
+	fmt.Fprintf(&b, "**%s** · effort **%s** · [the review](%s)",
+		copilotVerdict(p.Review.Body), copilotEffort(p.Review.Body), p.Review.HTMLURL)
 	if p.Review.SubmittedAt != "" {
 		fmt.Fprintf(&b, " · %s", p.Review.SubmittedAt)
 	}
@@ -354,4 +368,17 @@ func copilotInline(s string) string {
 		"://", ":\u200b//", "www.", "www\u200b.",
 	)
 	return r.Replace(s)
+}
+
+// copilotEffort is the effort level the review reports about itself, or
+// "unstated" when the overview does not carry one.
+//
+// Not defaulted to Balanced: a guess recorded as a fact is how the cost model
+// went wrong the first time, and a row saying "unstated" is honest about a
+// review whose effort nobody can recover.
+func copilotEffort(body string) string {
+	if m := copilotEffortRe.FindStringSubmatch(body); m != nil {
+		return m[1]
+	}
+	return "unstated"
 }

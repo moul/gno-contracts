@@ -692,6 +692,13 @@ minutes for the review itself, nothing metered per run.
 Custom instructions are read from the **head branch**, so a pull request can test its own
 instruction changes.
 
+**Verify the effort, never assume the default held.** The account default is not what
+reliably runs: on 2026-10-01 it was switched to Lite, the review on #312 at 19:00:02 ran
+**Lite**, and two reviews on #311 at 19:00:34 and 19:10:06 ran **Balanced** anyway. Something
+per-pull-request beats it, and the effort cannot be chosen from `gh` at all. Every review
+reports its own level (`**Review effort:** Lite`), and `copilot-log` now records it, so a
+cost figure derived from the log is no longer an average over an unknown mix.
+
 **Every review is digested into [#280](https://github.com/moul/gno-contracts/issues/280)** by
 `copilot-review-log.yml` (an hourly sweep, because a run triggered by Copilot's review waits
 for an approval nothing can give it) plus `gnocontracts copilot-log`, one entry per finding,
