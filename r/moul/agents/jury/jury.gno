@@ -60,6 +60,16 @@ type Case struct {
 
 var cases []*Case // index 0 => ID 1
 
+// The bounds on what a wallet may open. OpenCase is callable by anyone, so
+// without them the case list and every panel grow without limit, and so does
+// the index page that renders them.
+const (
+	MaxCases    = 1000
+	MaxJurors   = 25
+	MaxSubject  = 200 // bytes
+	IndexRecent = 50  // cases the index lists, newest first
+)
+
 // OpenCase starts a dispute with a fixed panel of jurors, given as
 // comma-separated addresses. An odd panel size avoids ties; duplicates and
 // invalid addresses are rejected.
@@ -70,8 +80,11 @@ var cases []*Case // index 0 => ID 1
 func OpenCase(cur realm, subject, jurorsCSV string) uint64 {
 	opener := caller(cur)
 	assert(subject != "", "empty subject")
+	assert(len(subject) <= MaxSubject, "subject too long")
+	assert(len(cases) < MaxCases, "the jury is full")
 	jurors := parseJurors(jurorsCSV)
 	assert(len(jurors) >= 1, "need at least one juror")
+	assert(len(jurors) <= MaxJurors, "panel too large")
 
 	seen := make(map[string]bool)
 	panel := make([]*Juror, 0, len(jurors))
@@ -234,9 +247,15 @@ func renderIndex() string {
 		sb.WriteString("_No cases yet._\n")
 		return sb.String()
 	}
+	if len(cases) > IndexRecent {
+		sb.WriteString(ufmt.Sprintf("The %d most recent of %d cases, newest first.\n\n", IndexRecent, len(cases)))
+	}
 	sb.WriteString("| # | Subject | Phase | ✅ | ❌ | Outcome |\n")
 	sb.WriteString("|---|---|---|---|---|---|\n")
-	for _, c := range cases {
+	// Newest first, and only the last IndexRecent: the page has to render at
+	// MaxCases too.
+	for i := len(cases) - 1; i >= 0 && i >= len(cases)-IndexRecent; i-- {
+		c := cases[i]
 		out := c.Outcome
 		if out == "" {
 			out = "—"

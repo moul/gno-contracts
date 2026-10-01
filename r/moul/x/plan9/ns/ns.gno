@@ -385,7 +385,7 @@ func renderHome(key string) string {
 		b.WriteString("| name | posted by | since |\n|---|---|---|\n")
 		services.Iterate("", "", func(k string, v any) bool {
 			s := v.(*service)
-			b.WriteString("| `" + k + "` | [`" + s.owner + "`](" +
+			b.WriteString("| " + ui.Cell(k) + " | [`" + s.owner + "`](" +
 				strings.TrimPrefix(s.owner, "gno.land") + ") | " +
 				strconv.FormatInt(s.since, 10) + " |\n")
 			return false

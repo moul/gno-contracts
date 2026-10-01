@@ -237,3 +237,13 @@ func TestPathDerivedTextIsEscaped(t *testing.T) {
 		uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
 	}
 }
+
+// A service name is chosen by whichever realm posts it, and ValidName refuses
+// only "", ".", ".." and "/": the /srv table escapes it as a cell.
+func TestServiceNameIsTableSafe(cur realm, t *testing.T) {
+	name := "x` | [claim](https://evil.example) |"
+	services.Set(name, &service{owner: "gno.land/r/someone/poster"})
+	defer services.Remove(name)
+	out := Render("")
+	uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
+}

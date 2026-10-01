@@ -126,3 +126,27 @@ func TestEvenPanelSplitIsATie(cur realm, t *testing.T) {
 	revealAs(cur, j2, id, false, "t2")
 	uassert.Equal(t, "tie", Outcome(id))
 }
+
+// OpenCase is callable by any wallet, so what it admits is bounded, and the
+// index renders a fixed window whatever the case count.
+func TestOpenCaseIsBounded(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(opener))
+	uassert.AbortsContains(t, cur, "subject too long", func() {
+		OpenCase(cross(cur), strings.Repeat("s", MaxSubject+1), j1.String())
+	})
+	panel := ""
+	for i := 0; i <= MaxJurors; i++ {
+		if i > 0 {
+			panel += ","
+		}
+		panel += testutils.TestAddress(ufmt.Sprintf("juror%d", i+10)).String()
+	}
+	uassert.AbortsContains(t, cur, "panel too large", func() { OpenCase(cross(cur), "big", panel) })
+
+	for len(cases) < IndexRecent+5 {
+		OpenCase(cross(cur), "filler", j1.String())
+	}
+	idx := Render("")
+	uassert.True(t, strings.Contains(idx, ufmt.Sprintf("The %d most recent of %d cases", IndexRecent, len(cases))), idx)
+	uassert.Equal(t, IndexRecent, strings.Count(idx, "](/r/moul/agents/jury/v0:"))
+}

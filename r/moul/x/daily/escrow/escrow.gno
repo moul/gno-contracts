@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -138,7 +139,7 @@ func Render(path string) string {
 		if id, err := strconv.Atoi(path); err == nil {
 			v := deals.Get(strconv.Itoa(id))
 			if v == nil {
-				return "# Escrow\n\nDeal `" + path + "` not found.\n"
+				return "# Escrow\n\nDeal " + md.InlineCode(path) + " not found.\n"
 			}
 			return renderOne(v.(*Deal))
 		}
