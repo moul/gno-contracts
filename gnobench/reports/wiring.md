@@ -9,7 +9,7 @@ The same n writes, batched into one transaction and spread across n transactions
 
 | machine | hardware | go | gno revision | gnobench | rows | updated |
 |---|---|---|---|---|--:|---|
-| `darwin-arm64-apple-m4-max-16c` | darwin/arm64, Apple M4 Max, 16 cores, 64 GB | go1.25.9 | `1fc4c140e (2026-09-14)` | `94fef032` | 168 | 2026-10-01T15:13:53Z |
+| `darwin-arm64-apple-m4-max-16c` | darwin/arm64, Apple M4 Max, 16 cores, 64 GB | go1.25.9 | `1fc4c140e (2026-09-14)` | `a346e802` | 258 | 2026-10-01T15:51:16Z |
 | `linux-amd64-amd-epyc-7763-64-core-processor-4c` | linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores | go1.25.9 | `3cc494ec4 (2026-10-01)` | `ecd062a` | 24 | 2026-10-01T15:34:11Z |
 
 ## How to read this
@@ -82,6 +82,36 @@ container pays the per-byte cost on all of itself. Neither is strictly better.
 |  | `p/nt/bptree/v0 fanout=32` | 24 | 0 | 0 | 211,149 | 2,259,370 | 2,470,519 |
 |  | `p/nt/avl/v0` | 31 | 0 | 0 | 202,956 | 2,531,236 | 2,734,192 |
 |  | `p/nt/bptree/v0 fanout=128` | 24 | 0 | 0 | 292,203 | 2,703,155 | 2,995,358 |
+| 700 | `builtin []string` | 2 | 0 | 0 | 172,808 | 1,068,062 | **1,240,870** |
+|  | `p/moul/ulist/v1` | 29 | 0 | 0 | 140,582 | 2,167,773 | 2,308,355 |
+|  | `builtin map[string]string` | 2 | 0 | 0 | 392,907 | 1,948,628 | 2,341,535 |
+|  | `p/nt/bptree/v0 fanout=32` | 24 | 0 | 0 | 213,055 | 2,271,559 | 2,484,614 |
+|  | `p/nt/avl/v0` | 33 | 0 | 0 | 217,085 | 2,668,429 | 2,885,514 |
+|  | `p/nt/bptree/v0 fanout=128` | 24 | 0 | 0 | 292,430 | 2,707,218 | 2,999,648 |
+| 720 | `builtin []string` | 2 | 0 | 0 | 177,681 | 1,094,922 | **1,272,603** |
+|  | `p/moul/ulist/v1` | 29 | 0 | 0 | 140,609 | 2,167,926 | 2,308,535 |
+|  | `builtin map[string]string` | 2 | 0 | 0 | 404,056 | 2,000,648 | 2,404,704 |
+|  | `p/nt/bptree/v0 fanout=32` | 24 | 0 | 0 | 214,017 | 2,275,622 | 2,489,639 |
+|  | `p/nt/avl/v0` | 33 | 0 | 0 | 213,183 | 2,668,429 | 2,881,612 |
+|  | `p/nt/bptree/v0 fanout=128` | 24 | 0 | 0 | 292,920 | 2,707,218 | 3,000,138 |
+| 740 | `builtin []string` | 2 | 0 | 0 | 182,554 | 1,121,782 | **1,304,336** |
+|  | `p/moul/ulist/v1` | 29 | 0 | 0 | 140,609 | 2,167,926 | 2,308,535 |
+|  | `builtin map[string]string` | 2 | 0 | 0 | 415,204 | 2,052,668 | 2,467,872 |
+|  | `p/nt/bptree/v0 fanout=32` | 24 | 0 | 0 | 214,262 | 2,275,622 | 2,489,884 |
+|  | `p/nt/avl/v0` | 33 | 0 | 0 | 215,134 | 2,668,429 | 2,883,563 |
+|  | `p/nt/bptree/v0 fanout=128` | 24 | 0 | 0 | 292,920 | 2,707,218 | 3,000,138 |
+| 760 | `builtin []string` | 2 | 0 | 0 | 187,427 | 1,148,642 | **1,336,069** |
+|  | `p/moul/ulist/v1` | 29 | 0 | 0 | 140,609 | 2,167,926 | 2,308,535 |
+|  | `p/nt/bptree/v0 fanout=32` | 24 | 0 | 0 | 214,244 | 2,279,685 | 2,493,929 |
+|  | `builtin map[string]string` | 2 | 0 | 0 | 426,353 | 2,104,688 | 2,531,041 |
+|  | `p/nt/avl/v0` | 33 | 0 | 0 | 217,085 | 2,668,429 | 2,885,514 |
+|  | `p/nt/bptree/v0 fanout=128` | 24 | 0 | 0 | 293,410 | 2,707,218 | 3,000,628 |
+| 780 | `builtin []string` | 2 | 0 | 0 | 192,300 | 1,175,502 | **1,367,802** |
+|  | `p/moul/ulist/v1` | 29 | 0 | 0 | 140,609 | 2,167,926 | 2,308,535 |
+|  | `p/nt/bptree/v0 fanout=32` | 24 | 0 | 0 | 215,206 | 2,283,748 | 2,498,954 |
+|  | `builtin map[string]string` | 2 | 0 | 0 | 437,501 | 2,156,708 | 2,594,209 |
+|  | `p/nt/avl/v0` | 33 | 0 | 0 | 213,231 | 2,668,701 | 2,881,932 |
+|  | `p/nt/bptree/v0 fanout=128` | 24 | 0 | 0 | 296,377 | 2,711,281 | 3,007,658 |
 | 800 | `builtin []string` | 2 | 0 | 0 | 197,172 | 1,202,362 | **1,399,534** |
 |  | `p/moul/ulist/v1` | 29 | 0 | 0 | 140,609 | 2,167,926 | 2,308,535 |
 |  | `p/nt/bptree/v0 fanout=32` | 24 | 0 | 0 | 215,451 | 2,283,748 | 2,499,199 |
@@ -135,6 +165,36 @@ container pays the per-byte cost on all of itself. Neither is strictly better.
 |  | `builtin map[string]string` | 2 | 4 | 0 | 619,026 | 3,993,289 | 4,612,315 |
 |  | `p/moul/ulist/v1` | 29 | 23 | 0 | 179,146 | 8,030,740 | 8,209,886 |
 |  | `p/nt/avl/v0` | 58 | 35 | 20 | 341,116 | 18,157,263 | 18,498,379 |
+| 700 | `p/nt/bptree/v0 fanout=32` | 25 | 1 | 0 | 221,233 | 2,581,700 | **2,802,933** |
+|  | `builtin []string` | 2 | 4 | 0 | 345,194 | 2,861,935 | 3,207,129 |
+|  | `p/nt/bptree/v0 fanout=128` | 25 | 1 | 0 | 300,608 | 3,017,359 | 3,317,967 |
+|  | `builtin map[string]string` | 2 | 4 | 0 | 720,669 | 4,467,589 | 5,188,258 |
+|  | `p/moul/ulist/v1` | 29 | 23 | 0 | 179,146 | 8,030,740 | 8,209,886 |
+|  | `p/nt/avl/v0` | 63 | 38 | 22 | 365,840 | 19,749,380 | 20,115,220 |
+| 720 | `p/nt/bptree/v0 fanout=32` | 25 | 1 | 0 | 222,195 | 2,585,763 | **2,807,958** |
+|  | `builtin []string` | 2 | 4 | 0 | 354,807 | 2,910,915 | 3,265,722 |
+|  | `p/nt/bptree/v0 fanout=128` | 25 | 1 | 0 | 301,098 | 3,017,359 | 3,318,457 |
+|  | `builtin map[string]string` | 2 | 4 | 0 | 740,998 | 4,562,449 | 5,303,447 |
+|  | `p/moul/ulist/v1` | 29 | 23 | 0 | 179,200 | 8,031,019 | 8,210,219 |
+|  | `p/nt/avl/v0` | 63 | 38 | 22 | 365,840 | 19,749,380 | 20,115,220 |
+| 740 | `p/nt/bptree/v0 fanout=32` | 25 | 1 | 0 | 222,440 | 2,585,763 | **2,808,203** |
+|  | `p/nt/bptree/v0 fanout=128` | 25 | 1 | 0 | 301,098 | 3,017,359 | 3,318,457 |
+|  | `builtin []string` | 2 | 4 | 0 | 364,420 | 2,959,895 | 3,324,315 |
+|  | `builtin map[string]string` | 2 | 4 | 0 | 761,326 | 4,657,309 | 5,418,635 |
+|  | `p/moul/ulist/v1` | 29 | 23 | 0 | 179,200 | 8,031,019 | 8,210,219 |
+|  | `p/nt/avl/v0` | 63 | 38 | 22 | 365,840 | 19,749,380 | 20,115,220 |
+| 760 | `p/nt/bptree/v0 fanout=32` | 25 | 1 | 0 | 222,422 | 2,589,826 | **2,812,248** |
+|  | `p/nt/bptree/v0 fanout=128` | 25 | 1 | 0 | 301,588 | 3,017,359 | 3,318,947 |
+|  | `builtin []string` | 2 | 4 | 0 | 374,033 | 3,008,875 | 3,382,908 |
+|  | `builtin map[string]string` | 2 | 4 | 0 | 781,655 | 4,752,169 | 5,533,824 |
+|  | `p/moul/ulist/v1` | 29 | 23 | 0 | 179,200 | 8,031,019 | 8,210,219 |
+|  | `p/nt/avl/v0` | 63 | 38 | 22 | 365,840 | 19,749,380 | 20,115,220 |
+| 780 | `p/nt/bptree/v0 fanout=32` | 25 | 1 | 0 | 223,384 | 2,593,889 | **2,817,273** |
+|  | `p/nt/bptree/v0 fanout=128` | 25 | 1 | 0 | 304,555 | 3,021,422 | 3,325,977 |
+|  | `builtin []string` | 2 | 4 | 0 | 383,646 | 3,057,855 | 3,441,501 |
+|  | `builtin map[string]string` | 2 | 4 | 0 | 801,983 | 4,847,029 | 5,649,012 |
+|  | `p/moul/ulist/v1` | 29 | 23 | 0 | 179,200 | 8,031,019 | 8,210,219 |
+|  | `p/nt/avl/v0` | 63 | 38 | 22 | 365,933 | 19,749,862 | 20,115,795 |
 | 800 | `p/nt/bptree/v0 fanout=32` | 25 | 1 | 0 | 223,629 | 2,593,889 | **2,817,518** |
 |  | `p/nt/bptree/v0 fanout=128` | 25 | 1 | 0 | 304,800 | 3,021,422 | 3,326,222 |
 |  | `builtin []string` | 2 | 4 | 0 | 393,258 | 3,106,835 | 3,500,093 |
@@ -234,7 +294,7 @@ the cache emits a delete either way, so the chain charges either way.
 
 ## Raw results
 
-168 rows, every one of them. `d_*` columns are baseline-subtracted.
+258 rows, every one of them. `d_*` columns are baseline-subtracted.
 
 <details><summary>Expand</summary>
 
@@ -249,6 +309,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `builtin []string` | str | cold | op_base | 2000 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_base | 400 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_base | 600 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_base | 700 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_base | 720 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_base | 740 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_base | 760 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_base | 780 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_base | 800 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_read | 100 | 1 | 38262 | 0 | 26710 | 0 | 0.1 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_read | 1000 | 1 | 257385 | 0 | 245827 | 0 | 1.4 | 2026-10-01 |  |
@@ -257,6 +322,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `builtin []string` | str | cold | op_read | 2000 | 1 | 501210 | 0 | 489652 | 0 | 2.1 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_read | 400 | 1 | 111276 | 0 | 99718 | 0 | 0.4 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_read | 600 | 1 | 160001 | 0 | 148443 | 0 | 0.7 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_read | 700 | 1 | 184366 | 0 | 172808 | 0 | 0.8 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_read | 720 | 1 | 189239 | 0 | 177681 | 0 | 0.8 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_read | 740 | 1 | 194112 | 0 | 182554 | 0 | 0.8 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_read | 760 | 1 | 198985 | 0 | 187427 | 0 | 0.8 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_read | 780 | 1 | 203858 | 0 | 192300 | 0 | 0.8 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_read | 800 | 1 | 208730 | 0 | 197172 | 0 | 0.8 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_write | 100 | 1 | 68433 | -3 | 56881 | -3 | 0.2 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_write | 1000 | 1 | 500877 | -1 | 489319 | -1 | 1.4 | 2026-10-01 |  |
@@ -265,6 +335,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `builtin []string` | str | cold | op_write | 2000 | 1 | 981702 | -1 | 970144 | -1 | 2.6 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_write | 400 | 1 | 212562 | -1 | 201004 | -1 | 0.6 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_write | 600 | 1 | 308687 | -1 | 297129 | -1 | 0.8 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_write | 700 | 1 | 356752 | -1 | 345194 | -1 | 1.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_write | 720 | 1 | 366365 | -1 | 354807 | -1 | 1.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_write | 740 | 1 | 375978 | -1 | 364420 | -1 | 0.9 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_write | 760 | 1 | 385591 | -1 | 374033 | -1 | 1.0 | 2026-10-01 |  |
+| `builtin []string` | str | cold | op_write | 780 | 1 | 395204 | -1 | 383646 | -1 | 1.1 | 2026-10-01 |  |
 | `builtin []string` | str | cold | op_write | 800 | 1 | 404816 | -1 | 393258 | -1 | 1.1 | 2026-10-01 |  |
 | `builtin []string` | str | cold | tx_each | 100 | 100 | 4603721 | 8223 | 4603721 | 8223 | 16.8 | 2026-10-01 |  |
 | `builtin []string` | str | cold | tx_each | 1000 | 1000 | 283350288 | 79328 | 283350288 | 79328 | 771.7 | 2026-10-01 |  |
@@ -277,6 +352,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `builtin map[string]string` | str | cold | op_base | 2000 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_base | 400 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_base | 600 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_base | 700 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_base | 720 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_base | 740 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_base | 760 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_base | 780 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_base | 800 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_read | 100 | 1 | 69937 | 0 | 58379 | 0 | 0.2 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_read | 1000 | 1 | 572302 | 0 | 560744 | 0 | 2.3 | 2026-10-01 |  |
@@ -285,6 +365,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `builtin map[string]string` | str | cold | op_read | 2000 | 1 | 1133007 | 0 | 1121449 | 0 | 4.9 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_read | 400 | 1 | 237230 | 0 | 225672 | 0 | 1.0 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_read | 600 | 1 | 348722 | 0 | 337164 | 0 | 1.3 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_read | 700 | 1 | 404465 | 0 | 392907 | 0 | 1.6 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_read | 720 | 1 | 415614 | 0 | 404056 | 0 | 1.8 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_read | 740 | 1 | 426762 | 0 | 415204 | 0 | 1.7 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_read | 760 | 1 | 437911 | 0 | 426353 | 0 | 1.7 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_read | 780 | 1 | 449059 | 0 | 437501 | 0 | 1.6 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_read | 800 | 1 | 460208 | 0 | 448650 | 0 | 1.8 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_write | 100 | 1 | 122293 | -8 | 110735 | -8 | 0.3 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_write | 1000 | 1 | 1037764 | -8 | 1026206 | -8 | 2.6 | 2026-10-01 |  |
@@ -293,6 +378,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `builtin map[string]string` | str | cold | op_write | 2000 | 1 | 2057469 | -8 | 2045911 | -8 | 5.8 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_write | 400 | 1 | 427292 | -8 | 415734 | -8 | 1.1 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_write | 600 | 1 | 630584 | -8 | 619026 | -8 | 1.6 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_write | 700 | 1 | 732227 | -8 | 720669 | -8 | 1.9 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_write | 720 | 1 | 752556 | -8 | 740998 | -8 | 2.0 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_write | 740 | 1 | 772884 | -8 | 761326 | -8 | 2.0 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_write | 760 | 1 | 793213 | -8 | 781655 | -8 | 2.1 | 2026-10-01 |  |
+| `builtin map[string]string` | str | cold | op_write | 780 | 1 | 813541 | -8 | 801983 | -8 | 2.2 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | op_write | 800 | 1 | 833870 | -8 | 822312 | -8 | 2.3 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | tx_each | 100 | 100 | 6705716 | 15317 | 6705716 | 15317 | 23.3 | 2026-10-01 |  |
 | `builtin map[string]string` | str | cold | tx_each | 1000 | 1000 | 524684620 | 153019 | 524684620 | 153019 | 1484.7 | 2026-10-01 |  |
@@ -305,6 +395,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/moul/ulist/v1` | str | cold | op_base | 2000 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_base | 400 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_base | 600 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_base | 700 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_base | 720 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_base | 740 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_base | 760 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_base | 780 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_base | 800 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_read | 100 | 1 | 129439 | 0 | 117350 | 0 | 0.3 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_read | 1000 | 1 | 152710 | 0 | 140621 | 0 | 0.3 | 2026-10-01 |  |
@@ -313,6 +408,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/moul/ulist/v1` | str | cold | op_read | 2000 | 1 | 160482 | 0 | 148393 | 0 | 0.3 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_read | 400 | 1 | 144947 | 0 | 132858 | 0 | 0.3 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_read | 600 | 1 | 152671 | 0 | 140582 | 0 | 0.4 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_read | 700 | 1 | 152671 | 0 | 140582 | 0 | 0.3 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_read | 720 | 1 | 152698 | 0 | 140609 | 0 | 0.3 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_read | 740 | 1 | 152698 | 0 | 140609 | 0 | 0.3 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_read | 760 | 1 | 152698 | 0 | 140609 | 0 | 0.3 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_read | 780 | 1 | 152698 | 0 | 140609 | 0 | 0.3 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_read | 800 | 1 | 152698 | 0 | 140609 | 0 | 0.3 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_write | 100 | 1 | 158814 | 6 | 146725 | 6 | 0.3 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_write | 1000 | 1 | 191313 | 4 | 179224 | 4 | 0.4 | 2026-10-01 |  |
@@ -321,6 +421,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/moul/ulist/v1` | str | cold | op_write | 2000 | 1 | 202178 | 4 | 190089 | 4 | 0.4 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_write | 400 | 1 | 180466 | 4 | 168377 | 4 | 0.4 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_write | 600 | 1 | 191235 | 4 | 179146 | 4 | 0.9 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_write | 700 | 1 | 191235 | 4 | 179146 | 4 | 0.4 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_write | 720 | 1 | 191289 | 4 | 179200 | 4 | 0.4 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_write | 740 | 1 | 191289 | 4 | 179200 | 4 | 0.5 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_write | 760 | 1 | 191289 | 4 | 179200 | 4 | 0.4 | 2026-10-01 |  |
+| `p/moul/ulist/v1` | str | cold | op_write | 780 | 1 | 191289 | 4 | 179200 | 4 | 0.4 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | op_write | 800 | 1 | 191289 | 4 | 179200 | 4 | 0.4 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | tx_each | 100 | 100 | 14362376 | 92245 | 14362376 | 92245 | 34.2 | 2026-10-01 |  |
 | `p/moul/ulist/v1` | str | cold | tx_each | 1000 | 1000 | 178185211 | 928187 | 178185211 | 928187 | 423.2 | 2026-10-01 |  |
@@ -333,6 +438,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/avl/v0` | str | cold | op_base | 2000 | 1 | 12080 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_base | 400 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_base | 600 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_base | 700 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_base | 720 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_base | 740 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_base | 760 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_base | 780 | 1 | 12080 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_base | 800 | 1 | 12080 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_read | 100 | 1 | 192559 | 0 | 180485 | 0 | 0.3 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_read | 1000 | 1 | 229333 | 0 | 217253 | 0 | 0.4 | 2026-10-01 |  |
@@ -341,6 +451,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/avl/v0` | str | cold | op_read | 2000 | 1 | 239620 | 0 | 227540 | 0 | 0.4 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_read | 400 | 1 | 213061 | 0 | 200987 | 0 | 0.3 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_read | 600 | 1 | 215030 | 0 | 202956 | 0 | 0.4 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_read | 700 | 1 | 229159 | 0 | 217085 | 0 | 0.4 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_read | 720 | 1 | 225257 | 0 | 213183 | 0 | 0.4 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_read | 740 | 1 | 227208 | 0 | 215134 | 0 | 0.4 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_read | 760 | 1 | 229159 | 0 | 217085 | 0 | 0.4 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_read | 780 | 1 | 225311 | 0 | 213231 | 0 | 0.4 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_read | 800 | 1 | 223360 | 0 | 211280 | 0 | 0.4 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_write | 100 | 1 | 303370 | -20 | 291296 | -20 | 0.6 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_write | 1000 | 1 | 378253 | -47 | 366173 | -47 | 0.8 | 2026-10-01 |  |
@@ -349,6 +464,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/avl/v0` | str | cold | op_write | 2000 | 1 | 403211 | -78 | 391131 | -78 | 0.8 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_write | 400 | 1 | 352962 | -56 | 340888 | -56 | 0.8 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_write | 600 | 1 | 353190 | -2 | 341116 | -2 | 0.7 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_write | 700 | 1 | 377914 | -8 | 365840 | -8 | 0.8 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_write | 720 | 1 | 377914 | -8 | 365840 | -8 | 0.8 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_write | 740 | 1 | 377914 | -8 | 365840 | -8 | 0.8 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_write | 760 | 1 | 377914 | -8 | 365840 | -8 | 0.8 | 2026-10-01 |  |
+| `p/nt/avl/v0` | str | cold | op_write | 780 | 1 | 378013 | -11 | 365933 | -11 | 0.7 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | op_write | 800 | 1 | 378013 | -11 | 365933 | -11 | 0.8 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | tx_each | 100 | 100 | 45148132 | 202550 | 45148132 | 202550 | 65.6 | 2026-10-01 |  |
 | `p/nt/avl/v0` | str | cold | tx_each | 1000 | 1000 | 613773445 | 2049548 | 613773445 | 2049548 | 886.4 | 2026-10-01 |  |
@@ -361,6 +481,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 2000 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 400 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 600 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 700 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 720 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 740 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 760 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 780 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 800 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 100 | 1 | 241454 | 0 | 229374 | 0 | 0.7 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 1000 | 1 | 310160 | 0 | 298074 | 0 | 0.9 | 2026-10-01 |  |
@@ -369,6 +494,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 2000 | 1 | 319402 | 0 | 307316 | 0 | 1.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 400 | 1 | 303327 | 0 | 291241 | 0 | 0.9 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 600 | 1 | 304289 | 0 | 292203 | 0 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 700 | 1 | 304516 | 0 | 292430 | 0 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 720 | 1 | 305006 | 0 | 292920 | 0 | 1.1 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 740 | 1 | 305006 | 0 | 292920 | 0 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 760 | 1 | 305496 | 0 | 293410 | 0 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 780 | 1 | 308463 | 0 | 296377 | 0 | 0.9 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 800 | 1 | 308708 | 0 | 296622 | 0 | 0.9 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 100 | 1 | 316711 | -3 | 304631 | -3 | 0.8 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 1000 | 1 | 318338 | -8 | 306252 | -8 | 0.9 | 2026-10-01 |  |
@@ -377,6 +507,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 2000 | 1 | 327583 | -8 | 315497 | -8 | 1.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 400 | 1 | 311505 | -8 | 299419 | -8 | 0.9 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 600 | 1 | 312467 | -8 | 300381 | -8 | 1.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 700 | 1 | 312694 | -8 | 300608 | -8 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 720 | 1 | 313184 | -8 | 301098 | -8 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 740 | 1 | 313184 | -8 | 301098 | -8 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 760 | 1 | 313674 | -8 | 301588 | -8 | 0.9 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 780 | 1 | 316641 | -8 | 304555 | -8 | 1.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 800 | 1 | 316886 | -8 | 304800 | -8 | 0.9 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | tx_each | 100 | 100 | 30651420 | 55801 | 30651420 | 55801 | 82.1 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=128` | str | cold | tx_each | 1000 | 1000 | 407836809 | 553793 | 407836809 | 553793 | 1130.7 | 2026-10-01 |  |
@@ -389,6 +524,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 2000 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 400 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 600 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 700 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 720 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 740 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 760 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 780 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 800 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 100 | 1 | 205069 | 0 | 192983 | 0 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 1000 | 1 | 247423 | 0 | 235337 | 0 | 0.6 | 2026-10-01 |  |
@@ -397,6 +537,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 2000 | 1 | 249504 | 0 | 237418 | 0 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 400 | 1 | 214986 | 0 | 202900 | 0 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 600 | 1 | 223235 | 0 | 211149 | 0 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 700 | 1 | 225141 | 0 | 213055 | 0 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 720 | 1 | 226103 | 0 | 214017 | 0 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 740 | 1 | 226348 | 0 | 214262 | 0 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 760 | 1 | 226330 | 0 | 214244 | 0 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 780 | 1 | 227292 | 0 | 215206 | 0 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 800 | 1 | 227537 | 0 | 215451 | 0 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 100 | 1 | 213241 | -7 | 201155 | -7 | 0.4 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 1000 | 1 | 260460 | -8 | 248374 | -8 | 0.7 | 2026-10-01 |  |
@@ -405,6 +550,11 @@ the cache emits a delete either way, so the chain charges either way.
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 2000 | 1 | 262547 | -8 | 250461 | -8 | 0.6 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 400 | 1 | 223164 | -8 | 211078 | -8 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 600 | 1 | 231413 | -8 | 219327 | -8 | 0.4 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 700 | 1 | 233319 | -8 | 221233 | -8 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 720 | 1 | 234281 | -8 | 222195 | -8 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 740 | 1 | 234526 | -8 | 222440 | -8 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 760 | 1 | 234508 | -8 | 222422 | -8 | 0.5 | 2026-10-01 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 780 | 1 | 235470 | -8 | 223384 | -8 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 800 | 1 | 235715 | -8 | 223629 | -8 | 0.5 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | tx_each | 100 | 100 | 24982802 | 66007 | 24982802 | 66007 | 59.7 | 2026-10-01 |  |
 | `p/nt/bptree/v0 fanout=32` | str | cold | tx_each | 1000 | 1000 | 292280159 | 601090 | 292280159 | 601090 | 695.4 | 2026-10-01 |  |
