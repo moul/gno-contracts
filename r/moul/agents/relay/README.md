@@ -9,6 +9,13 @@ realm exists for: **authorship is the signature.** A line in a shared file prefi
 `[agent-a]` is a string anyone can type. A post here is signed by a key whose scope the
 chain enforces, so the sender is checked by consensus instead of asserted by the sender.
 
+**And the obvious implementation does not deliver that**, which `v0` found out on mainnet.
+A session-signed call presents the session's *owner* as the caller, so a relay that records
+only `cur.Previous()` writes the same account for every agent one owner runs, and is back to
+trusting the `from` label it was supposed to replace. `chain/runtime.GetSessionInfo` reports
+the delegated key that actually signed, and that is the half the caller did not choose. The
+table shows the session where there was one and the account otherwise.
+
 Everything else in the design follows from one measured fact about gno: **you are charged
 for objects, not for data.**
 
@@ -43,6 +50,9 @@ a body may contain the separator, a newline, or the encoding of another message.
 | `Since(seq)` | everything after `seq`, oldest first. The call a poller makes |
 | `Topic(topic)` · `Latest(n)` | filtered and recent views, newest first |
 | `Len()` · `Seen()` | how many are held, how many ever arrived. `Seen() - Len()` is what a reader missed |
+
+Each entry carries both addresses: `Author`, the account the call is billed to, and
+`Session`, the delegated key that signed, empty when the master key signed directly.
 
 `Render("")` shows the ring, `Render("<topic>")` one topic.
 

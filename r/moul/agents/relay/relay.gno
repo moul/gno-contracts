@@ -7,6 +7,14 @@
 // post here is signed by a key whose scope the chain enforces, so the sender
 // is checked by consensus rather than asserted by the sender.
 //
+// Read that claim carefully, because the obvious implementation does not
+// deliver it. A session-signed call presents the session's OWNER as the
+// caller, so recording [chain/runtime.Realm.Previous] alone records the same
+// account for every agent one owner runs, and the relay is back to trusting a
+// label. [chain/runtime.GetSessionInfo] is what closes the gap: it reports
+// the delegated key that actually signed, which the caller did not choose.
+// v0 shipped without it and every post read as its owner.
+//
 // Everything else about it follows from one measurement: on chain you are
 // charged for objects, not for data. A message's own bytes are a rounding
 // error beside the per-entry cost of the container holding it, so this realm
@@ -53,15 +61,20 @@ import (
 // version at a new path, which is the trade a permanent package path imposes.
 const Slots = 64
 
-// Entry is a stored message plus who signed for it.
+// Entry is a stored message plus the two addresses the chain can vouch for.
 //
-// Author is the chain's answer and From is the caller's claim. Keeping both
-// is the whole point: an agent id is a label an agent chooses, an address is
-// not, and a reader comparing the two is doing the only verification this
-// realm can offer.
+// Author is the account the call is billed to. Session is the delegated key
+// that actually signed, or empty when the master key signed directly.
+//
+// Both are needed and neither is enough. Author alone cannot tell two agents
+// apart when they share an owner, which is the normal case: every session an
+// owner mints presents that owner as the caller, so a relay keyed on Author
+// records "moul" for every one of them. Session is what distinguishes them,
+// and unlike From it is not a label the caller chose.
 type Entry struct {
-	Msg    msg.Msg
-	Author address
+	Msg     msg.Msg
+	Author  address
+	Session address // empty when the master key signed
 }
 
 var (
@@ -96,17 +109,22 @@ func Post(cur realm, from, topic, kind, ref, body string) uint64 {
 	}
 
 	caller := cur.Previous().Address()
+	sessionAddr, _, _, isSession := runtime.GetSessionInfo()
+	if !isSession {
+		sessionAddr = ""
+	}
 	seq++
 	seen++
 	m.Seq = seq
 	m.Height = runtime.ChainHeight()
 
-	log.Push(encode(Entry{Msg: m, Author: caller}))
+	log.Push(encode(Entry{Msg: m, Author: caller, Session: sessionAddr}))
 	chain.Emit("Posted",
 		"seq", strconv.FormatUint(m.Seq, 10),
 		"topic", m.Topic,
 		"from", m.From,
 		"author", caller.String(),
+		"session", sessionAddr.String(),
 	)
 	return m.Seq
 }
@@ -186,7 +204,7 @@ func renderTopic(topic string) string {
 }
 
 func renderTable(entries []Entry) string {
-	t := ui.NewTable("Seq", "Height", "From", "Topic", "Kind", "Body", "Author")
+	t := ui.NewTable("Seq", "Height", "From", "Topic", "Kind", "Body", "Signer")
 	for _, e := range entries {
 		t.Row(
 			strconv.FormatUint(e.Msg.Seq, 10),
@@ -194,11 +212,36 @@ func renderTable(entries []Entry) string {
 			ui.Cell(e.Msg.From),
 			ui.Cell(e.Msg.Topic),
 			ui.Cell(e.Msg.Kind),
-			ui.Cell(ui.Excerpt(e.Msg.Body, 72)),
-			ui.Addr(e.Author),
+			excerptCell(e.Msg.Body, 72),
+			signer(e),
 		)
 	}
 	return t.OrEmpty("_Nothing on the relay yet._")
+}
+
+// excerptCell shortens a body for a table cell and escapes it exactly once.
+//
+// ui.Excerpt cannot be used here: it escapes through ui.Inline before
+// returning, so ui.Cell(ui.Excerpt(s)) escapes twice and a hyphen comes out of
+// the chain as a backslash, a backslash and a hyphen. v0 shipped that bug and
+// rendered "evicting in\\\-call" on mainnet. Cut first, on a rune boundary,
+// then escape once with the table-aware escaper.
+func excerptCell(s string, width int) string {
+	r := []rune(s)
+	if len(r) <= width+1 {
+		return ui.Cell(s)
+	}
+	return ui.Cell(string(r[:width])) + ui.Ellipsis
+}
+
+// signer shows the session key when there was one, and the account otherwise.
+// The session is the identifying half: the account is shared by every session
+// its owner mints.
+func signer(e Entry) string {
+	if e.Session != "" {
+		return ui.Addr(e.Session)
+	}
+	return ui.Addr(e.Author)
 }
 
 // encode frames the author ahead of the encoded message, so the ring stays a
@@ -206,7 +249,7 @@ func renderTable(entries []Entry) string {
 // trails because a trailing field cannot be found by scanning backwards: a
 // message body ending in digits is indistinguishable from a length prefix.
 func encode(e Entry) string {
-	return msg.Frame(e.Author.String()) + e.Msg.Encode()
+	return msg.Frame(e.Author.String()) + msg.Frame(e.Session.String()) + e.Msg.Encode()
 }
 
 func decode(s string) (Entry, bool) {
@@ -214,11 +257,15 @@ func decode(s string) (Entry, bool) {
 	if !ok {
 		return Entry{}, false
 	}
+	session, rest, ok := msg.Unframe(rest)
+	if !ok {
+		return Entry{}, false
+	}
 	m, ok := msg.Decode(rest)
 	if !ok {
 		return Entry{}, false
 	}
-	return Entry{Msg: m, Author: address(author)}, true
+	return Entry{Msg: m, Author: address(author), Session: address(session)}, true
 }
 
 func decodeAll(raw []string) []Entry {

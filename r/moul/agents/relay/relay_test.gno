@@ -149,3 +149,51 @@ func TestRenderEscapesACallersString(cur realm, t *testing.T) {
 	uassert.False(t, strings.Contains(out, "| a | b |"),
 		"an unescaped pipe opened a column in the rendered table")
 }
+
+// TestRenderEscapesABodyExactlyOnce is the regression test for the v0 bug.
+// ui.Cell(ui.Excerpt(s)) escaped twice, so a hyphen reached mainnet as
+// backslash-backslash-backslash-hyphen. Over-escaping is not a security hole,
+// which is exactly why the pipe test above passed while this was broken: a
+// doubly escaped pipe is still safe and still wrong.
+func TestRenderEscapesABodyExactlyOnce(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Post(cross(cur), "agent-a", "build", "", "", "evicting in-call")
+
+	out := Render("")
+	uassert.True(t, strings.Contains(out, `evicting in\-call`),
+		"a hyphen in a short body should be escaped once")
+	uassert.False(t, strings.Contains(out, `in\\-call`),
+		"the body was escaped more than once")
+}
+
+// TestRenderEscapesALongBodyExactlyOnce covers the other branch of
+// excerptCell, where the body is cut before it is escaped.
+func TestRenderEscapesALongBodyExactlyOnce(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	long := "evicting in-call"
+	for len(long) < 200 {
+		long += " and-again"
+	}
+	Post(cross(cur), "agent-a", "build", "", "", long)
+
+	out := Render("")
+	uassert.True(t, strings.Contains(out, `evicting in\-call`),
+		"a hyphen in a cut body should be escaped once")
+	uassert.False(t, strings.Contains(out, `in\\-call`),
+		"the cut body was escaped more than once")
+}
+
+// TestPostRecordsNoSessionForAMasterKey pins the empty-session branch. A test
+// signs as a plain user realm, never through a session, so isSession is false
+// and Session must stay empty rather than inherit the author.
+func TestPostRecordsNoSessionForAMasterKey(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	Post(cross(cur), "agent-a", "build", "", "", "body")
+
+	e := Latest(0)[0]
+	uassert.Equal(t, alice.String(), e.Author.String())
+	uassert.Equal(t, "", e.Session.String())
+}
