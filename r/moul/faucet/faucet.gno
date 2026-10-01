@@ -209,7 +209,17 @@ func Status(id int64) string {
 // Fund credits the ugnot sent with the call to the float. Coins sent straight
 // to [Address] land there too; they just do not emit an event.
 func Fund(cur realm) {
-	from := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("faucet: spoofed realm")
+	}
+	// OriginSend is what the SIGNER attached, not what reached this realm. A
+	// realm the user called keeps those coins and could call Fund any number of
+	// times, booking each as a donation, so only a user call may read it.
+	prev := cur.Previous()
+	if !prev.IsUserCall() {
+		panic("faucet: Fund must be called directly by an account, with -send")
+	}
+	from := prev.Address()
 	amount := unsafe.OriginSend().AmountOf(Denom)
 	if amount <= 0 {
 		panic("faucet: send some " + Denom + " with the call")

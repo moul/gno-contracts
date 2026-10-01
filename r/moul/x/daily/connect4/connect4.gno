@@ -11,6 +11,10 @@ import (
 	"gno.land/p/moul/kit/store/v0"
 )
 
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/connect4/v1"
+
 const (
 	cols = 7
 	rows = 6
@@ -236,7 +240,7 @@ func renderList() string {
 		default:
 			status = "🟡 to move"
 		}
-		sb.WriteString("| [" + id.String() + "](/r:" + id.String() + ") | " +
+		sb.WriteString("| [" + id.String() + "](" + selfPath + ":" + id.String() + ") | " +
 			ui.Addr(g.Red) + " | " + ui.Addr(g.Yellow) + " | " + status + " |\n")
 	})
 	sb.WriteString("\nOpen a game by its id (e.g. path `1`).\n")

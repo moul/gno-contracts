@@ -242,3 +242,14 @@ func TestApplyForPaysTheBeneficiaryNotTheFiler(cur realm, t *testing.T) {
 		ApplyFor(cross(cur), kim.String(), "", "no reason given", "", "x:1")
 	})
 }
+
+// A realm cannot book a donation. It would receive the user's coins itself,
+// then call Fund as many times as it liked, each one reading the same
+// OriginSend and naming it a donation, with nothing reaching the treasury.
+func TestFundRefusesARealmCaller(cur realm, t *testing.T) {
+	reset()
+	testing.SetOriginSend(chain.NewCoins(chain.NewCoin(Denom, 1_000_000)))
+	testing.SetRealm(testing.NewCodeRealm("gno.land/r/someone/relay"))
+	uassert.AbortsContains(t, cur, "called directly by an account", func() { Fund(cross(cur)) })
+	uassert.Equal(t, int64(0), Raised(), "nothing booked")
+}

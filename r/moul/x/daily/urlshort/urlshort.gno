@@ -16,6 +16,10 @@ import (
 	"gno.land/p/nt/avl/v0"
 )
 
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/urlshort/v1"
+
 // entry is the persisted record for a single alias.
 type entry struct {
 	url    string
@@ -115,7 +119,7 @@ func Render(path string) string {
 	alias := strings.TrimPrefix(path, "/")
 	v := aliases.Get(alias)
 	if v == nil {
-		return "# URL Shortener\n\nNo alias named `" + alias + "`.\n\n[← all aliases](/)\n"
+		return "# URL Shortener\n\nNo alias named `" + alias + "`.\n\n[← all aliases](" + selfPath + ")\n"
 	}
 
 	e := v.(*entry)
@@ -129,7 +133,7 @@ func Render(path string) string {
 		b.WriteString("**Note:** " + e.note + "\n\n")
 	}
 	b.WriteString("**Clicks:** " + itoa(e.clicks) + "\n\n")
-	b.WriteString("[← all aliases](/)\n")
+	b.WriteString("[← all aliases](" + selfPath + ")\n")
 	return b.String()
 }
 
@@ -147,7 +151,7 @@ func renderIndex() string {
 	b.WriteString("|-------|--------|-------|--------|\n")
 	aliases.Iterate("", "", func(key string, value interface{}) bool {
 		e := value.(*entry)
-		b.WriteString("| [" + key + "](/" + key + ") | <" + e.url + "> | " +
+		b.WriteString("| [" + key + "](" + selfPath + ":" + key + ") | <" + e.url + "> | " +
 			ui.Addr(e.owner) + " | " + itoa(e.clicks) + " |\n")
 		return false
 	})

@@ -10,7 +10,7 @@
 // name means what YOU bound it to. Composing two realms that were never
 // written to work together stops being a redeploy and becomes a transaction:
 //
-//	gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v0 -func Exec \
+//	gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v1 -func Exec \
 //	  -args 'bind -ac /srv/dev /dev; echo hello > /tmp/greeting'
 //
 // SECURITY. Mounted trees are READ-ONLY by construction: ninep.File has no
@@ -350,8 +350,8 @@ func renderCmd(key, line, title string) string {
 	} else {
 		b.WriteString("```\n" + out + "```\n")
 	}
-	b.WriteString("\n[namespace](:ns?u=" + key + ") · [root](:ls?u=" + key +
-		") · [home](:)\n")
+	b.WriteString("\n[namespace](/r/moul/x/plan9/ns/v1:ns?u=" + key + ") · [root](/r/moul/x/plan9/ns/v1:ls?u=" + key +
+		") · [home](/r/moul/x/plan9/ns/v1)\n")
 	return b.String()
 }
 
@@ -383,13 +383,13 @@ func renderHome(key string) string {
 	b.WriteString("`/bin` is a union: the system `/bin` first, then `/usr/glenda/bin`, ")
 	b.WriteString("with `-c` so new files land in the second. Listing it shows both members ")
 	b.WriteString("because a Plan 9 union is a concatenation, so shadowing stays visible.\n\n")
-	b.WriteString("- [ns](:ns) · [ls /](:ls) · [ls /bin](:ls/bin) · ")
-	b.WriteString("[cat /tmp/greeting](:cat/tmp/greeting) · [walk /bin/rc](:walk/bin/rc)\n")
-	b.WriteString("- any read-only command: [`rc?c=ls -l /srv`](:rc?c=ls%20-l%20/srv)\n\n")
+	b.WriteString("- [ns](/r/moul/x/plan9/ns/v1:ns) · [ls /](/r/moul/x/plan9/ns/v1:ls) · [ls /bin](/r/moul/x/plan9/ns/v1:ls/bin) · ")
+	b.WriteString("[cat /tmp/greeting](/r/moul/x/plan9/ns/v1:cat/tmp/greeting) · [walk /bin/rc](/r/moul/x/plan9/ns/v1:walk/bin/rc)\n")
+	b.WriteString("- any read-only command: [`rc?c=ls -l /srv`](/r/moul/x/plan9/ns/v1:rc?c=ls%20-l%20/srv)\n\n")
 
 	b.WriteString("## Your own namespace\n\n")
 	b.WriteString("```\n")
-	b.WriteString("gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v0 \\\n")
+	b.WriteString("gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v1 \\\n")
 	b.WriteString("  -func Exec -args 'bind -ac /srv/dev /dev; echo hi > /tmp/f'\n")
 	b.WriteString("```\n\n")
 	b.WriteString("Then browse it with `?u=<your address>`. `Reset` throws it away.\n\n")
@@ -397,7 +397,7 @@ func renderHome(key string) string {
 	b.WriteString("## Namespaces\n\n")
 	keys := Keys()
 	for _, k := range keys {
-		b.WriteString("- [`" + k + "`](:ns?u=" + k + ")\n")
+		b.WriteString("- [`" + k + "`](/r/moul/x/plan9/ns/v1:ns?u=" + k + ")\n")
 	}
 	b.WriteString("\nDesign and analysis: ")
 	b.WriteString("[moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).\n")

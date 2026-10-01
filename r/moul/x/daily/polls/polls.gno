@@ -15,6 +15,10 @@ import (
 	"gno.land/p/nt/avl/v0"
 )
 
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/polls/v1"
+
 // Poll is a single question with its options and per-address vote tracking.
 type Poll struct {
 	ID       int
@@ -194,7 +198,7 @@ func Render(path string) string {
 		}
 		b.WriteString("# Polls\n\n")
 		renderPoll(&b, polls[id])
-		b.WriteString("[← all polls](/r/REPLACE_ADDR/polls)\n")
+		b.WriteString("[← all polls](" + selfPath + ")\n")
 		return b.String()
 	}
 

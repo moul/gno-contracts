@@ -59,10 +59,16 @@ type Case struct {
 
 var cases []*Case // index 0 => ID 1
 
-// OpenCase starts a dispute with a fixed panel of jurors. An odd panel size
-// avoids ties; duplicates are rejected.
-func OpenCase(cur realm, subject string, jurors []address) uint64 {
+// OpenCase starts a dispute with a fixed panel of jurors, given as
+// comma-separated addresses. An odd panel size avoids ties; duplicates and
+// invalid addresses are rejected.
+//
+// The panel is a string, not a []address, because MsgCall carries every
+// argument as a string and the VM decodes no slice but []byte: a []address
+// parameter made this function unreachable from any wallet.
+func OpenCase(cur realm, subject, jurorsCSV string) uint64 {
 	assert(subject != "", "empty subject")
+	jurors := parseJurors(jurorsCSV)
 	assert(len(jurors) >= 1, "need at least one juror")
 
 	seen := make(map[string]bool)
@@ -96,6 +102,13 @@ func Commit(cur realm, caseID uint64, commitment string) {
 	assert(commitment != "", "empty commitment")
 	j := mustJuror(c, cur.Previous().Address())
 	assert(!j.Committed, "already committed")
+	// Every commitment is public through Get, so without this a juror could
+	// commit a copy of another's hash, then reveal the same (verdict, salt)
+	// once the first juror's reveal puts it in a transaction. Refusing a
+	// repeat makes a copied commitment unrevealable.
+	for _, other := range c.Jurors {
+		assert(!other.Committed || other.Commitment != commitment, "commitment already used in this case")
+	}
 	j.Commitment = commitment
 	j.Committed = true
 	j.Height = runtime.ChainHeight()
@@ -273,4 +286,16 @@ func short(a address) string {
 		return s
 	}
 	return s[:8] + "…" + s[len(s)-4:]
+}
+
+// parseJurors splits a comma-separated panel, trimming spaces around each
+// address and refusing an empty or invalid one.
+func parseJurors(csv string) []address {
+	var out []address
+	for _, part := range strings.Split(csv, ",") {
+		a := address(strings.TrimSpace(part))
+		assert(a.IsValid(), "invalid juror address: "+string(a))
+		out = append(out, a)
+	}
+	return out
 }

@@ -43,7 +43,7 @@ import any of them; it adjudicates references. That's the point of small,
 single-purpose realms: they snap together without hard dependencies.
 
 ```go
-id := jury.OpenCase(cross(cur), "receipt#7", []address{j1, j2, j3})
+id := jury.OpenCase(cross(cur), "receipt#7", j1.String()+","+j2.String()+","+j3.String())
 // ... commit + reveal ...
 jury.Outcome(id) // "upheld" | "rejected" | "tie"
 ```

@@ -107,7 +107,17 @@ func Requests() int { return program.Board.Size() }
 // on the record. Coins sent to the realm address directly still land in the
 // treasury; they just do not get a name next to them.
 func Fund(cur realm) {
-	from := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	// OriginSend is what the SIGNER attached, not what reached this realm. A
+	// realm the user called keeps those coins and could call Fund any number of
+	// times, booking each as a donation, so only a user call may read it.
+	prev := cur.Previous()
+	if !prev.IsUserCall() {
+		panic("grant: Fund must be called directly by an account, with -send")
+	}
+	from := prev.Address()
 	amount := unsafe.OriginSend().AmountOf(Denom)
 	if err := program.Fund(from, amount, runtime.ChainHeight()); err != nil {
 		panic(err)

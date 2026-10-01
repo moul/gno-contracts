@@ -166,7 +166,7 @@ func renderOne(d *Deal) string {
 	b.WriteString("- **State:** " + d.State + "\n")
 	b.WriteString("- **Creator:** " + d.Creator.String() + " (" + yn(d.CreatorOK) + ")\n")
 	b.WriteString("- **Counterparty:** " + d.Counterparty.String() + " (" + yn(d.CounterOK) + ")\n")
-	b.WriteString("- **Terms:** " + d.Terms + "\n")
+	b.WriteString("- **Terms:** " + ui.Inline(d.Terms) + "\n")
 	return b.String()
 }
 

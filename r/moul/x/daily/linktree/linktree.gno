@@ -10,6 +10,10 @@ import (
 	"gno.land/p/nt/avl/v0"
 )
 
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/linktree/v1"
+
 // link is a single labeled URL on a profile.
 type link struct {
 	Label string
@@ -94,7 +98,7 @@ func renderIndex() string {
 	profiles.Iterate("", "", func(key string, _ interface{}) bool {
 		b.WriteString("- [")
 		b.WriteString(key)
-		b.WriteString("](/r/REPLACE_ADDR/linktree:")
+		b.WriteString("](" + selfPath + ":")
 		b.WriteString(key)
 		b.WriteString(")\n")
 		return false

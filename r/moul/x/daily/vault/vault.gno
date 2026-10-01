@@ -9,6 +9,10 @@ import (
 	"gno.land/p/nt/avl/v0"
 )
 
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/vault/v1"
+
 // vaults maps address string -> *avl.Tree (key string -> value string).
 var vaults avl.Tree
 
@@ -76,7 +80,7 @@ func renderRoot() string {
 		t := v.(*avl.Tree)
 		b.WriteString("| [")
 		b.WriteString(k)
-		b.WriteString("](/r:")
+		b.WriteString("](" + selfPath + ":")
 		// link back into this realm's render for the address subpage
 		b.WriteString(k)
 		b.WriteString(") | ")

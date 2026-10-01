@@ -166,7 +166,7 @@ func TestPostRejectsASecondOwner(cur realm, t *testing.T) {
 
 	testing.SetRealm(testing.NewCodeRealm("gno.land/r/other/thing/v0"))
 	uassert.AbortsWithMessage(t, cur,
-		"post: taken is already posted by gno.land/r/moul/x/plan9/ns/v0",
+		"post: taken is already posted by gno.land/r/moul/x/plan9/ns/v1",
 		func() { Post(cross(cur), "taken", probe("taken", "second")) })
 }
 

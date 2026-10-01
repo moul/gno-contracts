@@ -16,6 +16,10 @@ import (
 	"gno.land/p/moul/kit/store/v0"
 )
 
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/blog/v1"
+
 // Post is a single blog entry. It carries no id field: the id belongs to the
 // store, which hands it back on lookup and iteration.
 type Post struct {
@@ -85,11 +89,11 @@ func Render(path string) string {
 	idStr := strings.TrimPrefix(path, "/")
 	id, ok := store.ParseID(idStr)
 	if !ok {
-		return "# Not found\n\nInvalid post path: `" + path + "`\n\n[← back](/r/REPLACE_ADDR/blog)\n"
+		return "# Not found\n\nInvalid post path: `" + path + "`\n\n[← back](" + selfPath + ")\n"
 	}
 	v, ok := posts.Get(id)
 	if !ok {
-		return "# Not found\n\nNo post with id " + idStr + ".\n\n[← back](/r/REPLACE_ADDR/blog)\n"
+		return "# Not found\n\nNo post with id " + idStr + ".\n\n[← back](" + selfPath + ")\n"
 	}
 	return renderPost(v.(*Post))
 }
@@ -108,7 +112,7 @@ func renderList() string {
 		p := v.(*Post)
 		b.WriteString("## [")
 		b.WriteString(p.Title)
-		b.WriteString("](/r/REPLACE_ADDR/blog:/")
+		b.WriteString("](" + selfPath + ":/")
 		b.WriteString(id.String())
 		b.WriteString(")\n\n")
 		b.WriteString("by `")
@@ -133,6 +137,6 @@ func renderPost(p *Post) string {
 	b.WriteString(strconv.FormatInt(p.Height, 10))
 	b.WriteString("\n\n")
 	b.WriteString(p.Body)
-	b.WriteString("\n\n---\n\n[← back to all posts](/r/REPLACE_ADDR/blog)\n")
+	b.WriteString("\n\n---\n\n[← back to all posts](" + selfPath + ")\n")
 	return b.String()
 }

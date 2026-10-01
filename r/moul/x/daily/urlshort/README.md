@@ -15,7 +15,7 @@ basis, only its owner may update or remove it, and every resolution through
 `Render("/<alias>")` bumps a per-alias click counter. Aliases must be non-empty
 and alphanumeric.
 
-**Realm path:** `gno.land/r/REPLACE_ADDR/urlshort`
+**Realm path:** `gno.land/r/moul/x/daily/urlshort/v1`
 
 ## Example calls
 

@@ -11,7 +11,7 @@
 
 A two-player Connect Four realm on a 7-wide × 6-tall board. The game creator plays 🔴 and moves first; the named opponent plays 🟡. `Drop` enforces turn order by caller, rejects full and out-of-range columns, and detects a horizontal, vertical, or diagonal 4-in-a-row (or a draw). `Render` draws the board with 🔴🟡· and shows whose turn it is or who won.
 
-Realm path: `gno.land/r/REPLACE_ADDR/connect4`
+Realm path: `gno.land/r/moul/x/daily/connect4/v1`
 
 ## Example calls
 

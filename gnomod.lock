@@ -726,6 +726,11 @@ source = { dir = "r/moul/x/daily/coinflipduel" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/collatz/v0"
+source = { commit = "64ba64c0f83f22fcbb7c2f5887d4d5731462237d", dir = "r/moul/x/daily/collatz" }
+hash = "h1:eUwEAR1VxMyo/G7vrpbL6gQNhEGUifqL50qOCnK0xNE="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/collatz/v1"
 source = { dir = "r/moul/x/daily/collatz" }
 
 [[module]]
@@ -931,6 +936,11 @@ source = { dir = "r/moul/x/daily/life" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/linktree/v0"
+source = { commit = "64ba64c0f83f22fcbb7c2f5887d4d5731462237d", dir = "r/moul/x/daily/linktree" }
+hash = "h1:9RXlTG5APXXKBDvIXLpOmH3cjxWTuwKBh7D/fO8LfWU="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/linktree/v1"
 source = { dir = "r/moul/x/daily/linktree" }
 
 [[module]]
@@ -1006,6 +1016,11 @@ source = { dir = "r/moul/x/daily/pixelcanvas" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/polls/v0"
+source = { commit = "64ba64c0f83f22fcbb7c2f5887d4d5731462237d", dir = "r/moul/x/daily/polls" }
+hash = "h1:yaePIoEbEtWmpDBJbnun9oY+/1mfGqR8hVWVvl9gb/8="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/polls/v1"
 source = { dir = "r/moul/x/daily/polls" }
 
 [[module]]
@@ -1215,6 +1230,11 @@ source = { dir = "r/moul/x/daily/urlshort" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/vault/v0"
+source = { commit = "64ba64c0f83f22fcbb7c2f5887d4d5731462237d", dir = "r/moul/x/daily/vault" }
+hash = "h1:Acb9KOnvUrIz5mmHngG7H/zRYuCS9s5/UjAp//Nyex0="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/vault/v1"
 source = { dir = "r/moul/x/daily/vault" }
 
 [[module]]
@@ -1291,10 +1311,20 @@ source = { dir = "r/moul/x/pilotdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/plan9/dev/v0"
+source = { commit = "998c902855ad5aea1ed9c8c71f0a0fee1985119f", dir = "r/moul/x/plan9/dev" }
+hash = "h1:CJW8TDnbHMzQhrR0wBRmKGg11bHa4y0zaLNvf7PRa4U="
+
+[[module]]
+module = "gno.land/r/moul/x/plan9/dev/v1"
 source = { dir = "r/moul/x/plan9/dev" }
 
 [[module]]
 module = "gno.land/r/moul/x/plan9/ns/v0"
+source = { commit = "998c902855ad5aea1ed9c8c71f0a0fee1985119f", dir = "r/moul/x/plan9/ns" }
+hash = "h1:seCw/wazz87aXHdxxFfNTEv11YEdw/dahRSuAwX3I/U="
+
+[[module]]
+module = "gno.land/r/moul/x/plan9/ns/v1"
 source = { dir = "r/moul/x/plan9/ns" }
 
 [[module]]

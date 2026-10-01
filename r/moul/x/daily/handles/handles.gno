@@ -18,6 +18,10 @@ import (
 	"gno.land/p/nt/avl/v0"
 )
 
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/handles/v1"
+
 const maxBioLen = 140
 
 // record is the persisted state for one claimed handle.
@@ -184,7 +188,7 @@ func renderIndex() string {
 	b.WriteString("|--------|-------|-------------|\n")
 	byHandle.Iterate("", "", func(key string, value interface{}) bool {
 		r := value.(*record)
-		b.WriteString("| [" + key + "](/" + key + ") | " + ui.Addr(r.owner) +
+		b.WriteString("| [" + key + "](" + selfPath + ":" + key + ") | " + ui.Addr(r.owner) +
 			" | " + strconv.Itoa(int(r.sinceBlk)) + " |\n")
 		return false
 	})
@@ -195,7 +199,7 @@ func renderIndex() string {
 func renderHandle(handle string) string {
 	v := byHandle.Get(handle)
 	if v == nil {
-		return "# Handles\n\nNo handle named `" + handle + "`.\n\n[← all handles](/)\n"
+		return "# Handles\n\nNo handle named `" + handle + "`.\n\n[← all handles](" + selfPath + ")\n"
 	}
 	r := v.(*record)
 
@@ -206,6 +210,6 @@ func renderHandle(handle string) string {
 		b.WriteString("**Bio:** " + r.bio + "\n\n")
 	}
 	b.WriteString("**Registered at block:** " + strconv.Itoa(int(r.sinceBlk)) + "\n\n")
-	b.WriteString("[← all handles](/)\n")
+	b.WriteString("[← all handles](" + selfPath + ")\n")
 	return b.String()
 }

@@ -27,9 +27,10 @@ import (
 
 // MaxBody is the longest note this realm accepts, in bytes.
 //
-// A bound rather than none: every byte stored here locks a storage deposit this
-// realm's address pays, and an unbounded write is an unbounded bill a stranger
-// chooses the size of.
+// A bound rather than none: every byte stored here locks a storage deposit,
+// paid by whoever signs the write and refunded to whoever signs the delete
+// (EFFECTIVE_GNO.md section 9.2), and an unbounded write is an unbounded
+// state the realm carries forever.
 const MaxBody = 280
 
 // MaxTagLen bounds the index key for the same reason, and small because a tag
@@ -42,15 +43,17 @@ const PageSize = 20
 // MaxNotes and MaxPerAuthor bound the WHOLE board, which MaxBody does not.
 //
 // A per-call length limit bounds one write and nothing else: a caller posting
-// one-byte notes in a loop grows the store and both indexes without limit,
-// and the storage deposit for every one of those bytes is locked against this
-// realm's address. "An unbounded container a third party can grow is an
+// one-byte notes in a loop grows the store and both indexes without limit. "An unbounded container a third party can grow is an
 // unbounded storage deposit someone is paying for" is a rule this realm exists
 // to demonstrate, so it had better obey it.
 //
-// Two caps rather than one, because a single global cap is filled by whoever
-// gets there first: the per-author cap is what keeps the board open to the
-// twenty-first address. Retracting frees a slot, so neither is a one-way door.
+// Two caps rather than one, and what each buys is narrower than it looks.
+// MaxNotes bounds the state, which is the property this realm promises.
+// MaxPerAuthor stops one ADDRESS, not one actor: addresses are free, so fifty
+// fresh ones at twenty notes each still fill the board and lock everyone else
+// out until somebody retracts. Keeping a board open to strangers needs
+// something a griefer cannot mint for free, a deposit or an expiry, which this
+// demo does not carry. Retracting frees a slot, so neither cap is a one-way door.
 //
 // MaxPerAuthor is answered by byAuthor.Count, which is the index doing the job
 // it was added for.

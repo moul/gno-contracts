@@ -2,13 +2,16 @@ package collatz
 
 import (
 	"chain"
-	"chain/runtime/unsafe"
 	"sort"
 	"strconv"
 	"strings"
 
 	"gno.land/p/nt/avl/v0"
 )
+
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/collatz/v1"
 
 // maxIters caps the Collatz walk so a hostile / huge input cannot loop
 // forever on-chain. No known n stays below this bound and fails to reach 1.
@@ -29,9 +32,16 @@ type Result struct {
 // deterministic order for iteration inside Render.
 var results avl.Tree
 
+// maxOdd is the largest odd term whose successor 3n+1 still fits in an
+// int64. Past it the step wraps: 6148914691236517205 maps to exactly 2^64,
+// which is 0, and the walk then spins on 0 until maxIters.
+const maxOdd = (1<<63 - 1 - 1) / 3
+
 // stopping returns the number of steps to reach 1 and the peak value seen,
-// walking the Collatz (hailstone) map. It never mutates state.
-func stopping(n int64) (steps int, peak int64) {
+// walking the Collatz (hailstone) map. ok is false when a term would overflow
+// int64, in which case steps and peak describe the walk up to that term. It
+// never mutates state.
+func stopping(n int64) (steps int, peak int64, ok bool) {
 	peak = n
 	cur := n
 	for cur != 1 {
@@ -41,6 +51,9 @@ func stopping(n int64) (steps int, peak int64) {
 		if cur%2 == 0 {
 			cur = cur / 2
 		} else {
+			if cur > maxOdd {
+				return steps, peak, false
+			}
 			cur = 3*cur + 1
 		}
 		if cur > peak {
@@ -48,7 +61,7 @@ func stopping(n int64) (steps int, peak int64) {
 		}
 		steps++
 	}
-	return steps, peak
+	return steps, peak, true
 }
 
 // Compute walks the hailstone sequence for n and records the result
@@ -57,9 +70,16 @@ func Compute(cur realm, n int) {
 	if n <= 0 {
 		panic("n must be > 0")
 	}
-	caller := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("collatz: spoofed realm")
+	}
+	caller := cur.Previous().Address()
 	nn := int64(n)
-	steps, peak := stopping(nn)
+	steps, peak, ok := stopping(nn)
+	if !ok {
+		// Recording it would put a wrapped walk on the leaderboard, forever.
+		panic("collatz: the walk from " + strconv.FormatInt(nn, 10) + " overflows int64")
+	}
 
 	res := Result{N: nn, Steps: steps, Peak: peak, Who: caller}
 	key := strconv.FormatInt(nn, 10)
@@ -129,7 +149,7 @@ func renderLeaderboard() string {
 	for i := 0; i < limit; i++ {
 		r := all[i]
 		sb.WriteString("| " + strconv.Itoa(i+1) + " | ")
-		sb.WriteString("[" + strconv.FormatInt(r.N, 10) + "](/r:" + strconv.FormatInt(r.N, 10) + ") | ")
+		sb.WriteString("[" + strconv.FormatInt(r.N, 10) + "](" + selfPath + ":" + strconv.FormatInt(r.N, 10) + ") | ")
 		sb.WriteString(strconv.Itoa(r.Steps) + " | ")
 		sb.WriteString(strconv.FormatInt(r.Peak, 10) + " | ")
 		sb.WriteString(r.Who.String() + " |\n")
@@ -152,6 +172,7 @@ func renderSequence(p string) string {
 	cur := n
 	var peak int64 = n
 	truncated := false
+	overflow := false
 	for {
 		seq = append(seq, cur)
 		if cur == 1 {
@@ -164,6 +185,10 @@ func renderSequence(p string) string {
 		if cur%2 == 0 {
 			cur = cur / 2
 		} else {
+			if cur > maxOdd {
+				overflow = true
+				break
+			}
 			cur = 3*cur + 1
 		}
 		if cur > peak {
@@ -179,6 +204,9 @@ func renderSequence(p string) string {
 	sb.WriteString("\n\n")
 	sb.WriteString("- steps: " + strconv.Itoa(len(seq)-1) + "\n")
 	sb.WriteString("- peak: " + strconv.FormatInt(peak, 10) + "\n")
+	if overflow {
+		sb.WriteString("\n_Stopped: the next term would overflow int64._\n")
+	}
 	if truncated {
 		sb.WriteString("\n_Sequence truncated at " + strconv.Itoa(maxSeqLen) + " terms._\n")
 	}

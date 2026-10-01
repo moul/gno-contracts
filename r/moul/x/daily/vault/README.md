@@ -14,7 +14,7 @@ namespace; only the owner can set or delete their own entries. The root render
 lists every address that owns a vault with its entry count, and the `/<address>`
 path renders that address's keys and values in a table.
 
-**Realm path:** `gno.land/r/REPLACE_ADDR/vault`
+**Realm path:** `gno.land/r/moul/x/daily/vault/v1`
 
 ## Example calls
 

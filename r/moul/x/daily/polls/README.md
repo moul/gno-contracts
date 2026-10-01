@@ -17,7 +17,7 @@ percentages, and the total number of votes.
 
 ## Realm path
 
-`gno.land/r/REPLACE_ADDR/polls`
+`gno.land/r/moul/x/daily/polls/v1`
 
 ## Exported transactions
 
@@ -39,18 +39,18 @@ address is read via `runtime.PreviousRealm().Address()`.
 
 ```sh
 # create a poll (returns its id, e.g. 0)
-gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/polls" \
+gnokey maketx call -pkgpath "gno.land/r/moul/x/daily/polls/v1" \
   -func CreatePoll -args "Best L1 for smart contracts?" -args "gno,eth,sol" \
   -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 mykey
 
 # vote for option index 0 on poll 0
-gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/polls" \
+gnokey maketx call -pkgpath "gno.land/r/moul/x/daily/polls/v1" \
   -func Vote -args 0 -args 0 \
   -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 mykey
 
 # view results in gnoweb
-#   https://gno.land/r/REPLACE_ADDR/polls
-#   https://gno.land/r/REPLACE_ADDR/polls:0
+#   https://gno.land/r/moul/x/daily/polls/v1
+#   https://gno.land/r/moul/x/daily/polls/v1:0
 ```
 
 ## Testing

@@ -10,7 +10,7 @@ import (
 
 	ninep "gno.land/p/moul/x/plan9/ninep/v0"
 
-	nsrealm "gno.land/r/moul/x/plan9/ns/v0"
+	nsrealm "gno.land/r/moul/x/plan9/ns/v1"
 )
 
 func read(t *testing.T, name string) string {

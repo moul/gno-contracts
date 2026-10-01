@@ -120,3 +120,11 @@ func ExampleRender() {
 	//
 	// Records include burned positions, so the count is not a count of live liquidity.
 }
+
+// The offset comes from the path, so maxInt is free to ask for, and
+// offset+scanWindow used to wrap negative into "Records N to -M".
+func TestRenderClampsAnOverflowingOffset(t *testing.T) {
+	out := Render(someone + "/from/9223372036854775807")
+	uassert.False(t, strings.Contains(out, " to -"), out)
+	uassert.False(t, strings.Contains(out, "9223372036854775807"), "the offset is clamped to what exists")
+}

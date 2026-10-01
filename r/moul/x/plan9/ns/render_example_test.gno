@@ -34,13 +34,13 @@ func ExampleRender() {
 	//
 	// `/bin` is a union: the system `/bin` first, then `/usr/glenda/bin`, with `-c` so new files land in the second. Listing it shows both members because a Plan 9 union is a concatenation, so shadowing stays visible.
 	//
-	// - [ns](:ns) · [ls /](:ls) · [ls /bin](:ls/bin) · [cat /tmp/greeting](:cat/tmp/greeting) · [walk /bin/rc](:walk/bin/rc)
-	// - any read-only command: [`rc?c=ls -l /srv`](:rc?c=ls%20-l%20/srv)
+	// - [ns](/r/moul/x/plan9/ns/v1:ns) · [ls /](/r/moul/x/plan9/ns/v1:ls) · [ls /bin](/r/moul/x/plan9/ns/v1:ls/bin) · [cat /tmp/greeting](/r/moul/x/plan9/ns/v1:cat/tmp/greeting) · [walk /bin/rc](/r/moul/x/plan9/ns/v1:walk/bin/rc)
+	// - any read-only command: [`rc?c=ls -l /srv`](/r/moul/x/plan9/ns/v1:rc?c=ls%20-l%20/srv)
 	//
 	// ## Your own namespace
 	//
 	// ```
-	// gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v0 \
+	// gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v1 \
 	//   -func Exec -args 'bind -ac /srv/dev /dev; echo hi > /tmp/f'
 	// ```
 	//
@@ -48,7 +48,7 @@ func ExampleRender() {
 	//
 	// ## Namespaces
 	//
-	// - [`demo`](:ns?u=demo)
+	// - [`demo`](/r/moul/x/plan9/ns/v1:ns?u=demo)
 	//
 	// Design and analysis: [moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).
 	//
@@ -69,7 +69,7 @@ func ExampleRender_ls() {
 	// -rw-r--r-- demo         demo          10 rc
 	// ```
 	//
-	// [namespace](:ns?u=demo) · [root](:ls?u=demo) · [home](:)
+	// [namespace](/r/moul/x/plan9/ns/v1:ns?u=demo) · [root](/r/moul/x/plan9/ns/v1:ls?u=demo) · [home](/r/moul/x/plan9/ns/v1)
 }
 
 // ExampleRender_walk pins a resolution trace, which is where a bind becomes
@@ -88,5 +88,5 @@ func ExampleRender_walk() {
 	// /bin/rc                  (9 1 f) -rw-r--r-- union=1
 	// ```
 	//
-	// [namespace](:ns?u=demo) · [root](:ls?u=demo) · [home](:)
+	// [namespace](/r/moul/x/plan9/ns/v1:ns?u=demo) · [root](/r/moul/x/plan9/ns/v1:ls?u=demo) · [home](/r/moul/x/plan9/ns/v1)
 }

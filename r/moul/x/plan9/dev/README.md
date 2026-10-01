@@ -1,4 +1,4 @@
-# `gno.land/r/moul/x/plan9/dev/v0`
+# `gno.land/r/moul/x/plan9/dev/v1`
 
 **The chain as a Plan 9 device tree.** Everything a realm normally reaches
 through an import of `chain/runtime` is published here as a file instead, so it
@@ -30,7 +30,7 @@ never stale.
 ## The cross-realm mount
 
 This realm posts its tree to
-[`r/moul/x/plan9/ns`](../../../../../r/moul/x/plan9/ns/v0)'s `/srv` at deploy
+[`r/moul/x/plan9/ns`](../../../../../r/moul/x/plan9/ns/v1)'s `/srv` at deploy
 time, so any account can bind it into their own namespace and nobody has to
 import this realm to use it:
 
