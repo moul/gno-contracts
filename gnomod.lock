@@ -21,6 +21,10 @@ module = "gno.land/p/moul/agents/commit/v0"
 source = { dir = "p/moul/agents/commit" }
 
 [[module]]
+module = "gno.land/p/moul/agents/msg/v0"
+source = { dir = "p/moul/agents/msg" }
+
+[[module]]
 module = "gno.land/p/moul/art/v0"
 source = { dir = "p/moul/art" }
 
@@ -486,6 +490,10 @@ source = { dir = "r/moul/agents/passport" }
 [[module]]
 module = "gno.land/r/moul/agents/receipt/v0"
 source = { dir = "r/moul/agents/receipt" }
+
+[[module]]
+module = "gno.land/r/moul/agents/relay/v0"
+source = { dir = "r/moul/agents/relay" }
 
 [[module]]
 module = "gno.land/r/moul/blog"
