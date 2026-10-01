@@ -9,16 +9,35 @@ import (
 
 // Whether to spend a Copilot code review on this pull request.
 //
-// Copilot code review costs 13 PREMIUM REQUESTS per review (GitHub's published
-// model multiplier for code review since 2026-06-01), against a monthly
-// allowance of 300 on Copilot Pro and 1,500 on Pro+, with overage at $0.04 per
-// request. One review is therefore about $0.52 at the margin.
+// Copilot code review costs 13 AI CREDITS per review (GitHub's published model
+// multiplier for code review since 2026-06-01, where the unit used to be called
+// a premium request).
+//
+// The real budget, read off moul's billing page on 2026-10-01 rather than from
+// the docs, and it is not what the docs implied:
+//
+//	plan              Copilot Pro
+//	included          1,500 AI credits / month, resets the 1st
+//	used that day     1,211 of 1,500 (81%)
+//	additional usage  $0.00 of $0 budget, NOT ENABLED
+//
+// Two corrections to what this file said before. The allowance on Pro is 1,500
+// and not 300: the 300 figure is the older premium-request number and it is
+// wrong for this account. And the failure mode is NOT a surprise bill, because
+// additional usage is disabled: when the 1,500 runs out, Copilot code review
+// simply STOPS until the reset. A hard cap, not a meter.
+//
+// That inverts the risk. The thing to protect is not moul's money, it is the
+// ability to get a review at the moment one is actually worth having, which on
+// 2026-10-01 was 289 credits away, about 22 reviews, with 31 days to go and the
+// rest of the budget being spent by Copilot in his editor.
 //
 // This repository opened more than 100 pull requests in the fourteen days to
-// 2026-10-01, roughly 215 a month. Reviewing all of them is ~2,800 premium
-// requests a month: nine times a Pro allowance, twice a Pro+ allowance, and
-// somewhere between $50 and $100 a month in overage. "Review everything" is not
-// a policy this repository can hold, whatever the plan.
+// 2026-10-01, roughly 215 a month. Reviewing all of them is ~2,800 AI credits a
+// month against an allowance of 1,500 that is already 81% spent on other
+// things. "Review everything" does not mean a bigger bill, it means the reviews
+// stop part-way through the month and the next one that mattered does not
+// happen.
 //
 // So the rule is not "review the big diffs" or "review when unsure". It is one
 // sentence, and it comes from this repository's own central fact:
@@ -42,12 +61,19 @@ import (
 // agent reads the line and decides. A tool that silently refused to review
 // something would be worse than the cost it saves.
 
-// premiumPerReview is GitHub's published model multiplier for Copilot code
+// creditsPerReview is GitHub's published model multiplier for Copilot code
 // review. Dated because it is a product figure and will move.
-const premiumPerReview = 13 // as published 2026-10-01, effective 2026-06-01
+//
+// NOT verified against moul's own billing page: that page reports a total, not
+// a per-feature breakdown, and its "View details" view is the only thing that
+// would confirm the 13. Treat it as the best published figure and not as a
+// measurement.
+const creditsPerReview = 13 // as published 2026-10-01, effective 2026-06-01
 
-// overageUSD is the per-premium-request price past the monthly allowance.
-const overageUSD = 0.04
+// monthlyCredits is the Copilot Pro allowance, read off the billing page on
+// 2026-10-01. The older docs say 300 premium requests for Pro; that is the
+// previous unit and it is wrong for this account.
+const monthlyCredits = 1500
 
 type reviewVerdict struct {
 	review  bool
@@ -88,8 +114,10 @@ func cmdReviewAdvice(root string, args []string) error {
 		}
 	}
 	fmt.Printf("\nthe rule:\n%s\n", indentLines(reviewAdviceHint(), "  "))
-	fmt.Printf("\ncost if requested: %d premium request(s), about $%.2f at the $%.2f overage rate\n",
-		premiumPerReview, premiumPerReview*overageUSD, overageUSD)
+	fmt.Printf("\ncost if requested: %d AI credit(s) of the %d-a-month Copilot Pro allowance.\n"+
+		"Additional usage is disabled, so running out does not bill, it stops the reviews.\n"+
+		"Balance: https://github.com/settings/billing\n",
+		creditsPerReview, monthlyCredits)
 	if v.review {
 		fmt.Println("\n  gh pr edit <N> --add-reviewer @copilot")
 	}
