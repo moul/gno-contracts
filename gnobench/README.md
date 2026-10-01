@@ -204,7 +204,7 @@ differently.
 
 | file | what |
 |---|---|
-| `main.go` | the CLI: `run`, `report`, `list` |
+| `main.go` | the CLI: `run`, `report`, `list`, `compare`, `affected`, `env` |
 | `run.go` | generation, execution, baseline subtraction |
 | `template.go` | the single gno file every measurement is rendered into, and the warm/cold placement |
 | `env.go` | machine and toolchain detection |
