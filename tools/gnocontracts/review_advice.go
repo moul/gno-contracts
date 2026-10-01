@@ -83,9 +83,44 @@ import (
 // its documentation is worth re-measuring whenever the usage page is open.
 const creditsPerReview = 76 // measured 2026-10-01: 1210.74 credits / 16 reviews
 
-// maxPassesPerPR is the standing cap this policy recommends per pull request:
-// the first review, plus one re-review after the findings are fixed.
+// budgetUSD is the additional-usage budget moul enabled on 2026-10-01, on top of
+// the 1,500 included credits. At $0.01 a credit that is 10,000 more, so about
+// 132 more reviews, 152 a month in total.
 //
+// It is what makes rule 3 below affordable, and it is also why this file still
+// has rules at all: 152 is a lot and it is not unlimited. Reviewing every pull
+// request in this repository is ~320 reviews a month, which overruns the budget
+// around the twentieth of each month and then stops.
+const budgetUSD = 100
+
+// maxPassesPerPR is the cap for a pull request whose findings can still be
+// fixed later: the first review, plus one after the findings land.
+//
+// It is NOT the cap for a permanence pull request, and the two arguments that
+// look contradictory are both right. Fourteen of sixteen passes across #289 and
+// #295 spent a month's budget in a day, which says cap it. And passes two to
+// five on #289 each found one to three more real defects in a package one merge
+// from frozen forever, which says do not.
+//
+// What separates them is exactly what the triage already asks: whether a miss is
+// recoverable. On a package not yet live, a missed defect costs a new version at
+// a new path and every importer moved, so keep going until a pass adds nothing.
+// On tooling or config, which can be fixed next week, two passes and then read
+// the diff yourself.
+// passRule renders the cap for the verdict at hand, because the number depends
+// on whether the diff is a permanence case.
+func passRule(v reviewVerdict) string {
+	for _, r := range v.reasons {
+		if strings.Contains(r, "NOT yet live") {
+			return "This one is PERMANENCE: keep re-reviewing after each fix until a pass\n" +
+				"adds nothing. A miss here costs a new version at a new path."
+		}
+	}
+	return fmt.Sprintf("At most %d passes: the first, and one after the fixes land.\n"+
+		"A miss here is fixable next week, so the third pass is not worth its credits.",
+		maxPassesPerPR)
+}
+
 // It is the lever that matters. On 2026-10-01, 14 of 16 reviews were third and
 // later passes on two pull requests, and they are what spent the month.
 const maxPassesPerPR = 2
@@ -134,12 +169,12 @@ func cmdReviewAdvice(root string, args []string) error {
 		}
 	}
 	fmt.Printf("\nthe rule:\n%s\n", indentLines(reviewAdviceHint(), "  "))
-	fmt.Printf("\ncost if requested: ~%d AI credits (measured) of a %d-a-month allowance,\n"+
-		"which is about %d reviews a month in total. Additional usage is disabled, so\n"+
-		"running out does not bill, it stops the reviews until the 1st.\n"+
-		"At most %d passes per pull request: the first, and one after the fixes land.\n"+
+	total := monthlyCredits + budgetUSD*100 // $1 buys 100 credits at $0.01 each
+	fmt.Printf("\ncost if requested: ~%d AI credits (measured) of %d included plus a $%d\n"+
+		"additional-usage budget, so about %d reviews a month in total.\n"+
+		"%s\n"+
 		"Balance: https://github.com/settings/billing (AI usage)\n",
-		creditsPerReview, monthlyCredits, monthlyCredits/creditsPerReview, maxPassesPerPR)
+		creditsPerReview, monthlyCredits, budgetUSD, total/creditsPerReview, passRule(v))
 	if v.review {
 		fmt.Println("\n  gh pr edit <N> --add-reviewer @copilot")
 	}
@@ -172,6 +207,30 @@ func adviseReview(a *prAnalysis) reviewVerdict {
 			v.reasons = append(v.reasons,
 				f+" governs every later review, so a defect in it is permanent until caught")
 		}
+		v.review = true
+	}
+
+	// The third trigger, affordable since the $100 budget and justified before
+	// it: the repository's own tooling.
+	//
+	// This file used to skip tools/ on the grounds that tooling has tests, has
+	// CI, and is fixable any time. The first two are true and the third made it
+	// look like a cheap thing to drop. Then #296's review returned four
+	// findings and EVERY ONE of them was in tooling or docs: a markdown escaper
+	// that let a contributor put a live link in the hub issue, a `gh api
+	// --paginate` that silently dropped every page but the first, a workflow
+	// that would fail on any fork, and an index carrying a rule an earlier
+	// review had already disproved. None of that is caught by tests, because
+	// none of it was wrong in a way anybody had thought to test.
+	//
+	// Measured over the last 60 merged pull requests: adding tools/*.go takes
+	// the triage from 6 to 17 of 60, about 91 reviews a month, roughly $54 of
+	// the $100. Adding every .gno pull request on top would be 39 of 60 and
+	// ~$144, which is why that one is still out.
+	if tools := changedTooling(a.paths); len(tools) > 0 {
+		v.reasons = append(v.reasons, fmt.Sprintf(
+			"%d tooling file(s) changed, starting %s: three of #296's four findings were in Go tooling or a workflow, and the tests had caught none of them",
+			len(tools), tools[0]))
 		v.review = true
 	}
 
@@ -235,10 +294,18 @@ func liveOnMainnet(c *Contract) bool {
 // reviewAdviceHint is the one-paragraph version, for a human who asked why.
 func reviewAdviceHint() string {
 	return strings.TrimSpace(`
-Review exactly what is about to become permanent. A package already live on
-mainnet cannot be fixed in place, so a finding against it needs a vN+1 and a
-human decision; a package not yet live is one merge from being frozen forever,
-and that is the only moment a review changes the outcome.`)
+1. What is about to become PERMANENT. A package already live on mainnet cannot
+   be fixed in place, so a finding against it needs a vN+1 and a human decision;
+   a package not yet live is one merge from frozen, and that is the only moment
+   a review changes the outcome.
+2. The REVIEWER'S OWN CONFIG, because a wrong instruction produces wrong
+   findings on every later review until somebody notices.
+3. The TOOLING, because every finding on #296 was in tooling and the tests had
+   caught none of them.
+
+Not every .gno pull request: at ~76 credits a review that is ~$144 a month
+against a $100 budget. Not diff size either, because a one-line change to an
+unpublished package is exactly as permanent as a thousand-line one.`)
 }
 
 // indentLines prefixes every line, so the rule reads as a block under a heading.
@@ -265,6 +332,27 @@ func changedReviewConfig(paths []string) []string {
 				break
 			}
 		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// changedTooling returns the tooling sources in the diff: Go under tools/, and
+// the workflows, which are the other place a defect runs unattended.
+//
+// Test files are excluded. A test is where the bad shape is written on purpose.
+func changedTooling(paths []string) []string {
+	var out []string
+	for _, p := range paths {
+		switch {
+		case strings.HasPrefix(p, "tools/") && strings.HasSuffix(p, ".go") &&
+			!strings.HasSuffix(p, "_test.go"):
+		case strings.HasPrefix(p, ".github/workflows/") &&
+			(strings.HasSuffix(p, ".yml") || strings.HasSuffix(p, ".yaml")):
+		default:
+			continue
+		}
+		out = append(out, p)
 	}
 	sort.Strings(out)
 	return out

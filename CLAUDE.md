@@ -58,13 +58,14 @@ irreversible.
 - **Green before commit:** `make lint test`, with `GNOROOT` on a gnolang/gno checkout.
 - **Run `make review-advice BASE=origin/main` before requesting a Copilot review, and follow
   it.** A review costs **~76 AI credits measured** (GitHub publishes 13; the bill says
-  otherwise) of a 1,500-a-month allowance, so the whole budget is **twenty reviews a month**,
-  and additional usage is DISABLED so running out stops the reviews rather than billing.
-  **At most two passes per PR**: the first, and one after the fixes land. Re-reviews are what
-  actually spend the budget. The rule: **review exactly what
-  is about to become permanent**, that is, a package not yet live on mainnet, plus any change
-  to `.github/copilot-instructions.md` or `.github/instructions/`. Everything else is a path
-  that cannot be fixed in place anyway. Request with `gh pr edit <N> --add-reviewer @copilot`.
+  otherwise), against 1,500 included plus a **$100 additional-usage budget**, so about **152
+  reviews a month**. **Two passes per PR** (the first, and one after the fixes land) for
+  tooling and config, but **keep going until a pass adds nothing when the package is not yet
+  live**, because there a miss is permanent. Re-reviews are most of the spend. Three triggers: **what is about to
+  become permanent** (a package not yet live on mainnet), **the reviewer's own config**, and
+  **the tooling** (non-test Go under `tools/`, and workflows: three of #296's four
+  findings were there and the tests had caught none of them). NOT every `.gno` PR: that is ~$144/month against the
+  $100 budget. Request with `gh pr edit <N> --add-reviewer @copilot`.
 - **A Copilot finding that is wrong is OUR bug, not noise.** The house rules live in
   `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md`; every review
   is digested into #280 with a box asking which line produced a false positive. Fix that line

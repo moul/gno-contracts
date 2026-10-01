@@ -156,8 +156,14 @@ func analyzePR(root, base string) (*prAnalysis, error) {
 		a.totDel += del
 	}
 	a.files = len(files)
-	for path := range files {
-		a.paths = append(a.paths, path)
+	// paths come from --name-only, NOT from the --numstat keys above: git
+	// renders a rename in numstat as `{old => new}` brace syntax, so a renamed
+	// tools/foo.go stops ending in .go and every path-matching rule silently
+	// skips it. --name-only reports the destination path plainly.
+	for _, path := range gitLines(root, "diff", "--name-only", spec) {
+		if path = strings.TrimSpace(path); path != "" {
+			a.paths = append(a.paths, path)
+		}
 	}
 	sort.Strings(a.paths)
 

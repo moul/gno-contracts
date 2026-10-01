@@ -562,7 +562,7 @@ From the AI usage page's per-model breakdown, **2026-10-01**:
 | included | **1,500 AI credits a month**, resets the 1st |
 | used | **1,211 of 1,500 (81%)**, on the **first day of the cycle** |
 | of which | **1,210.74 is the Code Review model.** Essentially all of it |
-| additional usage | **$0.00 of $0, NOT ENABLED** |
+| additional usage | **$0.00 of $0, NOT ENABLED** *(superseded: a $100 budget was enabled later the same day, see below)* |
 | credit price | $0.01 |
 
 Divide by the **16 Copilot reviews** requested that day (#274 x1, #289 x6, #295 x8, #296 x1,
@@ -573,8 +573,10 @@ Three things follow, and the third is the one that actually matters.
 
 **1. The Pro allowance is 1,500, not 300.** The 300 figure is the older premium-request unit.
 
-**2. The failure mode is silence, not a bill.** Additional usage is disabled, so when the
-1,500 runs out Copilot code review simply **stops** until the reset. What this policy protects
+**2. The failure mode was silence, not a bill.** With additional usage disabled, running out
+simply **stopped** code review until the reset. **That changed the same day**: a $100 budget
+is now enabled, so the total is ~11,500 credits, about 152 reviews a month, and the stop moves
+to $100 rather than to zero. The reasoning below is what the budget was sized against. What this policy protects
 is not money, which is capped at zero by construction, but the ability to get a review at the
 moment one is worth having. On 2026-10-01 that was 289 credits, **under four reviews**, with
 31 days to go.
@@ -599,10 +601,21 @@ it needs a new version at a new path and every importer moved, which is a human 
 review does not unblock. A package **not yet live** is one merge from being frozen forever,
 and that is the only moment a review changes the outcome.
 
-One other trigger, and it is there because of a counterexample rather than for symmetry:
-**a change to `.github/copilot-instructions.md` or `.github/instructions/`**. A wrong
+**Two other triggers**, each there because of a counterexample rather than for symmetry.
+
+**A change to `.github/copilot-instructions.md` or `.github/instructions/`.** A wrong
 instruction does not produce one wrong finding, it produces wrong findings on every later
 review until somebody notices, which is a permanence of its own.
+
+**A change to a non-test Go source under `tools/`, or a workflow.** (`_test.go` is excluded:
+a test is where the bad shape is written on purpose.) This policy used to skip tooling on the grounds
+that it has tests, has CI, and is fixable any time. The first two are true and the third made
+it look cheap to drop. Then #296's review returned four findings and **every one was in
+tooling or docs**: a markdown escaper that let a contributor put a live link in the hub issue,
+a `gh api --paginate` that silently dropped every page but the first, a workflow that would
+fail on any fork, and an index carrying a rule an earlier review had already disproved. None
+of that is caught by tests, because none of it was wrong in a way anybody had thought to
+test.
 
 `make review-advice BASE=origin/main` answers it, reading `contracts.json` rather than the
 chain, and prints the reason. It is **advice and never a gate**: it exits 0 and a human or an
@@ -620,27 +633,48 @@ cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
   gh pr edit <N> --add-reviewer @copilot
 ```
 
-Backtested over the last 60 merged pull requests: **4 would be reviewed (6%)**, three for
-permanence and one for the config. At ~76 credits that is **303 credits a month for first
-passes, 20% of the allowance**, and **71% if each one averages the three-and-a-half passes
-the two expensive pull requests took**.
+### What it costs, with the budget moul enabled on 2026-10-01
 
-So the budget is tight either way, and the honest framing is a standing cap of about twenty
-reviews a month rather than a comfortable margin. The triage picks the pull requests; the
-two-pass rule is what keeps the picking from being undone.
+1,500 included credits, plus a **$100 additional-usage budget** at $0.01 a credit, is 11,500
+credits a month: **about 152 reviews**.
 
-**Once a diff qualifies, one pass is not the review: re-request after every push that fixed
-findings, until a pass adds nothing above low.** #289 (`p/moul/kit/index`, not yet live) took
-six passes. Passes two to five each found one to three more real defects, every one in a
-package one merge from frozen: a copied `Index` that splits its counter from its tree, every
-tag link dead, an untested global storage cap. Five extra passes cost 65 premium requests,
-about $2.60; any one of those defects shipped would have cost a new version at a new path.
-The "finish the file" instruction is the attempt to make pass one enough. Until the log shows
-it working, the second pass is the cheap one.
+Backtested over the last 60 merged pull requests, scaled to this repository's ~215 a month at
+1.5 passes each:
 
-Two things it does not do, deliberately. It does not look at diff size, because a one-line
-change to an unpublished package is exactly as permanent as a thousand-line one. And it does
-not review `tools/`, because tooling has tests, has CI, and can be fixed any time.
+| rule set | PRs | reviews/mo | overage |
+|---|--:|--:|--:|
+| permanence + config | 6/60 | 32 | **$9** |
+| **+ tooling (what ships)** | **17/60** | **91** | **$54** |
+| + every `.gno` pull request | 39/60 | 210 | $144, **over** |
+
+So tooling is affordable and every `.gno` change is not, which is the line drawn above. The
+two-pass cap is what keeps the picking from being undone: it is **not** a cost rule any more,
+it is that the third and later passes on #289 and #295 were 14 of 16 reviews that day and
+found proportionally much less than the first two.
+
+### How many passes, and why the answer is not one number
+
+Two arguments here look contradictory and **both are right**.
+
+Fourteen of the sixteen passes across #289 and #295 spent a month's budget in a day, which
+says cap it. And **passes two to five on #289 each found one to three more real defects**, all
+in a package one merge from frozen: a copied `Index` that splits its counter from its tree,
+every tag link dead, an untested global storage cap. Five extra passes cost ~380 credits,
+about $3.80; any one of those defects shipped would have cost a new version at a new path.
+
+What separates them is the thing the triage already asks: **whether a miss is recoverable.**
+
+| the diff is | passes |
+|---|---|
+| a package **not yet live** | keep re-requesting after each fix until a pass adds nothing. A miss is permanent |
+| tooling, a workflow, the config | **two**: the first, and one after the fixes land. A miss is fixable next week |
+
+`make review-advice` prints whichever applies, because it already knows which case it is.
+
+Two things it still does not do, deliberately. It does not look at diff size, because a
+one-line change to an unpublished package is exactly as permanent as a thousand-line one. And
+it does not review every `.gno` pull request, because at ~76 credits a review that is about
+$144 a month against a $100 budget.
 ## Copilot code review, and the log that makes it better
 
 The house rules live where GitHub already reads them:
