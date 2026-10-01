@@ -285,3 +285,85 @@ func TestCopilotDigestDoesNotCountAFailedReviewAsClean(t *testing.T) {
 		t.Errorf("want the verdict and Copilot's reason:\n%s", got)
 	}
 }
+
+// liteReview is the real Lite review captured from moul/gno-contracts#312 on
+// 2026-10-01, the first Lite one this repository ever got and the first clean
+// one of any kind.
+func liteReview(t *testing.T) copilotPayload {
+	t.Helper()
+	b, err := os.ReadFile(filepath.Join("testdata", "copilot-review-lite.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var p copilotPayload
+	if err := json.Unmarshal(b, &p); err != nil {
+		t.Fatal(err)
+	}
+	return p
+}
+
+// The effort is read back off the review, never assumed from the account
+// default, because the default is not reliably what runs: on 2026-10-01 the
+// default was Lite and two reviews on #311 ran Balanced anyway.
+func TestCopilotDigestRecordsTheEffort(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		load func(*testing.T) copilotPayload
+		want string
+	}{
+		{"balanced", realReview, "effort **Balanced**"},
+		{"lite", liteReview, "effort **Lite**"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got, ok := copilotDigest(tc.load(t))
+			if !ok {
+				t.Fatal("want a digest")
+			}
+			if !strings.Contains(got, tc.want) {
+				t.Errorf("want %q in the digest:\n%s", tc.want, got)
+			}
+		})
+	}
+}
+
+// A review whose overview carries no effort line is recorded as unstated, not
+// defaulted to Balanced: a guess written down as a fact is how a 13 ended up in
+// these files for a day.
+func TestCopilotEffortIsNotGuessed(t *testing.T) {
+	if got := copilotEffort("### 🟢 Approval recommended\n\nno effort line here"); got != "unstated" {
+		t.Errorf("want unstated, got %q", got)
+	}
+	if got := copilotEffort("**Review effort:** Max  \n"); got != "Max" {
+		t.Errorf("want Max, got %q", got)
+	}
+
+	// The phrase quoted inside a finding is PROSE, not the metadata line, and
+	// an unanchored match reads it as the effort. This pull request's own body
+	// quotes "**Review effort:** Lite" while explaining the feature, so the
+	// failure is not hypothetical.
+	prose := "### 🟡 Changes recommended\n\n" +
+		"The digest prints `**Review effort:** Lite` which is wrong here.\n"
+	if got := copilotEffort(prose); got != "unstated" {
+		t.Errorf("a quoted phrase is not the metadata line: got %q", got)
+	}
+
+	// And the real shape still wins when both are present: the metadata line
+	// comes first, on its own line.
+	both := "### 🟡 Changes recommended\n\n**Review effort:** Balanced  \n\n" +
+		"a finding quoting `**Review effort:** Lite` in passing\n"
+	if got := copilotEffort(both); got != "Balanced" {
+		t.Errorf("the metadata line wins, got %q", got)
+	}
+}
+
+// The Lite review found nothing, which is the first clean review in this
+// repository's history and the negative data point the log was missing.
+func TestTheLiteFixtureIsACleanReview(t *testing.T) {
+	got, _ := copilotDigest(liteReview(t))
+	if !strings.Contains(got, "No inline findings") {
+		t.Errorf("want the clean-review line:\n%s", got)
+	}
+	if strings.Contains(got, "- [ ]") {
+		t.Errorf("a clean review carries no checkboxes:\n%s", got)
+	}
+}
