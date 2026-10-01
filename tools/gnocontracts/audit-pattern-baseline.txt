@@ -65,8 +65,6 @@ exported_pointer_leak r/moul/x/upgrade/lazy/gen0 1
 exported_pointer_leak r/moul/x/upgrade/lazy/gen1 2
 interface_realm_param p/moul/pilot 1
 origin_caller_auth r/moul/demo/wikicoin 1
-payment_user_call r/moul/faucet 1
-payment_user_call r/moul/grant 1
 payment_user_call r/moul/x/moultest 1
 pkg_mutable_pointer r/moul/gns 7
 render_map_iteration r/moul/x/daily/erc20 1
@@ -106,13 +104,12 @@ render_markdown_escape r/moul/x/pairreg 1
 render_markdown_escape r/moul/x/pairs/aaabbb 1
 render_markdown_escape r/moul/x/provable 1
 render_markdown_escape r/moul/x/wesh 1
-unsafe_previous_realm r/moul/faucet 8
-unsafe_previous_realm r/moul/grant 8
+unsafe_previous_realm r/moul/faucet 7
+unsafe_previous_realm r/moul/grant 7
 unsafe_previous_realm r/moul/reactions 2
 unsafe_previous_realm r/moul/vesting 2
 unsafe_previous_realm r/moul/x/allinone/devtools 1
 unsafe_previous_realm r/moul/x/daily/blog 1
-unsafe_previous_realm r/moul/x/daily/collatz 1
 unsafe_previous_realm r/moul/x/daily/connect4 2
 unsafe_previous_realm r/moul/x/daily/counter 1
 unsafe_previous_realm r/moul/x/daily/crowdfund 5
