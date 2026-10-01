@@ -52,8 +52,11 @@ changing here.
   and proposed again under the same slug). Approving, rejecting, retiring,
   editing and removing all name it, so an edit that lands between the reading
   and the decision makes the decision fail, instead of attaching a name to text
-  nobody read. Verifying an endpoint binds the same way, to the chain id it was
-  checked against.
+  nobody read. Every status change bumps it too, so an approval opened before a
+  colleague's rejection fails rather than reversing it. Verifying an endpoint
+  binds the same way, to the revision it was checked against: what was checked
+  is that it answers for this zone's chain id. An edit that changes nothing is
+  refused, so a revision only moves when something did.
 - **Only a pending or approved zone is editable.** An edit before review takes
   no reason. An edit to an approved zone is a curator decision: the reason is
   required and replaces the review on record. A changed chain id, on any zone,
@@ -82,9 +85,12 @@ also an index key, a URL segment or a config-file line:
   digits, and a scheme from a short list. A zone's main RPC is `http`, `https`
   or `tcp` with no path, query or trailing slash, which is what `gnokey -remote`
   dials; an `rpc` endpoint also takes `ws`, `wss` and a path. A `%` never
-  escapes a character that needs no escaping, so a URL has one spelling. A
-  loopback or private host (localhost, 127/8, 10/8, 172.16/12, 192.168/16,
-  169.254/16, 100.64/10, 0/8) is refused except on a `local` zone.
+  escapes a character that needs no escaping, and a path has no `.` or `..`
+  segment, so a URL has one spelling. A host that names a different machine
+  for every reader is refused except on a `local` zone: a name with no dot,
+  `.localhost`, `.local`, `.internal`, `.home.arpa`, `.localdomain`, and IPv4
+  loopback, private, link-local, CGNAT, multicast and reserved ranges. A zone
+  cannot leave the `local` kind while it lists one.
 - **Peer**: `<node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes,
   the node id a lowercase g1 address (tm2 compares node ids byte for byte), and
   no terminal dot on an IPv4 host (Go's dialer cannot use one).
@@ -101,8 +107,9 @@ also an index key, a URL segment or a config-file line:
 An endpoint is stored in canonical spelling (scheme lowercased, a peer
 lowercased whole without its host's terminal dot) and deduplicated on
 `Canonical`: scheme and host lowercased, a terminal dot, a default port, an
-empty path before a query and a trailing lone `?` or `/` dropped, `%XX` hex
-uppercased, anything meaningful after the host kept as typed. The same address under two kinds is two
+empty path before a query, an empty query's `?` and a bare `/` dropped, `%XX`
+hex uppercased, an rpc `tcp://` read as the `http://` gnokey dials, anything
+meaningful after the host kept as typed. The same address under two kinds is two
 endpoints.
 
 ## Bounds
@@ -116,17 +123,19 @@ amount of time fills the registry for good.
 **Per-address caps** make one address cheap to ignore: 4 pending proposals, 16
 endpoints per zone. Neither stops a flood from many addresses, so **the review
 queue has an admission gate of its own**: 64 pending zones in all, 64
-endpoints per zone that are not verified (unverified or flagged), under a hard
-128 per zone. It is checked where something enters, so a curator's own review
-can push a count past it. A flood fills the queue and never crowds out an
+endpoints per zone waiting for a verdict, under a hard 128 per zone. A flagged
+endpoint has its verdict and leaves the queue, so curators keep warnings
+instead of deleting them to make room. The gate is checked where something
+enters, so a review or a reset can push a count past it. A flood fills the queue and never crowds out an
 approved zone or a verified endpoint. Each entry costs its sender a storage deposit, refunded to whoever
 signs the transaction that frees it, so a flooder who withdraws first gets it
 back: a bond, not a fee.
 
 ## Storage
 
-Records live in a B+ tree at fanout 128, the ordered container EFFECTIVE_GNO
-measures cheapest (592 B per entry), with ids that are never reused. `kit/store`
+Records live in a B+ tree at fanout 128, the keyed, ordered container
+EFFECTIVE_GNO recommends for iteration and pagination (592 B per entry), with
+ids that are never reused. `kit/store`
 has that shape on an avl tree (2,029 B), and on an immutable path the choice is
 permanent. Three B+ trees hold an id per key: slug, the endpoint dedup key (a
 128-bit hash of the canonical address rather than a second copy of it), and the

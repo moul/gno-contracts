@@ -54,7 +54,7 @@ func ExampleRender_zone() {
 	// - **gnoweb**: [https://onyx\.testnets\.gno\.land](https://onyx.testnets.gno.land)
 	// - **genesis**: [https://github\.com/gnolang/gno/releases/download/chain/onyx/genesis\.json](https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json)
 	// - **proposed** by `g1manfre…dlf5` at block 123
-	// - **revision**: 2
+	// - **revision**: 4
 	// - **last reviewed** by `g1manfre…dlf5` at block 123: seeded at deploy; probed 2026\-10\-01
 	//
 	// ## Endpoints
@@ -71,7 +71,7 @@ func ExampleRender_zone() {
 	// | 12 | faucet | `https://onyx.testnets.gno.land/faucet` | gno core | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
 	// | 13 | explorer | `https://gnoscope.com/?network=onyx` | gnoscope | ✅ verified: seeded at deploy; probed 2026\-10\-01 (`g1manfre…dlf5`, block 123) | `g1manfre…dlf5` |
 	//
-	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&revision=2&slug=onyx)
+	// [Register an endpoint](/r/moul/zones/v0$help&func=RegisterEndpoint&addr=&kind=rpc&label=&slug=onyx) · [Retire](/r/moul/zones/v0$help&func=RetireZone&reason=&revision=4&slug=onyx)
 	//
 	// ```
 	// gnokey query vm/qeval -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'
@@ -118,7 +118,7 @@ func ExampleRender_rejected() {
 	//
 	// | zone | chain id | proposed by | why |  |
 	// | --- | --- | --- | --- | --- |
-	// | [Mainnet \(faster\!\)](/r/moul/zones/v0:zone/fake-mainnet) | `gnoland-1` | `g1vfhkyh…vdhu` | not the mainnet RPC | [Remove](/r/moul/zones/v0$help&func=RemoveZone&revision=5&slug=fake-mainnet) |
+	// | [Mainnet \(faster\!\)](/r/moul/zones/v0:zone/fake-mainnet) | `gnoland-1` | `g1vfhkyh…vdhu` | not the mainnet RPC | [Remove](/r/moul/zones/v0$help&func=RemoveZone&revision=10&slug=fake-mainnet) |
 	//
 	// [pending](/r/moul/zones/v0:proposals) · [All zones](/r/moul/zones/v0)
 }

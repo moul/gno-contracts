@@ -25,10 +25,12 @@ import (
 // The per-address caps make one address cheap to ignore. Neither stops a flood
 // from many addresses, because an address is not an identity, so admission to
 // the review queue has a gate of its own (MaxPending zones, MaxUnverifiedPerZone
-// endpoints), well under the hard caps: a flood fills the queue and never
-// crowds out an approved zone or a verified endpoint. The gate is checked where
-// something enters (Propose, Register); a curator's own review can push a count
-// past it, and never fails for it. The queue clears through approval,
+// endpoints awaiting a verdict), well under the hard caps: a flood fills the
+// queue and never crowds out an approved zone or a verified endpoint. A
+// flagged endpoint has its verdict and leaves the queue, so curators keep a
+// warning instead of having to delete it to make room. The gate is checked
+// where something enters (Propose, Register); a review or a reset can push a
+// count past it, and never fails for it. The queue clears through approval,
 // verification, rejection, RemoveZone and RemoveEndpoint. Each entry costs its
 // sender a storage deposit, refunded to whoever signs the transaction that
 // frees it, so a flooder who withdraws first gets it back: a bond, not a fee.
@@ -39,15 +41,15 @@ const (
 	MaxRejected            = 64  // rejected zones kept for the record
 	MaxRetired             = 128 // retired zones kept for the record
 	MaxEndpointsPerZone    = 128
-	MaxUnverifiedPerZone   = 64 // endpoints on one zone that are not verified: unverified or flagged
+	MaxUnverifiedPerZone   = 64 // endpoints on one zone still waiting for a verdict (flagged ones have theirs)
 	MaxEndpointsPerAddress = 16 // endpoints one address may register on one zone
 )
 
 // The reasons an endpoint carries when its zone changed under it and sent it
-// back to unverified. A reset caused by a curator's decision (a rejection, a
-// retirement, an edit to an approved zone) records that curator as the
-// reviewer; one caused by a proposer's edit to a pending zone records nobody,
-// because a proposer is not a reviewer: ReviewedBy is empty and Reason says why.
+// back to unverified. A reset caused by a curator (a rejection, a retirement,
+// an edit) records that curator as the reviewer; one caused by the proposer's
+// own edit to their pending zone records nobody, because a proposer is not a
+// reviewer: ReviewedBy is empty and Reason says why.
 const (
 	ChainIDChanged = "the zone's chain id changed; verify again"
 	ZoneRetired    = "the zone was retired; verify again if it returns"
@@ -84,6 +86,7 @@ type Registry struct {
 	byKind    *index.Index // slug|kind -> endpoint ids, so a page reads only its rows
 	byOwner   *counter     // slug|registrant -> how many endpoints they registered
 	unchecked *index.Index // slug -> ids of endpoints that are not Verified
+	flagged   *counter     // slug -> how many of those are Flagged
 }
 
 // NewRegistry returns an empty registry.
@@ -100,6 +103,7 @@ func NewRegistry() *Registry {
 		byZone:     index.New(),
 		byKind:     index.New(),
 		byOwner:    newCounter(),
+		flagged:    newCounter(),
 		unchecked:  index.New(),
 	}
 }
@@ -129,8 +133,7 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 		return errors.New("zones: " + by.String() + " already has " + strconv.Itoa(n) +
 			" pending proposals, the limit is " + strconv.Itoa(MaxPendingPerProposer))
 	}
-	r.rev++
-	z := &Zone{Slug: slug, Status: Pending, Proposer: by, ProposedAt: at, Revision: int64(r.rev)}
+	z := &Zone{Slug: slug, Proposer: by, ProposedAt: at}
 	z.setInfo(in)
 	id := r.zones.add(z)
 	r.bySlug.set(slug, id)
@@ -138,19 +141,29 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 	return r.enter(z, id, Pending)
 }
 
-// enter files a zone under a status: the status index, and the entry order
-// eviction reads. The caller has already taken it out of its old status.
+// enter files a zone under a status, and bumps its Revision: a decision
+// prepared against the old status must fail too, or an approval opened before
+// a colleague's rejection would quietly reverse it. Only the two states that
+// evict read the entry order, so only they write it. The caller has already
+// taken the zone out of its old status.
 func (r *Registry) enter(z *Zone, id store.ID, to Status) error {
 	r.seq++
-	z.Status, z.Entered = to, int64(r.seq)
-	r.entered.set(enteredKey(to, z.Entered), id)
+	r.rev++
+	z.Status, z.Entered, z.Revision = to, int64(r.seq), int64(r.rev)
+	if evicts(to) {
+		r.entered.set(enteredKey(to, z.Entered), id)
+	}
 	return r.byStatus.Add(string(to), id)
 }
+
+func evicts(st Status) bool { return st == Rejected || st == Retired }
 
 // leave takes a zone out of its current status.
 func (r *Registry) leave(z *Zone, id store.ID) {
 	r.byStatus.Remove(string(z.Status), id)
-	r.entered.remove(enteredKey(z.Status, z.Entered))
+	if evicts(z.Status) {
+		r.entered.remove(enteredKey(z.Status, z.Entered))
+	}
 	if z.Status == Pending {
 		r.byProposer.dec(z.Proposer.String())
 	}
@@ -175,8 +188,10 @@ func enteredKey(st Status, seq int64) string { return string(st) + "|" + store.I
 //
 // When the chain id changes, whatever the status, every endpoint verified
 // against the old one goes back to unverified: what was verified was that it
-// answered for a chain this zone no longer names. On a pending zone that reset
-// records no reviewer, because the proposer is not one.
+// answered for a chain this zone no longer names. A reset the proposer's edit
+// causes records no reviewer, because the proposer is not one; anybody else's
+// records them. An edit that changes nothing is refused, and leaving the local
+// kind is refused while the zone lists a loopback or private host.
 //
 // An edit names the revision it was written against, like an approval does, so
 // two editors working from the same reading cannot silently undo each other.
@@ -208,10 +223,30 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 	case z.Status == Approved && !HasVisible(reason):
 		return errors.New("zones: " + slug + " is approved, so an edit needs a reason")
 	}
+	// An edit that changes nothing would still bump the revision, so refusing
+	// it is what stops a revision being bumped for its own sake.
+	if in == z.Info() {
+		return errors.New("zones: that edit changes nothing on " + slug)
+	}
+	// Leaving the local kind: the private hosts only a local zone may list
+	// would otherwise stay listed on a zone that no longer may.
+	if z.Kind == Local && in.Kind != Local {
+		for _, eid := range r.byZone.Lookup(slug) {
+			v, _ := r.endpoints.get(eid)
+			if e := v.(*Endpoint); IsPrivateHost(HostOf(e.Kind, e.Address)) {
+				return errors.New("zones: " + slug + " lists " + e.Address +
+					", a loopback or private address only a local zone may list; remove it first")
+			}
+		}
+	}
 	if in.ChainID != z.ChainID {
+		// The proposer is not a reviewer; anybody else editing (a curator, on a
+		// pending zone or an approved one) is, and is named on the reset.
 		resetBy := address("")
-		if z.Status == Approved {
+		if z.Status == Approved || by != z.Proposer {
 			resetBy = by
+		}
+		if z.Status == Approved {
 			r.approved.Remove(z.ChainID, zid)
 			if err := r.approved.Add(in.ChainID, zid); err != nil {
 				return err
@@ -247,8 +282,9 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 // Rejecting or retiring sends every verified endpoint back to unverified: a
 // rejected zone was never vouched for, and a retired network's peers may be
 // somebody else's hosts by the time anyone reads them. Each state keeps at most
-// MaxRejected or MaxRetired zones; the next one in drops the zone proposed
-// longest ago in that state, with its endpoints.
+// MaxRejected or MaxRetired zones; the next one in drops the zone that entered
+// that state first, with its endpoints. Every transition bumps the zone's
+// Revision, so a decision prepared against the old status fails.
 //
 // Nothing goes back to pending: a proposer who disagrees with a rejection
 // removes the zone and proposes it again. An official zone is never rejected
@@ -378,10 +414,19 @@ func (r *Registry) removeZone(z *Zone, id store.ID) {
 		if !ok {
 			continue
 		}
-		e := v.(*Endpoint)
-		r.byAddress.remove(addressKey(slug, e.Kind, e.Address))
-		r.byOwner.dec(ownerKey(slug, e.Registrant))
+		r.byOwner.dec(ownerKey(slug, v.(*Endpoint).Registrant))
 	}
+	// The zone's dedup keys are one contiguous range (a slug is [a-z0-9-], all
+	// below "|"), so they are dropped without hashing each address again.
+	keys := []string{}
+	r.byAddress.tree.Iterate(slug+"|", slug+"}", func(k string, _ any) bool {
+		keys = append(keys, k)
+		return false
+	})
+	for _, k := range keys {
+		r.byAddress.remove(k)
+	}
+	r.flagged.drop(slug)
 	r.byZone.RemoveKey(slug)
 	r.unchecked.RemoveKey(slug)
 	for _, k := range EndpointKinds() {
@@ -433,7 +478,7 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 	if n := r.byZone.Count(slug); n >= MaxEndpointsPerZone {
 		return 0, errors.New("zones: " + slug + " is full at " + strconv.Itoa(MaxEndpointsPerZone) + " endpoints")
 	}
-	if n := r.unchecked.Count(slug); n >= MaxUnverifiedPerZone {
+	if n := r.unchecked.Count(slug) - r.flagged.count(slug); n >= MaxUnverifiedPerZone {
 		return 0, errors.New("zones: " + slug + " already has " + strconv.Itoa(n) +
 			" endpoints waiting for review; try again once a curator has cleared some")
 	}
@@ -517,14 +562,20 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, revision int64, by 
 			return err
 		}
 	}
+	if e.Status == Flagged {
+		r.flagged.dec(e.Zone)
+	}
+	if to == Flagged {
+		r.flagged.inc(e.Zone)
+	}
 	e.Status = to
 	e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, reason
 	return nil
 }
 
 // unverifyAll sends every verified endpoint of a zone back to unverified with
-// that reason, and by as the reviewer ("" when the reset is the registry's own
-// doing). Flagged ones keep their flag. Only the verified ones are read: their
+// that reason, and by as the reviewer ("" when the proposer's own edit caused
+// it). Flagged ones keep their flag. Only the verified ones are read: their
 // ids are the zone's ids minus the unchecked ones, both kept ascending, so one
 // merge pass finds them without loading the rest.
 func (r *Registry) unverifyAll(slug string, by address, at int64, reason string) error {
@@ -562,7 +613,7 @@ func (r *Registry) RemoveEndpoint(id int64) error {
 	return nil
 }
 
-// removeEndpoint unwinds the record and all five of its indexes together.
+// removeEndpoint unwinds the record and all six of its indexes together.
 func (r *Registry) removeEndpoint(id store.ID) {
 	v, ok := r.endpoints.remove(id)
 	if !ok {
@@ -574,6 +625,9 @@ func (r *Registry) removeEndpoint(id store.ID) {
 	r.byKind.Remove(kindKey(e.Zone, e.Kind), id)
 	r.byOwner.dec(ownerKey(e.Zone, e.Registrant))
 	r.unchecked.Remove(e.Zone, id)
+	if e.Status == Flagged {
+		r.flagged.dec(e.Zone)
+	}
 }
 
 // Zone returns a copy of the zone under slug.
@@ -840,7 +894,8 @@ func (r *Registry) endpoint(id int64) (*Endpoint, error) {
 }
 
 // addressKey is the dedup key: the zone, the kind, and a hash of the address
-// in [Canonical] form. Hashed so the key is 16 bytes whatever the URL's length,
+// in [Canonical] form. Hashed so the address part of the key is 16 bytes
+// whatever the URL's length,
 // instead of a second copy of up to MaxURLLen bytes the record already holds,
 // and kept raw rather than hex: it is a key, never shown. Truncated to 128
 // bits, which no accidental collision reaches and which only lets a deliberate
@@ -873,7 +928,8 @@ func trimInfo(in Info) Info {
 
 // table is numbered records in a B+ tree at fanout 128: kit/store's shape (an
 // id that is never reused, keyed by its seqid encoding so the tree iterates in
-// id order) on the ordered container EFFECTIVE_GNO.md measured cheapest.
+// id order) on the keyed, ordered container EFFECTIVE_GNO.md recommends for
+// iteration and pagination.
 // kit/store/v0 sits on an avl, which it measured at 2,029 B per entry against
 // 592, and about six times the gas per entry iterated, and on an immutable path
 // that choice is permanent.
@@ -960,3 +1016,5 @@ func (c *counter) dec(key string) {
 		c.tree.Remove(key)
 	}
 }
+
+func (c *counter) drop(key string) { c.tree.Remove(key) }

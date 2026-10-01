@@ -33,8 +33,9 @@ func action(title, fn string, args ...string) string {
 // PageSize is how many rows any table here shows at once. Every list is
 // paginated and every page reads only its own records, because vm/qrender is
 // gas-metered (3B per query) and a Render that outgrows it stops answering
-// instead of slowing down. At the caps a page reads about 25 records and a few
-// index nodes, so it stays a small fraction of that ceiling.
+// instead of slowing down. At the caps a page reads its 25 records, each
+// row's main-RPC endpoint on the index, and a few index nodes: a small fraction
+// of that ceiling.
 const PageSize = 25
 
 // Render is the whole public surface, three pages: the zone list (official,
@@ -169,10 +170,10 @@ func renderZone(slug string, req *realmpath.Request) string {
 		md.Bold("rpc") + ": " + md.InlineCode(z.RPCURL) + rpcFlag(z),
 	}
 	if z.GnowebURL != "" {
-		facts = append(facts, md.Bold("gnoweb")+": "+urlFact(z, z.GnowebURL))
+		facts = append(facts, md.Bold("gnoweb")+": "+urlFact(z, zones.Gnoweb, z.GnowebURL))
 	}
 	if z.GenesisURL != "" {
-		facts = append(facts, md.Bold("genesis")+": "+urlFact(z, z.GenesisURL))
+		facts = append(facts, md.Bold("genesis")+": "+urlFact(z, "", z.GenesisURL))
 	}
 	facts = append(facts, md.Bold("proposed")+" by "+ui.Addr(z.Proposer)+" at block "+strconv.FormatInt(z.ProposedAt, 10))
 	if z.EditedBy != "" {
@@ -237,8 +238,6 @@ func renderZone(slug string, req *realmpath.Request) string {
 		actions = append(actions, action("Register an endpoint (proposer or curator)", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	}
-	// Approve carries the revision this page was rendered from, so approving
-	// what you read here fails if the zone changed after you read it.
 	// Every decision carries the revision this page was rendered from, so acting
 	// on what you read here fails if the zone changed after you read it.
 	rev := revStr(z)
@@ -403,7 +402,13 @@ func zoneLink(z zones.Zone) string {
 // open anything, a pre-filled transaction form included, right under the
 // Approve button. Only an approved zone's URLs are links; a proposal's are
 // code, to copy and check, not to click.
-func urlFact(z zones.Zone, url string) string {
+//
+// A URL the zone also lists as a flagged endpoint is code and marked, never a
+// link: the page does not offer what its own endpoint table says not to use.
+func urlFact(z zones.Zone, kind zones.EndpointKind, url string) string {
+	if kind != "" && flagged(z, kind, url) {
+		return md.InlineCode(url) + " ⚠️ flagged"
+	}
 	if z.Status == zones.Approved {
 		return md.Link(url, url)
 	}
@@ -423,8 +428,27 @@ func cell(s string) string { return escapeMentions(ui.Cell(s)) }
 // character reference. It runs after ui.Inline or ui.Cell, which escape every
 // & the caller typed, so the only reference in the output is this one; goldmark
 // decodes it back to "1" after the mention parser has looked and not matched.
+//
+// One pass, and none at all when there is nothing to escape: it runs on every
+// free-text field of every page.
 func escapeMentions(s string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(s, "@", "\\@"), "g1", "g&#49;")
+	if !strings.Contains(s, "@") && !strings.Contains(s, "g1") {
+		return s
+	}
+	var b strings.Builder
+	n := len(s)
+	for i := 0; i < n; i++ {
+		switch {
+		case s[i] == '@':
+			b.WriteString("\\@")
+		case s[i] == 'g' && i+1 < n && s[i+1] == '1':
+			b.WriteString("g&#49;")
+			i++
+		default:
+			b.WriteByte(s[i])
+		}
+	}
+	return b.String()
 }
 
 // rpcFlag marks a zone's main RPC when the endpoint table flags it, so the
@@ -436,16 +460,14 @@ func rpcFlag(z zones.Zone) string {
 	return ""
 }
 
-// rpcFlagged reports whether the endpoint listing the zone's main RPC is
-// flagged, under its own spelling or, for tcp://, the http:// one gnokey reads
-// it as.
-func rpcFlagged(z zones.Zone) bool {
-	for _, u := range []string{z.RPCURL, "http" + strings.TrimPrefix(z.RPCURL, "tcp")} {
-		if e, ok := reg.EndpointByAddress(z.Slug, zones.RPC, u); ok && e.Status == zones.Flagged {
-			return true
-		}
-	}
-	return false
+func rpcFlagged(z zones.Zone) bool { return flagged(z, zones.RPC, z.RPCURL) }
+
+// flagged reports whether the zone lists url as an endpoint of that kind and a
+// curator flagged it. The lookup compares in Canonical form, which reads an rpc
+// tcp:// as the http:// gnokey dials, so either spelling finds the other.
+func flagged(z zones.Zone, kind zones.EndpointKind, url string) bool {
+	e, ok := reg.EndpointByAddress(z.Slug, kind, url)
+	return ok && e.Status == zones.Flagged
 }
 
 func revStr(z zones.Zone) string { return strconv.FormatInt(z.Revision, 10) }

@@ -114,8 +114,19 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	// The proposer fills in an endpoint and edits the zone (its gnoweb URL)
 	// while pending.
 	id := RegisterEndpoint(cross(cur), "alice-dev", "peer", nodeID+"@alice.example:26656", "alice")
+	// A proposer waits between their own edits: every edit bumps the revision a
+	// curator's decision must name, and curators need a window to make one.
+	uassert.AbortsContains(t, cur, "may edit again in", func() {
+		EditZone(cross(cur), "alice-dev", zrev("alice-dev"), "alicedev-1", "Alice's devnet", "for trying things",
+			"devnet", "https://alice.example", "https://rpc.alice.example", "", "")
+	})
+	testing.SkipHeights(ProposerEditCooldown)
 	EditZone(cross(cur), "alice-dev", zrev("alice-dev"), "alicedev-1", "Alice's devnet", "for trying things",
 		"devnet", "https://alice.example", "https://rpc.alice.example", "", "")
+	uassert.AbortsContains(t, cur, "may edit again in", func() {
+		EditZone(cross(cur), "alice-dev", zrev("alice-dev"), "alicedev-1", "Alice's devnet", "for trying more",
+			"devnet", "https://alice.example", "https://rpc.alice.example", "", "")
+	})
 	z, _ = GetZone("alice-dev")
 	uassert.Equal(t, "https://alice.example", z.GnowebURL)
 	uassert.False(t, z.Reviewed()) // a pending edit is just an edit
@@ -541,4 +552,27 @@ func TestFlaggedMainRPCIsMarked(t *testing.T) {
 	uassert.True(t, strings.Contains(Render(""), "`https://rpc.staging.gno.land` ⚠️ flagged"))
 	uassert.True(t, strings.Contains(Render("zone/staging"), "`https://rpc.staging.gno.land` ⚠️ flagged"))
 	uassert.False(t, strings.Contains(Render(""), "`https://rpc.gno.land` ⚠️"))
+}
+
+// A flagged gnoweb URL is shown as code and marked, never as a link the page's
+// own endpoint table says not to use.
+func TestFlaggedGnowebIsNotALink(t *testing.T) {
+	reset()
+	page := Render("zone/staging")
+	uassert.True(t, strings.Contains(page, "`https://staging.gno.land` ⚠️ flagged"))
+	uassert.False(t, strings.Contains(page, "](https://staging.gno.land)"))
+}
+
+// A curator's flag on an rpc endpoint under the tcp:// spelling still marks a
+// main RPC written as http://, and the reverse: gnokey dials them alike.
+func TestFlaggedRPCMatchesAcrossTcpAndHttp(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	z, _ := GetZone("onyx")
+	id := RegisterEndpoint(cross(cur), "onyx", "rpc", "tcp://rpc.tcp.example:26657", "")
+	FlagEndpoint(cross(cur), id, "down")
+	in := zones.Info{ChainID: z.ChainID, Title: z.Title, Description: z.Description, Kind: z.Kind,
+		GnowebURL: z.GnowebURL, RPCURL: "http://rpc.tcp.example:26657", GenesisURL: z.GenesisURL}
+	must(reg.Edit("onyx", zrev("onyx"), in, Admin, 1, "moved"))
+	uassert.True(t, strings.Contains(Render("zone/onyx"), "`http://rpc.tcp.example:26657` ⚠️ flagged"))
 }

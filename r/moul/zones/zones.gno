@@ -38,6 +38,13 @@ import (
 // curators when they accept.
 const Admin address = "g1manfred47kzduec920z88wfr64ylksmdcedlf5"
 
+// ProposerEditCooldown is how many blocks a proposer waits between edits of
+// their own pending zone. Every edit bumps the revision every curator decision
+// must name, so a proposer editing every block would make their zone
+// unreviewable, and unremovable, forever. The cooldown leaves curators a window.
+// A curator's own edits are not limited.
+const ProposerEditCooldown = 100
+
 // MaxCurators bounds curators and open invitations together. The curator list
 // renders on the index page, and only curators can grow it, but a bound costs
 // nothing and an unbounded list on a public page is a page someone can break.
@@ -73,7 +80,9 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 // curator may edit any pending or approved zone; the proposer may edit their
 // own while it is pending. revision is the zone's Revision the edit was
 // written against: it fails if somebody edited in between. Every edit bumps
-// the revision, so a decision prepared against the old one fails too. On a pending zone the reason
+// the revision, so a decision prepared against the old one fails too. A
+// proposer waits ProposerEditCooldown blocks between their own edits, and an
+// edit that changes nothing is refused. On a pending zone the reason
 // must be empty; on an approved one it is required and replaces the review on
 // record, so the page names who changed the values, and why. A new chain id
 // sends the zone's verified endpoints back to unverified. A rejected or retired
@@ -82,8 +91,18 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
 	z := mustZone(slug)
-	if !curators.Has(who) && !(z.Status == zones.Pending && z.Proposer == who) {
-		panic("zones: only a curator, or the proposer while it is pending, may edit " + slug)
+	if !curators.Has(who) {
+		if z.Status != zones.Pending || z.Proposer != who {
+			panic("zones: only a curator, or the proposer while it is pending, may edit " + slug)
+		}
+		last := z.ProposedAt
+		if z.EditedAt > last {
+			last = z.EditedAt
+		}
+		if wait := last + ProposerEditCooldown - runtime.ChainHeight(); wait > 0 {
+			panic("zones: " + slug + " was changed at block " + strconv.FormatInt(last, 10) +
+				"; a proposer may edit again in " + strconv.FormatInt(wait, 10) + " blocks, so curators can review it")
+		}
 	}
 	must(reg.Edit(slug, revision, info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL),
 		who, runtime.ChainHeight(), reason))
@@ -115,8 +134,8 @@ func RetireZone(cur realm, slug string, revision int64, reason string) {
 // another proposed again under the same slug. A curator may remove any. The
 // proposer may remove their own only while every endpoint on it is theirs (the
 // storage deposit is refunded to whoever signs the removal, so removing
-// somebody else's endpoints would collect what they paid) and none carries a
-// curator's verdict (removing and proposing it again would wipe a flag). A
+// somebody else's endpoints would collect what they paid) and none is verified
+// or flagged (removing and proposing it again would wipe the verdict). A
 // zone that was ever official is never removed this way: an approved one is
 // retired, and a retired one is kept until newer retirements push it out.
 func RemoveZone(cur realm, slug string, revision int64) {

@@ -5,7 +5,8 @@
 // A zone is one network a person can point a node or a wallet at: mainnet, a
 // testnet, a staging chain, somebody's gnodev. An endpoint is one way in: an
 // RPC, a gnoweb, a seed or persistent peer, an indexer, a faucet, an explorer.
-// Anybody may propose a zone or register an endpoint; a curator decides which
+// Anybody may propose a zone, and register endpoints as the holding realm
+// allows; a curator decides which
 // zones are official and which endpoints are verified. Every decision is
 // recorded with who made it and when; a rejection, a retirement, a flag and an
 // edit to an approved zone also require a reason, which the public reads.
@@ -356,25 +357,49 @@ func HostOf(kind EndpointKind, addr string) string {
 }
 
 // IsPrivateHost reports whether host names a machine that is different for
-// every reader: localhost, or an IPv4 address in a loopback, private,
-// link-local, carrier-grade NAT or "this network" range.
+// every reader, or no machine at all:
+//
+//   - a name with no dot (resolved through the reader's own search domain), or
+//     one under a suffix reserved for local use: .localhost, .local (mDNS),
+//     .internal, .home.arpa, .localdomain, and the loopback names hosts files
+//     carry (localhost4, localhost6, ip6-localhost, ip6-loopback);
+//   - an IPv4 address in a loopback, private, link-local, carrier-grade NAT,
+//     "this network", IETF-protocol, benchmarking, multicast or reserved range;
+//   - anything else shaped like a number but not a valid dotted quad, so an
+//     outside caller is not told 127.1 is public (validation refuses it anyway).
+//
+// It looks at the string only; a public name that resolves to a private
+// address is beyond what a registry can know.
 func IsPrivateHost(host string) bool {
 	h := strings.ToLower(strings.TrimSuffix(host, "."))
-	if h == "localhost" || strings.HasSuffix(h, ".localhost") {
+	if !strings.Contains(h, ".") {
 		return true
 	}
-	if checkIPv4(h) != nil {
+	for _, suffix := range []string{".localhost", ".local", ".internal", ".home.arpa", ".localdomain"} {
+		if strings.HasSuffix(h, suffix) {
+			return true
+		}
+	}
+	labels := strings.Split(h, ".")
+	last := labels[len(labels)-1]
+	numeric := strings.Trim(last, "0123456789") == "" || strings.HasPrefix(last, "0x")
+	if !numeric {
 		return false
 	}
-	o := strings.Split(h, ".")
-	a, _ := strconv.Atoi(o[0])
-	b, _ := strconv.Atoi(o[1])
+	if checkIPv4(h) != nil {
+		return true
+	}
+	a, _ := strconv.Atoi(labels[0])
+	b, _ := strconv.Atoi(labels[1])
+	c, _ := strconv.Atoi(labels[2])
 	switch {
-	case a == 0, a == 10, a == 127:
+	case a == 0, a == 10, a == 127, a >= 224:
 		return true
 	case a == 169 && b == 254, a == 192 && b == 168:
 		return true
 	case a == 172 && b >= 16 && b <= 31, a == 100 && b >= 64 && b <= 127:
+		return true
+	case a == 192 && b == 0 && c == 0, a == 198 && (b == 18 || b == 19):
 		return true
 	}
 	return false
@@ -464,8 +489,10 @@ func isSelector(r rune) bool {
 func isBadge(r rune) bool {
 	switch r {
 	case 0x2705, 0x26A0, 0x23F3, 0x274C, 0x23F9, // ✅ ⚠ ⏳ ❌ ⏹, what Render draws
-		0x2713, 0x2714, 0x2611, 0x1F5F8, 0x1F5F9, // check marks
-		0x2716, 0x2717, 0x2718, 0x1F6AB, 0x26D4: // crosses and no-entry signs
+		0x2713, 0x2714, 0x2611, 0x1F5F8, 0x1F5F9, 0x221A, 0x1F197, // check marks, √, 🆗
+		0x2716, 0x2717, 0x2718, 0x2715, 0x274E, 0x2612, 0x1F6AB, 0x26D4, 0x1F6D1, // crosses, no-entry
+		0x1F5F4, 0x1F5F5, 0x1F5F6, 0x1F5F7, // ballot x and ballot box with x
+		0x231B, 0x23F8, 0x23FA: // ⌛ ⏸ ⏺
 		return true
 	}
 	return false
@@ -489,6 +516,11 @@ func isBadge(r rune) bool {
 //
 // Refused rather than stripped, so what is stored is what is shown.
 func checkText(field, s string, min, max int) error {
+	// No rune is more than four bytes: anything longer cannot be within max
+	// characters, and is refused before a per-rune scan the writer pays for.
+	if len(s) > 4*max {
+		return errors.New("zones: the " + field + " is at most " + strconv.Itoa(max) + " characters")
+	}
 	if sanitize.StripBidiAndZeroWidth(s) != s {
 		return errors.New("zones: the " + field + " contains an invisible or bidi character")
 	}
@@ -550,12 +582,13 @@ func checkURL(field, s string, schemes []string) error {
 	if len(s) > MaxURLLen {
 		return errors.New("zones: the " + field + " is longer than " + strconv.Itoa(MaxURLLen) + " bytes")
 	}
-	for i := 0; i < len(s); i++ {
+	n := len(s)
+	for i := 0; i < n; i++ {
 		c := s[i]
-		if c <= ' ' || c >= 0x7f || strings.IndexByte("<>\"'`()[]{}|\\^#", c) >= 0 {
+		if c <= ' ' || c >= 0x7f || isURLForbidden(c) {
 			return errors.New("zones: the " + field + " contains " + strconv.Quote(string(c)) + ": " + strconv.Quote(s))
 		}
-		if c == '%' && (i+2 >= len(s) || !isHex(s[i+1]) || !isHex(s[i+2])) {
+		if c == '%' && (i+2 >= n || !isHex(s[i+1]) || !isHex(s[i+2])) {
 			return errors.New("zones: the " + field + " has a % that is not followed by two hex digits: " + strconv.Quote(s))
 		}
 		if c == '%' && isUnreserved(unhex(s[i+1])<<4|unhex(s[i+2])) {
@@ -587,6 +620,17 @@ func checkURL(field, s string, schemes []string) error {
 	authority := rest
 	if i := strings.IndexAny(authority, "/?#"); i >= 0 {
 		authority = authority[:i]
+		// A "." or ".." path segment is resolved away by every browser and by
+		// RFC 3986, so it would be a second spelling of another URL.
+		path := rest[i:]
+		if j := strings.IndexByte(path, '?'); j >= 0 {
+			path = path[:j]
+		}
+		for _, seg := range strings.Split(path, "/") {
+			if seg == "." || seg == ".." {
+				return errors.New("zones: the " + field + " has a . or .. path segment: " + strconv.Quote(s))
+			}
+		}
 	}
 	if strings.Contains(authority, "@") {
 		return errors.New("zones: the " + field + " carries credentials: " + strconv.Quote(s))
@@ -675,6 +719,16 @@ func checkPort(port string) error {
 	return nil
 }
 
+// isURLForbidden is the visible ASCII a URL here may not carry: what could
+// close a markdown link or open a construct around it, and a fragment.
+func isURLForbidden(c byte) bool {
+	switch c {
+	case '<', '>', '"', '\'', '`', '(', ')', '[', ']', '{', '}', '|', '\\', '^', '#':
+		return true
+	}
+	return false
+}
+
 func isHex(c byte) bool {
 	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
 }
@@ -726,8 +780,9 @@ func lowerScheme(addr string) string {
 // be listed twice under two spellings: the scheme and the host lowercased (both
 // are case-insensitive), the host's terminal dot dropped, the scheme's default
 // port dropped (:443 for https and wss, :80 for http and ws), an empty path
-// before a query dropped, a trailing lone "?" or "/" dropped, and the hex
-// digits of every %XX escape uppercased. A path or a query that says something
+// before a query dropped, an empty query's "?" and a bare "/" dropped, the hex
+// digits of every %XX escape uppercased, and for an rpc endpoint tcp:// read as
+// http://, which is how gnokey dials it. A path or a query that says something
 // is kept as typed: those are case-sensitive and name different resources. A
 // peer is lowercased whole and loses its host's terminal dot: its node id is
 // lowercase bech32 and its host is a name.
@@ -747,6 +802,9 @@ func Canonical(kind EndpointKind, addr string) string {
 		return addr
 	}
 	scheme = strings.ToLower(scheme)
+	if kind == RPC && scheme == "tcp" {
+		scheme = "http"
+	}
 	i := strings.IndexAny(rest, "/?")
 	if i < 0 {
 		i = len(rest)
@@ -765,7 +823,9 @@ func Canonical(kind EndpointKind, addr string) string {
 	if port != "" {
 		host += ":" + port
 	}
-	tail = strings.TrimSuffix(tail, "?")
+	if strings.HasSuffix(tail, "?") && strings.Count(tail, "?") == 1 {
+		tail = tail[:len(tail)-1] // an empty query, not a query ending in "?"
+	}
 	if strings.HasPrefix(tail, "/?") {
 		tail = tail[1:]
 	}

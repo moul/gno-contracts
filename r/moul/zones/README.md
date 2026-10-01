@@ -57,7 +57,7 @@ do that.
 | `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. A rejected or retired zone is not editable |
 | `ApproveZone(slug, revision, reason)` | a curator |
 | `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified |
-| `RemoveZone(slug, revision)` | a curator, or the proposer while every endpoint on it is theirs and none carries a curator's verdict, on a pending or rejected zone. One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
+| `RemoveZone(slug, revision)` | a curator, or the proposer while every endpoint on it is theirs and none is verified or flagged, on a pending or rejected zone. One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
 | `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator |
 | `VerifyEndpoint(id, revision, reason)` | a curator, naming the zone revision they checked it against |
 | `FlagEndpoint(id, reason)`, `UnverifyEndpoint(id, reason)` | a curator; a flag needs a reason |
@@ -66,10 +66,12 @@ do that.
 | `AcceptCurator()` | the invited address, to take up the invitation |
 | `RemoveCurator(addr)` | a curator; it withdraws an invitation, or removes a curator along with every invitation they sent. The last curator cannot be removed |
 
-Every function that acts on a zone takes its `revision`, the one you read (the
-zone page shows it, and its action links carry it): if the zone changed since,
-the call fails and you read it again. The `$help` links on each page fill it
-in.
+Every decision on a zone (edit, approve, reject, retire, remove) and every
+verification takes its `revision`, the one you read (the zone page shows it,
+and its action links carry it): if the zone changed since, its content or its
+status, the call fails and you read it again. The `$help` links on each page
+fill it in. A proposer waits 100 blocks between their own edits, so a zone
+cannot be kept out of a curator's reach by editing it faster than they read.
 
 **Curators are equals**: any one may remove any other, the admin included. That
 is the trust a curator set is, and it is why there are few of them.

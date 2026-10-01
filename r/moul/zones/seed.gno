@@ -118,8 +118,8 @@ func seed() {
 	at := runtime.ChainHeight()
 	for _, s := range seeds() {
 		must(reg.Propose(Admin, at, s.slug, s.info))
-		rev := mustZone(s.slug).Revision
-		must(reg.ReviewZone(s.slug, zones.Approved, rev, Admin, at, seedReason))
+		must(reg.ReviewZone(s.slug, zones.Approved, mustZone(s.slug).Revision, Admin, at, seedReason))
+		rev := mustZone(s.slug).Revision // the approval bumped it
 		for _, e := range s.endpoints {
 			k, err := zones.ParseEndpointKind(e[0])
 			must(err)
