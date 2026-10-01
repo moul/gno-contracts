@@ -277,3 +277,23 @@ func TestNamespacesAndServicesAreBounded(cur realm, t *testing.T) {
 	uassert.PanicsContains(t, cur, "full at", func() { spaceFor(testutils.TestAddress("one-more").String()) })
 	uassert.Equal(t, HomeRecent, strings.Count(Render(""), "](/r/moul/x/plan9/ns/v1:ns?u="))
 }
+
+// /srv is bounded: once MaxServices names are posted, a new one is refused,
+// and re-posting is not how a realm gets around it.
+func TestServicesAreBounded(cur realm, t *testing.T) {
+	var added []string
+	for i := 0; services.Size() < MaxServices; i++ {
+		name := "svc" + strconv.Itoa(i)
+		if services.Get(name) == nil {
+			services.Set(name, &service{owner: "gno.land/r/someone/poster"})
+			added = append(added, name)
+		}
+	}
+	defer func() {
+		for _, n := range added {
+			services.Remove(n)
+		}
+	}()
+	testing.SetRealm(testing.NewCodeRealm("gno.land/r/someone/late"))
+	uassert.AbortsContains(t, cur, "/srv is full", func() { Post(cross(cur), "late", probe("late", "x")) })
+}

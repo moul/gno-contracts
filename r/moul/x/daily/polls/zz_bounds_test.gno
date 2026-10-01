@@ -30,3 +30,17 @@ func TestPollCountIsBounded(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(testutils.TestAddress("latecomer")))
 	uassert.AbortsContains(t, cur, "polls is full", func() { CreatePoll(cross(cur), "one more", "a,b") })
 }
+
+// Polls past the newest page stay reachable: the index links to the next
+// page, and a page past the end says so instead of wrapping.
+func TestOlderPollsArePaged(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(testutils.TestAddress("pager")))
+	for len(polls) < IndexRecent+1 {
+		CreatePoll(cross(cur), "filler", "a,b")
+	}
+	idx := Render("")
+	uassert.True(t, strings.Contains(idx, "(/r/moul/x/daily/polls/v1:page/2)"), idx)
+	p2 := Render("page/2")
+	uassert.True(t, strings.Contains(p2, "## Poll #0:"), p2)
+	uassert.True(t, strings.Contains(Render("page/9223372036854775807"), "No such page"))
+}

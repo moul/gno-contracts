@@ -209,12 +209,22 @@ func renderPoll(b *strings.Builder, p *Poll) {
 
 // Render produces the Markdown page for gnoweb. It is NOT a crossing function.
 //
-//   - ""        -> index of all polls
-//   - "<id>"    -> a single poll by id
+//   - ""          -> the IndexRecent newest polls
+//   - "page/<n>"  -> the n-th page of IndexRecent, newest first (page/1 is "")
+//   - "<id>"      -> a single poll by id
 func Render(path string) string {
 	var b strings.Builder
 
 	path = strings.TrimSpace(path)
+	page := 1
+	if rest, ok := strings.CutPrefix(path, "page/"); ok {
+		n, err := strconv.Atoi(rest)
+		// Bounded before any multiply: the page comes from the URL.
+		if err != nil || n < 1 || n > 1+(len(polls)-1)/IndexRecent {
+			return "# Polls\n\nNo such page.\n\n[← all polls](" + selfPath + ")\n"
+		}
+		page, path = n, ""
+	}
 	if path != "" {
 		id, err := strconv.Atoi(path)
 		if err != nil || id < 0 || id >= len(polls) {
@@ -232,14 +242,20 @@ func Render(path string) string {
 		return b.String()
 	}
 
+	pages := 1 + (len(polls)-1)/IndexRecent
 	b.WriteString("Total polls: ")
 	b.WriteString(strconv.Itoa(len(polls)))
-	if len(polls) > IndexRecent {
-		b.WriteString(", the " + strconv.Itoa(IndexRecent) + " newest shown")
+	if pages > 1 {
+		b.WriteString(", page " + strconv.Itoa(page) + " of " + strconv.Itoa(pages))
 	}
 	b.WriteString("\n\n")
-	for i := len(polls) - 1; i >= 0 && i >= len(polls)-IndexRecent; i-- {
+	//gnovet:ignore page-offset-overflow page is bounded by pages above
+	top := len(polls) - 1 - (page-1)*IndexRecent
+	for i := top; i >= 0 && i > top-IndexRecent; i-- {
 		renderPoll(&b, polls[i])
+	}
+	if page < pages {
+		b.WriteString("[older polls →](" + selfPath + ":page/" + strconv.Itoa(page+1) + ")\n")
 	}
 	return b.String()
 }
