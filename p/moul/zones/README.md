@@ -76,7 +76,9 @@ official zone or a verified endpoint; a curator clears it with `RemoveZone` /
 only admission price a permissionless list has. Removing a zone removes its
 endpoints and gives the deposit back.
 
-Storage is a [`kit/store`](../kit/store) for each record type plus six
-[`kit/index`](../kit/index) lookups (slug, pending-by-proposer, zone, dedup key,
-registrant, unverified-by-zone), every one written in the same method as its
-record.
+Storage is a [`kit/store`](../kit/store) for each record type plus nine
+[`kit/index`](../kit/index) lookups, every one written in the same method as its
+record. Zones: slug, pending-by-proposer, status, chain id. Endpoints: zone,
+dedup key, registrant, zone-and-kind, unverified-by-zone. The status and
+zone-and-kind indexes are what let `ZonePage` and `EndpointPage` read only the
+rows on a page, and the counts come from the indexes without reading a record.

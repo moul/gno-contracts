@@ -17,6 +17,19 @@ import (
 // TestRealmURLMatchesTheModule pins it to the module line.
 const realmURL = "/r/moul/zones/v0"
 
+// pkgPath is this realm's package path, for the action links.
+const pkgPath = "gno.land" + realmURL
+
+// action is a call link to a function of THIS realm, named explicitly.
+//
+// Not ui.Action: that resolves its target through unsafe.CurrentRealm, which in
+// a borrowed Render is the caller, so a realm embedding this page would get
+// links that call its own functions. filetests/z_borrowed_render_filetest.gno
+// pins it from a caller realm, the only place the difference shows.
+func action(title, fn string, args ...string) string {
+	return ui.ActionIn(pkgPath, title, fn, args...)
+}
+
 // PageSize is how many rows any table here shows at once. Every list is
 // paginated and every page reads only its own rows, because vm/qrender is
 // gas-metered and a Render that outgrows it stops answering instead of slowing
@@ -63,7 +76,7 @@ func renderIndex(req *realmpath.Request) string {
 	}
 	links = append(links,
 		md.Link(strconv.Itoa(reg.ZoneCount(zones.Pending))+" proposal(s) waiting for review", realmURL+":proposals"),
-		ui.Action("Propose a zone", "ProposeZone",
+		action("Propose a zone", "ProposeZone",
 			"slug", "", "chainID", "", "title", "", "description", "", "kind", "testnet",
 			"gnowebURL", "", "rpcURL", "", "genesisURL", ""))
 
@@ -111,8 +124,8 @@ func zoneTable(status zones.Status, req *realmpath.Request, empty string) (strin
 				strconv.Itoa(verified)+" verified of "+strconv.Itoa(total))
 		case zones.Pending:
 			t.Row(zoneLink(z), md.InlineCode(z.ChainID), string(z.Kind), ui.Addr(z.Proposer),
-				ui.Action("Approve", "ApproveZone", "slug", z.Slug, "reason", "")+" · "+
-					ui.Action("Reject", "RejectZone", "slug", z.Slug, "reason", ""))
+				action("Approve", "ApproveZone", "slug", z.Slug, "reason", "")+" · "+
+					action("Reject", "RejectZone", "slug", z.Slug, "reason", ""))
 		default:
 			t.Row(zoneLink(z), md.InlineCode(z.ChainID), ui.Addr(z.Proposer), ui.Cell(z.Reason))
 		}
@@ -192,18 +205,18 @@ func renderZone(slug string, req *realmpath.Request) string {
 
 	actions := []string{}
 	if z.Status == zones.Pending || z.Status == zones.Approved {
-		actions = append(actions, ui.Action("Register an endpoint", "RegisterEndpoint",
+		actions = append(actions, action("Register an endpoint", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	}
 	switch z.Status {
 	case zones.Pending:
 		actions = append(actions,
-			ui.Action("Approve", "ApproveZone", "slug", z.Slug, "reason", ""),
-			ui.Action("Reject", "RejectZone", "slug", z.Slug, "reason", ""))
+			action("Approve", "ApproveZone", "slug", z.Slug, "reason", ""),
+			action("Reject", "RejectZone", "slug", z.Slug, "reason", ""))
 	case zones.Approved:
-		actions = append(actions, ui.Action("Retire", "RetireZone", "slug", z.Slug, "reason", ""))
+		actions = append(actions, action("Retire", "RetireZone", "slug", z.Slug, "reason", ""))
 	case zones.Rejected, zones.Retired:
-		actions = append(actions, ui.Action("Approve", "ApproveZone", "slug", z.Slug, "reason", ""))
+		actions = append(actions, action("Approve", "ApproveZone", "slug", z.Slug, "reason", ""))
 	}
 	parts = append(parts,
 		para(strings.Join(actions, " · ")),
@@ -327,7 +340,7 @@ func queryCommand(call string) string {
 			break
 		}
 	}
-	return "gnokey query vm/qeval" + remote + " -data '" + "gno.land" + realmURL + "." + call + "'"
+	return "gnokey query vm/qeval" + remote + " -data '" + pkgPath + "." + call + "'"
 }
 
 // para is one paragraph as a Join part. Not md.Paragraph, whose trailing blank
