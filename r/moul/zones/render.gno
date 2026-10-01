@@ -354,8 +354,13 @@ func queryCommand(call string) string {
 // line plus Join's separator makes two in a row, which an example cannot pin.
 func para(s string) string { return s + "\n" }
 
+// zoneLink is a zone's title linking to its page, for a TABLE cell. Built by
+// hand rather than with md.Link, whose text escape is for prose and leaves a
+// pipe literal, so a title like "Alice|official" would open a column in every
+// zone table. ui.Cell escapes the pipe too; the destination is a constant plus
+// a slug checked to [a-z0-9-] at write time.
 func zoneLink(z zones.Zone) string {
-	return md.Link(z.Title, realmURL+":zone/"+z.Slug)
+	return "[" + ui.Cell(z.Title) + "](" + realmURL + ":zone/" + z.Slug + ")"
 }
 
 func statusBadge(s zones.Status) string {

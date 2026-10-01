@@ -468,6 +468,17 @@ func checkPort(port string) error {
 	return nil
 }
 
+// lowerScheme lowercases a URL's scheme and leaves the rest as typed. Stored
+// that way because a scheme is case-insensitive but gno's link sanitizer is
+// not: an HTTPS:// link would render with an empty href.
+func lowerScheme(addr string) string {
+	scheme, rest, ok := strings.Cut(addr, "://")
+	if !ok {
+		return addr
+	}
+	return strings.ToLower(scheme) + "://" + rest
+}
+
 // Canonical is the form two addresses are compared in: the scheme and the
 // host lowercased, because both are case-insensitive, and everything after the
 // host kept as typed, because a path and a query are not. A peer's node id is

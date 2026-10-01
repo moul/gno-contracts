@@ -292,6 +292,23 @@ func TestRenderEscapesCallerText(cur realm, t *testing.T) {
 	uassert.False(t, strings.Contains(page, "**bold**"), "a description renders as text, not markup")
 	uassert.True(t, strings.Contains(page, `a\|b`), "a label cannot open a table column")
 
+	// A pipe in a title cannot open a column in the zone tables.
+	ProposeZone(cross(cur), "evil-pipe", "evil-9", "Alice|official", "", "devnet", "", "https://rpc.pipe.example", "")
+	uassert.True(t, strings.Contains(Render("proposals"), `[Alice\|official](/r/moul/zones/v0:zone/evil-pipe)`))
+
+	// A scheme's case is stored lowercased, so the link is live: the sanitizer
+	// gno's md.Link uses accepts lowercase http and https only.
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ProposeZone(cross(cur), "upper", "upper-1", "Upper", "", "devnet", "HTTPS://Upper.example/Web", "HTTPS://rpc.upper.example", "")
+	z, _ := GetZone("upper")
+	uassert.Equal(t, "https://Upper.example/Web", z.GnowebURL)
+	uassert.Equal(t, "https://rpc.upper.example", z.RPCURL)
+	uassert.True(t, strings.Contains(Render("zone/upper"), "(https://Upper.example/Web)"))
+	id := RegisterEndpoint(cross(cur), "upper", "faucet", "HTTP://f.upper.example", "")
+	e, _ := GetEndpoint(id)
+	uassert.Equal(t, "http://f.upper.example", e.Address)
+	testing.SetRealm(testing.NewUserRealm(alice))
+
 	uassert.AbortsContains(t, cur, "contains", func() {
 		ProposeZone(cross(cur), "evil2", "evil-2", "x", "", "devnet", "", "https://rpc.evil.example/)[x](y", "")
 	})

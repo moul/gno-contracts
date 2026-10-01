@@ -280,6 +280,9 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 	if err := ValidateEndpoint(kind, addr); err != nil {
 		return 0, err
 	}
+	if kind != Seed && kind != Peer {
+		addr = lowerScheme(addr)
+	}
 	if err := ValidateLabel(label); err != nil {
 		return 0, err
 	}
@@ -600,8 +603,8 @@ func trimInfo(in Info) Info {
 	in.Title = strings.TrimSpace(in.Title)
 	in.Description = strings.TrimSpace(in.Description)
 	in.Kind = Kind(strings.TrimSpace(string(in.Kind)))
-	in.GnowebURL = strings.TrimSpace(in.GnowebURL)
-	in.RPCURL = strings.TrimSpace(in.RPCURL)
-	in.GenesisURL = strings.TrimSpace(in.GenesisURL)
+	in.GnowebURL = lowerScheme(strings.TrimSpace(in.GnowebURL))
+	in.RPCURL = lowerScheme(strings.TrimSpace(in.RPCURL))
+	in.GenesisURL = lowerScheme(strings.TrimSpace(in.GenesisURL))
 	return in
 }
