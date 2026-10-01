@@ -78,6 +78,8 @@ func main() {
 		err = cmdGuardGenerated(root, args)
 	case "copilot-log":
 		err = cmdCopilotLog(root, args)
+	case "gnovet":
+		err = cmdGnovet(root, args)
 	case "audit-patterns":
 		err = cmdAuditPatterns(root, args)
 	case "review-advice":
@@ -128,6 +130,7 @@ commands:
   guard-tables     fail if a package builds a markdown table by hand
   guard-generated  fail if a PR modifies generated artifacts
   copilot-log      render one hub-issue digest from a Copilot review (stdin JSON)
+  gnovet           this repo's own rules, each one a review finding that happened
   audit-patterns   run the upstream audit-pattern rules over every contract and
                    fail on a hit the baseline does not already record
   review-advice    should this diff get a Copilot review? REVIEW or SKIP, with why

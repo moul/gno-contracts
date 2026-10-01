@@ -63,6 +63,12 @@ guard-untrusted-render: ## fail if a realm renders a caller's string without esc
 review-advice: ## should this diff get a Copilot code review? REVIEW or SKIP, with why; BASE=<ref>
 	@$(GNOCONTRACTS) review-advice $(if $(BASE),-base $(BASE),) $(ARGS)
 
+gnovet: ## this repo's own house rules, each one a code-review finding that happened; ARGS=-rules explains them
+	@$(GNOCONTRACTS) gnovet $(ARGS)
+
+gnovet-update: ## re-record the gnovet baseline from what the tree contains now
+	@$(GNOCONTRACTS) gnovet -update
+
 audit-patterns: ## run the upstream audit-pattern rules over every contract; fails on a hit the baseline does not record
 	@$(GNOCONTRACTS) audit-patterns $(ARGS)
 

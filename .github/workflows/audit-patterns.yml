@@ -9,6 +9,11 @@ name: audit-patterns
 # and a count that goes down fails too, asking to be re-recorded, so the debt can
 # only shrink.
 #
+# `make gnovet` runs beside it: the same shape, but the rules are ours, and every
+# one of them was a real defect found in this repository (usually by a paid code
+# review) before it was written down as a rule. That is the loop: a review finds
+# a thing once for 13 premium requests, a rule finds it forever for nothing.
+#
 # A dedicated workflow rather than a step in `ci`, deliberately. It is a separate
 # question from "does this build", it needs no gno toolchain (the rules are pure
 # Go text scanning, so this is seconds where `ci` is minutes), and a separate
@@ -39,6 +44,12 @@ jobs:
 
       - name: Scan every contract
         run: make audit-patterns
+
+      # Our own rules, each one a finding that happened here before it was a
+      # rule. Same job because it asks the same question and needs the same
+      # nothing: no gno toolchain, no key, seconds.
+      - name: Our own house rules
+        run: make gnovet
 
       # The rules are MIRRORED (tools/auditpattern/run.go) because upstream's
       # package is internal/ in a module of its own. A mirror nobody verifies is
