@@ -59,15 +59,18 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 }
 
 // EditZone replaces a zone's description. A curator may edit any zone; the
-// proposer may edit their own while it is still pending.
-func EditZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL string) {
+// proposer may edit their own while it is still pending. Once a curator has
+// reviewed the zone, an edit needs a reason, and it replaces the review on
+// record: the page then names who changed the values, and why.
+func EditZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
 	z := mustZone(slug)
 	if !curators.Has(who) && !(z.Status == zones.Pending && z.Proposer == who) {
 		panic("zones: only a curator, or the proposer while it is pending, may edit " + slug)
 	}
-	must(reg.Edit(slug, info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)))
+	must(reg.Edit(slug, info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL),
+		who, runtime.ChainHeight(), reason))
 }
 
 // ApproveZone makes a zone official. The reason is optional.

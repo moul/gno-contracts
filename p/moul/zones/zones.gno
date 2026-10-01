@@ -136,7 +136,8 @@ type Zone struct {
 	Proposer   address
 	ProposedAt int64
 
-	// The latest curator decision, empty until there is one.
+	// The latest curator decision, empty until there is one. A curator's edit
+	// to a zone already reviewed is a decision too, and replaces these.
 	ReviewedBy address
 	ReviewedAt int64
 	Reason     string
@@ -155,7 +156,8 @@ func (z Zone) Info() Info {
 	}
 }
 
-// Reviewed reports whether a curator has decided anything about the zone.
+// Reviewed reports whether a curator has decided anything about the zone,
+// including an edit made after its first review.
 func (z Zone) Reviewed() bool { return z.ReviewedBy != "" }
 
 func (z *Zone) setInfo(in Info) {
@@ -399,18 +401,46 @@ func checkURL(field, s string, schemes []string) error {
 	return nil
 }
 
-// checkHost accepts a DNS name or a dotted IPv4 address: [A-Za-z0-9.-].
-// Bracketed IPv6 is refused, deliberately: it is the one host shape that needs
-// characters every other field here refuses, and no zone needs it yet.
+// checkHost accepts a DNS name or a dotted IPv4 address.
+//
+// A DNS name is labels of 1 to 63 characters of [A-Za-z0-9-], alphanumeric at
+// both ends, at most 253 characters in all, with one optional terminal dot. A
+// host made only of digits and dots must be a valid IPv4 address, so 1.2.3 and
+// 300.1.1.1 are refused rather than read as names. Bracketed IPv6 is refused,
+// deliberately: it is the one host shape that needs characters every other
+// field here refuses, and no zone needs it yet.
 func checkHost(host string) error {
-	if len(host) > MaxURLLen {
-		return errors.New("host too long")
+	name := strings.TrimSuffix(host, ".")
+	if name == "" || len(name) > 253 {
+		return errors.New("bad host")
 	}
-	for _, r := range host {
-		switch {
-		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '.', r == '-':
-		default:
+	if strings.Trim(name, "0123456789.") == "" {
+		return checkIPv4(name)
+	}
+	for _, label := range strings.Split(name, ".") {
+		if label == "" || len(label) > 63 || label[0] == '-' || label[len(label)-1] == '-' {
 			return errors.New("bad host")
+		}
+		for _, r := range label {
+			switch {
+			case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '-':
+			default:
+				return errors.New("bad host")
+			}
+		}
+	}
+	return nil
+}
+
+func checkIPv4(s string) error {
+	parts := strings.Split(s, ".")
+	if len(parts) != 4 {
+		return errors.New("bad ipv4")
+	}
+	for _, p := range parts {
+		n, err := strconv.Atoi(p)
+		if err != nil || n < 0 || n > 255 || len(p) > 3 || (len(p) > 1 && p[0] == '0') {
+			return errors.New("bad ipv4")
 		}
 	}
 	return nil

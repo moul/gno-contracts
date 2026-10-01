@@ -96,8 +96,14 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 	return r.byProposer.Add(by.String(), id)
 }
 
-// Edit replaces a zone's description. Its slug, status and history stay.
-func (r *Registry) Edit(slug string, in Info) error {
+// Edit replaces a zone's description. Its slug and status stay.
+//
+// Editing a zone that is still pending is just an edit. Editing one a curator
+// has already decided is a curator decision of its own: the reviewed values
+// changed, so the review on record is replaced by this one, with a reason
+// required. Otherwise the page would show a new chain id or RPC under the
+// name, height and reason of whoever approved the old ones.
+func (r *Registry) Edit(slug string, in Info, by address, at int64, reason string) error {
 	z, _, err := r.zone(slug)
 	if err != nil {
 		return err
@@ -105,6 +111,19 @@ func (r *Registry) Edit(slug string, in Info) error {
 	in = trimInfo(in)
 	if err := ValidateInfo(in); err != nil {
 		return err
+	}
+	reason = strings.TrimSpace(reason)
+	if err := ValidateReason(reason); err != nil {
+		return err
+	}
+	if z.Status != Pending {
+		if !by.IsValid() {
+			return errors.New("zones: the editor is not a valid address")
+		}
+		if reason == "" {
+			return errors.New("zones: " + slug + " is " + string(z.Status) + ", so an edit needs a reason")
+		}
+		z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
 	}
 	z.setInfo(in)
 	return nil

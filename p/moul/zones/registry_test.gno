@@ -131,15 +131,34 @@ func TestEdit(t *testing.T) {
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
 	in := onyx()
 	in.GenesisURL = "https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json"
-	uassert.NoError(t, r.Edit("onyx", in))
+	uassert.NoError(t, r.Edit("onyx", in, alice, 2, ""))
 	z, _ := r.Zone("onyx")
 	uassert.Equal(t, in.GenesisURL, z.GenesisURL)
+	uassert.False(t, z.Reviewed()) // pending: just an edit
 
-	in.RPCURL = ""
-	uassert.ErrorContains(t, r.Edit("onyx", in), "rpc url is empty")
-	uassert.ErrorContains(t, r.Edit("nope", in), "no zone")
+	bad := in
+	bad.RPCURL = ""
+	uassert.ErrorContains(t, r.Edit("onyx", bad, alice, 2, ""), "rpc url is empty")
+	uassert.ErrorContains(t, r.Edit("nope", in, alice, 2, ""), "no zone")
 	z, _ = r.Zone("onyx")
 	uassert.Equal(t, "https://rpc.onyx.testnets.gno.land", z.RPCURL) // unchanged by the refused edit
+
+	// Once reviewed, an edit is a decision: it needs a reason and an editor, and
+	// it replaces the review on record.
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, curator, 3, "probed"))
+	in.RPCURL = "https://rpc2.onyx.example"
+	uassert.ErrorContains(t, r.Edit("onyx", in, curator, 4, ""), "an edit needs a reason")
+	uassert.ErrorContains(t, r.Edit("onyx", in, "", 4, "moved"), "editor is not a valid address")
+	z, _ = r.Zone("onyx")
+	uassert.Equal(t, "https://rpc.onyx.testnets.gno.land", z.RPCURL)
+	uassert.Equal(t, "probed", z.Reason)
+	uassert.NoError(t, r.Edit("onyx", in, bob, 5, "rpc moved"))
+	z, _ = r.Zone("onyx")
+	uassert.Equal(t, "https://rpc2.onyx.example", z.RPCURL)
+	uassert.Equal(t, bob.String(), z.ReviewedBy.String())
+	uassert.Equal(t, int64(5), z.ReviewedAt)
+	uassert.Equal(t, "rpc moved", z.Reason)
+	uassert.Equal(t, string(Approved), string(z.Status))
 }
 
 func TestRegisterAndFilter(t *testing.T) {

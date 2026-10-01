@@ -101,7 +101,7 @@ func renderZone(slug string) string {
 	}
 	facts = append(facts, md.Bold("proposed")+" by "+ui.Addr(z.Proposer)+" at block "+strconv.FormatInt(z.ProposedAt, 10))
 	if z.Reviewed() {
-		facts = append(facts, md.Bold(string(z.Status))+" "+reviewText(z.ReviewedBy, z.ReviewedAt, z.Reason))
+		facts = append(facts, md.Bold("last reviewed")+" "+reviewText(z.ReviewedBy, z.ReviewedAt, z.Reason))
 	}
 
 	parts := []string{

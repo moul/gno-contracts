@@ -99,15 +99,16 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	// The proposer fills in an endpoint and edits the description while pending.
 	id := RegisterEndpoint(cross(cur), "alice-dev", "peer", nodeID+"@alice.example:26656", "alice")
 	EditZone(cross(cur), "alice-dev", "alicedev-1", "Alice's devnet", "for trying things",
-		"devnet", "https://alice.example", "https://rpc.alice.example", "")
+		"devnet", "https://alice.example", "https://rpc.alice.example", "", "")
 	z, _ = GetZone("alice-dev")
 	uassert.Equal(t, "https://alice.example", z.GnowebURL)
+	uassert.False(t, z.Reviewed()) // a pending edit is just an edit
 
 	// Nobody but a curator approves, and bob cannot touch alice's proposal.
 	uassert.AbortsContains(t, cur, "is not a curator", func() { ApproveZone(cross(cur), "alice-dev", "") })
 	testing.SetRealm(testing.NewUserRealm(bob))
 	uassert.AbortsContains(t, cur, "only a curator, or the proposer", func() {
-		EditZone(cross(cur), "alice-dev", "x", "x", "", "devnet", "", "https://x.example", "")
+		EditZone(cross(cur), "alice-dev", "x", "x", "", "devnet", "", "https://x.example", "", "")
 	})
 	uassert.AbortsContains(t, cur, "only a curator, or the proposer while it is pending or rejected", func() {
 		RemoveZone(cross(cur), "alice-dev")
@@ -128,8 +129,21 @@ func TestProposeThenCurate(cur realm, t *testing.T) {
 	// Approved, it is the curator's to edit now, not the proposer's.
 	testing.SetRealm(testing.NewUserRealm(alice))
 	uassert.AbortsContains(t, cur, "only a curator, or the proposer while it is pending", func() {
-		EditZone(cross(cur), "alice-dev", "alicedev-1", "renamed", "", "devnet", "", "https://rpc.alice.example", "")
+		EditZone(cross(cur), "alice-dev", "alicedev-1", "renamed", "", "devnet", "", "https://rpc.alice.example", "", "x")
 	})
+
+	// A curator's edit to a reviewed zone replaces the review on record, and
+	// needs a reason, so the page never shows new values under the old review.
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	uassert.AbortsContains(t, cur, "an edit needs a reason", func() {
+		EditZone(cross(cur), "alice-dev", "alicedev-1", "Alice's devnet", "", "devnet", "", "https://rpc2.alice.example", "", "")
+	})
+	EditZone(cross(cur), "alice-dev", "alicedev-1", "Alice's devnet", "", "devnet", "", "https://rpc2.alice.example", "", "rpc moved")
+	z, _ = GetZone("alice-dev")
+	uassert.Equal(t, "https://rpc2.alice.example", z.RPCURL)
+	uassert.Equal(t, "rpc moved", z.Reason)
+	uassert.Equal(t, string(zones.Approved), string(z.Status))
+	testing.SetRealm(testing.NewUserRealm(alice))
 	// Nor hers to remove; and not even a curator removes it: it is retired.
 	uassert.AbortsContains(t, cur, "while it is pending or rejected", func() { RemoveZone(cross(cur), "alice-dev") })
 	testing.SetRealm(testing.NewUserRealm(Admin))
@@ -158,7 +172,7 @@ func TestQueryCommandQuotesTheRemote(t *testing.T) {
 	reset()
 	z, _ := GetZone("moul-staging")
 	must(reg.Edit("moul-staging", zones.Info{ChainID: runtime.ChainID(), Title: z.Title, Kind: z.Kind,
-		RPCURL: "https://rpc.example/;id;#"}))
+		RPCURL: "https://rpc.example/;id;#"}, Admin, 1, "test"))
 	got := queryCommand(`GetZone("onyx")`)
 	uassert.Equal(t, `gnokey query vm/qeval -remote 'https://rpc.example/;id;#' -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'`, got)
 	uassert.ErrorContains(t, zones.ValidateEndpoint(zones.RPC, "https://rpc.example/'x"), "contains")

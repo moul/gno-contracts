@@ -53,7 +53,7 @@ func ExampleRender_zone() {
 	// - **gnoweb**: [https://onyx\.testnets\.gno\.land](https://onyx.testnets.gno.land)
 	// - **genesis**: [genesis\.json](https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json)
 	// - **proposed** by `g1manfre…dlf5` at block 123
-	// - **approved** by `g1manfre…dlf5` at block 123: seeded at deploy; probed 2026\-10\-01
+	// - **last reviewed** by `g1manfre…dlf5` at block 123: seeded at deploy; probed 2026\-10\-01
 	//
 	// ## Endpoints
 	//

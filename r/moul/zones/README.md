@@ -51,7 +51,7 @@ do that.
 | function | who |
 |---|---|
 | `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody |
-| `EditZone(...)` | a curator, or the proposer while it is pending |
+| `EditZone(..., reason)` | a curator, or the proposer while it is pending; once reviewed, the reason is required and replaces the review on record |
 | `RemoveZone(slug)` | a curator or the proposer, on a pending or rejected zone; one that was ever official is kept |
 | `RegisterEndpoint(slug, kind, addr, label)` | anybody, on a pending or approved zone |
 | `RemoveEndpoint(id)` | its registrant or a curator |
