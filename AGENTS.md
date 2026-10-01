@@ -755,12 +755,14 @@ reviewed, plus the 93 `avl` imports we already knew about:
 disappointment, it is the argument: the rule is a pre-deploy gate, and these shipped before it
 existed.
 
-Two more on 2026-10-01, each a shape review had found and the tree still carried:
+Four more on 2026-10-01, each a shape a review had found and the tree still carried:
 
 | rule | found | the one that stings |
 |---|--:|---|
 | `page-offset-overflow` | 6, one already bounded | `p/moul/kit/store/store.gno:266`, the same unbounded `(page - 1) * size` #289 fixed in `kit/index`, and #311 found a third time |
 | `placeholder-path` | 6 | three live daily realms linking to `/r/REPLACE_ADDR/...`, a generator token nobody substituted |
+| `root-relative-link` | 11 | `daily/{handles,urlshort,vault,collatz,connect4}` link to `gno.land/moul` and `gno.land/r:42`; collatz and connect4 were not in the hand-made list, and `x/across` is a true negative (its computed target starts with `r/`) |
+| `uncallable-crossing-arg` | 1 | `agents/jury` `OpenCase(..., jurors []address)`: `MsgCall` decodes `[]byte` and no other slice, so no wallet can open a case |
 
 ### Adding one
 

@@ -120,5 +120,12 @@ page-offset-overflow r/moul/x/daily/microblog/microblog.gno 1
 placeholder-path r/moul/x/daily/blog/blog.gno 4
 placeholder-path r/moul/x/daily/linktree/linktree.gno 1
 placeholder-path r/moul/x/daily/polls/polls.gno 1
+root-relative-link r/moul/x/across/across.gno 1
+root-relative-link r/moul/x/daily/collatz/collatz.gno 1
+root-relative-link r/moul/x/daily/connect4/connect4.gno 1
+root-relative-link r/moul/x/daily/handles/handles.gno 3
+root-relative-link r/moul/x/daily/urlshort/urlshort.gno 3
+root-relative-link r/moul/x/daily/vault/vault.gno 1
 slice-inplace-remove p/moul/x/daily/orderedmap/orderedmap.gno 1
 slice-inplace-remove r/moul/x/daily/linktree/linktree.gno 1
+uncallable-crossing-arg r/moul/agents/jury/jury.gno 1

@@ -16,6 +16,8 @@ var Rules = []Rule{
 	avlInNewCode,
 	pageOffsetOverflow,
 	placeholderPath,
+	rootRelativeLink,
+	uncallableCrossingArg,
 }
 
 // ---------------------------------------------------------------------------
@@ -197,6 +199,92 @@ var placeholderPath = Rule{
 		for i, ln := range f.Literal {
 			if placeholderRe.MatchString(ln) {
 				out = append(out, i)
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+// rootRelativeLink finds a markdown link target starting with "/" that is not
+// a realm, package or user path. Go's regexp has no lookahead, so the check is
+// by hand on what follows "](/".
+var rootRelativeLink = Rule{
+	ID:   "root-relative-link",
+	What: "renders a link to /something that is not /r/, /p/ or /u/, which leaves the realm",
+	Why: "gnoweb resolves a root-relative target against the domain, not the realm: " +
+		"[moul](/moul) is gno.land/moul and (/r:x) is the malformed gno.land/r:x. Each " +
+		"was meant to be this realm's own subpage, renders as a dead link on a permanent " +
+		"path, and passed its ExampleRender because the dead link is in the expected " +
+		"output too.",
+	Fix: "The realm's own absolute path: (/r/moul/x/daily/<name>/v0:<sub>). A link that " +
+		"is computed (\"](/\" + x) needs x to carry the r/ or p/ itself.",
+	Finding: "r/moul/x/daily/{handles,urlshort,vault}, found live on mainnet by putting " +
+		"real rows into ten realms and reading what they rendered, 2026-09-30; " +
+		"collatz and connect4 found by this rule's first run, 2026-10-01",
+	Bad:  "package x\n\nfunc Render(string) string {\n\treturn \"[moul](/moul)\"\n}\n",
+	Good: "package x\n\nfunc Render(string) string {\n\treturn \"[moul](/r/moul/x/daily/handles/v1:moul) [h](/u/moul) [$](/$help)\"\n}\n",
+	Check: func(f File) []int {
+		var out []int
+		for i, ln := range f.Literal {
+			rest := ln
+			for {
+				j := strings.Index(rest, "](/")
+				if j < 0 {
+					break
+				}
+				rest = rest[j+3:]
+				if !strings.HasPrefix(rest, "r/") && !strings.HasPrefix(rest, "p/") &&
+					!strings.HasPrefix(rest, "u/") && !strings.HasPrefix(rest, "$") &&
+					!strings.HasPrefix(rest, "#") {
+					out = append(out, i)
+					break
+				}
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+// crossingFuncRe matches an exported top-level crossing function, capturing
+// its parameter list. Single-line signatures only, which is what gofmt leaves.
+var crossingFuncRe = regexp.MustCompile(`^func\s+[A-Z]\w*\s*\(\s*\w+\s+realm\b([^)]*)\)`)
+
+// sliceParamRe matches a slice or map parameter type. []byte and []uint8 are
+// excluded in Check: the VM decodes those from base64.
+var sliceParamRe = regexp.MustCompile(`\[\]\s*(\w+(?:\.\w+)?)|\bmap\[`)
+
+var uncallableCrossingArg = Rule{
+	ID:   "uncallable-crossing-arg",
+	What: "an exported crossing function takes a slice or map, which no wallet can encode",
+	Why: "MsgCall carries every argument as a string, and the VM's convertArgToGno " +
+		"(gno.land/pkg/sdk/vm/convert.go) decodes primitives and []byte only: any other " +
+		"slice panics \"unexpected slice type in contract arg\". So gnokey, every wallet " +
+		"and every session key are refused, MsgRun is gated by run_submitters on " +
+		"mainnet, and the function is unreachable on a permanent path.",
+	Fix: "Take a delimited string and split it in the realm, as x/daily/ballot " +
+		"(proposalNamesCSV) and x/daily/multisig (ownersCSV) already do. If the function " +
+		"is meant for other realms only, say so with //gnovet:ignore.",
+	Finding: "r/moul/agents/jury/v0 OpenCase(cur realm, subject string, jurors []address), " +
+		"refused by simulation on gnoland-1 while seeding the agent realms, 2026-09-30",
+	Bad: "package x\n\nfunc OpenCase(cur realm, subject string, jurors []address) uint64 {\n\treturn 0\n}\n",
+	Good: "package x\n\nfunc OpenCase(cur realm, subject, jurorsCSV string) uint64 {\n\treturn 0\n}\n\n" +
+		"func SetRecord(cur realm, name string, value []byte) {}\n\nfunc helper(xs []address) {}\n",
+	Check: func(f File) []int {
+		var out []int
+		for i, ln := range f.Code {
+			m := crossingFuncRe.FindStringSubmatch(ln)
+			if m == nil {
+				continue
+			}
+			for _, p := range sliceParamRe.FindAllStringSubmatch(m[1], -1) {
+				if p[1] != "byte" && p[1] != "uint8" {
+					out = append(out, i)
+					break
+				}
 			}
 		}
 		return out
