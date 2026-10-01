@@ -12,7 +12,7 @@ module github.com/moul/gno-contracts/tools
 
 go 1.24.0
 
-require moul.io/gnopm v0.12.1-0.20260929122057-94c97ca9d5ab
+require moul.io/gnopm v0.13.0
 
 tool (
 	github.com/moul/gno-contracts/tools/gnoblog
