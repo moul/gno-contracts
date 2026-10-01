@@ -238,3 +238,20 @@ func TestRenderLinksAreAbsolute(cur realm, t *testing.T) {
 func TestRealmURLMatchesTheModule(cur realm, t *testing.T) {
 	uassert.Equal(t, "gno.land"+realmURL, cur.PkgPath())
 }
+
+// The global cap is what bounds the realm's whole storage bill, so its
+// refusal is pinned, and pinned as refusing BEFORE any write: the store and
+// both indexes are exactly as full as they were.
+func TestTheBoardIsFull(cur realm, t *testing.T) {
+	reset()
+	for i := 0; i < MaxNotes; i++ {
+		notes.Add(&note{Author: bob, Tag: "gno", Body: "x"})
+	}
+	testing.SetRealm(testing.NewUserRealm(alice))
+	uassert.AbortsContains(t, cur, "the board is full", func() {
+		Post(cross(cur), "gno", "one too many")
+	})
+	uassert.Equal(t, MaxNotes, notes.Len())
+	uassert.Equal(t, 0, byTag.Len())
+	uassert.Equal(t, 0, byAuthor.Count(alice.String()))
+}
