@@ -74,7 +74,7 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 
 ### `wiring`: What it costs to write one change at a time
 
-- **168** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-10-01.
+- **258** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-10-01.
 - **24** measured rows on `linux-amd64-amd-epyc-7763-64-core-processor-4c` (linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores), Go 1.25.9, gno `3cc494ec4 (2026-10-01)`, last updated 2026-10-01.
 
 [Full report](reports/wiring.md) `·` [Dashboard, filterable](reports/wiring.html) `·` [Raw rows](results/wiring/)
