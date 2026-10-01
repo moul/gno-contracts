@@ -13,7 +13,9 @@ func seed() {
 	reset()
 	entries := []Entry{
 		{Msg: msg.Msg{Seq: 1, Height: 500, From: "agent-a", Topic: "build", Kind: "note", Ref: "pr/1", Body: "ci is green"}, Author: testutils.TestAddress("alice")},
-		{Msg: msg.Msg{Seq: 2, Height: 501, From: "agent-b", Topic: "deploy", Kind: "ack", Ref: "", Body: "picked it up"}, Author: testutils.TestAddress("bob")},
+		// Session set: two agents under one owner, told apart by the key that
+		// signed rather than by the id they called themselves.
+		{Msg: msg.Msg{Seq: 2, Height: 501, From: "agent-b", Topic: "deploy", Kind: "ack", Ref: "", Body: "picked it up"}, Author: testutils.TestAddress("alice"), Session: testutils.TestAddress("session-b")},
 		{Msg: msg.Msg{Seq: 3, Height: 502, From: "agent-a", Topic: "build", Kind: "note", Ref: "pr/2", Body: "needs a rebase"}, Author: testutils.TestAddress("alice")},
 	}
 	for _, e := range entries {
@@ -48,10 +50,10 @@ func ExampleRenderPopulated() {
 	//
 	// 3 of 64 slots used, 3 posted in total, 0 dropped off the back.
 	//
-	// | Seq | Height | From | Topic | Kind | Body | Author |
+	// | Seq | Height | From | Topic | Kind | Body | Signer |
 	// | --- | --- | --- | --- | --- | --- | --- |
 	// | 3 | 502 | agent\-a | build | note | needs a rebase | `g1v9kxjc…40gh` |
-	// | 2 | 501 | agent\-b | deploy | ack | picked it up | `g1vfhkyh…vdhu` |
+	// | 2 | 501 | agent\-b | deploy | ack | picked it up | `g1wdjhxu…cmjm` |
 	// | 1 | 500 | agent\-a | build | note | ci is green | `g1v9kxjc…40gh` |
 }
 
@@ -62,7 +64,7 @@ func ExampleRenderTopic() {
 	// Output:
 	// # Agent Relay: build
 	//
-	// | Seq | Height | From | Topic | Kind | Body | Author |
+	// | Seq | Height | From | Topic | Kind | Body | Signer |
 	// | --- | --- | --- | --- | --- | --- | --- |
 	// | 3 | 502 | agent\-a | build | note | needs a rebase | `g1v9kxjc…40gh` |
 	// | 1 | 500 | agent\-a | build | note | ci is green | `g1v9kxjc…40gh` |
