@@ -146,17 +146,8 @@ func (r *Registry) Edit(slug string, in Info, by address, at int64, reason strin
 		return errors.New("zones: " + slug + " is approved, so an edit needs a reason")
 	}
 	if in.ChainID != z.ChainID {
-		for _, id := range r.byZone.Lookup(slug) {
-			v, _ := r.endpoints.Get(id)
-			e := v.(*Endpoint)
-			if e.Status != Verified {
-				continue
-			}
-			if err := r.unchecked.Add(slug, id); err != nil {
-				return err
-			}
-			e.Status = Unverified
-			e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, ChainIDChanged
+		if err := r.unverifyAll(slug, by, at, ChainIDChanged); err != nil {
+			return err
 		}
 	}
 	if z.Status == Approved {
@@ -172,9 +163,30 @@ func (r *Registry) Edit(slug string, in Info, by address, at int64, reason strin
 	return nil
 }
 
-// ChainIDChanged is the reason an endpoint carries when an edit to its zone's
-// chain id sent it back to unverified.
-const ChainIDChanged = "the zone's chain id changed; verify again"
+// The reasons an endpoint carries when its zone changed under it and sent it
+// back to unverified: a chain id edit, or a retired zone approved again.
+const (
+	ChainIDChanged = "the zone's chain id changed; verify again"
+	Revived        = "the zone was retired and approved again; verify again"
+)
+
+// unverifyAll sends every verified endpoint of a zone back to unverified,
+// recording who, when and why on each. Flagged ones keep their flag.
+func (r *Registry) unverifyAll(slug string, by address, at int64, reason string) error {
+	for _, id := range r.byZone.Lookup(slug) {
+		v, _ := r.endpoints.Get(id)
+		e := v.(*Endpoint)
+		if e.Status != Verified {
+			continue
+		}
+		if err := r.unchecked.Add(slug, id); err != nil {
+			return err
+		}
+		e.Status = Unverified
+		e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, reason
+	}
+	return nil
+}
 
 // ReviewZone records a curator's decision on a zone.
 //
@@ -229,6 +241,12 @@ func (r *Registry) ReviewZone(slug string, to Status, by address, at int64, reas
 	r.byStatus.Remove(string(z.Status), id)
 	if err := r.byStatus.Add(string(to), id); err != nil {
 		return err
+	}
+	if z.Status == Retired && to == Approved {
+		// Revived: nothing verified before it stopped has been checked since.
+		if err := r.unverifyAll(slug, by, at, Revived); err != nil {
+			return err
+		}
 	}
 	z.Status = to
 	z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason

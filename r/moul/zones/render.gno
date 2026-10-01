@@ -331,7 +331,8 @@ func notFound(msg string) string { return md.H1("Not found") + ui.Empty(msg) }
 // The remote is looked up in the registry itself, by the chain id this realm is
 // running on, so the command a reader copies points at the chain they are
 // reading. A chain the registry does not list gets no -remote, rather than a
-// guessed one.
+// guessed one, and so does a chain id two approved zones share (every gnodev
+// is "dev"): picking one would be the same guess.
 //
 // The remote is single-quoted because a reader pastes this into a shell, and a
 // URL may legally carry ; & # $, which a shell reads as syntax: an approved
@@ -340,12 +341,15 @@ func notFound(msg string) string { return md.H1("Not found") + ui.Empty(msg) }
 // refuses one, so the quoting cannot be closed from within. The call is built
 // here from charset-checked slugs and literals only.
 func queryCommand(call string) string {
-	remote := ""
+	remote, matches := "", 0
 	for _, z := range reg.ZonesByChainID(runtime.ChainID()) {
 		if z.Status == zones.Approved {
 			remote = " -remote '" + z.RPCURL + "'"
-			break
+			matches++
 		}
+	}
+	if matches != 1 {
+		remote = ""
 	}
 	return "gnokey query vm/qeval" + remote + " -data '" + pkgPath + "." + call + "'"
 }

@@ -206,6 +206,16 @@ func TestChainIDEditUnverifiesEndpoints(t *testing.T) {
 	uassert.NoError(t, r.ReviewEndpoint(a, Verified, curator, 6, "answers onyx-2"))
 	uassert.Equal(t, 1, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
 
+	// Retiring and approving again is a revival: nothing verified before the
+	// network stopped has been checked since.
+	uassert.NoError(t, r.ReviewEndpoint(b, Verified, curator, 6, ""))
+	uassert.NoError(t, r.ReviewZone("onyx", Retired, curator, 6, "stopped"))
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, curator, 7, "back up"))
+	uassert.Equal(t, 0, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
+	e, _ = r.Endpoint(b)
+	uassert.Equal(t, Revived, e.Reason)
+	e, _ = r.Endpoint(f)
+	uassert.Equal(t, string(Flagged), string(e.Status))
 	// A pending zone is no exception: a proposer collecting verdicts for one
 	// chain id and then switching it gets them all reset.
 	uassert.NoError(t, r.Propose(alice, 7, "pend", onyx()))

@@ -180,6 +180,11 @@ func TestQueryCommandQuotesTheRemote(t *testing.T) {
 		RPCURL: "https://rpc.example/;id;#"}, Admin, 1, "test"))
 	got := queryCommand(`GetZone("onyx")`)
 	uassert.Equal(t, `gnokey query vm/qeval -remote 'https://rpc.example/;id;#' -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'`, got)
+
+	// Two approved zones on the same chain id: no -remote, rather than a guess.
+	must(reg.Edit("staging", zones.Info{ChainID: runtime.ChainID(), Title: "S", Kind: zones.Devnet,
+		RPCURL: "https://other.example"}, Admin, 1, "test"))
+	uassert.Equal(t, `gnokey query vm/qeval -data 'gno.land/r/moul/zones/v0.GetZone("onyx")'`, queryCommand(`GetZone("onyx")`))
 	uassert.ErrorContains(t, zones.ValidateEndpoint(zones.RPC, "https://rpc.example/'x"), "contains")
 }
 

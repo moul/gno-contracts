@@ -351,7 +351,10 @@ func checkText(field, s string, min, max int) error {
 	}
 	n := 0
 	for _, r := range s {
-		if r < 0x20 || r == 0x7f {
+		// C0, DEL, C1 (NEL included) and the two Unicode separators: each one
+		// is a line break somewhere, and ui.Inline folds them to a space, so the
+		// stored text would not be the text shown.
+		if r < 0x20 || (r >= 0x7f && r <= 0x9f) || r == 0x2028 || r == 0x2029 {
 			return errors.New("zones: the " + field + " contains a control character")
 		}
 		n++
