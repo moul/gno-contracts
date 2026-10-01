@@ -94,8 +94,16 @@ func TestDefaultBatchPathIsPerChain(t *testing.T) {
 	if main == staging {
 		t.Fatalf("both chains write to %s", main)
 	}
-	if filepath.Dir(main) != os.TempDir() {
-		t.Errorf("default path %s is not under the temp dir; a repo-relative default would litter the checkout", main)
+	// filepath.Clean on both sides, because os.TempDir() returns $TMPDIR as the
+	// OS set it and macOS sets it WITH a trailing slash
+	// (/var/folders/.../T/), while filepath.Dir never returns one. Comparing
+	// them raw passes on Linux, where TMPDIR is usually unset and os.TempDir()
+	// is a bare /tmp, and fails on every Mac. CI is Linux, so the whole local
+	// suite was red for anyone on a Mac and green in the one place anybody
+	// looked.
+	if filepath.Clean(filepath.Dir(main)) != filepath.Clean(os.TempDir()) {
+		t.Errorf("default path %s is not under the temp dir %s; a repo-relative default would litter the checkout",
+			main, os.TempDir())
 	}
 	if !strings.HasSuffix(main, ".json") {
 		t.Errorf("default path %s does not end in .json, and the .sh is derived by swapping that suffix", main)
