@@ -103,6 +103,10 @@ module = "gno.land/p/moul/helplink/v0"
 source = { dir = "p/moul/helplink" }
 
 [[module]]
+module = "gno.land/p/moul/kit/index/v0"
+source = { dir = "p/moul/kit/index" }
+
+[[module]]
 module = "gno.land/p/moul/kit/num/v0"
 source = { dir = "p/moul/kit/num" }
 
@@ -1248,6 +1252,10 @@ source = { dir = "r/moul/x/grc20wrapdemo" }
 [[module]]
 module = "gno.land/r/moul/x/gsdash/v0"
 source = { dir = "r/moul/x/gsdash" }
+
+[[module]]
+module = "gno.land/r/moul/x/kitindexdemo/v0"
+source = { dir = "r/moul/x/kitindexdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/moultest/v0"

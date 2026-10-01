@@ -1,0 +1,47 @@
+# kitindexdemo
+
+A notes board whose only job is to show
+[`p/moul/kit/index`](../../../../p/moul/kit/index) doing the thing a realm with
+a store always ends up needing: answering "every note tagged `gno`" as cheaply
+as it answers "note 7".
+
+No logic of its own. The records are a [`kit/store`](../../../../p/moul/kit/store),
+the two lookups are `kit/index`, the page is [`kit/ui`](../../../../p/moul/kit/ui).
+
+## What is worth reading
+
+**Every write touches the store and both indexes in ONE function.** That is the
+entire correctness argument for keeping three containers apart instead of
+reaching for a multi-index store: an abort anywhere in `Post` leaves none of the
+three applied, and `Retract` unwinds all three together.
+
+**The tag is validated at write time, the body is escaped at render time**, and
+the difference is the point. A tag is also an index key and a path segment, so a
+tag carrying a pipe or a slash breaks the table and the URL as well as the
+sentence; `[a-z0-9-]`, checked once, is narrower and cheaper than escaping it in
+three places. A body is prose, so it goes through `ui.Cell` at the one call site
+that renders it.
+
+**The root page is pinned with `uassert.Equal`, not an example.** It carries two
+consecutive blank lines, and an `// Output:` block can never pin those: gno
+collapses them, exactly as Go does. The pages without that shape get an
+`ExampleRender`.
+
+## Pages
+
+| path | shows |
+|---|---|
+| `` | every tag with its count, paged |
+| `tag/<tag>` | the notes under one tag |
+| `author/<address>` | the notes by one address |
+
+## Functions
+
+| | |
+|---|---|
+| `Post(cur, tag, body) int64` | files a note, returns its id |
+| `Retract(cur, id)` | removes one, author only |
+
+`MaxBody` is 280 bytes and `MaxTagLen` is 24, because every byte stored locks a
+storage deposit this realm's address pays and an unbounded write is an unbounded
+bill a stranger chooses the size of.
