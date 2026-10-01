@@ -84,6 +84,7 @@ type prAnalysis struct {
 	newPkgs, updPkgs []*pkgAgg
 	labels           []string
 	selectors        []string // changed realm dirs, `./r/moul/...`
+	paths            []string // every changed path, for review-advice
 	byDir            map[string]*Contract
 }
 
@@ -155,6 +156,10 @@ func analyzePR(root, base string) (*prAnalysis, error) {
 		a.totDel += del
 	}
 	a.files = len(files)
+	for path := range files {
+		a.paths = append(a.paths, path)
+	}
+	sort.Strings(a.paths)
 
 	added := map[string]bool{}
 	for _, ln := range gitLines(root, "diff", "--name-status", spec) {

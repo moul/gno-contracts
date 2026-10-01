@@ -549,6 +549,57 @@ that case, and it is the first one.
 Five packages are exempt in code because emitting a separator correctly is what they are for:
 `kit/ui`, `mdtable`, `md`, `mdlist`, `template`.
 
+## When to spend a Copilot code review, and when not to
+
+**A Copilot code review costs 13 premium requests**, GitHub's published model multiplier for
+code review. The monthly allowance is 300 on Copilot Pro and 1,500 on Pro+, overage is $0.04
+a request, so one review is about **$0.52** at the margin.
+
+This repository opened **more than 100 pull requests in the fourteen days to 2026-10-01**,
+roughly 215 a month. Reviewing all of them is **~2,800 premium requests a month**: nine times
+a Pro allowance, twice a Pro+ allowance. "Review everything" is not a policy this repository
+can hold, on any plan.
+
+So the rule is one sentence, and it falls out of this repository's central fact rather than
+out of restraint:
+
+> **Review exactly what is about to become permanent.**
+
+331 of the 333 contracts in the catalog are live on mainnet, and a public package path is
+immutable. A finding against a package that is **already live** cannot be acted on in place:
+it needs a new version at a new path and every importer moved, which is a human decision a
+review does not unblock. A package **not yet live** is one merge from being frozen forever,
+and that is the only moment a review changes the outcome.
+
+One other trigger, and it is there because of a counterexample rather than for symmetry:
+**a change to `.github/copilot-instructions.md` or `.github/instructions/`**. A wrong
+instruction does not produce one wrong finding, it produces wrong findings on every later
+review until somebody notices, which is a permanence of its own.
+
+`make review-advice BASE=origin/main` answers it, reading `contracts.json` rather than the
+chain, and prints the reason. It is **advice and never a gate**: it exits 0 and a human or an
+agent decides.
+
+```
+REVIEW
+
+why:
+  - gno.land/p/moul/kit/index/v0 is NOT yet live on mainnet: this is the last
+    moment a finding can be acted on in place
+
+cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
+
+  gh pr edit <N> --add-reviewer @copilot
+```
+
+Backtested over the last 60 merged pull requests: **4 would be reviewed (6%)**, three for
+permanence and one for the config. **182 premium requests a month** projected, against ~2,800
+for reviewing everything, which fits inside the cheapest paid allowance with headroom.
+
+Two things it does not do, deliberately. It does not look at diff size, because a one-line
+change to an unpublished package is exactly as permanent as a thousand-line one. And it does
+not review `tools/`, because tooling has tests, has CI, and can be fixed any time.
+
 ## The audit patterns: somebody else's rules, on our contracts
 
 `gnolang/gno` ships an audit pattern harness at `misc/audit-pattern-harness`: ten finding

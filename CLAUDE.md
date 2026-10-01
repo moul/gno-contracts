@@ -54,6 +54,12 @@ irreversible.
 - **gno is not Go** in six ways that compile in your head and fail in CI. AGENTS.md
   § *Where gno differs from Go* names them, and takes the next one.
 - **Green before commit:** `make lint test`, with `GNOROOT` on a gnolang/gno checkout.
+- **Run `make review-advice BASE=origin/main` before requesting a Copilot review, and follow
+  it.** A review costs 13 premium requests (about $0.52 at the margin) and this repo opens
+  ~215 PRs a month, so reviewing everything is ~2,800 a month. The rule: **review exactly what
+  is about to become permanent**, that is, a package not yet live on mainnet, plus any change
+  to `.github/copilot-instructions.md` or `.github/instructions/`. Everything else is a path
+  that cannot be fixed in place anyway. Request with `gh pr edit <N> --add-reviewer @copilot`.
 - **`make audit-patterns` is a ratchet, and it fails in both directions.** The ten upstream
   audit-pattern rules run over every contract against a per-package baseline: a new hit
   fails, and a *fixed* one fails too until you `make audit-patterns-update`. A baseline row

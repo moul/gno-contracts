@@ -22,7 +22,7 @@ HOME_TX      ?= /tmp/home.tx.json
 
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render bench bench-report \
-	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update \
+	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update review-advice \
 	verify deps deps-chain bump-deps manifest readme readmes gen check \
 	sync graph publish status home-push home-packages report preview site clean
 
@@ -59,6 +59,9 @@ guard-private: ## fail if a realm declares neither private = true nor why it is 
 
 guard-untrusted-render: ## fail if a realm renders a caller's string without escaping it
 	@$(GNOCONTRACTS) guard-untrusted-render
+
+review-advice: ## should this diff get a Copilot code review? REVIEW or SKIP, with why; BASE=<ref>
+	@$(GNOCONTRACTS) review-advice $(if $(BASE),-base $(BASE),) $(ARGS)
 
 audit-patterns: ## run the upstream audit-pattern rules over every contract; fails on a hit the baseline does not record
 	@$(GNOCONTRACTS) audit-patterns $(ARGS)

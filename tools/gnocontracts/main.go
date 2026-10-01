@@ -78,6 +78,8 @@ func main() {
 		err = cmdGuardGenerated(root, args)
 	case "audit-patterns":
 		err = cmdAuditPatterns(root, args)
+	case "review-advice":
+		err = cmdReviewAdvice(root, args)
 	case "preview":
 		err = cmdPreview(root, args)
 	case "graph":
@@ -125,6 +127,7 @@ commands:
   guard-generated  fail if a PR modifies generated artifacts
   audit-patterns   run the upstream audit-pattern rules over every contract and
                    fail on a hit the baseline does not already record
+  review-advice    should this diff get a Copilot review? REVIEW or SKIP, with why
   graph      write per-package + global dependency graphs into _assets/
 `)
 }
