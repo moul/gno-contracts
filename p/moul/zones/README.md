@@ -42,9 +42,9 @@ The curation policy, which is the part worth reading before you hold one:
 | flag an endpoint | any other verdict | **required** |
 
 - **Only a pending or approved zone is editable.** Editing an approved one is
-  a curator decision: the reason is required and replaces the review on record,
-  and a changed chain id sends every verified endpoint back to unverified,
-  because what was verified was that it answered for the old one.
+  a curator decision: the reason is required and replaces the review on record.
+  A changed chain id, on any zone, sends every verified endpoint back to
+  unverified, because what was verified was that it answered for the old one.
 - **Nothing goes back to pending.** A proposer who disagrees with a rejection
   removes the zone and proposes it again.
 - **A zone that was ever official is never removed.** An approved one is
@@ -81,4 +81,7 @@ Storage is a [`kit/store`](../kit/store) for each record type plus nine
 record. Zones: slug, pending-by-proposer, status, chain id. Endpoints: zone,
 dedup key, registrant, zone-and-kind, unverified-by-zone. The status and
 zone-and-kind indexes are what let `ZonePage` and `EndpointPage` read only the
-rows on a page, and the counts come from the indexes without reading a record.
+records on a page (the bucket's id list, at most 512 ids, is read whole), and
+the counts come from the indexes without reading a record. Measured at the full
+caps, 256 approved zones and 512 endpoints on one zone: one `ZonePage` plus one
+`EndpointPage` of 25 costs about 7.5M gas, against `vm/qrender`'s 3B ceiling.

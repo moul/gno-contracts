@@ -118,9 +118,11 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 // decision of its own: the reviewed values changed, so the review on record is
 // replaced by this one, with a reason required. Otherwise the page would show
 // a new chain id or RPC under the name, height and reason of whoever approved
-// the old ones. And when the chain id itself changes, every endpoint verified
-// against the old one goes back to unverified, because what was verified was
-// that it answered for a chain this zone no longer names.
+// the old ones. And when the chain id itself changes, whatever the status,
+// every endpoint verified against the old one goes back to unverified, because
+// what was verified was that it answered for a chain this zone no longer names.
+// A pending zone is no exception: a proposer could otherwise collect verdicts
+// for one chain id and then switch it.
 func (r *Registry) Edit(slug string, in Info, by address, at int64, reason string) error {
 	z, zid, err := r.zone(slug)
 	if err != nil {
@@ -137,27 +139,27 @@ func (r *Registry) Edit(slug string, in Info, by address, at int64, reason strin
 	if err := ValidateReason(reason); err != nil {
 		return err
 	}
-	if z.Status == Approved {
-		if !by.IsValid() {
-			return errors.New("zones: the editor is not a valid address")
-		}
-		if reason == "" {
-			return errors.New("zones: " + slug + " is approved, so an edit needs a reason")
-		}
-		if in.ChainID != z.ChainID {
-			for _, id := range r.byZone.Lookup(slug) {
-				v, _ := r.endpoints.Get(id)
-				e := v.(*Endpoint)
-				if e.Status != Verified {
-					continue
-				}
-				if err := r.unchecked.Add(slug, id); err != nil {
-					return err
-				}
-				e.Status = Unverified
-				e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, ChainIDChanged
+	if !by.IsValid() {
+		return errors.New("zones: the editor is not a valid address")
+	}
+	if z.Status == Approved && reason == "" {
+		return errors.New("zones: " + slug + " is approved, so an edit needs a reason")
+	}
+	if in.ChainID != z.ChainID {
+		for _, id := range r.byZone.Lookup(slug) {
+			v, _ := r.endpoints.Get(id)
+			e := v.(*Endpoint)
+			if e.Status != Verified {
+				continue
 			}
+			if err := r.unchecked.Add(slug, id); err != nil {
+				return err
+			}
+			e.Status = Unverified
+			e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, ChainIDChanged
 		}
+	}
+	if z.Status == Approved {
 		z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
 	}
 	if in.ChainID != z.ChainID {
@@ -432,9 +434,13 @@ func (r *Registry) ZoneCount(status Status) int {
 }
 
 // ZonePage returns page (1-based) of the zones with that status, size per
-// page, in proposal order. It reads only the zones on the page, which is what
-// lets a Render stay inside a query's gas however full the registry is. A page
-// past the end is empty.
+// page, in proposal order. A page past the end is empty.
+//
+// It reads only the zones ON the page. The status's id list is read whole (one
+// object, at most MaxZones ids) and sliced, which is the bound that matters:
+// measured at the full caps, 256 approved zones and 512 endpoints on one zone,
+// one ZonePage plus one EndpointPage of 25 costs about 7.5M gas, against
+// vm/qrender's 3,000,000,000 ceiling.
 func (r *Registry) ZonePage(status Status, page, size int) []Zone {
 	out := []Zone{}
 	for _, id := range pageOf(r.byStatus.Lookup(string(status)), page, size) {
@@ -512,8 +518,9 @@ func (r *Registry) EndpointCount(slug string, kind EndpointKind) int {
 }
 
 // EndpointPage returns page (1-based) of a zone's endpoints of that kind, ""
-// for every kind, size per page, oldest first. Like [Registry.ZonePage] it
-// reads only what is on the page.
+// for every kind, size per page, oldest first. Like [Registry.ZonePage] it reads
+// the records on the page only, and the bucket's id list (at most
+// MaxEndpointsPerZone ids) whole.
 func (r *Registry) EndpointPage(slug string, kind EndpointKind, page, size int) []Endpoint {
 	ids := r.byZone.Lookup(slug)
 	if kind != "" {

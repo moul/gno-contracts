@@ -62,8 +62,10 @@ do that.
 
 ## Pages
 
-Every list is 25 rows a page (`?page=`), and a page reads only its own rows:
-`vm/qrender` is gas-metered, and a Render that outgrows it stops answering.
+Every list is 25 rows a page (`?page=`), and a page reads only its own
+records: `vm/qrender` is gas-metered, and a Render that outgrows it stops
+answering. At the full caps a zone page plus an endpoint page measured about
+7.5M gas of the 3B ceiling.
 
 | path | shows |
 |---|---|

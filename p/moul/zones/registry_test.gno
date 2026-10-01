@@ -131,6 +131,7 @@ func TestEdit(t *testing.T) {
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
 	in := onyx()
 	in.GenesisURL = "https://github.com/gnolang/gno/releases/download/chain/onyx/genesis.json"
+	uassert.ErrorContains(t, r.Edit("onyx", in, "", 2, ""), "editor is not a valid address")
 	uassert.NoError(t, r.Edit("onyx", in, alice, 2, ""))
 	z, _ := r.Zone("onyx")
 	uassert.Equal(t, in.GenesisURL, z.GenesisURL)
@@ -202,6 +203,20 @@ func TestChainIDEditUnverifiesEndpoints(t *testing.T) {
 	// And they count against the review queue again: verifying one frees it.
 	uassert.NoError(t, r.ReviewEndpoint(a, Verified, curator, 6, "answers onyx-2"))
 	uassert.Equal(t, 1, len(r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified})))
+
+	// A pending zone is no exception: a proposer collecting verdicts for one
+	// chain id and then switching it gets them all reset.
+	uassert.NoError(t, r.Propose(alice, 7, "pend", onyx()))
+	pid, _ := r.Register(alice, 7, "pend", RPC, "https://p.example", "")
+	uassert.NoError(t, r.ReviewEndpoint(pid, Verified, curator, 8, ""))
+	other := onyx()
+	other.ChainID = "elsewhere-1"
+	uassert.NoError(t, r.Edit("pend", other, alice, 9, ""))
+	e, _ = r.Endpoint(pid)
+	uassert.Equal(t, string(Unverified), string(e.Status))
+	uassert.Equal(t, alice.String(), e.ReviewedBy.String())
+	z, _ := r.Zone("pend")
+	uassert.False(t, z.Reviewed()) // still a pending edit: the zone's own review is untouched
 }
 
 func TestRegisterAndFilter(t *testing.T) {

@@ -328,6 +328,8 @@ func TestRenderPaginates(t *testing.T) {
 	uassert.True(t, strings.Contains(last, "page 3 of 3"))
 	uassert.Equal(t, first, Render("?page=-1"))
 	uassert.Equal(t, last, Render("?page=99999999999999999"))
+	uassert.Equal(t, last, Render("?page=999999999999999999999999999999"), "past int is past the end, not page 1")
+	uassert.Equal(t, first, Render("?page=-999999999999999999999999999999"))
 	uassert.Equal(t, first, Render("?page=nope"))
 	uassert.True(t, strings.Contains(Render("?status=nope"), "No such list."))
 

@@ -31,9 +31,11 @@ func action(title, fn string, args ...string) string {
 }
 
 // PageSize is how many rows any table here shows at once. Every list is
-// paginated and every page reads only its own rows, because vm/qrender is
+// paginated and every page reads only its own records, because vm/qrender is
 // gas-metered and a Render that outgrows it stops answering instead of slowing
-// down. The registry's caps allow 256 zones and 512 endpoints on one zone.
+// down. At the registry's caps (256 zones, 512 endpoints on one zone) a zone
+// page plus an endpoint page measured about 7.5M gas of the 3B ceiling; see
+// zones.Registry.ZonePage.
 const PageSize = 25
 
 // Render is the whole public surface, three pages: the zone list (official,
@@ -279,8 +281,13 @@ func pageCount(n int) int {
 // and ?page=-1 must not render a footer saying "page -1 of 2".
 func pageNum(req *realmpath.Request, pages int) int {
 	page := 1
-	if n, err := strconv.Atoi(req.Query.Get("page")); err == nil {
+	raw := req.Query.Get("page")
+	if n, err := strconv.Atoi(raw); err == nil {
 		page = n
+	} else if raw != "" && strings.Trim(raw, "0123456789") == "" {
+		// All digits and still unparseable: a positive number past int. It is
+		// past the last page too, so it lands there, as any big number does.
+		page = pages
 	}
 	if page < 1 {
 		page = 1
