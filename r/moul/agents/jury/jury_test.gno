@@ -1,10 +1,12 @@
 package jury
 
 import (
+	"strings"
 	"testing"
 
 	"gno.land/p/moul/agents/commit/v0"
 	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/ufmt/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
@@ -101,4 +103,14 @@ func TestOpenCaseRejectsAnInvalidJuror(cur realm, t *testing.T) {
 		OpenCase(cross(cur), "x", j1.String()+",notanaddress")
 	})
 	uassert.AbortsContains(t, cur, "invalid juror address", func() { OpenCase(cross(cur), "x", "") })
+}
+
+// The subject is wallet-controlled now that OpenCase is callable, so it is
+// escaped on both pages that show it.
+func TestSubjectIsEscaped(cur realm, t *testing.T) {
+	testing.SetRealm(testing.NewUserRealm(opener))
+	id := OpenCase(cross(cur), "x | [claim](https://evil.example)", j1.String())
+	idx, page := Render(""), Render(ufmt.Sprintf("%d", id))
+	uassert.False(t, strings.Contains(idx, "[claim](https://evil.example)"), idx)
+	uassert.False(t, strings.Contains(page, "[claim](https://evil.example)"), page)
 }

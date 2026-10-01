@@ -313,6 +313,12 @@ func Render(path string) string {
 	if key == "" {
 		key = DemoKey
 	}
+	// A namespace is keyed by the address that created it, or is the demo one.
+	// Anything else names no namespace, and refusing it here is also what keeps
+	// a crafted ?u= out of the links and code spans every page builds from it.
+	if key != DemoKey && !address(key).IsValid() {
+		return "# 404\n\nno namespace by that name. `?u=` takes an address.\n"
+	}
 	parts := req.PathParts()
 	if len(parts) == 0 || parts[0] == "" {
 		return renderHome(key)

@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/agents/commit/v0"
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/ufmt/v0"
 )
 
@@ -241,7 +242,7 @@ func renderIndex() string {
 			out = "—"
 		}
 		sb.WriteString(ufmt.Sprintf("| [%d](/r/moul/agents/jury/v0:%d) | %s | %s | %d | %d | %s |\n",
-			c.ID, c.ID, c.Subject, string(c.Phase), c.Yes, c.No, out))
+			c.ID, c.ID, ui.Cell(c.Subject), string(c.Phase), c.Yes, c.No, out))
 	}
 	return sb.String()
 }
@@ -250,7 +251,7 @@ func renderCase(id uint64) string {
 	c := mustCase(id)
 	var sb strings.Builder
 	sb.WriteString(ufmt.Sprintf("# Case #%d\n\n", c.ID))
-	sb.WriteString(ufmt.Sprintf("- **Subject:** %s\n", c.Subject))
+	sb.WriteString(ufmt.Sprintf("- **Subject:** %s\n", ui.Inline(c.Subject)))
 	sb.WriteString(ufmt.Sprintf("- **Phase:** %s\n", string(c.Phase)))
 	sb.WriteString(ufmt.Sprintf("- **Opened by:** %s at height %d\n", short(c.Opener), c.OpenedAt))
 	if c.Outcome != "" {

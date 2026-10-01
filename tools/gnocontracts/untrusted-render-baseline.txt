@@ -16,7 +16,6 @@
 # for, and it makes you name the validation.
 r/moul/agents/capwallet
 r/moul/agents/gnomem
-r/moul/agents/jury
 r/moul/agents/maintainer
 r/moul/agents/passport
 r/moul/agents/receipt

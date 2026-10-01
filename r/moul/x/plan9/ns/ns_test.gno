@@ -207,3 +207,11 @@ func TestRenderUnknownCommand(t *testing.T) {
 		t.Errorf("got %q", got)
 	}
 }
+
+// ?u= is the only caller-controlled part of every link the pages build, so a
+// value that is neither an address nor the demo key is refused outright.
+func TestRenderRefusesANonAddressNamespace(t *testing.T) {
+	out := Render("ns?u=x%29%20[evil](https://example)")
+	uassert.True(t, strings.Contains(out, "# 404"), out)
+	uassert.False(t, strings.Contains(out, "[evil](https://example)"), out)
+}
