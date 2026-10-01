@@ -58,7 +58,7 @@ func RunWiring(s *Suite, env Env, workdir string, ns []int, repeat int, re *rege
 					} else {
 						// Gas, bytes and write counts are
 						// deterministic; only wall time moves.
-						if t.Gas != best.Gas || t.KVSetBytes != best.KVSetBytes {
+						if t.Gas != best.Gas || t.KVSetBytes != best.KVSetBytes || t.KVGetBytes != best.KVGetBytes {
 							r.Stable = false
 						}
 						if t.Wall < best.Wall {
@@ -70,6 +70,7 @@ func RunWiring(s *Suite, env Env, workdir string, ns []int, repeat int, re *rege
 					r.Gas, r.Bytes = best.Gas, best.NetRealm
 					r.DGas, r.DBytes = best.Gas, best.NetRealm
 					r.KVSets, r.KVSetBytes, r.KVKeyBytes = best.KVSets, best.KVSetBytes, best.KVKeyBytes
+					r.KVGets, r.KVGetBytes, r.KVDels = best.KVGets, best.KVGetBytes, best.KVDels
 					r.Txs = best.Txs
 					r.WallNs = best.Wall.Nanoseconds()
 					r.DWallNs = r.WallNs
@@ -142,6 +143,9 @@ type wireTally struct {
 	KVSets     int64
 	KVSetBytes int64
 	KVKeyBytes int64
+	KVGets     int64
+	KVGetBytes int64
+	KVDels     int64
 	Wall       time.Duration
 	Txs        int
 }
@@ -152,6 +156,9 @@ func (t *wireTally) add(o wireTally) {
 	t.KVSets += o.KVSets
 	t.KVSetBytes += o.KVSetBytes
 	t.KVKeyBytes += o.KVKeyBytes
+	t.KVGets += o.KVGets
+	t.KVGetBytes += o.KVGetBytes
+	t.KVDels += o.KVDels
 	t.Wall += o.Wall
 	t.Txs += o.Txs
 }
@@ -239,6 +246,9 @@ func wireTx(cs *countStore, gnoStore gno.Store, fn func(*gno.Machine)) wireTally
 	return wireTally{
 		Gas: gasMeter.GasConsumed(), NetRealm: net,
 		KVSets: cs.Sets - before.Sets, KVSetBytes: cs.SetBytes - before.SetBytes,
-		KVKeyBytes: cs.KeyBytes - before.KeyBytes, Wall: time.Since(t0), Txs: 1,
+		KVKeyBytes: cs.KeyBytes - before.KeyBytes,
+		KVGets: cs.Gets - before.Gets, KVGetBytes: cs.GetBytes - before.GetBytes,
+		KVDels: cs.Dels - before.Dels,
+		Wall: time.Since(t0), Txs: 1,
 	}
 }

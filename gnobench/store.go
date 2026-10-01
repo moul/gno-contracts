@@ -42,6 +42,9 @@ type Row struct {
 	KVSets     int64 `json:"kv_sets,omitempty"`
 	KVSetBytes int64 `json:"kv_set_bytes,omitempty"`
 	KVKeyBytes int64 `json:"kv_key_bytes,omitempty"`
+	KVGets     int64 `json:"kv_gets,omitempty"`
+	KVGetBytes int64 `json:"kv_get_bytes,omitempty"`
+	KVDels     int64 `json:"kv_dels,omitempty"`
 	Txs        int   `json:"txs,omitempty"`
 
 	Stable bool   `json:"stable"`

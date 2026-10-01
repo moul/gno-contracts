@@ -173,16 +173,26 @@ func wiringSection(s *Suite, v view) string {
 		return ""
 	}
 	var b strings.Builder
+	cfg := chainGasConfig()
 	b.WriteString("## Batched against one at a time\n\n")
 	b.WriteString("Both columns perform the same writes and end at the same state, so the **deposit is\n")
-	b.WriteString("identical**. `kv bytes` is what the key/value store was actually asked to write, which\n")
-	b.WriteString("is what the node's disk absorbs and what no meter here charges for.\n\n")
+	b.WriteString("identical**. `kv bytes` is what the key/value store was actually asked to write.\n\n")
+	fmt.Fprintf(&b, "`store gas` is what a deployed chain charges for that I/O, at the genesis schedule\n"+
+		"(`ReadCostFlat` %s, `ReadCostPerByte` %d, `WriteCostFlat` %s, `WriteCostPerByte` %d, read depth\n"+
+		"%.2f, set-read depth %.2f, write depth %.2f). It is computed from the chain's own config, not\n"+
+		"transcribed. **It is a different meter from the `gas` column**, which is the VM's: that one\n"+
+		"counts opcodes, this one counts disk. Both are charged.\n\n",
+		addCommas(strconv.FormatInt(int64(cfg.ReadCostFlat), 10)), cfg.ReadCostPerByte,
+		addCommas(strconv.FormatInt(int64(cfg.WriteCostFlat), 10)), cfg.WriteCostPerByte,
+		float64(cfg.FixedGetReadDepth100)/100, float64(cfg.FixedSetReadDepth100)/100,
+		float64(cfg.FixedWriteDepth100)/100)
 	for _, n := range v.sizes() {
 		type row struct {
 			name            string
 			deposit         int64
 			oneKV, manyKV   int64
 			oneGas, manyGas int64
+			oneCG, manyCG   int64
 			amp             float64
 		}
 		var rows []row
@@ -196,6 +206,7 @@ func wiringSection(s *Suite, v view) string {
 				name: c.Name, deposit: one.Bytes,
 				oneKV: one.KVSetBytes, manyKV: many.KVSetBytes,
 				oneGas: one.Gas, manyGas: many.Gas,
+				oneCG: one.ChainGas(cfg), manyCG: many.ChainGas(cfg),
 				amp: float64(many.KVSetBytes) / float64(one.KVSetBytes),
 			})
 		}
@@ -204,14 +215,44 @@ func wiringSection(s *Suite, v view) string {
 		}
 		sort.Slice(rows, func(i, j int) bool { return rows[i].manyKV < rows[j].manyKV })
 		fmt.Fprintf(&b, "### %s writes\n\n", addCommas(strconv.Itoa(n)))
-		b.WriteString("| candidate | deposit (both) | kv bytes, 1 tx | kv bytes, one tx each | amplification | gas, one tx each |\n")
-		b.WriteString("|---|--:|--:|--:|--:|--:|\n")
+		b.WriteString("| candidate | deposit (both) | kv bytes, 1 tx | kv bytes, one tx each | amplification | store gas, 1 tx | store gas, one tx each |\n")
+		b.WriteString("|---|--:|--:|--:|--:|--:|--:|\n")
 		for _, r := range rows {
-			fmt.Fprintf(&b, "| `%s` | %s | %s | **%s** | %.1fx | %s |\n",
+			fmt.Fprintf(&b, "| `%s` | %s | %s | **%s** | %.1fx | %s | %s |\n",
 				r.name, addCommas(strconv.FormatInt(r.deposit, 10)),
 				addCommas(strconv.FormatInt(r.oneKV, 10)),
 				addCommas(strconv.FormatInt(r.manyKV, 10)),
-				r.amp, addCommas(strconv.FormatInt(r.manyGas, 10)))
+				r.amp,
+				addCommas(strconv.FormatInt(r.oneCG, 10)),
+				addCommas(strconv.FormatInt(r.manyCG, 10)))
+		}
+		b.WriteString("\nWhere that store gas goes. A delete is charged like a write and is not a\n")
+		b.WriteString("discount, so a container that rewrites a path per insert pays for every node it\n")
+		b.WriteString("orphans on the way.\n\n")
+		b.WriteString("The delete column is the same in both shapes, which looks wrong and is not: the\n")
+		b.WriteString("set of objects a build ever orphans does not depend on how the writes are\n")
+		b.WriteString("batched. Batching only decides whether an orphan was ever committed first, and\n")
+		b.WriteString("the cache emits a delete either way, so the chain charges either way.\n\n")
+		b.WriteString("| candidate | shape | kv gets | kv sets | kv deletes | read gas | write gas | delete gas |\n")
+		b.WriteString("|---|---|--:|--:|--:|--:|--:|--:|\n")
+		readFlat := cfg.FixedGetReadDepth100 * int64(cfg.ReadCostFlat) / 100
+		writeFlat := cfg.FixedSetReadDepth100*int64(cfg.ReadCostFlat)/100 +
+			cfg.FixedWriteDepth100*int64(cfg.WriteCostFlat)/100
+		for _, c := range wiringCandidates {
+			for _, shape := range []string{shapeOneTx, shapePerTx} {
+				w, ok := v.get(c.Name, "str", "cold", shape, n)
+				if !ok || w.KVSetBytes == 0 {
+					continue
+				}
+				fmt.Fprintf(&b, "| `%s` | %s | %s | %s | %s | %s | %s | %s |\n",
+					c.Name, shape,
+					addCommas(strconv.FormatInt(w.KVGets, 10)),
+					addCommas(strconv.FormatInt(w.KVSets, 10)),
+					addCommas(strconv.FormatInt(w.KVDels, 10)),
+					addCommas(strconv.FormatInt(w.KVGets*readFlat+w.KVGetBytes*int64(cfg.ReadCostPerByte), 10)),
+					addCommas(strconv.FormatInt(w.KVSets*writeFlat+w.KVSetBytes*int64(cfg.WriteCostPerByte), 10)),
+					addCommas(strconv.FormatInt(w.KVDels*writeFlat, 10)))
+			}
 		}
 		b.WriteString("\n")
 	}
