@@ -195,3 +195,23 @@ func TestRetractingFreesASlot(cur realm, t *testing.T) {
 	Post(cross(cur), "gno", "now it fits")
 	uassert.Equal(t, MaxPerAuthor, notes.Len())
 }
+
+// The page number is user input on the Render path. One outside 1..Pages is
+// clamped into it, so it never renders an empty board under a footer that
+// says "page -1 of 2".
+func TestRenderClampsThePageNumber(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	for i := 0; i < PageSize; i++ {
+		Post(cross(cur), "t"+strconv.Itoa(i), "x")
+	}
+	testing.SetRealm(testing.NewUserRealm(bob))
+	Post(cross(cur), "t-last", "x")
+	urequire.Equal(t, 2, byTag.Pages(PageSize))
+
+	first, last := Render("?page=1"), Render("?page=2")
+	uassert.Equal(t, first, Render("?page=-1"))
+	uassert.Equal(t, first, Render("?page=0"))
+	uassert.Equal(t, last, Render("?page=999"))
+	uassert.True(t, strings.Contains(last, "page 2 of 2"))
+}

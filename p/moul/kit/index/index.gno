@@ -306,9 +306,11 @@ func (ix *Index) Each(fn func(key string, ids []store.ID) bool) bool {
 // Page returns page number page of size keys, ascending, each with a copy of
 // its ids.
 //
-// Pages are 1-based and a page past the end returns nil rather than panicking,
-// matching [store.Store.Page] exactly, because the page number usually arrives
-// from a Render path and is user input.
+// Pages are 1-based, and every out-of-range page (zero, negative, past the end,
+// any page of an empty index) returns nil rather than panicking, because the
+// page number usually arrives from a Render path and is user input. This is
+// NOT [store.Store.Page], which returns an empty non-nil slice past the end;
+// test with len, not with nil, when code handles both.
 func (ix *Index) Page(page, size int) []Entry {
 	if ix.s == nil || page < 1 || size < 1 {
 		return nil

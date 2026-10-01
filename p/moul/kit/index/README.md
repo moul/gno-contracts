@@ -84,7 +84,7 @@ index, and `Len` can never disagree with `Keys` about what it holds.
 | `Lookup(key) []store.ID`, `First(key) (store.ID, bool)` | ascending; a copy |
 | `Has`, `Count(key)`, `Keys()`, `Len()`, `IsUnique()` | `Keys` counts keys, `Len` counts pairs, and the difference is the fan-out |
 | `Each(fn) bool` | ascending by key; true means stop, matching `bptree` and `kit/store`. `fn` must not write to the index |
-| `Page(page, size) []Entry`, `Pages(size) int` | 1-based, a page past the end is nil, `Pages` is never 0 |
+| `Page(page, size) []Entry`, `Pages(size) int` | 1-based, every out-of-range page is nil (`kit/store`'s `Page` returns an empty slice instead), `Pages` is never 0 |
 
 `Add` returns an error rather than aborting, because a `p/` package does not
 know the caller's policy. In a realm the handling is almost always `panic(err)`:

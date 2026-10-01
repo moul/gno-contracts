@@ -30,9 +30,18 @@ func Render(path string) string {
 }
 
 func renderIndex(req *realmpath.Request) string {
+	// The page number is user input: clamp it into 1..pages, or ?page=-1
+	// renders an empty board under a footer saying "page -1 of 2".
+	pages := byTag.Pages(PageSize)
 	page := 1
 	if n, err := strconv.Atoi(req.Query.Get("page")); err == nil {
 		page = n
+	}
+	if page < 1 {
+		page = 1
+	}
+	if page > pages {
+		page = pages
 	}
 
 	t := ui.NewTable("tag", "notes")
@@ -49,7 +58,7 @@ func renderIndex(req *realmpath.Request) string {
 			strconv.Itoa(byTag.Keys())+" tag(s), by "+
 			strconv.Itoa(byAuthor.Keys())+" author(s)."),
 		t.OrEmpty("Nothing posted yet."),
-		pager(page, byTag.Pages(PageSize)),
+		pager(page, pages),
 		md.Paragraph(ui.Action("Post a note", "Post", "tag", "", "body", "")),
 	)
 }
