@@ -562,7 +562,7 @@ From the AI usage page's per-model breakdown, **2026-10-01**:
 | included | **1,500 AI credits a month**, resets the 1st |
 | used | **1,211 of 1,500 (81%)**, on the **first day of the cycle** |
 | of which | **1,210.74 is the Code Review model.** Essentially all of it |
-| additional usage | **$0.00 of $0, NOT ENABLED** |
+| additional usage | **$0.00 of $0, NOT ENABLED** *(superseded: a $100 budget was enabled later the same day, see below)* |
 | credit price | $0.01 |
 
 Divide by the **16 Copilot reviews** requested that day (#274 x1, #289 x6, #295 x8, #296 x1,
@@ -573,8 +573,10 @@ Three things follow, and the third is the one that actually matters.
 
 **1. The Pro allowance is 1,500, not 300.** The 300 figure is the older premium-request unit.
 
-**2. The failure mode is silence, not a bill.** Additional usage is disabled, so when the
-1,500 runs out Copilot code review simply **stops** until the reset. What this policy protects
+**2. The failure mode was silence, not a bill.** With additional usage disabled, running out
+simply **stopped** code review until the reset. **That changed the same day**: a $100 budget
+is now enabled, so the total is ~11,500 credits, about 152 reviews a month, and the stop moves
+to $100 rather than to zero. The reasoning below is what the budget was sized against. What this policy protects
 is not money, which is capped at zero by construction, but the ability to get a review at the
 moment one is worth having. On 2026-10-01 that was 289 credits, **under four reviews**, with
 31 days to go.
@@ -605,7 +607,8 @@ and that is the only moment a review changes the outcome.
 instruction does not produce one wrong finding, it produces wrong findings on every later
 review until somebody notices, which is a permanence of its own.
 
-**A change to `tools/**/*.go` or a workflow.** This policy used to skip tooling on the grounds
+**A change to a non-test Go source under `tools/`, or a workflow.** (`_test.go` is excluded:
+a test is where the bad shape is written on purpose.) This policy used to skip tooling on the grounds
 that it has tests, has CI, and is fixable any time. The first two are true and the third made
 it look cheap to drop. Then #296's review returned four findings and **every one was in
 tooling or docs**: a markdown escaper that let a contributor put a live link in the hub issue,
@@ -649,14 +652,24 @@ two-pass cap is what keeps the picking from being undone: it is **not** a cost r
 it is that the third and later passes on #289 and #295 were 14 of 16 reviews that day and
 found proportionally much less than the first two.
 
-**Once a diff qualifies, one pass is not the review: re-request after every push that fixed
-findings, until a pass adds nothing above low.** #289 (`p/moul/kit/index`, not yet live) took
-six passes. Passes two to five each found one to three more real defects, every one in a
-package one merge from frozen: a copied `Index` that splits its counter from its tree, every
-tag link dead, an untested global storage cap. Five extra passes cost 65 premium requests,
-about $2.60; any one of those defects shipped would have cost a new version at a new path.
-The "finish the file" instruction is the attempt to make pass one enough. Until the log shows
-it working, the second pass is the cheap one.
+### How many passes, and why the answer is not one number
+
+Two arguments here look contradictory and **both are right**.
+
+Fourteen of the sixteen passes across #289 and #295 spent a month's budget in a day, which
+says cap it. And **passes two to five on #289 each found one to three more real defects**, all
+in a package one merge from frozen: a copied `Index` that splits its counter from its tree,
+every tag link dead, an untested global storage cap. Five extra passes cost ~380 credits,
+about $3.80; any one of those defects shipped would have cost a new version at a new path.
+
+What separates them is the thing the triage already asks: **whether a miss is recoverable.**
+
+| the diff is | passes |
+|---|---|
+| a package **not yet live** | keep re-requesting after each fix until a pass adds nothing. A miss is permanent |
+| tooling, a workflow, the config | **two**: the first, and one after the fixes land. A miss is fixable next week |
+
+`make review-advice` prints whichever applies, because it already knows which case it is.
 
 Two things it still does not do, deliberately. It does not look at diff size, because a
 one-line change to an unpublished package is exactly as permanent as a thousand-line one. And

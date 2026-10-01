@@ -93,13 +93,34 @@ const creditsPerReview = 76 // measured 2026-10-01: 1210.74 credits / 16 reviews
 // around the twentieth of each month and then stops.
 const budgetUSD = 100
 
-// maxPassesPerPR is the standing cap this policy recommends per pull request:
-// the first review, plus one re-review after the findings are fixed.
+// maxPassesPerPR is the cap for a pull request whose findings can still be
+// fixed later: the first review, plus one after the findings land.
 //
-// Unchanged by the budget, because it was never only a cost rule. The third and
-// later passes on #289 and #295 were 14 of 16 reviews that day and they found
-// proportionally much less than the first two.
+// It is NOT the cap for a permanence pull request, and the two arguments that
+// look contradictory are both right. Fourteen of sixteen passes across #289 and
+// #295 spent a month's budget in a day, which says cap it. And passes two to
+// five on #289 each found one to three more real defects in a package one merge
+// from frozen forever, which says do not.
 //
+// What separates them is exactly what the triage already asks: whether a miss is
+// recoverable. On a package not yet live, a missed defect costs a new version at
+// a new path and every importer moved, so keep going until a pass adds nothing.
+// On tooling or config, which can be fixed next week, two passes and then read
+// the diff yourself.
+// passRule renders the cap for the verdict at hand, because the number depends
+// on whether the diff is a permanence case.
+func passRule(v reviewVerdict) string {
+	for _, r := range v.reasons {
+		if strings.Contains(r, "NOT yet live") {
+			return "This one is PERMANENCE: keep re-reviewing after each fix until a pass\n" +
+				"adds nothing. A miss here costs a new version at a new path."
+		}
+	}
+	return fmt.Sprintf("At most %d passes: the first, and one after the fixes land.\n"+
+		"A miss here is fixable next week, so the third pass is not worth its credits.",
+		maxPassesPerPR)
+}
+
 // It is the lever that matters. On 2026-10-01, 14 of 16 reviews were third and
 // later passes on two pull requests, and they are what spent the month.
 const maxPassesPerPR = 2
@@ -148,12 +169,12 @@ func cmdReviewAdvice(root string, args []string) error {
 		}
 	}
 	fmt.Printf("\nthe rule:\n%s\n", indentLines(reviewAdviceHint(), "  "))
-	fmt.Printf("\ncost if requested: ~%d AI credits (measured) of a %d-a-month allowance,\n"+
-		"which is about %d reviews a month in total. Additional usage is disabled, so\n"+
-		"running out does not bill, it stops the reviews until the 1st.\n"+
-		"At most %d passes per pull request: the first, and one after the fixes land.\n"+
+	total := monthlyCredits + budgetUSD*100 // $1 buys 100 credits at $0.01 each
+	fmt.Printf("\ncost if requested: ~%d AI credits (measured) of %d included plus a $%d\n"+
+		"additional-usage budget, so about %d reviews a month in total.\n"+
+		"%s\n"+
 		"Balance: https://github.com/settings/billing (AI usage)\n",
-		creditsPerReview, monthlyCredits, monthlyCredits/creditsPerReview, maxPassesPerPR)
+		creditsPerReview, monthlyCredits, budgetUSD, total/creditsPerReview, passRule(v))
 	if v.review {
 		fmt.Println("\n  gh pr edit <N> --add-reviewer @copilot")
 	}
@@ -208,7 +229,7 @@ func adviseReview(a *prAnalysis) reviewVerdict {
 	// ~$144, which is why that one is still out.
 	if tools := changedTooling(a.paths); len(tools) > 0 {
 		v.reasons = append(v.reasons, fmt.Sprintf(
-			"%d tooling file(s) changed, starting %s: every finding on #296 was in tooling, and tests had caught none of them",
+			"%d tooling file(s) changed, starting %s: three of #296's four findings were in Go tooling or a workflow, and the tests had caught none of them",
 			len(tools), tools[0]))
 		v.review = true
 	}

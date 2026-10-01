@@ -192,3 +192,29 @@ func TestAdviseDoesNotTreatEveryToolsFileAsCode(t *testing.T) {
 		})
 	}
 }
+
+// A renamed tooling file must still trigger.
+//
+// paths used to come from `git diff --numstat`, which renders a rename as
+// `{old => new}` brace syntax: the entry stops ending in .go and the rule
+// silently skipped it. They come from --name-only now, which reports the
+// destination path plainly.
+func TestAdviseReviewsARenamedToolingFile(t *testing.T) {
+	v := adviseReview(analysis([]string{"tools/gnovet/renamed_rules.go"}, nil, nil))
+	if !v.review {
+		t.Fatalf("a renamed tooling file is still tooling: %v", v.skips)
+	}
+}
+
+// The pass rule depends on whether a miss is recoverable, which is the same
+// axis the triage already uses.
+func TestPassRuleScalesWithPermanence(t *testing.T) {
+	perm := reviewVerdict{reasons: []string{"gno.land/p/x/v0 is NOT yet live on mainnet: ..."}}
+	if !strings.Contains(passRule(perm), "keep re-reviewing") {
+		t.Errorf("a permanence diff earns passes until clean, got %q", passRule(perm))
+	}
+	tooling := reviewVerdict{reasons: []string{"1 tooling file(s) changed, starting tools/x.go: ..."}}
+	if !strings.Contains(passRule(tooling), "At most 2 passes") {
+		t.Errorf("a tooling diff is capped, got %q", passRule(tooling))
+	}
+}
