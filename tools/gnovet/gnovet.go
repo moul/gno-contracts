@@ -8,7 +8,8 @@
 // talked out of it. A rule with no Finding is not allowed (see Rule.Finding and
 // the test that enforces it).
 //
-// That is the whole design. A code review costs 13 premium requests and finds a
+// That is the whole design. A code review costs ~76 AI credits (measured
+// 2026-10-01; tools/gnocontracts/review_advice.go owns the figure) and finds a
 // defect once. A rule costs nothing and finds it every time. The loop is:
 //
 //	review finds it  ->  fix it  ->  write the rule  ->  never pay for it again
@@ -81,6 +82,10 @@ type File struct {
 	// Code has comments and string contents blanked to spaces, line numbers
 	// preserved.
 	Code []string
+	// Literal has comments blanked and string contents KEPT, line numbers
+	// preserved: what a rule about a rendered string matches, so that a doc
+	// comment quoting the bad string does not fire it.
+	Literal []string
 	// Raw is the file as written.
 	Raw []string
 }
@@ -121,8 +126,8 @@ func RunRules(dir string, rules []Rule) ([]Hit, error) {
 		if err != nil {
 			return nil, err
 		}
-		code, raw := codeLines(src)
-		view := File{Code: code, Raw: raw}
+		code, literal, raw := codeLines(src)
+		view := File{Code: code, Literal: literal, Raw: raw}
 		rel, _ := filepath.Rel(dir, f)
 		for _, r := range rules {
 			for _, i := range r.Check(view) {
@@ -183,16 +188,18 @@ func ByID(id string) (Rule, bool) {
 	return Rule{}, false
 }
 
-// codeLines returns the file twice: once with comments and string CONTENTS
-// blanked, which is what rules match against, and once raw, for the message and
-// the ignore comment.
+// codeLines returns the file three times: with comments and string CONTENTS
+// blanked, which is what most rules match against; with only comments blanked,
+// for a rule about what a string says; and raw, for the message and the ignore
+// comment.
 //
 // Blanking is why a rule can look for "append(" without matching the word in a
 // doc comment that explains the rule, which is exactly the trap a regexp over
 // raw source falls into in a repository whose comments discuss its own lints.
-func codeLines(src []byte) (code, raw []string) {
+func codeLines(src []byte) (code, literal, raw []string) {
 	raw = strings.Split(string(src), "\n")
 	blanked := append([]byte(nil), src...)
+	uncommented := append([]byte(nil), src...)
 
 	fset := token.NewFileSet()
 	f := fset.AddFile("", fset.Base(), len(src))
@@ -210,10 +217,13 @@ func codeLines(src []byte) (code, raw []string) {
 		for j := off; j < off+len(lit) && j < len(blanked); j++ {
 			if blanked[j] != '\n' {
 				blanked[j] = ' '
+				if tok == token.COMMENT {
+					uncommented[j] = ' '
+				}
 			}
 		}
 	}
-	return strings.Split(string(blanked), "\n"), raw
+	return strings.Split(string(blanked), "\n"), strings.Split(string(uncommented), "\n"), raw
 }
 
 // gnoFiles lists the non-test .gno files under dir, in a stable order.

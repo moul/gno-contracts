@@ -628,7 +628,8 @@ why:
   - gno.land/p/moul/kit/index/v0 is NOT yet live on mainnet: this is the last
     moment a finding can be acted on in place
 
-cost if requested: 13 premium request(s), about $0.52 at the $0.04 overage rate
+cost if requested: ~76 AI credits (measured) of 1500 included plus a $100
+additional-usage budget, so about 151 reviews a month in total.
 
   gh pr edit <N> --add-reviewer @copilot
 ```
@@ -720,7 +721,7 @@ Go-companion rules above now say "never hold key material" rather than "never si
 
 ## `gnovet`: our own rules, and the loop that writes them
 
-**A code review costs 13 premium requests and finds a defect once. A rule costs nothing and
+**A code review costs ~76 AI credits and finds a defect once. A rule costs nothing and
 finds it every time.** `make gnovet` is where the second kind lives, and its defining property
 is where the rules come from:
 
@@ -754,6 +755,13 @@ reviewed, plus the 93 `avl` imports we already knew about:
 disappointment, it is the argument: the rule is a pre-deploy gate, and these shipped before it
 existed.
 
+Two more on 2026-10-01, each a shape review had found and the tree still carried:
+
+| rule | found | the one that stings |
+|---|--:|---|
+| `page-offset-overflow` | 6, one already bounded | `p/moul/kit/store/store.gno:266`, the same unbounded `(page - 1) * size` #289 fixed in `kit/index`, and #311 found a third time |
+| `placeholder-path` | 6 | three live daily realms linking to `/r/REPLACE_ADDR/...`, a generator token nobody substituted |
+
 ### Adding one
 
 1. **Fix the defect first.** A rule for a bug still in the tree is a baseline row, not a rule.
@@ -766,8 +774,8 @@ existed.
 Use `f.Code` for anything matching an expression: comments and string contents are blanked
 there, so a rule looking for `append(` does not match a doc comment explaining the rule, which
 is the trap a regexp over raw source falls into in a repository whose comments discuss its own
-lints. Use `f.Raw` only for what genuinely lives in a string, which in practice means import
-paths.
+lints. Use `f.Literal` (comments blanked, strings kept) for what genuinely lives in a string,
+such as a rendered link, and `f.Raw` only for import paths.
 
 The opt-out is `//gnovet:ignore <rule-id> <why>`, 20-character floor, on the line or the one
 above it.

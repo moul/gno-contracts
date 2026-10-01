@@ -63,8 +63,8 @@ import (
 // live package is private. A finding against a package that is already live
 // cannot be acted on in place at all; it needs a new version at a new path and
 // every importer moved, which is a decision a human makes and not something a
-// review unblocks. Spending 13 premium requests to learn that is spending them
-// for nothing.
+// review unblocks. Spending a review to learn that is spending it for
+// nothing.
 //
 // The inverse is the whole value: a package that is NOT yet live is one merge
 // from being frozen forever, and that is the only moment a review changes the
@@ -193,8 +193,8 @@ func verdictWord(review bool) string {
 func adviseReview(a *prAnalysis) reviewVerdict {
 	var v reviewVerdict
 
-	// The reviewer's own configuration is the second thing worth 13 premium
-	// requests, and it is not a contract.
+	// The reviewer's own configuration is the second thing worth a review, and
+	// it is not a contract.
 	//
 	// Evidence, not symmetry: #274 added these files, touched no .gno, and
 	// would have been skipped by the permanence rule alone. Its review found

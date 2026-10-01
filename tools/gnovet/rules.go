@@ -14,6 +14,8 @@ var Rules = []Rule{
 	sliceInPlaceRemove,
 	ceilDivOverflow,
 	avlInNewCode,
+	pageOffsetOverflow,
+	placeholderPath,
 }
 
 // ---------------------------------------------------------------------------
@@ -121,6 +123,79 @@ var avlInNewCode = Rule{
 				continue
 			}
 			if strings.Contains(t, `"gno.land/p/nt/avl/`) {
+				out = append(out, i)
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+// pageOffsetRe matches (page - 1) * size, the offset of a 1-based page. Check
+// keeps only the matches whose first operand is named like a page number, so
+// (floor-1)*2 in an ASCII tree does not fire.
+var pageOffsetRe = regexp.MustCompile(`\(\s*([A-Za-z_]\w*)\s*-\s*1\s*\)\s*\*\s*[A-Za-z_]\w*`)
+
+var pageNameRe = regexp.MustCompile(`(?i)^(p|pg|pn|n?page\w*|\w*page)$`)
+
+var pageOffsetOverflow = Rule{
+	ID:   "page-offset-overflow",
+	What: "computes a page offset as (page - 1) * size, which wraps for a page past the end",
+	Why: "The page number arrives from a Render path or a call argument, so it reaches " +
+		"maxInt for free. (page-1)*size then wraps negative, and the iterators clamp a " +
+		"negative offset to 0: ?page=9223372036854775807 silently returns page 1 instead " +
+		"of nothing. Found by review twice, in two different packages, on the same day.",
+	Fix: "Bound the page first, on a quantity that cannot overflow: " +
+		"if page < 1 || page-1 > (total-1)/size { return nothing }, then multiply. " +
+		"Where a bound already precedes it, say so with //gnovet:ignore.",
+	Finding: "gno-contracts#289, Copilot review comment 4154919693, 2026-10-01; " +
+		"the same defect again in gno-contracts#311 (\"Overflowing page numbers " +
+		"incorrectly reset to page 1\"), 2026-10-01",
+	Bad: "package x\n\nfunc f(page, size int) int {\n\treturn (page - 1) * size\n}\n",
+	Good: "package x\n\nfunc f(page, size, total int) int {\n\t" +
+		"if page < 1 || page-1 > (total-1)/size {\n\t\treturn -1\n\t}\n\t" +
+		"return size * (page - 1)\n}\n",
+	Check: func(f File) []int {
+		var out []int
+		for i, ln := range f.Code {
+			for _, m := range pageOffsetRe.FindAllStringSubmatch(ln, -1) {
+				if pageNameRe.MatchString(m[1]) {
+					out = append(out, i)
+					break
+				}
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+// placeholderRe matches a generator template's unsubstituted placeholder.
+var placeholderRe = regexp.MustCompile(`\bREPLACE_[A-Z][A-Z0-9_]*\b`)
+
+var placeholderPath = Rule{
+	ID:   "placeholder-path",
+	What: "ships a template placeholder (REPLACE_ADDR) inside a string the realm renders",
+	Why: "A placeholder in a rendered link is a dead link on a permanent path: the " +
+		"realm is live, the page cannot be edited, and every visitor clicks through to " +
+		"/r/REPLACE_ADDR/... Three realms shipped exactly this from one code generator, " +
+		"and a test pinning the Render output pinned the dead link along with it.",
+	Fix: "The realm's own absolute path (/r/moul/x/daily/<name>/v0), written out, or a " +
+		"constant derived from it. Never a token a generator was meant to replace.",
+	Finding: "r/moul/x/daily/{linktree,polls,blog}, shipped by the generated corpus of " +
+		"gno-contracts#20 and found live on mainnet by a tree-wide link sweep, " +
+		"2026-09-30; confirmed by the agent review sweep of 2026-10-01",
+	Bad:  "package x\n\nfunc Render(string) string {\n\treturn \"[back](/r/REPLACE_ADDR/blog)\"\n}\n",
+	Good: "package x\n\n// Render once read [back](/r/REPLACE_ADDR/blog).\nfunc Render(string) string {\n\treturn \"[back](/r/moul/x/daily/blog/v0)\"\n}\n",
+	// Literal, not Code: the placeholder IS string content, which Code blanks;
+	// Literal still blanks comments, so the Good above (a comment quoting the
+	// old link) stays silent.
+	Check: func(f File) []int {
+		var out []int
+		for i, ln := range f.Literal {
+			if placeholderRe.MatchString(ln) {
 				out = append(out, i)
 			}
 		}

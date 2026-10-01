@@ -72,7 +72,7 @@ irreversible.
   in the same pull request. `gh pr edit <N> --add-reviewer @copilot` requests one.
 - **When a review finds something, write the rule.** `tools/gnovet` holds this repo's own
   house rules and every one of them was a real defect here before it was a rule, with the
-  review cited in `Finding`. A review costs 13 premium requests and finds a thing once; a rule
+  review cited in `Finding`. A review costs ~76 AI credits and finds a thing once; a rule
   costs nothing and finds it forever. Fix first, then add the rule with a `Bad` that fires and
   a `Good` that does not, then `make gnovet-update`. Opt-out:
   `//gnovet:ignore <rule-id> <why>`, 20 characters minimum.

@@ -113,5 +113,12 @@ ceil-div-overflow p/moul/x/storagecost/storagecost.gno 1
 ceil-div-overflow r/moul/forge/render.gno 1
 ceil-div-overflow r/moul/vesting/render.gno 1
 ceil-div-overflow r/moul/x/daily/microblog/microblog.gno 1
+page-offset-overflow p/moul/kit/store/store.gno 1
+page-offset-overflow p/moul/pageable/pageable.gno 2
+page-offset-overflow r/moul/gnopm/registry/render.gno 1
+page-offset-overflow r/moul/x/daily/microblog/microblog.gno 1
+placeholder-path r/moul/x/daily/blog/blog.gno 4
+placeholder-path r/moul/x/daily/linktree/linktree.gno 1
+placeholder-path r/moul/x/daily/polls/polls.gno 1
 slice-inplace-remove p/moul/x/daily/orderedmap/orderedmap.gno 1
 slice-inplace-remove r/moul/x/daily/linktree/linktree.gno 1
