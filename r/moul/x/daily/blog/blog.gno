@@ -6,7 +6,6 @@
 package blog
 
 import (
-	"gno.land/p/moul/kit/ui/v0"
 	"strconv"
 	"strings"
 
@@ -14,6 +13,8 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/store/v0"
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 )
 
 // selfPath is this realm's own page. A root-relative link resolves against
@@ -80,7 +81,7 @@ func Render(path string) string {
 	idStr := strings.TrimPrefix(path, "/")
 	id, ok := store.ParseID(idStr)
 	if !ok {
-		return "# Not found\n\nInvalid post path: `" + path + "`\n\n[← back](" + selfPath + ")\n"
+		return "# Not found\n\nInvalid post path: " + md.InlineCode(path) + "\n\n[← back](" + selfPath + ")\n"
 	}
 	v, ok := posts.Get(id)
 	if !ok {

@@ -54,7 +54,6 @@ func ExampleRender_cat() {
 	// time	block time, RFC3339
 	// user	the origin caller's address
 	// zero	endless NUL bytes; reads exactly what you ask for
-	//
 	// ```
 	//
 	// [all devices](/r/moul/x/plan9/dev/v1)

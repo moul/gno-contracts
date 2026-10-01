@@ -18,3 +18,11 @@ func TestKeysAndValuesAreTableSafe(cur realm, t *testing.T) {
 	uassert.False(t, strings.Contains(page, "[claim](https://evil.example)"), page)
 	uassert.False(t, strings.Contains(page, "| k | "), page)
 }
+
+// A path that names nothing is echoed back on the not-found page. It is the
+// visitor's text, so a backtick in it must not close a code span and let a
+// link through.
+func TestNotFoundPathIsEscaped(t *testing.T) {
+	out := Render("x` [claim](https://evil.example) `")
+	uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
+}

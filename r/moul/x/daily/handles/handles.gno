@@ -15,6 +15,7 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -199,7 +200,7 @@ func renderIndex() string {
 func renderHandle(handle string) string {
 	v := byHandle.Get(handle)
 	if v == nil {
-		return "# Handles\n\nNo handle named `" + handle + "`.\n\n[← all handles](" + selfPath + ")\n"
+		return "# Handles\n\nNo handle named " + md.InlineCode(handle) + ".\n\n[← all handles](" + selfPath + ")\n"
 	}
 	r := v.(*record)
 

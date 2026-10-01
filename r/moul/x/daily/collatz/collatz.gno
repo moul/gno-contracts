@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -162,7 +163,7 @@ func renderSequence(p string) string {
 	n, err := strconv.ParseInt(p, 10, 64)
 	var sb strings.Builder
 	if err != nil || n <= 0 {
-		sb.WriteString("# Invalid n\n\n`" + p + "` is not a positive integer.\n")
+		sb.WriteString("# Invalid n\n\n" + md.InlineCode(p) + " is not a positive integer.\n")
 		return sb.String()
 	}
 

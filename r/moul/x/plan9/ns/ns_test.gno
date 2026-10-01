@@ -228,3 +228,12 @@ func TestCatOutputCannotCloseItsFence(cur realm, t *testing.T) {
 	// the user's three backticks and the link after them stay inside the block.
 	uassert.True(t, strings.Contains(out, "````\n```\n[claim](https://evil.example)\n````\n"), out)
 }
+
+// The command name and the rest of the path come from the URL: escaped in the
+// heading and in the unknown-command page.
+func TestPathDerivedTextIsEscaped(t *testing.T) {
+	for _, path := range []string{"x` [claim](https://evil.example) `", "cat/x` [claim](https://evil.example) `"} {
+		out := Render(path)
+		uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
+	}
+}

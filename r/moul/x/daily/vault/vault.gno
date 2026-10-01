@@ -1,11 +1,11 @@
 package vault
 
 import (
-	"gno.land/p/moul/kit/ui/v0"
 	"chain"
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -95,7 +95,7 @@ func renderRoot() string {
 func renderAddress(addr string) string {
 	var b strings.Builder
 	b.WriteString("# Vault: ")
-	b.WriteString(addr)
+	b.WriteString(ui.Inline(addr))
 	b.WriteString("\n\n")
 	v := vaults.Get(addr)
 	if v == nil {

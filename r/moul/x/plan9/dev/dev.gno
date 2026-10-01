@@ -42,6 +42,8 @@ import (
 	"strings"
 	"time"
 
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	ninep "gno.land/p/moul/x/plan9/ninep/v0"
 	synfs "gno.land/p/moul/x/plan9/synfs/v0"
 
@@ -146,13 +148,13 @@ func Render(path string) string {
 		name := parts[1]
 		f, err := tree.Root().Walk(name)
 		if err != nil {
-			return "# /dev/" + name + "\n\n```\n" + err.Error() + "\n```\n"
+			return "# /dev/" + ui.Inline(name) + "\n\n" + md.CodeBlock(err.Error())
 		}
 		data, err := ninep.ReadAll(f)
 		if err != nil {
-			return "# /dev/" + name + "\n\n```\n" + err.Error() + "\n```\n"
+			return "# /dev/" + ui.Inline(name) + "\n\n" + md.CodeBlock(err.Error())
 		}
-		return "# /dev/" + name + "\n\n```\n" + data + "\n```\n\n[all devices](/r/moul/x/plan9/dev/v1)\n"
+		return "# /dev/" + ui.Inline(name) + "\n\n" + md.CodeBlock(strings.TrimSuffix(data, "\n")) + "\n[all devices](/r/moul/x/plan9/dev/v1)\n"
 	}
 	return renderIndex()
 }

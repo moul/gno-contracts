@@ -12,6 +12,7 @@ import (
 	"chain"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -129,7 +130,7 @@ func Render(path string) string {
 	alias := strings.TrimPrefix(path, "/")
 	v := aliases.Get(alias)
 	if v == nil {
-		return "# URL Shortener\n\nNo alias named `" + alias + "`.\n\n[← all aliases](" + selfPath + ")\n"
+		return "# URL Shortener\n\nNo alias named " + md.InlineCode(alias) + ".\n\n[← all aliases](" + selfPath + ")\n"
 	}
 
 	e := v.(*entry)

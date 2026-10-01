@@ -6,8 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/kit/store/v0"
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 )
 
 // selfPath is this realm's own page. A root-relative link resolves against
@@ -210,7 +211,7 @@ func Render(path string) string {
 	}
 	id, ok := store.ParseID(path)
 	if !ok {
-		return "# Connect Four\n\nInvalid game id: `" + path + "`\n"
+		return "# Connect Four\n\nInvalid game id: " + md.InlineCode(path) + "\n"
 	}
 	g, err := getGame(int64(id))
 	if err != nil {

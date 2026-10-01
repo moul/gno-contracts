@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"gno.land/p/nt/testutils/v0"
+	"gno.land/p/nt/uassert/v0"
 
 	ninep "gno.land/p/moul/x/plan9/ninep/v0"
 
@@ -155,4 +156,11 @@ func TestAFreshNamespaceHasDevBound(cur realm, t *testing.T) {
 	if ns := nsrealm.Namespace(user.String()); !strings.Contains(ns, "bind /srv/dev /dev") {
 		t.Errorf("mount table: %q", ns)
 	}
+}
+
+// The device name comes from the URL: escaped in the heading.
+func TestDeviceNameIsEscaped(t *testing.T) {
+	// No slash in the payload: Render splits the path on "/".
+	out := Render("cat/x` [claim](evil.example) `")
+	uassert.False(t, strings.Contains(out, "[claim](evil.example)"), out)
 }

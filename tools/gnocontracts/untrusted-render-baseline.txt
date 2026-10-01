@@ -57,7 +57,6 @@ r/moul/x/daily/wordle
 r/moul/x/grc20faucet
 r/moul/x/grc20wrapdemo
 r/moul/x/pairs/aaabbb
-r/moul/x/plan9/ns
 r/moul/x/provable
 r/moul/x/wesh
 r/moul/x/wiki

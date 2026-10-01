@@ -1,12 +1,12 @@
 package linktree
 
 import (
-	"gno.land/p/moul/kit/ui/v0"
 	"strconv"
 	"strings"
 
 	"chain"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -115,7 +115,7 @@ func renderIndex() string {
 func renderProfile(addr string) string {
 	var b strings.Builder
 	b.WriteString("# ")
-	b.WriteString(addr)
+	b.WriteString(ui.Inline(addr))
 	b.WriteString("\n\n")
 
 	v := profiles.Get(addr)

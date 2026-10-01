@@ -31,12 +31,13 @@
 package ns
 
 import (
-	"gno.land/p/moul/md/v0"
 	"chain/runtime"
 	"errors"
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 
 	"gno.land/p/moul/realmpath/v0"
@@ -345,14 +346,14 @@ func Render(path string) string {
 			line = "help"
 		}
 	default:
-		return "# 404\n\nunknown command `" + cmd + "`. Try `ls`, `cat`, `stat`, `walk`, `ns` or `rc?c=...`.\n"
+		return "# 404\n\nunknown command " + md.InlineCode(cmd) + ". Try `ls`, `cat`, `stat`, `walk`, `ns` or `rc?c=...`.\n"
 	}
 	return renderCmd(key, line, cmd+" "+rest)
 }
 
 func renderCmd(key, line, title string) string {
 	var b strings.Builder
-	b.WriteString("# " + title + "\n\n")
+	b.WriteString("# " + ui.Inline(title) + "\n\n")
 	b.WriteString("namespace: `" + key + "`\n\n")
 	out, err := Run(key, line)
 	if err != nil {
