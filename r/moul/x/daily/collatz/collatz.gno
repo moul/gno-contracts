@@ -67,13 +67,13 @@ func stopping(n int64) (steps int, peak int64, ok bool) {
 // Compute walks the hailstone sequence for n and records the result
 // attributed to the caller. It is a crossing (state-mutating) func.
 func Compute(cur realm, n int) {
-	if n <= 0 {
-		panic("n must be > 0")
-	}
 	if !cur.IsCurrent() {
 		panic("collatz: spoofed realm")
 	}
 	caller := cur.Previous().Address()
+	if n <= 0 {
+		panic("n must be > 0")
+	}
 	nn := int64(n)
 	steps, peak, ok := stopping(nn)
 	if !ok {

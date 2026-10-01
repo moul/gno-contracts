@@ -23,7 +23,7 @@ Publish a post (state-mutating, crossing function):
 ```
 gnokey maketx call -pkgpath "gno.land/r/moul/x/daily/blog/v1" \
   -func Publish -args "My first post" -args "Hello, gno.land!" \
-  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 KEY
+  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid onyx-1 -remote https://rpc.onyx.testnets.gno.land:443 KEY
 ```
 
 Read views (no transaction needed):

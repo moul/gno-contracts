@@ -67,6 +67,7 @@ var cases []*Case // index 0 => ID 1
 // argument as a string and the VM decodes no slice but []byte: a []address
 // parameter made this function unreachable from any wallet.
 func OpenCase(cur realm, subject, jurorsCSV string) uint64 {
+	opener := caller(cur)
 	assert(subject != "", "empty subject")
 	jurors := parseJurors(jurorsCSV)
 	assert(len(jurors) >= 1, "need at least one juror")
@@ -84,7 +85,7 @@ func OpenCase(cur realm, subject, jurorsCSV string) uint64 {
 	cases = append(cases, &Case{
 		ID:       id,
 		Subject:  subject,
-		Opener:   cur.Previous().Address(),
+		Opener:   opener,
 		Phase:    PhaseCommit,
 		Jurors:   panel,
 		OpenedAt: runtime.ChainHeight(),
@@ -97,10 +98,11 @@ func OpenCase(cur realm, subject, jurorsCSV string) uint64 {
 // commit.Verdict(verdict, salt) — computed off-chain. When the last juror
 // commits, the case advances to the reveal phase automatically.
 func Commit(cur realm, caseID uint64, commitment string) {
+	who := caller(cur)
 	c := mustCase(caseID)
 	assert(c.Phase == PhaseCommit, "not in commit phase")
 	assert(commitment != "", "empty commitment")
-	j := mustJuror(c, cur.Previous().Address())
+	j := mustJuror(c, who)
 	assert(!j.Committed, "already committed")
 	// Every commitment is public through Get, so without this a juror could
 	// commit a copy of another's hash, then reveal the same (verdict, salt)
@@ -123,9 +125,10 @@ func Commit(cur realm, caseID uint64, commitment string) {
 // commitment made earlier, or the reveal is rejected. When the last juror
 // reveals, the case closes and the majority outcome is recorded.
 func Reveal(cur realm, caseID uint64, verdict bool, salt string) {
+	who := caller(cur)
 	c := mustCase(caseID)
 	assert(c.Phase == PhaseReveal, "not in reveal phase")
-	j := mustJuror(c, cur.Previous().Address())
+	j := mustJuror(c, who)
 	assert(j.Committed && !j.Revealed, "nothing to reveal")
 	assert(commit.Verdict(verdict, salt) == j.Commitment, "reveal does not match commitment")
 
@@ -298,4 +301,14 @@ func parseJurors(csv string) []address {
 		out = append(out, a)
 	}
 	return out
+}
+
+// caller is the address that crossed into this realm, after checking that the
+// realm token is this frame's own. Every entry point reads it first, before
+// any other work.
+func caller(cur realm) address {
+	if !cur.IsCurrent() {
+		panic("jury: spoofed realm")
+	}
+	return cur.Previous().Address()
 }
