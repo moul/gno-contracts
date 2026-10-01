@@ -170,13 +170,50 @@ jobs:
       - name: Commit if anything moved
         run: |
           set -euo pipefail
-          if git diff --quiet -- gnobench/results gnobench/reports; then
+
+          # README.md belongs in this list. `gnobench report` rewrites its
+          # generated region, and the delta job runs `report -check`, which
+          # exits 1 when that region disagrees with results/. Committing the
+          # results without the README therefore turns every later pull
+          # request red.
+          paths=(gnobench/results gnobench/reports gnobench/README.md)
+
+          if git diff --quiet -- "${paths[@]}"; then
             echo "nothing moved" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gnobench/results gnobench/reports
-          git commit -m "chore(gnobench): re-measure against gno master [skip ci]"
-          git push
-          git show --stat --oneline HEAD >> "$GITHUB_STEP_SUMMARY"
+
+          # This job measures for half an hour, so main moves underneath it and
+          # a bare `git push` loses the race, taking every measurement with it.
+          # That is exactly how the first run of this job died: run
+          # 36868485814 on 2026-10-01 measured all three suites and was then
+          # rejected by a merge that had landed 31 minutes earlier.
+          #
+          # Rebase rather than merge. Result files are one per machine and this
+          # runner only ever writes its own, so the rebase cannot conflict on
+          # them; the reports and the README are a pure function of every
+          # result file, so they are regenerated on top of whatever the rebase
+          # brought in instead of being text-merged.
+          for attempt in 1 2 3; do
+            git add -- "${paths[@]}"
+            git commit -q -m "chore(gnobench): re-measure against gno master [skip ci]" || true
+            git fetch -q origin main
+            if ! git rebase -q origin/main; then
+              git rebase --abort || true
+              echo "rebase onto origin/main conflicted; nothing committed" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+            ./gnobench/gnobench report -root gnobench
+            git add -- "${paths[@]}"
+            git commit -q --amend --no-edit
+            if git push; then
+              git show --stat --oneline HEAD >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "push attempt $attempt rejected, rebasing and retrying" >&2
+            sleep $((attempt * 5))
+          done
+          echo "could not push after 3 attempts" >> "$GITHUB_STEP_SUMMARY"
+          exit 1
