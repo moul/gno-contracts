@@ -3,6 +3,7 @@ digraph gnocontracts_latest {
   node [shape=box, fontname="sans-serif"];
   "gno.land/p/moul/addrset/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/agents/commit/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/agents/msg/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/art/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/authz/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/collection/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -116,6 +117,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/agents/maintainer/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/agents/passport/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/agents/receipt/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/agents/relay/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/blog" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/config/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/demo/gnoface/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -359,6 +361,11 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/agents/passport/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/agents/passport/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/agents/receipt/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/agents/relay/v0" -> "gno.land/p/moul/agents/msg/v0";
+  "gno.land/r/moul/agents/relay/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/agents/relay/v0" -> "gno.land/p/moul/realmpath/v0";
+  "gno.land/r/moul/agents/relay/v0" -> "gno.land/p/moul/x/daily/ringbuffer/v0";
+  "gno.land/r/moul/agents/relay/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/blog" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/blog" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/blog" -> "gno.land/r/moul/config/v1";
