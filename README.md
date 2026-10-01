@@ -184,6 +184,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/grants/v0`](p/moul/grants) 📦 | — | [✅](https://gno.land/p/moul/grants/v0) | — | — | 3 |
 | [`p/moul/greet/v0`](p/moul/greet) 📦 | — | [✅](https://gno.land/p/moul/greet/v0) | — | — | — |
 | [`p/moul/helplink/v0`](p/moul/helplink) 📦 | [🗄️](https://onyx.testnets.gno.land/p/moul/helplink/v0) | [🗄️](https://gno.land/p/moul/helplink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink/v0) ≈ | 1 |
+| [`p/moul/kit/index/v0`](p/moul/kit/index) 📦 | — | — | — | — | 2 |
 | [`p/moul/kit/num/v0`](p/moul/kit/num) 📦 | — | [✅](https://gno.land/p/moul/kit/num/v0) | — | — | — |
 | [`p/moul/kit/store/v0`](p/moul/kit/store) 📦 | — | [✅](https://gno.land/p/moul/kit/store/v0) | — | — | 2 |
 | [`p/moul/kit/tally/v0`](p/moul/kit/tally) 📦 | — | [✅](https://gno.land/p/moul/kit/tally/v0) | — | — | 1 |
@@ -460,6 +461,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/grc20faucet/v0`](r/moul/x/grc20faucet) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20faucet/v0) | — | — | 4 |
 | [`r/moul/x/grc20wrapdemo/v0`](r/moul/x/grc20wrapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20wrapdemo/v0) | — | — | 6 |
 | [`r/moul/x/gsdash/v0`](r/moul/x/gsdash) 🏛️ | — | ⏳ | — | — | 7 |
+| [`r/moul/x/kitindexdemo/v0`](r/moul/x/kitindexdemo) 🏛️ | — | — | — | — | 5 |
 | [`r/moul/x/moultest/v0`](r/moul/x/moultest) 🏛️ | — | [✅](https://gno.land/r/moul/x/moultest/v0) | — | — | 4 |
 | [`r/moul/x/nativeify/v0`](r/moul/x/nativeify) 🏛️ | — | [✅](https://gno.land/r/moul/x/nativeify/v0) | — | — | 8 |
 | [`r/moul/x/nativereg/v0`](r/moul/x/nativereg) 🏛️ | — | [✅](https://gno.land/r/moul/x/nativereg/v0) | — | — | 4 |
@@ -501,7 +503,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-01T14:22:44Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-01T14:24:54Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
