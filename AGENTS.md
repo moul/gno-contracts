@@ -575,7 +575,7 @@ Three things follow, and the third is the one that actually matters.
 
 **2. The failure mode was silence, not a bill.** With additional usage disabled, running out
 simply **stopped** code review until the reset. **That changed the same day**: a $100 budget
-is now enabled, so the total is ~11,500 credits, about 152 reviews a month, and the stop moves
+is now enabled, so the total is ~11,500 credits, about 151 reviews a month, and the stop moves
 to $100 rather than to zero. The reasoning below is what the budget was sized against. What this policy protects
 is not money, which is capped at zero by construction, but the ability to get a review at the
 moment one is worth having. On 2026-10-01 that was 289 credits, **under four reviews**, with
@@ -637,7 +637,7 @@ additional-usage budget, so about 151 reviews a month in total.
 ### What it costs, with the budget moul enabled on 2026-10-01
 
 1,500 included credits, plus a **$100 additional-usage budget** at $0.01 a credit, is 11,500
-credits a month: **about 152 reviews**.
+credits a month: **about 151 reviews**.
 
 Backtested over the last 60 merged pull requests, scaled to this repository's ~215 a month at
 1.5 passes each:
@@ -755,14 +755,16 @@ reviewed, plus the 93 `avl` imports we already knew about:
 disappointment, it is the argument: the rule is a pre-deploy gate, and these shipped before it
 existed.
 
-Four more on 2026-10-01, each a shape a review had found and the tree still carried:
+Seven more on 2026-10-01, each a shape a review had found and the tree still carried. The last three came from an agent sweep of every package with these instructions:
 
 | rule | found | the one that stings |
 |---|--:|---|
 | `page-offset-overflow` | 6, one already bounded | `p/moul/kit/store/store.gno:266`, the same unbounded `(page - 1) * size` #289 fixed in `kit/index`, and #311 found a third time |
 | `placeholder-path` | 6 | three live daily realms linking to `/r/REPLACE_ADDR/...`, a generator token nobody substituted |
-| `root-relative-link` | 11 | `daily/{handles,urlshort,vault,collatz,connect4}` link to `gno.land/moul` and `gno.land/r:42`; collatz and connect4 were not in the hand-made list, and `x/across` is a true negative (its computed target starts with `r/`) |
-| `uncallable-crossing-arg` | 1 | `agents/jury` `OpenCase(..., jurors []address)`: `MsgCall` decodes `[]byte` and no other slice, so no wallet can open a case |
+| `root-relative-link` | 10 | `daily/{handles,urlshort,vault,collatz,connect4}` link to `gno.land/moul` and `gno.land/r:42`; collatz and connect4 were not in the hand-made list, and `x/across` is a true negative (its computed target starts with `r/`) |
+| `uncallable-crossing-arg` | 11 | `r/moul/gns` `Register(cur realm, request RegisterRequest)`: `MsgCall` decodes primitives and `[]byte` and nothing else, so **no name can be registered on mainnet**. Also `agents/jury` `OpenCase(..., []address)`. `pairreg`, `pilotdemo`, `config` and `plan9/ns` take a pointer or interface on purpose, from other realms |
+| `origin-send-unguarded` | 4 | `r/moul/grant` `Fund`: a realm the user called keeps the coins and calls `Fund` five times, so the board shows 5 GNOT raised and the treasury holds 0. Also `faucet`, `nativeify`, `moultest` |
+| `colon-relative-link` | 8 | every navigation link on `x/plan9/ns` and `plan9/dev`, which gnoweb renders as `<!-- invalid link -->` |
 
 ### Adding one
 

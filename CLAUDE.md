@@ -58,7 +58,7 @@ irreversible.
 - **Green before commit:** `make lint test`, with `GNOROOT` on a gnolang/gno checkout.
 - **Run `make review-advice BASE=origin/main` before requesting a Copilot review, and follow
   it.** A review costs **~76 AI credits measured** (GitHub publishes 13; the bill says
-  otherwise), against 1,500 included plus a **$100 additional-usage budget**, so about **152
+  otherwise), against 1,500 included plus a **$100 additional-usage budget**, so about **151
   reviews a month**. **Two passes per PR** (the first, and one after the fixes land) for
   tooling and config, but **keep going until a pass adds nothing when the package is not yet
   live**, because there a miss is permanent. Re-reviews are most of the spend. Three triggers: **what is about to

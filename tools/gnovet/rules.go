@@ -18,6 +18,8 @@ var Rules = []Rule{
 	placeholderPath,
 	rootRelativeLink,
 	uncallableCrossingArg,
+	originSendUnguarded,
+	colonRelativeLink,
 }
 
 // ---------------------------------------------------------------------------
@@ -134,10 +136,10 @@ var avlInNewCode = Rule{
 
 // ---------------------------------------------------------------------------
 
-// pageOffsetRe matches (page - 1) * size, the offset of a 1-based page. Check
-// keeps only the matches whose first operand is named like a page number, so
-// (floor-1)*2 in an ASCII tree does not fire.
-var pageOffsetRe = regexp.MustCompile(`\(\s*([A-Za-z_]\w*)\s*-\s*1\s*\)\s*\*\s*[A-Za-z_]\w*`)
+// pageOffsetRe matches (page - 1) * size, the offset of a 1-based page, in
+// either operand order. Check keeps only the matches whose decremented operand
+// is named like a page number, so (floor-1)*2 in an ASCII tree does not fire.
+var pageOffsetRe = regexp.MustCompile(`\(\s*([A-Za-z_]\w*)\s*-\s*1\s*\)\s*\*\s*[A-Za-z_]\w*|[A-Za-z_]\w*\s*\*\s*\(\s*([A-Za-z_]\w*)\s*-\s*1\s*\)`)
 
 var pageNameRe = regexp.MustCompile(`(?i)^(p|pg|pn|n?page\w*|\w*page)$`)
 
@@ -155,14 +157,18 @@ var pageOffsetOverflow = Rule{
 		"the same defect again in gno-contracts#311 (\"Overflowing page numbers " +
 		"incorrectly reset to page 1\"), 2026-10-01",
 	Bad: "package x\n\nfunc f(page, size int) int {\n\treturn (page - 1) * size\n}\n",
+	// The Good is silent because it SAYS it is bounded, not because it found a
+	// spelling the regexp misses: the rule cannot see a bound, so a bounded
+	// multiply carries the ignore, as p/moul/kit/index does.
 	Good: "package x\n\nfunc f(page, size, total int) int {\n\t" +
 		"if page < 1 || page-1 > (total-1)/size {\n\t\treturn -1\n\t}\n\t" +
+		"//gnovet:ignore page-offset-overflow bounded by total on the line above\n\t" +
 		"return size * (page - 1)\n}\n",
 	Check: func(f File) []int {
 		var out []int
 		for i, ln := range f.Code {
 			for _, m := range pageOffsetRe.FindAllStringSubmatch(ln, -1) {
-				if pageNameRe.MatchString(m[1]) {
+				if pageNameRe.MatchString(m[1]) || pageNameRe.MatchString(m[2]) {
 					out = append(out, i)
 					break
 				}
@@ -174,8 +180,10 @@ var pageOffsetOverflow = Rule{
 
 // ---------------------------------------------------------------------------
 
-// placeholderRe matches a generator template's unsubstituted placeholder.
-var placeholderRe = regexp.MustCompile(`\bREPLACE_[A-Z][A-Z0-9_]*\b`)
+// placeholderRe matches a generator template's unsubstituted placeholder as a
+// PATH segment, which is the only place it has ever shipped. A bare word
+// (a "REPLACE_ALL" mode name in a string) is not a link and does not fire.
+var placeholderRe = regexp.MustCompile(`/REPLACE_[A-Z][A-Z0-9_]*\b`)
 
 var placeholderPath = Rule{
 	ID:   "placeholder-path",
@@ -190,7 +198,7 @@ var placeholderPath = Rule{
 		"gno-contracts#20 and found live on mainnet by a tree-wide link sweep, " +
 		"2026-09-30; confirmed by the agent review sweep of 2026-10-01",
 	Bad:  "package x\n\nfunc Render(string) string {\n\treturn \"[back](/r/REPLACE_ADDR/blog)\"\n}\n",
-	Good: "package x\n\n// Render once read [back](/r/REPLACE_ADDR/blog).\nfunc Render(string) string {\n\treturn \"[back](/r/moul/x/daily/blog/v0)\"\n}\n",
+	Good: "package x\n\n// Render once read [back](/r/REPLACE_ADDR/blog).\nfunc Render(string) string {\n\treturn \"[back](/r/moul/x/daily/blog/v0) REPLACE_ALL\"\n}\n",
 	// Literal, not Code: the placeholder IS string content, which Code blanks;
 	// Literal still blanks comments, so the Good above (a comment quoting the
 	// old link) stays silent.
@@ -253,38 +261,157 @@ var rootRelativeLink = Rule{
 // its parameter list. Single-line signatures only, which is what gofmt leaves.
 var crossingFuncRe = regexp.MustCompile(`^func\s+[A-Z]\w*\s*\(\s*\w+\s+realm\b([^)]*)\)`)
 
-// sliceParamRe matches a slice or map parameter type. []byte and []uint8 are
-// excluded in Check: the VM decodes those from base64.
-var sliceParamRe = regexp.MustCompile(`\[\]\s*(\w+(?:\.\w+)?)|\bmap\[`)
+// structDeclRe finds the struct types a file declares, so a parameter of one
+// can be told apart from a parameter of a named string or integer type, which
+// the VM does decode.
+var structDeclRe = regexp.MustCompile(`^type\s+([A-Za-z_]\w*)\s+struct\b`)
+
+// encodable is every parameter type MsgCall can carry, by the switch in
+// gno.land/pkg/sdk/vm/convert.go.
+var encodable = map[string]bool{
+	"string": true, "bool": true, "address": true, "byte": true, "rune": true,
+	"int": true, "int8": true, "int16": true, "int32": true, "int64": true,
+	"uint": true, "uint8": true, "uint16": true, "uint32": true, "uint64": true,
+	"float32": true, "float64": true, "[]byte": true, "[]uint8": true,
+}
+
+// unencodable reports why a parameter type cannot be decoded from a MsgCall
+// argument, or "" when it can or when this file cannot tell.
+func unencodable(typ string, structs map[string]bool) string {
+	t := strings.TrimSpace(typ)
+	t = strings.TrimPrefix(t, "...")
+	switch {
+	case t == "" || encodable[t]:
+		return ""
+	case strings.HasPrefix(t, "[]"), strings.HasPrefix(t, "map["),
+		strings.HasPrefix(t, "*"), strings.HasPrefix(t, "func"),
+		strings.HasPrefix(t, "interface"), strings.HasPrefix(t, "chan"):
+		return t
+	case strings.Contains(t, "."):
+		return t // another package's type: in this tree, always a struct
+	case structs[t]:
+		return t
+	}
+	return ""
+}
 
 var uncallableCrossingArg = Rule{
 	ID:   "uncallable-crossing-arg",
-	What: "an exported crossing function takes a slice or map, which no wallet can encode",
+	What: "an exported crossing function takes a struct, pointer, slice or map, which no wallet can encode",
 	Why: "MsgCall carries every argument as a string, and the VM's convertArgToGno " +
-		"(gno.land/pkg/sdk/vm/convert.go) decodes primitives and []byte only: any other " +
-		"slice panics \"unexpected slice type in contract arg\". So gnokey, every wallet " +
-		"and every session key are refused, MsgRun is gated by run_submitters on " +
-		"mainnet, and the function is unreachable on a permanent path.",
-	Fix: "Take a delimited string and split it in the realm, as x/daily/ballot " +
+		"(gno.land/pkg/sdk/vm/convert.go) decodes primitives, named primitives and " +
+		"[]byte only: anything else panics (\"unexpected slice type\", \"unexpected type " +
+		"in contract arg\"). gnokey, every wallet and every session key are refused, " +
+		"MsgRun is gated by run_submitters on mainnet, and the function is unreachable " +
+		"on a permanent path. r/moul/gns shipped its Register this way, so no name can " +
+		"be registered on mainnet.",
+	Fix: "Flat parameters, or a delimited string split in the realm, as x/daily/ballot " +
 		"(proposalNamesCSV) and x/daily/multisig (ownersCSV) already do. If the function " +
 		"is meant for other realms only, say so with //gnovet:ignore.",
 	Finding: "r/moul/agents/jury/v0 OpenCase(cur realm, subject string, jurors []address), " +
-		"refused by simulation on gnoland-1 while seeding the agent realms, 2026-09-30",
-	Bad: "package x\n\nfunc OpenCase(cur realm, subject string, jurors []address) uint64 {\n\treturn 0\n}\n",
-	Good: "package x\n\nfunc OpenCase(cur realm, subject, jurorsCSV string) uint64 {\n\treturn 0\n}\n\n" +
-		"func SetRecord(cur realm, name string, value []byte) {}\n\nfunc helper(xs []address) {}\n",
+		"refused by simulation on gnoland-1 while seeding the agent realms, 2026-09-30; " +
+		"r/moul/gns Register(cur realm, request RegisterRequest), found by the agent " +
+		"review sweep, 2026-10-01",
+	Bad: "package x\n\ntype Req struct{ Name string }\n\n" +
+		"func OpenCase(cur realm, subject string, jurors []address) uint64 {\n\treturn 0\n}\n\n" +
+		"func Register(cur realm, r Req) {}\n",
+	Good: "package x\n\ntype Mode string\n\n" +
+		"func OpenCase(cur realm, subject, jurorsCSV string) uint64 {\n\treturn 0\n}\n\n" +
+		"func SetRecord(cur realm, name string, value []byte, m Mode) {}\n\nfunc helper(xs []address) {}\n",
 	Check: func(f File) []int {
+		structs := map[string]bool{}
+		for _, ln := range f.Code {
+			if m := structDeclRe.FindStringSubmatch(ln); m != nil {
+				structs[m[1]] = true
+			}
+		}
 		var out []int
 		for i, ln := range f.Code {
 			m := crossingFuncRe.FindStringSubmatch(ln)
 			if m == nil {
 				continue
 			}
-			for _, p := range sliceParamRe.FindAllStringSubmatch(m[1], -1) {
-				if p[1] != "byte" && p[1] != "uint8" {
+			for _, param := range strings.Split(m[1], ",") {
+				// "name type" carries a type; a bare "name" takes the next one's.
+				fields := strings.Fields(param)
+				if len(fields) < 2 {
+					continue
+				}
+				if unencodable(strings.Join(fields[1:], " "), structs) != "" {
 					out = append(out, i)
 					break
 				}
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+// originSendRe matches a read of the coins sent with the transaction, directly
+// or through p/moul/x/envelope.
+var originSendRe = regexp.MustCompile(`\bOriginSend\s*\(|\benvelope\.(Require|RequireAtLeast|RequireExactly|Amount|Only|All)\s*\(`)
+
+var crossingDeclRe = regexp.MustCompile(`^func\s+\w+\s*\(\s*\w+\s+realm\b`)
+
+var originSendUnguarded = Rule{
+	ID:   "origin-send-unguarded",
+	What: "a crossing function trusts OriginSend without checking the caller is a user",
+	Why: "OriginSend is what the SIGNER attached to the transaction, not what reached " +
+		"this realm. A realm the user called receives those coins itself, then calls in " +
+		"here, as many times as it likes: r/moul/grant's Fund recorded 5 donations of " +
+		"1 GNOT from one 1 GNOT send, with nothing in the treasury.",
+	Fix: "if !cur.Previous().IsUserCall() { panic(...) } before the read, or measure the " +
+		"realm's own balance delta instead.",
+	Finding: "r/moul/grant Fund, reproduced by a scratch test in the agent review sweep " +
+		"of 2026-10-01; the same shape in r/moul/faucet Fund and r/moul/x/nativeify Unwrap",
+	Bad: "package x\n\nfunc Fund(cur realm) {\n\tsent := unsafe.OriginSend()\n\t_ = sent\n}\n",
+	Good: "package x\n\nfunc Fund(cur realm) {\n\tif !cur.Previous().IsUserCall() {\n\t\t" +
+		"panic(\"users only\")\n\t}\n\tsent := unsafe.OriginSend()\n\t_ = sent\n}\n\n" +
+		"func Amount(denom string) int64 {\n\treturn unsafe.OriginSend().AmountOf(denom)\n}\n",
+	// A function body runs from its "func" line to the next top-level one.
+	// Only crossing functions: a non-crossing helper (p/moul/x/envelope itself)
+	// cannot check the caller, and the guard belongs to whoever calls it.
+	Check: func(f File) []int {
+		var out []int
+		for i := 0; i < len(f.Code); i++ {
+			if !crossingDeclRe.MatchString(f.Code[i]) {
+				continue
+			}
+			end := i + 1
+			for end < len(f.Code) && !strings.HasPrefix(f.Code[end], "func ") {
+				end++
+			}
+			body := strings.Join(f.Code[i:end], "\n")
+			if originSendRe.MatchString(body) && !strings.Contains(body, "IsUserCall") {
+				out = append(out, i)
+			}
+			i = end - 1
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+var colonRelativeLink = Rule{
+	ID:   "colon-relative-link",
+	What: "renders a link whose target starts with a colon, (:sub), which gnoweb drops",
+	Why: "A target of :ns parses as a URL with an empty scheme, so gnoweb renders it as " +
+		"<!-- invalid link --> and a browser would resolve it to .../ns/v0/:ns anyway. " +
+		"Every navigation link on r/moul/x/plan9/ns and plan9/dev is dead this way, on " +
+		"public paths.",
+	Fix: "The realm's own absolute path: (/r/moul/x/plan9/ns/v0:ns).",
+	Finding: "r/moul/x/plan9/{ns,dev}, the live page at gno.land/r/moul/x/plan9/ns/v0 " +
+		"checked by the agent review sweep, 2026-10-01",
+	Bad:  "package x\n\nfunc Render(string) string {\n\treturn \"[ns](:ns)\"\n}\n",
+	Good: "package x\n\nfunc Render(string) string {\n\treturn \"[ns](/r/moul/x/plan9/ns/v0:ns) a:b\"\n}\n",
+	Check: func(f File) []int {
+		var out []int
+		for i, ln := range f.Literal {
+			if strings.Contains(ln, "](:") {
+				out = append(out, i)
 			}
 		}
 		return out

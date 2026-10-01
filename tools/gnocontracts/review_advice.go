@@ -85,10 +85,10 @@ const creditsPerReview = 76 // measured 2026-10-01: 1210.74 credits / 16 reviews
 
 // budgetUSD is the additional-usage budget moul enabled on 2026-10-01, on top of
 // the 1,500 included credits. At $0.01 a credit that is 10,000 more, so about
-// 132 more reviews, 152 a month in total.
+// 131 more reviews, 151 a month in total.
 //
 // It is what makes rule 3 below affordable, and it is also why this file still
-// has rules at all: 152 is a lot and it is not unlimited. Reviewing every pull
+// has rules at all: 151 is a lot and it is not unlimited. Reviewing every pull
 // request in this repository is ~320 reviews a month, which overruns the budget
 // around the twentieth of each month and then stops.
 const budgetUSD = 100
