@@ -230,6 +230,13 @@ func TestCopilotDigestNeverLetsAStringWriteMarkdown(t *testing.T) {
 			notWant: "\n## injected",
 		},
 		{
+			name:    "a bare URL in the title is not a live link",
+			path:    "a.gno",
+			title:   "see https://evil.example and www.evil.example",
+			want:    "see https:\u200b//evil.example and www\u200b.evil.example",
+			notWant: "https://evil",
+		},
+		{
 			name:    "a mention in the title notifies nobody",
 			path:    "a.gno",
 			title:   "ping @org/team",

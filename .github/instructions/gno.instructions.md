@@ -54,7 +54,9 @@ In priority order. Each item is a real defect class, not a preference.
   - page and offset arithmetic on a number that arrives from a `Render` path, at the integer
     limit. `(page-1)*size` wraps, and `bptree.IterateByOffset` clamps a negative offset to 0,
     so an overflow returns page 1 instead of nothing.
-  - the same out-of-range condition answered two ways (`nil` here, an empty slice there).
+  - one method answering the same out-of-range condition two ways (`nil` for one page, an
+    empty slice for the next), or a doc comment claiming another package's contract that the
+    code does not keep. Two packages documenting different answers is not a finding.
   - a callback handed out during iteration that can write to the tree being walked. The
     walk holds a position inside a leaf, so a removal skips the next key; the doc comment
     has to forbid it or the method has to snapshot.

@@ -337,6 +337,9 @@ func copilotInline(s string) string {
 		// A backslash does not stop a mention, and the bot reposting
 		// "@org/team" would notify that team. A zero-width space does.
 		"@", "@\u200b",
+		// GFM autolinks a bare URL with no <...> around it, so a title saying
+		// https://host would be a live link in a bot-authored comment.
+		"://", ":\u200b//", "www.", "www\u200b.",
 	)
 	return r.Replace(s)
 }
