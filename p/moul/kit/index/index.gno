@@ -328,6 +328,7 @@ func (ix *Index) Page(page, size int) []Entry {
 	if keys == 0 || page > 1+(keys-1)/size {
 		return nil
 	}
+	//gnovet:ignore page-offset-overflow bounded by keys-1 on the line above
 	offset := (page - 1) * size
 
 	// The capacity follows what exists, not what was asked for, so Page(1,

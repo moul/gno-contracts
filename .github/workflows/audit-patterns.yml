@@ -12,7 +12,7 @@ name: audit-patterns
 # `make gnovet` runs beside it: the same shape, but the rules are ours, and every
 # one of them was a real defect found in this repository (usually by a paid code
 # review) before it was written down as a rule. That is the loop: a review finds
-# a thing once for 13 premium requests, a rule finds it forever for nothing.
+# a thing once for ~76 AI credits, a rule finds it forever for nothing.
 #
 # A dedicated workflow rather than a step in `ci`, deliberately. It is a separate
 # question from "does this build", it needs no gno toolchain (the rules are pure

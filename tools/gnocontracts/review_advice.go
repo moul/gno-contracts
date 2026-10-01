@@ -63,8 +63,8 @@ import (
 // live package is private. A finding against a package that is already live
 // cannot be acted on in place at all; it needs a new version at a new path and
 // every importer moved, which is a decision a human makes and not something a
-// review unblocks. Spending 13 premium requests to learn that is spending them
-// for nothing.
+// review unblocks. Spending a review to learn that is spending it for
+// nothing.
 //
 // The inverse is the whole value: a package that is NOT yet live is one merge
 // from being frozen forever, and that is the only moment a review changes the
@@ -85,10 +85,10 @@ const creditsPerReview = 76 // measured 2026-10-01: 1210.74 credits / 16 reviews
 
 // budgetUSD is the additional-usage budget moul enabled on 2026-10-01, on top of
 // the 1,500 included credits. At $0.01 a credit that is 10,000 more, so about
-// 132 more reviews, 152 a month in total.
+// 131 more reviews, 151 a month in total.
 //
 // It is what makes rule 3 below affordable, and it is also why this file still
-// has rules at all: 152 is a lot and it is not unlimited. Reviewing every pull
+// has rules at all: 151 is a lot and it is not unlimited. Reviewing every pull
 // request in this repository is ~320 reviews a month, which overruns the budget
 // around the twentieth of each month and then stops.
 const budgetUSD = 100
@@ -193,8 +193,8 @@ func verdictWord(review bool) string {
 func adviseReview(a *prAnalysis) reviewVerdict {
 	var v reviewVerdict
 
-	// The reviewer's own configuration is the second thing worth 13 premium
-	// requests, and it is not a contract.
+	// The reviewer's own configuration is the second thing worth a review, and
+	// it is not a contract.
 	//
 	// Evidence, not symmetry: #274 added these files, touched no .gno, and
 	// would have been skipped by the permanence rule alone. Its review found

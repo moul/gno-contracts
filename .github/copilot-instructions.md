@@ -48,17 +48,21 @@ three more real defects in code it had already read. If nothing is wrong, say so
 | `audit-patterns` | ten lexical audit-pattern rules from `gnolang/gno`'s own harness, ratcheted against a baseline |
 | `guard-untrusted-render` | a realm that renders a caller's string and escapes nothing |
 | `guard-tables` | a markdown table built by concatenating pipes |
+| `gnovet` | this repo's own rules, each one a review finding first: in-place slice removal, `(n+size-1)/size`, `(page-1)*size`, a `REPLACE_ADDR` placeholder, `p/nt/avl` in new code. `make gnovet ARGS=-rules` lists them |
 | `guard-render`, `guard-examples` | a `Render` no test calls, an `Example` with no `// Output:` block |
 | `guard-private`, `guard-readmes`, `guard-generated` | the `private` decision, empty READMEs, generated files in a PR |
 
 Those are lexical and they miss what needs judgement. **That is your half**: deciding which
 mechanical hit is real, and finding the defects with no lexical shape at all.
 
-## You get one pass, and it costs 13 premium requests
+## Make the first pass the thorough one
 
-A review of this repository is requested deliberately, by a human or an agent, after a
-triage step decided this particular diff was worth 13 premium requests. A second review on
-the same pull request costs another 13. **So one pass has to be the thorough one.**
+A review of this repository is requested deliberately, after a triage step
+(`make review-advice`) decided this particular diff was worth it. **Each pass costs about
+76 AI credits** (measured 2026-10-01; `tools/gnocontracts/review_advice.go` owns the
+figure), and a re-review costs the same again. An unpublished package gets re-reviewed until
+a pass adds nothing, because there a miss is permanent; tooling and config get two passes.
+**So every finding you defer to a later pass costs a whole extra review.**
 
 Three things follow, and they are the difference between a useful reviewer and an expensive
 one:
@@ -66,8 +70,8 @@ one:
 1. **Finish the file before you report.** The first review of #289 returned five findings; the
    second returned two more *in code that had not changed*, and GitHub labelled them
    "previously missed". Both were real. Those two cost a second full review because the first
-   pass stopped early. After your sweep, re-read each changed file end to end and ask what you
-   skipped.
+   pass stopped early. On #311, 17 of 32 findings (as of 2026-10-01) came back as
+   "previously missed". After your sweep, re-read each changed file end to end and ask what you skipped.
 2. **Rank by whether the finding can still be acted on.** A package not yet live on mainnet
    can be fixed in place; one already live needs a new version at a new path and every importer
    moved. A permanence-class defect in an unpublished package is worth more than a larger

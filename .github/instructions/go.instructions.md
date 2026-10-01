@@ -33,3 +33,24 @@ and there cannot be one.** Anything placed outside `tools/` is built and tested 
   returning a map and an error, plus separate `qeval` and `abciQuery` helpers.
 - **A guard with a baseline ratchets in both directions.** A count that goes down must fail
   too, until the baseline is re-recorded, or a fix can be quietly undone.
+
+## Defects review has already found here, none of which a test caught
+
+Each was a real finding on a tooling pull request. Look for the shape, not the file.
+
+- **`gh api --paginate` emits one JSON array per page**, so `jq '.[0]'` or `$x[0]` reads page
+  one only. Past 100 items the rest is dropped and the output still looks complete (#296).
+  Use `--slurp` or `jq -s 'add'`.
+- **`git diff --numstat` prints a rename as `{old => new}` brace syntax**, so a path suffix
+  check (`.go`, `.gno`) on that field silently skips every renamed file (#310). Use
+  `--no-renames` or `-z`.
+- **Text from a pull request, review or issue reposted as markdown** has to be neutralised:
+  a `[x](url)` link, a bare `https://` autolink and an `@mention` each become live in the
+  comment the tool posts (#296, #295).
+- **An API error read as "nothing found".** A failed fetch that falls through to the empty
+  case reposts what was already posted, or logs a review that never ran as clean (#295,
+  #304: a quota refusal is a review body, not an empty review).
+- **A regexp over free text not anchored to the line it means** (`Review effort:**`
+  matched in prose, #313). Anchor to `^` and the exact metadata shape.
+- **A constant declared and never read**, so the tool prints the old figure while the PR
+  claims the new one (#310's `budgetUSD`).
