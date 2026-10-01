@@ -155,7 +155,8 @@ func TestCopilotDigestEscapesPreEscapedTitles(t *testing.T) {
 	if strings.Contains(got, `\\[click`) && !strings.Contains(got, `\\\[click`) {
 		t.Errorf("a doubled backslash leaves the bracket active:\n%s", got)
 	}
-	if !strings.Contains(got, `\\\[click\\\](http://evil.example)`) {
+	// "://" also carries a zero-width space now, so a bare URL cannot autolink.
+	if !strings.Contains(got, `\\\[click\\\](http:`+"\u200b"+`//evil.example)`) {
 		t.Errorf("want the bracket escaped behind the escaped backslash:\n%s", got)
 	}
 	if strings.Contains(got, "<http://evil.example>") {
