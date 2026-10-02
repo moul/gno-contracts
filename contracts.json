@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-02T17:33:06Z",
+  "status_checked_at": "2026-10-02T17:59:41Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -3555,6 +3555,31 @@
           "uploaded": false
         },
         "pearl": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/zones/v0",
+      "dir": "p/moul/zones",
+      "kind": "p",
+      "name": "zones",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/index/v0",
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/nt/bptree/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -10914,6 +10939,33 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/zones/v0",
+      "dir": "r/moul/zones",
+      "kind": "r",
+      "name": "zones",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/addrset/v1",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/zones/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
