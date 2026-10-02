@@ -472,6 +472,10 @@ module = "gno.land/p/moul/xmath/v1"
 source = { dir = "p/moul/xmath" }
 
 [[module]]
+module = "gno.land/p/moul/zones/v0"
+source = { dir = "p/moul/zones" }
+
+[[module]]
 module = "gno.land/r/moul/agents/capwallet/v0"
 source = { dir = "r/moul/agents/capwallet" }
 
@@ -1431,3 +1435,7 @@ source = { dir = "r/moul/x/wesh" }
 [[module]]
 module = "gno.land/r/moul/x/wiki/v0"
 source = { dir = "r/moul/x/wiki" }
+
+[[module]]
+module = "gno.land/r/moul/zones/v0"
+source = { dir = "r/moul/zones" }

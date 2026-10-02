@@ -1,0 +1,4 @@
+module = "gno.land/r/moul/zones/v0"
+gno = "0.9"
+
+# public: the registry is meant to be read by other realms (a config generator for node operators first), and a private realm cannot be imported

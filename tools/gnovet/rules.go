@@ -101,8 +101,9 @@ var avlInNewCode = Rule{
 		"20,290 GNOT of storage deposit; in a map, 1,530. It is the ecosystem default and " +
 		"it should not be.",
 	Fix: "A native gno map when nothing navigates it by key order (gno maps iterate " +
-		"deterministically, in insertion order), or p/nt/bptree at fanout 128 when " +
-		"something does. EFFECTIVE_GNO.md sections 2.3 to 2.5.",
+		"deterministically, in insertion order), or p/nt/bptree when something does, at " +
+		"fanout 128 if entries are only added and 32 if they are removed. EFFECTIVE_GNO.md " +
+		"sections 2.3 to 2.5.",
 	Finding: "EFFECTIVE_GNO.md section 2.3 (gno-contracts#270), from the storage benchmark " +
 		"of 2026-09-29 against gno master 1fc4c140e; promoted to a rule 2026-10-01",
 	Bad:  "package x\n\nimport \"gno.land/p/nt/avl/v0\"\n\nvar t = avl.NewTree()\n",

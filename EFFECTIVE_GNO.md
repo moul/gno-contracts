@@ -522,7 +522,7 @@ in one function**, so an abort anywhere leaves none of them applied. That is the
 correctness argument for keeping them apart, and it is why the library deliberately does not
 try to own the store. Worked example: [`r/moul/x/kitindexdemo`](./r/moul/x/kitindexdemo).
 
-`kit/index` is a B+ tree at fanout 128, keeps the ids under a key ascending so a `Lookup`
+`kit/index` is a B+ tree at fanout 32 (its keys move, [2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout)), keeps the ids under a key ascending so a `Lookup`
 does not depend on insertion order, and hands out a copy rather than its stored slice.
 
 ### 2.11 Caching and snapshots

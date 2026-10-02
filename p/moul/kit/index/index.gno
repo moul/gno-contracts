@@ -34,15 +34,19 @@ import (
 	"gno.land/p/nt/bptree/v0"
 )
 
-// Fanout is the B+ tree fanout this package uses, and 128 is not the package
-// default of 32.
+// Fanout is the B+ tree fanout this package uses: 32, because an index's keys
+// are removed as its records move.
 //
-// Measured against gno master 1fc4c140e on 2026-09-29, at n = 1,000 with string
-// values: fanout 128 costs 592 bytes per entry and 152,975 gas per insert,
-// against 671 and 162,161 at fanout 32, and against avl's 2,029 and 417,811.
-// Raising the fanout amortises the node objects, and nothing below it can be
-// recovered: the remaining cost is the B+ tree's per-entry value box.
-const Fanout = 128
+// A removal shifts every later value in its leaf and rewrites each one, and an
+// index's values are pointers: measured on a real node against gno master
+// 3cc494ec4 on 2026-10-02, removing the first key of a fanout-128 leaf holding
+// 120 cost 35.3M gas against 8.0M for the last, about 230k per value shifted.
+// Fanout 32 bounds what one removal rewrites to about 45 values: its own
+// leaf, and a neighbour's when the leaf underflows and borrows. What it costs, measured against gno master
+// 1fc4c140e on 2026-09-29 at n = 1,000 with string values: 671 bytes per entry
+// and 162,161 gas per insert, against 592 and 152,975 at fanout 128, and avl's
+// 2,029 and 417,811.
+const Fanout = 32
 
 // Errors an Add can return. A /p/ package returns errors and lets the realm
 // decide whether they are fatal; every one of these is a programming error in

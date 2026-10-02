@@ -44,11 +44,11 @@ it is paying for.
 bound, because only the realm knows what it is willing to pay a storage deposit
 for.
 
-## The three decisions worth knowing
+## The decisions worth knowing
 
-**Backed by a B+ tree at fanout 128, not `avl` and not the package default of
-32.** Measured against gno master `1fc4c140e` on 2026-09-29, n = 1,000, string
-values:
+**Backed by a B+ tree at fanout 32, not `avl`, and not 128.** A wider node is
+cheaper to store and to insert into, measured against gno master `1fc4c140e` on
+2026-09-29, n = 1,000, string values:
 
 | backing | bytes/entry | gas/insert |
 |---|--:|--:|
@@ -56,8 +56,13 @@ values:
 | `bptree` fanout 32 | 671 | 162,161 |
 | `avl` | 2,029 | 417,811 |
 
-Raising the fanout amortises the node objects. Nothing below 592 is reachable:
-the rest is the B+ tree's per-entry value box, which fanout cannot touch.
+But an index's keys are removed whenever its records move, and a removal
+rewrites every later value in its leaf. Measured on a real node against gno
+master `3cc494ec4` on 2026-10-02: removing the first key of a fanout-128 leaf
+holding 120 cost 35.3M gas, the last 8.0M, about 230k per value shifted (its
+values are `*entry`, a pointer). At 32 one removal rewrites about 45 values at
+most (its own leaf, and a neighbour's when the leaf underflows and borrows), so
+it is the cheaper default for something that moves.
 
 **The ids under a key are kept ascending, not in insertion order.** So `Lookup`
 depends on the *set* of ids and not on the order they arrived in: two realms
