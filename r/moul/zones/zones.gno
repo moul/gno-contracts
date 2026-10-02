@@ -102,7 +102,8 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 // while one carries a curator's ruling (a verified one its registrant may
 // withdraw first); the proposer's edit only drops endpoints that are theirs and
 // that they could withdraw on their own (RemoveEndpoint), as for RemoveZone. A
-// new main RPC or gnoweb a stranger already lists under its kind would make
+// new main RPC or gnoweb a stranger (on an approved zone, its proposer too)
+// already lists under its kind would make
 // that listing the zone's own: on a curator's edit it is dropped if nobody
 // ruled on it, and refuses the edit if a curator did; a proposer's edit
 // refuses rather than drop what is not theirs; and a flagged listing refuses
@@ -152,7 +153,7 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 		if !ok {
 			continue
 		}
-		if e.Registrant == z.Proposer || curators.Has(e.Registrant) {
+		if curators.Has(e.Registrant) || (z.Status == zones.Pending && e.Registrant == z.Proposer) {
 			// Theirs to hold, but a flagged one would mark the zone's own URL
 			// the moment it becomes one.
 			if e.Status == zones.Flagged {
@@ -238,7 +239,8 @@ func RemoveZone(cur realm, slug string, revision int64) {
 
 // RegisterEndpoint lists an endpoint on a zone and returns its id. On an
 // approved zone anybody may, except the zone's own main RPC under rpc and
-// gnoweb under gnoweb, which only its proposer or a curator lists; on a
+// gnoweb under gnoweb, which only a curator lists (or the proposer while the
+// zone is pending: every proposer right ends at approval); on a
 // pending one only the proposer or a curator, so a stranger cannot pin a
 // proposal the proposer then cannot withdraw. It shows as unverified until a
 // curator checks it. A curator also registers past the review queue's caps
@@ -259,13 +261,14 @@ func RegisterEndpoint(cur realm, slug, kind, addr, label string) int64 {
 	must(err)
 	addr = zones.TrimSpaces(addr) // compared as the registry will store it
 	// The zone's own main RPC and gnoweb, listed under their own kind, carry
-	// the verdict its page shows on them, so only its proposer or a curator
-	// lists them: a stranger's listing, once flagged for its label, would
-	// mark the zone's own URL.
-	if z.Proposer != who && !curators.Has(who) &&
+	// the verdict its page shows on them, so only a curator lists them, or the
+	// proposer while the zone is pending (every proposer right ends at
+	// approval): a stranger's listing, once flagged for its label, would mark
+	// the zone's own URL.
+	if !curators.Has(who) && !(z.Status == zones.Pending && z.Proposer == who) &&
 		((k == zones.RPC && zones.Canonical(k, addr) == zones.Canonical(k, z.RPCURL)) ||
 			(k == zones.Gnoweb && z.GnowebURL != "" && zones.Canonical(k, addr) == zones.Canonical(k, z.GnowebURL))) {
-		panic("zones: that is " + slug + "'s own " + string(k) + "; only its proposer or a curator lists it")
+		panic("zones: that is " + slug + "'s own " + string(k) + "; only a curator, or its proposer while it is pending, lists it")
 	}
 	register := reg.Register
 	if curators.Has(who) {
@@ -303,10 +306,10 @@ func UnverifyEndpoint(cur realm, id, revision int64, reason string) {
 // RemoveEndpoint deletes an endpoint. revision is its revision as read: the
 // removal fails if a verdict landed since, rather than delete one nobody saw. A
 // curator may remove any. Its registrant may remove it unless a curator flagged
-// or unverified it, or a reset left a reason on it (a flag is a warning, an
-// unverify carries why, and removing and registering it again would wipe
-// either; a verified one the registrant may take down, since listing it again
-// starts it unverified), only while its zone is pending or approved (a rejected
+// or unverified it (a flag is a warning, an unverify carries why, and removing
+// and registering it again would wipe either; a verified one the registrant may
+// take down, since listing it again starts it unverified, and so one a reset
+// sent back to unverified, since the reset says the zone changed, not it), only while its zone is pending or approved (a rejected
 // or retired zone is a record, endpoints and all), and only ReviewWindow blocks
 // after registering it (removing and registering again every block would give
 // it a new id faster than a curator could flag the old one).
@@ -355,18 +358,18 @@ func ClearUnreviewed(cur realm, slug string, throughRevision int64) int {
 }
 
 // assertWithdrawable refuses a non-curator's withdrawal of an endpoint a
-// curator flagged or unverified, or a reset left a reason on, or one
-// registered less than ReviewWindow
+// curator flagged or unverified, or one registered less than ReviewWindow
 // blocks ago. Shared by RemoveEndpoint, the proposer's RemoveZone and the
 // proposer's edit off local, so none can do what another refuses.
 func assertWithdrawable(e zones.Endpoint) {
 	id := strconv.FormatInt(e.ID, 10)
 	// A verification guards nothing a withdrawal could erase: the registrant
 	// takes down a node that is going away, and listing it again starts it
-	// unverified. A flag, or an unverify a curator wrote or a reset left (a
-	// reviewer or a reason), is a warning, and removing and registering it
-	// again would wipe it.
-	if e.Status == zones.Flagged || (e.Status == zones.Unverified && (e.ReviewedBy != "" || e.Reason != "")) {
+	// unverified. A flag, or an unverify a curator wrote (a reviewer or a
+	// reason), is a warning, and removing and registering it again would wipe
+	// it. A reset is not: it reaches only a verified endpoint and says the zone
+	// changed, not the endpoint, so it leaves the withdrawal a verified one had.
+	if e.Status == zones.Flagged || (e.Status == zones.Unverified && (e.ReviewedBy != "" || e.Reason != "") && !zones.IsReset(e)) {
 		panic("zones: a curator ruled on endpoint #" + id + "; only a curator may remove it now")
 	}
 	if wait := e.RegisteredAt + ReviewWindow - runtime.ChainHeight(); wait > 0 {

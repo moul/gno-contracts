@@ -123,12 +123,13 @@ also an index key, a URL segment or a config-file line:
   it too).
 - **Address** (proposer, registrant, reviewer): a valid g1 address in lowercase.
   bech32 also decodes the uppercase form, and here it would be a second identity.
-- **Trimming**: only plain spaces and tabs are trimmed from what a caller
-  types. Anything else at an edge (a line separator, U+0085) reaches the
-  validator and is refused, not cut. A zone's gnoweb and genesis URLs, like its
-  main RPC, have an empty query's `?` and a bare `/` dropped, as a browser's
-  address bar writes them; the main RPC, which gnokey dials, is refused with
-  them.
+- **Trimming**: tabs and every Unicode space separator (Zs: U+0020, U+00A0,
+  U+3000 and the like) are trimmed from what a caller types. Anything else at
+  an edge (a line separator, U+0085) reaches the validator and is refused, not
+  cut. A zone's gnoweb and genesis URLs, like an endpoint's, have an empty
+  query's `?` and a bare `/` dropped, as a browser's address bar writes them;
+  the zone's main RPC, which gnokey dials, is refused with them. An endpoint is
+  validated as it will be stored.
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no
@@ -210,9 +211,10 @@ heaviest page is a zone page of 25 flagged rows with full reasons, about 1.5B of
 the 3B query cap. A removal shifts the later records in its B+ tree leaf, and
 borrows from a neighbour when the leaf underflows; endpoint ids are handed out
 registry-wide, so what a removal of a zone's endpoints costs depends on how they
-interleave with other zones'. With them registered together, a retirement that
-evicts a full zone costs about 0.39B; in the worst layout a registrant can
-arrange, with the shifted neighbours at full size and flagged, 2.20B (73% of a
-3B block), the heaviest write, measured landing on a node capped at 3B. That is
-also why an edit leaving `local` drops at most 64 (1.94B worst, with a chain-id
-change and both own URLs moved in the same edit).
+interleave with other zones'. With them registered together, a rejection or
+retirement that evicts a full zone costs about 0.39B; in the worst layout a
+registrant can arrange, with the shifted neighbours at full size and flagged and
+the zone's verified endpoints spread across leaves, 2.35B (78% of a 3B block),
+the heaviest write (an earlier 2.20B layout was sent to a node capped at 3B and
+landed). That is also why an edit leaving `local` drops at most 64 (2.02B worst,
+with a chain-id change and both own URLs moved in the same edit).

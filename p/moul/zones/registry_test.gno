@@ -1415,10 +1415,11 @@ func TestTheStoredFormKeepsItsCanonicalForm(t *testing.T) {
 	uassert.Equal(t, "https://h.example.com??", trimEmptyTail("https://h.example.com??"))
 }
 
-// Only plain spaces and tabs are trimmed: a line separator at an edge reaches
-// the validator and is refused, never silently cut. A zone's own URL with an
-// empty tail is refused, not repaired.
-func TestOnlySpacesAreTrimmed(t *testing.T) {
+// Spaces of every kind (Unicode Zs) and tabs are trimmed; a line separator at
+// an edge reaches the validator and is refused, never silently cut. A zone's
+// gnoweb and genesis URLs have an empty tail repaired, its main RPC is refused
+// with one, and an endpoint is validated as it will be stored.
+func TestTrimsSpacesNotLineBreaks(t *testing.T) {
 	r := NewRegistry()
 	in := onyx()
 	in.Title = "Onyx\u2028"
@@ -1430,8 +1431,6 @@ func TestOnlySpacesAreTrimmed(t *testing.T) {
 	_, err := r.Register(alice, 2, "onyx", RPC, "https://a.example.com", "operator\u2028")
 	uassert.ErrorContains(t, err, "control character")
 	uassert.Equal(t, "x", TrimSpaces(" \tx\t "))
-	// A zone's gnoweb and genesis URLs are repaired as a browser writes them;
-	// its main RPC is refused with a tail.
 	for _, u := range []string{"https://g.example.com/", "https://g.example.com?", "https://g.example.com/?"} {
 		r := NewRegistry()
 		in := onyx()
@@ -1441,13 +1440,26 @@ func TestOnlySpacesAreTrimmed(t *testing.T) {
 		uassert.Equal(t, "https://g.example.com", z.GnowebURL, u)
 		uassert.Equal(t, "https://g.example.com", z.GenesisURL, u)
 	}
-	bad := onyx()
-	bad.RPCURL = "https://rpc.example.com/"
-	uassert.Error(t, ValidateInfo(bad))
-	// Spaces of every kind are trimmed, line breaks are not.
+	for _, u := range []string{"https://rpc.example.com/", "https://rpc.example.com?"} {
+		bad := onyx()
+		bad.RPCURL = u
+		uassert.Error(t, ValidateInfo(bad), u)
+		uassert.Error(t, NewRegistry().Propose(alice, 1, "xz", bad), "the registry refuses it too: "+u)
+	}
 	uassert.Equal(t, "Onyx", TrimSpaces("\u00a0Onyx\u3000"))
 	uassert.Equal(t, "Onyx\n", TrimSpaces("Onyx\n"))
-	uassert.NoError(t, ValidateEndpoint(RPC, "tcp://rpc.example.com:26657/"), "a bare / is trimmed, not refused")
+	// ValidateEndpoint judges the string it is given; Register stores the
+	// trimmed form and validates that.
+	uassert.Error(t, ValidateEndpoint(RPC, "tcp://rpc.example.com:26657/"), "as given, it has a path")
+	id, err := r.Register(alice, 2, "onyx", RPC, "tcp://rpc.example.com:26657/", "")
+	uassert.NoError(t, err)
+	e, _ := r.Endpoint(id)
+	uassert.Equal(t, "tcp://rpc.example.com:26657", e.Address)
+	long := "https://e.example.com/" + strings.Repeat("a", MaxURLLen-len("https://e.example.com/"))
+	_, err = r.Register(alice, 2, "onyx", Explorer, long+"?", "")
+	uassert.NoError(t, err, "257 bytes as typed, 256 as stored")
+	_, err = r.Register(alice, 2, "onyx", Explorer, long+"b", "")
+	uassert.Error(t, err, "257 as stored")
 }
 
 // Chain id charset, text and URL bounds, controls, escapes and trims.
@@ -1507,4 +1519,48 @@ func TestFurtherBoundaries(t *testing.T) {
 	uassert.NoError(t, r.ReviewZone("onyx", Rejected, rev(r, "onyx"), carol, 9, "restated"))
 	z, _ = r.Zone("onyx")
 	uassert.Equal(t, int64(9), z.ReviewedAt, "a restatement records when")
+}
+
+// Round 13: rules that had no test of their own.
+func TestRoundThirteenBoundaries(t *testing.T) {
+	// HasVisible is exported, so its filler rule is its own, not checkText's.
+	uassert.False(t, HasVisible("\u3164"), "a Hangul filler is not visible")
+	uassert.True(t, HasVisible("a\u3164"))
+	// A 0x last label is held to the address rule even when it is not hex.
+	uassert.Error(t, ValidateEndpoint(RPC, "https://a.0xyz"))
+	// A peer is at most MaxURLLen bytes, exactly.
+	peer := func(n int) string {
+		host := strings.Repeat("a", 63) + "." + strings.Repeat("b", 63) + "." + strings.Repeat("c", 63) + "."
+		pre, post := nodeID+"@", ".com:26656"
+		return pre + host + strings.Repeat("d", n-len(pre)-len(host)-len(post)) + post
+	}
+	uassert.Equal(t, MaxURLLen, len(peer(MaxURLLen)))
+	uassert.NoError(t, ValidateEndpoint(Peer, peer(MaxURLLen)))
+	uassert.Error(t, ValidateEndpoint(Peer, peer(MaxURLLen+1)))
+	// A filtered list is capped at its length, so an importer's append copies
+	// instead of writing into a slice it may not write.
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	for i := 0; i < 3; i++ {
+		_, err := r.Register(alice, 1, "onyx", RPC, "https://r"+strconv.Itoa(i)+".example.com", "")
+		uassert.NoError(t, err)
+	}
+	id, err := r.Register(alice, 1, "onyx", RPC, "https://v.example.com", "")
+	uassert.NoError(t, err)
+	e, _ := r.Endpoint(id)
+	z, _ := r.Zone("onyx")
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, z.Revision, e.Revision, alice, 1, ""))
+	for _, es := range [][]Endpoint{
+		r.Endpoints(EndpointFilter{Zone: "onyx", Status: Verified}),
+		r.Endpoints(EndpointFilter{Zone: "onyx", Kind: RPC, Status: Verified}),
+		r.Endpoints(EndpointFilter{Status: Verified}),
+	} {
+		uassert.Equal(t, 1, len(es))
+		uassert.Equal(t, len(es), cap(es))
+	}
+	uassert.NoError(t, r.Propose(alice, 1, "dev", Info{ChainID: "dev", Title: "D", Kind: Devnet, RPCURL: "https://rpc.dev.example.com"}))
+	for _, zs := range [][]Zone{r.Zones(ZoneFilter{Kind: Devnet}), r.Zones(ZoneFilter{Status: Pending, Kind: Devnet})} {
+		uassert.Equal(t, 1, len(zs))
+		uassert.Equal(t, len(zs), cap(zs))
+	}
 }

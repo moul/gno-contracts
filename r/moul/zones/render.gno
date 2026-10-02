@@ -272,18 +272,23 @@ func renderZone(slug string, req *realmpath.Request) string {
 	case z.Status == zones.Approved:
 		actions = append(actions, action("Register an endpoint", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
+	case z.Status == zones.Pending && !curators.Has(z.Proposer) && reg.OwnerCount(z.Slug, z.Proposer) >= zones.MaxEndpointsPerAddress:
+		// On a pending zone the proposer is the one gated registrant.
+		actions = append(actions, "the proposer has registered "+strconv.Itoa(zones.MaxEndpointsPerAddress)+" endpoints here, the limit per address",
+			action("Register an endpoint (curators only)", "RegisterEndpoint",
+				"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	case z.Status == zones.Pending:
 		actions = append(actions, action("Register an endpoint (proposer or curator)", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	}
-	// A flood clears in one call. The call reaches every page and every kind,
-	// so it is offered only on the unfiltered view of a zone that takes
-	// endpoints, only while it would clear something (the clearable count, no
-	// endpoint read), labelled with its real scope, and bounded in time: an
-	// endpoint registered after this page was rendered has a later revision
-	// and is kept.
-	if n := reg.Clearable(z.Slug); open && kind == "" && n > 0 {
-		actions = append(actions, action("Clear "+strconv.Itoa(n)+" never-reviewed endpoint(s) registered through the review queue, all pages (curators only)", "ClearUnreviewed",
+	// A flood clears in one call, on any zone the call takes (a rejected or
+	// retired zone's records are a curator's to remove too). The call reaches
+	// every page and every kind, so it is offered only on the unfiltered view,
+	// only while it would clear something (the clearable count, no endpoint
+	// read), labelled with its real scope, and bounded in time: an endpoint
+	// registered after this page was rendered has a later revision and is kept.
+	if n := reg.Clearable(z.Slug); kind == "" && n > 0 {
+		actions = append(actions, action("Clear "+strconv.Itoa(n)+" never-reviewed endpoint(s) registered through the review queue, all pages and kinds (curators only)", "ClearUnreviewed",
 			"slug", z.Slug, "throughRevision", strconv.FormatInt(reg.Revision(), 10)))
 	}
 	// Every decision carries the revision this page was rendered from, so acting

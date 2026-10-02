@@ -900,15 +900,18 @@ func TestProposerLeavingLocalMeetsTheWithdrawalRules(cur realm, t *testing.T) {
 	uassert.False(t, ok, "the proposer's own, never ruled on, is dropped")
 }
 
-// A verdict a proposer's chain-id edit reset is still a record: the reset
-// leaves a reason, so the registrant cannot then withdraw it.
-func TestAResetVerdictIsNotWithdrawable(cur realm, t *testing.T) {
+// A reset reaches only a verified endpoint, which its registrant could
+// withdraw, and it says the zone changed, not the endpoint: so it leaves that
+// withdrawal in place, after a chain-id edit and after a retirement undone.
+func TestAResetLeavesTheWithdrawal(cur realm, t *testing.T) {
 	reset()
 	testing.SetRealm(testing.NewUserRealm(bob))
 	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "", "https://rpc.bobs.example.com", "")
 	id := RegisterEndpoint(cross(cur), "bobs", "rpc", "https://a.bobs.example.com", "")
+	id2 := RegisterEndpoint(cross(cur), "bobs", "rpc", "https://b.bobs.example.com", "")
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	VerifyEndpoint(cross(cur), id, zr(id), erev(id), "answers bobs-1")
+	VerifyEndpoint(cross(cur), id2, zr(id2), erev(id2), "answers bobs-1")
 	testing.SetRealm(testing.NewUserRealm(bob))
 	testing.SkipHeights(ReviewWindow)
 	z, _ := GetZone("bobs")
@@ -917,7 +920,29 @@ func TestAResetVerdictIsNotWithdrawable(cur realm, t *testing.T) {
 	e, _ := GetEndpoint(id)
 	uassert.Equal(t, "", e.ReviewedBy.String())
 	uassert.Equal(t, zones.ChainIDChanged, e.Reason)
-	uassert.AbortsContains(t, cur, "a curator ruled on", func() { RemoveEndpoint(cross(cur), id, erev(id)) })
+	RemoveEndpoint(cross(cur), id, erev(id))
+	_, ok := GetEndpoint(id)
+	uassert.False(t, ok, "a chain-id reset leaves the withdrawal")
+
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	VerifyEndpoint(cross(cur), id2, zr(id2), erev(id2), "answers bobs-2")
+	ApproveZone(cross(cur), "bobs", zr(id2), "")
+	RetireZone(cross(cur), "bobs", zr(id2), "shut down")
+	ApproveZone(cross(cur), "bobs", zr(id2), "back")
+	e, _ = GetEndpoint(id2)
+	uassert.Equal(t, zones.ZoneRetired, e.Reason)
+	testing.SetRealm(testing.NewUserRealm(bob))
+	RemoveEndpoint(cross(cur), id2, erev(id2))
+	_, ok = GetEndpoint(id2)
+	uassert.False(t, ok, "a retirement's reset leaves it too")
+
+	// A curator's own unverify is still a warning.
+	id3 := RegisterEndpoint(cross(cur), "bobs", "rpc", "https://c.bobs.example.com", "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	UnverifyEndpoint(cross(cur), id3, erev(id3), "answers a different chain")
+	testing.SetRealm(testing.NewUserRealm(bob))
+	testing.SkipHeights(ReviewWindow)
+	uassert.AbortsContains(t, cur, "a curator ruled on", func() { RemoveEndpoint(cross(cur), id3, erev(id3)) })
 }
 
 // The zone's own main RPC and gnoweb, under their own kind, are its proposer's
@@ -1041,17 +1066,40 @@ func TestClearKeepsAResetEndpoint(cur realm, t *testing.T) {
 	uassert.Equal(t, 0, ClearUnreviewed(cross(cur), "bobs", reg.Revision()))
 }
 
-// The reservation exempts the zone's proposer and any curator, each alone.
+// The reservation exempts any curator, and the proposer while the zone is
+// pending, each alone: every proposer right ends at approval.
 func TestTheReservationsExemptions(cur realm, t *testing.T) {
 	reset()
 	testing.SetRealm(testing.NewUserRealm(bob))
 	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "https://gnoweb.bobs.example.com", "https://rpc.bobs.example.com", "")
+	RegisterEndpoint(cross(cur), "bobs", "rpc", "https://rpc.bobs.example.com", "mine") // the proposer, pending
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	ApproveZone(cross(cur), "bobs", zrev("bobs"), "")
 	testing.SetRealm(testing.NewUserRealm(bob))
-	RegisterEndpoint(cross(cur), "bobs", "rpc", "https://rpc.bobs.example.com", "mine") // the proposer
+	uassert.AbortsContains(t, cur, "only a curator, or its proposer while it is pending", func() {
+		RegisterEndpoint(cross(cur), "bobs", "gnoweb", "https://gnoweb.bobs.example.com", "mine too")
+	})
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	RegisterEndpoint(cross(cur), "bobs", "gnoweb", "https://gnoweb.bobs.example.com", "") // a curator, not the proposer
+}
+
+// On an approved zone the proposer's listing of a new own URL is anybody's
+// listing: a curator's edit drops it if nobody ruled on it, rather than adopt
+// it as the zone's own.
+func TestApprovedProposersListingIsNotAdopted(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "", "https://rpc.bobs.example.com", "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	ApproveZone(cross(cur), "bobs", zrev("bobs"), "")
+	testing.SetRealm(testing.NewUserRealm(bob))
+	id := RegisterEndpoint(cross(cur), "bobs", "rpc", "https://rpc2.bobs.example.com", "official next")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	z, _ := GetZone("bobs")
+	EditZone(cross(cur), "bobs", z.Revision, z.ChainID, z.Title, z.Description, string(z.Kind),
+		z.GnowebURL, "https://rpc2.bobs.example.com", z.GenesisURL, "moved")
+	_, ok := GetEndpoint(id)
+	uassert.False(t, ok, "the proposer's unruled listing is dropped, not adopted")
 }
 
 // An edit cannot make a stranger's listing the zone's own. One nobody ruled on
@@ -1142,7 +1190,7 @@ func TestTheClearLinksScope(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	RetireZone(cross(cur), "onyx", zrev("onyx"), "shut down")
 	uassert.Equal(t, 1, reg.Clearable("onyx"))
-	uassert.False(t, strings.Contains(Render("zone/onyx"), "func=ClearUnreviewed"), "a retired zone takes no endpoints")
+	uassert.True(t, strings.Contains(Render("zone/onyx"), "func=ClearUnreviewed"), "a retired zone's flood is a curator's to clear")
 }
 
 // A registrant cannot withdraw an endpoint a curator unverified, even with no
@@ -1528,22 +1576,48 @@ func regexpLinkCarries(page, fn, rv string) bool {
 	return false
 }
 
-// A flagged listing of a zone's new URL refuses the edit even when its
-// proposer or a curator holds it: it would mark the zone's own URL.
+// A flagged listing of a zone's new URL refuses the edit whoever holds it and
+// whoever edits: it would mark the zone's own URL. Each case starts fresh: a
+// test does not roll back an aborted call's writes.
 func TestAFlaggedOwnListingRefusesTheEdit(cur realm, t *testing.T) {
-	reset()
-	testing.SetRealm(testing.NewUserRealm(bob))
-	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "", "https://rpc.bobs.example.com", "")
-	testing.SetRealm(testing.NewUserRealm(Admin))
-	ApproveZone(cross(cur), "bobs", zrev("bobs"), "")
-	testing.SetRealm(testing.NewUserRealm(bob))
-	id := RegisterEndpoint(cross(cur), "bobs", "rpc", "https://rpc2.bobs.example.com", "spam")
-	testing.SetRealm(testing.NewUserRealm(Admin))
-	FlagEndpoint(cross(cur), id, erev(id), "spam label")
-	z, _ := GetZone("bobs")
-	uassert.AbortsContains(t, cur, "flagged; a curator removes it", func() {
-		EditZone(cross(cur), "bobs", z.Revision, z.ChainID, z.Title, z.Description, string(z.Kind), "", "https://rpc2.bobs.example.com", "", "moved")
-	})
+	for _, tc := range []struct {
+		name            string
+		approve         bool
+		holder, editor  address
+		kind, url, want string
+	}{
+		{"the proposer's, on a pending zone, by the proposer", false, bob, bob, "rpc", "https://rpc2.bobs.example.com", "flagged; a curator removes it"},
+		{"a curator's, under rpc, by a curator", true, Admin, Admin, "rpc", "https://rpc2.bobs.example.com", "flagged; a curator removes it"},
+		{"a curator's, under gnoweb, by a curator", true, Admin, Admin, "gnoweb", "https://web2.bobs.example.com", "flagged; a curator removes it"},
+		{"the proposer's, on an approved zone, by a curator", true, bob, Admin, "rpc", "https://rpc2.bobs.example.com", "a curator removes it before it becomes"},
+	} {
+		reset()
+		testing.SetRealm(testing.NewUserRealm(bob))
+		ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "https://web.bobs.example.com", "https://rpc.bobs.example.com", "")
+		if tc.approve {
+			testing.SetRealm(testing.NewUserRealm(Admin))
+			ApproveZone(cross(cur), "bobs", zrev("bobs"), "")
+		}
+		k, _ := zones.ParseEndpointKind(tc.kind)
+		id, err := reg.Register(tc.holder, 1, "bobs", k, tc.url, "spam")
+		must(err)
+		must(reg.ReviewEndpoint(id, zones.Flagged, 0, erev(id), Admin, 1, "spam label"))
+		testing.SkipHeights(ReviewWindow)
+		testing.SetRealm(testing.NewUserRealm(tc.editor))
+		z, _ := GetZone("bobs")
+		web, rpc, reason := z.GnowebURL, z.RPCURL, ""
+		if tc.kind == "gnoweb" {
+			web = tc.url
+		} else {
+			rpc = tc.url
+		}
+		if tc.approve {
+			reason = "moved"
+		}
+		uassert.AbortsContains(t, cur, tc.want, func() {
+			EditZone(cross(cur), "bobs", z.Revision, z.ChainID, z.Title, z.Description, string(z.Kind), web, rpc, z.GenesisURL, reason)
+		}, tc.name)
+	}
 }
 
 // Paging keeps a list's status, and the next link shows on the page before
@@ -1567,6 +1641,180 @@ func TestListPagingAndRetiredRecords(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(bob))
 	testing.SkipHeights(ReviewWindow)
 	uassert.AbortsContains(t, cur, "a record", func() { RemoveEndpoint(cross(cur), id, erev(id)) })
-	uassert.True(t, strings.Contains(Render("proposals"), "No pending zone yet.") || !strings.Contains(Render("proposals"), "0 rejected"))
+	uassert.False(t, strings.Contains(Render("proposals"), "0 rejected"), "no link to an empty rejected list")
 	uassert.Equal(t, Render("proposals"), Render("proposals?status=pending"))
+}
+
+// The reserve notes come before the queue notes when both caps are full, and
+// every link a non-curator's call would fail on says who it is for.
+func TestReserveNotesAreLabelledAndComeFirst(cur realm, t *testing.T) {
+	reset()
+	for i := 0; reg.Live() < zones.MaxZones-zones.ReservedForReviewers-zones.MaxPending; i++ {
+		s := "ap" + strconv.Itoa(i)
+		must(reg.ProposeExempt(Admin, 1, s, zones.Info{ChainID: s, Title: "A", Kind: zones.Testnet, RPCURL: "https://rpca" + strconv.Itoa(i) + ".example.com"}))
+		must(reg.ReviewZone(s, zones.Approved, zrev(s), Admin, 1, ""))
+	}
+	for i := 0; reg.ZoneCount(zones.Pending) < zones.MaxPending; i++ {
+		s := "pp" + strconv.Itoa(i)
+		must(reg.ProposeExempt(Admin, 1, s, zones.Info{ChainID: s, Title: "P", Kind: zones.Testnet, RPCURL: "https://rpcq" + strconv.Itoa(i) + ".example.com"}))
+	}
+	uassert.Equal(t, zones.MaxZones-zones.ReservedForReviewers, reg.Live())
+	page := Render("")
+	uassert.True(t, strings.Contains(page, "the registry's last 16 places are kept for curators"))
+	uassert.True(t, strings.Contains(page, `Propose a zone \(curators only\)]`))
+	uassert.False(t, strings.Contains(page, "the review queue is full"), "the reserve binds first")
+
+	reset()
+	for i := 0; reg.Awaiting("onyx") < zones.MaxUnverifiedPerZone; i++ {
+		_, err := reg.RegisterExempt(Admin, 1, "onyx", zones.RPC, "https://u"+strconv.Itoa(i)+".example.com", "")
+		must(err)
+	}
+	for i := 0; reg.EndpointCount("onyx", "") < zones.MaxEndpointsPerZone-zones.ReservedForReviewers; i++ {
+		id, err := reg.RegisterExempt(Admin, 1, "onyx", zones.RPC, "https://f"+strconv.Itoa(i)+".example.com", "")
+		must(err)
+		must(reg.ReviewEndpoint(id, zones.Flagged, 0, erev(id), Admin, 1, "spam"))
+	}
+	page = Render("zone/onyx")
+	uassert.True(t, strings.Contains(page, "the last 16 endpoint places are kept for curators"))
+	uassert.True(t, strings.Contains(page, `Register an endpoint \(curators only\)]`))
+	uassert.False(t, strings.Contains(page, "the review queue is full"), "the reserve binds first")
+
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	RegisterEndpoint(cross(cur), "onyx", "rpc", "https://bob.example.com", "")
+	uassert.True(t, strings.Contains(Render("zone/onyx"), `all pages and kinds \(curators only\)]`))
+}
+
+// A rejected or retired zone takes no endpoints: no Register link and no cap
+// note, but a curator still clears its never-reviewed endpoints.
+func TestARecordZoneOffersNoRegistration(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	RegisterEndpoint(cross(cur), "onyx", "rpc", "https://bob.example.com", "")
+	for i := 0; reg.EndpointCount("onyx", "") < zones.MaxEndpointsPerZone; i++ {
+		id, err := reg.RegisterExempt(Admin, 1, "onyx", zones.RPC, "https://f"+strconv.Itoa(i)+".example.com", "")
+		must(err)
+		must(reg.ReviewEndpoint(id, zones.Flagged, 0, erev(id), Admin, 1, "spam"))
+	}
+	must(reg.ReviewZone("onyx", zones.Retired, zrev("onyx"), Admin, 1, "gone"))
+	page := Render("zone/onyx")
+	uassert.False(t, strings.Contains(page, "func=RegisterEndpoint"))
+	uassert.False(t, strings.Contains(page, "endpoints are full"))
+	uassert.True(t, strings.Contains(page, "func=ClearUnreviewed"), "the record's flood is still a curator's to clear")
+}
+
+// On a pending zone the proposer is the one gated registrant, so once they
+// reach the per-address cap the link is for curators.
+func TestThePendingRegisterLinkFollowsTheProposersCap(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "", "https://rpc.bobs.example.com", "")
+	uassert.True(t, strings.Contains(Render("zone/bobs"), `Register an endpoint \(proposer or curator\)]`))
+	for i := 0; i < zones.MaxEndpointsPerAddress; i++ {
+		RegisterEndpoint(cross(cur), "bobs", "rpc", "https://b"+strconv.Itoa(i)+".bobs.example.com", "")
+	}
+	page := Render("zone/bobs")
+	uassert.True(t, strings.Contains(page, "the proposer has registered 16 endpoints here"))
+	uassert.True(t, strings.Contains(page, `Register an endpoint \(curators only\)]`))
+}
+
+// The rejected list's pager stays in the rejected list.
+func TestTheRejectedPagerKeepsItsList(t *testing.T) {
+	reset()
+	for i := 0; reg.ZoneCount(zones.Rejected) < PageSize+1; i++ {
+		s := "rj" + strconv.Itoa(i)
+		must(reg.ProposeExempt(Admin, 1, s, zones.Info{ChainID: s, Title: "R", Kind: zones.Testnet, RPCURL: "https://rpcr" + strconv.Itoa(i) + ".example.com"}))
+		must(reg.ReviewZone(s, zones.Rejected, zrev(s), Admin, 1, "no"))
+	}
+	uassert.True(t, strings.Contains(Render("proposals?status=rejected"), "status=rejected&page=2"))
+}
+
+// A reason on an endpoint is free text: a mention in it stays text.
+func TestAnEndpointReasonCannotMention(t *testing.T) {
+	reset()
+	id, err := reg.Register(bob, 1, "onyx", zones.RPC, "https://bob.example.com", "")
+	must(err)
+	must(reg.ReviewEndpoint(id, zones.Flagged, 0, erev(id), Admin, 1, "ask @alice"))
+	page := Render("zone/onyx?kind=rpc")
+	uassert.True(t, strings.Contains(page, `ask \@alice`))
+	uassert.False(t, strings.Contains(page, "ask @alice"))
+}
+
+// An edit onto a listing a curator ruled on is refused whatever the ruling
+// left: a reasonless unverify, or a reset's reason with nobody recorded.
+func TestAnEditRefusesEveryRuling(cur realm, t *testing.T) {
+	// A curator's reasonless unverify.
+	reset()
+	id, err := reg.Register(bob, 1, "onyx", zones.RPC, "https://rpc2.onyx.example.com", "")
+	must(err)
+	must(reg.ReviewEndpoint(id, zones.Verified, zrev("onyx"), erev(id), Admin, 1, ""))
+	must(reg.ReviewEndpoint(id, zones.Unverified, 0, erev(id), Admin, 1, ""))
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	z, _ := GetZone("onyx")
+	uassert.AbortsContains(t, cur, "with a curator's ruling", func() {
+		EditZone(cross(cur), "onyx", z.Revision, z.ChainID, z.Title, z.Description, string(z.Kind), z.GnowebURL, "https://rpc2.onyx.example.com", z.GenesisURL, "moved")
+	})
+
+	// A proposer's chain-id reset of a former curator's listing: no reviewer,
+	// a reason.
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "", "https://rpc.bobs.example.com", "")
+	id, err = reg.RegisterExempt(carol, 1, "bobs", zones.RPC, "https://rpc2.bobs.example.com", "")
+	must(err)
+	must(reg.ReviewEndpoint(id, zones.Verified, zrev("bobs"), erev(id), Admin, 1, ""))
+	testing.SkipHeights(ReviewWindow)
+	z, _ = GetZone("bobs")
+	EditZone(cross(cur), "bobs", z.Revision, "bobs-2", z.Title, z.Description, string(z.Kind), z.GnowebURL, z.RPCURL, z.GenesisURL, "")
+	e, _ := GetEndpoint(id)
+	uassert.Equal(t, "", e.ReviewedBy.String())
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	z, _ = GetZone("bobs")
+	uassert.AbortsContains(t, cur, "with a curator's ruling", func() {
+		EditZone(cross(cur), "bobs", z.Revision, z.ChainID, z.Title, z.Description, string(z.Kind), z.GnowebURL, "https://rpc2.bobs.example.com", z.GenesisURL, "")
+	})
+}
+
+// Respelling the zone's own URL is no change to it: the edit does not look at
+// listings of it, ruled or not.
+func TestRespellingTheOwnURLIsNoMove(cur realm, t *testing.T) {
+	reset()
+	z, _ := GetZone("onyx")
+	reg.RemoveEndpoint(mustRPC(t, "onyx", z.RPCURL))
+	id, err := reg.Register(bob, 1, "onyx", zones.RPC, z.RPCURL, "")
+	must(err)
+	must(reg.ReviewEndpoint(id, zones.Verified, zrev("onyx"), erev(id), Admin, 1, ""))
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	z, _ = GetZone("onyx")
+	EditZone(cross(cur), "onyx", z.Revision, z.ChainID, "Onyx, retitled", z.Description, string(z.Kind), z.GnowebURL, z.RPCURL+":443", z.GenesisURL, "retitled")
+	_, ok := GetEndpoint(id)
+	uassert.True(t, ok)
+}
+
+// The slug is trimmed on every write, EditZone and RemoveZone included.
+func TestEveryWriteTrimsTheSlug(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	ProposeZone(cross(cur), "tz", "tz-1", "T", "", "devnet", "", "https://rpc.tz.example.com", "")
+	z, _ := GetZone("tz")
+	EditZone(cross(cur), " tz\t", z.Revision, z.ChainID, "T, edited", z.Description, string(z.Kind), z.GnowebURL, z.RPCURL, z.GenesisURL, "")
+	z, _ = GetZone("tz")
+	uassert.Equal(t, "T, edited", z.Title)
+	RemoveZone(cross(cur), "\ttz ", z.Revision)
+	_, ok := GetZone("tz")
+	uassert.False(t, ok)
+}
+
+// The seeded endpoints went through the gated registration, so none is
+// Exempt; and a zone with no endpoints draws no kind bar.
+func TestSeedsAreGatedAndAnEmptyZoneHasNoKindBar(cur realm, t *testing.T) {
+	reset()
+	for _, slug := range []string{"mainnet", "onyx", "staging", "moul-staging"} {
+		for _, e := range ListEndpoints(slug, "", "") {
+			uassert.False(t, e.Exempt, slug+" #"+strconv.FormatInt(e.ID, 10))
+		}
+	}
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	ProposeZone(cross(cur), "tz", "tz-1", "T", "", "devnet", "", "https://rpc.tz.example.com", "")
+	uassert.False(t, strings.Contains(Render("zone/tz"), "all (0)"))
 }

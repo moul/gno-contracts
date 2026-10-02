@@ -54,8 +54,8 @@ const (
 	// drops, and so its gas: a removal rewrites up to about 45 later values in
 	// two B+ tree leaves, and a caller can lay ids out so every removal does,
 	// which at 128 measured 2.6B, close to a 3B block, and at 64 measures
-	// 1.94B even with a chain-id reset and both own URLs moved in the same
-	// edit. More waits for removals.
+	// 2.02B even with a chain-id reset spread across leaves and both own URLs
+	// moved in the same edit. More waits for removals.
 	MaxDropPerEdit = 64
 	// ReservedForReviewers is how much of each hard cap (MaxZones live,
 	// MaxEndpointsPerZone) only the exempt calls may use: strangers who keep
@@ -75,6 +75,13 @@ const (
 	ZoneRejected   = "the zone was rejected; verify again if it is approved"
 )
 
+// IsReset reports whether an unverified endpoint is unverified only because its
+// zone changed under it: its reason is one of the three above. A reset reaches
+// only a verified endpoint, so it says nothing against the endpoint itself.
+func IsReset(e Endpoint) bool {
+	return e.Status == Unverified && (e.Reason == ChainIDChanged || e.Reason == ZoneRetired || e.Reason == ZoneRejected)
+}
+
 // sequences are the registry-wide counters: the last Revision handed out (so
 // none is reused) and the last status-entry sequence (the eviction order).
 type sequences struct{ rev, seq uint64 }
@@ -85,9 +92,9 @@ type sequences struct{ rev, seq uint64 }
 // key shifts every later value in the leaf, each shift a store write. Measured
 // on a node, one transaction per step (gno master 3cc494ec4): removing the
 // first key of a fanout-128 leaf filled with 120 cost 15.8M gas, the last 5.1M,
-// about 90k gas per entry shifted (kit/index, whose values are pointers, measured
-// 230k per shift); at fanout 32 it is the same 90k on a leaf a
-// quarter the size. Endpoints are removed and their dedup keys inserted at
+// about 90k gas per entry shifted for a scalar value (the counters, the unique
+// ids) and about 230k for a pointer (the zone and endpoint tables, kit/index);
+// at fanout 32 each costs the same per shift, on a leaf a quarter the size. Endpoints are removed and their dedup keys inserted at
 // arbitrary positions, so the smaller leaf is worth its larger node overhead
 // (671 B per entry against 592).
 const fanout = 32
@@ -562,13 +569,16 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	}
 	addr = TrimSpaces(addr)
 	label = TrimSpaces(label)
+	if kind != Seed && kind != Peer {
+		// Validated as it will be stored, so every rule judges the string
+		// that dials, length included.
+		addr = trimEmptyTail(lowerAuthority(addr))
+	}
 	if err := ValidateEndpoint(kind, addr); err != nil {
 		return 0, err
 	}
 	if kind == Seed || kind == Peer {
 		addr = Canonical(kind, addr) // lowercase, no terminal dot: what tm2 dials
-	} else {
-		addr = trimEmptyTail(lowerAuthority(addr))
 	}
 	private := IsPrivateHost(HostOf(kind, addr))
 	if z.Kind != Local && private {
@@ -843,6 +853,12 @@ func (f ZoneFilter) Match(z Zone) bool {
 
 // Zones returns copies of the zones passing f, in the order they were
 // proposed. With a status set it reads that status's zones only.
+//
+// The result, like Endpoints', is capped at its length. A slice handed to
+// another realm is readonly there: an append that fits in spare capacity
+// writes into it and aborts, one that does not copies and succeeds. Uncapped,
+// an importer's append would pass or abort by how many rows the filter
+// dropped, which strangers decide by registering.
 func (r *Registry) Zones(f ZoneFilter) []Zone {
 	if f.Status != "" {
 		ids := r.byStatus.Lookup(string(f.Status))
@@ -853,7 +869,7 @@ func (r *Registry) Zones(f ZoneFilter) []Zone {
 				out = append(out, *z)
 			}
 		}
-		return out
+		return out[:len(out):len(out)]
 	}
 	out := make([]Zone, 0, r.zones.len())
 	r.zones.each(func(v any) {
@@ -861,7 +877,7 @@ func (r *Registry) Zones(f ZoneFilter) []Zone {
 			out = append(out, *z)
 		}
 	})
-	return out
+	return out[:len(out):len(out)]
 }
 
 // ZoneCount returns how many zones have that status ("" for all), without
@@ -967,7 +983,7 @@ func (r *Registry) Endpoints(f EndpointFilter) []Endpoint {
 				out = append(out, *e)
 			}
 		}
-		return out
+		return out[:len(out):len(out)]
 	}
 	out := make([]Endpoint, 0, r.endpoints.len())
 	r.endpoints.each(func(v any) {
@@ -975,7 +991,7 @@ func (r *Registry) Endpoints(f EndpointFilter) []Endpoint {
 			out = append(out, *e)
 		}
 	})
-	return out
+	return out[:len(out):len(out)]
 }
 
 // Count returns how many endpoints a zone has, and how many of them are
@@ -1093,8 +1109,10 @@ func ownerKey(slug string, who address) string { return slug + "|" + who.String(
 // trimInfo normalizes what a caller typed before it is validated: spaces
 // around every field, and each URL's scheme and host lowercased in ASCII
 // (both are case-insensitive, gno's link sanitizer is not, so HTTPS:// would
-// render as a dead link). Nothing else is rewritten: what fails validation is
-// refused, not repaired.
+// render as a dead link), and a gnoweb or genesis URL's empty tail dropped
+// (trimEmptyTail), as an address bar writes it. Nothing else is rewritten:
+// what fails validation is refused, not repaired, and the main RPC with an
+// empty tail is refused.
 func trimInfo(in Info) Info {
 	in.ChainID = TrimSpaces(in.ChainID)
 	in.Title = TrimSpaces(in.Title)

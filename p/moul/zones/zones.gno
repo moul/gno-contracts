@@ -447,7 +447,7 @@ func ValidateEndpoint(kind EndpointKind, addr string) error {
 		// gnokey dials a tcp:// remote as host:port, path and all, so one with
 		// a path is undialable, and Canonical would read it as an http URL
 		// that is a different resource.
-		if scheme, rest, _ := strings.Cut(trimEmptyTail(addr), "://"); strings.EqualFold(scheme, "tcp") &&
+		if scheme, rest, _ := strings.Cut(addr, "://"); strings.EqualFold(scheme, "tcp") &&
 			strings.IndexAny(rest, "/?") >= 0 {
 			return errors.New("zones: a tcp:// rpc address is host and port only, no path or query")
 		}
