@@ -663,7 +663,7 @@ func TestFullQueuesSayWhoMayStillAct(t *testing.T) {
 	}
 	uassert.True(t, strings.Contains(Render(""), "func=ProposeZone"))
 	for i := zones.MaxPending; reg.Live() < zones.MaxZones; i++ {
-		must(reg.Propose(who(i), 4, slug(i), in(i)))
+		must(reg.ProposeExempt(who(i), 4, slug(i), in(i)))
 		must(reg.ReviewZone(slug(i), zones.Approved, zrev(slug(i)), Admin, 4, ""))
 	}
 	uassert.Equal(t, 0, reg.ZoneCount(zones.Pending))
@@ -671,6 +671,7 @@ func TestFullQueuesSayWhoMayStillAct(t *testing.T) {
 	uassert.True(t, strings.Contains(Render("zone/nope"), "approving it waits for a free slot"))
 	uassert.False(t, strings.Contains(Render(""), "func=ProposeZone"), "the live cap binds curators too")
 	uassert.True(t, strings.Contains(Render(""), "the registry is full at 256 live zones"))
+	uassert.True(t, strings.Contains(Render(""), "live zones until an official zone is retired"), "nothing is pending to reject")
 }
 
 // Withdrawing the zone is no way round an endpoint's own review window: the
@@ -1097,18 +1098,20 @@ func TestAnExCuratorsListingDoesNotFreezeTheZone(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	ApproveZone(cross(cur), "bobs", zrev("bobs"), "")
 	testing.SetRealm(testing.NewUserRealm(carol))
-	RegisterEndpoint(cross(cur), "bobs", "rpc", "https://rpc.bobs.example.com", "")
+	listed := RegisterEndpoint(cross(cur), "bobs", "rpc", "https://rpc.bobs.example.com", "")
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	RemoveCurator(cross(cur), carol)
 	z, _ := GetZone("bobs")
 	EditZone(cross(cur), "bobs", z.Revision, z.ChainID, "Bob's, retitled", z.Description, string(z.Kind),
 		z.GnowebURL, z.RPCURL, z.GenesisURL, "a better title")
+	_, ok := GetEndpoint(listed)
+	uassert.True(t, ok, "an edit that leaves the URL alone touches no listing of it")
 }
 
 // The Clear link reaches every page and kind, so it is offered only on the
 // unfiltered view of a zone that takes endpoints, bound to the revision the
-// page was rendered at; the call keeps an endpoint registered exactly at that
-// revision's successor and clears one registered at it.
+// page was rendered at; the call clears an endpoint registered exactly at the
+// revision it names.
 func TestTheClearLinksScope(cur realm, t *testing.T) {
 	reset()
 	testing.SetRealm(testing.NewUserRealm(bob))
@@ -1215,16 +1218,16 @@ func TestRoutesNotesAndLabels(cur realm, t *testing.T) {
 
 // The Clear link shows only while something is clearable, and the admission
 // gate bounds how much that can be.
-func TestClearIsOfferedOnlyWhenItClearsAndIsCapped(cur realm, t *testing.T) {
+func TestClearIsOfferedOnlyWhenItClears(cur realm, t *testing.T) {
 	reset()
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	RegisterEndpoint(cross(cur), "onyx", "rpc", "https://curators.example.com", "")
 	uassert.False(t, strings.Contains(Render("zone/onyx"), "func=ClearUnreviewed"), "a curator's own listing is not clearable")
-	for i := 0; reg.Clearable("mainnet") <= zones.MaxDropPerEdit; i++ {
+	for i := 0; reg.Clearable("mainnet") <= zones.MaxUnverifiedPerZone; i++ {
 		_, err := reg.Register(testutils.TestAddress("c"+strconv.Itoa(i/zones.MaxEndpointsPerAddress)), 1, "mainnet", zones.RPC,
 			"https://c"+strconv.Itoa(i)+".example.com", "")
 		if err != nil {
-			// The admission gate holds at 64; let the rest through as a flood would, one verdict at a time.
+			// The admission gate holds the queue at 64: this is as full as a flood gets.
 			break
 		}
 	}
@@ -1248,4 +1251,136 @@ func TestTheEvictionNote(cur realm, t *testing.T) {
 	must(reg.ProposeExempt(Admin, 2, "next", zones.Info{ChainID: "next", Title: "N", Kind: zones.Testnet, RPCURL: "https://rpcn.example.com"}))
 	uassert.True(t, strings.Contains(Render("zone/next"), "rejecting it drops the zone rejected longest ago"))
 	uassert.False(t, strings.Contains(Render("zone/onyx"), "retiring it drops"))
+}
+
+// The last places of each hard cap are curators': strangers who keep a cap
+// full cannot lock out the people who would act under it, and the page says
+// so with a link for them.
+func TestTheHardCapsKeepPlacesForCurators(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	for i := 0; reg.EndpointCount("onyx", "") < zones.MaxEndpointsPerZone-zones.ReservedForReviewers; i++ {
+		id := RegisterEndpoint(cross(cur), "onyx", "rpc", "https://v"+strconv.Itoa(i)+".example.com", "")
+		VerifyEndpoint(cross(cur), id, zr(id), erev(id), "")
+	}
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "kept for curators", func() {
+		RegisterEndpoint(cross(cur), "onyx", "rpc", "https://bob.example.com", "")
+	})
+	uassert.True(t, strings.Contains(Render("zone/onyx"), "endpoint places are kept for curators"))
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	RegisterEndpoint(cross(cur), "onyx", "rpc", "https://curator.example.com", "")
+
+	for i := 0; reg.Live() < zones.MaxZones-zones.ReservedForReviewers; i++ {
+		s := "l" + strconv.Itoa(i)
+		must(reg.ProposeExempt(Admin, 1, s, zones.Info{ChainID: s, Title: "L", Kind: zones.Testnet, RPCURL: "https://rpcl" + strconv.Itoa(i) + ".example.com"}))
+		must(reg.ReviewZone(s, zones.Approved, zrev(s), Admin, 1, ""))
+	}
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "kept for curators", func() {
+		ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "", "https://rpc.bobs.example.com", "")
+	})
+	uassert.True(t, strings.Contains(Render(""), "places are kept for curators"))
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	ProposeZone(cross(cur), "admins", "admins-1", "A", "", "devnet", "", "https://rpc.admins.example.com", "")
+}
+
+// Survivors of an independent mutation sweep, realm side.
+func TestRealmRulesASweepFoundUntested(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	// Every slug a caller types is trimmed.
+	RetireZone(cross(cur), " onyx ", zrev("onyx"), "shut down")
+	ApproveZone(cross(cur), " onyx ", zrev("onyx"), "")
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's | best @moul "+Admin.String(), "run by @moul "+Admin.String(), "devnet", "", "https://rpc.bobs.example.com", "")
+	id := RegisterEndpoint(cross(cur), "onyx", "rpc", "https://spam.example.com", "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	uassert.Equal(t, 1, ClearUnreviewed(cross(cur), " onyx ", reg.Revision()))
+	_, ok := GetEndpoint(id)
+	uassert.False(t, ok)
+
+	// A pending zone offers Approve and Remove; its title and description
+	// have no live mention.
+	page := Render("zone/bobs")
+	uassert.True(t, strings.Contains(page, "func=ApproveZone"))
+	uassert.True(t, strings.Contains(page, "func=RemoveZone"))
+	uassert.True(t, strings.Contains(page, "pending review"))
+	uassert.False(t, strings.Contains(page, " @moul"))
+	uassert.False(t, strings.Contains(page, " "+Admin.String()))
+
+	// A rejected zone offers Remove, its reason cell escapes a pipe and has
+	// no live mention.
+	RejectZone(cross(cur), " bobs ", zrev("bobs"), "a | b, see @moul")
+	page = Render("zone/bobs")
+	uassert.True(t, strings.Contains(page, "func=RemoveZone"))
+	uassert.True(t, strings.Contains(page, "rejected"))
+	uassert.False(t, strings.Contains(page, " @moul"))
+	uassert.True(t, strings.Contains(Render("proposals?status=rejected"), `a \| b`))
+	uassert.True(t, strings.Contains(Render("proposals?status=nope"), "No such list."))
+
+	// An endpoint reason with a pipe stays in its cell.
+	e := RegisterEndpoint(cross(cur), "onyx", "rpc", "https://r.example.com", "")
+	FlagEndpoint(cross(cur), e, erev(e), "x | y")
+	uassert.True(t, strings.Contains(Render("zone/onyx?kind=rpc"), `x \| y`))
+
+	// A retired zone offers Approve, and its reason cell escapes a pipe.
+	RetireZone(cross(cur), "mainnet", zrev("mainnet"), "c | d")
+	uassert.True(t, strings.Contains(Render("zone/mainnet"), "func=ApproveZone"))
+	uassert.True(t, strings.Contains(Render("zone/mainnet"), "retired"))
+	uassert.True(t, strings.Contains(Render("?status=retired"), `c \| d`))
+}
+
+// The index's example asks this chain's zone for peers when it lists one, not
+// the onyx fallback.
+func TestTheIndexExampleUsesThisChainsZone(t *testing.T) {
+	reset()
+	m, _ := GetZone("mainnet")
+	in := zones.Info{ChainID: runtime.ChainID(), Title: m.Title, Kind: m.Kind, RPCURL: m.RPCURL, GnowebURL: m.GnowebURL}
+	must(reg.Edit("mainnet", zrev("mainnet"), in, Admin, 1, "on this chain"))
+	uassert.True(t, reg.EndpointCount("mainnet", zones.Peer) > 0)
+	uassert.True(t, strings.Contains(Render(""), `ListAddresses("mainnet", "peer", "verified")`))
+}
+
+// Retiring a zone with the retired list full says it evicts the oldest.
+func TestTheRetireEvictionNote(t *testing.T) {
+	reset()
+	for i := 0; reg.ZoneCount(zones.Retired) < zones.MaxRetired; i++ {
+		s := "rt" + strconv.Itoa(i)
+		must(reg.ProposeExempt(Admin, 1, s, zones.Info{ChainID: s, Title: "R", Kind: zones.Testnet, RPCURL: "https://rpcr" + strconv.Itoa(i) + ".example.com"}))
+		must(reg.ReviewZone(s, zones.Approved, zrev(s), Admin, 1, ""))
+		must(reg.ReviewZone(s, zones.Retired, zrev(s), Admin, 1, "gone"))
+	}
+	uassert.True(t, strings.Contains(Render("zone/onyx"), "retiring it drops the zone retired longest ago"))
+}
+
+// An edit is validated before it acts: one that cannot pass removes nothing
+// on its way to failing. A former curator's unruled listing of a new URL is
+// dropped like a stranger's: only a ruling refuses.
+func TestAnEditValidatesBeforeItRemoves(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ws := RegisterEndpoint(cross(cur), "onyx", "rpc", "wss://rpc9.onyx.example.com/websocket", "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	FlagEndpoint(cross(cur), ws, erev(ws), "not ours")
+	z, _ := GetZone("onyx")
+	edit := func(rpc string) func() {
+		return func() {
+			EditZone(cross(cur), "onyx", zrev("onyx"), z.ChainID, z.Title+".", z.Description, string(z.Kind),
+				z.GnowebURL, rpc, z.GenesisURL, "moved")
+		}
+	}
+	uassert.AbortsContains(t, cur, "rpc url", edit("wss://rpc9.onyx.example.com/websocket"))
+	_, ok := GetEndpoint(ws)
+	uassert.True(t, ok, "a failing edit removed nothing")
+
+	AddCurator(cross(cur), carol)
+	testing.SetRealm(testing.NewUserRealm(carol))
+	AcceptCurator(cross(cur))
+	old := RegisterEndpoint(cross(cur), "onyx", "rpc", "https://next.onyx.example.com", "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	RemoveCurator(cross(cur), carol)
+	edit("https://next.onyx.example.com")()
+	_, ok = GetEndpoint(old)
+	uassert.False(t, ok, "an unruled former curator's listing is dropped")
 }

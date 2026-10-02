@@ -699,7 +699,7 @@ func TestReviveRespectsTheLiveCap(t *testing.T) {
 	uassert.NoError(t, r.ReviewZone("back", Rejected, rev(r, "back"), curator, 1, "not yet"))
 	for i := 0; i < MaxZones; i++ {
 		slug := "z" + strconv.Itoa(i)
-		uassert.NoError(t, r.Propose(curator, 2, slug, onyx()))
+		uassert.NoError(t, r.ProposeExempt(curator, 2, slug, onyx()))
 		uassert.NoError(t, r.ReviewZone(slug, Approved, rev(r, slug), curator, 2, ""))
 	}
 	uassert.Equal(t, MaxZones, r.Live())
@@ -1219,8 +1219,8 @@ func TestLeavingLocalRefusesEveryRuling(t *testing.T) {
 }
 
 // Clearable counts what a bulk clear may remove: registered through the gate,
-// never ruled on. A verdict, a reset or a removal takes one out; an exempt
-// registration never counts.
+// never ruled on. A first verdict or a removal takes one out (a reset cannot:
+// it touches only verified endpoints); an exempt registration never counts.
 func TestTheClearableCount(t *testing.T) {
 	r := NewRegistry()
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
@@ -1288,7 +1288,8 @@ func TestValidationEdges(t *testing.T) {
 	in := onyx()
 	in.Title = "On͏yx"
 	uassert.ErrorContains(t, ValidateInfo(in), "invisible")
-	// Needless escapes of unreserved characters, a numeric entity shape.
+	// Needless escapes of unreserved characters; an entity shape (refused for
+	// its "#" before the entity rule is reached).
 	for _, u := range []string{"https://h.example.com/a%5Fb", "https://h.example.com/a%2Db", "https://h.example.com/%2E%2E/x",
 		"https://h.example.com/a&#38;b"} {
 		uassert.Error(t, ValidateEndpoint(RPC, u), u)
@@ -1337,4 +1338,67 @@ func TestARemovedZonesClearableCountIsGone(t *testing.T) {
 	uassert.NoError(t, r.RemoveZone("onyx", rev(r, "onyx")))
 	uassert.NoError(t, r.Propose(alice, 2, "onyx", onyx()))
 	uassert.Equal(t, 0, r.Clearable("onyx"))
+}
+
+// Survivors of an independent mutation sweep, each pinned here.
+func TestRulesASweepFoundUntested(t *testing.T) {
+	// Every character a URL may not hold, one at a time.
+	for _, c := range []string{"<", ">", "`", "(", ")", "[", "]", "{", "}", "|", "\\", "^", "#", "\"", "'"} {
+		uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/a"+c+"b"), c)
+	}
+	// A needless escape of a digit or a lowercase letter; the hex case of the
+	// first escape digit.
+	uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/a%30"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/a%61"))
+	uassert.Equal(t, Canonical(RPC, "https://h.example.com/%af"), Canonical(RPC, "https://h.example.com/%AF"))
+	// A hex last label reads as an IPv4 number.
+	uassert.Error(t, ValidateEndpoint(RPC, "https://a.0x1"))
+	uassert.True(t, IsPrivateHost("a.0x1"))
+	uassert.True(t, IsPrivateHost("PRINTER.LOCAL"))
+	// Schemes per field.
+	in := onyx()
+	in.GnowebURL = "tcp://onyx.example.com:26657"
+	uassert.Error(t, ValidateInfo(in))
+	uassert.Error(t, ValidateEndpoint(Indexer, "tcp://indexer.example.com:8546"))
+	// Variation selectors only after a base they modify.
+	for _, s := range []string{"a︀", "᠀᠋"} {
+		in := onyx()
+		in.Title = s
+		uassert.ErrorContains(t, ValidateInfo(in), "invisible", s)
+	}
+	ok := onyx()
+	ok.Title = "ᠨ᠏"
+	uassert.NoError(t, ValidateInfo(ok))
+	uassert.False(t, HasVisible("​‍"))
+	// The Parse functions trim.
+	st, err := ParseStatus(" approved ")
+	uassert.NoError(t, err)
+	uassert.Equal(t, string(Approved), string(st))
+	k, err := ParseEndpointKind(" rpc ")
+	uassert.NoError(t, err)
+	uassert.Equal(t, string(RPC), string(k))
+	v, err := ParseVerification(" verified ")
+	uassert.NoError(t, err)
+	uassert.Equal(t, string(Verified), string(v))
+	// Nothing goes back to pending, not even as a restatement.
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	uassert.Error(t, r.ReviewZone("onyx", Pending, rev(r, "onyx"), curator, 2, "x"))
+	z, _ := r.Zone("onyx")
+	uassert.Equal(t, "", z.ReviewedBy.String())
+	// An empty query and a bare "/" are not stored, so the dialable spelling
+	// is the one listed.
+	id, err := r.Register(alice, 3, "onyx", RPC, "https://rpc2.zz.example.com/?", "")
+	uassert.NoError(t, err)
+	e, _ := r.Endpoint(id)
+	uassert.Equal(t, "https://rpc2.zz.example.com", e.Address)
+	_, err = r.Register(alice, 3, "onyx", RPC, "https://rpc2.zz.example.com", "")
+	uassert.ErrorContains(t, err, "already lists")
+	// More private suffixes, more look-alikes.
+	for _, h := range []string{"rpc.node.incus", "web.dns.podman", "foo.i2p", "gnoland.default.svc"} {
+		uassert.True(t, IsPrivateHost(h), h)
+	}
+	for _, r := range []rune{0x1FBBD, 0x1F6AD, 0x1F6AF, 0x1F6B1, 0x1F6B3, 0x1F6B7, 0x1F4F5, 0x1F51E, 0x1F10D, 0x1F10F, 0x1F16E} {
+		uassert.Error(t, ValidateLabel(string(r)+" official"), string(r))
+	}
 }

@@ -8,10 +8,10 @@
 // endpoints: RPCs, seeds and peers, indexers, faucets, explorers.
 //
 // Curation is the point. Anybody may propose a zone and register endpoints on
-// an approved one (on a pending one, its proposer or a curator); a curator
-// approves or rejects a proposal, retires a zone that stopped
-// running, and verifies or flags an endpoint. Every decision is recorded with
-// who made it and when, and a rejection, a retirement, a flag or an edit to an
+// an approved one (on a pending one, its proposer or a curator; a zone's own
+// main RPC and gnoweb, only them); a curator approves or rejects a proposal,
+// retires a zone that stopped running, and verifies or flags an endpoint. The
+// latest decision on each is recorded with who made it and when, and a rejection, a retirement, a flag or an edit to an
 // approved zone must also say why, on the zone's page. Nothing is hidden while
 // it waits: proposals and unverified endpoints are listed, and labelled.
 //
@@ -102,14 +102,18 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 // while one carries a curator's ruling (a verified one its registrant may
 // withdraw first); the proposer's edit only drops endpoints that are theirs and
 // that they could withdraw on their own (RemoveEndpoint), as for RemoveZone. A
-// new main RPC or gnoweb already listed under its kind by anybody but the
-// proposer or a curator is refused, as RegisterEndpoint refuses it. A rejected
-// or retired zone cannot be edited.
+// new main RPC or gnoweb a stranger already lists under its kind would make
+// that listing the zone's own: it is dropped in the edit if nobody ruled on it,
+// and refuses the edit if a curator did. The edit is validated before any of
+// this. A rejected or retired zone cannot be edited.
 func EditZone(cur realm, slug string, revision int64, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
 	z := mustZone(slug)
 	in := info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)
+	// Validated before anything below acts on it: an edit that cannot pass
+	// must not remove a listing on its way to failing.
+	must(zones.ValidateInfo(in))
 	if !curators.Has(who) {
 		if z.Status != zones.Pending || z.Proposer != who {
 			panic("zones: only a curator, or the proposer while it is pending, may edit " + slug)
@@ -138,7 +142,7 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 	for _, own := range []struct {
 		kind     zones.EndpointKind
 		url, was string
-	}{{zones.RPC, strings.TrimSpace(rpcURL), z.RPCURL}, {zones.Gnoweb, strings.TrimSpace(gnowebURL), z.GnowebURL}} {
+	}{{zones.RPC, in.RPCURL, z.RPCURL}, {zones.Gnoweb, in.GnowebURL, z.GnowebURL}} {
 		if own.url == "" || (own.was != "" && zones.Canonical(own.kind, own.url) == zones.Canonical(own.kind, own.was)) {
 			continue
 		}
@@ -146,7 +150,7 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 		if !ok || e.Registrant == z.Proposer || curators.Has(e.Registrant) {
 			continue
 		}
-		if !e.Clearable() {
+		if e.ReviewedBy != "" || e.Reason != "" { // a ruling, a reset's reason
 			panic("zones: " + own.url + " is listed under " + string(own.kind) + " by " + e.Registrant.String() +
 				" (endpoint #" + strconv.FormatInt(e.ID, 10) + "), with a curator's ruling; a curator removes it before it becomes " + slug + "'s own")
 		}
@@ -217,10 +221,13 @@ func RemoveZone(cur realm, slug string, revision int64) {
 // ---- registering and curating endpoints
 
 // RegisterEndpoint lists an endpoint on a zone and returns its id. On an
-// approved zone anybody may; on a pending one only the proposer or a curator,
-// so a stranger cannot pin a proposal the proposer then cannot withdraw. It
-// shows as unverified until a curator checks it. A curator also registers
-// past the review queue's caps, never past zones.MaxEndpointsPerZone.
+// approved zone anybody may, except the zone's own main RPC under rpc and
+// gnoweb under gnoweb, which only its proposer or a curator lists; on a
+// pending one only the proposer or a curator, so a stranger cannot pin a
+// proposal the proposer then cannot withdraw. It shows as unverified until a
+// curator checks it. A curator also registers past the review queue's caps
+// and into the zones.ReservedForReviewers places a gated registration may
+// not take, never past zones.MaxEndpointsPerZone.
 //
 // kind is rpc, gnoweb, seed, peer, indexer, faucet or explorer. addr is a
 // URL, or <node id>@<host>:<port> for a seed or a peer. label is optional:
@@ -278,14 +285,15 @@ func UnverifyEndpoint(cur realm, id, revision int64, reason string) {
 }
 
 // RemoveEndpoint deletes an endpoint. revision is its revision as read: the
-// removal fails if a verdict landed since, rather than delete one nobody saw.
-// A curator may remove any. Its registrant may remove it unless a curator
-// flagged or unverified it (a flag is a warning, an unverify carries why, and
-// removing and registering it again would wipe either; a verified one the
-// registrant may take down, since listing it again starts it unverified), only while its zone is pending or approved (a rejected or
-// retired zone is a record, endpoints and all), and only ReviewWindow
-// blocks after registering it (removing and registering again every block
-// would give it a new id faster than a curator could flag the old one).
+// removal fails if a verdict landed since, rather than delete one nobody saw. A
+// curator may remove any. Its registrant may remove it unless a curator flagged
+// or unverified it, or a reset left a reason on it (a flag is a warning, an
+// unverify carries why, and removing and registering it again would wipe
+// either; a verified one the registrant may take down, since listing it again
+// starts it unverified), only while its zone is pending or approved (a rejected
+// or retired zone is a record, endpoints and all), and only ReviewWindow blocks
+// after registering it (removing and registering again every block would give
+// it a new id faster than a curator could flag the old one).
 func RemoveEndpoint(cur realm, id, revision int64) {
 	who := caller(cur)
 	e, ok := reg.Endpoint(id)
@@ -512,13 +520,13 @@ func info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL strin
 	k, err := zones.ParseKind(kind)
 	must(err)
 	return zones.Info{
-		ChainID:     chainID,
-		Title:       title,
-		Description: description,
+		ChainID:     strings.TrimSpace(chainID),
+		Title:       strings.TrimSpace(title),
+		Description: strings.TrimSpace(description),
 		Kind:        k,
-		GnowebURL:   gnowebURL,
-		RPCURL:      rpcURL,
-		GenesisURL:  genesisURL,
+		GnowebURL:   strings.TrimSpace(gnowebURL),
+		RPCURL:      strings.TrimSpace(rpcURL),
+		GenesisURL:  strings.TrimSpace(genesisURL),
 	}
 }
 

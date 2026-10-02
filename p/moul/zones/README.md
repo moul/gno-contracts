@@ -141,7 +141,8 @@ also an index key, a URL segment or a config-file line:
   tables) accepts it.
 
 An endpoint, like a zone's URLs, is stored with its scheme and host lowercased
-(a peer lowercased whole, without its host's terminal dot), so every later
+(a peer lowercased whole, without its host's terminal dot; a URL without an
+empty query's `?` or a bare `/`, which gnokey would dial), so every later
 comparison finds nothing to change, and deduplicated on
 `Canonical`: scheme and host lowercased, a terminal dot, a default port, an
 empty path before a query, an empty query's `?` and a bare `/` dropped, `%XX`
@@ -156,6 +157,10 @@ Rejected and retired zones are kept for the record but do not count against it:
 each state keeps at most 64 and 128, and the next one in drops the zone that has
 been in that state longest, endpoints and all. So no flood, no curator and no
 amount of time fills the registry for good.
+
+The last `ReservedForReviewers` (16) places of each hard cap, the live registry
+and a zone's endpoints, take only the exempt calls: strangers who keep a cap
+full would otherwise lock out the curators who act under it.
 
 **Per-address caps** make one address cheap to ignore: 4 pending proposals, 16
 endpoints on a zone. Neither stops a flood from many addresses, so **the review
@@ -186,8 +191,9 @@ node, so a smaller leaf bounds what one removal costs. `kit/store` has that
 shape on an avl tree (2,029 B), and on an immutable path the choice is
 permanent. Three B+ trees hold an id per key: slug, the endpoint dedup key (a
 128-bit hash of the canonical address rather than a second copy of it), and the
-order zones entered their state. Three hold a count per key: pending proposals
-per proposer, endpoints per registrant on a zone, flagged endpoints per zone.
+order zones entered their state. Four hold a count per key: pending proposals
+per proposer, endpoints per registrant on a zone, flagged and clearable
+endpoints per zone.
 The other six are [`kit/index`](../kit/index): status, approved-by-chain-id, and
 for endpoints zone, zone-and-kind, not-verified and on-a-private-host (so
 leaving `local` reads only those). Every one is written in the same method as
@@ -202,4 +208,5 @@ so what a removal of a zone's endpoints costs depends on how they interleave
 with other zones'. With them registered together, a retirement that evicts a
 full zone costs about 0.32B; in the worst layout a registrant can arrange, 1.93B
 (64% of a 3B block), the heaviest write, measured landing on a node capped at
-3B. That is also why an edit leaving `local` drops at most 64 (1.46B worst).
+3B; with the shifted neighbours also at full size and flagged with full
+reasons, 2.12B (71%). That is also why an edit leaving `local` drops at most 64 (1.46B worst).

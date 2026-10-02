@@ -179,7 +179,6 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.Title = "\u2060" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "\u3164" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "\u061cOnyx" }, "invisible or bidi")
-	bad(func(in *Info) { in.Title = "Onyx\ufe0f" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "Onyx\U000e0041" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "\u2800" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "x\u17b4" }, "invisible or bidi")    // Khmer inherent vowels draw nothing

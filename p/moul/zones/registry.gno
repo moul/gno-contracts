@@ -56,6 +56,11 @@ const (
 	// which at 128 measured 2.6B, close to a 3B block, and at 64 measures
 	// 1.46B. More waits for removals.
 	MaxDropPerEdit = 64
+	// ReservedForReviewers is how much of each hard cap (MaxZones live,
+	// MaxEndpointsPerZone) only the exempt calls may use: strangers who keep
+	// a cap full refill it the block after a curator clears it, and a cap a
+	// curator cannot reach is one they cannot act under.
+	ReservedForReviewers = 16
 )
 
 // The reasons an endpoint carries when its zone changed under it and sent it
@@ -172,6 +177,9 @@ func (r *Registry) propose(by address, at int64, slug string, in Info, gated boo
 	if r.Live() >= MaxZones {
 		return errors.New("zones: the registry is full at " + strconv.Itoa(MaxZones) + " pending and approved zones")
 	}
+	if gated && r.Live() >= MaxZones-ReservedForReviewers {
+		return errors.New("zones: the registry's last " + strconv.Itoa(ReservedForReviewers) + " places are kept for curators")
+	}
 	if gated && r.byStatus.Count(string(Pending)) >= MaxPending {
 		return errors.New("zones: " + strconv.Itoa(MaxPending) + " proposals are already waiting for review; try again once a curator has cleared some")
 	}
@@ -238,7 +246,8 @@ func enteredKey(st Status, seq int64) string { return string(st) + "|" + store.I
 // proposer's own edit to a pending zone records no reviewer; any other records
 // the editor. An edit that changes nothing is refused, and leaving the local
 // kind removes every endpoint on a private or special-use host (IsPrivateHost),
-// and is refused while one of them carries a curator's ruling.
+// at most MaxDropPerEdit in one edit, and is refused while one of them carries
+// a curator's ruling.
 //
 // An edit names the revision it was written against, like an approval does, so
 // two editors working from the same reading cannot silently undo each other.
@@ -556,7 +565,7 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	if kind == Seed || kind == Peer {
 		addr = Canonical(kind, addr) // lowercase, no terminal dot: what tm2 dials
 	} else {
-		addr = lowerAuthority(addr)
+		addr = trimEmptyTail(lowerAuthority(addr))
 	}
 	private := IsPrivateHost(HostOf(kind, addr))
 	if z.Kind != Local && private {
@@ -575,6 +584,8 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	}
 	if n := r.byZone.Count(slug); n >= MaxEndpointsPerZone {
 		return 0, errors.New("zones: " + slug + " is full at " + strconv.Itoa(MaxEndpointsPerZone) + " endpoints")
+	} else if gated && n >= MaxEndpointsPerZone-ReservedForReviewers {
+		return 0, errors.New("zones: " + slug + "'s last " + strconv.Itoa(ReservedForReviewers) + " endpoint places are kept for curators")
 	}
 	if n := r.Awaiting(slug); gated && n >= MaxUnverifiedPerZone {
 		return 0, errors.New("zones: " + slug + " already has " + strconv.Itoa(n) +
@@ -746,7 +757,8 @@ func (r *Registry) RemoveEndpoint(id, revision int64) error {
 	return nil
 }
 
-// removeEndpoint unwinds the record and all seven of its indexes together.
+// removeEndpoint unwinds the record and all eight of its indexes and counters
+// together.
 func (r *Registry) removeEndpoint(id store.ID) {
 	v, ok := r.endpoints.remove(id)
 	if !ok {
@@ -1158,7 +1170,8 @@ func (u *unique) remove(key string) { u.tree.Remove(key) }
 
 // counter is a key -> count map in a B+ tree, one object per key. What it
 // answers (pending proposals per proposer and endpoints per registrant per
-// zone for the caps, flagged endpoints per zone for the admission gate) only
+// zone for the caps, flagged endpoints per zone for the admission gate,
+// clearable endpoints per zone for the bulk clear) only
 // ever asks how many, so keeping the ids would be two more objects per key,
 // written and deleted for nothing.
 type counter struct{ tree *bptree.BPTree }

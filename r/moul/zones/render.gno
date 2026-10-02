@@ -100,10 +100,12 @@ func renderIndex(req *realmpath.Request) string {
 	}
 	switch {
 	case reg.Live() >= zones.MaxZones:
-		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+
-			" live zones until a proposal is rejected or removed, or an official zone retired")
+		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+" live zones until "+freesALiveSlot())
 	case reg.ZoneCount(zones.Pending) >= zones.MaxPending:
 		links = append(links, "proposals are full until one is reviewed or removed",
+			propose("Propose a zone (curators only, while full)"))
+	case reg.Live() >= zones.MaxZones-zones.ReservedForReviewers:
+		links = append(links, "the registry's last "+strconv.Itoa(zones.ReservedForReviewers)+" places are kept for curators",
 			propose("Propose a zone (curators only, while full)"))
 	default:
 		links = append(links, propose("Propose a zone"))
@@ -257,6 +259,10 @@ func renderZone(slug string, req *realmpath.Request) string {
 	switch {
 	case open && reg.EndpointCount(z.Slug, "") >= zones.MaxEndpointsPerZone:
 		actions = append(actions, "endpoints are full at "+strconv.Itoa(zones.MaxEndpointsPerZone)+" until some are removed")
+	case open && reg.EndpointCount(z.Slug, "") >= zones.MaxEndpointsPerZone-zones.ReservedForReviewers:
+		actions = append(actions, "the last "+strconv.Itoa(zones.ReservedForReviewers)+" endpoint places are kept for curators",
+			action("Register an endpoint (curators only, while full)", "RegisterEndpoint",
+				"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	case open && reg.Awaiting(z.Slug) >= zones.MaxUnverifiedPerZone:
 		actions = append(actions, "endpoints are full until some are reviewed or removed",
 			action("Register an endpoint (curators only, while full)", "RegisterEndpoint",
@@ -275,7 +281,7 @@ func renderZone(slug string, req *realmpath.Request) string {
 	// endpoint registered after this page was rendered has a later revision
 	// and is kept.
 	if n := reg.Clearable(z.Slug); open && kind == "" && n > 0 {
-		actions = append(actions, action("Clear "+strconv.Itoa(n)+" never-reviewed endpoint(s) a non-curator registered, all pages (curators)", "ClearUnreviewed",
+		actions = append(actions, action("Clear "+strconv.Itoa(n)+" never-reviewed endpoint(s) registered through the review queue, all pages (curators)", "ClearUnreviewed",
 			"slug", z.Slug, "throughRevision", strconv.FormatInt(reg.Revision(), 10)))
 	}
 	// Every decision carries the revision this page was rendered from, so acting
@@ -301,7 +307,7 @@ func renderZone(slug string, req *realmpath.Request) string {
 			actions = append(actions, approve)
 		} else {
 			actions = append(actions, "approving it waits for a free slot: "+strconv.Itoa(zones.MaxZones)+
-				" zones are live until a proposal is rejected or removed, or an official zone retired")
+				" zones are live until "+freesALiveSlot())
 		}
 		if z.Status == zones.Rejected {
 			actions = append(actions, remove)
@@ -435,6 +441,15 @@ func queryCommand(call string) string {
 		remote = " -remote '" + z.RPCURL + "'"
 	}
 	return "gnokey query vm/qeval" + remote + " -data '" + pkgPath + "." + call + "'"
+}
+
+// freesALiveSlot names what would free a place in the live registry: a
+// proposal's rejection or removal only while there is one.
+func freesALiveSlot() string {
+	if reg.ZoneCount(zones.Pending) > 0 {
+		return "a proposal is rejected or removed, or an official zone retired"
+	}
+	return "an official zone is retired"
 }
 
 // exampleSlug is the zone the index's example asks for peers of: the one

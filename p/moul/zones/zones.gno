@@ -143,8 +143,8 @@ type Zone struct {
 	Proposer   address
 	ProposedAt int64
 
-	// Revision changes on every edit of the zone's Info and on every status
-	// change, and is never reused,
+	// Revision changes on every edit of the zone's Info, on every status
+	// change and on every restated decision, and is never reused,
 	// not even by a zone removed and proposed again under the same slug. A
 	// curator acting on a zone names the revision they read, so an edit that
 	// lands between their reading and their decision makes the decision fail
@@ -379,8 +379,9 @@ func HostOf(kind EndpointKind, addr string) string {
 //     one under a suffix reserved for local or private use, or that public DNS
 //     does not delegate: .localhost, .local (mDNS), .internal, .localdomain,
 //     .test, .example, .invalid, .lan, .home, .corp, .mail, .intranet,
-//     .private, .onion, .alt, the service-discovery and container names
-//     .consul, .lxd, .docker and .localnet, and every .arpa name, which is infrastructure
+//     .private, .onion and .i2p, the service-discovery and container names
+//     .consul, .lxd, .incus, .docker, .podman, .localnet and .svc, and every
+//     .arpa name, which is infrastructure
 //     and never a public service (.home.arpa, ipv4only.arpa,
 //     default.service.arpa). Hosts files' localhost4, localhost6,
 //     ip6-localhost and ip6-loopback have no dot and fall under the first rule;
@@ -407,7 +408,7 @@ func IsPrivateHost(host string) bool {
 	}
 	for _, suffix := range []string{".localhost", ".local", ".internal", ".arpa", ".localdomain",
 		".test", ".example", ".invalid", ".lan", ".home", ".corp", ".mail", ".intranet", ".private", ".onion", ".alt",
-		".consul", ".lxd", ".docker", ".localnet"} {
+		".consul", ".lxd", ".incus", ".docker", ".podman", ".localnet", ".svc", ".i2p"} {
 		if strings.HasSuffix(h, suffix) {
 			return true
 		}
@@ -573,7 +574,8 @@ func isBadge(r rune) bool {
 		0x1F6C7, 0x2298, 0x29B8, // prohibition signs
 		0x24CD, 0x24E7, 0x24B3, 0x1F127, 0x29BB, 0x2A34, 0x2A35, 0x2A37, 0x292B, 0x292C, // circled, parenthesized and crossing x
 		0x1F532, 0x1F533, // square buttons, beside ⏹
-		0x26DD, 0x1F5BE, 0x2B59, 0x2A36, 0x26D2, 0x1FBC0, 0x1D145, 0x26CC, 0x2A3B: // more boxed, circled and heavy crosses
+		0x26DD, 0x1F5BE, 0x2B59, 0x2A36, 0x26D2, 0x1FBC0, 0x1D145, 0x26CC, 0x2A3B, // more boxed, circled and heavy crosses
+		0x1FBBD, 0x1F6AD, 0x1F6AF, 0x1F6B1, 0x1F6B3, 0x1F6B7, 0x1F4F5, 0x1F51E, 0x1F10D, 0x1F10F, 0x1F16E: // more no-entry signs
 		return true
 	}
 	return r >= 0x1F7A8 && r <= 0x1F7AE // the geometric crosses beside ✖
@@ -882,6 +884,18 @@ func lowerAuthority(addr string) string {
 		host, tail = rest[:i], rest[i:]
 	}
 	return asciiLower(scheme) + "://" + asciiLower(host) + tail
+}
+
+// trimEmptyTail drops an empty query's "?" and a bare "/" path from a URL.
+// Both mean nothing (Canonical drops them too), and gnokey would dial a host
+// with them attached, so an endpoint is not stored with them: what is listed
+// is what dials. A zone's own URLs are refused with them instead.
+func trimEmptyTail(addr string) string {
+	addr = strings.TrimSuffix(addr, "?")
+	if scheme, rest, ok := strings.Cut(addr, "://"); ok && strings.HasSuffix(rest, "/") && strings.Count(rest, "/") == 1 {
+		return scheme + "://" + strings.TrimSuffix(rest, "/")
+	}
+	return addr
 }
 
 // asciiLower lowercases A to Z and nothing else. strings.ToLower also folds
