@@ -181,9 +181,14 @@ permanent. Three B+ trees hold an id per key: slug, the endpoint dedup key (a
 128-bit hash of the canonical address rather than a second copy of it), and the
 order zones entered their state. Three hold a count per key: pending proposals
 per proposer, endpoints per registrant on a zone, flagged endpoints per zone.
-The other six are [`kit/index`](../kit/index): status, approved-by-chain-id,
-and for endpoints zone, zone-and-kind, not-verified and on-a-private-host (so
+The other six are [`kit/index`](../kit/index): status, approved-by-chain-id, and
+for endpoints zone, zone-and-kind, not-verified and on-a-private-host (so
 leaving `local` reads only those). Every one is written in the same method as
 its record; counts come from the indexes without reading a record, and a page
 reads the records on it only (the bucket's id list, at most 256 or 128 ids, is
-read whole). COSTLINE
+read whole). Measured on a node at the caps, with every text field at full
+length in the costliest characters and 240-character hosts: the heaviest write
+is an edit taking a local zone with 128 private endpoints off `local`, about
+1.1B gas (36% of a 3B block), and a retirement that evicts a full zone is about
+0.35B; the heaviest page is a zone page of 25 flagged rows with full reasons,
+about 1.5B of the 3B query cap.
