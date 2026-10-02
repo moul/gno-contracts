@@ -268,10 +268,13 @@ func renderZone(slug string, req *realmpath.Request) string {
 		actions = append(actions, action("Register an endpoint (proposer or curator)", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	}
-	// A flood clears in one call, bounded to what this page shows: an endpoint
-	// registered after it was rendered has a later revision and is kept.
-	if reg.Awaiting(z.Slug) > 0 {
-		actions = append(actions, action("Clear unreviewed (curators)", "ClearUnreviewed",
+	// A flood clears in one call. The call reaches every page and every kind,
+	// so it is offered only on the unfiltered view of a zone that takes
+	// endpoints, labelled with its real scope, and bounded in time: an
+	// endpoint registered after this page was rendered has a later revision
+	// and is kept.
+	if open && kind == "" && reg.Awaiting(z.Slug) > 0 {
+		actions = append(actions, action("Clear every never-reviewed endpoint on this zone (curators)", "ClearUnreviewed",
 			"slug", z.Slug, "throughRevision", strconv.FormatInt(reg.Revision(), 10)))
 	}
 	// Every decision carries the revision this page was rendered from, so acting

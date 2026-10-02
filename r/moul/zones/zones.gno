@@ -90,19 +90,21 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 
 // EditZone replaces a zone's Info, every field but its slug and status. A
 // curator may edit any pending or approved zone; the proposer may edit their
-// own while it is pending. revision is the zone's Revision the edit was
-// written against: it fails if the zone changed in between, its content or its
-// status. Every edit bumps the revision, so a decision prepared against the old
-// one fails too. A proposer edits only ReviewWindow blocks after the
-// zone was proposed or last edited, and an edit that changes nothing is
-// refused. On a pending zone the reason
-// must be empty; on an approved one it is required and replaces the review on
-// record, so the page names who changed the values, and why. A new chain id
-// sends the zone's verified endpoints back to unverified. Leaving the local
-// kind drops every endpoint on a private host; the proposer may do that only
-// when each one is theirs and one they could withdraw on its own
-// (RemoveEndpoint), as for RemoveZone. A rejected or retired zone cannot be
-// edited.
+// own while it is pending. revision is the zone's Revision the edit was written
+// against: it fails if the zone changed in between, its content or its status.
+// Every edit bumps the revision, so a decision prepared against the old one
+// fails too. A proposer edits only ReviewWindow blocks after the zone was
+// proposed or last edited, and an edit that changes nothing is refused. On a
+// pending zone the reason must be empty; on an approved one it is required and
+// replaces the review on record, so the page names who changed the values, and
+// why. A new chain id sends the zone's verified endpoints back to unverified.
+// Leaving the local kind drops every endpoint on a private host, and is refused
+// while one carries a curator's ruling (a verified one its registrant may
+// withdraw first); the proposer's edit only drops endpoints that are theirs and
+// that they could withdraw on their own (RemoveEndpoint), as for RemoveZone. A
+// new main RPC or gnoweb already listed under its kind by anybody but the
+// proposer or a curator is refused, as RegisterEndpoint refuses it. A rejected
+// or retired zone cannot be edited.
 func EditZone(cur realm, slug string, revision int64, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
@@ -123,6 +125,21 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 				}
 				assertWithdrawable(e)
 			}
+		}
+	}
+	// The reservation RegisterEndpoint keeps holds across an edit too: a new
+	// main RPC or gnoweb already listed under its kind by a stranger would
+	// make that listing, and its verdict, the zone's own.
+	for _, own := range []struct {
+		kind zones.EndpointKind
+		url  string
+	}{{zones.RPC, strings.TrimSpace(rpcURL)}, {zones.Gnoweb, strings.TrimSpace(gnowebURL)}} {
+		if own.url == "" {
+			continue
+		}
+		if e, ok := reg.EndpointByAddress(slug, own.kind, own.url); ok && e.Registrant != z.Proposer && !curators.Has(e.Registrant) {
+			panic("zones: " + own.url + " is listed under " + string(own.kind) + " by " + e.Registrant.String() +
+				" (endpoint #" + strconv.FormatInt(e.ID, 10) + "); a curator removes it before it becomes " + slug + "'s own")
 		}
 	}
 	must(reg.Edit(slug, revision, in, who, runtime.ChainHeight(), reason))
@@ -207,6 +224,7 @@ func RegisterEndpoint(cur realm, slug, kind, addr, label string) int64 {
 	}
 	k, err := zones.ParseEndpointKind(kind)
 	must(err)
+	addr = strings.TrimSpace(addr) // compared as the registry will store it
 	// The zone's own main RPC and gnoweb, listed under their own kind, carry
 	// the verdict its page shows on them, so only its proposer or a curator
 	// lists them: a stranger's listing, once flagged for its label, would

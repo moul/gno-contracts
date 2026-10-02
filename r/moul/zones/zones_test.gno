@@ -925,9 +925,17 @@ func TestTheZonesOwnURLsAreReserved(cur realm, t *testing.T) {
 	reset()
 	z, _ := GetZone("onyx")
 	reg.RemoveEndpoint(mustRPC(t, "onyx", z.RPCURL))
+	ge, ok := reg.EndpointByAddress("onyx", zones.Gnoweb, z.GnowebURL)
+	urequire.True(t, ok)
+	reg.RemoveEndpoint(ge.ID, ge.Revision)
 	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsContains(t, cur, "onyx's own rpc", func() {
-		RegisterEndpoint(cross(cur), "onyx", "rpc", strings.ToUpper(z.RPCURL), "moved: use mine")
+	for _, a := range []string{strings.ToUpper(z.RPCURL), " " + z.RPCURL, z.RPCURL + "\t"} {
+		uassert.AbortsContains(t, cur, "onyx's own rpc", func() {
+			RegisterEndpoint(cross(cur), "onyx", "rpc", a, "moved: use mine")
+		})
+	}
+	uassert.AbortsContains(t, cur, "onyx's own gnoweb", func() {
+		RegisterEndpoint(cross(cur), "onyx", "gnoweb", z.GnowebURL+"\t", "")
 	})
 	// Under another kind it is anybody's, and its flag marks nothing.
 	RegisterEndpoint(cross(cur), "onyx", "explorer", z.RPCURL, "")
@@ -1029,4 +1037,80 @@ func TestClearKeepsAResetEndpoint(cur realm, t *testing.T) {
 	EditZone(cross(cur), "bobs", z.Revision, "bobs-2", z.Title, z.Description, string(z.Kind), z.GnowebURL, z.RPCURL, z.GenesisURL, "")
 	testing.SetRealm(testing.NewUserRealm(Admin))
 	uassert.Equal(t, 0, ClearUnreviewed(cross(cur), "bobs", reg.Revision()))
+}
+
+// The reservation exempts the zone's proposer and any curator, each alone.
+func TestTheReservationsExemptions(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	ProposeZone(cross(cur), "bobs", "bobs-1", "Bob's", "", "devnet", "https://gnoweb.bobs.example.com", "https://rpc.bobs.example.com", "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	ApproveZone(cross(cur), "bobs", zrev("bobs"), "")
+	testing.SetRealm(testing.NewUserRealm(bob))
+	RegisterEndpoint(cross(cur), "bobs", "rpc", "https://rpc.bobs.example.com", "mine") // the proposer
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	RegisterEndpoint(cross(cur), "bobs", "gnoweb", "https://gnoweb.bobs.example.com", "") // a curator, not the proposer
+}
+
+// An edit cannot make a stranger's listing the zone's own: a curator removes
+// it first.
+func TestAnEditCannotAdoptAStrangersListing(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	id := RegisterEndpoint(cross(cur), "onyx", "rpc", "https://rpc2.onyx.example.com", "official onyx rpc")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	z, _ := GetZone("onyx")
+	edit := func() {
+		EditZone(cross(cur), "onyx", zrev("onyx"), z.ChainID, z.Title, z.Description, string(z.Kind),
+			z.GnowebURL, "https://rpc2.onyx.example.com", z.GenesisURL, "moved")
+	}
+	uassert.AbortsContains(t, cur, "a curator removes it before", edit)
+	RemoveEndpoint(cross(cur), id, erev(id))
+	edit()
+}
+
+// The Clear link reaches every page and kind, so it is offered only on the
+// unfiltered view of a zone that takes endpoints, bound to the revision the
+// page was rendered at; the call keeps an endpoint registered exactly at that
+// revision's successor and clears one registered at it.
+func TestTheClearLinksScope(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	id := RegisterEndpoint(cross(cur), "onyx", "faucet", "https://spam.example.com", "")
+	at := strconv.FormatInt(reg.Revision(), 10)
+	uassert.True(t, strings.Contains(Render("zone/onyx"), "throughRevision="+at))
+	uassert.False(t, strings.Contains(Render("zone/onyx?kind=rpc"), "func=ClearUnreviewed"))
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	uassert.Equal(t, 1, ClearUnreviewed(cross(cur), "onyx", erev(id)))
+	RetireZone(cross(cur), "onyx", zrev("onyx"), "shut down")
+	uassert.False(t, strings.Contains(Render("zone/onyx"), "func=ClearUnreviewed"), "a retired zone takes no endpoints")
+}
+
+// A registrant cannot withdraw an endpoint a curator unverified, even with no
+// reason: the reviewer is the ruling.
+func TestAReasonlessUnverifyIsARuling(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(bob))
+	id := RegisterEndpoint(cross(cur), "onyx", "rpc", "https://bob.example.com", "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	FlagEndpoint(cross(cur), id, erev(id), "checking")
+	UnverifyEndpoint(cross(cur), id, erev(id), "")
+	e, _ := GetEndpoint(id)
+	uassert.Equal(t, "", e.Reason)
+	testing.SetRealm(testing.NewUserRealm(bob))
+	testing.SkipHeights(ReviewWindow)
+	uassert.AbortsContains(t, cur, "a curator ruled on", func() { RemoveEndpoint(cross(cur), id, erev(id)) })
+}
+
+// With no listing of its own kind at all, a flag under another kind still
+// does not mark the zone's URL: there is no fallback.
+func TestNoCrossKindFallback(cur realm, t *testing.T) {
+	reset()
+	z, _ := GetZone("mainnet")
+	reg.RemoveEndpoint(mustRPC(t, "mainnet", z.RPCURL))
+	testing.SetRealm(testing.NewUserRealm(bob))
+	id := RegisterEndpoint(cross(cur), "mainnet", "explorer", z.RPCURL, "")
+	testing.SetRealm(testing.NewUserRealm(Admin))
+	FlagEndpoint(cross(cur), id, erev(id), "not an explorer")
+	uassert.False(t, strings.Contains(Render("zone/mainnet"), "`"+z.RPCURL+"` ⚠️"))
 }

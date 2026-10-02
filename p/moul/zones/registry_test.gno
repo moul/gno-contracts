@@ -609,7 +609,7 @@ func TestApprovalBindsToRevision(t *testing.T) {
 	uassert.ErrorContains(t, r.ReviewEndpoint(id, Unverified, zr(r, id), read, alice, 10, ""), "changed since you checked it")
 	// The same verdict again, with a new reason, restates it.
 	uassert.NoError(t, r.ReviewEndpoint(id, Flagged, zr(r, id), erev(r, id), curator, 11, "down since block 9"))
-	uassert.ErrorContains(t, r.ReviewEndpoint(id, Flagged, zr(r, id), erev(r, id), curator, 12, "down since block 9"), "with that reason")
+	uassert.ErrorContains(t, r.ReviewEndpoint(id, Flagged, zr(r, id), erev(r, id), curator, 12, "down since block 9"), "restating it needs a new reason")
 }
 
 func TestPendingEditTakesNoReason(t *testing.T) {
@@ -1140,4 +1140,80 @@ func TestAFutureRevisionIsRefused(t *testing.T) {
 	r := NewRegistry()
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
 	uassert.ErrorContains(t, r.ReviewZone("onyx", Approved, rev(r, "onyx")+1, curator, 2, ""), "changed since you read it")
+}
+
+// Restating: any review state with a new visible reason, bumping the
+// revision; never with an empty or the same reason.
+func TestRestatementRules(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 2, "answers onyx-1"))
+	read := rev(r, "onyx")
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, read, carol, 3, "answers onyx-1, re-probed"))
+	uassert.True(t, rev(r, "onyx") > read, "a restatement moves the revision")
+	uassert.ErrorContains(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), carol, 4, " "), "already approved")
+	id, _ := r.Register(bob, 4, "onyx", RPC, "https://a.example.com", "")
+	uassert.NoError(t, r.ReviewEndpoint(id, Flagged, zr(r, id), erev(r, id), curator, 4, "down"))
+	uassert.ErrorContains(t, r.ReviewEndpoint(id, Flagged, zr(r, id), erev(r, id), curator, 4, ""), "needs a new reason")
+	uassert.NoError(t, r.ReviewZone("onyx", Retired, rev(r, "onyx"), curator, 5, "shut down"))
+	uassert.NoError(t, r.ReviewZone("onyx", Retired, rev(r, "onyx"), carol, 6, "shut down 2026-10-01"))
+	z, _ := r.Zone("onyx")
+	uassert.Equal(t, "shut down 2026-10-01", z.Reason)
+
+}
+
+// What a URL is stored as: scheme and host lowercased in ASCII only, the path
+// and query as typed; a letter that lowercases into ASCII is refused, not
+// folded. A tcp:// rpc path is refused whatever the scheme's case.
+func TestStoredURLForm(t *testing.T) {
+	r := NewRegistry()
+	in := onyx()
+	in.GenesisURL = "HTTPS://Files.Example.com/G?Q=1"
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", in))
+	z, _ := r.Zone("onyx")
+	uassert.Equal(t, "https://files.example.com/G?Q=1", z.GenesisURL)
+	id, err := r.Register(alice, 1, "onyx", Indexer, "HTTPS://Idx.Example.com?Q=1", "")
+	uassert.NoError(t, err)
+	e, _ := r.Endpoint(id)
+	uassert.Equal(t, "https://idx.example.com?Q=1", e.Address)
+	for _, u := range []string{"https://Key.example.com", "https://rpc.İnfo.example.com"} {
+		bad := onyx()
+		bad.RPCURL = u
+		uassert.Error(t, r.Propose(bob, 2, "x"+strconv.Itoa(len(u)), bad), u)
+	}
+	uassert.ErrorContains(t, ValidateEndpoint(RPC, "TCP://h.example.com:26657/websocket"), "host and port only")
+	uassert.False(t, IsPrivateHost("RPC.GNO.LAND"))
+	uassert.ErrorContains(t, ValidateEndpoint(RPC, "https://café.example.com"), "'é'")
+}
+
+// A curator's leave-local edit is refused while a private endpoint carries a
+// ruling of any kind: a reset's reason, a reasonless unverify, a verification;
+// a curator who proposed the zone included.
+func TestLeavingLocalRefusesEveryRuling(t *testing.T) {
+	setup := func() (*Registry, int64) {
+		r := NewRegistry()
+		local := onyx()
+		local.Kind, local.RPCURL = Local, "http://127.0.0.1:26657"
+		uassert.NoError(t, r.Propose(curator, 1, "lab", local))
+		id, err := r.Register(curator, 1, "lab", RPC, "http://10.0.0.1:26657", "")
+		uassert.NoError(t, err)
+		return r, id
+	}
+	r, id := setup()
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, zr(r, id), erev(r, id), carol, 2, ""))
+	uassert.ErrorContains(t, r.Edit("lab", rev(r, "lab"), onyx(), curator, 3, ""), "is verified")
+
+	r, id = setup()
+	uassert.NoError(t, r.ReviewEndpoint(id, Flagged, zr(r, id), erev(r, id), carol, 2, "x"))
+	uassert.NoError(t, r.ReviewEndpoint(id, Unverified, zr(r, id), erev(r, id), carol, 3, ""))
+	uassert.ErrorContains(t, r.Edit("lab", rev(r, "lab"), onyx(), curator, 4, ""), "a curator ruled on")
+
+	r, id = setup()
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, zr(r, id), erev(r, id), carol, 2, ""))
+	moved := onyx()
+	moved.Kind, moved.RPCURL, moved.ChainID = Local, "http://127.0.0.1:26657", "lab-2"
+	uassert.NoError(t, r.Edit("lab", rev(r, "lab"), moved, curator, 3, "")) // the proposer's reset: no reviewer, a reason
+	e, _ := r.Endpoint(id)
+	uassert.Equal(t, "", e.ReviewedBy.String())
+	uassert.ErrorContains(t, r.Edit("lab", rev(r, "lab"), onyx(), curator, 4, ""), "a curator ruled on")
 }

@@ -201,6 +201,8 @@ func TestValidateInfo(t *testing.T) {
 	// base it modifies is text: an emoji heart as a phone writes it, a
 	// Mongolian free variant, an ideographic variation sequence.
 	for _, s := range []string{"fees scale with \u221an", "1920\u00d71080", "made with \u2764\ufe0f",
+		"\u2764\ufe0e text heart", "\u2211\ufe0f", "\u203c\ufe0f new", "\u2049\ufe0f", "\u2139\ufe0f", "\u3030\ufe0f", "\u303d\ufe0f",
+		"\u18aa\u180b",
 		"\u1828\u180b\u1821", "\u845b\U000e0100"} {
 		good := ok
 		good.Description = s
@@ -210,7 +212,8 @@ func TestValidateInfo(t *testing.T) {
 		0x274E, 0x2612, 0x1F6AB, 0x26D4, 0x1F6D1, 0x1F5F4, 0x1F5F7, 0x231B, 0x23F8, 0x23FA, 0x2705, 0x26A0,
 		0x23F3, 0x274C, 0x23F9, 0x1FBB1, 0x237B, 0x10102, 0x1F5D9, 0x2A2F, 0x2573, 0x2BBD, 0x2BBF, 0x29D6,
 		0x29D7, 0x1F7A8, 0x1F7AE, 0x2613, 0x2A09, 0x22A0, 0x2327, 0x1F147, 0x1F187, 0x2297, 0x2A02, 0x1F167,
-		0x1F6C7, 0x2298, 0x29B8} {
+		0x1F6C7, 0x2298, 0x29B8, 0x24CD, 0x24E7, 0x24B3, 0x1F127, 0x29BB, 0x2A34, 0x2A35, 0x2A37, 0x292B,
+		0x292C, 0x1F532, 0x1F533} {
 		r := r
 		bad(func(in *Info) { in.Title = string(r) + " official" }, "status glyph")
 	}

@@ -60,14 +60,14 @@ caller catches, so check one taken from a query string with them first.
 | function | who |
 |---|---|
 | `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody; a curator also when the review queue is full |
-| `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. Leaving `local` drops every endpoint on a private host, and is refused while one carries a curator's ruling (a curator removes it first); the proposer's edit only drops endpoints that are theirs and that they could withdraw on their own. A rejected or retired zone is not editable |
+| `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. Leaving `local` drops every endpoint on a private host, and is refused while one carries a curator's ruling (a curator removes it first; a verified one its registrant may withdraw); the proposer's edit only drops endpoints that are theirs and that they could withdraw on their own. A rejected or retired zone is not editable |
 | `ApproveZone(slug, revision, reason)` | a curator |
-| `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified. Rejecting a rejected zone, or retiring a retired one, with a new reason restates it |
+| `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified. Rejecting a rejected zone, or retiring a retired one, with a new reason restates it; so does approving an approved one |
 | `RemoveZone(slug, revision)` | a curator, on a pending or rejected zone; or its proposer, on a pending one, 100 blocks after it was proposed or last edited, while every endpoint on it is theirs and one they could withdraw on its own (below). One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
-| `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator. The zone's own main RPC under `rpc` and gnoweb under `gnoweb` only its proposer or a curator lists, since the page marks those URLs by that listing's verdict. A curator also registers past the review queue and the 16-per-address cap, up to the hard 128 |
+| `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator. The zone's own main RPC under `rpc` and gnoweb under `gnoweb` only its proposer or a curator lists, since the page marks those URLs by that listing's verdict. An edit cannot make a stranger's listing the zone's own either: a new main RPC or gnoweb already listed under its kind by anybody but the proposer or a curator is refused until a curator removes it. A curator also registers past the review queue and the 16-per-address cap, up to the hard 128 |
 | `VerifyEndpoint(id, zoneRevision, revision, reason)` | a curator, naming the endpoint's revision (the endpoint table's column) and the zone's (the zone page's), both as read |
 | `FlagEndpoint(id, revision, reason)`, `UnverifyEndpoint(id, revision, reason)` | a curator, naming the endpoint's revision as read. A flag needs a reason; any verdict given again with a new reason restates it |
-| `ClearUnreviewed(slug, throughRevision)` | a curator: removes, in one call, every endpoint on the zone no curator has ruled on and no curator registered, up to the revision named (the zone page's link carries the one it was rendered at, so nothing registered after is touched). For a flood that withdraws and registers again faster than one removal at a time |
+| `ClearUnreviewed(slug, throughRevision)` | a curator: removes, in one call, every endpoint on the zone no curator has ruled on and no curator registered, up to the revision named, on every page and every kind (the link on the zone's unfiltered page carries the revision it was rendered at, so nothing registered after is touched). For a flood that withdraws and registers again faster than one removal at a time |
 | `RemoveEndpoint(id, revision)` | a curator; or its registrant, on a pending or approved zone, 100 blocks after registering it, unless a curator flagged or unverified it. Naming the revision means a removal fails if a verdict landed since. A verified endpoint its registrant may take down; a flagged or curator-unverified one is a warning, and everything on a rejected or retired zone is a record: only a curator removes those |
 | `AddCurator(addr)` | a curator; it is an invitation, at most 16 curators and invitations together |
 | `AcceptCurator()` | the invited address, to take up the invitation |
@@ -103,7 +103,7 @@ plus a bounded handful of lookups (each row's main RPC verdict, the flags on a
 zone's own URLs, the zone serving the current chain for the printed command,
 the curators), never a whole list: `vm/qrender` is
 gas-metered, and a Render that outgrows it stops answering.
-Paths are exact; anything else is Not found.
+Paths are exact, up to slashes at either end; anything else is Not found.
 
 | path | shows |
 |---|---|
@@ -121,8 +121,9 @@ curator lists it. RPCs and endpoint addresses are always code. An action link
 is shown only when the call could pass the caps, and where a cap is full a note
 says which and what frees it; a full review queue still takes a curator's call,
 so its link stays, labelled for curators, and a zone with endpoints awaiting
-review offers curators a Clear link bound to the revision the page was
-rendered at. Addresses are shown in full everywhere,
+review offers curators, on its unfiltered page, a Clear link labelled with its
+scope (every never-reviewed endpoint, all pages and kinds) and bound to the
+revision the page was rendered at. Addresses are shown in full everywhere,
 never shortened: an 8+4 shortening is within reach of a vanity grinder who
 wants to look like a curator. Free text has `@` and bare `g1` addresses
 neutralised, so a label cannot turn into a profile link.

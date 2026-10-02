@@ -374,12 +374,13 @@ func HostOf(kind EndpointKind, addr string) string {
 //     default.service.arpa). Hosts files' localhost4, localhost6,
 //     ip6-localhost and ip6-loopback have no dot and fall under the first rule;
 //   - an IPv4 address in a loopback, private, link-local, carrier-grade NAT,
-//     "this network", IETF-protocol, documentation, benchmarking, multicast or
-//     reserved range;
+//     "this network", IETF-protocol, documentation, benchmarking, 6to4 relay
+//     anycast, multicast or reserved range;
 //   - anything else shaped like a number but not a valid dotted quad, so an
 //     outside caller is not told 127.1 is public (validation refuses it anyway).
 //
-// It looks at the string only; a public name that resolves to a private
+// It fails closed: anything but a bare host ([A-Za-z0-9.-] only) is private
+// to it. It looks at the string only; a public name that resolves to a private
 // address is beyond what a registry can know.
 func IsPrivateHost(host string) bool {
 	// Fail closed: anything but a bare host (a port, a path, a stray
@@ -530,7 +531,10 @@ func isSelector(r rune) bool {
 func selects(base, sel rune) bool {
 	switch {
 	case sel == 0xFE0E || sel == 0xFE0F:
-		return unicode.In(base, unicode.So, unicode.Sm)
+		// The symbols, and the five emoji whose base is punctuation or a
+		// letter by category: ‼ ⁉ ℹ 〰 〽.
+		return unicode.In(base, unicode.So, unicode.Sm) ||
+			base == 0x203C || base == 0x2049 || base == 0x2139 || base == 0x3030 || base == 0x303D
 	case sel >= 0x180B && sel <= 0x180F && sel != 0x180E:
 		return base >= 0x1820 && base <= 0x18AA
 	case sel >= 0xE0100 && sel <= 0xE01EF:
@@ -553,7 +557,9 @@ func isBadge(r rune) bool {
 		0x29D6, 0x29D7, // hourglasses
 		0x2613, 0x2A09, // saltire, n-ary times (× itself is everyday text: 1920×1080)
 		0x22A0, 0x2327, 0x1F147, 0x1F187, 0x2297, 0x2A02, 0x1F167, // boxed and circled crosses
-		0x1F6C7, 0x2298, 0x29B8: // prohibition signs
+		0x1F6C7, 0x2298, 0x29B8, // prohibition signs
+		0x24CD, 0x24E7, 0x24B3, 0x1F127, 0x29BB, 0x2A34, 0x2A35, 0x2A37, 0x292B, 0x292C, // circled, parenthesized and crossing x
+		0x1F532, 0x1F533: // square buttons, beside ⏹
 		return true
 	}
 	return r >= 0x1F7A8 && r <= 0x1F7AE // the geometric crosses beside ✖
@@ -568,8 +574,9 @@ func isBadge(r rune) bool {
 //   - no invisible or undrawable character: every format character (Unicode
 //     Cf, which covers the bidi controls and isolates, the zero-width
 //     characters, U+061C, word joiners, tags), every character that is not
-//     graphic (private use, unassigned, noncharacters), the blank fillers, the
-//     variation selectors, the combining grapheme joiner. A title made of them
+//     graphic (private use, unassigned, noncharacters), the blank fillers, a
+//     variation selector except right after a base it modifies (selects), the
+//     combining grapheme joiner. A title made of them
 //     would pass the length check and render blank or as a box.
 //   - no enclosing mark, which draws a badge's frame around any character,
 //     and no run of more than four nonspacing marks, which stack over
@@ -665,7 +672,8 @@ func checkURL(field, s string, schemes []string) error {
 	for i := 0; i < n; i++ {
 		c := s[i]
 		if c <= ' ' || c >= 0x7f || isURLForbidden(c) {
-			return errors.New("zones: the " + field + " contains " + strconv.Quote(string(c)) + ": " + strconv.Quote(s))
+			r, _ := utf8.DecodeRuneInString(s[i:]) // the character, not its first byte
+			return errors.New("zones: the " + field + " contains " + strconv.QuoteRune(r) + ": " + strconv.Quote(s))
 		}
 		if c == '%' && (i+2 >= n || !isHex(s[i+1]) || !isHex(s[i+2])) {
 			return errors.New("zones: the " + field + " has a % that is not followed by two hex digits: " + strconv.Quote(s))
@@ -848,7 +856,8 @@ func isEntity(s string) bool {
 // and leaves the path and query as typed. Stored that way because gno's link
 // sanitizer is not case-insensitive (an HTTPS:// link would render with an
 // empty href), and so every later lowercasing of the host (Canonical,
-// IsPrivateHost) finds nothing to change and costs nothing.
+// IsPrivateHost) finds nothing to change: a scan, no copy. ASCII only, see
+// asciiLower.
 func lowerAuthority(addr string) string {
 	scheme, rest, ok := strings.Cut(addr, "://")
 	if !ok {
@@ -858,7 +867,26 @@ func lowerAuthority(addr string) string {
 	if i := strings.IndexAny(rest, "/?"); i >= 0 {
 		host, tail = rest[:i], rest[i:]
 	}
-	return strings.ToLower(scheme) + "://" + strings.ToLower(host) + tail
+	return asciiLower(scheme) + "://" + asciiLower(host) + tail
+}
+
+// asciiLower lowercases A to Z and nothing else. strings.ToLower also folds
+// a few non-ASCII letters into ASCII ones (U+212A KELVIN SIGN to k, U+0130 to
+// i), which would turn a URL validation refuses into one it accepts, under a
+// spelling the caller never typed.
+func asciiLower(s string) string {
+	for i := 0; i < len(s); i++ {
+		if c := s[i]; c >= 'A' && c <= 'Z' {
+			b := []byte(s)
+			for j := i; j < len(b); j++ {
+				if b[j] >= 'A' && b[j] <= 'Z' {
+					b[j] += 'a' - 'A'
+				}
+			}
+			return string(b)
+		}
+	}
+	return s
 }
 
 // Canonical is the form two addresses are compared in, so one endpoint cannot
@@ -873,9 +901,9 @@ func lowerAuthority(addr string) string {
 // lowercase bech32 and its host is a name.
 func Canonical(kind EndpointKind, addr string) string {
 	if kind == Seed || kind == Peer {
-		id, hostport, ok := strings.Cut(strings.ToLower(addr), "@")
+		id, hostport, ok := strings.Cut(asciiLower(addr), "@")
 		if !ok {
-			return strings.ToLower(addr)
+			return asciiLower(addr)
 		}
 		if i := strings.LastIndexByte(hostport, ':'); i >= 0 {
 			hostport = strings.TrimSuffix(hostport[:i], ".") + hostport[i:]
@@ -886,7 +914,7 @@ func Canonical(kind EndpointKind, addr string) string {
 	if !ok {
 		return addr
 	}
-	scheme = strings.ToLower(scheme)
+	scheme = asciiLower(scheme)
 	if kind == RPC && scheme == "tcp" {
 		scheme = "http"
 	}
@@ -894,7 +922,7 @@ func Canonical(kind EndpointKind, addr string) string {
 	if i < 0 {
 		i = len(rest)
 	}
-	authority, tail := strings.ToLower(rest[:i]), rest[i:]
+	authority, tail := asciiLower(rest[:i]), rest[i:]
 	host, port := authority, ""
 	if j := strings.LastIndexByte(authority, ':'); j >= 0 {
 		host, port = authority[:j], authority[j+1:]

@@ -280,9 +280,14 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 		drop := r.private.Lookup(slug)
 		for _, eid := range drop {
 			v, _ := r.endpoints.get(eid)
-			if e := v.(*Endpoint); e.Status != Unverified || e.ReviewedBy != "" || e.Reason != "" {
-				return errors.New("zones: leaving local would drop endpoint #" + strconv.FormatInt(e.ID, 10) +
-					", which a curator ruled on; a curator must remove it first")
+			// Every verdict names its reviewer and a reset leaves a reason, so
+			// these two say "ruled on".
+			if e := v.(*Endpoint); e.ReviewedBy != "" || e.Reason != "" {
+				who := "a curator ruled on; a curator must remove it first"
+				if e.Status == Verified {
+					who = "is verified; its registrant or a curator must remove it first"
+				}
+				return errors.New("zones: leaving local would drop endpoint #" + strconv.FormatInt(e.ID, 10) + ", which " + who)
 			}
 		}
 		for _, eid := range drop {
@@ -324,6 +329,11 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 //	reject   from pending                        reason REQUIRED
 //	retire   from approved                       reason REQUIRED
 //
+// and a decision restated: the zone's present status again, with a new
+// visible reason, which records the new reviewer and bumps the revision and
+// does nothing else (no new entry in the state, no eviction, no reset). It is
+// the only way to correct a reason.
+//
 // Every decision names the zone's Revision the curator read, and fails if the
 // zone changed since: otherwise a proposer's edit landing just before an
 // approval would become official under the curator's name, and a rejection's
@@ -356,9 +366,10 @@ func (r *Registry) ReviewZone(slug string, to Status, revision int64, by address
 		return err
 	}
 	if z.Status == to {
-		// A rejection or a retirement is restated with a new reason, the only
-		// way to correct one: neither state is editable.
-		if (to == Rejected || to == Retired) && HasVisible(reason) && reason != z.Reason {
+		// A decision is restated with a new reason, the only way to correct
+		// one: a rejected or retired zone is not editable, and an edit to an
+		// approved zone must change something besides its reason.
+		if (to == Approved || to == Rejected || to == Retired) && HasVisible(reason) && reason != z.Reason {
 			r.ids.rev++
 			z.Revision = int64(r.ids.rev)
 			z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
@@ -500,8 +511,10 @@ func (r *Registry) removeZone(z *Zone, id store.ID) {
 //
 // A zone takes endpoints while it is pending or approved, and a rejected or
 // retired zone takes none. Who may register on a pending zone is the holding
-// realm's call; the address is stored in its canonical spelling (scheme
-// lowercased, a peer lowercased whole) so what is listed is what dials.
+// realm's call; a URL is stored with its scheme and host lowercased, a peer
+// lowercased whole without its host's terminal dot, so what is listed is what
+// dials (Canonical, which also drops default ports and reads tcp as http, is
+// what they are compared in, not what is stored).
 func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind, addr, label string) (int64, error) {
 	return r.register(by, at, slug, kind, addr, label, true)
 }
@@ -620,9 +633,9 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, zoneRevision, revis
 		// as written would match no filter and count as unverified forever.
 		return errors.New("zones: unknown verification " + strconv.Quote(string(to)) + ", want verified, unverified or flagged")
 	}
-	if e.Status == to && reason == e.Reason {
+	if e.Status == to && (reason == e.Reason || !HasVisible(reason)) {
 		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " is already " + string(to) +
-			", with that reason")
+			"; restating it needs a new reason")
 	}
 	if to == Flagged && !HasVisible(reason) {
 		return errors.New("zones: flagging an endpoint needs a reason")
@@ -1037,10 +1050,10 @@ func kindKey(slug string, kind EndpointKind) string { return slug + "|" + string
 func ownerKey(slug string, who address) string { return slug + "|" + who.String() }
 
 // trimInfo normalizes what a caller typed before it is validated: spaces
-// around every field, and each URL's scheme lowercased (a scheme is
-// case-insensitive, gno's link sanitizer is not, so HTTPS:// would render as a
-// dead link). Nothing else is rewritten: what fails validation is refused, not
-// repaired.
+// around every field, and each URL's scheme and host lowercased in ASCII
+// (both are case-insensitive, gno's link sanitizer is not, so HTTPS:// would
+// render as a dead link). Nothing else is rewritten: what fails validation is
+// refused, not repaired.
 func trimInfo(in Info) Info {
 	in.ChainID = strings.TrimSpace(in.ChainID)
 	in.Title = strings.TrimSpace(in.Title)

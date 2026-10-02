@@ -40,7 +40,7 @@ changing here.
 
 | decision | from | reason | also |
 |---|---|---|---|
-| approve | pending, rejected, retired | optional | |
+| approve | pending, rejected, retired; approved, to restate the reason | optional (required to restate) | |
 | reject | pending; rejected, to restate the reason | **required** | verified endpoints go back to unverified |
 | retire | approved; retired, to restate the reason | **required** | verified endpoints go back to unverified |
 | edit | pending, approved | none before review, **required** after | a new chain id un-verifies endpoints; leaving `local` drops the private ones, refused while one carries a curator's ruling |
@@ -49,7 +49,7 @@ changing here.
 | unverify an endpoint | any, the same one only with a new reason | optional | |
 | flag an endpoint | any, the same one only with a new reason | **required** | |
 
-Every endpoint verdict, and every removal, names the endpoint's own
+Every endpoint verdict, and every removal of one endpoint, names the endpoint's own
 `Revision`, bumped on registration, on every verdict and on every reset, from
 the same never-repeating counter zones use: so it fails if another curator
 ruled on the endpoint since it was read (a verdict landing unseen would reverse
@@ -113,7 +113,8 @@ also an index key, a URL segment or a config-file line:
   benchmarking, 6to4 relay anycast, multicast and reserved ranges.
   `IsPrivateHost` fails closed: anything but a bare host is private to it. A
   zone that leaves the `local` kind drops every endpoint on one, in the same
-  edit. An IPv4 host has no terminal dot.
+  edit, and the edit is refused while one of them carries a curator's ruling.
+  An IPv4 host has no terminal dot.
 - **Peer**: `<node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes,
   the node id a lowercase g1 address (tm2 compares node ids byte for byte), and
   no terminal dot on an IPv4 host (Go's dialer cannot use one, so URLs refuse
@@ -123,9 +124,9 @@ also an index key, a URL segment or a config-file line:
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no
-  variation selector except right after a character it modifies (an emoji
-  heart as a phone writes it, a Mongolian variant, an ideographic variation
-  sequence), no enclosing mark (it draws a badge's frame around any
+  variation selector except right after a character it modifies (FE0E or FE0F
+  after a symbol or one of the five emoji whose base is punctuation, as a phone
+  writes ❤️ or ‼️; a Mongolian free variant; an ideographic variation sequence), no enclosing mark (it draws a badge's frame around any
   character), no run of more than four nonspacing marks, none of the
   status glyphs a Render draws nor their look-alikes, and, unless it is empty,
   something visible. Refused rather than stripped, so what is stored is what is
@@ -187,8 +188,13 @@ leaving `local` reads only those). Every one is written in the same method as
 its record; counts come from the indexes without reading a record, and a page
 reads the records on it only (the bucket's id list, at most 256 or 128 ids, is
 read whole). Measured on a node at the caps, with every text field at full
-length in the costliest characters and 240-character hosts: the heaviest write
-is an edit taking a local zone with 128 private endpoints off `local`, about
-1.1B gas (36% of a 3B block), and a retirement that evicts a full zone is about
-0.35B; the heaviest page is a zone page of 25 flagged rows with full reasons,
-about 1.5B of the 3B query cap.
+length in the costliest characters and 240-character hosts: the heaviest page is
+a zone page of 25 flagged rows with full reasons, about 1.5B of the 3B query
+cap. A removal shifts the later records in its B+ tree leaf, and endpoint ids
+are handed out registry-wide, so what a removal of a zone's endpoints costs
+depends on how they interleave with other zones'. With a zone's 128 endpoints
+registered together, an edit taking it off `local` costs about 1.1B and a
+retirement that evicts a full zone about 0.35B; with each of them spread to the
+head of its own leaf, the worst a registrant can arrange, they cost 2.1B (70% of
+a 3B block) and 1.4B, and `ClearUnreviewed` of 128 costs 1.9B, all under a 3B
+block.
