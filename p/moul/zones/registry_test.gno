@@ -297,7 +297,7 @@ func TestRegisterAndFilter(t *testing.T) {
 	uassert.Equal(t, 1, v)
 	uassert.Equal(t, 5, total)
 
-	uassert.ErrorContains(t, r.ReviewEndpoint(rpc, Verified, erev(r, rpc), curator, 8, ""), "already verified")
+	uassert.ErrorContains(t, r.ReviewEndpoint(rpc, Verified, erev(r, rpc), curator, 8, "answers onyx-1"), "already verified")
 	uassert.ErrorContains(t, r.ReviewEndpoint(peer, Flagged, erev(r, peer), curator, 8, ""), "needs a reason")
 	uassert.ErrorContains(t, r.ReviewEndpoint(peer, "trusted", erev(r, peer), curator, 8, ""), "unknown verification")
 	uassert.ErrorContains(t, r.ReviewEndpoint(peer, "", erev(r, peer), curator, 8, ""), "needs a verdict")
@@ -419,12 +419,12 @@ func TestFloodCannotCrowdOutReviewedEntries(t *testing.T) {
 	// still make room, instead of deleting the warning to make room.
 	_, err = r.Register(bob, 11, "onyx", RPC, "https://honest2.example.com", "")
 	uassert.ErrorContains(t, err, "waiting for review")
-	uassert.NoError(t, r.ReviewEndpoint(ids[1], Flagged, 0, curator, 12, "spam"))
+	uassert.NoError(t, r.ReviewEndpoint(ids[1], Flagged, erev(r, ids[1]), curator, 12, "spam"))
 	_, err = r.Register(bob, 13, "onyx", RPC, "https://honest2.example.com", "")
 	uassert.NoError(t, err)
 	// Unflagging puts it back in the queue, and a review is never refused for
 	// the queue being full, only a registration is.
-	uassert.NoError(t, r.ReviewEndpoint(ids[1], Unverified, 0, curator, 14, "re-checking"))
+	uassert.NoError(t, r.ReviewEndpoint(ids[1], Unverified, erev(r, ids[1]), curator, 14, "re-checking"))
 	_, err = r.Register(bob, 15, "onyx", RPC, "https://honest3.example.com", "")
 	uassert.ErrorContains(t, err, "waiting for review")
 	uassert.NoError(t, r.RemoveEndpoint(ids[2]))
@@ -547,13 +547,14 @@ func rev(r *Registry, slug string) int64 {
 	return z.Revision
 }
 
-// erev is the revision of an endpoint's zone, what a curator verifies against.
+// erev is what a verdict on an endpoint names: VerdictRevision.
 func erev(r *Registry, id int64) int64 {
 	e, ok := r.Endpoint(id)
 	if !ok {
 		return 0
 	}
-	return rev(r, e.Zone)
+	z, _ := r.Zone(e.Zone)
+	return VerdictRevision(z, e)
 }
 
 // An approval names the revision the curator read. An edit landing between the
@@ -583,14 +584,20 @@ func TestApprovalBindsToRevision(t *testing.T) {
 	// Verifying an endpoint binds the same way: to the chain id it was checked against.
 	id, err := r.Register(alice, 6, "onyx", RPC, "https://a.example.com", "")
 	uassert.NoError(t, err)
-	checked := rev(r, "onyx")
+	checked := erev(r, id)
 	moved := onyx()
 	moved.ChainID = "onyx-2"
 	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), moved, curator, 7, "relaunch"))
 	uassert.ErrorContains(t, r.ReviewEndpoint(id, Verified, checked, curator, 8, ""), "changed since you checked it")
-	uassert.NoError(t, r.ReviewEndpoint(id, Verified, rev(r, "onyx"), curator, 8, ""))
-	// Flagging and unverifying need no revision: they withdraw trust, never grant it.
-	uassert.NoError(t, r.ReviewEndpoint(id, Flagged, 0, curator, 9, "down"))
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, erev(r, id), curator, 8, ""))
+	// Every verdict binds to the endpoint as read, too: a verify written before
+	// another curator's flag fails rather than silently reversing it.
+	read = erev(r, id)
+	uassert.NoError(t, r.ReviewEndpoint(id, Flagged, read, curator, 9, "down"))
+	uassert.ErrorContains(t, r.ReviewEndpoint(id, Unverified, read, alice, 10, ""), "changed since you checked it")
+	// The same verdict again, with a new reason, restates it.
+	uassert.NoError(t, r.ReviewEndpoint(id, Flagged, erev(r, id), curator, 11, "down since block 9"))
+	uassert.ErrorContains(t, r.ReviewEndpoint(id, Flagged, erev(r, id), curator, 12, "down since block 9"), "with that reason")
 }
 
 func TestPendingEditTakesNoReason(t *testing.T) {
@@ -648,6 +655,9 @@ func TestEvictionUnwindsEverything(t *testing.T) {
 	uassert.NoError(t, r.Propose(alice, 1, "first", onyx()))
 	_, err := r.Register(alice, 1, "first", RPC, "https://f.example.com", "")
 	uassert.NoError(t, err)
+	fl, err := r.Register(alice, 1, "first", RPC, "https://flagged.example.com", "")
+	uassert.NoError(t, err)
+	uassert.NoError(t, r.ReviewEndpoint(fl, Flagged, erev(r, fl), curator, 1, "spam"))
 	uassert.NoError(t, r.ReviewZone("first", Rejected, rev(r, "first"), curator, 2, "dup"))
 	for i := 0; i < MaxRejected; i++ {
 		slug := "rej" + strconv.Itoa(i)
@@ -661,8 +671,12 @@ func TestEvictionUnwindsEverything(t *testing.T) {
 	uassert.Equal(t, 0, r.OwnerCount("first", alice))
 	uassert.Equal(t, 0, r.EndpointCount("first", RPC))
 	uassert.NoError(t, r.Propose(alice, 5, "first", onyx()))
+	// Neither the review queue nor the flag count of the evicted zone carries
+	// over to the slug proposed again.
+	uassert.Equal(t, 0, r.Awaiting("first"))
 	_, err = r.Register(alice, 5, "first", RPC, "https://f.example.com", "")
 	uassert.NoError(t, err)
+	uassert.Equal(t, 1, r.Awaiting("first"))
 }
 
 // Approving a rejected or retired zone back into the live registry respects
@@ -718,7 +732,7 @@ func TestRejectUnverifies(t *testing.T) {
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
 	id, err := r.Register(alice, 1, "onyx", RPC, "https://a.example.com", "")
 	uassert.NoError(t, err)
-	uassert.NoError(t, r.ReviewEndpoint(id, Verified, rev(r, "onyx"), curator, 2, ""))
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, erev(r, id), curator, 2, ""))
 	uassert.NoError(t, r.ReviewZone("onyx", Rejected, rev(r, "onyx"), curator, 3, "not a gno chain"))
 	e, _ := r.Endpoint(id)
 	uassert.Equal(t, string(Unverified), string(e.Status))
@@ -783,9 +797,9 @@ func TestCanonicalHostAndTextEdgeCases(t *testing.T) {
 	uassert.ErrorContains(t, ValidateEndpoint(Peer, nodeID+"@1.2.3.4.:26656"), "DNS name or an IPv4")
 	// A loopback or private host is a local zone's only.
 	_, err = r.Register(alice, 1, "onyx", RPC, "http://127.0.0.1:26657", "")
-	uassert.ErrorContains(t, err, "loopback or private")
+	uassert.ErrorContains(t, err, "private or special-use")
 	_, err = r.Register(alice, 1, "onyx", Peer, nodeID+"@10.1.2.3:26656", "")
-	uassert.ErrorContains(t, err, "loopback or private")
+	uassert.ErrorContains(t, err, "private or special-use")
 	local := onyx()
 	local.Kind, local.RPCURL = Local, "http://127.0.0.1:26657"
 	uassert.NoError(t, r.Propose(alice, 1, "mine", local))
@@ -856,7 +870,6 @@ func TestStatusChangeBumpsTheRevision(t *testing.T) {
 	uassert.Equal(t, "phishing RPC", z.Reason)
 }
 
-// Leaving the local kind is refused while the zone lists a private host.
 // Leaving the local kind drops the private endpoints in the same edit, so
 // nobody can block the edit by registering one again after each removal.
 func TestLeavingLocalDropsPrivateEndpoints(t *testing.T) {
@@ -868,7 +881,7 @@ func TestLeavingLocalDropsPrivateEndpoints(t *testing.T) {
 	uassert.NoError(t, err)
 	flagged, err := r.Register(bob, 1, "mine", RPC, "http://localhost:1", "")
 	uassert.NoError(t, err)
-	uassert.NoError(t, r.ReviewEndpoint(flagged, Flagged, 0, curator, 1, "squatting"))
+	uassert.NoError(t, r.ReviewEndpoint(flagged, Flagged, erev(r, flagged), curator, 1, "squatting"))
 	pub, err := r.Register(alice, 1, "mine", RPC, "https://rpc.mine.example.com", "")
 	uassert.NoError(t, err)
 	uassert.NoError(t, r.Edit("mine", rev(r, "mine"), onyx(), alice, 2, ""))
@@ -889,7 +902,7 @@ func TestResetNamesACuratorEditor(t *testing.T) {
 	r := NewRegistry()
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
 	id, _ := r.Register(alice, 1, "onyx", RPC, "https://a.example.com", "")
-	uassert.NoError(t, r.ReviewEndpoint(id, Verified, rev(r, "onyx"), curator, 2, ""))
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, erev(r, id), curator, 2, ""))
 	moved := onyx()
 	moved.ChainID = "onyx-2"
 	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), moved, curator, 3, ""))
@@ -903,12 +916,13 @@ func TestPrivateHostsAndURLForms(t *testing.T) {
 		"127.1", "0x7f.1", "2130706433",
 		"rpc.test", "node.lan", "nas.home", "dc.corp", "wiki.intranet", "box.private", "x.onion", "y.alt",
 		"192.0.2.1", "198.51.100.7", "203.0.113.255",
-		"gno.example", "x.invalid", "rpc.mail", "ipv4only.arpa"} {
+		"gno.example", "x.invalid", "rpc.mail", "ipv4only.arpa", "gnoland.default.service.arpa", "x.arpa",
+		"100.127.255.255"} {
 		uassert.True(t, IsPrivateHost(h), h)
 	}
-	for _, h := range []string{"rpc.gno.land", "1.1.1.1", "198.20.0.1", "172.32.0.1", "gno.land.",
+	for _, h := range []string{"rpc.gno.land", "1.1.1.1", "198.20.0.1", "172.32.0.1", "gno.land.", "100.128.0.1",
 		"a.latest", "my.salt", "192.0.3.1", "198.51.101.1", "203.0.114.1",
-		"example.com", "gmail.com", "x.arpa"} {
+		"example.com", "gmail.com", "arpa.example.com"} {
 		uassert.False(t, IsPrivateHost(h), h)
 	}
 	// tcp:// and http:// are one rpc endpoint, the way gnokey dials them.
@@ -922,7 +936,7 @@ func TestPrivateHostsAndURLForms(t *testing.T) {
 	}
 	uassert.NoError(t, ValidateEndpoint(Indexer, "https://h.example.com/a.b/..c/x."))
 	in := onyx()
-	for _, title := range []string{"⌛ pending", "❎ rejected", "√ ok", "\U0001F6D1 stop", "☒ no"} {
+	for _, title := range []string{"⌛ pending", "❎ rejected", "\U0001F6D1 stop", "☒ no"} {
 		in.Title = title
 		uassert.ErrorContains(t, ValidateInfo(in), "status glyph", title)
 	}
@@ -945,4 +959,55 @@ func TestCopiedRegistryIsTheSameRegistry(t *testing.T) {
 	uassert.NoError(t, r1.Edit("onyx", seen, in, alice, 3, ""))
 	uassert.True(t, rev(r1, "onyx") != seen, "a new content, a new revision")
 	uassert.ErrorContains(t, r1.ReviewZone("onyx", Approved, seen, curator, 4, ""), "changed since you read it")
+}
+
+// Editing a local zone that stays local drops nothing, and every Info URL is
+// checked for a private host, not only the main RPC.
+func TestOnlyLeavingLocalDrops(t *testing.T) {
+	r := NewRegistry()
+	local := onyx()
+	local.Kind, local.RPCURL = Local, "http://127.0.0.1:26657"
+	uassert.NoError(t, r.Propose(alice, 1, "mine", local))
+	id, err := r.Register(alice, 1, "mine", Peer, nodeID+"@10.0.0.5:26656", "")
+	uassert.NoError(t, err)
+	local.Title = "Mine, renamed"
+	uassert.NoError(t, r.Edit("mine", rev(r, "mine"), local, alice, 2, ""))
+	_, ok := r.Endpoint(id)
+	uassert.True(t, ok, "a local zone keeps its private endpoints")
+
+	for _, set := range []func(*Info){
+		func(in *Info) { in.GnowebURL = "http://192.168.1.2" },
+		func(in *Info) { in.GenesisURL = "https://files.lan/genesis.json" },
+	} {
+		in := onyx()
+		set(&in)
+		uassert.ErrorContains(t, ValidateInfo(in), "private or special-use")
+	}
+}
+
+// Any edit to an approved zone is a review on record, so a chain-id reset it
+// causes names its editor, whoever that is; only a pending zone's own
+// proposer resets as nobody.
+func TestApprovedEditResetNamesTheEditor(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 2, ""))
+	id, _ := r.Register(bob, 3, "onyx", RPC, "https://a.example.com", "")
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, erev(r, id), curator, 4, ""))
+	moved := onyx()
+	moved.ChainID = "onyx-2"
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), moved, alice, 5, "relaunched"))
+	e, _ := r.Endpoint(id)
+	uassert.Equal(t, alice.String(), e.ReviewedBy.String())
+}
+
+// A curator's exemption is from the review queue, never from the live cap.
+func TestExemptStillMeetsTheLiveCap(t *testing.T) {
+	r := NewRegistry()
+	for i := 0; i < MaxZones; i++ {
+		slug := "z" + strconv.Itoa(i)
+		uassert.NoError(t, r.ProposeExempt(curator, 1, slug, onyx()))
+		uassert.NoError(t, r.ReviewZone(slug, Approved, rev(r, slug), curator, 1, ""))
+	}
+	uassert.ErrorContains(t, r.ProposeExempt(curator, 2, "one-more", onyx()), "the registry is full")
 }

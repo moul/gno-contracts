@@ -119,12 +119,13 @@ func seed() {
 	for _, s := range seeds() {
 		must(reg.Propose(Admin, at, s.slug, s.info))
 		must(reg.ReviewZone(s.slug, zones.Approved, mustZone(s.slug).Revision, Admin, at, seedReason))
-		rev := mustZone(s.slug).Revision // the approval bumped it
 		for _, e := range s.endpoints {
 			k, err := zones.ParseEndpointKind(e[0])
 			must(err)
 			id, err := reg.Register(Admin, at, s.slug, k, e[1], e[2])
 			must(err)
+			ep, _ := reg.Endpoint(id)
+			rev := zones.VerdictRevision(mustZone(s.slug), ep) // the approval and the registration both moved it
 			if s.failed == "" {
 				must(reg.ReviewEndpoint(id, zones.Verified, rev, Admin, at, seedReason))
 			} else {

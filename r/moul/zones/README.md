@@ -47,11 +47,11 @@ gnokey query vm/qeval -remote https://rpc.gno.land \
 
 Turning these into a node's `config.toml` is deliberately not this realm's job.
 It is public (`gnomod.toml` says why) so that a separate realm can import it and
-do that. Two things an importer must know: what these return is read-only in
-the importing realm (copy a slice before sorting it, a struct before changing
-it), and a kind or status that is not one of the exact values panics, which no
-`recover` in the caller catches, so check one taken from a query string with
-`p/moul/zones`'s `Parse` functions first.
+do that. Two things an importer must know: a slice these return is read-only in
+the importing realm, elements included (copy it before sorting or changing it;
+a struct returned on its own is already the caller's), and a kind or status the
+`p/moul/zones` `Parse` functions do not accept panics, which no `recover` in the
+caller catches, so check one taken from a query string with them first.
 
 ## Write to it
 
@@ -63,20 +63,21 @@ it), and a kind or status that is not one of the exact values panics, which no
 | `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified |
 | `RemoveZone(slug, revision)` | a curator, on a pending or rejected zone; or its proposer, on a pending one, 100 blocks after it was proposed or last edited, while every endpoint on it is theirs and one they could withdraw on its own (below). One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
 | `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator. A curator also when the zone's review queue is full, up to the hard 128 |
-| `VerifyEndpoint(id, revision, reason)` | a curator, naming the zone revision they checked it against |
-| `FlagEndpoint(id, reason)`, `UnverifyEndpoint(id, reason)` | a curator; a flag needs a reason, and flagging a flagged endpoint again restates its reason |
+| `VerifyEndpoint(id, revision, reason)`, `FlagEndpoint(id, revision, reason)`, `UnverifyEndpoint(id, revision, reason)` | a curator, naming the endpoint's revision as read (the endpoint table's revision column). A flag needs a reason; the same verdict again with a new reason restates it |
+| `ClearUnreviewed(slug)` | a curator: removes every endpoint on the zone no curator has ruled on, in one call, for a flood that withdraws and registers again faster than one removal at a time |
 | `RemoveEndpoint(id)` | a curator; or its registrant, on a pending or approved zone, 100 blocks after registering it, while no curator has ruled on it. A verified, flagged or curator-unverified endpoint is a record, and so is everything on a rejected or retired zone: only a curator removes them |
 | `AddCurator(addr)` | a curator; it is an invitation, at most 16 curators and invitations together |
 | `AcceptCurator()` | the invited address, to take up the invitation |
 | `RemoveCurator(addr)` | a curator; it withdraws an invitation, or removes a curator along with every invitation they sent. The last curator cannot be removed |
 
-Every decision on a zone (edit, approve, reject, retire, remove) and every
-verification takes its `revision`, the one you read (the zone page shows it,
-and its action links carry it): if the zone changed since, its content or its
-status, the call fails and you read it again. The `$help` links on each page
-fill it in (an edit and a verification have no link: copy the revision from
-the zone page). The revision covers the zone's own fields and status, not its
-endpoints' verdicts. A proposer edits or withdraws a pending zone only 100
+Every decision on a zone (edit, approve, reject, retire, remove) takes its
+`revision`, the one you read (the zone page shows it, and its action links
+carry it): if the zone changed since, its content or its status, the call fails
+and you read it again. An endpoint's verdict takes the endpoint's revision, the
+later of its zone's and its own (`zones.VerdictRevision`), so it also fails if
+another curator ruled on it since. The `$help` links fill a revision in; an edit
+and a verdict have no link, so copy it from the zone page. A zone's revision
+covers its own fields and status, not its endpoints' verdicts. A proposer edits or withdraws a pending zone only 100
 blocks (`ReviewWindow`) after it was proposed or last edited, by anybody, and a
 registrant withdraws an endpoint only 100 blocks after registering it, so
 neither can keep an entry out of a curator's reach by changing it faster than
@@ -105,14 +106,15 @@ Paths are exact; anything else is Not found.
 | `proposals` | pending proposals; `?status=rejected` for rejected ones, with the reason |
 
 An approved zone's gnoweb and genesis URLs are links; any other zone's show as
-code, to copy and check. A URL the zone also lists as a flagged endpoint is code
-and marked, wherever it is shown: the verdict of the kind it is shown as
-decides (its main RPC as an rpc, its gnoweb as a gnoweb), and a flag under
-another kind counts only when that kind holds no verdict, so "not a faucet" on
-a URL does not mark a verified gnoweb. The printed `gnokey` line leaves out a
-main RPC so marked. RPCs and endpoint addresses are always code. An action link
-is shown only when the call could pass the caps, and in its place a note says
-which cap is full and what frees it. Addresses are shown in full everywhere,
+code, to copy and check. A main RPC or gnoweb URL the zone also lists, under
+that same kind, as a flagged endpoint is code and marked wherever it is shown,
+and the printed `gnokey` line leaves out a main RPC so marked. Only that kind's
+flag counts: a listing under another kind is anybody's to make, so its flag
+never marks the zone's own URL, and a curator who means the zone's URL flags it
+under its own kind. RPCs and endpoint addresses are always code. An action link
+is shown only when the call could pass the caps, and where a cap is full a note
+says which and what frees it; a full review queue still takes a curator's call,
+so its link stays, labelled for curators. Addresses are shown in full everywhere,
 never shortened: an 8+4 shortening is within reach of a vanity grinder who
 wants to look like a curator. Free text has `@` and bare `g1` addresses
 neutralised, so a label cannot turn into a profile link.

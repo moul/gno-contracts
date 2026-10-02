@@ -44,9 +44,15 @@ changing here.
 | retire | approved | **required** | verified endpoints go back to unverified |
 | edit | pending, approved | none before review, **required** after | a new chain id un-verifies endpoints |
 | remove | pending, rejected | | endpoints go with it |
-| verify an endpoint | any other verdict | optional | must name the zone's current `Revision`; zone pending or approved |
-| unverify an endpoint | any other verdict | optional | |
-| flag an endpoint | any other verdict, or flagged with a new reason | **required** | |
+| verify an endpoint | any, the same one only with a new reason | optional | zone pending or approved |
+| unverify an endpoint | any, the same one only with a new reason | optional | |
+| flag an endpoint | any, the same one only with a new reason | **required** | |
+
+Every endpoint verdict names `VerdictRevision(zone, endpoint)`, the later of the
+zone's `Revision` and the endpoint's own, both from the one counter that never
+repeats: so it fails if the zone changed (a verification checks the endpoint
+answers for this zone's chain id) or another curator ruled on the endpoint
+since it was read (a verdict landing unseen would reverse theirs).
 
 - **Every decision on a zone binds to the zone as read**: its fields and its
   status. Every edit bumps the
@@ -92,10 +98,10 @@ also an index key, a URL segment or a config-file line:
   escapes a character that needs no escaping, and a path has no `.` or `..`
   segment, so a URL has one spelling. A host that names a different machine
   for every reader is refused except on a `local` zone: a name with no dot,
-  `.localhost`, `.local`, `.internal`, `.home.arpa`, `.localdomain`, the
-  RFC 6761 names `.test`, `.example` and `.invalid`, the never-delegated
-  `.lan`, `.home`, `.corp`, `.mail`, `.intranet`, `.private`, `.onion`, `.alt`,
-  `ipv4only.arpa`, and IPv4 "this network", loopback, private, link-local,
+  `.localhost`, `.local`, `.internal`, `.localdomain`, the RFC 6761 names
+  `.test`, `.example` and `.invalid`, the never-delegated `.lan`, `.home`,
+  `.corp`, `.mail`, `.intranet`, `.private`, `.onion`, `.alt`, every `.arpa`
+  name (infrastructure, never a public service), and IPv4 "this network", loopback, private, link-local,
   CGNAT, IETF-protocol, documentation, benchmarking, multicast and reserved
   ranges. A zone that leaves the `local` kind drops every endpoint on one, in
   the same edit. An IPv4 host has no terminal dot.
@@ -108,7 +114,8 @@ also an index key, a URL segment or a config-file line:
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no
-  variation selector, no run of more than four combining marks, none of the
+  variation selector, no enclosing mark (it draws a badge's frame around any
+  character), no run of more than four other combining marks, none of the
   status glyphs a Render draws nor their look-alikes, and, unless it is empty,
   something visible. Refused rather than stripped, so what is stored is what is
   shown. It must still be escaped by whoever renders it. Two consequences:
@@ -142,12 +149,12 @@ has its verdict and leaves the queue, so curators keep warnings instead of
 deleting them to make room. The gate is checked where something enters, so a
 review or a reset can push a count past it. A flood fills the queue and never
 crowds out an approved zone or a verified endpoint, and `ProposeExempt` and
-`RegisterExempt` skip the gate (not the hard caps) for the reviewers the holding
-realm trusts, so a full queue never locks out the people who clear it. Each
-entry costs its sender a storage deposit, refunded to whoever signs the
-transaction that frees it (on a chain with transfers locked, to the storage fee
-collector instead), so a flooder who withdraws first gets it back: a bond, not a
-fee.
+`RegisterExempt` skip the gate and the per-address caps (not the hard caps) for
+the reviewers the holding realm trusts, so a full queue never locks out the
+people who clear it. Each entry costs its sender a storage deposit, refunded to
+whoever signs the transaction that frees it (on a chain with transfers locked,
+to the storage fee collector instead), so a flooder who withdraws first gets it
+back: a bond, not a fee.
 
 ## Storage
 
@@ -166,6 +173,8 @@ The other five are [`kit/index`](../kit/index): status, approved-by-chain-id,
 and for endpoints zone, zone-and-kind and not-verified. Every one is written in
 the same method as its record; counts come from the indexes without reading a
 record, and a page reads the records on it only (the bucket's id list, at most
-256 or 128 ids, is read whole). A rejection or a retirement at the caps is the
-heaviest write: the reviewed zone's resets plus, when its state is full, the
-eviction of a zone with up to 128 endpoints, in one transaction.
+256 or 128 ids, is read whole). The heaviest write, measured on a node at the
+caps with full-length text, is an edit taking a local zone with 128 private
+endpoints off `local`, about 0.65B gas, because each dropped endpoint unwinds
+its own index entries; a retirement that evicts a full zone is about 0.38B. Both
+are well under a block's gas.

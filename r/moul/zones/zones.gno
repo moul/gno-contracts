@@ -97,20 +97,37 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 // refused. On a pending zone the reason
 // must be empty; on an approved one it is required and replaces the review on
 // record, so the page names who changed the values, and why. A new chain id
-// sends the zone's verified endpoints back to unverified. A rejected or retired
-// zone cannot be edited.
+// sends the zone's verified endpoints back to unverified. Leaving the local
+// kind drops every endpoint on a private host; the proposer may do that only
+// when each one is theirs and one they could withdraw on its own
+// (RemoveEndpoint), as for RemoveZone. A rejected or retired zone cannot be
+// edited.
 func EditZone(cur realm, slug string, revision int64, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = strings.TrimSpace(slug)
 	z := mustZone(slug)
+	in := info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)
 	if !curators.Has(who) {
 		if z.Status != zones.Pending || z.Proposer != who {
 			panic("zones: only a curator, or the proposer while it is pending, may edit " + slug)
 		}
-		assertCooled(slug, z)
+		assertReviewWindow(slug, z)
+		if z.Kind == zones.Local && in.Kind != zones.Local {
+			// The edit would drop these; dropping is removing, under the
+			// rules a removal by the proposer has.
+			for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug}) {
+				if !zones.IsPrivateHost(zones.HostOf(e.Kind, e.Address)) {
+					continue
+				}
+				if e.Registrant != who {
+					panic("zones: leaving local would drop endpoint #" + strconv.FormatInt(e.ID, 10) +
+						", which somebody else registered; a curator must remove it first")
+				}
+				assertWithdrawable(e)
+			}
+		}
 	}
-	must(reg.Edit(slug, revision, info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL),
-		who, runtime.ChainHeight(), reason))
+	must(reg.Edit(slug, revision, in, who, runtime.ChainHeight(), reason))
 }
 
 // ApproveZone makes a zone official. revision is the zone's Revision as you
@@ -158,12 +175,13 @@ func RemoveZone(cur realm, slug string, revision int64) {
 		if z.Proposer != who || z.Status != zones.Pending {
 			panic("zones: only a curator, or the proposer while it is pending, may remove " + slug)
 		}
-		assertCooled(slug, z)
+		assertReviewWindow(slug, z)
 		// From the index counts first: nothing is read to answer it.
 		if _, total := reg.Count(slug); reg.OwnerCount(slug, who) != total {
 			panic("zones: " + slug + " carries endpoints somebody else registered; they must be removed first")
 		}
-		// Every endpoint is the proposer's, so at most MaxEndpointsPerAddress.
+		// Every endpoint is the proposer's: at most MaxEndpointsPerZone (a curator
+		// who proposed it may have registered past the per-address cap).
 		for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug}) {
 			assertWithdrawable(e)
 		}
@@ -200,23 +218,26 @@ func RegisterEndpoint(cur realm, slug, kind, addr, label string) int64 {
 	return id
 }
 
-// VerifyEndpoint marks an endpoint as checked against its zone. revision is the
-// zone's Revision you checked it against: if the zone changed since, its
-// content (its chain id, say) or its status, the verdict fails. The reason is
-// optional.
+// VerifyEndpoint marks an endpoint as checked against its zone. revision is
+// the endpoint's revision as you read it (the zone page shows it, as
+// zones.VerdictRevision): if the endpoint or its zone changed since (its chain
+// id, its status, another curator's verdict), the verdict fails. The reason is
+// optional. All three verdicts bind the same way, and each may be given again
+// with a new reason to restate it.
 func VerifyEndpoint(cur realm, id int64, revision int64, reason string) {
 	reviewEndpoint(cur, id, zones.Verified, revision, reason)
 }
 
 // FlagEndpoint tells readers not to use an endpoint. The reason is required.
-func FlagEndpoint(cur realm, id int64, reason string) {
-	reviewEndpoint(cur, id, zones.Flagged, 0, reason)
+// revision is as for VerifyEndpoint.
+func FlagEndpoint(cur realm, id int64, revision int64, reason string) {
+	reviewEndpoint(cur, id, zones.Flagged, revision, reason)
 }
 
 // UnverifyEndpoint puts an endpoint back to unverified, for one that changed
-// hands or needs checking again.
-func UnverifyEndpoint(cur realm, id int64, reason string) {
-	reviewEndpoint(cur, id, zones.Unverified, 0, reason)
+// hands or needs checking again. revision is as for VerifyEndpoint.
+func UnverifyEndpoint(cur realm, id int64, revision int64, reason string) {
+	reviewEndpoint(cur, id, zones.Unverified, revision, reason)
 }
 
 // RemoveEndpoint deletes an endpoint. A curator may remove any. Its registrant
@@ -245,15 +266,37 @@ func RemoveEndpoint(cur realm, id int64) {
 	must(reg.RemoveEndpoint(id))
 }
 
+// ClearUnreviewed removes, in one call, every endpoint on a zone that no
+// curator has ruled on, and returns how many. It is the answer to a flood that
+// cycles: registrants who withdraw and register again each review window keep
+// the queue full, and one removal per transaction lets them refill it before a
+// curator is done. The deposits go to the curator who signs. At most
+// zones.MaxEndpointsPerZone are read.
+func ClearUnreviewed(cur realm, slug string) int {
+	who := caller(cur)
+	assertCurator(who)
+	slug = strings.TrimSpace(slug)
+	mustZone(slug)
+	n := 0
+	for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug, Status: zones.Unverified}) {
+		if e.ReviewedBy == "" && e.Reason == "" {
+			must(reg.RemoveEndpoint(e.ID))
+			n++
+		}
+	}
+	return n
+}
+
 // assertWithdrawable refuses a non-curator's withdrawal of an endpoint a
 // curator has ruled on, or one registered less than ReviewWindow
 // blocks ago. Shared by RemoveEndpoint and the proposer's RemoveZone, so one
 // cannot do what the other refuses.
 func assertWithdrawable(e zones.Endpoint) {
 	id := strconv.FormatInt(e.ID, 10)
-	// Every verdict names its reviewer, and so does a reset a curator caused:
-	// an empty ReviewedBy is exactly "no curator has ruled on it".
-	if e.ReviewedBy != "" {
+	// Every verdict names its reviewer, a reset a curator caused names that
+	// curator, and a reset the proposer's own edit caused leaves a reason: an
+	// endpoint with neither has never been ruled on.
+	if e.ReviewedBy != "" || e.Reason != "" {
 		panic("zones: a curator ruled on endpoint #" + id + "; only a curator may remove it now")
 	}
 	if wait := e.RegisteredAt + ReviewWindow - runtime.ChainHeight(); wait > 0 {
@@ -443,10 +486,10 @@ func caller(cur realm) address {
 	return cur.Previous().Address()
 }
 
-// assertCooled refuses a proposer's edit or withdrawal of a pending zone
+// assertReviewWindow refuses a proposer's edit or withdrawal of a pending zone
 // sooner than ReviewWindow blocks after it was proposed or last edited,
 // by anybody.
-func assertCooled(slug string, z zones.Zone) {
+func assertReviewWindow(slug string, z zones.Zone) {
 	last := z.ProposedAt
 	if z.EditedAt > last {
 		last = z.EditedAt

@@ -44,7 +44,7 @@ it is paying for.
 bound, because only the realm knows what it is willing to pay a storage deposit
 for.
 
-## The three decisions worth knowing
+## The decisions worth knowing
 
 **Backed by a B+ tree at fanout 32, not `avl`, and not 128.** A wider node is
 cheaper to store and to insert into, measured against gno master `1fc4c140e` on
@@ -58,8 +58,8 @@ cheaper to store and to insert into, measured against gno master `1fc4c140e` on
 
 But an index's keys are removed whenever its records move, and a removal
 rewrites every later value in its leaf. Measured on a real node against gno
-master `3cc494ec4` on 2026-10-02: removing the first key of a full fanout-128
-leaf of 120 cost 35.3M gas, the last 8.0M, about 230k per value shifted. At 32
+master `3cc494ec4` on 2026-10-02: removing the first key of a fanout-128 leaf
+holding 120 cost 35.3M gas, the last 8.0M, about 230k per value shifted. At 32
 the worst removal shifts 31, so it is the cheaper default for something that
 moves.
 

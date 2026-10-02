@@ -153,14 +153,14 @@ func TestValidateInfo(t *testing.T) {
 	// different machine for every reader.
 	tcp := ok
 	tcp.RPCURL = "tcp://127.0.0.1:26657"
-	uassert.ErrorContains(t, ValidateInfo(tcp), "loopback or private")
+	uassert.ErrorContains(t, ValidateInfo(tcp), "private or special-use")
 	tcp.Kind = Local
 	uassert.NoError(t, ValidateInfo(tcp))
 	for _, h := range []string{"http://localhost:26657", "http://10.0.0.1:26657", "http://192.168.1.2", "http://172.20.0.1",
 		"http://169.254.169.254", "http://100.64.0.1", "http://0.0.0.0:26657", "http://api.localhost"} {
 		in := ok
 		in.RPCURL = h
-		uassert.ErrorContains(t, ValidateInfo(in), "loopback or private", h)
+		uassert.ErrorContains(t, ValidateInfo(in), "private or special-use", h)
 	}
 	pub := ok
 	pub.RPCURL = "http://172.32.0.1"
@@ -185,7 +185,26 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.Title = "x\u17b4" }, "invisible or bidi")    // Khmer inherent vowels draw nothing
 	bad(func(in *Info) { in.Description = "\u0301" }, "nothing visible") // optional, but not blank
 	bad(func(in *Info) { in.Title = "\ue000 Onyx" }, "which this chain does not draw")
-	for _, r := range []rune{0x1FBB1, 0x237B, 0x10102, 0x1F5D9, 0x2A2F, 0x2573, 0x2BBD, 0x2BBF, 0x29D6, 0x29D7, 0x1F7A8, 0x1F7AE} {
+	bad(func(in *Info) { in.Title = "a\u180bb" }, "invisible or bidi") // a Mongolian variation selector
+	for _, r := range []rune{0x115F, 0x1160, 0xFFA0, 0x17B5, 0x13441, 0x13442, 0x16FE4} {
+		r := r
+		bad(func(in *Info) { in.Title = "on" + string(r) + "yx" }, "invisible or bidi")
+	}
+	// Enclosing marks draw a badge's frame around any character.
+	for _, s := range []string{"!\u20e4 flagged", "v\u20de verified", "x\u20e0", "x\u20dd"} {
+		s := s
+		bad(func(in *Info) { in.Title = s }, "enclosing mark")
+	}
+	// √ is maths, not a badge; × is everyday text.
+	for _, s := range []string{"fees scale with \u221an", "1920\u00d71080"} {
+		good := ok
+		good.Description = s
+		uassert.NoError(t, ValidateInfo(good), s)
+	}
+	for _, r := range []rune{0x2713, 0x2714, 0x2611, 0x1F5F8, 0x1F5F9, 0x1F197, 0x2716, 0x2717, 0x2718, 0x2715,
+		0x274E, 0x2612, 0x1F6AB, 0x26D4, 0x1F6D1, 0x1F5F4, 0x1F5F7, 0x231B, 0x23F8, 0x23FA, 0x2705, 0x26A0,
+		0x23F3, 0x274C, 0x23F9, 0x1FBB1, 0x237B, 0x10102, 0x1F5D9, 0x2A2F, 0x2573, 0x2BBD, 0x2BBF, 0x29D6,
+		0x29D7, 0x1F7A8, 0x1F7AE, 0x2613, 0x2A09} {
 		r := r
 		bad(func(in *Info) { in.Title = string(r) + " official" }, "status glyph")
 	}

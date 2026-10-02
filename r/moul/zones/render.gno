@@ -33,9 +33,11 @@ func action(title, fn string, args ...string) string {
 // PageSize is how many rows any table here shows at once. Every list is
 // paginated and every page reads only its own records, because vm/qrender is
 // gas-metered (3B per query) and a Render that outgrows it stops answering
-// instead of slowing down. At the caps a page reads its 25 records, each
-// row's main-RPC endpoint on the index, and a few index nodes: a small fraction
-// of that ceiling.
+// instead of slowing down. At the caps a page reads its 25 records, one lookup
+// per URL it may mark flagged (each row's main RPC on the index; the zone's
+// RPC and gnoweb on its page), and a few index nodes. Escaping free text is
+// what dominates: about 97k gas a character on a node, so a page of full-length
+// fields costs on the order of a billion, still under the ceiling.
 const PageSize = 25
 
 // Render is the whole public surface, three pages: the zone list (official,
@@ -88,16 +90,23 @@ func renderIndex(req *realmpath.Request) string {
 	links = append(links,
 		md.Link(strconv.Itoa(reg.ZoneCount(zones.Pending))+" proposal(s) waiting for review", realmURL+":proposals"))
 	// Offered only while it can succeed: a link certain to fail is a dead end,
-	// and the note says which cap is full, so it names what would free it.
+	// and the note says which cap is full, so it names what would free it. A
+	// full review queue still takes a curator's proposal, so the link stays,
+	// labelled for them.
+	propose := func(title string) string {
+		return action(title, "ProposeZone",
+			"slug", "", "chainID", "", "title", "", "description", "", "kind", "testnet",
+			"gnowebURL", "", "rpcURL", "", "genesisURL", "")
+	}
 	switch {
 	case reg.Live() >= zones.MaxZones:
-		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+" live zones until a curator retires or removes one")
+		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+
+			" live zones until a proposal is rejected or withdrawn, or an official zone retired")
 	case reg.ZoneCount(zones.Pending) >= zones.MaxPending:
-		links = append(links, "proposals are full until a curator clears some")
+		links = append(links, "proposals are full until one is reviewed or withdrawn",
+			propose("Propose a zone (curators only, while full)"))
 	default:
-		links = append(links, action("Propose a zone", "ProposeZone",
-			"slug", "", "chainID", "", "title", "", "description", "", "kind", "testnet",
-			"gnowebURL", "", "rpcURL", "", "genesisURL", ""))
+		links = append(links, propose("Propose a zone"))
 	}
 
 	return ui.Join("\n",
@@ -219,10 +228,12 @@ func renderZone(slug string, req *realmpath.Request) string {
 	}
 
 	pages := pageCount(reg.EndpointCount(z.Slug, kind))
-	t := ui.NewTable("#", "kind", "address", "label", "status", "registered by")
+	// The revision column is what a verdict names (zones.VerdictRevision).
+	t := ui.NewTable("#", "revision", "kind", "address", "label", "status", "registered by")
 	for _, e := range reg.EndpointPage(z.Slug, kind, pageNum(req, pages), PageSize) {
 		t.Row(
 			strconv.FormatInt(e.ID, 10),
+			strconv.FormatInt(zones.VerdictRevision(z, e), 10),
 			string(e.Kind),
 			md.InlineCode(e.Address),
 			cell(e.Label),
@@ -246,7 +257,9 @@ func renderZone(slug string, req *realmpath.Request) string {
 	case open && reg.EndpointCount(z.Slug, "") >= zones.MaxEndpointsPerZone:
 		actions = append(actions, "endpoints are full at "+strconv.Itoa(zones.MaxEndpointsPerZone)+" until a curator removes some")
 	case open && reg.Awaiting(z.Slug) >= zones.MaxUnverifiedPerZone:
-		actions = append(actions, "endpoints are full until a curator reviews some")
+		actions = append(actions, "endpoints are full until a curator reviews some",
+			action("Register an endpoint (curators only, while full)", "RegisterEndpoint",
+				"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	case z.Status == zones.Approved:
 		actions = append(actions, action("Register an endpoint", "RegisterEndpoint",
 			"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
@@ -269,6 +282,8 @@ func renderZone(slug string, req *realmpath.Request) string {
 		// Back into the live registry only while it has room.
 		if reg.Live() < zones.MaxZones {
 			actions = append(actions, approve)
+		} else {
+			actions = append(actions, "approving it waits for a free slot: "+strconv.Itoa(zones.MaxZones)+" zones are live")
 		}
 		if z.Status == zones.Rejected {
 			actions = append(actions, remove)
@@ -394,15 +409,6 @@ func notFound(msg string) string { return md.H1("Not found") + ui.Empty(msg) }
 // nothing a shell reads as syntax; and it is single-quoted anyway, a quote being
 // the one character no URL here can contain, so a later, wider validator does
 // not reopen it. The call is built from charset-checked slugs and literals.
-// exampleSlug is the zone the index's example asks about: the one serving the
-// chain this page is read on, when there is exactly one, else onyx.
-func exampleSlug() string {
-	if z, ok := reg.SoleApproved(runtime.ChainID()); ok {
-		return z.Slug
-	}
-	return "onyx"
-}
-
 func queryCommand(call string) string {
 	remote := ""
 	if z, ok := reg.SoleApproved(runtime.ChainID()); ok && !rpcFlagged(z) {
@@ -411,6 +417,15 @@ func queryCommand(call string) string {
 		remote = " -remote '" + z.RPCURL + "'"
 	}
 	return "gnokey query vm/qeval" + remote + " -data '" + pkgPath + "." + call + "'"
+}
+
+// exampleSlug is the zone the index's example asks about: the one serving the
+// chain this page is read on, when there is exactly one, else onyx.
+func exampleSlug() string {
+	if z, ok := reg.SoleApproved(runtime.ChainID()); ok {
+		return z.Slug
+	}
+	return "onyx"
 }
 
 // para is one paragraph as a Join part. Not md.Paragraph, whose trailing blank
@@ -432,12 +447,12 @@ func zoneLink(z zones.Zone) string {
 // Approve button. Only an approved zone's URLs are links; a proposal's are
 // code, to copy and check, not to click.
 //
-// A URL the zone also lists as a flagged endpoint is code and marked, never a
-// link: the page does not offer what its own endpoint table says not to use.
-// kind is what the URL is shown as, "" for one with no kind of its own
-// (flaggedAs).
+// A URL the zone also lists, under the kind it is shown as, as a flagged
+// endpoint is code and marked, never a link: the page does not offer what its
+// own endpoint table says not to use. kind is what the URL is shown as, ""
+// for the genesis URL, which no endpoint kind lists (flaggedAs).
 func urlFact(z zones.Zone, kind zones.EndpointKind, url string) string {
-	if flaggedAs(z, kind, url) {
+	if kind != "" && flaggedAs(z, kind, url) {
 		return md.InlineCode(url) + " ⚠️ flagged"
 	}
 	if z.Status == zones.Approved {
@@ -499,30 +514,16 @@ func rpcFlag(z zones.Zone) string {
 func rpcFlagged(z zones.Zone) bool { return flaggedAs(z, zones.RPC, z.RPCURL) }
 
 // flaggedAs reports whether a URL the page shows as a kind (the main RPC as
-// rpc, the gnoweb URL as gnoweb; "" for the genesis URL, which has no kind of
-// its own) is to be marked flagged. The same URL can be listed under several
-// kinds, each with its own verdict, so the verdict of the kind it is shown as
-// decides: flagged is flagged, verified is not. Only when that kind holds no
-// verdict does a flag under any other kind count, so a curator's "not a
-// faucet" does not mark a verified gnoweb, and a "phishing clone" under rpc
-// still marks a gnoweb URL nobody verified. The lookups compare in Canonical
-// form, which reads an rpc tcp:// as the http:// gnokey dials.
+// rpc, the gnoweb URL as gnoweb) is listed under that kind and flagged. Only
+// that kind's verdict counts. A listing under another kind is anybody's to
+// make on an approved zone, so letting its flag mark the zone's own URL would
+// let a stranger's mis-kinded entry, flagged as mis-kinded, mark an official
+// URL; a curator who means the zone's URL flags it under its own kind. The
+// lookup compares in Canonical form, which reads an rpc tcp:// as the http://
+// gnokey dials, so either spelling finds the other.
 func flaggedAs(z zones.Zone, shown zones.EndpointKind, url string) bool {
-	if shown != "" {
-		if e, ok := reg.EndpointByAddress(z.Slug, shown, url); ok && e.Status != zones.Unverified {
-			return e.Status == zones.Flagged
-		}
-	}
-	// Every kind a URL can be listed under; a seed or a peer is never a URL.
-	for _, k := range []zones.EndpointKind{zones.RPC, zones.Gnoweb, zones.Indexer, zones.Faucet, zones.Explorer} {
-		if k == shown {
-			continue
-		}
-		if e, ok := reg.EndpointByAddress(z.Slug, k, url); ok && e.Status == zones.Flagged {
-			return true
-		}
-	}
-	return false
+	e, ok := reg.EndpointByAddress(z.Slug, shown, url)
+	return ok && e.Status == zones.Flagged
 }
 
 func revStr(z zones.Zone) string { return strconv.FormatInt(z.Revision, 10) }

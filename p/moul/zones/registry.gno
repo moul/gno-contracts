@@ -31,12 +31,13 @@ import (
 // warning instead of having to delete it to make room. The gate is checked
 // where something enters (Propose, Register); a review or a reset can push a
 // count past it, and never fails for it. ProposeExempt and RegisterExempt skip
-// it, for the reviewers a holder trusts: a full queue must not lock out the
-// people who clear it. The queue clears through approval,
-// verification, a flag, rejection, RemoveZone and RemoveEndpoint. Flagged
-// endpoints still count toward MaxEndpointsPerZone: a flood a curator flags
-// rather than removes can fill a zone, and removing it is the answer. Each
-// entry costs its sender a storage deposit, refunded to whoever signs the transaction that
+// it, and the per-address caps, for the reviewers a holder trusts: a full
+// queue must not lock out the people who clear it. The queue clears through
+// approval, verification, a flag, rejection, RemoveZone, RemoveEndpoint, an
+// edit leaving the local kind, and eviction. Flagged endpoints still count
+// toward MaxEndpointsPerZone: a flood a curator flags rather than removes can
+// fill a zone, and removing it is the answer. Each entry costs its sender a
+// storage deposit, refunded to whoever signs the transaction that
 // frees it (on a chain where ugnot is not transfer-locked; on one that is, the
 // refund goes to the storage fee collector), so a flooder who withdraws first
 // gets it back: a bond, not a fee.
@@ -59,7 +60,7 @@ const (
 const (
 	ChainIDChanged = "the zone's chain id changed; verify again"
 	ZoneRetired    = "the zone was retired; verify again if it returns"
-	ZoneRejected   = "the zone was rejected"
+	ZoneRejected   = "the zone was rejected; verify again if it is approved"
 )
 
 // sequences are the registry-wide counters: the last Revision handed out (so
@@ -226,7 +227,7 @@ func enteredKey(st Status, seq int64) string { return string(st) + "|" + store.I
 // answered for a chain this zone no longer names. A reset caused by the
 // proposer's own edit to a pending zone records no reviewer; any other records
 // the editor. An edit that changes nothing is refused, and leaving the local
-// kind removes every endpoint on a loopback or private host.
+// kind removes every endpoint on a private or special-use host (IsPrivateHost).
 //
 // An edit names the revision it was written against, like an approval does, so
 // two editors working from the same reading cannot silently undo each other.
@@ -512,7 +513,7 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	}
 	if z.Kind != Local && IsPrivateHost(HostOf(kind, addr)) {
 		return 0, errors.New("zones: " + slug + " is a " + string(z.Kind) + " zone, and " + addr +
-			" is a loopback or private address; only a local zone lists those")
+			" names a private or special-use host; only a local zone lists those")
 	}
 	if err := ValidateLabel(label); err != nil {
 		return 0, err
@@ -539,6 +540,8 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	e := &Endpoint{Zone: slug, Kind: kind, Address: addr, Label: label, Registrant: by, RegisteredAt: at, Status: Unverified}
 	id := r.endpoints.add(e)
 	e.ID = int64(id)
+	r.ids.rev++
+	e.Revision = int64(r.ids.rev)
 	r.byAddress.set(akey, id)
 	if err := r.byZone.Add(slug, id); err != nil {
 		return 0, err
@@ -554,14 +557,18 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 }
 
 // ReviewEndpoint records a curator's verdict on an endpoint. Any verdict may
-// follow any other, with three rules:
+// follow any other, and the same one again with a new reason (so a typo is
+// corrected without passing through a state its registrant may remove it
+// from), with these rules:
 //
+//   - every verdict names the VerdictRevision it was written against, and
+//     fails if the endpoint or its zone changed since: a verdict landing
+//     after another curator's, unseen, would silently reverse it;
 //   - flagging needs a reason, because "do not use this" with no why is not
 //     something an operator can act on;
-//   - verifying names the zone's Revision the curator checked against, and
-//     fails if the zone changed since: what is verified is that the endpoint
-//     answers for THIS zone's chain id, and a proposer could otherwise switch
-//     it while the verdict is in flight;
+//   - for a verification that binding is also to the zone: what is verified is
+//     that the endpoint answers for THIS zone's chain id, and a proposer could
+//     otherwise switch it while the verdict is in flight;
 //   - only an endpoint of a pending or approved zone can be verified.
 func (r *Registry) ReviewEndpoint(id int64, to Verification, revision int64, by address, at int64, reason string) error {
 	e, err := r.endpoint(id)
@@ -584,26 +591,24 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, revision int64, by 
 		// as written would match no filter and count as unverified forever.
 		return errors.New("zones: unknown verification " + strconv.Quote(string(to)) + ", want verified, unverified or flagged")
 	}
-	// A flag can be restated with a new reason, so correcting one never means
-	// passing through a state its registrant may remove it from.
-	if e.Status == to && (to != Flagged || reason == e.Reason) {
-		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " is already " + string(to))
+	if e.Status == to && reason == e.Reason {
+		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " is already " + string(to) +
+			", with that reason")
 	}
 	if to == Flagged && !HasVisible(reason) {
 		return errors.New("zones: flagging an endpoint needs a reason")
 	}
-	if to == Verified {
-		z, _, err := r.zone(e.Zone)
-		if err != nil {
-			return err
-		}
-		if z.Status != Pending && z.Status != Approved {
-			return errors.New("zones: " + z.Slug + " is " + string(z.Status) + "; nothing on it can be verified")
-		}
-		if revision != z.Revision {
-			return errors.New("zones: " + z.Slug + " changed since you checked it: it is at revision " +
-				strconv.FormatInt(z.Revision, 10) + ", you verified against revision " + strconv.FormatInt(revision, 10))
-		}
+	z, _, err := r.zone(e.Zone)
+	if err != nil {
+		return err
+	}
+	if want := VerdictRevision(*z, *e); revision != want {
+		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " or " + z.Slug +
+			" changed since you checked it: it is at revision " + strconv.FormatInt(want, 10) +
+			", you acted on revision " + strconv.FormatInt(revision, 10))
+	}
+	if to == Verified && z.Status != Pending && z.Status != Approved {
+		return errors.New("zones: " + z.Slug + " is " + string(z.Status) + "; nothing on it can be verified")
 	}
 	sid := store.ID(id)
 	if to == Verified {
@@ -621,6 +626,8 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, revision int64, by 
 	}
 	e.Status = to
 	e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, reason
+	r.ids.rev++
+	e.Revision = int64(r.ids.rev)
 	return nil
 }
 

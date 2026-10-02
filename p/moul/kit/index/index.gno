@@ -39,7 +39,7 @@ import (
 //
 // A removal shifts every later value in its leaf and rewrites each one, and an
 // index's values are pointers: measured on a real node against gno master
-// 3cc494ec4 on 2026-10-02, removing the first key of a full fanout-128 leaf of
+// 3cc494ec4 on 2026-10-02, removing the first key of a fanout-128 leaf holding
 // 120 cost 35.3M gas against 8.0M for the last, about 230k per value shifted.
 // Fanout 32 caps the shift at 31. What it costs, measured against gno master
 // 1fc4c140e on 2026-09-29 at n = 1,000 with string values: 671 bytes per entry

@@ -203,6 +203,21 @@ type Endpoint struct {
 	ReviewedBy address
 	ReviewedAt int64
 	Reason     string
+	// Revision is bumped, from the registry-wide counter zones use, when the
+	// endpoint is registered and on every verdict. A verdict names
+	// VerdictRevision, the later of this and its zone's.
+	Revision int64
+}
+
+// VerdictRevision is what a verdict on e must name: the later of its zone's
+// Revision and its own. Both come from one counter that never repeats, so a
+// change to either after it was read (an edit, a status change, another
+// curator's verdict) makes it move, and the verdict fail.
+func VerdictRevision(z Zone, e Endpoint) int64 {
+	if e.Revision > z.Revision {
+		return e.Revision
+	}
+	return z.Revision
 }
 
 // ParseStatus reads a status from a caller's string. "" is the zero Status,
@@ -329,7 +344,7 @@ func ValidateInfo(in Info) error {
 	if in.Kind != Local {
 		for _, u := range []string{in.RPCURL, in.GnowebURL, in.GenesisURL} {
 			if u != "" && IsPrivateHost(HostOf(RPC, u)) {
-				return errors.New("zones: " + strconv.Quote(u) + " is a loopback or private address; only a local zone lists those")
+				return errors.New("zones: " + strconv.Quote(u) + " names a private or special-use host; only a local zone lists those")
 			}
 		}
 	}
@@ -362,10 +377,12 @@ func HostOf(kind EndpointKind, addr string) string {
 //
 //   - a name with no dot (resolved through the reader's own search domain), or
 //     one under a suffix reserved for local or private use, or that public DNS
-//     does not delegate: .localhost, .local (mDNS), .internal, .home.arpa,
-//     .localdomain, .test, .example, .invalid, .lan, .home, .corp, .mail,
-//     .intranet, .private, .onion, .alt, ipv4only.arpa (hosts files' localhost4, localhost6, ip6-localhost and ip6-loopback
-//     have no dot and are caught by the first rule);
+//     does not delegate: .localhost, .local (mDNS), .internal, .localdomain,
+//     .test, .example, .invalid, .lan, .home, .corp, .mail, .intranet,
+//     .private, .onion, .alt, and every .arpa name, which is infrastructure
+//     and never a public service (.home.arpa, ipv4only.arpa,
+//     default.service.arpa). Hosts files' localhost4, localhost6,
+//     ip6-localhost and ip6-loopback have no dot and fall under the first rule;
 //   - an IPv4 address in a loopback, private, link-local, carrier-grade NAT,
 //     "this network", IETF-protocol, documentation, benchmarking, multicast or
 //     reserved range;
@@ -379,14 +396,11 @@ func IsPrivateHost(host string) bool {
 	if !strings.Contains(h, ".") {
 		return true
 	}
-	for _, suffix := range []string{".localhost", ".local", ".internal", ".home.arpa", ".localdomain",
+	for _, suffix := range []string{".localhost", ".local", ".internal", ".arpa", ".localdomain",
 		".test", ".example", ".invalid", ".lan", ".home", ".corp", ".mail", ".intranet", ".private", ".onion", ".alt"} {
 		if strings.HasSuffix(h, suffix) {
 			return true
 		}
-	}
-	if h == "ipv4only.arpa" { // defined to resolve to 192.0.0.170 and .171
-		return true
 	}
 	labels := strings.Split(h, ".")
 	last := labels[len(labels)-1]
@@ -478,12 +492,13 @@ func HasVisible(s string) bool {
 
 // isBlankFiller is the handful of characters that are letters or symbols by
 // category and still draw nothing: the Hangul fillers, the blank Braille cell,
-// the musical null notehead, and the two Khmer inherent vowels (marks by
-// category, drawn as nothing). Unicode does not class them as format
+// the musical null notehead, the Egyptian hieroglyph blanks, and the Khmer
+// inherent vowels and the Khitan filler (marks by category, drawn as nothing). Unicode does not class them as format
 // characters, so they need naming.
 func isBlankFiller(r rune) bool {
 	switch r {
-	case 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800, 0x1D159, 0x17B4, 0x17B5:
+	case 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800, 0x1D159, 0x17B4, 0x17B5,
+		0x13441, 0x13442, 0x16FE4:
 		return true
 	}
 	return false
@@ -500,13 +515,14 @@ func isSelector(r rune) bool {
 func isBadge(r rune) bool {
 	switch r {
 	case 0x2705, 0x26A0, 0x23F3, 0x274C, 0x23F9, // ✅ ⚠ ⏳ ❌ ⏹, what Render draws
-		0x2713, 0x2714, 0x2611, 0x1F5F8, 0x1F5F9, 0x221A, 0x1F197, // check marks, √, 🆗
+		0x2713, 0x2714, 0x2611, 0x1F5F8, 0x1F5F9, 0x1F197, // check marks, 🆗
 		0x2716, 0x2717, 0x2718, 0x2715, 0x274E, 0x2612, 0x1F6AB, 0x26D4, 0x1F6D1, // crosses, no-entry
 		0x1F5F4, 0x1F5F5, 0x1F5F6, 0x1F5F7, // ballot x and ballot box with x
 		0x231B, 0x23F8, 0x23FA, // ⌛ ⏸ ⏺
 		0x1FBB1, 0x237B, 0x10102, // more check marks
 		0x1F5D9, 0x2A2F, 0x2573, 0x2BBD, 0x2BBE, 0x2BBF, // more crosses and ballot boxes
-		0x29D6, 0x29D7: // hourglasses
+		0x29D6, 0x29D7, // hourglasses
+		0x2613, 0x2A09: // saltire, n-ary times (× itself is everyday text: 1920×1080)
 		return true
 	}
 	return r >= 0x1F7A8 && r <= 0x1F7AE // the geometric crosses beside ✖
@@ -524,7 +540,8 @@ func isBadge(r rune) bool {
 //     graphic (private use, unassigned, noncharacters), the blank fillers, the
 //     variation selectors, the combining grapheme joiner. A title made of them
 //     would pass the length check and render blank or as a box.
-//   - no run of more than four nonspacing or enclosing marks, which stack over
+//   - no enclosing mark, which draws a badge's frame around any character,
+//     and no run of more than four nonspacing marks, which stack over
 //     neighbouring lines (a spacing mark takes its own width and ends a run,
 //     so Devanagari, Gurmukhi, Burmese and Tibetan words pass), and none of
 //     the status glyphs a Render draws.
@@ -535,7 +552,7 @@ func checkText(field, s string, min, max int) error {
 	// No rune is more than four bytes: anything longer cannot be within max
 	// characters, and is refused before a per-rune scan the writer pays for.
 	if len(s) > 4*max {
-		return errors.New("zones: the " + field + " is at most " + strconv.Itoa(max) + " characters")
+		return errors.New("zones: the " + field + " is longer than " + strconv.Itoa(max) + " characters")
 	}
 	if sanitize.StripBidiAndZeroWidth(s) != s {
 		return errors.New("zones: the " + field + " contains an invisible or bidi character")
@@ -561,9 +578,15 @@ func checkText(field, s string, min, max int) error {
 				", which this chain does not draw: private use, a noncharacter, or unassigned in its Unicode 15.0 tables")
 		}
 		if isBadge(r) {
-			return errors.New("zones: the " + field + " contains a status glyph a Render draws: " + strconv.Quote(string(r)))
+			return errors.New("zones: the " + field + " contains a status glyph a Render draws, or a look-alike of one: " + strconv.Quote(string(r)))
 		}
-		if unicode.In(r, unicode.Mn, unicode.Me) {
+		if unicode.Is(unicode.Me, r) {
+			// An enclosing mark draws a frame around what precedes it: !\u20E4
+			// is a warning triangle, v\u20DE a checked box. No living script
+			// needs one, and keycaps need U+FE0F, refused above.
+			return errors.New("zones: the " + field + " contains an enclosing mark, which draws a status glyph's frame")
+		}
+		if unicode.Is(unicode.Mn, r) {
 			marks++
 			if marks > 4 {
 				return errors.New("zones: the " + field + " stacks more than four combining marks")
