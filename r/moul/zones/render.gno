@@ -35,7 +35,8 @@ func action(title, fn string, args ...string) string {
 // gas-metered (3B per query) and a Render that outgrows it stops answering
 // instead of slowing down. At the caps a page reads its 25 records, one lookup
 // per URL it may mark flagged (each row's main RPC on the index; the zone's
-// RPC and gnoweb on its page), and a few index nodes. Escaping free text is
+// RPC and gnoweb on its page), the zone serving this chain for the printed
+// command, the curators, and a few index nodes. Escaping free text is
 // what dominates: about 97k gas a character on a node, so a page of full-length
 // fields costs on the order of a billion, still under the ceiling.
 const PageSize = 25
@@ -100,12 +101,14 @@ func renderIndex(req *realmpath.Request) string {
 	}
 	switch {
 	case reg.Live() >= zones.MaxZones:
-		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+" live zones until "+freesALiveSlot())
+		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+" live zones until "+freesALiveSlot()+
+			"; anybody may propose again below "+strconv.Itoa(zones.MaxZones-zones.ReservedForReviewers))
+	case reg.Live() >= zones.MaxZones-zones.ReservedForReviewers:
+		links = append(links, "the registry's last "+strconv.Itoa(zones.ReservedForReviewers)+" places are kept for curators until fewer than "+
+			strconv.Itoa(zones.MaxZones-zones.ReservedForReviewers)+" zones are live",
+			propose("Propose a zone (curators only)"))
 	case reg.ZoneCount(zones.Pending) >= zones.MaxPending:
 		links = append(links, "proposals are full until one is reviewed or removed",
-			propose("Propose a zone (curators only, while full)"))
-	case reg.Live() >= zones.MaxZones-zones.ReservedForReviewers:
-		links = append(links, "the registry's last "+strconv.Itoa(zones.ReservedForReviewers)+" places are kept for curators",
 			propose("Propose a zone (curators only, while full)"))
 	default:
 		links = append(links, propose("Propose a zone"))
@@ -258,10 +261,12 @@ func renderZone(slug string, req *realmpath.Request) string {
 	open := z.Status == zones.Approved || z.Status == zones.Pending
 	switch {
 	case open && reg.EndpointCount(z.Slug, "") >= zones.MaxEndpointsPerZone:
-		actions = append(actions, "endpoints are full at "+strconv.Itoa(zones.MaxEndpointsPerZone)+" until some are removed")
+		actions = append(actions, "endpoints are full at "+strconv.Itoa(zones.MaxEndpointsPerZone)+" until some are removed; anybody may register again below "+
+			strconv.Itoa(zones.MaxEndpointsPerZone-zones.ReservedForReviewers))
 	case open && reg.EndpointCount(z.Slug, "") >= zones.MaxEndpointsPerZone-zones.ReservedForReviewers:
-		actions = append(actions, "the last "+strconv.Itoa(zones.ReservedForReviewers)+" endpoint places are kept for curators",
-			action("Register an endpoint (curators only, while full)", "RegisterEndpoint",
+		actions = append(actions, "the last "+strconv.Itoa(zones.ReservedForReviewers)+" endpoint places are kept for curators until fewer than "+
+			strconv.Itoa(zones.MaxEndpointsPerZone-zones.ReservedForReviewers)+" are listed",
+			action("Register an endpoint (curators only)", "RegisterEndpoint",
 				"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	case open && reg.Awaiting(z.Slug) >= zones.MaxUnverifiedPerZone:
 		actions = append(actions, "endpoints are full until some are reviewed or removed",

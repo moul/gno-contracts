@@ -28,7 +28,6 @@ package zones
 import (
 	"chain/runtime"
 	"strconv"
-	"strings"
 
 	"gno.land/p/moul/addrset/v1"
 	"gno.land/p/moul/zones/v0"
@@ -70,8 +69,9 @@ func init() {
 
 // ProposeZone files a new zone for review. Anybody may; it is listed as a
 // proposal until a curator approves or rejects it. The review queue's caps
-// (zones.MaxPending, zones.MaxPendingPerProposer) do not stop a curator, so a
-// flood that fills it never locks out the people who clear it.
+// (zones.MaxPending, zones.MaxPendingPerProposer) do not stop a curator, who
+// also has the registry's last zones.ReservedForReviewers places, so neither a
+// flood nor a full registry locks out the people who clear it.
 //
 // kind is mainnet, testnet, devnet or local. gnowebURL and genesisURL may be
 // empty; rpcURL may not, and is <scheme>://<host>[:<port>] with no path, which
@@ -82,10 +82,10 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 	if curators.Has(who) {
 		// A flood that fills the review queue must not lock out the people
 		// who clear it.
-		must(reg.ProposeExempt(who, runtime.ChainHeight(), strings.TrimSpace(slug), in))
+		must(reg.ProposeExempt(who, runtime.ChainHeight(), zones.TrimSpaces(slug), in))
 		return
 	}
-	must(reg.Propose(who, runtime.ChainHeight(), strings.TrimSpace(slug), in))
+	must(reg.Propose(who, runtime.ChainHeight(), zones.TrimSpaces(slug), in))
 }
 
 // EditZone replaces a zone's Info, every field but its slug and status. A
@@ -108,12 +108,9 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 // this. A rejected or retired zone cannot be edited.
 func EditZone(cur realm, slug string, revision int64, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
-	slug = strings.TrimSpace(slug)
+	slug = zones.TrimSpaces(slug)
 	z := mustZone(slug)
 	in := info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)
-	// Validated before anything below acts on it: an edit that cannot pass
-	// must not remove a listing on its way to failing.
-	must(zones.ValidateInfo(in))
 	if !curators.Has(who) {
 		if z.Status != zones.Pending || z.Proposer != who {
 			panic("zones: only a curator, or the proposer while it is pending, may edit " + slug)
@@ -131,14 +128,16 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 			}
 		}
 	}
+	must(reg.Edit(slug, revision, in, who, runtime.ChainHeight(), reason))
 	// The reservation RegisterEndpoint keeps holds across an edit too: a new
 	// main RPC or gnoweb already listed under its kind by a stranger would
 	// make that listing, and its verdict, the zone's own. Checked only for a
-	// URL the edit changes. A stranger's listing nobody ruled on is dropped
-	// in the edit itself, so listing a zone's likely next URL cannot hold its
-	// move off (only an approved zone takes a stranger's listing, and only a
-	// curator edits one); one a curator ruled on refuses the edit, and a
-	// curator removes it first.
+	// URL the edit changed, after the edit, which has validated everything: a
+	// refusal here reverts the edit with it, and an edit that cannot pass never
+	// gets this far. On a curator's edit a stranger's listing nobody ruled on
+	// is dropped, so listing a zone's likely next URL cannot hold its move
+	// off; one a curator ruled on refuses the edit, and a curator removes it
+	// first. A proposer's edit drops nothing that is not theirs.
 	for _, own := range []struct {
 		kind     zones.EndpointKind
 		url, was string
@@ -150,13 +149,18 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 		if !ok || e.Registrant == z.Proposer || curators.Has(e.Registrant) {
 			continue
 		}
+		if !curators.Has(who) {
+			// A proposer's edit (a pending zone) drops nothing that is not
+			// theirs: the only other registrant there is a former curator.
+			panic("zones: " + own.url + " is listed under " + string(own.kind) + " by " + e.Registrant.String() +
+				" (endpoint #" + strconv.FormatInt(e.ID, 10) + "); a curator removes it before it becomes " + slug + "'s own")
+		}
 		if e.ReviewedBy != "" || e.Reason != "" { // a ruling, a reset's reason
 			panic("zones: " + own.url + " is listed under " + string(own.kind) + " by " + e.Registrant.String() +
 				" (endpoint #" + strconv.FormatInt(e.ID, 10) + "), with a curator's ruling; a curator removes it before it becomes " + slug + "'s own")
 		}
 		must(reg.RemoveEndpoint(e.ID, e.Revision))
 	}
-	must(reg.Edit(slug, revision, in, who, runtime.ChainHeight(), reason))
 }
 
 // ApproveZone makes a zone official. revision is the zone's Revision as you
@@ -198,7 +202,7 @@ func RetireZone(cur realm, slug string, revision int64, reason string) {
 // until newer retirements push it out.
 func RemoveZone(cur realm, slug string, revision int64) {
 	who := caller(cur)
-	slug = strings.TrimSpace(slug)
+	slug = zones.TrimSpaces(slug)
 	z := mustZone(slug)
 	if !curators.Has(who) {
 		if z.Proposer != who || z.Status != zones.Pending {
@@ -234,14 +238,14 @@ func RemoveZone(cur realm, slug string, revision int64) {
 // who runs it, in your words.
 func RegisterEndpoint(cur realm, slug, kind, addr, label string) int64 {
 	who := caller(cur)
-	slug = strings.TrimSpace(slug)
+	slug = zones.TrimSpaces(slug)
 	z := mustZone(slug)
 	if z.Status == zones.Pending && z.Proposer != who && !curators.Has(who) {
 		panic("zones: " + slug + " is pending; only its proposer or a curator may register on it")
 	}
 	k, err := zones.ParseEndpointKind(kind)
 	must(err)
-	addr = strings.TrimSpace(addr) // compared as the registry will store it
+	addr = zones.TrimSpaces(addr) // compared as the registry will store it
 	// The zone's own main RPC and gnoweb, listed under their own kind, carry
 	// the verdict its page shows on them, so only its proposer or a curator
 	// lists them: a stranger's listing, once flagged for its label, would
@@ -326,7 +330,7 @@ func RemoveEndpoint(cur realm, id, revision int64) {
 func ClearUnreviewed(cur realm, slug string, throughRevision int64) int {
 	who := caller(cur)
 	assertCurator(who)
-	slug = strings.TrimSpace(slug)
+	slug = zones.TrimSpaces(slug)
 	mustZone(slug)
 	n := 0
 	for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug, Status: zones.Unverified}) {
@@ -430,7 +434,7 @@ func RemoveCurator(cur realm, addr address) {
 
 // GetZone returns the zone under slug, and whether there is one.
 func GetZone(slug string) (zones.Zone, bool) {
-	return reg.Zone(strings.TrimSpace(slug))
+	return reg.Zone(zones.TrimSpaces(slug))
 }
 
 // ListZones returns the zones with that status and kind, in the order they
@@ -495,7 +499,7 @@ func members(set *addrset.Set) []address {
 func review(cur realm, slug string, to zones.Status, revision int64, reason string) {
 	who := caller(cur)
 	assertCurator(who)
-	must(reg.ReviewZone(strings.TrimSpace(slug), to, revision, who, runtime.ChainHeight(), reason))
+	must(reg.ReviewZone(zones.TrimSpaces(slug), to, revision, who, runtime.ChainHeight(), reason))
 }
 
 func reviewEndpoint(cur realm, id int64, to zones.Verification, zoneRevision, revision int64, reason string) {
@@ -505,7 +509,7 @@ func reviewEndpoint(cur realm, id int64, to zones.Verification, zoneRevision, re
 }
 
 func endpointFilter(slug, kind, status string) zones.EndpointFilter {
-	slug = strings.TrimSpace(slug)
+	slug = zones.TrimSpaces(slug)
 	if slug == "" {
 		panic("zones: name a zone; ListZones lists them")
 	}
@@ -520,13 +524,13 @@ func info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL strin
 	k, err := zones.ParseKind(kind)
 	must(err)
 	return zones.Info{
-		ChainID:     strings.TrimSpace(chainID),
-		Title:       strings.TrimSpace(title),
-		Description: strings.TrimSpace(description),
+		ChainID:     zones.TrimSpaces(chainID),
+		Title:       zones.TrimSpaces(title),
+		Description: zones.TrimSpaces(description),
 		Kind:        k,
-		GnowebURL:   strings.TrimSpace(gnowebURL),
-		RPCURL:      strings.TrimSpace(rpcURL),
-		GenesisURL:  strings.TrimSpace(genesisURL),
+		GnowebURL:   zones.TrimSpaces(gnowebURL),
+		RPCURL:      zones.TrimSpaces(rpcURL),
+		GenesisURL:  zones.TrimSpaces(genesisURL),
 	}
 }
 

@@ -27,8 +27,6 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
-
-	"gno.land/p/nt/markdown/sanitize/v0"
 )
 
 // Status is where a zone stands in curation.
@@ -223,7 +221,7 @@ func (e Endpoint) Clearable() bool { return !e.Exempt && e.ReviewedBy == "" && e
 // ParseStatus reads a status from a caller's string. "" is the zero Status,
 // which a filter reads as "any".
 func ParseStatus(s string) (Status, error) {
-	switch st := Status(strings.TrimSpace(s)); st {
+	switch st := Status(TrimSpaces(s)); st {
 	case "", Pending, Approved, Rejected, Retired:
 		return st, nil
 	}
@@ -232,7 +230,7 @@ func ParseStatus(s string) (Status, error) {
 
 // ParseKind reads a zone kind. "" is the zero Kind, "any" to a filter.
 func ParseKind(s string) (Kind, error) {
-	switch k := Kind(strings.TrimSpace(s)); k {
+	switch k := Kind(TrimSpaces(s)); k {
 	case "", Mainnet, Testnet, Devnet, Local:
 		return k, nil
 	}
@@ -241,7 +239,7 @@ func ParseKind(s string) (Kind, error) {
 
 // ParseEndpointKind reads an endpoint kind. "" is "any" to a filter.
 func ParseEndpointKind(s string) (EndpointKind, error) {
-	switch k := EndpointKind(strings.TrimSpace(s)); k {
+	switch k := EndpointKind(TrimSpaces(s)); k {
 	case "", RPC, Gnoweb, Seed, Peer, Indexer, Faucet, Explorer:
 		return k, nil
 	}
@@ -251,7 +249,7 @@ func ParseEndpointKind(s string) (EndpointKind, error) {
 
 // ParseVerification reads an endpoint verdict. "" is "any" to a filter.
 func ParseVerification(s string) (Verification, error) {
-	switch v := Verification(strings.TrimSpace(s)); v {
+	switch v := Verification(TrimSpaces(s)); v {
 	case "", Unverified, Verified, Flagged:
 		return v, nil
 	}
@@ -327,14 +325,18 @@ func ValidateInfo(in Info) error {
 		return errors.New("zones: the rpc url is <scheme>://<host>[:<port>], what gnokey -remote takes, with no path, not even a trailing slash: " +
 			strconv.Quote(in.RPCURL))
 	}
-	if in.GnowebURL != "" {
-		if err := checkURL("gnoweb url", in.GnowebURL, webSchemes); err != nil {
+	// A zone's own URLs carry no empty tail an endpoint would be stored
+	// without: the zone's URL and its own listing must key alike, or a flag on
+	// the listing would miss the URL it is about.
+	for _, u := range [][2]string{{"gnoweb url", in.GnowebURL}, {"genesis url", in.GenesisURL}} {
+		if u[1] == "" {
+			continue
+		}
+		if err := checkURL(u[0], u[1], webSchemes); err != nil {
 			return err
 		}
-	}
-	if in.GenesisURL != "" {
-		if err := checkURL("genesis url", in.GenesisURL, webSchemes); err != nil {
-			return err
+		if trimEmptyTail(u[1]) != u[1] {
+			return errors.New("zones: the " + u[0] + " ends in an empty query or a bare \"/\"; drop it: " + strconv.Quote(u[1]))
 		}
 	}
 	// A loopback or private address names a different machine for every
@@ -379,7 +381,7 @@ func HostOf(kind EndpointKind, addr string) string {
 //     one under a suffix reserved for local or private use, or that public DNS
 //     does not delegate: .localhost, .local (mDNS), .internal, .localdomain,
 //     .test, .example, .invalid, .lan, .home, .corp, .mail, .intranet,
-//     .private, .onion and .i2p, the service-discovery and container names
+//     .private, .alt, .onion and .i2p, the service-discovery and container names
 //     .consul, .lxd, .incus, .docker, .podman, .localnet and .svc, and every
 //     .arpa name, which is infrastructure
 //     and never a public service (.home.arpa, ipv4only.arpa,
@@ -502,7 +504,8 @@ func ValidAddress(a address) bool {
 }
 
 // HasVisible reports whether s has at least one character a reader can see:
-// not a space, not a combining mark, not an invisible format character. A
+// not a space, not a combining mark, not an invisible format character, not a
+// blank filler. A
 // required title or reason must, or it passes the "needs a reason" check and
 // renders blank.
 func HasVisible(s string) bool {
@@ -607,9 +610,6 @@ func checkText(field, s string, min, max int) error {
 	// characters, and is refused before a per-rune scan the writer pays for.
 	if len(s) > 4*max {
 		return errors.New("zones: the " + field + " is longer than " + strconv.Itoa(max) + " characters")
-	}
-	if sanitize.StripBidiAndZeroWidth(s) != s {
-		return errors.New("zones: the " + field + " contains an invisible or bidi character")
 	}
 	n, marks, prev := 0, 0, rune(0)
 	for i, r := range s {
@@ -868,6 +868,13 @@ func isEntity(s string) bool {
 	return false
 }
 
+// TrimSpaces trims ordinary spaces and tabs from both ends, and nothing else.
+// strings.TrimSpace also strips line separators (U+2028, U+0085) and other
+// Unicode space, which free text refuses: trimmed first, they would be
+// accepted silently, changed. What a caller types that is not a plain space
+// reaches the validator and is refused there.
+func TrimSpaces(s string) string { return strings.Trim(s, " \t") }
+
 // lowerAuthority lowercases a URL's scheme and host, both case-insensitive,
 // and leaves the path and query as typed. Stored that way because gno's link
 // sanitizer is not case-insensitive (an HTTPS:// link would render with an
@@ -886,16 +893,30 @@ func lowerAuthority(addr string) string {
 	return asciiLower(scheme) + "://" + asciiLower(host) + tail
 }
 
-// trimEmptyTail drops an empty query's "?" and a bare "/" path from a URL.
-// Both mean nothing (Canonical drops them too), and gnokey would dial a host
-// with them attached, so an endpoint is not stored with them: what is listed
-// is what dials. A zone's own URLs are refused with them instead.
+// trimEmptyTail drops an empty tail from a URL, by Canonical's own rules: an
+// empty query's "?" (when it is the tail's only "?") and a bare "/". gnokey
+// would dial a host with them attached, so an endpoint is not stored with them
+// (a zone's own URLs are refused with them instead, ValidateInfo). Canonical
+// drops both too, so Canonical(trimEmptyTail(x)) == Canonical(x), and a check
+// made on what a caller typed holds for what is stored. A path is kept as
+// typed otherwise ("/?q" stays: Canonical reads it as "?q", a browser too).
 func trimEmptyTail(addr string) string {
-	addr = strings.TrimSuffix(addr, "?")
-	if scheme, rest, ok := strings.Cut(addr, "://"); ok && strings.HasSuffix(rest, "/") && strings.Count(rest, "/") == 1 {
-		return scheme + "://" + strings.TrimSuffix(rest, "/")
+	scheme, rest, ok := strings.Cut(addr, "://")
+	if !ok {
+		return addr
 	}
-	return addr
+	i := strings.IndexAny(rest, "/?")
+	if i < 0 {
+		return addr
+	}
+	authority, tail := rest[:i], rest[i:]
+	if strings.HasSuffix(tail, "?") && strings.Count(tail, "?") == 1 {
+		tail = tail[:len(tail)-1]
+	}
+	if tail == "/" {
+		tail = ""
+	}
+	return scheme + "://" + authority + tail
 }
 
 // asciiLower lowercases A to Z and nothing else. strings.ToLower also folds

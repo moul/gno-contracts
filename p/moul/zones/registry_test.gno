@@ -1402,3 +1402,77 @@ func TestRulesASweepFoundUntested(t *testing.T) {
 		uassert.Error(t, ValidateLabel(string(r)+" official"), string(r))
 	}
 }
+
+// What is stored canonicalizes as what was typed, so a check made on the
+// typed address (the realm's own-URL reservation) holds for the stored one.
+func TestTheStoredFormKeepsItsCanonicalForm(t *testing.T) {
+	for _, u := range []string{"https://h.example.com??", "https://h.example.com/??", "https://h.example.com?/",
+		"https://h.example.com?path=/", "https://h.example.com/p?x=?", "https://h.example.com/p??", "https://h.example.com/?",
+		"https://h.example.com/", "https://h.example.com?", "https://h.example.com/?q=1", "https://h.example.com/p/"} {
+		uassert.Equal(t, Canonical(RPC, u), Canonical(RPC, trimEmptyTail(lowerAuthority(u))), u)
+	}
+	uassert.Equal(t, "https://h.example.com?path=/", trimEmptyTail("https://h.example.com?path=/"))
+	uassert.Equal(t, "https://h.example.com??", trimEmptyTail("https://h.example.com??"))
+}
+
+// Only plain spaces and tabs are trimmed: a line separator at an edge reaches
+// the validator and is refused, never silently cut. A zone's own URL with an
+// empty tail is refused, not repaired.
+func TestOnlySpacesAreTrimmed(t *testing.T) {
+	r := NewRegistry()
+	in := onyx()
+	in.Title = "Onyx "
+	uassert.ErrorContains(t, r.Propose(alice, 1, "onyx", in), "control character")
+	in = onyx()
+	in.Description = "\u0085" + in.Description
+	uassert.ErrorContains(t, r.Propose(alice, 1, "onyx", in), "control character")
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	_, err := r.Register(alice, 2, "onyx", RPC, "https://a.example.com", "operator ")
+	uassert.ErrorContains(t, err, "control character")
+	uassert.Equal(t, "x", TrimSpaces(" \tx\t "))
+	for _, u := range []string{"https://g.example.com/", "https://g.example.com?", "https://g.example.com/?"} {
+		bad := onyx()
+		bad.GnowebURL = u
+		uassert.ErrorContains(t, ValidateInfo(bad), "empty query or a bare", u)
+		bad = onyx()
+		bad.GenesisURL = u
+		uassert.ErrorContains(t, ValidateInfo(bad), "empty query or a bare", u)
+	}
+}
+
+// More rules an independent sweep found untested.
+func TestMoreBoundaries(t *testing.T) {
+	in := onyx()
+	in.ChainID = "onyx:1"
+	uassert.Error(t, ValidateInfo(in))
+	uassert.Error(t, ValidateReason(strings.Repeat("x", MaxReasonLen+1)))
+	uassert.NoError(t, ValidateReason(strings.Repeat("x", MaxReasonLen)))
+	uassert.Error(t, ValidateLabel(strings.Repeat("x", MaxLabelLen+1)))
+	uassert.NoError(t, ValidateLabel(strings.Repeat("x", MaxLabelLen)))
+	for _, c := range []string{"\x1f", "\x7f", "\u009f"} {
+		uassert.ErrorContains(t, ValidateLabel("a"+c+"b"), "control character")
+	}
+	ok := onyx()
+	ok.Title = "ᠠ᠋"
+	uassert.NoError(t, ValidateInfo(ok))
+	host := "https://" + strings.Repeat("a", 20) + ".example.com/"
+	long := host + strings.Repeat("p", MaxURLLen-len(host))
+	uassert.NoError(t, ValidateEndpoint(RPC, long))
+	uassert.Error(t, ValidateEndpoint(RPC, long+"p"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/a\x7fb"))
+	uassert.NoError(t, ValidateEndpoint(Explorer, "https://h.example.com/a&;b"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/a%2z"))
+	uassert.NoError(t, ValidateEndpoint(Explorer, "https://h.example.com/p?a=/../"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://a.0X1"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://256.1.1.1"))
+
+	r := NewRegistry()
+	in = onyx()
+	in.Description = " \t" + in.Description + "\t "
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", in))
+	z, _ := r.Zone("onyx")
+	uassert.Equal(t, onyx().Description, z.Description)
+	edited := onyx()
+	edited.Title = "Onyx, edited"
+	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), edited, alice, 2, "x"), "takes no reason")
+}

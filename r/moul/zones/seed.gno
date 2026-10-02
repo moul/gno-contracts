@@ -112,8 +112,10 @@ func seeds() []seedZone {
 }
 
 // seed files every seed through the same Registry methods a caller's
-// transaction goes through, so a seed that would fail validation fails the
-// deploy instead of shipping a zone no later edit could reproduce.
+// transaction goes through (the gated ones, so a seeded endpoint is not
+// Exempt; each is ruled on at once, so none is clearable), so a seed that
+// would fail validation fails the deploy instead of shipping a zone no later
+// edit could reproduce.
 func seed() {
 	at := runtime.ChainHeight()
 	for _, s := range seeds() {

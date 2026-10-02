@@ -108,8 +108,8 @@ also an index key, a URL segment or a config-file line:
   `.localhost`, `.local`, `.internal`, `.localdomain`, the RFC 6761 names
   `.test`, `.example` and `.invalid`, the never-delegated `.lan`, `.home`,
   `.corp`, `.mail`, `.intranet`, `.private`, `.onion`, `.alt`, the
-  service-discovery and container names `.consul`, `.lxd`, `.docker` and
-  `.localnet`, every `.arpa`
+  service-discovery, container and overlay names `.consul`, `.lxd`, `.incus`,
+  `.docker`, `.podman`, `.localnet`, `.svc` and `.i2p`, every `.arpa`
   name (infrastructure, never a public service), and IPv4 "this network",
   loopback, private, link-local, CGNAT, IETF-protocol, documentation,
   benchmarking, 6to4 relay anycast, multicast and reserved ranges.
@@ -123,6 +123,10 @@ also an index key, a URL segment or a config-file line:
   it too).
 - **Address** (proposer, registrant, reviewer): a valid g1 address in lowercase.
   bech32 also decodes the uppercase form, and here it would be a second identity.
+- **Trimming**: only plain spaces and tabs are trimmed from what a caller
+  types. Anything else at an edge (a line separator, U+0085) reaches the
+  validator and is refused, not cut. A zone's gnoweb and genesis URLs, like its
+  main RPC, are refused with an empty query's `?` or a bare `/`.
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no

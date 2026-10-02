@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"errors"
 	"strconv"
-	"strings"
 
 	"gno.land/p/moul/kit/index/v0"
 	"gno.land/p/moul/kit/store/v0"
@@ -36,7 +35,8 @@ import (
 // approval, verification, a flag, rejection, RemoveZone, RemoveEndpoint, an
 // edit leaving the local kind, and eviction. Flagged endpoints still count
 // toward MaxEndpointsPerZone: a flood a curator flags rather than removes can
-// fill a zone, and removing it is the answer. Each entry costs its sender a
+// fill the places a gated registration may use (all but the last
+// ReservedForReviewers), and removing it is the answer. Each entry costs its sender a
 // storage deposit, refunded to whoever signs the transaction that
 // frees it (on a chain where ugnot is not transfer-locked; on one that is, the
 // refund goes to the storage fee collector), so a flooder who withdraws first
@@ -154,8 +154,9 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 
 // ProposeExempt is Propose without the admission gates (MaxPending and
 // MaxPendingPerProposer), for the reviewers a holding realm trusts: a flood
-// that fills the queue would otherwise lock out the people who clear it. The
-// live cap, MaxZones, still holds.
+// that fills the queue would otherwise lock out the people who clear it. It
+// also takes the last ReservedForReviewers places of the live registry, which
+// Propose may not; MaxZones itself still holds.
 func (r *Registry) ProposeExempt(by address, at int64, slug string, in Info) error {
 	return r.propose(by, at, slug, in, false)
 }
@@ -269,7 +270,7 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 	if !ValidAddress(by) {
 		return errors.New("zones: the editor is not a valid lowercase address")
 	}
-	reason = strings.TrimSpace(reason)
+	reason = TrimSpaces(reason)
 	if err := ValidateReason(reason); err != nil {
 		return err
 	}
@@ -379,7 +380,7 @@ func (r *Registry) ReviewZone(slug string, to Status, revision int64, by address
 	if !ValidAddress(by) {
 		return errors.New("zones: the reviewer is not a valid lowercase address")
 	}
-	reason = strings.TrimSpace(reason)
+	reason = TrimSpaces(reason)
 	if err := ValidateReason(reason); err != nil {
 		return err
 	}
@@ -543,8 +544,8 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 
 // RegisterExempt is Register without the admission gates
 // (MaxUnverifiedPerZone and MaxEndpointsPerAddress), for the reviewers a
-// holding realm trusts, as ProposeExempt is. The hard cap,
-// MaxEndpointsPerZone, still holds.
+// holding realm trusts, as ProposeExempt is, and also takes a zone's last
+// ReservedForReviewers places; the hard cap, MaxEndpointsPerZone, still holds.
 func (r *Registry) RegisterExempt(by address, at int64, slug string, kind EndpointKind, addr, label string) (int64, error) {
 	return r.register(by, at, slug, kind, addr, label, false)
 }
@@ -557,8 +558,8 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	if z.Status != Pending && z.Status != Approved {
 		return 0, errors.New("zones: " + slug + " is " + string(z.Status) + " and takes no endpoints")
 	}
-	addr = strings.TrimSpace(addr)
-	label = strings.TrimSpace(label)
+	addr = TrimSpaces(addr)
+	label = TrimSpaces(label)
 	if err := ValidateEndpoint(kind, addr); err != nil {
 		return 0, err
 	}
@@ -647,7 +648,7 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, zoneRevision, revis
 	if !ValidAddress(by) {
 		return errors.New("zones: the reviewer is not a valid lowercase address")
 	}
-	reason = strings.TrimSpace(reason)
+	reason = TrimSpaces(reason)
 	if err := ValidateReason(reason); err != nil {
 		return err
 	}
@@ -1093,13 +1094,13 @@ func ownerKey(slug string, who address) string { return slug + "|" + who.String(
 // render as a dead link). Nothing else is rewritten: what fails validation is
 // refused, not repaired.
 func trimInfo(in Info) Info {
-	in.ChainID = strings.TrimSpace(in.ChainID)
-	in.Title = strings.TrimSpace(in.Title)
-	in.Description = strings.TrimSpace(in.Description)
-	in.Kind = Kind(strings.TrimSpace(string(in.Kind)))
-	in.GnowebURL = lowerAuthority(strings.TrimSpace(in.GnowebURL))
-	in.RPCURL = lowerAuthority(strings.TrimSpace(in.RPCURL))
-	in.GenesisURL = lowerAuthority(strings.TrimSpace(in.GenesisURL))
+	in.ChainID = TrimSpaces(in.ChainID)
+	in.Title = TrimSpaces(in.Title)
+	in.Description = TrimSpaces(in.Description)
+	in.Kind = Kind(TrimSpaces(string(in.Kind)))
+	in.GnowebURL = lowerAuthority(TrimSpaces(in.GnowebURL))
+	in.RPCURL = lowerAuthority(TrimSpaces(in.RPCURL))
+	in.GenesisURL = lowerAuthority(TrimSpaces(in.GenesisURL))
 	return in
 }
 
