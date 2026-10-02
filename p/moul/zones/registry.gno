@@ -110,6 +110,7 @@ type Registry struct {
 	byOwner   *counter     // slug|registrant -> how many endpoints they registered
 	unchecked *index.Index // slug -> ids of endpoints that are not Verified
 	flagged   *counter     // slug -> how many of those are Flagged
+	private   *index.Index // slug -> ids of endpoints on a private host (a local zone's only)
 }
 
 // NewRegistry returns an empty registry.
@@ -129,6 +130,7 @@ func NewRegistry() *Registry {
 		byOwner:    newCounter(),
 		flagged:    newCounter(),
 		unchecked:  index.New(),
+		private:    index.New(),
 	}
 }
 
@@ -227,7 +229,8 @@ func enteredKey(st Status, seq int64) string { return string(st) + "|" + store.I
 // answered for a chain this zone no longer names. A reset caused by the
 // proposer's own edit to a pending zone records no reviewer; any other records
 // the editor. An edit that changes nothing is refused, and leaving the local
-// kind removes every endpoint on a private or special-use host (IsPrivateHost).
+// kind removes every endpoint on a private or special-use host (IsPrivateHost),
+// and is refused while one of them carries a curator's ruling.
 //
 // An edit names the revision it was written against, like an approval does, so
 // two editors working from the same reading cannot silently undo each other.
@@ -268,13 +271,22 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 	// list, whatever their verdict: they name nothing on the zone it becomes.
 	// Dropped in the edit itself, not refused until somebody removes them,
 	// because anybody may register one again between that removal and this
-	// edit. Every endpoint is read once; this is a rare edit.
+	// edit. Only those endpoints are read, from their own index. One a
+	// curator ruled on (a verdict, or a reset that left a reason) is a
+	// record, maybe one the editor never saw: the edit fails while one is
+	// listed, and a curator removes it first, naming its revision. Only a
+	// curator can rule, so nobody else can block the edit this way.
 	if z.Kind == Local && in.Kind != Local {
-		for _, eid := range r.byZone.Lookup(slug) {
+		drop := r.private.Lookup(slug)
+		for _, eid := range drop {
 			v, _ := r.endpoints.get(eid)
-			if e := v.(*Endpoint); IsPrivateHost(HostOf(e.Kind, e.Address)) {
-				r.removeEndpoint(eid)
+			if e := v.(*Endpoint); e.Status != Unverified || e.ReviewedBy != "" || e.Reason != "" {
+				return errors.New("zones: leaving local would drop endpoint #" + strconv.FormatInt(e.ID, 10) +
+					", which a curator ruled on; a curator must remove it first")
 			}
+		}
+		for _, eid := range drop {
+			r.removeEndpoint(eid)
 		}
 	}
 	if in.ChainID != z.ChainID {
@@ -344,6 +356,14 @@ func (r *Registry) ReviewZone(slug string, to Status, revision int64, by address
 		return err
 	}
 	if z.Status == to {
+		// A rejection or a retirement is restated with a new reason, the only
+		// way to correct one: neither state is editable.
+		if (to == Rejected || to == Retired) && HasVisible(reason) && reason != z.Reason {
+			r.ids.rev++
+			z.Revision = int64(r.ids.rev)
+			z.ReviewedBy, z.ReviewedAt, z.Reason = by, at, reason
+			return nil
+		}
 		return errors.New("zones: " + slug + " is already " + string(to))
 	}
 	switch to {
@@ -467,6 +487,7 @@ func (r *Registry) removeZone(z *Zone, id store.ID) {
 	r.flagged.drop(slug)
 	r.byZone.RemoveKey(slug)
 	r.unchecked.RemoveKey(slug)
+	r.private.RemoveKey(slug)
 	for _, k := range EndpointKinds() {
 		r.byKind.RemoveKey(kindKey(slug, k))
 	}
@@ -509,9 +530,10 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	if kind == Seed || kind == Peer {
 		addr = Canonical(kind, addr) // lowercase, no terminal dot: what tm2 dials
 	} else {
-		addr = lowerScheme(addr)
+		addr = lowerAuthority(addr)
 	}
-	if z.Kind != Local && IsPrivateHost(HostOf(kind, addr)) {
+	private := IsPrivateHost(HostOf(kind, addr))
+	if z.Kind != Local && private {
 		return 0, errors.New("zones: " + slug + " is a " + string(z.Kind) + " zone, and " + addr +
 			" names a private or special-use host; only a local zone lists those")
 	}
@@ -553,6 +575,11 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 	if err := r.unchecked.Add(slug, id); err != nil {
 		return 0, err
 	}
+	if private {
+		if err := r.private.Add(slug, id); err != nil {
+			return 0, err
+		}
+	}
 	return e.ID, nil
 }
 
@@ -561,16 +588,18 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 // corrected without passing through a state its registrant may remove it
 // from), with these rules:
 //
-//   - every verdict names the VerdictRevision it was written against, and
-//     fails if the endpoint or its zone changed since: a verdict landing
-//     after another curator's, unseen, would silently reverse it;
+//   - every verdict names the endpoint's Revision as read, and fails if the
+//     endpoint changed since: a verdict landing after another curator's,
+//     unseen, would silently reverse it;
 //   - flagging needs a reason, because "do not use this" with no why is not
 //     something an operator can act on;
-//   - for a verification that binding is also to the zone: what is verified is
-//     that the endpoint answers for THIS zone's chain id, and a proposer could
-//     otherwise switch it while the verdict is in flight;
+//   - a verification also names the zone's Revision it was checked against,
+//     and fails if the zone changed since: what is verified is that the
+//     endpoint answers for THIS zone's chain id, and a proposer could otherwise
+//     switch it while the verdict is in flight. A flag or an unverify does
+//     not, so an edit to the zone cannot hold off a warning;
 //   - only an endpoint of a pending or approved zone can be verified.
-func (r *Registry) ReviewEndpoint(id int64, to Verification, revision int64, by address, at int64, reason string) error {
+func (r *Registry) ReviewEndpoint(id int64, to Verification, zoneRevision, revision int64, by address, at int64, reason string) error {
 	e, err := r.endpoint(id)
 	if err != nil {
 		return err
@@ -602,13 +631,18 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, revision int64, by 
 	if err != nil {
 		return err
 	}
-	if want := VerdictRevision(*z, *e); revision != want {
-		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " or " + z.Slug +
-			" changed since you checked it: it is at revision " + strconv.FormatInt(want, 10) +
-			", you acted on revision " + strconv.FormatInt(revision, 10))
+	if revision != e.Revision {
+		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " changed since you checked it: it is at revision " +
+			strconv.FormatInt(e.Revision, 10) + ", you acted on revision " + strconv.FormatInt(revision, 10))
 	}
-	if to == Verified && z.Status != Pending && z.Status != Approved {
-		return errors.New("zones: " + z.Slug + " is " + string(z.Status) + "; nothing on it can be verified")
+	if to == Verified {
+		if z.Status != Pending && z.Status != Approved {
+			return errors.New("zones: " + z.Slug + " is " + string(z.Status) + "; nothing on it can be verified")
+		}
+		if zoneRevision != z.Revision {
+			return errors.New("zones: " + z.Slug + " changed since you checked it against it: it is at revision " +
+				strconv.FormatInt(z.Revision, 10) + ", you verified against revision " + strconv.FormatInt(zoneRevision, 10))
+		}
 	}
 	sid := store.ID(id)
 	if to == Verified {
@@ -657,21 +691,30 @@ func (r *Registry) unverifyAll(slug string, by address, at int64, reason string)
 		}
 		e.Status = Unverified
 		e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, reason
+		r.ids.rev++
+		e.Revision = int64(r.ids.rev)
 	}
 	return nil
 }
 
 // RemoveEndpoint deletes an endpoint, freeing its storage deposit to whoever
-// signs the removal. Who may is the holding realm's call.
-func (r *Registry) RemoveEndpoint(id int64) error {
-	if _, err := r.endpoint(id); err != nil {
+// signs the removal. revision is the endpoint's Revision as read: a removal
+// fails if a verdict landed since, rather than delete one nobody saw. Who may
+// is the holding realm's call.
+func (r *Registry) RemoveEndpoint(id, revision int64) error {
+	e, err := r.endpoint(id)
+	if err != nil {
 		return err
+	}
+	if revision != e.Revision {
+		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " changed since you read it: it is at revision " +
+			strconv.FormatInt(e.Revision, 10) + ", you acted on revision " + strconv.FormatInt(revision, 10))
 	}
 	r.removeEndpoint(store.ID(id))
 	return nil
 }
 
-// removeEndpoint unwinds the record and all six of its indexes together.
+// removeEndpoint unwinds the record and all seven of its indexes together.
 func (r *Registry) removeEndpoint(id store.ID) {
 	v, ok := r.endpoints.remove(id)
 	if !ok {
@@ -683,9 +726,26 @@ func (r *Registry) removeEndpoint(id store.ID) {
 	r.byKind.Remove(kindKey(e.Zone, e.Kind), id)
 	r.byOwner.dec(ownerKey(e.Zone, e.Registrant))
 	r.unchecked.Remove(e.Zone, id)
+	r.private.Remove(e.Zone, id)
 	if e.Status == Flagged {
 		r.flagged.dec(e.Zone)
 	}
+}
+
+// Revision is the last revision handed out, to a zone or an endpoint. Anything
+// that changes after a read gets a later one.
+func (r *Registry) Revision() int64 { return int64(r.ids.rev) }
+
+// PrivateEndpoints returns a zone's endpoints on a private host, the ones
+// leaving the local kind drops. Only those are read.
+func (r *Registry) PrivateEndpoints(slug string) []Endpoint {
+	out := []Endpoint{}
+	for _, id := range r.private.Lookup(slug) {
+		if v, ok := r.endpoints.get(id); ok {
+			out = append(out, *v.(*Endpoint))
+		}
+	}
+	return out
 }
 
 // Zone returns a copy of the zone under slug.
@@ -986,9 +1046,9 @@ func trimInfo(in Info) Info {
 	in.Title = strings.TrimSpace(in.Title)
 	in.Description = strings.TrimSpace(in.Description)
 	in.Kind = Kind(strings.TrimSpace(string(in.Kind)))
-	in.GnowebURL = lowerScheme(strings.TrimSpace(in.GnowebURL))
-	in.RPCURL = lowerScheme(strings.TrimSpace(in.RPCURL))
-	in.GenesisURL = lowerScheme(strings.TrimSpace(in.GenesisURL))
+	in.GnowebURL = lowerAuthority(strings.TrimSpace(in.GnowebURL))
+	in.RPCURL = lowerAuthority(strings.TrimSpace(in.RPCURL))
+	in.GenesisURL = lowerAuthority(strings.TrimSpace(in.GenesisURL))
 	return in
 }
 

@@ -204,20 +204,10 @@ type Endpoint struct {
 	ReviewedAt int64
 	Reason     string
 	// Revision is bumped, from the registry-wide counter zones use, when the
-	// endpoint is registered and on every verdict. A verdict names
-	// VerdictRevision, the later of this and its zone's.
+	// endpoint is registered, on every verdict and on every reset. A verdict
+	// and a removal name it, so either fails on an endpoint that changed
+	// after it was read.
 	Revision int64
-}
-
-// VerdictRevision is what a verdict on e must name: the later of its zone's
-// Revision and its own. Both come from one counter that never repeats, so a
-// change to either after it was read (an edit, a status change, another
-// curator's verdict) makes it move, and the verdict fail.
-func VerdictRevision(z Zone, e Endpoint) int64 {
-	if e.Revision > z.Revision {
-		return e.Revision
-	}
-	return z.Revision
 }
 
 // ParseStatus reads a status from a caller's string. "" is the zero Status,
@@ -392,6 +382,13 @@ func HostOf(kind EndpointKind, addr string) string {
 // It looks at the string only; a public name that resolves to a private
 // address is beyond what a registry can know.
 func IsPrivateHost(host string) bool {
+	// Fail closed: anything but a bare host (a port, a path, a stray
+	// character) is not one this can vouch for.
+	for i := 0; i < len(host); i++ {
+		if c := host[i]; !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '.' || c == '-') {
+			return true
+		}
+	}
 	h := strings.ToLower(strings.TrimSuffix(host, "."))
 	if !strings.Contains(h, ".") {
 		return true
@@ -421,7 +418,7 @@ func IsPrivateHost(host string) bool {
 		return true
 	case a == 172 && b >= 16 && b <= 31, a == 100 && b >= 64 && b <= 127:
 		return true
-	case a == 192 && b == 0 && c == 0, a == 198 && (b == 18 || b == 19):
+	case a == 192 && b == 0 && c == 0, a == 198 && (b == 18 || b == 19), a == 192 && b == 88 && c == 99:
 		return true
 	case a == 192 && b == 0 && c == 2, a == 198 && b == 51 && c == 100, a == 203 && b == 0 && c == 113:
 		return true // documentation ranges
@@ -434,8 +431,21 @@ func IsPrivateHost(host string) bool {
 func ValidateEndpoint(kind EndpointKind, addr string) error {
 	switch kind {
 	case RPC:
-		return checkURL("rpc address", addr, rpcSchemes)
-	case Gnoweb, Indexer, Faucet, Explorer:
+		if err := checkURL("rpc address", addr, rpcSchemes); err != nil {
+			return err
+		}
+		// gnokey dials a tcp:// remote as host:port, path and all, so one with
+		// a path is undialable, and Canonical would read it as an http URL
+		// that is a different resource.
+		if scheme, rest, _ := strings.Cut(addr, "://"); strings.EqualFold(scheme, "tcp") &&
+			strings.IndexAny(rest, "/?") >= 0 {
+			return errors.New("zones: a tcp:// rpc address is host and port only, no path or query")
+		}
+		return nil
+	case Indexer:
+		// A tx-indexer serves GraphQL subscriptions over a websocket too.
+		return checkURL("indexer address", addr, rpcSchemes[:4])
+	case Gnoweb, Faucet, Explorer:
 		return checkURL(string(kind)+" address", addr, webSchemes)
 	case Seed, Peer:
 		return checkPeer(addr)
@@ -510,6 +520,25 @@ func isSelector(r rune) bool {
 	return (r >= 0xFE00 && r <= 0xFE0F) || (r >= 0xE0100 && r <= 0xE01EF) || (r >= 0x180B && r <= 0x180F)
 }
 
+// selects reports whether a variation selector modifies the character before
+// it, the one place it is text rather than an invisible difference: the
+// emoji and text presentation selectors after a symbol (a phone writes ❤️ as
+// U+2764 U+FE0F), the Mongolian free variation selectors after a Mongolian
+// letter, and an ideographic variation sequence after a Han ideograph. A
+// selector cannot make a badge: every symbol that looks like one is refused on
+// its own.
+func selects(base, sel rune) bool {
+	switch {
+	case sel == 0xFE0E || sel == 0xFE0F:
+		return unicode.In(base, unicode.So, unicode.Sm)
+	case sel >= 0x180B && sel <= 0x180F && sel != 0x180E:
+		return base >= 0x1820 && base <= 0x18AA
+	case sel >= 0xE0100 && sel <= 0xE01EF:
+		return unicode.Is(unicode.Han, base)
+	}
+	return false
+}
+
 // isBadge is the status glyphs Render draws, and their look-alikes, refused in
 // free text so a title cannot claim "✔ official" beside a pending badge.
 func isBadge(r rune) bool {
@@ -522,7 +551,9 @@ func isBadge(r rune) bool {
 		0x1FBB1, 0x237B, 0x10102, // more check marks
 		0x1F5D9, 0x2A2F, 0x2573, 0x2BBD, 0x2BBE, 0x2BBF, // more crosses and ballot boxes
 		0x29D6, 0x29D7, // hourglasses
-		0x2613, 0x2A09: // saltire, n-ary times (× itself is everyday text: 1920×1080)
+		0x2613, 0x2A09, // saltire, n-ary times (× itself is everyday text: 1920×1080)
+		0x22A0, 0x2327, 0x1F147, 0x1F187, 0x2297, 0x2A02, 0x1F167, // boxed and circled crosses
+		0x1F6C7, 0x2298, 0x29B8: // prohibition signs
 		return true
 	}
 	return r >= 0x1F7A8 && r <= 0x1F7AE // the geometric crosses beside ✖
@@ -557,7 +588,7 @@ func checkText(field, s string, min, max int) error {
 	if sanitize.StripBidiAndZeroWidth(s) != s {
 		return errors.New("zones: the " + field + " contains an invisible or bidi character")
 	}
-	n, marks := 0, 0
+	n, marks, prev := 0, 0, rune(0)
 	for i, r := range s {
 		if r == utf8.RuneError {
 			if _, size := utf8.DecodeRuneInString(s[i:]); size <= 1 {
@@ -567,7 +598,7 @@ func checkText(field, s string, min, max int) error {
 		if r < 0x20 || (r >= 0x7f && r <= 0x9f) || r == 0x2028 || r == 0x2029 {
 			return errors.New("zones: the " + field + " contains a control character")
 		}
-		if unicode.Is(unicode.Cf, r) || isBlankFiller(r) || r == 0x034F || isSelector(r) {
+		if unicode.Is(unicode.Cf, r) || isBlankFiller(r) || r == 0x034F || (isSelector(r) && !selects(prev, r)) {
 			return errors.New("zones: the " + field + " contains an invisible or bidi character")
 		}
 		if !unicode.IsGraphic(r) && !unicode.IsSpace(r) {
@@ -594,6 +625,7 @@ func checkText(field, s string, min, max int) error {
 		} else {
 			marks = 0
 		}
+		prev = r
 		n++
 		if n > max {
 			break // refused below; no need to classify the rest
@@ -812,15 +844,21 @@ func isEntity(s string) bool {
 	return false
 }
 
-// lowerScheme lowercases a URL's scheme and leaves the rest as typed. Stored
-// that way because a scheme is case-insensitive but gno's link sanitizer is
-// not: an HTTPS:// link would render with an empty href.
-func lowerScheme(addr string) string {
+// lowerAuthority lowercases a URL's scheme and host, both case-insensitive,
+// and leaves the path and query as typed. Stored that way because gno's link
+// sanitizer is not case-insensitive (an HTTPS:// link would render with an
+// empty href), and so every later lowercasing of the host (Canonical,
+// IsPrivateHost) finds nothing to change and costs nothing.
+func lowerAuthority(addr string) string {
 	scheme, rest, ok := strings.Cut(addr, "://")
 	if !ok {
 		return addr
 	}
-	return strings.ToLower(scheme) + "://" + rest
+	host, tail := rest, ""
+	if i := strings.IndexAny(rest, "/?"); i >= 0 {
+		host, tail = rest[:i], rest[i:]
+	}
+	return strings.ToLower(scheme) + "://" + strings.ToLower(host) + tail
 }
 
 // Canonical is the form two addresses are compared in, so one endpoint cannot

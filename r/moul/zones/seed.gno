@@ -125,11 +125,11 @@ func seed() {
 			id, err := reg.Register(Admin, at, s.slug, k, e[1], e[2])
 			must(err)
 			ep, _ := reg.Endpoint(id)
-			rev := zones.VerdictRevision(mustZone(s.slug), ep) // the approval and the registration both moved it
+			zrev := mustZone(s.slug).Revision // the approval moved it
 			if s.failed == "" {
-				must(reg.ReviewEndpoint(id, zones.Verified, rev, Admin, at, seedReason))
+				must(reg.ReviewEndpoint(id, zones.Verified, zrev, ep.Revision, Admin, at, seedReason))
 			} else {
-				must(reg.ReviewEndpoint(id, zones.Flagged, rev, Admin, at, s.failed))
+				must(reg.ReviewEndpoint(id, zones.Flagged, zrev, ep.Revision, Admin, at, s.failed))
 			}
 		}
 	}

@@ -16,7 +16,8 @@ z, _ = r.Zone("onyx") // the approval bumped the revision
 id, err := r.Register(proposer, height, "onyx", zones.Peer,
 	"g1x5mlj5ava0dw9vkf4j6admjlzswm6f06p44krn@seed-1.onyx.testnets.gno.land:26656", "gno core")
 must(err)
-must(r.ReviewEndpoint(id, zones.Verified, z.Revision, curator, height, "answers onyx-1"))
+e, _ := r.Endpoint(id) // a verification names the zone's revision and the endpoint's
+must(r.ReviewEndpoint(id, zones.Verified, z.Revision, e.Revision, curator, height, "answers onyx-1"))
 r.Endpoints(zones.EndpointFilter{Zone: "onyx", Kind: zones.Peer, Status: zones.Verified}) // that one peer
 ```
 
@@ -40,19 +41,23 @@ changing here.
 | decision | from | reason | also |
 |---|---|---|---|
 | approve | pending, rejected, retired | optional | |
-| reject | pending | **required** | verified endpoints go back to unverified |
-| retire | approved | **required** | verified endpoints go back to unverified |
-| edit | pending, approved | none before review, **required** after | a new chain id un-verifies endpoints |
+| reject | pending; rejected, to restate the reason | **required** | verified endpoints go back to unverified |
+| retire | approved; retired, to restate the reason | **required** | verified endpoints go back to unverified |
+| edit | pending, approved | none before review, **required** after | a new chain id un-verifies endpoints; leaving `local` drops the private ones, refused while one carries a curator's ruling |
 | remove | pending, rejected | | endpoints go with it |
 | verify an endpoint | any, the same one only with a new reason | optional | zone pending or approved |
 | unverify an endpoint | any, the same one only with a new reason | optional | |
 | flag an endpoint | any, the same one only with a new reason | **required** | |
 
-Every endpoint verdict names `VerdictRevision(zone, endpoint)`, the later of the
-zone's `Revision` and the endpoint's own, both from the one counter that never
-repeats: so it fails if the zone changed (a verification checks the endpoint
-answers for this zone's chain id) or another curator ruled on the endpoint
-since it was read (a verdict landing unseen would reverse theirs).
+Every endpoint verdict, and every removal, names the endpoint's own
+`Revision`, bumped on registration, on every verdict and on every reset, from
+the same never-repeating counter zones use: so it fails if another curator
+ruled on the endpoint since it was read (a verdict landing unseen would reverse
+theirs). A verification also names the zone's `Revision`, and fails if the zone
+changed: what it checks is that the endpoint answers for this zone's chain id.
+A flag or an unverify does not, so editing a zone cannot hold off a warning.
+The two are named apart, never combined, because a reader who takes them from
+two reads at two heights could otherwise combine stale ones into a valid one.
 
 - **Every decision on a zone binds to the zone as read**: its fields and its
   status. Every edit bumps the
@@ -94,17 +99,21 @@ also an index key, a URL segment or a config-file line:
   `0x7f.1`, must be a valid dotted quad), an optional port of 1 to 65535 in
   digits, and a scheme from a short list. A zone's main RPC is `http`, `https`
   or `tcp` with no path, query or trailing slash, which is what `gnokey -remote`
-  dials; an `rpc` endpoint also takes `ws`, `wss` and a path. A `%` never
+  dials; an `rpc` endpoint also takes `ws`, `wss` and a path (a `tcp://` one
+  is host and port only, since gnokey dials it as such), and an `indexer`
+  takes `ws` and `wss` for its subscriptions. A `%` never
   escapes a character that needs no escaping, and a path has no `.` or `..`
   segment, so a URL has one spelling. A host that names a different machine
   for every reader is refused except on a `local` zone: a name with no dot,
   `.localhost`, `.local`, `.internal`, `.localdomain`, the RFC 6761 names
   `.test`, `.example` and `.invalid`, the never-delegated `.lan`, `.home`,
   `.corp`, `.mail`, `.intranet`, `.private`, `.onion`, `.alt`, every `.arpa`
-  name (infrastructure, never a public service), and IPv4 "this network", loopback, private, link-local,
-  CGNAT, IETF-protocol, documentation, benchmarking, multicast and reserved
-  ranges. A zone that leaves the `local` kind drops every endpoint on one, in
-  the same edit. An IPv4 host has no terminal dot.
+  name (infrastructure, never a public service), and IPv4 "this network",
+  loopback, private, link-local, CGNAT, IETF-protocol, documentation,
+  benchmarking, 6to4 relay anycast, multicast and reserved ranges.
+  `IsPrivateHost` fails closed: anything but a bare host is private to it. A
+  zone that leaves the `local` kind drops every endpoint on one, in the same
+  edit. An IPv4 host has no terminal dot.
 - **Peer**: `<node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes,
   the node id a lowercase g1 address (tm2 compares node ids byte for byte), and
   no terminal dot on an IPv4 host (Go's dialer cannot use one, so URLs refuse
@@ -114,8 +123,10 @@ also an index key, a URL segment or a config-file line:
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no
-  variation selector, no enclosing mark (it draws a badge's frame around any
-  character), no run of more than four other combining marks, none of the
+  variation selector except right after a character it modifies (an emoji
+  heart as a phone writes it, a Mongolian variant, an ideographic variation
+  sequence), no enclosing mark (it draws a badge's frame around any
+  character), no run of more than four nonspacing marks, none of the
   status glyphs a Render draws nor their look-alikes, and, unless it is empty,
   something visible. Refused rather than stripped, so what is stored is what is
   shown. It must still be escaped by whoever renders it. Two consequences:
@@ -125,8 +136,9 @@ also an index key, a URL segment or a config-file line:
   assigned since is refused on chain though `gno test` (which uses the host's
   tables) accepts it.
 
-An endpoint is stored in canonical spelling (scheme lowercased, a peer
-lowercased whole without its host's terminal dot) and deduplicated on
+An endpoint, like a zone's URLs, is stored with its scheme and host lowercased
+(a peer lowercased whole, without its host's terminal dot), so every later
+comparison finds nothing to change, and deduplicated on
 `Canonical`: scheme and host lowercased, a terminal dot, a default port, an
 empty path before a query, an empty query's `?` and a bare `/` dropped, `%XX`
 hex uppercased, an rpc `tcp://` read as the `http://` gnokey dials, anything
@@ -169,12 +181,9 @@ permanent. Three B+ trees hold an id per key: slug, the endpoint dedup key (a
 128-bit hash of the canonical address rather than a second copy of it), and the
 order zones entered their state. Three hold a count per key: pending proposals
 per proposer, endpoints per registrant on a zone, flagged endpoints per zone.
-The other five are [`kit/index`](../kit/index): status, approved-by-chain-id,
-and for endpoints zone, zone-and-kind and not-verified. Every one is written in
-the same method as its record; counts come from the indexes without reading a
-record, and a page reads the records on it only (the bucket's id list, at most
-256 or 128 ids, is read whole). The heaviest write, measured on a node at the
-caps with full-length text, is an edit taking a local zone with 128 private
-endpoints off `local`, about 0.65B gas, because each dropped endpoint unwinds
-its own index entries; a retirement that evicts a full zone is about 0.38B. Both
-are well under a block's gas.
+The other six are [`kit/index`](../kit/index): status, approved-by-chain-id,
+and for endpoints zone, zone-and-kind, not-verified and on-a-private-host (so
+leaving `local` reads only those). Every one is written in the same method as
+its record; counts come from the indexes without reading a record, and a page
+reads the records on it only (the bucket's id list, at most 256 or 128 ids, is
+read whole). COSTLINE

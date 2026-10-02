@@ -49,7 +49,9 @@ Turning these into a node's `config.toml` is deliberately not this realm's job.
 It is public (`gnomod.toml` says why) so that a separate realm can import it and
 do that. Two things an importer must know: a slice these return is read-only in
 the importing realm, elements included (copy it before sorting or changing it;
-a struct returned on its own is already the caller's), and a kind or status the
+a struct returned on its own is already the caller's; a slice the importer
+keeps in its own state stays this realm's object, so copy it before storing it
+too), and a kind or status the
 `p/moul/zones` `Parse` functions do not accept panics, which no `recover` in the
 caller catches, so check one taken from a query string with them first.
 
@@ -58,30 +60,33 @@ caller catches, so check one taken from a query string with them first.
 | function | who |
 |---|---|
 | `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody; a curator also when the review queue is full |
-| `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. A rejected or retired zone is not editable |
+| `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. Leaving `local` drops every endpoint on a private host, and is refused while one carries a curator's ruling (a curator removes it first); the proposer's edit only drops endpoints that are theirs and that they could withdraw on their own. A rejected or retired zone is not editable |
 | `ApproveZone(slug, revision, reason)` | a curator |
-| `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified |
+| `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified. Rejecting a rejected zone, or retiring a retired one, with a new reason restates it |
 | `RemoveZone(slug, revision)` | a curator, on a pending or rejected zone; or its proposer, on a pending one, 100 blocks after it was proposed or last edited, while every endpoint on it is theirs and one they could withdraw on its own (below). One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
-| `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator. A curator also when the zone's review queue is full, up to the hard 128 |
-| `VerifyEndpoint(id, revision, reason)`, `FlagEndpoint(id, revision, reason)`, `UnverifyEndpoint(id, revision, reason)` | a curator, naming the endpoint's revision as read (the endpoint table's revision column). A flag needs a reason; the same verdict again with a new reason restates it |
-| `ClearUnreviewed(slug)` | a curator: removes every endpoint on the zone no curator has ruled on, in one call, for a flood that withdraws and registers again faster than one removal at a time |
-| `RemoveEndpoint(id)` | a curator; or its registrant, on a pending or approved zone, 100 blocks after registering it, while no curator has ruled on it. A verified, flagged or curator-unverified endpoint is a record, and so is everything on a rejected or retired zone: only a curator removes them |
+| `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator. The zone's own main RPC under `rpc` and gnoweb under `gnoweb` only its proposer or a curator lists, since the page marks those URLs by that listing's verdict. A curator also registers past the review queue and the 16-per-address cap, up to the hard 128 |
+| `VerifyEndpoint(id, zoneRevision, revision, reason)` | a curator, naming the endpoint's revision (the endpoint table's column) and the zone's (the zone page's), both as read |
+| `FlagEndpoint(id, revision, reason)`, `UnverifyEndpoint(id, revision, reason)` | a curator, naming the endpoint's revision as read. A flag needs a reason; any verdict given again with a new reason restates it |
+| `ClearUnreviewed(slug, throughRevision)` | a curator: removes, in one call, every endpoint on the zone no curator has ruled on and no curator registered, up to the revision named (the zone page's link carries the one it was rendered at, so nothing registered after is touched). For a flood that withdraws and registers again faster than one removal at a time |
+| `RemoveEndpoint(id, revision)` | a curator; or its registrant, on a pending or approved zone, 100 blocks after registering it, unless a curator flagged or unverified it. Naming the revision means a removal fails if a verdict landed since. A verified endpoint its registrant may take down; a flagged or curator-unverified one is a warning, and everything on a rejected or retired zone is a record: only a curator removes those |
 | `AddCurator(addr)` | a curator; it is an invitation, at most 16 curators and invitations together |
 | `AcceptCurator()` | the invited address, to take up the invitation |
 | `RemoveCurator(addr)` | a curator; it withdraws an invitation, or removes a curator along with every invitation they sent. The last curator cannot be removed |
 
 Every decision on a zone (edit, approve, reject, retire, remove) takes its
-`revision`, the one you read (the zone page shows it, and its action links
-carry it): if the zone changed since, its content or its status, the call fails
-and you read it again. An endpoint's verdict takes the endpoint's revision, the
-later of its zone's and its own (`zones.VerdictRevision`), so it also fails if
-another curator ruled on it since. The `$help` links fill a revision in; an edit
-and a verdict have no link, so copy it from the zone page. A zone's revision
-covers its own fields and status, not its endpoints' verdicts. A proposer edits or withdraws a pending zone only 100
-blocks (`ReviewWindow`) after it was proposed or last edited, by anybody, and a
-registrant withdraws an endpoint only 100 blocks after registering it, so
-neither can keep an entry out of a curator's reach by changing it faster than
-they read.
+`revision`, the one you read (the zone page shows it, and its action links carry
+it): if the zone changed since, its content or its status, the call fails and
+you read it again. A verdict on an endpoint, and its removal, take the
+endpoint's own revision (the endpoint table's column), so they fail if another
+curator ruled on it since; a verification also takes the zone's. The two are
+named apart: one number combined from two reads could pair a stale value with a
+fresh one. The `$help` links fill a revision in; an edit and a verdict have no
+link, so copy them from the zone page. A zone's revision covers its own fields
+and status, not its endpoints' verdicts. A proposer edits or withdraws a pending
+zone only 100 blocks (`ReviewWindow`) after it was proposed or last edited, by
+anybody, and a registrant withdraws an endpoint only 100 blocks after
+registering it: a rate bound (100 blocks is minutes), so neither can change an
+entry every block.
 
 **Curators are equals**: any one may remove any other, the admin included. That
 is the trust a curator set is, and it is why there are few of them.
@@ -95,7 +100,8 @@ why a curator's removal collects what the remover did not pay.
 
 Every list is 25 rows a page (`?page=`), and a page reads the records it shows
 plus a bounded handful of lookups (each row's main RPC verdict, the flags on a
-zone's own URLs, the curators), never a whole list: `vm/qrender` is
+zone's own URLs, the zone serving the current chain for the printed command,
+the curators), never a whole list: `vm/qrender` is
 gas-metered, and a Render that outgrows it stops answering.
 Paths are exact; anything else is Not found.
 
@@ -110,11 +116,13 @@ code, to copy and check. A main RPC or gnoweb URL the zone also lists, under
 that same kind, as a flagged endpoint is code and marked wherever it is shown,
 and the printed `gnokey` line leaves out a main RPC so marked. Only that kind's
 flag counts: a listing under another kind is anybody's to make, so its flag
-never marks the zone's own URL, and a curator who means the zone's URL flags it
-under its own kind. RPCs and endpoint addresses are always code. An action link
+never marks the zone's own URL, and under its own kind only the proposer or a
+curator lists it. RPCs and endpoint addresses are always code. An action link
 is shown only when the call could pass the caps, and where a cap is full a note
 says which and what frees it; a full review queue still takes a curator's call,
-so its link stays, labelled for curators. Addresses are shown in full everywhere,
+so its link stays, labelled for curators, and a zone with endpoints awaiting
+review offers curators a Clear link bound to the revision the page was
+rendered at. Addresses are shown in full everywhere,
 never shortened: an 8+4 shortening is within reach of a vanity grinder who
 wants to look like a curator. Free text has `@` and bare `g1` addresses
 neutralised, so a label cannot turn into a profile link.
