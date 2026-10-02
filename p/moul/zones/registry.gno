@@ -53,7 +53,8 @@ const (
 	// MaxDropPerEdit bounds how many endpoints one edit off the local kind
 	// drops, and so its gas: a removal rewrites up to about 45 later values in
 	// two B+ tree leaves, and a caller can lay ids out so every removal does,
-	// which at 128 measured 2.6B, close to a 3B block. More waits for removals.
+	// which at 128 measured 2.6B, close to a 3B block, and at 64 measures
+	// 1.46B. More waits for removals.
 	MaxDropPerEdit = 64
 )
 

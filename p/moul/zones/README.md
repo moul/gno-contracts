@@ -196,11 +196,10 @@ reads the records on it only (the bucket's id list, at most 256 or 128 ids, is
 read whole). Measured on a node at the caps, with every text field at full
 length in the costliest characters and 240-character hosts: the heaviest page is
 a zone page of 25 flagged rows with full reasons, about 1.5B of the 3B query
-cap. A removal shifts the later records in its B+ tree leaf, and endpoint ids
-are handed out registry-wide, so what a removal of a zone's endpoints costs
-depends on how they interleave with other zones'. With a zone's 128 endpoints
-registered together, an edit taking it off `local` costs about 1.1B and a
-retirement that evicts a full zone about 0.35B; with each of them spread to the
-head of its own leaf, the worst a registrant can arrange, they cost 2.1B (70% of
-a 3B block) and 1.4B, and `ClearUnreviewed` of 128 costs 1.9B, all under a 3B
-block.
+cap. A removal shifts the later records in its B+ tree leaf, and borrows from a
+neighbour when the leaf underflows; endpoint ids are handed out registry-wide,
+so what a removal of a zone's endpoints costs depends on how they interleave
+with other zones'. With them registered together, a retirement that evicts a
+full zone costs about 0.32B; in the worst layout a registrant can arrange, 1.93B
+(64% of a 3B block), the heaviest write, measured landing on a node capped at
+3B. That is also why an edit leaving `local` drops at most 64 (1.46B worst).
