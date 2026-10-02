@@ -197,20 +197,20 @@ permanent. Three B+ trees hold an id per key: slug, the endpoint dedup key (a
 128-bit hash of the canonical address rather than a second copy of it), and the
 order zones entered their state. Four hold a count per key: pending proposals
 per proposer, endpoints per registrant on a zone, flagged and clearable
-endpoints per zone.
-The other six are [`kit/index`](../kit/index): status, approved-by-chain-id, and
-for endpoints zone, zone-and-kind, not-verified and on-a-private-host (so
-leaving `local` reads only those). Every one is written in the same method as
-its record; counts come from the indexes without reading a record, and a page
-reads the records on it only (the bucket's id list, at most 256 or 128 ids, is
-read whole). Measured on a node at the caps, with every text field at full
-length in the costliest characters and 240-character hosts: the heaviest page is
-a zone page of 25 flagged rows with full reasons, about 1.5B of the 3B query
-cap. A removal shifts the later records in its B+ tree leaf, and borrows from a
-neighbour when the leaf underflows; endpoint ids are handed out registry-wide,
-so what a removal of a zone's endpoints costs depends on how they interleave
-with other zones'. With them registered together, a retirement that evicts a
-full zone costs about 0.32B; in the worst layout a registrant can arrange, 1.93B
-(64% of a 3B block), the heaviest write, measured landing on a node capped at
-3B; with the shifted neighbours also at full size and flagged with full
-reasons, 2.12B (71%). That is also why an edit leaving `local` drops at most 64 (1.46B worst).
+endpoints per zone. The other six are [`kit/index`](../kit/index): status,
+approved-by-chain-id, and for endpoints zone, zone-and-kind, not-verified and
+on-a-private-host (so leaving `local` reads only those). Every one is written in
+the same method as its record; counts come from the indexes without reading a
+record, and a page reads the records on it only (the bucket's id list, at most
+256 or 128 ids, is read whole). Measured on a node at the caps, with every text
+field at full length in the costliest characters and 240-character hosts: the
+heaviest page is a zone page of 25 flagged rows with full reasons, about 1.5B of
+the 3B query cap. A removal shifts the later records in its B+ tree leaf, and
+borrows from a neighbour when the leaf underflows; endpoint ids are handed out
+registry-wide, so what a removal of a zone's endpoints costs depends on how they
+interleave with other zones'. With them registered together, a retirement that
+evicts a full zone costs about 0.39B; in the worst layout a registrant can
+arrange, with the shifted neighbours at full size and flagged, 2.20B (73% of a
+3B block), the heaviest write, measured landing on a node capped at 3B. That is
+also why an edit leaving `local` drops at most 64 (1.94B worst, with a chain-id
+change and both own URLs moved in the same edit).
