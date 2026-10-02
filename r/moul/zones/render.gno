@@ -91,7 +91,8 @@ func renderIndex(req *realmpath.Request) string {
 	links = append(links,
 		md.Link(strconv.Itoa(reg.ZoneCount(zones.Pending))+" proposal(s) waiting for review", realmURL+":proposals"))
 	// Offered only while it can succeed: a link certain to fail is a dead end,
-	// and the note says which cap is full, so it names what would free it. A
+	// and the note says which cap is full (not what would free it: that
+	// depends on who acts, and what frees one cap can fill another). A
 	// full review queue still takes a curator's proposal, so the link stays,
 	// labelled for them.
 	propose := func(title string) string {
@@ -101,14 +102,12 @@ func renderIndex(req *realmpath.Request) string {
 	}
 	switch {
 	case reg.Live() >= zones.MaxZones:
-		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+" live zones until "+freesALiveSlot()+
-			"; anybody may propose again below "+strconv.Itoa(zones.MaxZones-zones.ReservedForReviewers))
+		links = append(links, "the registry is full at "+strconv.Itoa(zones.MaxZones)+" live zones")
 	case reg.Live() >= zones.MaxZones-zones.ReservedForReviewers:
-		links = append(links, "the registry's last "+strconv.Itoa(zones.ReservedForReviewers)+" places are kept for curators until fewer than "+
-			strconv.Itoa(zones.MaxZones-zones.ReservedForReviewers)+" zones are live",
+		links = append(links, "the registry's last "+strconv.Itoa(zones.ReservedForReviewers)+" places are kept for curators",
 			propose("Propose a zone (curators only)"))
 	case reg.ZoneCount(zones.Pending) >= zones.MaxPending:
-		links = append(links, "proposals are full until one is reviewed or removed",
+		links = append(links, "the review queue is full at "+strconv.Itoa(zones.MaxPending)+" proposals",
 			propose("Propose a zone (curators only, while full)"))
 	default:
 		links = append(links, propose("Propose a zone"))
@@ -261,15 +260,13 @@ func renderZone(slug string, req *realmpath.Request) string {
 	open := z.Status == zones.Approved || z.Status == zones.Pending
 	switch {
 	case open && reg.EndpointCount(z.Slug, "") >= zones.MaxEndpointsPerZone:
-		actions = append(actions, "endpoints are full at "+strconv.Itoa(zones.MaxEndpointsPerZone)+" until some are removed; anybody may register again below "+
-			strconv.Itoa(zones.MaxEndpointsPerZone-zones.ReservedForReviewers))
+		actions = append(actions, "endpoints are full at "+strconv.Itoa(zones.MaxEndpointsPerZone))
 	case open && reg.EndpointCount(z.Slug, "") >= zones.MaxEndpointsPerZone-zones.ReservedForReviewers:
-		actions = append(actions, "the last "+strconv.Itoa(zones.ReservedForReviewers)+" endpoint places are kept for curators until fewer than "+
-			strconv.Itoa(zones.MaxEndpointsPerZone-zones.ReservedForReviewers)+" are listed",
+		actions = append(actions, "the last "+strconv.Itoa(zones.ReservedForReviewers)+" endpoint places are kept for curators",
 			action("Register an endpoint (curators only)", "RegisterEndpoint",
 				"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	case open && reg.Awaiting(z.Slug) >= zones.MaxUnverifiedPerZone:
-		actions = append(actions, "endpoints are full until some are reviewed or removed",
+		actions = append(actions, "the review queue is full at "+strconv.Itoa(zones.MaxUnverifiedPerZone)+" endpoints awaiting review",
 			action("Register an endpoint (curators only, while full)", "RegisterEndpoint",
 				"slug", z.Slug, "kind", "rpc", "addr", "", "label", ""))
 	case z.Status == zones.Approved:
@@ -286,7 +283,7 @@ func renderZone(slug string, req *realmpath.Request) string {
 	// endpoint registered after this page was rendered has a later revision
 	// and is kept.
 	if n := reg.Clearable(z.Slug); open && kind == "" && n > 0 {
-		actions = append(actions, action("Clear "+strconv.Itoa(n)+" never-reviewed endpoint(s) registered through the review queue, all pages (curators)", "ClearUnreviewed",
+		actions = append(actions, action("Clear "+strconv.Itoa(n)+" never-reviewed endpoint(s) registered through the review queue, all pages (curators only)", "ClearUnreviewed",
 			"slug", z.Slug, "throughRevision", strconv.FormatInt(reg.Revision(), 10)))
 	}
 	// Every decision carries the revision this page was rendered from, so acting
@@ -311,8 +308,7 @@ func renderZone(slug string, req *realmpath.Request) string {
 		if reg.Live() < zones.MaxZones {
 			actions = append(actions, approve)
 		} else {
-			actions = append(actions, "approving it waits for a free slot: "+strconv.Itoa(zones.MaxZones)+
-				" zones are live until "+freesALiveSlot())
+			actions = append(actions, "approving it waits for a free place: the registry is full at "+strconv.Itoa(zones.MaxZones)+" live zones")
 		}
 		if z.Status == zones.Rejected {
 			actions = append(actions, remove)
@@ -446,15 +442,6 @@ func queryCommand(call string) string {
 		remote = " -remote '" + z.RPCURL + "'"
 	}
 	return "gnokey query vm/qeval" + remote + " -data '" + pkgPath + "." + call + "'"
-}
-
-// freesALiveSlot names what would free a place in the live registry: a
-// proposal's rejection or removal only while there is one.
-func freesALiveSlot() string {
-	if reg.ZoneCount(zones.Pending) > 0 {
-		return "a proposal is rejected or removed, or an official zone retired"
-	}
-	return "an official zone is retired"
 }
 
 // exampleSlug is the zone the index's example asks for peers of: the one

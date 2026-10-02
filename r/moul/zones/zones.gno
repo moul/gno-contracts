@@ -103,9 +103,12 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 // withdraw first); the proposer's edit only drops endpoints that are theirs and
 // that they could withdraw on their own (RemoveEndpoint), as for RemoveZone. A
 // new main RPC or gnoweb a stranger already lists under its kind would make
-// that listing the zone's own: it is dropped in the edit if nobody ruled on it,
-// and refuses the edit if a curator did. The edit is validated before any of
-// this. A rejected or retired zone cannot be edited.
+// that listing the zone's own: on a curator's edit it is dropped if nobody
+// ruled on it, and refuses the edit if a curator did; a proposer's edit
+// refuses rather than drop what is not theirs; and a flagged listing refuses
+// the edit whoever holds it. The registry validates the edit before it drops
+// or resets anything, and a refusal reverts the edit with it. A rejected or
+// retired zone cannot be edited.
 func EditZone(cur realm, slug string, revision int64, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL, reason string) {
 	who := caller(cur)
 	slug = zones.TrimSpaces(slug)
@@ -146,7 +149,16 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 			continue
 		}
 		e, ok := reg.EndpointByAddress(slug, own.kind, own.url)
-		if !ok || e.Registrant == z.Proposer || curators.Has(e.Registrant) {
+		if !ok {
+			continue
+		}
+		if e.Registrant == z.Proposer || curators.Has(e.Registrant) {
+			// Theirs to hold, but a flagged one would mark the zone's own URL
+			// the moment it becomes one.
+			if e.Status == zones.Flagged {
+				panic("zones: " + own.url + " is listed under " + string(own.kind) + " as endpoint #" + strconv.FormatInt(e.ID, 10) +
+					", flagged; a curator removes it or rules again before it becomes " + slug + "'s own")
+			}
 			continue
 		}
 		if !curators.Has(who) {
@@ -194,7 +206,7 @@ func RetireZone(cur realm, slug string, revision int64, reason string) {
 // endpoint on it is theirs (the deposit is refunded to whoever signs the
 // removal, so removing somebody else's endpoints would collect what they paid)
 // and each one is one they could withdraw on its own (RemoveEndpoint):
-// removing the zone must not wipe a curator's verdict, or skip an endpoint's
+// removing the zone must not wipe a curator's flag or unverify, or skip an endpoint's
 // own wait. A rejected zone is the curators' record: only a curator removes
 // it, or newer rejections push it out, and the rejection's deposit, paid by the
 // curator, is not the proposer's to collect. A zone that was ever official is
@@ -343,7 +355,8 @@ func ClearUnreviewed(cur realm, slug string, throughRevision int64) int {
 }
 
 // assertWithdrawable refuses a non-curator's withdrawal of an endpoint a
-// curator flagged or unverified, or one registered less than ReviewWindow
+// curator flagged or unverified, or a reset left a reason on, or one
+// registered less than ReviewWindow
 // blocks ago. Shared by RemoveEndpoint, the proposer's RemoveZone and the
 // proposer's edit off local, so none can do what another refuses.
 func assertWithdrawable(e zones.Endpoint) {

@@ -96,7 +96,7 @@ also an index key, a URL segment or a config-file line:
 - **URL**: visible ASCII with none of `` <>"'`()[]{}|\^# ``, no credentials,
   no `%` without two hex digits after it, no `&name;` shape, a host that is a
   DNS name or an IPv4 address (anything a browser would read as IPv4, like
-  `0x7f.1`, must be a valid dotted quad), an optional port of 1 to 65535 in
+  `0x7f.1`, must be a valid dotted quad), an optional port of 1 to 65535 with no leading zero, in
   digits, and a scheme from a short list. A zone's main RPC is `http`, `https`
   or `tcp` with no path, query or trailing slash, which is what `gnokey -remote`
   dials; an `rpc` endpoint also takes `ws`, `wss` and a path (a `tcp://` one
@@ -126,7 +126,9 @@ also an index key, a URL segment or a config-file line:
 - **Trimming**: only plain spaces and tabs are trimmed from what a caller
   types. Anything else at an edge (a line separator, U+0085) reaches the
   validator and is refused, not cut. A zone's gnoweb and genesis URLs, like its
-  main RPC, are refused with an empty query's `?` or a bare `/`.
+  main RPC, have an empty query's `?` and a bare `/` dropped, as a browser's
+  address bar writes them; the main RPC, which gnokey dials, is refused with
+  them.
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no

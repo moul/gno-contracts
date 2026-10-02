@@ -305,8 +305,8 @@ func ValidateInfo(in Info) error {
 	if err := checkText("description", in.Description, 0, MaxDescriptionLen); err != nil {
 		return err
 	}
-	// Exact values only: ParseKind trims, and a Kind(" testnet ") stored as
-	// written would match no filter.
+	// Exact values only: a Kind(" testnet ") stored as written would match no
+	// filter (the Registry trims before it validates; a direct caller must).
 	switch in.Kind {
 	case Mainnet, Testnet, Devnet, Local:
 	case "":
@@ -325,18 +325,12 @@ func ValidateInfo(in Info) error {
 		return errors.New("zones: the rpc url is <scheme>://<host>[:<port>], what gnokey -remote takes, with no path, not even a trailing slash: " +
 			strconv.Quote(in.RPCURL))
 	}
-	// A zone's own URLs carry no empty tail an endpoint would be stored
-	// without: the zone's URL and its own listing must key alike, or a flag on
-	// the listing would miss the URL it is about.
 	for _, u := range [][2]string{{"gnoweb url", in.GnowebURL}, {"genesis url", in.GenesisURL}} {
 		if u[1] == "" {
 			continue
 		}
 		if err := checkURL(u[0], u[1], webSchemes); err != nil {
 			return err
-		}
-		if trimEmptyTail(u[1]) != u[1] {
-			return errors.New("zones: the " + u[0] + " ends in an empty query or a bare \"/\"; drop it: " + strconv.Quote(u[1]))
 		}
 	}
 	// A loopback or private address names a different machine for every
@@ -453,7 +447,7 @@ func ValidateEndpoint(kind EndpointKind, addr string) error {
 		// gnokey dials a tcp:// remote as host:port, path and all, so one with
 		// a path is undialable, and Canonical would read it as an http URL
 		// that is a different resource.
-		if scheme, rest, _ := strings.Cut(addr, "://"); strings.EqualFold(scheme, "tcp") &&
+		if scheme, rest, _ := strings.Cut(trimEmptyTail(addr), "://"); strings.EqualFold(scheme, "tcp") &&
 			strings.IndexAny(rest, "/?") >= 0 {
 			return errors.New("zones: a tcp:// rpc address is host and port only, no path or query")
 		}
@@ -761,7 +755,9 @@ func checkURL(field, s string, schemes []string) error {
 // Anything a browser would parse as IPv4 must BE a valid dotted-quad address:
 // under the WHATWG URL parser a host whose last label is numeric (decimal, or
 // 0x hex) is an IPv4 address, so 0x7f.1 opens 127.0.0.1 and a.1 is no URL at
-// all. Bracketed IPv6 is refused, deliberately: it is the one host shape that
+// all. A last label starting 0x is held to the address rule even when the rest
+// is not hex (a browser would take 0xyz as a name): stricter, never looser.
+// An address takes no terminal dot. Bracketed IPv6 is refused, deliberately: it is the one host shape that
 // needs characters every other field here refuses, and no zone needs it yet.
 func checkHost(host string) error {
 	name := strings.TrimSuffix(host, ".")
@@ -868,12 +864,14 @@ func isEntity(s string) bool {
 	return false
 }
 
-// TrimSpaces trims ordinary spaces and tabs from both ends, and nothing else.
-// strings.TrimSpace also strips line separators (U+2028, U+0085) and other
-// Unicode space, which free text refuses: trimmed first, they would be
-// accepted silently, changed. What a caller types that is not a plain space
-// reaches the validator and is refused there.
-func TrimSpaces(s string) string { return strings.Trim(s, " \t") }
+// TrimSpaces trims spaces (Unicode Zs: U+0020, no-break space, U+3000 and the
+// like) and tabs from both ends, and nothing else. strings.TrimSpace also
+// strips line breaks and separators (CR, LF, U+0085, U+2028), which free text
+// refuses: trimmed first, they would be accepted silently, changed. A line
+// break a caller types reaches the validator and is refused there.
+func TrimSpaces(s string) string {
+	return strings.TrimFunc(s, func(r rune) bool { return r == '\t' || unicode.Is(unicode.Zs, r) })
+}
 
 // lowerAuthority lowercases a URL's scheme and host, both case-insensitive,
 // and leaves the path and query as typed. Stored that way because gno's link
@@ -896,7 +894,9 @@ func lowerAuthority(addr string) string {
 // trimEmptyTail drops an empty tail from a URL, by Canonical's own rules: an
 // empty query's "?" (when it is the tail's only "?") and a bare "/". gnokey
 // would dial a host with them attached, so an endpoint is not stored with them
-// (a zone's own URLs are refused with them instead, ValidateInfo). Canonical
+// (nor a zone's gnoweb and genesis URLs, which trimInfo repairs the same way, as
+// a browser's address bar writes https://host/; its main RPC is refused with
+// them, ValidateInfo). Canonical
 // drops both too, so Canonical(trimEmptyTail(x)) == Canonical(x), and a check
 // made on what a caller typed holds for what is stored. A path is kept as
 // typed otherwise ("/?q" stays: Canonical reads it as "?q", a browser too).

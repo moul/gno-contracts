@@ -85,7 +85,8 @@ type sequences struct{ rev, seq uint64 }
 // key shifts every later value in the leaf, each shift a store write. Measured
 // on a node, one transaction per step (gno master 3cc494ec4): removing the
 // first key of a fanout-128 leaf filled with 120 cost 15.8M gas, the last 5.1M,
-// about 90k gas per entry shifted; at fanout 32 it is the same 90k on a leaf a
+// about 90k gas per entry shifted (kit/index, whose values are pointers, measured
+// 230k per shift); at fanout 32 it is the same 90k on a leaf a
 // quarter the size. Endpoints are removed and their dedup keys inserted at
 // arbitrary positions, so the smaller leaf is worth its larger node overhead
 // (671 B per entry against 592).
@@ -535,9 +536,9 @@ func (r *Registry) removeZone(z *Zone, id store.ID) {
 //
 // A zone takes endpoints while it is pending or approved, and a rejected or
 // retired zone takes none. Who may register on a pending zone is the holding
-// realm's call; a URL is stored with its scheme and host lowercased, a peer
-// lowercased whole without its host's terminal dot, so what is listed is what
-// dials (Canonical, which also drops default ports and reads tcp as http, is
+// realm's call; a URL is stored with its scheme and host lowercased and
+// without an empty tail (trimEmptyTail), a peer lowercased whole without its
+// host's terminal dot, so what is listed is what dials (Canonical, which also drops default ports and reads tcp as http, is
 // what they are compared in, not what is stored).
 func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind, addr, label string) (int64, error) {
 	return r.register(by, at, slug, kind, addr, label, true)
@@ -1099,9 +1100,9 @@ func trimInfo(in Info) Info {
 	in.Title = TrimSpaces(in.Title)
 	in.Description = TrimSpaces(in.Description)
 	in.Kind = Kind(TrimSpaces(string(in.Kind)))
-	in.GnowebURL = lowerAuthority(TrimSpaces(in.GnowebURL))
+	in.GnowebURL = trimEmptyTail(lowerAuthority(TrimSpaces(in.GnowebURL)))
 	in.RPCURL = lowerAuthority(TrimSpaces(in.RPCURL))
-	in.GenesisURL = lowerAuthority(TrimSpaces(in.GenesisURL))
+	in.GenesisURL = trimEmptyTail(lowerAuthority(TrimSpaces(in.GenesisURL)))
 	return in
 }
 

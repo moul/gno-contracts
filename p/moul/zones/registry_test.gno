@@ -1286,10 +1286,9 @@ func TestValidationEdges(t *testing.T) {
 	}
 	// The combining grapheme joiner draws nothing.
 	in := onyx()
-	in.Title = "On͏yx"
+	in.Title = "On\u034fyx"
 	uassert.ErrorContains(t, ValidateInfo(in), "invisible")
-	// Needless escapes of unreserved characters; an entity shape (refused for
-	// its "#" before the entity rule is reached).
+	// Needless escapes of unreserved characters, and an entity shape.
 	for _, u := range []string{"https://h.example.com/a%5Fb", "https://h.example.com/a%2Db", "https://h.example.com/%2E%2E/x",
 		"https://h.example.com/a&#38;b"} {
 		uassert.Error(t, ValidateEndpoint(RPC, u), u)
@@ -1340,8 +1339,9 @@ func TestARemovedZonesClearableCountIsGone(t *testing.T) {
 	uassert.Equal(t, 0, r.Clearable("onyx"))
 }
 
-// Survivors of an independent mutation sweep, each pinned here.
-func TestRulesASweepFoundUntested(t *testing.T) {
+// URL characters, escapes, schemes, selectors, Parse trimming, pending
+// restatement and stored tails.
+func TestURLAndTextRules(t *testing.T) {
 	// Every character a URL may not hold, one at a time.
 	for _, c := range []string{"<", ">", "`", "(", ")", "[", "]", "{", "}", "|", "\\", "^", "#", "\"", "'"} {
 		uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/a"+c+"b"), c)
@@ -1361,15 +1361,15 @@ func TestRulesASweepFoundUntested(t *testing.T) {
 	uassert.Error(t, ValidateInfo(in))
 	uassert.Error(t, ValidateEndpoint(Indexer, "tcp://indexer.example.com:8546"))
 	// Variation selectors only after a base they modify.
-	for _, s := range []string{"a︀", "᠀᠋"} {
+	for _, s := range []string{"a\ufe00", "᠀\u180b"} {
 		in := onyx()
 		in.Title = s
 		uassert.ErrorContains(t, ValidateInfo(in), "invisible", s)
 	}
 	ok := onyx()
-	ok.Title = "ᠨ᠏"
+	ok.Title = "ᠨ\u180f"
 	uassert.NoError(t, ValidateInfo(ok))
-	uassert.False(t, HasVisible("​‍"))
+	uassert.False(t, HasVisible("\u200b\u200d"))
 	// The Parse functions trim.
 	st, err := ParseStatus(" approved ")
 	uassert.NoError(t, err)
@@ -1421,26 +1421,36 @@ func TestTheStoredFormKeepsItsCanonicalForm(t *testing.T) {
 func TestOnlySpacesAreTrimmed(t *testing.T) {
 	r := NewRegistry()
 	in := onyx()
-	in.Title = "Onyx "
+	in.Title = "Onyx\u2028"
 	uassert.ErrorContains(t, r.Propose(alice, 1, "onyx", in), "control character")
 	in = onyx()
 	in.Description = "\u0085" + in.Description
 	uassert.ErrorContains(t, r.Propose(alice, 1, "onyx", in), "control character")
 	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
-	_, err := r.Register(alice, 2, "onyx", RPC, "https://a.example.com", "operator ")
+	_, err := r.Register(alice, 2, "onyx", RPC, "https://a.example.com", "operator\u2028")
 	uassert.ErrorContains(t, err, "control character")
 	uassert.Equal(t, "x", TrimSpaces(" \tx\t "))
+	// A zone's gnoweb and genesis URLs are repaired as a browser writes them;
+	// its main RPC is refused with a tail.
 	for _, u := range []string{"https://g.example.com/", "https://g.example.com?", "https://g.example.com/?"} {
-		bad := onyx()
-		bad.GnowebURL = u
-		uassert.ErrorContains(t, ValidateInfo(bad), "empty query or a bare", u)
-		bad = onyx()
-		bad.GenesisURL = u
-		uassert.ErrorContains(t, ValidateInfo(bad), "empty query or a bare", u)
+		r := NewRegistry()
+		in := onyx()
+		in.GnowebURL, in.GenesisURL = u, u
+		uassert.NoError(t, r.Propose(alice, 1, "xz", in), u)
+		z, _ := r.Zone("xz")
+		uassert.Equal(t, "https://g.example.com", z.GnowebURL, u)
+		uassert.Equal(t, "https://g.example.com", z.GenesisURL, u)
 	}
+	bad := onyx()
+	bad.RPCURL = "https://rpc.example.com/"
+	uassert.Error(t, ValidateInfo(bad))
+	// Spaces of every kind are trimmed, line breaks are not.
+	uassert.Equal(t, "Onyx", TrimSpaces("\u00a0Onyx\u3000"))
+	uassert.Equal(t, "Onyx\n", TrimSpaces("Onyx\n"))
+	uassert.NoError(t, ValidateEndpoint(RPC, "tcp://rpc.example.com:26657/"), "a bare / is trimmed, not refused")
 }
 
-// More rules an independent sweep found untested.
+// Chain id charset, text and URL bounds, controls, escapes and trims.
 func TestMoreBoundaries(t *testing.T) {
 	in := onyx()
 	in.ChainID = "onyx:1"
@@ -1453,7 +1463,7 @@ func TestMoreBoundaries(t *testing.T) {
 		uassert.ErrorContains(t, ValidateLabel("a"+c+"b"), "control character")
 	}
 	ok := onyx()
-	ok.Title = "ᠠ᠋"
+	ok.Title = "ᠠ\u180b"
 	uassert.NoError(t, ValidateInfo(ok))
 	host := "https://" + strings.Repeat("a", 20) + ".example.com/"
 	long := host + strings.Repeat("p", MaxURLLen-len(host))
@@ -1475,4 +1485,26 @@ func TestMoreBoundaries(t *testing.T) {
 	edited := onyx()
 	edited.Title = "Onyx, edited"
 	uassert.ErrorContains(t, r.Edit("onyx", rev(r, "onyx"), edited, alice, 2, "x"), "takes no reason")
+}
+
+// Boundaries the suites reached only in part.
+func TestFurtherBoundaries(t *testing.T) {
+	uassert.ErrorContains(t, ValidateLabel("　"), "nothing visible")
+	uassert.Error(t, ValidateLabel("a\U000E01EF"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/a%2!"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://h.example.com/%2d"))
+	uassert.Error(t, ValidateEndpoint(RPC, "https://1.2.3.4.5"))
+	uassert.Error(t, ValidateEndpoint(Peer, nodeID+"@"+strings.Repeat("a", 250)+".example.com:26656"))
+	uassert.Equal(t, 16, ReservedForReviewers)
+
+	r := NewRegistry()
+	in := onyx()
+	in.ChainID = " onyx-1 "
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", in))
+	z, _ := r.Zone("onyx")
+	uassert.Equal(t, "onyx-1", z.ChainID)
+	uassert.NoError(t, r.ReviewZone("onyx", Rejected, rev(r, "onyx"), curator, 2, "first"))
+	uassert.NoError(t, r.ReviewZone("onyx", Rejected, rev(r, "onyx"), carol, 9, "restated"))
+	z, _ = r.Zone("onyx")
+	uassert.Equal(t, int64(9), z.ReviewedAt, "a restatement records when")
 }
