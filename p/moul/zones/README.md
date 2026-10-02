@@ -41,9 +41,9 @@ changing here.
 | decision | from | reason | also |
 |---|---|---|---|
 | approve | pending, rejected, retired; approved, to restate the reason | optional (required to restate) | |
-| reject | pending; rejected, to restate the reason | **required** | verified endpoints go back to unverified |
-| retire | approved; retired, to restate the reason | **required** | verified endpoints go back to unverified |
-| edit | pending, approved | none before review, **required** after | a new chain id un-verifies endpoints; leaving `local` drops the private ones, refused while one carries a curator's ruling |
+| reject | pending; rejected, to restate the reason | **required** | verified endpoints go back to unverified (a restatement resets nothing) |
+| retire | approved; retired, to restate the reason | **required** | verified endpoints go back to unverified (a restatement resets nothing) |
+| edit | pending, approved | none before review, **required** after | a new chain id un-verifies endpoints; leaving `local` drops the private ones, at most `MaxDropPerEdit` (64) in one edit, refused while one carries a curator's ruling |
 | remove | pending, rejected | | endpoints go with it |
 | verify an endpoint | any, the same one only with a new reason | optional | zone pending or approved |
 | unverify an endpoint | any, the same one only with a new reason | optional | |
@@ -107,7 +107,9 @@ also an index key, a URL segment or a config-file line:
   for every reader is refused except on a `local` zone: a name with no dot,
   `.localhost`, `.local`, `.internal`, `.localdomain`, the RFC 6761 names
   `.test`, `.example` and `.invalid`, the never-delegated `.lan`, `.home`,
-  `.corp`, `.mail`, `.intranet`, `.private`, `.onion`, `.alt`, every `.arpa`
+  `.corp`, `.mail`, `.intranet`, `.private`, `.onion`, `.alt`, the
+  service-discovery and container names `.consul`, `.lxd`, `.docker` and
+  `.localnet`, every `.arpa`
   name (infrastructure, never a public service), and IPv4 "this network",
   loopback, private, link-local, CGNAT, IETF-protocol, documentation,
   benchmarking, 6to4 relay anycast, multicast and reserved ranges.
@@ -125,7 +127,8 @@ also an index key, a URL segment or a config-file line:
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no
   variation selector except right after a character it modifies (FE0E or FE0F
-  after a symbol or one of the five emoji whose base is punctuation, as a phone
+  after a symbol or one of the five emoji whose base is punctuation or a letter
+  by category (‼ ⁉ ℹ 〰 〽), as a phone
   writes ❤️ or ‼️; a Mongolian free variant; an ideographic variation sequence), no enclosing mark (it draws a badge's frame around any
   character), no run of more than four nonspacing marks, none of the
   status glyphs a Render draws nor their look-alikes, and, unless it is empty,
@@ -164,7 +167,10 @@ review or a reset can push a count past it. A flood fills the queue and never
 crowds out an approved zone or a verified endpoint, and `ProposeExempt` and
 `RegisterExempt` skip the gate and the per-address caps (not the hard caps) for
 the reviewers the holding realm trusts, so a full queue never locks out the
-people who clear it. Each entry costs its sender a storage deposit, refunded to
+people who clear it. An endpoint registered that way is marked `Exempt`.
+`Clearable` is an endpoint nobody ruled on that is not `Exempt`, what a bulk
+clear of a flood may remove, and `Registry.Clearable` counts them without
+reading one; since the gate holds the queue, there are never more than 64. Each entry costs its sender a storage deposit, refunded to
 whoever signs the transaction that frees it (on a chain with transfers locked,
 to the storage fee collector instead), so a flooder who withdraws first gets it
 back: a bond, not a fee.

@@ -933,10 +933,10 @@ func TestPrivateHostsAndURLForms(t *testing.T) {
 		"rpc.test", "node.lan", "nas.home", "dc.corp", "wiki.intranet", "box.private", "x.onion", "y.alt",
 		"192.0.2.1", "198.51.100.7", "203.0.113.255",
 		"gno.example", "x.invalid", "rpc.mail", "ipv4only.arpa", "gnoland.default.service.arpa", "x.arpa",
-		"100.127.255.255"} {
+		"100.127.255.255", "172.16.0.1", "172.31.255.255", "svc.service.consul", "node.lxd", "x.docker", "y.localnet"} {
 		uassert.True(t, IsPrivateHost(h), h)
 	}
-	for _, h := range []string{"rpc.gno.land", "1.1.1.1", "198.20.0.1", "172.32.0.1", "gno.land.", "100.128.0.1",
+	for _, h := range []string{"rpc.gno.land", "1.1.1.1", "198.20.0.1", "172.32.0.1", "172.15.255.255", "gno.land.", "100.128.0.1",
 		"a.latest", "my.salt", "192.0.3.1", "198.51.101.1", "203.0.114.1",
 		"example.com", "gmail.com", "arpa.example.com"} {
 		uassert.False(t, IsPrivateHost(h), h)
@@ -1216,4 +1216,125 @@ func TestLeavingLocalRefusesEveryRuling(t *testing.T) {
 	e, _ := r.Endpoint(id)
 	uassert.Equal(t, "", e.ReviewedBy.String())
 	uassert.ErrorContains(t, r.Edit("lab", rev(r, "lab"), onyx(), curator, 4, ""), "a curator ruled on")
+}
+
+// Clearable counts what a bulk clear may remove: registered through the gate,
+// never ruled on. A verdict, a reset or a removal takes one out; an exempt
+// registration never counts.
+func TestTheClearableCount(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 1, ""))
+	a, _ := r.Register(bob, 2, "onyx", RPC, "https://a.example.com", "")
+	b, _ := r.Register(bob, 2, "onyx", RPC, "https://b.example.com", "")
+	c, _ := r.Register(bob, 2, "onyx", RPC, "https://c.example.com", "")
+	x, _ := r.RegisterExempt(curator, 2, "onyx", RPC, "https://x.example.com", "")
+	ex, _ := r.Endpoint(x)
+	uassert.True(t, ex.Exempt)
+	uassert.False(t, ex.Clearable())
+	uassert.Equal(t, 3, r.Clearable("onyx"))
+	uassert.NoError(t, r.ReviewEndpoint(a, Verified, zr(r, a), erev(r, a), curator, 3, ""))
+	uassert.Equal(t, 2, r.Clearable("onyx"))
+	uassert.NoError(t, r.ReviewEndpoint(a, Flagged, zr(r, a), erev(r, a), curator, 3, "down"))
+	uassert.Equal(t, 2, r.Clearable("onyx"), "a second verdict changes nothing")
+	uassert.NoError(t, r.RemoveEndpoint(b, erev(r, b)))
+	uassert.Equal(t, 1, r.Clearable("onyx"))
+	moved := onyx()
+	moved.ChainID = "onyx-2"
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), moved, curator, 4, "relaunch"))
+	uassert.Equal(t, 1, r.Clearable("onyx"), "a reset touches only verified endpoints")
+	_ = c
+}
+
+// One edit off the local kind drops at most MaxDropPerEdit endpoints.
+func TestLeavingLocalDropsAtMostTheCap(t *testing.T) {
+	r := NewRegistry()
+	local := onyx()
+	local.Kind, local.RPCURL = Local, "http://127.0.0.1:26657"
+	uassert.NoError(t, r.Propose(curator, 1, "lab", local))
+	for i := 0; i <= MaxDropPerEdit; i++ {
+		_, err := r.RegisterExempt(curator, 1, "lab", RPC, "http://10.0.0."+strconv.Itoa(i%250+1)+":"+strconv.Itoa(26000+i), "")
+		uassert.NoError(t, err)
+	}
+	uassert.ErrorContains(t, r.Edit("lab", rev(r, "lab"), onyx(), curator, 2, ""), "more than 64 in one edit")
+	ids := r.PrivateEndpoints("lab")
+	uassert.NoError(t, r.RemoveEndpoint(ids[0].ID, ids[0].Revision))
+	uassert.NoError(t, r.Edit("lab", rev(r, "lab"), onyx(), curator, 3, ""))
+}
+
+// The numbers the READMEs state, pinned: a change to one is a change to what
+// the docs promise.
+func TestTheDocumentedBounds(t *testing.T) {
+	for name, got := range map[string]int{"MaxZones": MaxZones, "MaxPending": MaxPending, "MaxPendingPerProposer": MaxPendingPerProposer,
+		"MaxRejected": MaxRejected, "MaxRetired": MaxRetired, "MaxEndpointsPerZone": MaxEndpointsPerZone,
+		"MaxUnverifiedPerZone": MaxUnverifiedPerZone, "MaxEndpointsPerAddress": MaxEndpointsPerAddress, "MaxDropPerEdit": MaxDropPerEdit,
+		"MaxTitleLen": MaxTitleLen, "MaxDescriptionLen": MaxDescriptionLen, "MaxLabelLen": MaxLabelLen, "MaxReasonLen": MaxReasonLen, "MaxURLLen": MaxURLLen} {
+		want := map[string]int{"MaxZones": 256, "MaxPending": 64, "MaxPendingPerProposer": 4, "MaxRejected": 64, "MaxRetired": 128,
+			"MaxEndpointsPerZone": 128, "MaxUnverifiedPerZone": 64, "MaxEndpointsPerAddress": 16, "MaxDropPerEdit": 64,
+			"MaxTitleLen": 64, "MaxDescriptionLen": 512, "MaxLabelLen": 64, "MaxReasonLen": 280, "MaxURLLen": 256}[name]
+		uassert.Equal(t, want, got, name)
+	}
+}
+
+// Rules the other tests reach only in part.
+func TestValidationEdges(t *testing.T) {
+	// A private host is refused on every kind but local.
+	for _, k := range []Kind{Mainnet, Testnet, Devnet} {
+		in := onyx()
+		in.Kind, in.RPCURL = k, "http://10.0.0.1:26657"
+		uassert.ErrorContains(t, ValidateInfo(in), "private or special-use", string(k))
+	}
+	// The combining grapheme joiner draws nothing.
+	in := onyx()
+	in.Title = "On͏yx"
+	uassert.ErrorContains(t, ValidateInfo(in), "invisible")
+	// Needless escapes of unreserved characters, a numeric entity shape.
+	for _, u := range []string{"https://h.example.com/a%5Fb", "https://h.example.com/a%2Db", "https://h.example.com/%2E%2E/x",
+		"https://h.example.com/a&#38;b"} {
+		uassert.Error(t, ValidateEndpoint(RPC, u), u)
+	}
+	// Dot segments are a path rule; a query may hold dots.
+	uassert.NoError(t, ValidateEndpoint(Explorer, "https://h.example.com/p?x=../y"))
+	// Default websocket ports are dropped like the http ones.
+	uassert.Equal(t, Canonical(RPC, "wss://h.example.com/ws"), Canonical(RPC, "wss://h.example.com:443/ws"))
+	uassert.Equal(t, Canonical(RPC, "ws://h.example.com/ws"), Canonical(RPC, "ws://h.example.com:80/ws"))
+}
+
+// What a caller types is trimmed before it is used: the kind, a label, a
+// reason; and a restatement of verify or unverify needs a new visible reason.
+func TestTrimsAndRestatementReasons(t *testing.T) {
+	r := NewRegistry()
+	in := onyx()
+	in.Kind = " testnet "
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", in))
+	z, _ := r.Zone("onyx")
+	uassert.Equal(t, string(Testnet), string(z.Kind))
+	uassert.NoError(t, r.ReviewZone("onyx", Approved, rev(r, "onyx"), curator, 1, ""))
+	id, _ := r.Register(bob, 2, "onyx", RPC, "https://a.example.com", "  bob's node  ")
+	e, _ := r.Endpoint(id)
+	uassert.Equal(t, "bob's node", e.Label)
+	uassert.NoError(t, r.ReviewEndpoint(id, Verified, zr(r, id), erev(r, id), curator, 3, "  answers  "))
+	e, _ = r.Endpoint(id)
+	uassert.Equal(t, "answers", e.Reason)
+	uassert.ErrorContains(t, r.ReviewEndpoint(id, Verified, zr(r, id), erev(r, id), curator, 4, " "), "needs a new reason")
+	uassert.NoError(t, r.ReviewEndpoint(id, Unverified, zr(r, id), erev(r, id), curator, 5, "x"))
+	uassert.ErrorContains(t, r.ReviewEndpoint(id, Unverified, zr(r, id), erev(r, id), curator, 6, ""), "needs a new reason")
+	edited := onyx()
+	edited.Title = "Onyx, edited"
+	uassert.NoError(t, r.Edit("onyx", rev(r, "onyx"), edited, curator, 7, "  retitled  "))
+	z, _ = r.Zone("onyx")
+	uassert.Equal(t, "retitled", z.Reason)
+	uassert.Equal(t, rev(r, "onyx"), r.Revision(), "the last revision handed out")
+}
+
+// A zone removed and proposed again starts with nothing clearable.
+func TestARemovedZonesClearableCountIsGone(t *testing.T) {
+	r := NewRegistry()
+	uassert.NoError(t, r.Propose(alice, 1, "onyx", onyx()))
+	_, err := r.Register(alice, 1, "onyx", RPC, "https://a.example.com", "")
+	uassert.NoError(t, err)
+	uassert.Equal(t, 1, r.Clearable("onyx"))
+	uassert.NoError(t, r.RemoveZone("onyx", rev(r, "onyx")))
+	uassert.NoError(t, r.Propose(alice, 2, "onyx", onyx()))
+	uassert.Equal(t, 0, r.Clearable("onyx"))
 }

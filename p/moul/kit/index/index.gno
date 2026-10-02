@@ -41,7 +41,8 @@ import (
 // index's values are pointers: measured on a real node against gno master
 // 3cc494ec4 on 2026-10-02, removing the first key of a fanout-128 leaf holding
 // 120 cost 35.3M gas against 8.0M for the last, about 230k per value shifted.
-// Fanout 32 caps the shift at 31. What it costs, measured against gno master
+// Fanout 32 bounds what one removal rewrites to about 45 values: its own
+// leaf, and a neighbour's when the leaf underflows and borrows. What it costs, measured against gno master
 // 1fc4c140e on 2026-09-29 at n = 1,000 with string values: 671 bytes per entry
 // and 162,161 gas per insert, against 592 and 152,975 at fanout 128, and avl's
 // 2,029 and 417,811.

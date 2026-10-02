@@ -270,11 +270,12 @@ func renderZone(slug string, req *realmpath.Request) string {
 	}
 	// A flood clears in one call. The call reaches every page and every kind,
 	// so it is offered only on the unfiltered view of a zone that takes
-	// endpoints, labelled with its real scope, and bounded in time: an
+	// endpoints, only while it would clear something (the clearable count, no
+	// endpoint read), labelled with its real scope, and bounded in time: an
 	// endpoint registered after this page was rendered has a later revision
 	// and is kept.
-	if open && kind == "" && reg.Awaiting(z.Slug) > 0 {
-		actions = append(actions, action("Clear every never-reviewed endpoint on this zone (curators)", "ClearUnreviewed",
+	if n := reg.Clearable(z.Slug); open && kind == "" && n > 0 {
+		actions = append(actions, action("Clear "+strconv.Itoa(n)+" never-reviewed endpoint(s) a non-curator registered, all pages (curators)", "ClearUnreviewed",
 			"slug", z.Slug, "throughRevision", strconv.FormatInt(reg.Revision(), 10)))
 	}
 	// Every decision carries the revision this page was rendered from, so acting
@@ -286,8 +287,14 @@ func renderZone(slug string, req *realmpath.Request) string {
 	case zones.Pending:
 		actions = append(actions, approve,
 			action("Reject", "RejectZone", "slug", z.Slug, "revision", rev, "reason", ""), remove)
+		if reg.ZoneCount(zones.Rejected) >= zones.MaxRejected {
+			actions = append(actions, "rejecting it drops the zone rejected longest ago, endpoints and all")
+		}
 	case zones.Approved:
 		actions = append(actions, action("Retire", "RetireZone", "slug", z.Slug, "revision", rev, "reason", ""))
+		if reg.ZoneCount(zones.Retired) >= zones.MaxRetired {
+			actions = append(actions, "retiring it drops the zone retired longest ago, endpoints and all")
+		}
 	case zones.Rejected, zones.Retired:
 		// Back into the live registry only while it has room.
 		if reg.Live() < zones.MaxZones {
@@ -432,7 +439,7 @@ func queryCommand(call string) string {
 
 // exampleSlug is the zone the index's example asks for peers of: the one
 // serving the chain this page is read on, when there is exactly one and it
-// lists a peer, else onyx (from the index counts, nothing read).
+// lists a peer, else onyx (one zone and an index count read).
 func exampleSlug() string {
 	if z, ok := reg.SoleApproved(runtime.ChainID()); ok && reg.EndpointCount(z.Slug, zones.Peer) > 0 {
 		return z.Slug

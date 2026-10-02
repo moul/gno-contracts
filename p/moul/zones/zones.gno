@@ -208,7 +208,17 @@ type Endpoint struct {
 	// and a removal name it, so either fails on an endpoint that changed
 	// after it was read.
 	Revision int64
+	// Exempt marks an endpoint registered through RegisterExempt, by a
+	// reviewer the holder trusts: never clearable as a never-reviewed one,
+	// whoever is a reviewer later.
+	Exempt bool
 }
+
+// Clearable reports whether nobody has ruled on the endpoint and it was not a
+// reviewer's own registration: no verdict (every verdict names its
+// reviewer), no reset (every reset leaves a reason), not Exempt. It is what
+// a bulk clear of a flood may remove.
+func (e Endpoint) Clearable() bool { return !e.Exempt && e.ReviewedBy == "" && e.Reason == "" }
 
 // ParseStatus reads a status from a caller's string. "" is the zero Status,
 // which a filter reads as "any".
@@ -369,7 +379,8 @@ func HostOf(kind EndpointKind, addr string) string {
 //     one under a suffix reserved for local or private use, or that public DNS
 //     does not delegate: .localhost, .local (mDNS), .internal, .localdomain,
 //     .test, .example, .invalid, .lan, .home, .corp, .mail, .intranet,
-//     .private, .onion, .alt, and every .arpa name, which is infrastructure
+//     .private, .onion, .alt, the service-discovery and container names
+//     .consul, .lxd, .docker and .localnet, and every .arpa name, which is infrastructure
 //     and never a public service (.home.arpa, ipv4only.arpa,
 //     default.service.arpa). Hosts files' localhost4, localhost6,
 //     ip6-localhost and ip6-loopback have no dot and fall under the first rule;
@@ -395,7 +406,8 @@ func IsPrivateHost(host string) bool {
 		return true
 	}
 	for _, suffix := range []string{".localhost", ".local", ".internal", ".arpa", ".localdomain",
-		".test", ".example", ".invalid", ".lan", ".home", ".corp", ".mail", ".intranet", ".private", ".onion", ".alt"} {
+		".test", ".example", ".invalid", ".lan", ".home", ".corp", ".mail", ".intranet", ".private", ".onion", ".alt",
+		".consul", ".lxd", ".docker", ".localnet"} {
 		if strings.HasSuffix(h, suffix) {
 			return true
 		}
@@ -515,7 +527,8 @@ func isBlankFiller(r rune) bool {
 	return false
 }
 
-// isSelector is the variation selectors, all three blocks: invisible on their
+// isSelector is the variation selectors, all three blocks (U+180E, inside the
+// Mongolian range, is a format character and refused as one): invisible on their
 // own, and an invisible difference between two spellings of a name.
 func isSelector(r rune) bool {
 	return (r >= 0xFE00 && r <= 0xFE0F) || (r >= 0xE0100 && r <= 0xE01EF) || (r >= 0x180B && r <= 0x180F)
@@ -559,7 +572,8 @@ func isBadge(r rune) bool {
 		0x22A0, 0x2327, 0x1F147, 0x1F187, 0x2297, 0x2A02, 0x1F167, // boxed and circled crosses
 		0x1F6C7, 0x2298, 0x29B8, // prohibition signs
 		0x24CD, 0x24E7, 0x24B3, 0x1F127, 0x29BB, 0x2A34, 0x2A35, 0x2A37, 0x292B, 0x292C, // circled, parenthesized and crossing x
-		0x1F532, 0x1F533: // square buttons, beside ⏹
+		0x1F532, 0x1F533, // square buttons, beside ⏹
+		0x26DD, 0x1F5BE, 0x2B59, 0x2A36, 0x26D2, 0x1FBC0, 0x1D145, 0x26CC, 0x2A3B: // more boxed, circled and heavy crosses
 		return true
 	}
 	return r >= 0x1F7A8 && r <= 0x1F7AE // the geometric crosses beside ✖

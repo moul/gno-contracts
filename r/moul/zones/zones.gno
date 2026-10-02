@@ -129,18 +129,28 @@ func EditZone(cur realm, slug string, revision int64, chainID, title, descriptio
 	}
 	// The reservation RegisterEndpoint keeps holds across an edit too: a new
 	// main RPC or gnoweb already listed under its kind by a stranger would
-	// make that listing, and its verdict, the zone's own.
+	// make that listing, and its verdict, the zone's own. Checked only for a
+	// URL the edit changes. A stranger's listing nobody ruled on is dropped
+	// in the edit itself, so listing a zone's likely next URL cannot hold its
+	// move off (only an approved zone takes a stranger's listing, and only a
+	// curator edits one); one a curator ruled on refuses the edit, and a
+	// curator removes it first.
 	for _, own := range []struct {
-		kind zones.EndpointKind
-		url  string
-	}{{zones.RPC, strings.TrimSpace(rpcURL)}, {zones.Gnoweb, strings.TrimSpace(gnowebURL)}} {
-		if own.url == "" {
+		kind     zones.EndpointKind
+		url, was string
+	}{{zones.RPC, strings.TrimSpace(rpcURL), z.RPCURL}, {zones.Gnoweb, strings.TrimSpace(gnowebURL), z.GnowebURL}} {
+		if own.url == "" || (own.was != "" && zones.Canonical(own.kind, own.url) == zones.Canonical(own.kind, own.was)) {
 			continue
 		}
-		if e, ok := reg.EndpointByAddress(slug, own.kind, own.url); ok && e.Registrant != z.Proposer && !curators.Has(e.Registrant) {
-			panic("zones: " + own.url + " is listed under " + string(own.kind) + " by " + e.Registrant.String() +
-				" (endpoint #" + strconv.FormatInt(e.ID, 10) + "); a curator removes it before it becomes " + slug + "'s own")
+		e, ok := reg.EndpointByAddress(slug, own.kind, own.url)
+		if !ok || e.Registrant == z.Proposer || curators.Has(e.Registrant) {
+			continue
 		}
+		if !e.Clearable() {
+			panic("zones: " + own.url + " is listed under " + string(own.kind) + " by " + e.Registrant.String() +
+				" (endpoint #" + strconv.FormatInt(e.ID, 10) + "), with a curator's ruling; a curator removes it before it becomes " + slug + "'s own")
+		}
+		must(reg.RemoveEndpoint(e.ID, e.Revision))
 	}
 	must(reg.Edit(slug, revision, in, who, runtime.ChainHeight(), reason))
 }
@@ -294,15 +304,17 @@ func RemoveEndpoint(cur realm, id, revision int64) {
 	must(reg.RemoveEndpoint(id, revision))
 }
 
-// ClearUnreviewed removes, in one call, every endpoint on a zone that no
-// curator has ruled on, and returns how many. It is the answer to a flood that
-// cycles: registrants who withdraw and register again each review window keep
-// the queue full, and one removal per transaction lets them refill it before a
-// curator is done. throughRevision bounds it to what the curator read: an
-// endpoint registered after it (a later Revision) is kept, so is one a curator
-// registered, and so is any a curator ruled on. The deposits go to the curator
-// who signs. At most
-// zones.MaxEndpointsPerZone are read.
+// ClearUnreviewed removes, in one call, every endpoint on a zone that is
+// zones.Endpoint.Clearable (nobody ruled on it, and no reviewer registered it
+// past the caps), and returns how many. There are never more than
+// zones.MaxUnverifiedPerZone: clearable endpoints are a part of the review
+// queue its gate holds there, and no reset makes one. It is the answer to a
+// flood that cycles: registrants who withdraw and register again each review
+// window keep the queue full, and one removal per transaction lets them refill
+// it before a curator is done. throughRevision bounds it to what the curator
+// read: an endpoint registered after it (a later Revision) is kept. The
+// deposits go to the curator who signs. At most zones.MaxEndpointsPerZone are
+// read.
 func ClearUnreviewed(cur realm, slug string, throughRevision int64) int {
 	who := caller(cur)
 	assertCurator(who)
@@ -310,7 +322,7 @@ func ClearUnreviewed(cur realm, slug string, throughRevision int64) int {
 	mustZone(slug)
 	n := 0
 	for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug, Status: zones.Unverified}) {
-		if e.ReviewedBy == "" && e.Reason == "" && e.Revision <= throughRevision && !curators.Has(e.Registrant) {
+		if e.Clearable() && e.Revision <= throughRevision {
 			must(reg.RemoveEndpoint(e.ID, e.Revision))
 			n++
 		}

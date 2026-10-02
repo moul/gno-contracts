@@ -59,9 +59,10 @@ cheaper to store and to insert into, measured against gno master `1fc4c140e` on
 But an index's keys are removed whenever its records move, and a removal
 rewrites every later value in its leaf. Measured on a real node against gno
 master `3cc494ec4` on 2026-10-02: removing the first key of a fanout-128 leaf
-holding 120 cost 35.3M gas, the last 8.0M, about 230k per value shifted. At 32
-the worst removal shifts 31, so it is the cheaper default for something that
-moves.
+holding 120 cost 35.3M gas, the last 8.0M, about 230k per value shifted (its
+values are `*entry`, a pointer). At 32 one removal rewrites about 45 values at
+most (its own leaf, and a neighbour's when the leaf underflows and borrows), so
+it is the cheaper default for something that moves.
 
 **The ids under a key are kept ascending, not in insertion order.** So `Lookup`
 depends on the *set* of ids and not on the order they arrived in: two realms

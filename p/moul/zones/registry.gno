@@ -50,6 +50,11 @@ const (
 	MaxEndpointsPerZone    = 128
 	MaxUnverifiedPerZone   = 64 // endpoints on one zone still waiting for a verdict (flagged ones have theirs)
 	MaxEndpointsPerAddress = 16 // endpoints one address may register on one zone
+	// MaxDropPerEdit bounds how many endpoints one edit off the local kind
+	// drops, and so its gas: a removal rewrites up to about 45 later values in
+	// two B+ tree leaves, and a caller can lay ids out so every removal does,
+	// which at 128 measured 2.6B, close to a 3B block. More waits for removals.
+	MaxDropPerEdit = 64
 )
 
 // The reasons an endpoint carries when its zone changed under it and sent it
@@ -72,7 +77,7 @@ type sequences struct{ rev, seq uint64 }
 // a B+ tree leaf is a boxed object of its own, and removing (or inserting) a
 // key shifts every later value in the leaf, each shift a store write. Measured
 // on a node, one transaction per step (gno master 3cc494ec4): removing the
-// first of 119 keys in one fanout-128 leaf cost 15.8M gas, the last 5.1M,
+// first key of a fanout-128 leaf filled with 120 cost 15.8M gas, the last 5.1M,
 // about 90k gas per entry shifted; at fanout 32 it is the same 90k on a leaf a
 // quarter the size. Endpoints are removed and their dedup keys inserted at
 // arbitrary positions, so the smaller leaf is worth its larger node overhead
@@ -110,6 +115,7 @@ type Registry struct {
 	byOwner   *counter     // slug|registrant -> how many endpoints they registered
 	unchecked *index.Index // slug -> ids of endpoints that are not Verified
 	flagged   *counter     // slug -> how many of those are Flagged
+	fresh     *counter     // slug -> how many endpoints are Clearable
 	private   *index.Index // slug -> ids of endpoints on a private host (a local zone's only)
 }
 
@@ -129,6 +135,7 @@ func NewRegistry() *Registry {
 		byKind:     index.New(),
 		byOwner:    newCounter(),
 		flagged:    newCounter(),
+		fresh:      newCounter(),
 		unchecked:  index.New(),
 		private:    index.New(),
 	}
@@ -278,6 +285,10 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 	// curator can rule, so nobody else can block the edit this way.
 	if z.Kind == Local && in.Kind != Local {
 		drop := r.private.Lookup(slug)
+		if len(drop) > MaxDropPerEdit {
+			return errors.New("zones: leaving local would drop " + strconv.Itoa(len(drop)) + " endpoints, more than " +
+				strconv.Itoa(MaxDropPerEdit) + " in one edit; remove some first")
+		}
 		for _, eid := range drop {
 			v, _ := r.endpoints.get(eid)
 			// Every verdict names its reviewer and a reset leaves a reason, so
@@ -496,6 +507,7 @@ func (r *Registry) removeZone(z *Zone, id store.ID) {
 		r.byAddress.remove(k)
 	}
 	r.flagged.drop(slug)
+	r.fresh.drop(slug)
 	r.byZone.RemoveKey(slug)
 	r.unchecked.RemoveKey(slug)
 	r.private.RemoveKey(slug)
@@ -572,7 +584,7 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 		return 0, errors.New("zones: " + by.String() + " already registered " + strconv.Itoa(n) +
 			" endpoints on " + slug + ", the limit is " + strconv.Itoa(MaxEndpointsPerAddress))
 	}
-	e := &Endpoint{Zone: slug, Kind: kind, Address: addr, Label: label, Registrant: by, RegisteredAt: at, Status: Unverified}
+	e := &Endpoint{Zone: slug, Kind: kind, Address: addr, Label: label, Registrant: by, RegisteredAt: at, Status: Unverified, Exempt: !gated}
 	id := r.endpoints.add(e)
 	e.ID = int64(id)
 	r.ids.rev++
@@ -585,6 +597,9 @@ func (r *Registry) register(by address, at int64, slug string, kind EndpointKind
 		return 0, err
 	}
 	r.byOwner.inc(okey)
+	if gated {
+		r.fresh.inc(slug)
+	}
 	if err := r.unchecked.Add(slug, id); err != nil {
 		return 0, err
 	}
@@ -671,6 +686,9 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, zoneRevision, revis
 	if to == Flagged {
 		r.flagged.inc(e.Zone)
 	}
+	if e.Clearable() {
+		r.fresh.dec(e.Zone) // its first verdict: somebody has ruled on it now
+	}
 	e.Status = to
 	e.ReviewedBy, e.ReviewedAt, e.Reason = by, at, reason
 	r.ids.rev++
@@ -742,6 +760,9 @@ func (r *Registry) removeEndpoint(id store.ID) {
 	r.private.Remove(e.Zone, id)
 	if e.Status == Flagged {
 		r.flagged.dec(e.Zone)
+	}
+	if e.Clearable() {
+		r.fresh.dec(e.Zone)
 	}
 }
 
@@ -962,6 +983,10 @@ func (r *Registry) EndpointCount(slug string, kind EndpointKind) int {
 func (r *Registry) Awaiting(slug string) int {
 	return r.unchecked.Count(slug) - r.flagged.count(slug)
 }
+
+// Clearable returns how many of a zone's endpoints are Clearable, what a bulk
+// clear could remove. No endpoint is read.
+func (r *Registry) Clearable(slug string) int { return r.fresh.count(slug) }
 
 // OwnerCount returns how many endpoints that address registered on a zone. No
 // endpoint is read.
