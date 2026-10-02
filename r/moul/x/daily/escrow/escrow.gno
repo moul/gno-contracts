@@ -2,12 +2,12 @@ package escrow
 
 import (
 	"chain"
-	"chain/runtime/unsafe"
 	"errors"
 	"strconv"
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -48,10 +48,13 @@ var (
 // given counterparty, governed by a free-form terms string. Returns the
 // new deal id. Panics on invalid input (cross-realm abort).
 func Create(cur realm, counterparty address, terms string) int {
+	if !cur.IsCurrent() {
+		panic("escrow: spoofed realm")
+	}
 	if !counterparty.IsValid() {
 		panic(errBadAddr)
 	}
-	creator := unsafe.PreviousRealm().Address()
+	creator := cur.Previous().Address()
 	if counterparty == creator {
 		panic(errSelfDeal)
 	}
@@ -76,11 +79,14 @@ func Create(cur realm, counterparty address, terms string) int {
 // Confirm records confirmation by whichever party is calling. Once both
 // parties have confirmed, the deal transitions to Settled.
 func Confirm(cur realm, id int) {
+	if !cur.IsCurrent() {
+		panic("escrow: spoofed realm")
+	}
 	d := mustGet(id)
 	if d.State != StateOpen {
 		panic(errNotOpen)
 	}
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 
 	switch caller {
 	case d.Creator:
@@ -102,11 +108,14 @@ func Confirm(cur realm, id int) {
 // Cancel voids an open deal. Only the creator may cancel, and only
 // before the deal has settled.
 func Cancel(cur realm, id int) {
+	if !cur.IsCurrent() {
+		panic("escrow: spoofed realm")
+	}
 	d := mustGet(id)
 	if d.State != StateOpen {
 		panic(errNotOpen)
 	}
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 	if caller != d.Creator {
 		panic(errNotCreator)
 	}
@@ -130,7 +139,7 @@ func Render(path string) string {
 		if id, err := strconv.Atoi(path); err == nil {
 			v := deals.Get(strconv.Itoa(id))
 			if v == nil {
-				return "# Escrow\n\nDeal `" + path + "` not found.\n"
+				return "# Escrow\n\nDeal " + md.InlineCode(path) + " not found.\n"
 			}
 			return renderOne(v.(*Deal))
 		}
@@ -166,7 +175,7 @@ func renderOne(d *Deal) string {
 	b.WriteString("- **State:** " + d.State + "\n")
 	b.WriteString("- **Creator:** " + d.Creator.String() + " (" + yn(d.CreatorOK) + ")\n")
 	b.WriteString("- **Counterparty:** " + d.Counterparty.String() + " (" + yn(d.CounterOK) + ")\n")
-	b.WriteString("- **Terms:** " + d.Terms + "\n")
+	b.WriteString("- **Terms:** " + ui.Inline(d.Terms) + "\n")
 	return b.String()
 }
 

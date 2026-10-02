@@ -10,11 +10,15 @@ import (
 	"strings"
 
 	"chain"
-	"chain/runtime/unsafe"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
+
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/urlshort/v1"
 
 // entry is the persisted record for a single alias.
 type entry struct {
@@ -54,14 +58,22 @@ func isAlphanumeric(s string) bool {
 //   - if it is already claimed by the caller, the url/note are updated;
 //   - if it is claimed by someone else, the call aborts.
 func Shorten(cur realm, alias string, url string, note string) {
+	if !cur.IsCurrent() {
+		panic("urlshort: spoofed realm")
+	}
 	if !isAlphanumeric(alias) {
 		panic("alias must be non-empty and alphanumeric")
 	}
 	if url == "" {
 		panic("url must be non-empty")
 	}
+	// The URL is rendered as an <autolink>, so it is checked here rather than
+	// escaped there: http(s) only, and nothing that could close the brackets.
+	if !safeURL(url) {
+		panic("url must be http:// or https:// with no spaces or angle brackets")
+	}
 
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 
 	if v := aliases.Get(alias); v != nil {
 		e := v.(*entry)
@@ -82,12 +94,15 @@ func Shorten(cur realm, alias string, url string, note string) {
 // Remove deletes an alias owned by the caller. Aborts if the alias does not
 // exist or the caller is not the owner.
 func Remove(cur realm, alias string) {
+	if !cur.IsCurrent() {
+		panic("urlshort: spoofed realm")
+	}
 	v := aliases.Get(alias)
 	if v == nil {
 		panic("alias not found")
 	}
 	e := v.(*entry)
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 	if e.owner != caller {
 		panic("only the owner can remove an alias")
 	}
@@ -115,7 +130,7 @@ func Render(path string) string {
 	alias := strings.TrimPrefix(path, "/")
 	v := aliases.Get(alias)
 	if v == nil {
-		return "# URL Shortener\n\nNo alias named `" + alias + "`.\n\n[← all aliases](/)\n"
+		return "# URL Shortener\n\nNo alias named " + md.InlineCode(alias) + ".\n\n[← all aliases](" + selfPath + ")\n"
 	}
 
 	e := v.(*entry)
@@ -126,10 +141,10 @@ func Render(path string) string {
 	b.WriteString("**Target:** <" + e.url + ">\n\n")
 	b.WriteString("**Owner:** " + e.owner.String() + "\n\n")
 	if e.note != "" {
-		b.WriteString("**Note:** " + e.note + "\n\n")
+		b.WriteString("**Note:** " + ui.Inline(e.note) + "\n\n")
 	}
 	b.WriteString("**Clicks:** " + itoa(e.clicks) + "\n\n")
-	b.WriteString("[← all aliases](/)\n")
+	b.WriteString("[← all aliases](" + selfPath + ")\n")
 	return b.String()
 }
 
@@ -147,7 +162,7 @@ func renderIndex() string {
 	b.WriteString("|-------|--------|-------|--------|\n")
 	aliases.Iterate("", "", func(key string, value interface{}) bool {
 		e := value.(*entry)
-		b.WriteString("| [" + key + "](/" + key + ") | <" + e.url + "> | " +
+		b.WriteString("| [" + key + "](" + selfPath + ":" + key + ") | <" + e.url + "> | " +
 			ui.Addr(e.owner) + " | " + itoa(e.clicks) + " |\n")
 		return false
 	})
@@ -177,4 +192,12 @@ func itoa(n int) string {
 		buf[i] = '-'
 	}
 	return string(buf[i:])
+}
+
+// safeURL reports whether u can be written into a markdown autolink unescaped.
+func safeURL(u string) bool {
+	if !strings.HasPrefix(u, "https://") && !strings.HasPrefix(u, "http://") {
+		return false
+	}
+	return !strings.ContainsAny(u, " \t\r\n<>`\\")
 }

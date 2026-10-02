@@ -15,7 +15,7 @@ profile at `/<address>`, and the root page lists every profile that exists with
 a link to each. Profiles are stored in an ordered AVL tree so rendering is
 deterministic.
 
-Realm path: `gno.land/r/REPLACE_ADDR/linktree`
+Realm path: `gno.land/r/moul/x/daily/linktree/v1`
 
 ## Example calls
 

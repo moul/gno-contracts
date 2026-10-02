@@ -21,7 +21,7 @@ func TestStopping(t *testing.T) {
 		{27, 111, 9232},
 	}
 	for _, c := range cases {
-		steps, peak := stopping(c.n)
+		steps, peak, _ := stopping(c.n)
 		uassert.Equal(t, c.steps, steps)
 		uassert.Equal(t, c.peak, peak)
 	}
@@ -59,4 +59,15 @@ func TestRenderSequence(t *testing.T) {
 
 	bad := Render("/abc")
 	uassert.True(t, strings.Contains(bad, "Invalid"), "rejects non-numeric path")
+}
+
+// 3n+1 for this n is exactly 2^64, which wraps to 0. Recording it would put a
+// million-step walk on 0 at the top of the leaderboard, forever.
+func TestComputeRefusesAnOverflowingWalk(cur realm, t *testing.T) {
+	uassert.AbortsContains(t, cur, "overflows int64", func() { Compute(cross(cur), 6148914691236517205) })
+	_, _, ok := stopping(27)
+	uassert.True(t, ok, "an ordinary walk is unaffected")
+	out := Render("/6148914691236517205")
+	uassert.True(t, strings.Contains(out, "would overflow int64"), out)
+	uassert.False(t, strings.Contains(out, "→ 0"), "no wrapped term rendered")
 }

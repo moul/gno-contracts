@@ -96,11 +96,20 @@ func renderAddress(addr address, offset int) string {
 	)
 	s += t.String() + "\n"
 
-	s += ufmt.Sprintf("## Positions\n\nRecords %d to %d of %d.\n\n",
-		offset, offset+scanWindow, position.GetPositions().Size())
+	// The offset comes from the path, so it reaches maxInt for free, and
+	// offset+scanWindow would wrap negative. Clamp it to what exists first.
+	size := position.GetPositions().Size()
+	if offset > size {
+		offset = size
+	}
+	end := offset + scanWindow
+	if end > size {
+		end = size
+	}
+	s += ufmt.Sprintf("## Positions\n\nRecords %d to %d of %d.\n\n", offset, end, size)
 	s += renderPositions(addr, offset)
 
-	if next := offset + scanWindow; next < position.GetPositions().Size() {
+	if next := offset + scanWindow; next < size {
 		s += ufmt.Sprintf("\n[Next %d records](%s:%s/from/%d)\n", scanWindow, shortSelf, addr.String(), next)
 	}
 	return s

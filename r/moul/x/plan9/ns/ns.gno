@@ -10,7 +10,7 @@
 // name means what YOU bound it to. Composing two realms that were never
 // written to work together stops being a redeploy and becomes a transaction:
 //
-//	gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v0 -func Exec \
+//	gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v1 -func Exec \
 //	  -args 'bind -ac /srv/dev /dev; echo hello > /tmp/greeting'
 //
 // SECURITY. Mounted trees are READ-ONLY by construction: ninep.File has no
@@ -36,6 +36,8 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 
 	"gno.land/p/moul/realmpath/v0"
@@ -49,6 +51,14 @@ import (
 // DemoKey names the namespace gnoweb browses when no ?u= is given. It is a
 // plain string rather than an address so it can never collide with one.
 const DemoKey = "demo"
+
+// The bounds on what callers can create. Any realm may Post a service and any
+// account gets a namespace on its first Exec; the home page lists both.
+const (
+	MaxServices   = 64
+	MaxNamespaces = 1000
+	HomeRecent    = 50 // namespaces the home page lists
+)
 
 type service struct {
 	file  ninep.File
@@ -135,6 +145,9 @@ func Post(cur realm, name string, f ninep.File) {
 		panic("post: nil file server")
 	}
 	prev := cur.Previous()
+	if services.Get(name) == nil && services.Size() >= MaxServices {
+		panic("post: /srv is full at " + strconv.Itoa(MaxServices) + " services")
+	}
 	if existing := services.Get(name); existing != nil {
 		if existing.(*service).owner != prev.PkgPath() {
 			panic("post: " + name + " is already posted by " + existing.(*service).owner)
@@ -198,6 +211,9 @@ func spaceFor(key string) *space {
 	if v := spaces.Get(key); v != nil {
 		return v.(*space)
 	}
+	if spaces.Size() >= MaxNamespaces {
+		panic("ns: full at " + strconv.Itoa(MaxNamespaces) + " namespaces")
+	}
 	sp := newSpace(key)
 	spaces.Set(key, sp)
 	return sp
@@ -227,7 +243,12 @@ func seedDemo() {
 
 // ResetDemo rebuilds the demo namespace. Anyone may call it: it is a demo, and
 // the alternative is a demo that the first visitor ruins for everybody.
-func ResetDemo(cur realm) { seedDemo() }
+func ResetDemo(cur realm) {
+	if !cur.IsCurrent() {
+		panic("resetdemo: cur is not the caller's live realm")
+	}
+	seedDemo()
+}
 
 // ---------------------------------------------------------------- shell
 
@@ -308,6 +329,12 @@ func Render(path string) string {
 	if key == "" {
 		key = DemoKey
 	}
+	// A namespace is keyed by the address that created it, or is the demo one.
+	// Anything else names no namespace, and refusing it here is also what keeps
+	// a crafted ?u= out of the links and code spans every page builds from it.
+	if key != DemoKey && !address(key).IsValid() {
+		return "# 404\n\nno namespace by that name. `?u=` takes an address.\n"
+	}
 	parts := req.PathParts()
 	if len(parts) == 0 || parts[0] == "" {
 		return renderHome(key)
@@ -333,25 +360,27 @@ func Render(path string) string {
 			line = "help"
 		}
 	default:
-		return "# 404\n\nunknown command `" + cmd + "`. Try `ls`, `cat`, `stat`, `walk`, `ns` or `rc?c=...`.\n"
+		return "# 404\n\nunknown command " + md.InlineCode(cmd) + ". Try `ls`, `cat`, `stat`, `walk`, `ns` or `rc?c=...`.\n"
 	}
 	return renderCmd(key, line, cmd+" "+rest)
 }
 
 func renderCmd(key, line, title string) string {
 	var b strings.Builder
-	b.WriteString("# " + title + "\n\n")
+	b.WriteString("# " + ui.Inline(title) + "\n\n")
 	b.WriteString("namespace: `" + key + "`\n\n")
 	out, err := Run(key, line)
 	if err != nil {
-		b.WriteString("```\n" + err.Error() + "\n```\n")
+		b.WriteString(md.CodeBlock(err.Error()))
 	} else if out == "" {
 		b.WriteString("_(no output)_\n")
 	} else {
-		b.WriteString("```\n" + out + "```\n")
+		// The output is a user's file contents: a line of backticks in it
+		// would close a hand-written fence, and md.CodeBlock picks one it cannot.
+		b.WriteString(md.CodeBlock(strings.TrimSuffix(out, "\n")))
 	}
-	b.WriteString("\n[namespace](:ns?u=" + key + ") · [root](:ls?u=" + key +
-		") · [home](:)\n")
+	b.WriteString("\n[namespace](/r/moul/x/plan9/ns/v1:ns?u=" + key + ") · [root](/r/moul/x/plan9/ns/v1:ls?u=" + key +
+		") · [home](/r/moul/x/plan9/ns/v1)\n")
 	return b.String()
 }
 
@@ -370,7 +399,7 @@ func renderHome(key string) string {
 		b.WriteString("| name | posted by | since |\n|---|---|---|\n")
 		services.Iterate("", "", func(k string, v any) bool {
 			s := v.(*service)
-			b.WriteString("| `" + k + "` | [`" + s.owner + "`](" +
+			b.WriteString("| " + ui.Cell(k) + " | [`" + s.owner + "`](" +
 				strings.TrimPrefix(s.owner, "gno.land") + ") | " +
 				strconv.FormatInt(s.since, 10) + " |\n")
 			return false
@@ -379,25 +408,29 @@ func renderHome(key string) string {
 	}
 
 	b.WriteString("## The demo namespace\n\n")
-	b.WriteString("```\n" + Namespace(DemoKey) + "```\n\n")
+	b.WriteString(md.CodeBlock(strings.TrimSuffix(Namespace(DemoKey), "\n")) + "\n")
 	b.WriteString("`/bin` is a union: the system `/bin` first, then `/usr/glenda/bin`, ")
 	b.WriteString("with `-c` so new files land in the second. Listing it shows both members ")
 	b.WriteString("because a Plan 9 union is a concatenation, so shadowing stays visible.\n\n")
-	b.WriteString("- [ns](:ns) · [ls /](:ls) · [ls /bin](:ls/bin) · ")
-	b.WriteString("[cat /tmp/greeting](:cat/tmp/greeting) · [walk /bin/rc](:walk/bin/rc)\n")
-	b.WriteString("- any read-only command: [`rc?c=ls -l /srv`](:rc?c=ls%20-l%20/srv)\n\n")
+	b.WriteString("- [ns](/r/moul/x/plan9/ns/v1:ns) · [ls /](/r/moul/x/plan9/ns/v1:ls) · [ls /bin](/r/moul/x/plan9/ns/v1:ls/bin) · ")
+	b.WriteString("[cat /tmp/greeting](/r/moul/x/plan9/ns/v1:cat/tmp/greeting) · [walk /bin/rc](/r/moul/x/plan9/ns/v1:walk/bin/rc)\n")
+	b.WriteString("- any read-only command: [`rc?c=ls -l /srv`](/r/moul/x/plan9/ns/v1:rc?c=ls%20-l%20/srv)\n\n")
 
 	b.WriteString("## Your own namespace\n\n")
 	b.WriteString("```\n")
-	b.WriteString("gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v0 \\\n")
+	b.WriteString("gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v1 \\\n")
 	b.WriteString("  -func Exec -args 'bind -ac /srv/dev /dev; echo hi > /tmp/f'\n")
 	b.WriteString("```\n\n")
 	b.WriteString("Then browse it with `?u=<your address>`. `Reset` throws it away.\n\n")
 
 	b.WriteString("## Namespaces\n\n")
 	keys := Keys()
+	if len(keys) > HomeRecent {
+		b.WriteString(strconv.Itoa(len(keys)) + " namespaces, the first " + strconv.Itoa(HomeRecent) + " listed.\n\n")
+		keys = keys[:HomeRecent]
+	}
 	for _, k := range keys {
-		b.WriteString("- [`" + k + "`](:ns?u=" + k + ")\n")
+		b.WriteString("- [`" + k + "`](/r/moul/x/plan9/ns/v1:ns?u=" + k + ")\n")
 	}
 	b.WriteString("\nDesign and analysis: ")
 	b.WriteString("[moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).\n")
@@ -412,8 +445,8 @@ func renderHome(key string) string {
 
 // quote wraps a path for rc if it needs it.
 func quote(s string) string {
-	if !strings.ContainsAny(s, " \t'") {
-		return s
-	}
+	// Always quoted: the path comes from the URL, and a route like
+	// cat/tmp/f;echo must read one file, not run a second command. The shell
+	// is read-only either way, but a path is data.
 	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
 }

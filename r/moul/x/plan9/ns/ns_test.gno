@@ -1,6 +1,7 @@
 package ns
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
@@ -166,7 +167,7 @@ func TestPostRejectsASecondOwner(cur realm, t *testing.T) {
 
 	testing.SetRealm(testing.NewCodeRealm("gno.land/r/other/thing/v0"))
 	uassert.AbortsWithMessage(t, cur,
-		"post: taken is already posted by gno.land/r/moul/x/plan9/ns/v0",
+		"post: taken is already posted by gno.land/r/moul/x/plan9/ns/v1",
 		func() { Post(cross(cur), "taken", probe("taken", "second")) })
 }
 
@@ -206,4 +207,93 @@ func TestRenderUnknownCommand(t *testing.T) {
 	if got := Render("nope/x"); !strings.Contains(got, "404") {
 		t.Errorf("got %q", got)
 	}
+}
+
+// ?u= is the only caller-controlled part of every link the pages build, so a
+// value that is neither an address nor the demo key is refused outright.
+func TestRenderRefusesANonAddressNamespace(t *testing.T) {
+	out := Render("ns?u=x%29%20[evil](https://example)")
+	uassert.True(t, strings.Contains(out, "# 404"), out)
+	uassert.False(t, strings.Contains(out, "[evil](https://example)"), out)
+}
+
+// A file's contents are its owner's text. A line of backticks in one used to
+// close the hand-written fence around `cat`'s output, and everything after it
+// rendered as live markdown on the realm's own page.
+func TestCatOutputCannotCloseItsFence(cur realm, t *testing.T) {
+	who := testutils.TestAddress("fencer")
+	testing.SetRealm(testing.NewUserRealm(who))
+	Exec(cross(cur), "echo '```' > /tmp/f; echo '[claim](https://evil.example)' >> /tmp/f")
+	out := Render("cat/tmp/f?u=" + who.String())
+	// md.CodeBlock picks a fence longer than any run of backticks inside, so
+	// the user's three backticks and the link after them stay inside the block.
+	uassert.True(t, strings.Contains(out, "````\n```\n[claim](https://evil.example)\n````\n"), out)
+}
+
+// The command name and the rest of the path come from the URL: escaped in the
+// heading and in the unknown-command page.
+func TestPathDerivedTextIsEscaped(t *testing.T) {
+	for _, path := range []string{"x` [claim](https://evil.example) `", "cat/x` [claim](https://evil.example) `"} {
+		out := Render(path)
+		uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
+	}
+}
+
+// A service name is chosen by whichever realm posts it, and ValidName refuses
+// only "", ".", ".." and "/": the /srv table escapes it as a cell.
+func TestServiceNameIsTableSafe(cur realm, t *testing.T) {
+	name := "x` | [claim](https://evil.example) |"
+	services.Set(name, &service{owner: "gno.land/r/someone/poster"})
+	defer services.Remove(name)
+	out := Render("")
+	uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
+}
+
+// A path route reads what it names: the rest of the path is one quoted
+// argument, so a ";" in it is part of the file name and runs nothing.
+func TestPathRouteIsOneArgument(t *testing.T) {
+	// Unquoted, rc would cat /tmp/greeting and then run the second command;
+	// quoted, it looks for one file with a ";" in its name and finds none.
+	out := Render("cat/tmp/greeting;echo")
+	uassert.True(t, strings.Contains(out, "cat: file does not exist"), out)
+	uassert.Equal(t, "'/a;b'", quote("/a;b"))
+}
+
+// Namespaces and services are bounded, and the home page lists a fixed number.
+func TestNamespacesAndServicesAreBounded(cur realm, t *testing.T) {
+	var added []string
+	for i := 0; spaces.Size() < MaxNamespaces; i++ {
+		k := testutils.TestAddress("ns" + strconv.Itoa(i)).String()
+		if spaces.Get(k) == nil {
+			spaces.Set(k, newSpace(k))
+			added = append(added, k)
+		}
+	}
+	defer func() {
+		for _, k := range added {
+			spaces.Remove(k)
+		}
+	}()
+	uassert.PanicsContains(t, cur, "full at", func() { spaceFor(testutils.TestAddress("one-more").String()) })
+	uassert.Equal(t, HomeRecent, strings.Count(Render(""), "](/r/moul/x/plan9/ns/v1:ns?u="))
+}
+
+// /srv is bounded: once MaxServices names are posted, a new one is refused,
+// and re-posting is not how a realm gets around it.
+func TestServicesAreBounded(cur realm, t *testing.T) {
+	var added []string
+	for i := 0; services.Size() < MaxServices; i++ {
+		name := "svc" + strconv.Itoa(i)
+		if services.Get(name) == nil {
+			services.Set(name, &service{owner: "gno.land/r/someone/poster"})
+			added = append(added, name)
+		}
+	}
+	defer func() {
+		for _, n := range added {
+			services.Remove(n)
+		}
+	}()
+	testing.SetRealm(testing.NewCodeRealm("gno.land/r/someone/late"))
+	uassert.AbortsContains(t, cur, "/srv is full", func() { Post(cross(cur), "late", probe("late", "x")) })
 }

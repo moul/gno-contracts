@@ -2,14 +2,18 @@ package connect4
 
 import (
 	"chain"
-	"chain/runtime/unsafe"
 	"errors"
 	"strconv"
 	"strings"
 
-	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/kit/store/v0"
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 )
+
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/connect4/v1"
 
 const (
 	cols = 7
@@ -44,7 +48,10 @@ var games = store.Named("game")
 // NewGame creates a match between the caller (🔴) and opponent (🟡).
 // Returns the new game id.
 func NewGame(cur realm, opponent address) int64 {
-	caller := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("connect4: spoofed realm")
+	}
+	caller := cur.Previous().Address()
 	if opponent == caller {
 		panic("opponent must differ from caller")
 	}
@@ -76,6 +83,9 @@ func getGame(id int64) (*Game, error) {
 // Enforces turn order by caller, rejects full columns, and detects
 // a 4-in-a-row win or a draw.
 func Drop(cur realm, gameID int64, column int) {
+	if !cur.IsCurrent() {
+		panic("connect4: spoofed realm")
+	}
 	if column < 0 || column >= cols {
 		panic("column out of range (0-6)")
 	}
@@ -87,7 +97,7 @@ func Drop(cur realm, gameID int64, column int) {
 		panic("game already finished")
 	}
 
-	caller := unsafe.PreviousRealm().Address()
+	caller := cur.Previous().Address()
 	var mover int
 	switch caller {
 	case g.Red:
@@ -201,7 +211,7 @@ func Render(path string) string {
 	}
 	id, ok := store.ParseID(path)
 	if !ok {
-		return "# Connect Four\n\nInvalid game id: `" + path + "`\n"
+		return "# Connect Four\n\nInvalid game id: " + md.InlineCode(path) + "\n"
 	}
 	g, err := getGame(int64(id))
 	if err != nil {
@@ -236,7 +246,7 @@ func renderList() string {
 		default:
 			status = "🟡 to move"
 		}
-		sb.WriteString("| [" + id.String() + "](/r:" + id.String() + ") | " +
+		sb.WriteString("| [" + id.String() + "](" + selfPath + ":" + id.String() + ") | " +
 			ui.Addr(g.Red) + " | " + ui.Addr(g.Yellow) + " | " + status + " |\n")
 	})
 	sb.WriteString("\nOpen a game by its id (e.g. path `1`).\n")

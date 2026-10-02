@@ -9,7 +9,7 @@ func ExampleRender() {
 	//
 	// The chain as a Plan 9 device tree. Each file is a function: reading it runs code, so `/dev/height` is never stale.
 	//
-	// Posted to [`r/moul/x/plan9/ns`](/r/moul/x/plan9/ns/v0)'s `/srv` at deploy time, so no realm has to import this one to use it:
+	// Posted to [`r/moul/x/plan9/ns`](/r/moul/x/plan9/ns/v1)'s `/srv` at deploy time, so no realm has to import this one to use it:
 	//
 	// ```
 	// bind /srv/dev /dev
@@ -17,17 +17,17 @@ func ExampleRender() {
 	//
 	// | device | contents |
 	// |---|---|
-	// | [`caller`](:cat/caller) | pkgpath of the realm that crossed into this read |
-	// | [`domain`](:cat/domain) | the chain domain |
-	// | [`drivers`](:cat/drivers) | this table |
-	// | [`height`](:cat/height) | current block height |
-	// | [`null`](:cat/null) | always empty; the bit bucket |
-	// | [`random`](:cat/random) | sha256 of chain id and height, hex; block-deterministic, NOT unpredictable |
-	// | [`session`](:cat/session) | the calling key's session scope, one AllowPath per line |
-	// | [`sysname`](:cat/sysname) | the chain id |
-	// | [`time`](:cat/time) | block time, RFC3339 |
-	// | [`user`](:cat/user) | the origin caller's address |
-	// | [`zero`](:cat/zero) | endless NUL bytes; reads exactly what you ask for |
+	// | [`caller`](/r/moul/x/plan9/dev/v1:cat/caller) | pkgpath of the realm that crossed into this read |
+	// | [`domain`](/r/moul/x/plan9/dev/v1:cat/domain) | the chain domain |
+	// | [`drivers`](/r/moul/x/plan9/dev/v1:cat/drivers) | this table |
+	// | [`height`](/r/moul/x/plan9/dev/v1:cat/height) | current block height |
+	// | [`null`](/r/moul/x/plan9/dev/v1:cat/null) | always empty; the bit bucket |
+	// | [`random`](/r/moul/x/plan9/dev/v1:cat/random) | sha256 of chain id and height, hex; block-deterministic, NOT unpredictable |
+	// | [`session`](/r/moul/x/plan9/dev/v1:cat/session) | the calling key's session scope, one AllowPath per line |
+	// | [`sysname`](/r/moul/x/plan9/dev/v1:cat/sysname) | the chain id |
+	// | [`time`](/r/moul/x/plan9/dev/v1:cat/time) | block time, RFC3339 |
+	// | [`user`](/r/moul/x/plan9/dev/v1:cat/user) | the origin caller's address |
+	// | [`zero`](/r/moul/x/plan9/dev/v1:cat/zero) | endless NUL bytes; reads exactly what you ask for |
 	//
 	// Design and analysis: [moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).
 	//
@@ -54,8 +54,7 @@ func ExampleRender_cat() {
 	// time	block time, RFC3339
 	// user	the origin caller's address
 	// zero	endless NUL bytes; reads exactly what you ask for
-	//
 	// ```
 	//
-	// [all devices](:)
+	// [all devices](/r/moul/x/plan9/dev/v1)
 }

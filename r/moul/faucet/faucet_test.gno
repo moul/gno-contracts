@@ -378,3 +378,12 @@ func TestPathMatchesTheRealmItIsDeployedAs(cur realm, t *testing.T) {
 	uassert.Equal(t, cur.Address().String(), Address().String(),
 		"Path disagrees with the module line in gnomod.toml")
 }
+
+// A realm cannot emit a Fund event for coins it kept: OriginSend is what the
+// signer attached, not what reached the float.
+func TestFundRefusesARealmCaller(cur realm, t *testing.T) {
+	reset()
+	testing.SetOriginSend(chain.NewCoins(chain.NewCoin(Denom, 1_000_000)))
+	testing.SetRealm(testing.NewCodeRealm("gno.land/r/someone/relay"))
+	uassert.AbortsContains(t, cur, "called directly by an account", func() { Fund(cross(cur)) })
+}

@@ -8,12 +8,16 @@ package polls
 
 import (
 	"chain"
-	"chain/runtime/unsafe"
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/avl/v0"
 )
+
+// selfPath is this realm's own page. A root-relative link resolves against
+// the domain, not the realm, so every link back into it names it in full.
+const selfPath = "/r/moul/x/daily/polls/v1"
 
 // Poll is a single question with its options and per-address vote tracking.
 type Poll struct {
@@ -34,16 +38,30 @@ var (
 // entries are dropped. Returns the new poll's id. Crossing function: an EOA
 // invokes it via MsgCall; another realm via polls.CreatePoll(cross, q, opts).
 func CreatePoll(cur realm, question string, options string) int {
-	creator := unsafe.PreviousRealm().Address().String()
+	creator := caller(cur).String()
 
 	q := strings.TrimSpace(question)
 	if q == "" {
 		panic("question must not be empty")
 	}
 
+	if len(q) > MaxQuestionLen {
+		panic("question too long")
+	}
 	opts := parseOptions(options)
 	if len(opts) < 2 {
 		panic("a poll needs at least 2 options")
+	}
+	if len(opts) > MaxOptions {
+		panic("a poll takes at most " + strconv.Itoa(MaxOptions) + " options")
+	}
+	for _, o := range opts {
+		if len(o) > MaxOptionLen {
+			panic("option too long")
+		}
+	}
+	if len(polls) >= MaxPolls {
+		panic("polls is full at " + strconv.Itoa(MaxPolls) + " polls")
 	}
 
 	id := nextID
@@ -69,7 +87,7 @@ func CreatePoll(cur realm, question string, options string) int {
 // Vote casts one vote for optionIndex on poll pollID. Each caller address may
 // vote at most once per poll. Crossing function.
 func Vote(cur realm, pollID int, optionIndex int) {
-	voter := unsafe.PreviousRealm().Address().String()
+	voter := caller(cur).String()
 
 	p := getPoll(pollID)
 	if optionIndex < 0 || optionIndex >= len(p.Options) {
@@ -117,6 +135,16 @@ func PollCount() int {
 
 const barWidth = 20
 
+// The bounds on what a creator may store. Anyone may create a poll, and the
+// root page renders the newest ones.
+const (
+	MaxPolls       = 500
+	MaxQuestionLen = 200
+	MaxOptions     = 10
+	MaxOptionLen   = 64
+	IndexRecent    = 20 // polls the root page shows, newest first
+)
+
 // bar renders a proportional ▓░ bar of fixed width for count out of total.
 func bar(count, total int) string {
 	filled := 0
@@ -153,13 +181,13 @@ func renderPoll(b *strings.Builder, p *Poll) {
 	b.WriteString("## Poll #")
 	b.WriteString(strconv.Itoa(p.ID))
 	b.WriteString(": ")
-	b.WriteString(p.Question)
+	b.WriteString(ui.Inline(p.Question))
 	b.WriteString("\n\n")
 
 	for i, opt := range p.Options {
 		c := p.Tallies[i]
 		b.WriteString("- **")
-		b.WriteString(opt)
+		b.WriteString(ui.Inline(opt))
 		b.WriteString("** `")
 		b.WriteString(bar(c, sum))
 		b.WriteString("` ")
@@ -181,12 +209,22 @@ func renderPoll(b *strings.Builder, p *Poll) {
 
 // Render produces the Markdown page for gnoweb. It is NOT a crossing function.
 //
-//   - ""        -> index of all polls
-//   - "<id>"    -> a single poll by id
+//   - ""          -> the IndexRecent newest polls
+//   - "page/<n>"  -> the n-th page of IndexRecent, newest first (page/1 is "")
+//   - "<id>"      -> a single poll by id
 func Render(path string) string {
 	var b strings.Builder
 
 	path = strings.TrimSpace(path)
+	page := 1
+	if rest, ok := strings.CutPrefix(path, "page/"); ok {
+		n, err := strconv.Atoi(rest)
+		// Bounded before any multiply: the page comes from the URL.
+		if err != nil || n < 1 || n > 1+(len(polls)-1)/IndexRecent {
+			return "# Polls\n\nNo such page.\n\n[← all polls](" + selfPath + ")\n"
+		}
+		page, path = n, ""
+	}
 	if path != "" {
 		id, err := strconv.Atoi(path)
 		if err != nil || id < 0 || id >= len(polls) {
@@ -194,7 +232,7 @@ func Render(path string) string {
 		}
 		b.WriteString("# Polls\n\n")
 		renderPoll(&b, polls[id])
-		b.WriteString("[← all polls](/r/REPLACE_ADDR/polls)\n")
+		b.WriteString("[← all polls](" + selfPath + ")\n")
 		return b.String()
 	}
 
@@ -204,11 +242,29 @@ func Render(path string) string {
 		return b.String()
 	}
 
+	pages := 1 + (len(polls)-1)/IndexRecent
 	b.WriteString("Total polls: ")
 	b.WriteString(strconv.Itoa(len(polls)))
+	if pages > 1 {
+		b.WriteString(", page " + strconv.Itoa(page) + " of " + strconv.Itoa(pages))
+	}
 	b.WriteString("\n\n")
-	for _, p := range polls {
-		renderPoll(&b, p)
+	//gnovet:ignore page-offset-overflow page is bounded by pages above
+	top := len(polls) - 1 - (page-1)*IndexRecent
+	for i := top; i >= 0 && i > top-IndexRecent; i-- {
+		renderPoll(&b, polls[i])
+	}
+	if page < pages {
+		b.WriteString("[older polls →](" + selfPath + ":page/" + strconv.Itoa(page+1) + ")\n")
 	}
 	return b.String()
+}
+
+// caller is the address that crossed into this realm, after checking that the
+// realm token is this frame's own.
+func caller(cur realm) address {
+	if !cur.IsCurrent() {
+		panic("polls: spoofed realm")
+	}
+	return cur.Previous().Address()
 }

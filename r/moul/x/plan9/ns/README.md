@@ -1,4 +1,4 @@
-# `gno.land/r/moul/x/plan9/ns/v0`
+# `gno.land/r/moul/x/plan9/ns/v1`
 
 **A Plan 9 namespace server for gno.land.** Every account gets a private,
 persistent namespace: its own RAM root plus a mount table it alone controls.
@@ -6,11 +6,11 @@ Realms publish file trees into `/srv`, accounts `bind` those trees wherever they
 like, and a read-only `rc` shell renders the whole thing in gnoweb.
 
 ```sh
-gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v0 \
+gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v1 \
   -func Exec -args 'bind -ac /srv/dev /dev; echo hello > /tmp/greeting'
 ```
 
-Then browse it at `/r/moul/x/plan9/ns/v0:ns?u=<your address>`.
+Then browse it at `/r/moul/x/plan9/ns/v1:ns?u=<your address>`.
 
 This is the part of Plan 9 that gno does not otherwise have. The chain has a
 single global tree of realm paths that looks the same to everybody; here a name

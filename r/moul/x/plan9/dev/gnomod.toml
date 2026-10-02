@@ -1,4 +1,4 @@
-module = "gno.land/r/moul/x/plan9/dev/v0"
+module = "gno.land/r/moul/x/plan9/dev/v1"
 gno = "0.9"
 
 # public: posts its own tree into r/moul/x/plan9/ns, and a private realm may

@@ -42,10 +42,12 @@ import (
 	"strings"
 	"time"
 
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	ninep "gno.land/p/moul/x/plan9/ninep/v0"
 	synfs "gno.land/p/moul/x/plan9/synfs/v0"
 
-	nsrealm "gno.land/r/moul/x/plan9/ns/v0"
+	nsrealm "gno.land/r/moul/x/plan9/ns/v1"
 )
 
 var tree *synfs.Tree
@@ -146,13 +148,13 @@ func Render(path string) string {
 		name := parts[1]
 		f, err := tree.Root().Walk(name)
 		if err != nil {
-			return "# /dev/" + name + "\n\n```\n" + err.Error() + "\n```\n"
+			return "# /dev/" + ui.Inline(name) + "\n\n" + md.CodeBlock(err.Error())
 		}
 		data, err := ninep.ReadAll(f)
 		if err != nil {
-			return "# /dev/" + name + "\n\n```\n" + err.Error() + "\n```\n"
+			return "# /dev/" + ui.Inline(name) + "\n\n" + md.CodeBlock(err.Error())
 		}
-		return "# /dev/" + name + "\n\n```\n" + data + "\n```\n\n[all devices](:)\n"
+		return "# /dev/" + ui.Inline(name) + "\n\n" + md.CodeBlock(strings.TrimSuffix(data, "\n")) + "\n[all devices](/r/moul/x/plan9/dev/v1)\n"
 	}
 	return renderIndex()
 }
@@ -162,12 +164,12 @@ func renderIndex() string {
 	b.WriteString("# /dev\n\n")
 	b.WriteString("The chain as a Plan 9 device tree. Each file is a function: reading it ")
 	b.WriteString("runs code, so `/dev/height` is never stale.\n\n")
-	b.WriteString("Posted to [`r/moul/x/plan9/ns`](/r/moul/x/plan9/ns/v0)'s `/srv` at deploy ")
+	b.WriteString("Posted to [`r/moul/x/plan9/ns`](/r/moul/x/plan9/ns/v1)'s `/srv` at deploy ")
 	b.WriteString("time, so no realm has to import this one to use it:\n\n")
 	b.WriteString("```\nbind /srv/dev /dev\n```\n\n")
 	b.WriteString("| device | contents |\n|---|---|\n")
 	for _, d := range docs {
-		b.WriteString("| [`" + d[0] + "`](:cat/" + d[0] + ") | " + d[1] + " |\n")
+		b.WriteString("| [`" + d[0] + "`](/r/moul/x/plan9/dev/v1:cat/" + d[0] + ") | " + d[1] + " |\n")
 	}
 	b.WriteString("\nDesign and analysis: ")
 	b.WriteString("[moul/gno-contracts#136](https://github.com/moul/gno-contracts/issues/136).\n")

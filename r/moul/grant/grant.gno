@@ -107,7 +107,17 @@ func Requests() int { return program.Board.Size() }
 // on the record. Coins sent to the realm address directly still land in the
 // treasury; they just do not get a name next to them.
 func Fund(cur realm) {
-	from := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	// OriginSend is what the SIGNER attached, not what reached this realm. A
+	// realm the user called keeps those coins and could call Fund any number of
+	// times, booking each as a donation, so only a user call may read it.
+	prev := cur.Previous()
+	if !prev.IsUserCall() {
+		panic("grant: Fund must be called directly by an account, with -send")
+	}
+	from := prev.Address()
 	amount := unsafe.OriginSend().AmountOf(Denom)
 	if err := program.Fund(from, amount, runtime.ChainHeight()); err != nil {
 		panic(err)
@@ -119,7 +129,10 @@ func Fund(cur realm) {
 // "title:amount,title:amount", amounts in ugnot, paid in the order given.
 // Returns the request id.
 func Apply(cur realm, title, body, milestones string) int {
-	applicant := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	applicant := cur.Previous().Address()
 	return file(applicant, applicant, "", title, body, milestones)
 }
 
@@ -132,7 +145,10 @@ func Apply(cur realm, title, body, milestones string) int {
 // most need a small grant are exactly the people who cannot ask for one.
 // Either address may then submit the proofs, and neither may vote.
 func ApplyFor(cur realm, beneficiary, reason, title, body, milestones string) int {
-	applicant := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	applicant := cur.Previous().Address()
 	return file(applicant, address(beneficiary), reason, title, body, milestones)
 }
 
@@ -149,7 +165,10 @@ func file(applicant, beneficiary address, reason, title, body, milestones string
 
 // ProposeMember asks the board to add or remove a member. Members only.
 func ProposeMember(cur realm, addr string, add bool, body string) int {
-	proposer := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	proposer := cur.Previous().Address()
 	r, err := program.Board.SubmitMemberChange(proposer, address(addr), add, body, runtime.ChainHeight())
 	if err != nil {
 		panic(err)
@@ -161,7 +180,10 @@ func ProposeMember(cur realm, addr string, add bool, body string) int {
 
 // Retract pulls the caller's own request before it is decided.
 func Retract(cur realm, id int) {
-	caller := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	caller := cur.Previous().Address()
 	if err := program.Board.Withdraw(caller, id, runtime.ChainHeight()); err != nil {
 		panic(err)
 	}
@@ -172,7 +194,10 @@ func Retract(cur realm, id int) {
 // the vote: it is the only part of a decision that tells an applicant what to
 // do about it.
 func Vote(cur realm, id int, approve bool, reason string) {
-	voter := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	voter := cur.Previous().Address()
 	st, err := program.Board.Vote(voter, id, approve, reason, runtime.ChainHeight())
 	if err != nil {
 		panic(err)
@@ -184,7 +209,10 @@ func Vote(cur realm, id int, approve bool, reason string) {
 // SubmitProof offers evidence for the next milestone of an approved grant.
 // kind is "url", "hash" or "text"; ref is the link, digest or statement.
 func SubmitProof(cur realm, id, milestone int, kind, ref, note string) {
-	caller := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	caller := cur.Previous().Address()
 	p := grants.Proof{Kind: kind, Ref: ref, Note: note, Height: runtime.ChainHeight()}
 	if err := program.Board.SubmitProof(caller, id, milestone, p); err != nil {
 		panic(err)
@@ -197,7 +225,10 @@ func SubmitProof(cur realm, id, milestone int, kind, ref, note string) {
 // that carries also pays the tranche, in this same transaction. A verdict the
 // treasury cannot cover is refused outright and changes nothing.
 func Review(cur realm, id, milestone int, accept bool, reason string) {
-	voter := unsafe.PreviousRealm().Address()
+	if !cur.IsCurrent() {
+		panic("grant: spoofed realm")
+	}
+	voter := cur.Previous().Address()
 	out, pay, err := program.Review(voter, id, milestone, accept, reason, runtime.ChainHeight(), Balance())
 	if err != nil {
 		panic(err)
