@@ -104,18 +104,18 @@ func TestValidateEndpoint(t *testing.T) {
 		{RPC, "https://rpc.gno.land.", ""},
 		{RPC, "http://10.0.0.1:26657", ""},
 		{RPC, "http://localhost:26657", ""},
-		{RPC, "https://-.example", "DNS name"},
-		{RPC, "https://bad-.example", "DNS name"},
-		{RPC, "https://-bad.example", "DNS name"},
-		{RPC, "https://foo..example", "DNS name"},
-		{RPC, "https://.example", "DNS name"},
+		{RPC, "https://-.example.com", "DNS name"},
+		{RPC, "https://bad-.example.com", "DNS name"},
+		{RPC, "https://-bad.example.com", "DNS name"},
+		{RPC, "https://foo..example.com", "DNS name"},
+		{RPC, "https://.example.com", "DNS name"},
 		{RPC, "https://example..", "DNS name"},
-		{RPC, "https://" + strings.Repeat("a", 64) + ".example", "DNS name"},
-		{RPC, "https://" + strings.Repeat("a", 63) + ".example", ""},
+		{RPC, "https://" + strings.Repeat("a", 64) + ".example.com", "DNS name"},
+		{RPC, "https://" + strings.Repeat("a", 63) + ".example.com", ""},
 		{RPC, "http://300.1.1.1", "DNS name"},
 		{RPC, "http://1.2.3", "DNS name"},
 		{RPC, "http://01.2.3.4", "DNS name"},
-		{Peer, nodeID + "@bad-.example:26656", "DNS name"},
+		{Peer, nodeID + "@bad-.example.com:26656", "DNS name"},
 
 		{Peer, "seed-1.gno.land:26656", "<node id>@"},
 		{Peer, "nope@seed-1.gno.land:26656", "g1 address"},
@@ -173,7 +173,7 @@ func TestValidateInfo(t *testing.T) {
 	}
 	bad(func(in *Info) { in.ChainID = "" }, "chain id")
 	bad(func(in *Info) { in.Title = "" }, "title is 1 to 64")
-	bad(func(in *Info) { in.Title = strings.Repeat("x", MaxTitleLen+1) }, "title is 1 to 64")
+	bad(func(in *Info) { in.Title = strings.Repeat("x", MaxTitleLen+1) }, "title is longer than 64")
 	bad(func(in *Info) { in.Title = "two\nlines" }, "control character")
 	bad(func(in *Info) { in.Title = "\u200b" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "\u2060" }, "invisible or bidi")
@@ -182,10 +182,20 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.Title = "Onyx\ufe0f" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "Onyx\U000e0041" }, "invisible or bidi")
 	bad(func(in *Info) { in.Title = "\u2800" }, "invisible or bidi")
+	bad(func(in *Info) { in.Title = "x\u17b4" }, "invisible or bidi")    // Khmer inherent vowels draw nothing
+	bad(func(in *Info) { in.Description = "\u0301" }, "nothing visible") // optional, but not blank
+	bad(func(in *Info) { in.Title = "\ue000 Onyx" }, "which this chain does not draw")
+	for _, r := range []rune{0x1FBB1, 0x237B, 0x10102, 0x1F5D9, 0x2A2F, 0x2573, 0x2BBD, 0x2BBF, 0x29D6, 0x29D7, 0x1F7A8, 0x1F7AE} {
+		r := r
+		bad(func(in *Info) { in.Title = string(r) + " official" }, "status glyph")
+	}
 	bad(func(in *Info) { in.Title = "\u2705 official mainnet" }, "status glyph")
 	bad(func(in *Info) { in.Title = "Z\u0301\u0301\u0301\u0301\u0301" }, "combining marks")
-	// A spacing mark is not a stack, so real words in these scripts pass.
-	for _, word := range []string{"ज़िंदगी", "ਜ਼ਿੰਦਗੀ", "ကြိုး", "སྒྲུབ"} {
+	// The limit is a run: four marks pass, and a base character ends a run, so
+	// two runs of three are not a stack of six. A spacing mark is not a stack
+	// either, so real words in these scripts pass.
+	for _, word := range []string{"Z\u0301\u0301\u0301\u0301", "a\u0301\u0301\u0301b\u0301\u0301\u0301",
+		"ज़िंदगी", "ਜ਼ਿੰਦਗੀ", "ကြိုး", "སྒྲུབ"} {
 		good := ok
 		good.Title = word
 		uassert.NoError(t, ValidateInfo(good), word)
@@ -198,17 +208,17 @@ func TestValidateInfo(t *testing.T) {
 	bad(func(in *Info) { in.Description = "x\u009by" }, "control character")
 	bad(func(in *Info) { in.Title = "Onyx\u202e" }, "invisible or bidi")
 	bad(func(in *Info) { in.Description = "fine\u200dtext" }, "invisible or bidi")
-	bad(func(in *Info) { in.Description = strings.Repeat("x", MaxDescriptionLen+1) }, "description is at most")
+	bad(func(in *Info) { in.Description = strings.Repeat("x", MaxDescriptionLen+1) }, "description is longer than 512")
 	bad(func(in *Info) { in.Kind = "" }, "needs a kind")
 	bad(func(in *Info) { in.Kind = "betanet" }, "unknown kind")
 	bad(func(in *Info) { in.RPCURL = "" }, "rpc url is empty")
 	// The main RPC is what gnokey -remote gets, which dials http, https, tcp.
 	bad(func(in *Info) { in.RPCURL = "wss://rpc.onyx.testnets.gno.land/websocket" }, "rpc url scheme")
 	bad(func(in *Info) { in.RPCURL = "ws://rpc.onyx.testnets.gno.land/websocket" }, "rpc url scheme")
-	bad(func(in *Info) { in.RPCURL = "https://rpc.example/path" }, "no path")
-	bad(func(in *Info) { in.RPCURL = "https://rpc.example?x=1" }, "no path")
-	bad(func(in *Info) { in.RPCURL = "https://rpc.example:443#f" }, "contains")
-	bad(func(in *Info) { in.RPCURL = "https://rpc.example/" }, "no path")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example.com/path" }, "no path")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example.com?x=1" }, "no path")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example.com:443#f" }, "contains")
+	bad(func(in *Info) { in.RPCURL = "https://rpc.example.com/" }, "no path")
 	bad(func(in *Info) { in.Kind = " testnet " }, "unknown kind")
 	port := ok
 	port.RPCURL = "https://rpc.onyx.testnets.gno.land:443"
@@ -230,9 +240,9 @@ func TestCanonical(t *testing.T) {
 		"https://rpc.gno.land:443", "https://rpc.gno.land?", "HTTPS://RPC.gno.land.:443/"} {
 		uassert.Equal(t, "https://rpc.gno.land", Canonical(RPC, same), same)
 	}
-	uassert.Equal(t, "http://h.example", Canonical(Gnoweb, "http://h.example:80"))
-	uassert.Equal(t, "http://h.example:443", Canonical(Gnoweb, "http://h.example:443")) // not http's default
-	uassert.Equal(t, "https://h.example/api", Canonical(Indexer, "https://h.example:443/api"))
+	uassert.Equal(t, "http://h.example.com", Canonical(Gnoweb, "http://h.example.com:80"))
+	uassert.Equal(t, "http://h.example.com:443", Canonical(Gnoweb, "http://h.example.com:443")) // not http's default
+	uassert.Equal(t, "https://h.example.com/api", Canonical(Indexer, "https://h.example.com:443/api"))
 	uassert.Equal(t, nodeID+"@seed-1.gno.land:26656", Canonical(Peer, nodeID+"@SEED-1.gno.land:26656"))
 }
 

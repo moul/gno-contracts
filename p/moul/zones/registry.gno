@@ -30,11 +30,13 @@ import (
 // flagged endpoint has its verdict and leaves the queue, so curators keep a
 // warning instead of having to delete it to make room. The gate is checked
 // where something enters (Propose, Register); a review or a reset can push a
-// count past it, and never fails for it. The queue clears through approval,
+// count past it, and never fails for it. ProposeExempt and RegisterExempt skip
+// it, for the reviewers a holder trusts: a full queue must not lock out the
+// people who clear it. The queue clears through approval,
 // verification, a flag, rejection, RemoveZone and RemoveEndpoint. Flagged
 // endpoints still count toward MaxEndpointsPerZone: a flood a curator flags
-// rather than removes can fill a zone, and removing it is the answer. Each entry costs its
-// sender a storage deposit, refunded to whoever signs the transaction that
+// rather than removes can fill a zone, and removing it is the answer. Each
+// entry costs its sender a storage deposit, refunded to whoever signs the transaction that
 // frees it (on a chain where ugnot is not transfer-locked; on one that is, the
 // refund goes to the storage fee collector), so a flooder who withdraws first
 // gets it back: a bond, not a fee.
@@ -50,10 +52,10 @@ const (
 )
 
 // The reasons an endpoint carries when its zone changed under it and sent it
-// back to unverified. A reset caused by a curator (a rejection, a retirement,
-// an edit) records that curator as the reviewer; one caused by the proposer's
-// own edit to their pending zone records nobody, because a proposer is not a
-// reviewer there: ReviewedBy is empty and Reason says why.
+// back to unverified. A reset caused by an edit to a pending zone by its own
+// proposer records nobody, because that is not a review: ReviewedBy is empty
+// and Reason says why. Every other reset (a rejection, a retirement, anybody
+// else's edit, any edit to an approved zone) records whoever caused it.
 const (
 	ChainIDChanged = "the zone's chain id changed; verify again"
 	ZoneRetired    = "the zone was retired; verify again if it returns"
@@ -131,6 +133,18 @@ func NewRegistry() *Registry {
 
 // Propose files a new zone, Pending, under a slug nobody holds.
 func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
+	return r.propose(by, at, slug, in, true)
+}
+
+// ProposeExempt is Propose without the admission gates (MaxPending and
+// MaxPendingPerProposer), for the reviewers a holding realm trusts: a flood
+// that fills the queue would otherwise lock out the people who clear it. The
+// live cap, MaxZones, still holds.
+func (r *Registry) ProposeExempt(by address, at int64, slug string, in Info) error {
+	return r.propose(by, at, slug, in, false)
+}
+
+func (r *Registry) propose(by address, at int64, slug string, in Info, gated bool) error {
 	in = trimInfo(in)
 	if err := ValidateSlug(slug); err != nil {
 		return err
@@ -147,10 +161,10 @@ func (r *Registry) Propose(by address, at int64, slug string, in Info) error {
 	if r.Live() >= MaxZones {
 		return errors.New("zones: the registry is full at " + strconv.Itoa(MaxZones) + " pending and approved zones")
 	}
-	if r.byStatus.Count(string(Pending)) >= MaxPending {
+	if gated && r.byStatus.Count(string(Pending)) >= MaxPending {
 		return errors.New("zones: " + strconv.Itoa(MaxPending) + " proposals are already waiting for review; try again once a curator has cleared some")
 	}
-	if n := r.byProposer.count(by.String()); n >= MaxPendingPerProposer {
+	if n := r.byProposer.count(by.String()); gated && n >= MaxPendingPerProposer {
 		return errors.New("zones: " + by.String() + " already has " + strconv.Itoa(n) +
 			" pending proposals, the limit is " + strconv.Itoa(MaxPendingPerProposer))
 	}
@@ -209,10 +223,10 @@ func enteredKey(st Status, seq int64) string { return string(st) + "|" + store.I
 //
 // When the chain id changes, whatever the status, every endpoint verified
 // against the old one goes back to unverified: what was verified was that it
-// answered for a chain this zone no longer names. A reset the proposer's edit
-// causes records no reviewer, because the proposer is not one; anybody else's
-// records them. An edit that changes nothing is refused, and leaving the local
-// kind is refused while the zone lists a loopback or private host.
+// answered for a chain this zone no longer names. A reset caused by the
+// proposer's own edit to a pending zone records no reviewer; any other records
+// the editor. An edit that changes nothing is refused, and leaving the local
+// kind removes every endpoint on a loopback or private host.
 //
 // An edit names the revision it was written against, like an approval does, so
 // two editors working from the same reading cannot silently undo each other.
@@ -249,14 +263,16 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 	if in == z.Info() {
 		return errors.New("zones: that edit changes nothing on " + slug)
 	}
-	// Leaving the local kind: the private hosts only a local zone may list
-	// would otherwise stay listed on a zone that no longer may.
+	// Leaving the local kind drops the private hosts only a local zone may
+	// list, whatever their verdict: they name nothing on the zone it becomes.
+	// Dropped in the edit itself, not refused until somebody removes them,
+	// because anybody may register one again between that removal and this
+	// edit. Every endpoint is read once; this is a rare edit.
 	if z.Kind == Local && in.Kind != Local {
 		for _, eid := range r.byZone.Lookup(slug) {
 			v, _ := r.endpoints.get(eid)
 			if e := v.(*Endpoint); IsPrivateHost(HostOf(e.Kind, e.Address)) {
-				return errors.New("zones: " + slug + " lists " + e.Address +
-					", a loopback or private address only a local zone may list; remove it first")
+				r.removeEndpoint(eid)
 			}
 		}
 	}
@@ -307,8 +323,8 @@ func (r *Registry) Edit(slug string, revision int64, in Info, by address, at int
 // that state first, with its endpoints. Every transition bumps the zone's
 // Revision, so a decision prepared against the old status fails.
 //
-// Nothing goes back to pending: a proposer who disagrees with a rejection
-// removes the zone and proposes it again. An official zone is never rejected
+// Nothing goes back to pending: a rejected zone is approved after all, removed,
+// or pushed out by newer rejections. An official zone is never rejected
 // after the fact, it is retired, so the record of it having been official
 // survives.
 func (r *Registry) ReviewZone(slug string, to Status, revision int64, by address, at int64, reason string) error {
@@ -465,6 +481,18 @@ func (r *Registry) removeZone(z *Zone, id store.ID) {
 // realm's call; the address is stored in its canonical spelling (scheme
 // lowercased, a peer lowercased whole) so what is listed is what dials.
 func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind, addr, label string) (int64, error) {
+	return r.register(by, at, slug, kind, addr, label, true)
+}
+
+// RegisterExempt is Register without the admission gates
+// (MaxUnverifiedPerZone and MaxEndpointsPerAddress), for the reviewers a
+// holding realm trusts, as ProposeExempt is. The hard cap,
+// MaxEndpointsPerZone, still holds.
+func (r *Registry) RegisterExempt(by address, at int64, slug string, kind EndpointKind, addr, label string) (int64, error) {
+	return r.register(by, at, slug, kind, addr, label, false)
+}
+
+func (r *Registry) register(by address, at int64, slug string, kind EndpointKind, addr, label string, gated bool) (int64, error) {
 	z, _, err := r.zone(slug)
 	if err != nil {
 		return 0, err
@@ -499,12 +527,12 @@ func (r *Registry) Register(by address, at int64, slug string, kind EndpointKind
 	if n := r.byZone.Count(slug); n >= MaxEndpointsPerZone {
 		return 0, errors.New("zones: " + slug + " is full at " + strconv.Itoa(MaxEndpointsPerZone) + " endpoints")
 	}
-	if n := r.Awaiting(slug); n >= MaxUnverifiedPerZone {
+	if n := r.Awaiting(slug); gated && n >= MaxUnverifiedPerZone {
 		return 0, errors.New("zones: " + slug + " already has " + strconv.Itoa(n) +
 			" endpoints waiting for review; try again once a curator has cleared some")
 	}
 	okey := ownerKey(slug, by)
-	if n := r.byOwner.count(okey); n >= MaxEndpointsPerAddress {
+	if n := r.byOwner.count(okey); gated && n >= MaxEndpointsPerAddress {
 		return 0, errors.New("zones: " + by.String() + " already registered " + strconv.Itoa(n) +
 			" endpoints on " + slug + ", the limit is " + strconv.Itoa(MaxEndpointsPerAddress))
 	}
@@ -556,7 +584,9 @@ func (r *Registry) ReviewEndpoint(id int64, to Verification, revision int64, by 
 		// as written would match no filter and count as unverified forever.
 		return errors.New("zones: unknown verification " + strconv.Quote(string(to)) + ", want verified, unverified or flagged")
 	}
-	if e.Status == to {
+	// A flag can be restated with a new reason, so correcting one never means
+	// passing through a state its registrant may remove it from.
+	if e.Status == to && (to != Flagged || reason == e.Reason) {
 		return errors.New("zones: endpoint #" + strconv.FormatInt(id, 10) + " is already " + string(to))
 	}
 	if to == Flagged && !HasVisible(reason) {
@@ -746,6 +776,7 @@ func (r *Registry) ZonePage(status Status, page, size int) []Zone {
 			size = n
 		}
 		out := make([]Zone, 0, size)
+		//gnovet:ignore page-offset-overflow bounded by page-1 > n/size at the top
 		r.zones.page((page-1)*size, size, func(v any) { out = append(out, *v.(*Zone)) })
 		return out
 	}
@@ -886,6 +917,7 @@ func pageOf(ids []store.ID, page, size int) []store.ID {
 	if page < 1 || size < 1 || page-1 > len(ids)/size {
 		return nil
 	}
+	//gnovet:ignore page-offset-overflow bounded by page-1 > len(ids)/size above
 	start := (page - 1) * size
 	if start >= len(ids) {
 		return nil

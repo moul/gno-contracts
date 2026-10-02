@@ -46,9 +46,10 @@ changing here.
 | remove | pending, rejected | | endpoints go with it |
 | verify an endpoint | any other verdict | optional | must name the zone's current `Revision`; zone pending or approved |
 | unverify an endpoint | any other verdict | optional | |
-| flag an endpoint | any other verdict | **required** | |
+| flag an endpoint | any other verdict, or flagged with a new reason | **required** | |
 
-- **Every decision on a zone binds to what was read.** Every edit bumps the
+- **Every decision on a zone binds to the zone as read**: its fields and its
+  status. Every edit bumps the
   zone's `Revision`, registry-wide and never reused (not even by a zone removed
   and proposed again under the same slug). Approving, rejecting, retiring,
   editing and removing all name it, so an edit that lands between the reading
@@ -57,17 +58,19 @@ changing here.
   colleague's rejection fails rather than reversing it. Verifying an endpoint
   binds the same way, to the revision it was checked against: what was checked
   is that it answers for this zone's chain id. An edit that changes nothing is
-  refused, so a revision only moves when something did.
+  refused, so a revision only moves when something did. An endpoint's verdict
+  is not part of the zone and does not move it: a flag on the zone's own main
+  RPC shows on the zone, it does not invalidate an approval in flight.
 - **Only a pending or approved zone is editable.** An edit before review takes
   no reason. An edit to an approved zone is a curator decision: the reason is
   required and replaces the review on record. A changed chain id, on any zone,
   sends every verified endpoint back to unverified, because what was verified
-  was that it answered for the old one. A reset a curator's decision causes
-  records that curator; one a proposer's pending edit causes records nobody,
-  because a proposer is not a reviewer: `ReviewedBy` is empty and `Reason` says
-  why.
-- **Nothing goes back to pending.** A proposer who disagrees with a rejection
-  removes the zone and proposes it again.
+  was that it answered for the old one. A reset caused by an edit to a pending
+  zone by its own proposer records nobody, because that is not a review:
+  `ReviewedBy` is empty and `Reason` says why. Every other reset records the
+  editor or the reviewer who caused it.
+- **Nothing goes back to pending.** A rejected zone is approved after all,
+  removed, or pushed out by 64 newer rejections.
 - **A zone that was ever official is never removed by a caller.** An approved
   one is retired, and a retired one is kept until 128 newer retirements push it
   out, so whoever still holds its chain id can find out what happened to it.
@@ -89,22 +92,31 @@ also an index key, a URL segment or a config-file line:
   escapes a character that needs no escaping, and a path has no `.` or `..`
   segment, so a URL has one spelling. A host that names a different machine
   for every reader is refused except on a `local` zone: a name with no dot,
-  `.localhost`, `.local`, `.internal`, `.home.arpa`, `.localdomain`, `.test`,
-  `.lan`, `.home`, `.corp`, `.intranet`, `.private`, `.onion`, `.alt`, and IPv4
-  loopback, private, link-local, CGNAT, documentation, multicast and reserved
-  ranges. A zone
-  cannot leave the `local` kind while it lists one.
+  `.localhost`, `.local`, `.internal`, `.home.arpa`, `.localdomain`, the
+  RFC 6761 names `.test`, `.example` and `.invalid`, the never-delegated
+  `.lan`, `.home`, `.corp`, `.mail`, `.intranet`, `.private`, `.onion`, `.alt`,
+  `ipv4only.arpa`, and IPv4 "this network", loopback, private, link-local,
+  CGNAT, IETF-protocol, documentation, benchmarking, multicast and reserved
+  ranges. A zone that leaves the `local` kind drops every endpoint on one, in
+  the same edit. An IPv4 host has no terminal dot.
 - **Peer**: `<node id>@<host>:<port>`, the shape `p2p.persistent_peers` takes,
   the node id a lowercase g1 address (tm2 compares node ids byte for byte), and
-  no terminal dot on an IPv4 host (Go's dialer cannot use one).
+  no terminal dot on an IPv4 host (Go's dialer cannot use one, so URLs refuse
+  it too).
 - **Address** (proposer, registrant, reviewer): a valid g1 address in lowercase.
   bech32 also decodes the uppercase form, and here it would be a second identity.
 - **Free text** (title, description, label, reason): one line, bounded in
   characters (so at most four times as many bytes), valid UTF-8, with no control
   character, no invisible, format, private-use or unassigned character, no
   variation selector, no run of more than four combining marks, none of the
-  status glyphs a Render draws nor their look-alikes, and, where it is required, something visible. Refused rather than stripped, so what is stored
-  is what is shown. It must still be escaped by whoever renders it.
+  status glyphs a Render draws nor their look-alikes, and, unless it is empty,
+  something visible. Refused rather than stripped, so what is stored is what is
+  shown. It must still be escaped by whoever renders it. Two consequences:
+  the zero-width joiner and non-joiner are refused, so the Persian and Sinhala
+  spellings and the emoji sequences that need them cannot be written; and
+  "assigned" means in the chain's own Unicode tables, 15.0, so a character
+  assigned since is refused on chain though `gno test` (which uses the host's
+  tables) accepts it.
 
 An endpoint is stored in canonical spelling (scheme lowercased, a peer
 lowercased whole without its host's terminal dot) and deduplicated on
@@ -123,32 +135,37 @@ been in that state longest, endpoints and all. So no flood, no curator and no
 amount of time fills the registry for good.
 
 **Per-address caps** make one address cheap to ignore: 4 pending proposals, 16
-endpoints per zone. Neither stops a flood from many addresses, so **the review
+endpoints on a zone. Neither stops a flood from many addresses, so **the review
 queue has an admission gate of its own**: 64 pending zones in all, 64 endpoints
 per zone waiting for a verdict, under a hard 128 per zone. A flagged endpoint
 has its verdict and leaves the queue, so curators keep warnings instead of
 deleting them to make room. The gate is checked where something enters, so a
 review or a reset can push a count past it. A flood fills the queue and never
-crowds out an approved zone or a verified endpoint. Each entry costs its sender
-a storage deposit, refunded to whoever signs the transaction that frees it, so a
-flooder who withdraws first gets it back: a bond, not a fee.
+crowds out an approved zone or a verified endpoint, and `ProposeExempt` and
+`RegisterExempt` skip the gate (not the hard caps) for the reviewers the holding
+realm trusts, so a full queue never locks out the people who clear it. Each
+entry costs its sender a storage deposit, refunded to whoever signs the
+transaction that frees it (on a chain with transfers locked, to the storage fee
+collector instead), so a flooder who withdraws first gets it back: a bond, not a
+fee.
 
 ## Storage
 
-Records live in a B+ tree, the keyed, ordered container EFFECTIVE_GNO
-recommends for iteration and pagination (592 B per entry), with ids that are
-never reused. Every tree here is at fanout 32, not 128: a removal shifts every
-later value in its leaf, and each shifted value is rewritten, about 90k gas
-apiece on a real node, so a smaller leaf bounds what one removal costs. `kit/store`
-has that shape on an avl tree (2,029 B), and on an immutable path the choice is
+Records live in a B+ tree, the keyed, ordered container EFFECTIVE_GNO recommends
+for iteration and pagination (671 B per entry at fanout 32), with ids that are
+never reused. Every tree here, `kit/index`'s included, is at fanout 32, not 128:
+a removal shifts every later value in its leaf, and each shifted value is
+rewritten, about 90k gas apiece for a number and 230k for a pointer on a real
+node, so a smaller leaf bounds what one removal costs. `kit/store` has that
+shape on an avl tree (2,029 B), and on an immutable path the choice is
 permanent. Three B+ trees hold an id per key: slug, the endpoint dedup key (a
 128-bit hash of the canonical address rather than a second copy of it), and the
-order zones entered their state. Three hold a count per key: pending
-proposals per proposer, endpoints per registrant, flagged endpoints per zone. The other five are
-[`kit/index`](../kit/index): status, approved-by-chain-id, and for endpoints
-zone, zone-and-kind and not-verified. Every one is written in the same
-method as its record; counts come from the indexes without reading a record, and
-a page reads the records on it only (the bucket's id list, at most 256 or 128
-ids, is read whole). A rejection or a retirement at the caps is the heaviest
-write: the reviewed zone's resets plus, when its state is full, the eviction of
-a zone with up to 128 endpoints, in one transaction.
+order zones entered their state. Three hold a count per key: pending proposals
+per proposer, endpoints per registrant on a zone, flagged endpoints per zone.
+The other five are [`kit/index`](../kit/index): status, approved-by-chain-id,
+and for endpoints zone, zone-and-kind and not-verified. Every one is written in
+the same method as its record; counts come from the indexes without reading a
+record, and a page reads the records on it only (the bucket's id list, at most
+256 or 128 ids, is read whole). A rejection or a retirement at the caps is the
+heaviest write: the reviewed zone's resets plus, when its state is full, the
+eviction of a zone with up to 128 endpoints, in one transaction.

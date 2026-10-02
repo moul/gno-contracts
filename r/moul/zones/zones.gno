@@ -38,14 +38,15 @@ import (
 // curators when they accept.
 const Admin address = "g1manfred47kzduec920z88wfr64ylksmdcedlf5"
 
-// ProposerEditCooldown is how many blocks must pass after a zone was proposed
-// or last edited (by anybody) before its proposer may edit or withdraw it, and
-// after an endpoint was registered before its registrant may withdraw it. Every
+// ReviewWindow is how many blocks curators get to see a change before
+// its author may change it again: after a zone was proposed or last edited (by
+// anybody) before its proposer may edit or withdraw it, and after an endpoint
+// was registered before its registrant may withdraw it. Every
 // edit bumps the revision a curator's decision must name, and a withdrawal plus
 // a fresh proposal or registration does the same with a new revision or id, so
 // without a wait a proposer or a registrant acting every block would keep their
 // entry out of every curator's reach. Curators are not limited.
-const ProposerEditCooldown = 100
+const ReviewWindow = 100
 
 // MaxCurators bounds curators and open invitations together. The curator list
 // renders on the index page, and only curators can grow it, but a bound costs
@@ -67,7 +68,9 @@ func init() {
 // ---- proposing and curating zones
 
 // ProposeZone files a new zone for review. Anybody may; it is listed as a
-// proposal until a curator approves or rejects it.
+// proposal until a curator approves or rejects it. The review queue's caps
+// (zones.MaxPending, zones.MaxPendingPerProposer) do not stop a curator, so a
+// flood that fills it never locks out the people who clear it.
 //
 // kind is mainnet, testnet, devnet or local. gnowebURL and genesisURL may be
 // empty; rpcURL may not, and is <scheme>://<host>[:<port>] with no path, which
@@ -75,6 +78,12 @@ func init() {
 func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL string) {
 	who := caller(cur)
 	in := info(chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)
+	if curators.Has(who) {
+		// A flood that fills the review queue must not lock out the people
+		// who clear it.
+		must(reg.ProposeExempt(who, runtime.ChainHeight(), strings.TrimSpace(slug), in))
+		return
+	}
 	must(reg.Propose(who, runtime.ChainHeight(), strings.TrimSpace(slug), in))
 }
 
@@ -83,7 +92,7 @@ func ProposeZone(cur realm, slug, chainID, title, description, kind, gnowebURL, 
 // own while it is pending. revision is the zone's Revision the edit was
 // written against: it fails if the zone changed in between, its content or its
 // status. Every edit bumps the revision, so a decision prepared against the old
-// one fails too. A proposer edits only ProposerEditCooldown blocks after the
+// one fails too. A proposer edits only ReviewWindow blocks after the
 // zone was proposed or last edited, and an edit that changes nothing is
 // refused. On a pending zone the reason
 // must be empty; on an approved one it is required and replaces the review on
@@ -130,12 +139,13 @@ func RetireZone(cur realm, slug string, revision int64, reason string) {
 // the zone's Revision you read: a removal meant for one proposal fails on
 // another proposed again under the same slug. A curator may remove any pending
 // or rejected zone. The proposer may withdraw their own only while it is
-// pending, ProposerEditCooldown blocks after it was proposed or last edited
+// pending, ReviewWindow blocks after it was proposed or last edited
 // (so withdrawing and proposing again cannot dodge the edit wait), while every
 // endpoint on it is theirs (the deposit is refunded to whoever signs the
 // removal, so removing somebody else's endpoints would collect what they paid)
-// and none is verified or flagged (removing and proposing it again would wipe
-// the verdict). A rejected zone is the curators' record: only a curator removes
+// and each one is one they could withdraw on its own (RemoveEndpoint):
+// removing the zone must not wipe a curator's verdict, or skip an endpoint's
+// own wait. A rejected zone is the curators' record: only a curator removes
 // it, or newer rejections push it out, and the rejection's deposit, paid by the
 // curator, is not the proposer's to collect. A zone that was ever official is
 // never removed this way: an approved one is retired, and a retired one is kept
@@ -155,10 +165,7 @@ func RemoveZone(cur realm, slug string, revision int64) {
 		}
 		// Every endpoint is the proposer's, so at most MaxEndpointsPerAddress.
 		for _, e := range reg.Endpoints(zones.EndpointFilter{Zone: slug}) {
-			if e.Status != zones.Unverified {
-				panic("zones: " + slug + " carries endpoint #" + strconv.FormatInt(e.ID, 10) + ", " +
-					string(e.Status) + " by a curator; only a curator may remove the zone now")
-			}
+			assertWithdrawable(e)
 		}
 	}
 	must(reg.RemoveZone(slug, revision))
@@ -169,7 +176,8 @@ func RemoveZone(cur realm, slug string, revision int64) {
 // RegisterEndpoint lists an endpoint on a zone and returns its id. On an
 // approved zone anybody may; on a pending one only the proposer or a curator,
 // so a stranger cannot pin a proposal the proposer then cannot withdraw. It
-// shows as unverified until a curator checks it.
+// shows as unverified until a curator checks it. A curator also registers
+// past the review queue's caps, never past zones.MaxEndpointsPerZone.
 //
 // kind is rpc, gnoweb, seed, peer, indexer, faucet or explorer. addr is a
 // URL, or <node id>@<host>:<port> for a seed or a peer. label is optional:
@@ -183,7 +191,11 @@ func RegisterEndpoint(cur realm, slug, kind, addr, label string) int64 {
 	}
 	k, err := zones.ParseEndpointKind(kind)
 	must(err)
-	id, err := reg.Register(who, runtime.ChainHeight(), slug, k, addr, label)
+	register := reg.Register
+	if curators.Has(who) {
+		register = reg.RegisterExempt // past the review queue, as ProposeZone
+	}
+	id, err := register(who, runtime.ChainHeight(), slug, k, addr, label)
 	must(err)
 	return id
 }
@@ -208,9 +220,11 @@ func UnverifyEndpoint(cur realm, id int64, reason string) {
 }
 
 // RemoveEndpoint deletes an endpoint. A curator may remove any. Its registrant
-// may remove it only while it is unverified (a verified endpoint is a record
-// other people rely on, and a flagged one is a warning, and removing and
-// registering it again would wipe either one), and only ProposerEditCooldown
+// may remove it only while no curator has ruled on it (a verified endpoint is
+// a record other people rely on, a flagged one is a warning, one a curator
+// unverified carries why, and removing and registering it again would wipe
+// any of them), only while its zone is pending or approved (a rejected or
+// retired zone is a record, endpoints and all), and only ReviewWindow
 // blocks after registering it (removing and registering again every block
 // would give it a new id faster than a curator could flag the old one).
 func RemoveEndpoint(cur realm, id int64) {
@@ -223,17 +237,30 @@ func RemoveEndpoint(cur realm, id int64) {
 		if e.Registrant != who {
 			panic("zones: only a curator or its registrant may remove endpoint #" + strconv.FormatInt(id, 10))
 		}
-		if e.Status != zones.Unverified {
-			panic("zones: endpoint #" + strconv.FormatInt(id, 10) + " is " + string(e.Status) +
-				"; only a curator may remove it now")
+		if z := mustZone(e.Zone); z.Status != zones.Pending && z.Status != zones.Approved {
+			panic("zones: " + z.Slug + " is " + string(z.Status) + ", a record; only a curator may remove its endpoints")
 		}
-		if wait := e.RegisteredAt + ProposerEditCooldown - runtime.ChainHeight(); wait > 0 {
-			panic("zones: endpoint #" + strconv.FormatInt(id, 10) + " was registered at block " +
-				strconv.FormatInt(e.RegisteredAt, 10) + "; its registrant may withdraw it in " +
-				strconv.FormatInt(wait, 10) + " blocks, so curators can review it")
-		}
+		assertWithdrawable(e)
 	}
 	must(reg.RemoveEndpoint(id))
+}
+
+// assertWithdrawable refuses a non-curator's withdrawal of an endpoint a
+// curator has ruled on, or one registered less than ReviewWindow
+// blocks ago. Shared by RemoveEndpoint and the proposer's RemoveZone, so one
+// cannot do what the other refuses.
+func assertWithdrawable(e zones.Endpoint) {
+	id := strconv.FormatInt(e.ID, 10)
+	// Every verdict names its reviewer, and so does a reset a curator caused:
+	// an empty ReviewedBy is exactly "no curator has ruled on it".
+	if e.ReviewedBy != "" {
+		panic("zones: a curator ruled on endpoint #" + id + "; only a curator may remove it now")
+	}
+	if wait := e.RegisteredAt + ReviewWindow - runtime.ChainHeight(); wait > 0 {
+		panic("zones: endpoint #" + id + " was registered at block " +
+			strconv.FormatInt(e.RegisteredAt, 10) + "; it may be withdrawn in " +
+			strconv.FormatInt(wait, 10) + " blocks, so curators can review it")
+	}
 }
 
 // ---- curators
@@ -417,14 +444,14 @@ func caller(cur realm) address {
 }
 
 // assertCooled refuses a proposer's edit or withdrawal of a pending zone
-// sooner than ProposerEditCooldown blocks after it was proposed or last edited,
+// sooner than ReviewWindow blocks after it was proposed or last edited,
 // by anybody.
 func assertCooled(slug string, z zones.Zone) {
 	last := z.ProposedAt
 	if z.EditedAt > last {
 		last = z.EditedAt
 	}
-	if wait := last + ProposerEditCooldown - runtime.ChainHeight(); wait > 0 {
+	if wait := last + ReviewWindow - runtime.ChainHeight(); wait > 0 {
 		panic("zones: " + slug + " was changed at block " + strconv.FormatInt(last, 10) +
 			"; its proposer may act on it again in " + strconv.FormatInt(wait, 10) + " blocks, so curators can review it")
 	}

@@ -363,8 +363,8 @@ func HostOf(kind EndpointKind, addr string) string {
 //   - a name with no dot (resolved through the reader's own search domain), or
 //     one under a suffix reserved for local or private use, or that public DNS
 //     does not delegate: .localhost, .local (mDNS), .internal, .home.arpa,
-//     .localdomain, .test, .lan, .home, .corp, .intranet, .private, .onion,
-//     .alt (hosts files' localhost4, localhost6, ip6-localhost and ip6-loopback
+//     .localdomain, .test, .example, .invalid, .lan, .home, .corp, .mail,
+//     .intranet, .private, .onion, .alt, ipv4only.arpa (hosts files' localhost4, localhost6, ip6-localhost and ip6-loopback
 //     have no dot and are caught by the first rule);
 //   - an IPv4 address in a loopback, private, link-local, carrier-grade NAT,
 //     "this network", IETF-protocol, documentation, benchmarking, multicast or
@@ -380,10 +380,13 @@ func IsPrivateHost(host string) bool {
 		return true
 	}
 	for _, suffix := range []string{".localhost", ".local", ".internal", ".home.arpa", ".localdomain",
-		".test", ".lan", ".home", ".corp", ".intranet", ".private", ".onion", ".alt"} {
+		".test", ".example", ".invalid", ".lan", ".home", ".corp", ".mail", ".intranet", ".private", ".onion", ".alt"} {
 		if strings.HasSuffix(h, suffix) {
 			return true
 		}
+	}
+	if h == "ipv4only.arpa" { // defined to resolve to 192.0.0.170 and .171
+		return true
 	}
 	labels := strings.Split(h, ".")
 	last := labels[len(labels)-1]
@@ -475,11 +478,12 @@ func HasVisible(s string) bool {
 
 // isBlankFiller is the handful of characters that are letters or symbols by
 // category and still draw nothing: the Hangul fillers, the blank Braille cell,
-// the musical null notehead. Unicode does not class them as format
+// the musical null notehead, and the two Khmer inherent vowels (marks by
+// category, drawn as nothing). Unicode does not class them as format
 // characters, so they need naming.
 func isBlankFiller(r rune) bool {
 	switch r {
-	case 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800, 0x1D159:
+	case 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800, 0x1D159, 0x17B4, 0x17B5:
 		return true
 	}
 	return false
@@ -499,10 +503,13 @@ func isBadge(r rune) bool {
 		0x2713, 0x2714, 0x2611, 0x1F5F8, 0x1F5F9, 0x221A, 0x1F197, // check marks, √, 🆗
 		0x2716, 0x2717, 0x2718, 0x2715, 0x274E, 0x2612, 0x1F6AB, 0x26D4, 0x1F6D1, // crosses, no-entry
 		0x1F5F4, 0x1F5F5, 0x1F5F6, 0x1F5F7, // ballot x and ballot box with x
-		0x231B, 0x23F8, 0x23FA: // ⌛ ⏸ ⏺
+		0x231B, 0x23F8, 0x23FA, // ⌛ ⏸ ⏺
+		0x1FBB1, 0x237B, 0x10102, // more check marks
+		0x1F5D9, 0x2A2F, 0x2573, 0x2BBD, 0x2BBE, 0x2BBF, // more crosses and ballot boxes
+		0x29D6, 0x29D7: // hourglasses
 		return true
 	}
-	return false
+	return r >= 0x1F7A8 && r <= 0x1F7AE // the geometric crosses beside ✖
 }
 
 // checkText bounds a free-text field by runes (so at most four times as many
@@ -543,9 +550,15 @@ func checkText(field, s string, min, max int) error {
 		if r < 0x20 || (r >= 0x7f && r <= 0x9f) || r == 0x2028 || r == 0x2029 {
 			return errors.New("zones: the " + field + " contains a control character")
 		}
-		if unicode.Is(unicode.Cf, r) || isBlankFiller(r) || r == 0x034F || isSelector(r) ||
-			(!unicode.IsGraphic(r) && !unicode.IsSpace(r)) {
+		if unicode.Is(unicode.Cf, r) || isBlankFiller(r) || r == 0x034F || isSelector(r) {
 			return errors.New("zones: the " + field + " contains an invisible or bidi character")
+		}
+		if !unicode.IsGraphic(r) && !unicode.IsSpace(r) {
+			// The chain's unicode tables are Unicode 15.0, so a character
+			// assigned since then is refused here even where gno test (which
+			// uses the host's newer tables) accepts it.
+			return errors.New("zones: the " + field + " contains " + strconv.QuoteToASCII(string(r)) +
+				", which this chain does not draw: private use, a noncharacter, or unassigned in its Unicode 15.0 tables")
 		}
 		if isBadge(r) {
 			return errors.New("zones: the " + field + " contains a status glyph a Render draws: " + strconv.Quote(string(r)))
@@ -563,15 +576,14 @@ func checkText(field, s string, min, max int) error {
 			break // refused below; no need to classify the rest
 		}
 	}
-	if n < min || n > max {
-		if min > 0 {
-			return errors.New("zones: the " + field + " is " + strconv.Itoa(min) + " to " +
-				strconv.Itoa(max) + " characters, got " + strconv.Itoa(n))
-		}
-		return errors.New("zones: the " + field + " is at most " + strconv.Itoa(max) +
-			" characters, got " + strconv.Itoa(n))
+	if n > max {
+		return errors.New("zones: the " + field + " is longer than " + strconv.Itoa(max) + " characters")
 	}
-	if min > 0 && !HasVisible(s) {
+	if n < min {
+		return errors.New("zones: the " + field + " is " + strconv.Itoa(min) + " to " +
+			strconv.Itoa(max) + " characters, got " + strconv.Itoa(n))
+	}
+	if s != "" && !HasVisible(s) {
 		return errors.New("zones: the " + field + " has nothing visible in it")
 	}
 	return nil

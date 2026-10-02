@@ -47,21 +47,25 @@ gnokey query vm/qeval -remote https://rpc.gno.land \
 
 Turning these into a node's `config.toml` is deliberately not this realm's job.
 It is public (`gnomod.toml` says why) so that a separate realm can import it and
-do that.
+do that. Two things an importer must know: what these return is read-only in
+the importing realm (copy a slice before sorting it, a struct before changing
+it), and a kind or status that is not one of the exact values panics, which no
+`recover` in the caller catches, so check one taken from a query string with
+`p/moul/zones`'s `Parse` functions first.
 
 ## Write to it
 
 | function | who |
 |---|---|
-| `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody |
+| `ProposeZone(slug, chainID, title, description, kind, gnowebURL, rpcURL, genesisURL)` | anybody; a curator also when the review queue is full |
 | `EditZone(slug, revision, chainID, ..., reason)` | a curator, or the proposer while pending. Before review the reason must be empty; on an approved zone it is required and replaces the review on record. Every edit bumps the zone's revision, and a new chain id sends its verified endpoints back to unverified. A rejected or retired zone is not editable |
 | `ApproveZone(slug, revision, reason)` | a curator |
 | `RejectZone(slug, revision, reason)`, `RetireZone(slug, revision, reason)` | a curator, reason required; the zone's verified endpoints go back to unverified |
-| `RemoveZone(slug, revision)` | a curator, on a pending or rejected zone; or its proposer, on a pending one, while every endpoint on it is theirs and none is verified or flagged. One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
-| `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator |
+| `RemoveZone(slug, revision)` | a curator, on a pending or rejected zone; or its proposer, on a pending one, 100 blocks after it was proposed or last edited, while every endpoint on it is theirs and one they could withdraw on its own (below). One that was ever official is not removable; a retired one is kept until 128 newer retirements push it out |
+| `RegisterEndpoint(slug, kind, addr, label)` | anybody on an approved zone; on a pending one, its proposer or a curator. A curator also when the zone's review queue is full, up to the hard 128 |
 | `VerifyEndpoint(id, revision, reason)` | a curator, naming the zone revision they checked it against |
-| `FlagEndpoint(id, reason)`, `UnverifyEndpoint(id, reason)` | a curator; a flag needs a reason |
-| `RemoveEndpoint(id)` | a curator, or its registrant while it is unverified and 100 blocks after registering it: a verified or flagged endpoint is a record, and only a curator removes it |
+| `FlagEndpoint(id, reason)`, `UnverifyEndpoint(id, reason)` | a curator; a flag needs a reason, and flagging a flagged endpoint again restates its reason |
+| `RemoveEndpoint(id)` | a curator; or its registrant, on a pending or approved zone, 100 blocks after registering it, while no curator has ruled on it. A verified, flagged or curator-unverified endpoint is a record, and so is everything on a rejected or retired zone: only a curator removes them |
 | `AddCurator(addr)` | a curator; it is an invitation, at most 16 curators and invitations together |
 | `AcceptCurator()` | the invited address, to take up the invitation |
 | `RemoveCurator(addr)` | a curator; it withdraws an invitation, or removes a curator along with every invitation they sent. The last curator cannot be removed |
@@ -70,22 +74,28 @@ Every decision on a zone (edit, approve, reject, retire, remove) and every
 verification takes its `revision`, the one you read (the zone page shows it,
 and its action links carry it): if the zone changed since, its content or its
 status, the call fails and you read it again. The `$help` links on each page
-fill it in. A proposer edits or withdraws a pending zone only 100 blocks after it was
-proposed or last edited (by anybody), and a registrant withdraws an endpoint
-only 100 blocks after registering it, so neither can keep an entry out of a
-curator's reach by changing it faster than they read.
+fill it in (an edit and a verification have no link: copy the revision from
+the zone page). The revision covers the zone's own fields and status, not its
+endpoints' verdicts. A proposer edits or withdraws a pending zone only 100
+blocks (`ReviewWindow`) after it was proposed or last edited, by anybody, and a
+registrant withdraws an endpoint only 100 blocks after registering it, so
+neither can keep an entry out of a curator's reach by changing it faster than
+they read.
 
 **Curators are equals**: any one may remove any other, the admin included. That
 is the trust a curator set is, and it is why there are few of them.
 
-A storage deposit is refunded to whoever signs the transaction that frees it.
-That is why a proposer cannot remove a zone carrying somebody else's endpoints,
-and why a curator's removal collects what the remover did not pay.
+A storage deposit is refunded to whoever signs the transaction that frees it
+(on a chain with transfers locked, it goes to the storage fee collector). That
+is why a proposer cannot remove a zone carrying somebody else's endpoints, and
+why a curator's removal collects what the remover did not pay.
 
 ## Pages
 
-Every list is 25 rows a page (`?page=`), and a page reads only the records it shows:
-`vm/qrender` is gas-metered, and a Render that outgrows it stops answering.
+Every list is 25 rows a page (`?page=`), and a page reads the records it shows
+plus a bounded handful of lookups (each row's main RPC verdict, the flags on a
+zone's own URLs, the curators), never a whole list: `vm/qrender` is
+gas-metered, and a Render that outgrows it stops answering.
 Paths are exact; anything else is Not found.
 
 | path | shows |
@@ -94,11 +104,15 @@ Paths are exact; anything else is Not found.
 | `zone/<slug>` | one zone: its facts and revision, its last review, its endpoints; `?kind=peer` narrows them |
 | `proposals` | pending proposals; `?status=rejected` for rejected ones, with the reason |
 
-An official zone's gnoweb and genesis URLs are links; a proposal's show as
-code, to copy and check, and so does one the zone also lists as a flagged web
-endpoint, marked. RPCs and endpoint addresses are always code. An action link
-is shown only when the call could pass the caps: no Propose with the queue
-full, no Approve with the live registry full. Free
-text has `@` and bare `g1` addresses neutralised, so a label cannot turn into a
-profile link. A main RPC whose endpoint is flagged is marked so wherever it is
-shown, and the printed `gnokey` line leaves it out.
+An approved zone's gnoweb and genesis URLs are links; any other zone's show as
+code, to copy and check. A URL the zone also lists as a flagged endpoint is code
+and marked, wherever it is shown: the verdict of the kind it is shown as
+decides (its main RPC as an rpc, its gnoweb as a gnoweb), and a flag under
+another kind counts only when that kind holds no verdict, so "not a faucet" on
+a URL does not mark a verified gnoweb. The printed `gnokey` line leaves out a
+main RPC so marked. RPCs and endpoint addresses are always code. An action link
+is shown only when the call could pass the caps, and in its place a note says
+which cap is full and what frees it. Addresses are shown in full everywhere,
+never shortened: an 8+4 shortening is within reach of a vanity grinder who
+wants to look like a curator. Free text has `@` and bare `g1` addresses
+neutralised, so a label cannot turn into a profile link.
