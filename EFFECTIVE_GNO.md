@@ -64,7 +64,7 @@ section if you need the reasoning.
 |---|---|---|
 | one value, one struct, a counter | a package-level `var`. Nothing else | [2.2](#22-one-value-is-a-package-level-var) |
 | a keyed map, no ordering needed | a native gno **`map`**. 153 B/entry, O(1), deterministic | [2.4](#24-keyed-and-unordered-is-a-map) |
-| a keyed store you iterate in order, range or paginate | **`p/nt/bptree`** at fanout 128 | [2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout) |
+| a keyed store you iterate in order, range or paginate | **`p/nt/bptree`**, at fanout 128 if entries are only added, 32 if they are removed | [2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout) |
 | the same, but you inherited `avl` | keep reading, but new code should not start there | [2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout) |
 | an append-only log under ~4,000 entries | a plain **`[]T`**. Nothing is cheaper | [2.6](#26-append-only-is-a-slice-until-about-4000-entries) |
 | an append-only log above that, or one that deletes | [`p/moul/ulist`](./p/moul/ulist) | [2.6](#26-append-only-is-a-slice-until-about-4000-entries) |
@@ -275,7 +275,7 @@ each other and not a fee estimate; the byte counts are real.
 | If you need | Use | Why |
 |---|---|---|
 | a keyed store, no ordering | **`map[string]T`** | 153 B/entry, 4.2k gas/read, 57k gas/write, all O(1) |
-| ordered iteration, range, pagination | **`p/nt/bptree` at fanout 128** | 592 B/entry, 64k gas/read, 8k gas per entry iterated |
+| ordered iteration, range, pagination | **`p/nt/bptree` at fanout 128**, or 32 if entries are removed ([2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout)) | 592 B/entry, 64k gas/read, 8k gas per entry iterated |
 | a positional append-only log under ~4k entries | **a plain `[]T`** | 79 B/entry, 3.1k gas/read, nothing cheaper exists |
 | a log above ~4k entries, or one that deletes | [**`p/moul/ulist`**](./p/moul/ulist) | 923 B/entry buys stable indices, a flat append, a partial refund |
 | a queue you only ever scan | **a plain `[]T`**, not `deque` | `deque` is 1,043 B/entry and 534k gas for a random read |
@@ -336,8 +336,8 @@ So: a map for lookup, a tree for anything a reader navigates.
 
 ### 2.5 Keyed and ordered is a B+ tree at high fanout
 
-[`p/nt/bptree`](https://gno.land/p/nt/bptree/v0) beats `p/nt/avl` on every axis measured:
-592 B/entry against 2,029, 153k gas per insert against 418k, 8k gas per entry iterated
+[`p/nt/bptree`](https://gno.land/p/nt/bptree/v0) beats `p/nt/avl` on every axis measured but
+one (removal, below): 592 B/entry against 2,029, 153k gas per insert against 418k, 8k gas per entry iterated
 against 47k. `avl` is leaf-oriented, so n entries make 2n-1 node objects, each holding two
 child pointers; the keys were never the cost.
 
@@ -346,6 +346,30 @@ on insert gas, for one integer at construction. The package's default of 32 is n
 cheapest point; 128 won every workload measured. The floor underneath that is the B+
 tree's per-entry value box (`values []*any`, one separate object per entry for lazy
 loading), which fanout cannot touch.
+
+**Except on removal, where high fanout costs you.** Removing a key shifts every later value
+in its leaf down one slot, and since each value is its own boxed object, every shifted one is
+rewritten. That is about **90k gas per later entry in the leaf for a scalar value, and about
+230k for a pointer** (a `*struct`, which is what a record store holds), so the cost of a removal
+depends on where the key sits, and a full fanout-128 leaf makes its first key the most
+expensive thing in the tree to delete. Measured 2026-10-02 on a real node (integration
+txtar, one transaction per step, so store reads and writes are priced), `gnolang/gno` master
+`3cc494ec4`, 120 string keys inserted in order, `int` values:
+
+| tree | insert all 120 | remove the last key | the middle | the first |
+|---|--:|--:|--:|--:|
+| `bptree` fanout 128 (one leaf) | 19.2M | 5.1M | 10.4M | **15.8M** |
+| `bptree` fanout 32 (four leaves) | 21.4M | 4.8M | 5.0M | 7.5M |
+| `avl` | 55.8M | 6.6M | 6.6M | 6.5M |
+
+With `*struct` values in the same fanout-128 leaf, the last key costs 5.2M and the first
+**32.3M**.
+
+So fanout 128 is right for a tree that only grows, a log or an index of things never
+deleted. A tree whose keys are removed at arbitrary positions (a queue with expiry, a
+registry with withdrawals, an index whose entries move) should use 32: 11% more on insert,
+and the worst removal 2.1x cheaper. At 128 the worst removal costs 2.4x what `avl` charges,
+the one workload where `avl` wins.
 
 `avl` remains the ecosystem default and most example code you will read uses it. Two of its
 API shapes have cost this repo a red CI more than once and are worth memorising, because
