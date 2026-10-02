@@ -14,22 +14,22 @@ post records its author (the calling address) and the block height at which it
 was published. Posts are stored persistently and rendered newest-first, with a
 dedicated page for each post's full text.
 
-**Realm path:** `gno.land/r/REPLACE_ADDR/blog`
+**Realm path:** `gno.land/r/moul/x/daily/blog/v1`
 
 ## Example calls
 
 Publish a post (state-mutating, crossing function):
 
 ```
-gnokey maketx call -pkgpath "gno.land/r/REPLACE_ADDR/blog" \
+gnokey maketx call -pkgpath "gno.land/r/moul/x/daily/blog/v1" \
   -func Publish -args "My first post" -args "Hello, gno.land!" \
-  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid sapphire-1 KEY
+  -gas-fee 20000ugnot -gas-wanted 2000000 -broadcast -chainid onyx-1 -remote https://rpc.onyx.testnets.gno.land:443 KEY
 ```
 
 Read views (no transaction needed):
 
-- Root — list all posts, newest first: render `gno.land/r/REPLACE_ADDR/blog`
-- Single post by id: render `gno.land/r/REPLACE_ADDR/blog:/0`
+- Root — list all posts, newest first: render `gno.land/r/moul/x/daily/blog/v1`
+- Single post by id: render `gno.land/r/moul/x/daily/blog/v1:/0`
 
 `PostCount()` returns the total number of published posts.
 

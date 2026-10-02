@@ -15,7 +15,7 @@ profile at `/<address>`, and the root page lists every profile that exists with
 a link to each. Profiles are stored in an ordered AVL tree so rendering is
 deterministic.
 
-Realm path: `gno.land/r/REPLACE_ADDR/linktree`
+Realm path: `gno.land/r/moul/x/daily/linktree/v1`
 
 ## Example calls
 
@@ -42,11 +42,11 @@ RemoveLink(0)
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
-**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/daily/linktree/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v0) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/daily/linktree/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v0) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/daily/linktree/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v0) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/daily/linktree/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v0)
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/daily/linktree/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v1) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/daily/linktree/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v1) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/daily/linktree/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v1) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/daily/linktree/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/linktree/v1)
 
 **Dependency graph:**
 
-![gno.land/r/moul/x/daily/linktree/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/daily/linktree/v0/deps.png)
+![gno.land/r/moul/x/daily/linktree/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/daily/linktree/v1/deps.png)
 
 > 🧪 **Highly experimental — potentially vibe-coded.** Not audited; may break, change, or be removed at any time. Do not use with anything of value. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 

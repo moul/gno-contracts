@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-01T23:59:48Z",
+  "status_checked_at": "2026-10-02T00:19:44Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -3631,6 +3631,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/agents/commit/v0",
+        "gno.land/p/moul/kit/ui/v0",
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
@@ -5191,7 +5192,9 @@
       "version": "v1",
       "description": "",
       "deps": [
-        "gno.land/p/moul/kit/store/v0"
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0"
       ],
       "draft": false,
       "published": {
@@ -5543,6 +5546,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "64ba64c0f83f22fcbb7c2f5887d4d5731462237d",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5558,6 +5563,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/collatz/v1",
+      "dir": "r/moul/x/daily/collatz",
+      "kind": "r",
+      "name": "x/daily/collatz",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -5675,7 +5704,8 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/store/v0",
-        "gno.land/p/moul/kit/ui/v0"
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0"
       ],
       "draft": false,
       "published": {
@@ -6364,6 +6394,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -6691,6 +6722,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -7121,6 +7153,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "64ba64c0f83f22fcbb7c2f5887d4d5731462237d",
       "published": {
         "betanet": {
           "uploaded": false
@@ -7136,6 +7170,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/linktree/v1",
+      "dir": "r/moul/x/daily/linktree",
+      "kind": "r",
+      "name": "x/daily/linktree",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -7708,6 +7766,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "64ba64c0f83f22fcbb7c2f5887d4d5731462237d",
       "published": {
         "betanet": {
           "uploaded": false
@@ -7723,6 +7783,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/polls/v1",
+      "dir": "r/moul/x/daily/polls",
+      "kind": "r",
+      "name": "x/daily/polls",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -9295,6 +9379,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -9329,6 +9414,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "64ba64c0f83f22fcbb7c2f5887d4d5731462237d",
       "published": {
         "betanet": {
           "uploaded": false
@@ -9344,6 +9431,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/vault/v1",
+      "dir": "r/moul/x/daily/vault",
+      "kind": "r",
+      "name": "x/daily/vault",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -9932,6 +10043,8 @@
         "gno.land/r/moul/x/plan9/ns/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "998c902855ad5aea1ed9c8c71f0a0fee1985119f",
       "published": {
         "mainnet": {
           "uploaded": true,
@@ -9944,6 +10057,33 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/plan9/dev/v1",
+      "dir": "r/moul/x/plan9/dev",
+      "kind": "r",
+      "name": "x/plan9/dev",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/synfs/v0",
+        "gno.land/r/moul/x/plan9/ns/v1"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -9967,6 +10107,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "998c902855ad5aea1ed9c8c71f0a0fee1985119f",
       "published": {
         "mainnet": {
           "uploaded": true,
@@ -9979,6 +10121,36 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/plan9/ns/v1",
+      "dir": "r/moul/x/plan9/ns",
+      "kind": "r",
+      "name": "x/plan9/ns",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/plan9/memfs/v0",
+        "gno.land/p/moul/x/plan9/ninep/v0",
+        "gno.land/p/moul/x/plan9/ns/v0",
+        "gno.land/p/moul/x/plan9/rc/v0",
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {

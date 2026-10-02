@@ -1,4 +1,4 @@
-# `gno.land/r/moul/x/plan9/dev/v0`
+# `gno.land/r/moul/x/plan9/dev/v1`
 
 **The chain as a Plan 9 device tree.** Everything a realm normally reaches
 through an import of `chain/runtime` is published here as a file instead, so it
@@ -30,7 +30,7 @@ never stale.
 ## The cross-realm mount
 
 This realm posts its tree to
-[`r/moul/x/plan9/ns`](../../../../../r/moul/x/plan9/ns/v0)'s `/srv` at deploy
+[`r/moul/x/plan9/ns`](../../../../../r/moul/x/plan9/ns/v1)'s `/srv` at deploy
 time, so any account can bind it into their own namespace and nobody has to
 import this realm to use it:
 
@@ -74,11 +74,11 @@ attribution: [NOTICE](../../../../../NOTICE.md).
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
-**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/plan9/dev/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v0) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/plan9/dev/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v0) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/plan9/dev/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v0) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/plan9/dev/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v0)
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/plan9/dev/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v1) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/plan9/dev/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v1) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/plan9/dev/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v1) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/plan9/dev/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/dev/v1)
 
 **Dependency graph:**
 
-![gno.land/r/moul/x/plan9/dev/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/plan9/dev/v0/deps.png)
+![gno.land/r/moul/x/plan9/dev/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/plan9/dev/v1/deps.png)
 
 > 🧪 **Highly experimental — potentially vibe-coded.** Not audited; may break, change, or be removed at any time. Do not use with anything of value. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 

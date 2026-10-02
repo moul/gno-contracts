@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/agents/commit/v0"
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/nt/ufmt/v0"
 )
 
@@ -59,11 +60,35 @@ type Case struct {
 
 var cases []*Case // index 0 => ID 1
 
-// OpenCase starts a dispute with a fixed panel of jurors. An odd panel size
-// avoids ties; duplicates are rejected.
-func OpenCase(cur realm, subject string, jurors []address) uint64 {
-	assert(subject != "", "empty subject")
+// The bounds on what a wallet may open. OpenCase is callable by anyone, so
+// without them the case list and every panel grow without limit, and so does
+// the index page that renders them.
+const (
+	MaxCases    = 1000
+	MaxJurors   = 25
+	MaxSubject  = 200 // bytes
+	IndexRecent = 50  // cases the index lists, newest first
+
+	MaxCommitment = 128 // bytes; commit.Verdict returns 64
+)
+
+// OpenCase starts a dispute with a fixed panel of jurors, given as
+// comma-separated addresses. An odd panel size avoids ties; duplicates and
+// invalid addresses are rejected.
+//
+// The panel is a string, not a []address, because MsgCall carries every
+// argument as a string and the VM decodes no slice but []byte: a []address
+// parameter made this function unreachable from any wallet.
+func OpenCase(cur realm, subject, jurorsCSV string) uint64 {
+	opener := caller(cur)
+	// Checked after sanitizing: a subject of only zero-width runes is not empty
+	// as bytes, and renders as nothing.
+	assert(strings.TrimSpace(ui.Inline(subject)) != "", "empty subject")
+	assert(len(subject) <= MaxSubject, "subject too long")
+	assert(len(cases) < MaxCases, "the jury is full")
+	jurors := parseJurors(jurorsCSV)
 	assert(len(jurors) >= 1, "need at least one juror")
+	assert(len(jurors) <= MaxJurors, "panel too large")
 
 	seen := make(map[string]bool)
 	panel := make([]*Juror, 0, len(jurors))
@@ -78,7 +103,7 @@ func OpenCase(cur realm, subject string, jurors []address) uint64 {
 	cases = append(cases, &Case{
 		ID:       id,
 		Subject:  subject,
-		Opener:   cur.Previous().Address(),
+		Opener:   opener,
 		Phase:    PhaseCommit,
 		Jurors:   panel,
 		OpenedAt: runtime.ChainHeight(),
@@ -91,11 +116,22 @@ func OpenCase(cur realm, subject string, jurors []address) uint64 {
 // commit.Verdict(verdict, salt) — computed off-chain. When the last juror
 // commits, the case advances to the reveal phase automatically.
 func Commit(cur realm, caseID uint64, commitment string) {
+	who := caller(cur)
 	c := mustCase(caseID)
 	assert(c.Phase == PhaseCommit, "not in commit phase")
 	assert(commitment != "", "empty commitment")
-	j := mustJuror(c, cur.Previous().Address())
+	// commit.Verdict is a hex sha256; anything longer is not one, and would be
+	// stored and compared on every later Commit in the case.
+	assert(len(commitment) <= MaxCommitment, "commitment too long")
+	j := mustJuror(c, who)
 	assert(!j.Committed, "already committed")
+	// Every commitment is public through Get, so without this a juror could
+	// commit a copy of another's hash, then reveal the same (verdict, salt)
+	// once the first juror's reveal puts it in a transaction. Refusing a
+	// repeat makes a copied commitment unrevealable.
+	for _, other := range c.Jurors {
+		assert(!other.Committed || other.Commitment != commitment, "commitment already used in this case")
+	}
 	j.Commitment = commitment
 	j.Committed = true
 	j.Height = runtime.ChainHeight()
@@ -110,9 +146,10 @@ func Commit(cur realm, caseID uint64, commitment string) {
 // commitment made earlier, or the reveal is rejected. When the last juror
 // reveals, the case closes and the majority outcome is recorded.
 func Reveal(cur realm, caseID uint64, verdict bool, salt string) {
+	who := caller(cur)
 	c := mustCase(caseID)
 	assert(c.Phase == PhaseReveal, "not in reveal phase")
-	j := mustJuror(c, cur.Previous().Address())
+	j := mustJuror(c, who)
 	assert(j.Committed && !j.Revealed, "nothing to reveal")
 	assert(commit.Verdict(verdict, salt) == j.Commitment, "reveal does not match commitment")
 
@@ -217,15 +254,21 @@ func renderIndex() string {
 		sb.WriteString("_No cases yet._\n")
 		return sb.String()
 	}
+	if len(cases) > IndexRecent {
+		sb.WriteString(ufmt.Sprintf("The %d most recent of %d cases, newest first.\n\n", IndexRecent, len(cases)))
+	}
 	sb.WriteString("| # | Subject | Phase | ✅ | ❌ | Outcome |\n")
 	sb.WriteString("|---|---|---|---|---|---|\n")
-	for _, c := range cases {
+	// Newest first, and only the last IndexRecent: the page has to render at
+	// MaxCases too.
+	for i := len(cases) - 1; i >= 0 && i >= len(cases)-IndexRecent; i-- {
+		c := cases[i]
 		out := c.Outcome
 		if out == "" {
 			out = "—"
 		}
 		sb.WriteString(ufmt.Sprintf("| [%d](/r/moul/agents/jury/v0:%d) | %s | %s | %d | %d | %s |\n",
-			c.ID, c.ID, c.Subject, string(c.Phase), c.Yes, c.No, out))
+			c.ID, c.ID, ui.Cell(c.Subject), string(c.Phase), c.Yes, c.No, out))
 	}
 	return sb.String()
 }
@@ -234,7 +277,7 @@ func renderCase(id uint64) string {
 	c := mustCase(id)
 	var sb strings.Builder
 	sb.WriteString(ufmt.Sprintf("# Case #%d\n\n", c.ID))
-	sb.WriteString(ufmt.Sprintf("- **Subject:** %s\n", c.Subject))
+	sb.WriteString(ufmt.Sprintf("- **Subject:** %s\n", ui.Inline(c.Subject)))
 	sb.WriteString(ufmt.Sprintf("- **Phase:** %s\n", string(c.Phase)))
 	sb.WriteString(ufmt.Sprintf("- **Opened by:** %s at height %d\n", short(c.Opener), c.OpenedAt))
 	if c.Outcome != "" {
@@ -273,4 +316,26 @@ func short(a address) string {
 		return s
 	}
 	return s[:8] + "…" + s[len(s)-4:]
+}
+
+// parseJurors splits a comma-separated panel, trimming spaces around each
+// address and refusing an empty or invalid one.
+func parseJurors(csv string) []address {
+	var out []address
+	for _, part := range strings.Split(csv, ",") {
+		a := address(strings.TrimSpace(part))
+		assert(a.IsValid(), "invalid juror address: "+string(a))
+		out = append(out, a)
+	}
+	return out
+}
+
+// caller is the address that crossed into this realm, after checking that the
+// realm token is this frame's own. Every entry point reads it first, before
+// any other work.
+func caller(cur realm) address {
+	if !cur.IsCurrent() {
+		panic("jury: spoofed realm")
+	}
+	return cur.Previous().Address()
 }

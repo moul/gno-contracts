@@ -1,6 +1,7 @@
 package escrow
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
@@ -77,4 +78,14 @@ func TestOnlyCreatorCancels(cur realm, t *testing.T) {
 	uassert.AbortsWithMessage(t, cur, "escrow: only the creator can cancel", func() {
 		Cancel(cross(cur), id)
 	})
+}
+
+// The list view escaped Terms and the deal page did not, so a caller's terms
+// rendered as live markdown on the realm's own page.
+func TestDealPageEscapesTerms(cur realm, t *testing.T) {
+	resetState()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	id := Create(cross(cur), bob, "[claim](https://evil.example)")
+	out := Render(strconv.Itoa(id))
+	uassert.False(t, strings.Contains(out, "[claim](https://evil.example)"), out)
 }

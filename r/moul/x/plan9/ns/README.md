@@ -1,4 +1,4 @@
-# `gno.land/r/moul/x/plan9/ns/v0`
+# `gno.land/r/moul/x/plan9/ns/v1`
 
 **A Plan 9 namespace server for gno.land.** Every account gets a private,
 persistent namespace: its own RAM root plus a mount table it alone controls.
@@ -6,11 +6,11 @@ Realms publish file trees into `/srv`, accounts `bind` those trees wherever they
 like, and a read-only `rc` shell renders the whole thing in gnoweb.
 
 ```sh
-gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v0 \
+gnokey maketx call -pkgpath gno.land/r/moul/x/plan9/ns/v1 \
   -func Exec -args 'bind -ac /srv/dev /dev; echo hello > /tmp/greeting'
 ```
 
-Then browse it at `/r/moul/x/plan9/ns/v0:ns?u=<your address>`.
+Then browse it at `/r/moul/x/plan9/ns/v1:ns?u=<your address>`.
 
 This is the part of Plan 9 that gno does not otherwise have. The chain has a
 single global tree of realm paths that looks the same to everybody; here a name
@@ -82,11 +82,11 @@ attribution: [NOTICE](../../../../../NOTICE.md).
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
-**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/plan9/ns/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v0) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/plan9/ns/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v0) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/plan9/ns/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v0) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/plan9/ns/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v0)
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/plan9/ns/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v1) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/plan9/ns/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v1) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/plan9/ns/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v1) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/plan9/ns/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/plan9/ns/v1)
 
 **Dependency graph:**
 
-![gno.land/r/moul/x/plan9/ns/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/plan9/ns/v0/deps.png)
+![gno.land/r/moul/x/plan9/ns/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/plan9/ns/v1/deps.png)
 
 > 🧪 **Highly experimental — potentially vibe-coded.** Not audited; may break, change, or be removed at any time. Do not use with anything of value. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 

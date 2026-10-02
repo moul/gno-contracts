@@ -62,7 +62,7 @@ func TestShortenAndRender(cur realm, t *testing.T) {
 
 	// Index lists the alias.
 	idx := Render("/")
-	uassert.True(t, strings.Contains(idx, "[gno](/gno)"), "index lists alias")
+	uassert.True(t, strings.Contains(idx, "[gno](/r/moul/x/daily/urlshort/v1:gno)"), "index lists alias")
 }
 
 func TestShortenOwnershipRules(cur realm, t *testing.T) {

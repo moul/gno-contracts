@@ -14,7 +14,7 @@ namespace; only the owner can set or delete their own entries. The root render
 lists every address that owns a vault with its entry count, and the `/<address>`
 path renders that address's keys and values in a table.
 
-**Realm path:** `gno.land/r/REPLACE_ADDR/vault`
+**Realm path:** `gno.land/r/moul/x/daily/vault/v1`
 
 ## Example calls
 
@@ -40,11 +40,11 @@ Delete("greeting")
 
 Part of **[moul/gno-contracts](https://github.com/moul/gno-contracts)** — moul's versioned gno.land contracts. See the repository for the full catalog, build/test tooling, and usage.
 
-**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/daily/vault/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v0) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/daily/vault/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v0) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/daily/vault/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v0) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/daily/vault/v0?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v0)
+**On mainnet:** [![deployment status](https://gnoscope.com/_badges/shield/status/r/moul/x/daily/vault/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v1) [![transactions](https://gnoscope.com/_badges/shield/txs/r/moul/x/daily/vault/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v1) [![unique callers](https://gnoscope.com/_badges/shield/users/r/moul/x/daily/vault/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v1) [![deployed revision](https://gnoscope.com/_badges/shield/version/r/moul/x/daily/vault/v1?network=mainnet)](https://gnoscope.com/realm/r/moul/x/daily/vault/v1)
 
 **Dependency graph:**
 
-![gno.land/r/moul/x/daily/vault/v0 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/daily/vault/v0/deps.png)
+![gno.land/r/moul/x/daily/vault/v1 dependency graph](https://raw.githubusercontent.com/moul/gno-contracts/main/_assets/gno.land/r/moul/x/daily/vault/v1/deps.png)
 
 > 🧪 **Highly experimental — potentially vibe-coded.** Not audited; may break, change, or be removed at any time. Do not use with anything of value. Full disclaimer: [DISCLAIMER](https://github.com/moul/gno-contracts/blob/main/DISCLAIMER.md).
 
