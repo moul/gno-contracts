@@ -24,7 +24,7 @@ HOME_TX      ?= /tmp/home.tx.json
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render bench bench-report \
 	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update review-advice \
 	verify deps deps-chain bump-deps manifest readme readmes gen check \
-	sync graph publish status home-push home-packages report preview site clean
+	sync graph publish status home-push home-packages report preview site web clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^##@/{printf "\n%s\n",substr($$0,5)} /^[a-z][a-z-]*:.*?## /{printf "  %-14s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -153,6 +153,9 @@ preview: ## render what ARGS selects into _preview/, e.g. ARGS="./r/moul/home"
 
 site: ## render EVERY package into _site/, what the main workflow publishes
 	$(GNOCONTRACTS) preview -all -out _site
+
+web: ## serve the dapps dashboard (web/) on http://127.0.0.1:8080
+	python3 -m http.server -b 127.0.0.1 -d web 8080
 
 clean: ## remove the GNOROOT view, the gnopm assembly, the previews and the caches
 	rm -rf bin .gnoroot-view .gnopm .cache _preview _site
