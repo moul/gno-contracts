@@ -1,0 +1,35 @@
+name: web
+
+# Publishes web/, the dapps dashboard, to the gh-pages branch, which GitHub
+# Pages serves at https://moul.github.io/gno-contracts/.
+#
+# The branch is rewritten as a single orphan commit each time: every clone of
+# this repository downloads it, so it must never grow a history (that is why
+# the previews moved to their own repository).
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", ".github/workflows/web.yml"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: web
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish web/ to gh-pages
+        run: |
+          cd web
+          touch .nojekyll
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "web: publish ${GITHUB_SHA::7}"
+          git push -q --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" gh-pages
