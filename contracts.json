@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-05T12:50:10Z",
+  "status_checked_at": "2026-10-05T13:18:30Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -1646,6 +1646,27 @@
           "which": "ours"
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/vendor/nt/ufmt/v2",
+      "dir": "p/moul/vendor/nt/ufmt",
+      "kind": "p",
+      "name": "vendor/nt/ufmt",
+      "version": "v2",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -10855,11 +10876,11 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/vendor/nt/ufmt/v2",
         "gno.land/p/moul/x/vm/riscv/v0",
         "gno.land/p/moul/x/vm/vmkit/v0",
         "gno.land/p/nt/avl/v0",
-        "gno.land/p/nt/seqid/v0",
-        "gno.land/p/nt/ufmt/v0"
+        "gno.land/p/nt/seqid/v0"
       ],
       "draft": false,
       "published": {
