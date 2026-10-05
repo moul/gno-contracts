@@ -37,3 +37,15 @@ export async function call(chainId, pkgPath, func, args = [], send = "") {
   if (res.status !== "success") throw new Error(res.message || res.type || "transaction failed");
   return res.data;
 }
+
+// result decodes what the called function returned, e.g. `("Yes." string)`,
+// from the DoContract answer. Empty when the wallet did not hand it back.
+export function result(tx) {
+  const d = tx?.deliverTx?.ResponseBase?.Data ?? tx?.deliverTx?.Data ?? tx?.deliverTx?.data;
+  if (!d) return "";
+  try {
+    return new TextDecoder().decode(Uint8Array.from(atob(d), (c) => c.charCodeAt(0)));
+  } catch {
+    return "";
+  }
+}
