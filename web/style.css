@@ -93,3 +93,12 @@ body.dryrun .custom button, body.dryrun .txbtn { border-style: dashed; border-co
 .simulated ul { margin: .2rem 0; padding-left: 1.2rem; font-size: 13px; }
 .sim-head { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
 .sim-close { margin-left: auto; border: 0; background: none; font-size: 1.1rem; padding: 0 .3rem; }
+
+/* optimistic UI: shown before the chain has it */
+.pending { opacity: .55; animation: pending-pulse 1.2s ease-in-out infinite; }
+.pending-chip { display: inline-block; font-size: 11px; padding: 0 .45rem; border-radius: 999px; border: 1px dashed var(--muted); color: var(--muted); }
+.keys button.pending { opacity: 1; border-style: dashed; border-color: var(--accent); color: var(--accent); }
+.spin { display: inline-block; animation: spin 1s linear infinite; }
+@keyframes pending-pulse { 50% { opacity: .25; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .pending, .spin { animation: none; } }
