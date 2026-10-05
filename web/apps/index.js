@@ -3,7 +3,7 @@
 // Two kinds, so a demo can start as one line and grow:
 //   { path }              the generic view: Render, functions, source
 //   { path, module }      a custom page, `apps/<module>.js`, exporting
-//                         `mount(el, ctx)`; ctx is { client, net, path, call }
+//                         `mount(el, ctx)`; ctx is { client, net, path, call, wallet }
 //
 // Adding one: a line here. Promoting one: write the module, add `module`.
 

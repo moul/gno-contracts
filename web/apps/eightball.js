@@ -34,7 +34,7 @@ export function mount(el, { client, path, call, wallet }) {
       const tx = await call("Ask", [form.elements.q.value]);
       const answer = parseEval(wallet.result(tx));
       $("[data-a]").textContent = answer ? `“${answer}”` : "asked: the answer is in the history below";
-      $("[data-msg]").textContent = `included at height ${tx.height}`;
+      $("[data-msg]").textContent = wallet.describe(tx);
       refresh();
     } catch (e) {
       $("[data-msg]").textContent = e.message;

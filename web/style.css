@@ -75,3 +75,10 @@ input { min-width: 0; }
 .md blockquote { margin: 0; padding-left: 1rem; border-left: 3px solid var(--line); color: var(--muted); }
 .md code { background: var(--code); padding: 0 .25rem; border-radius: 3px; }
 .md pre code { background: none; padding: 0; }
+
+dialog.gnokey { max-width: min(46rem, 94vw); width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--fg); padding: 1.2rem; }
+dialog.gnokey::backdrop { background: rgb(0 0 0 / .45); }
+dialog.gnokey h3 { margin-top: 0; }
+dialog.gnokey pre { background: var(--code); padding: .8rem; border-radius: 6px; overflow-x: auto; white-space: pre; }
+dialog.gnokey input[name="addr"] { flex: 1; font-family: ui-monospace, Menlo, monospace; }
+button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }

@@ -12,7 +12,13 @@ export const NETWORKS = {
 const b64encode = (s) => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
 const b64decode = (s) => new TextDecoder().decode(Uint8Array.from(atob(s), (c) => c.charCodeAt(0)));
 
+import * as amino from "./amino.js";
+
 export class QueryError extends Error {}
+
+// The probe ceiling a sizing transaction carries. Simulation reports what the
+// call really used; a ceiling below that returns out-of-gas, not a smaller number.
+const GAS_PROBE = 100_000_000;
 
 export class Client {
   constructor(net) {
@@ -32,6 +38,33 @@ export class Client {
     const base = body.result.response.ResponseBase;
     if (base.Error) throw new QueryError(firstLine(base.Log) || base.Error["@type"]);
     return base.Data ? b64decode(base.Data) : "";
+  }
+
+  // simulate runs one MsgCall through .app/simulate and reports the gas it
+  // really used. No signature is needed for a call, but the tx must carry one
+  // (empty) signature per signer, and the caller must have transacted before:
+  // until then the chain has no public key for it and the ante handler refuses.
+  async simulate(caller, pkgPath, func, args = []) {
+    const body = amino.tx({
+      msgs: [amino.msgCall({ caller, pkgPath, func, args })],
+      fee: amino.fee({ gasWanted: GAS_PROBE, gasFee: `${GAS_PROBE / 1000}ugnot` }),
+      signatures: [],
+    });
+    const txb = new Uint8Array([...body, 0x1a, 0x00]); // field 3, one empty Signature
+    const res = await fetch(this.cfg.rpc, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "abci_query", params: { path: ".app/simulate", data: btoa(String.fromCharCode(...txb)) } }),
+    });
+    const r = (await res.json()).result?.response;
+    if (!r) throw new QueryError("simulate: no answer");
+    if (r.ResponseBase.Error) throw new QueryError(firstLine(r.ResponseBase.Log) || r.ResponseBase.Error["@type"]);
+    // Value is amino binary of the result: 1=ResponseBase{1=Error,2=Data,4=Log}, 2=GasWanted, 3=GasUsed.
+    const top = protoFields(Uint8Array.from(atob(r.Value || ""), (c) => c.charCodeAt(0)));
+    const base = protoFields(top.get(1) || new Uint8Array());
+    const log = new TextDecoder().decode(base.get(4) || new Uint8Array());
+    if (base.get(1)) throw new QueryError(firstLine(log) || "simulation failed");
+    return { gasUsed: unzigzag(top.get(3) || 0n), data: new TextDecoder().decode(base.get(2) || new Uint8Array()).trim() };
   }
 
   // render returns the markdown a realm's Render(path) produces.
@@ -55,6 +88,23 @@ export class Client {
     return this.abci("vm/qfile", path);
   }
 }
+
+// protoFields reads one level of protobuf: field number -> last value seen
+// (a BigInt for a varint, bytes for a length-delimited field).
+function protoFields(buf) {
+  const out = new Map();
+  let i = 0;
+  const varint = () => { let x = 0n, sh = 0n, b; do { b = buf[i++]; x |= BigInt(b & 0x7f) << sh; sh += 7n; } while (b & 0x80); return x; };
+  while (i < buf.length) {
+    const t = Number(varint());
+    if ((t & 7) === 0) out.set(t >> 3, varint());
+    else if ((t & 7) === 2) { const n = Number(varint()); out.set(t >> 3, buf.subarray(i, i + n)); i += n; }
+    else break;
+  }
+  return out;
+}
+
+const unzigzag = (z) => Number(z & 1n ? -(z >> 1n) - 1n : z >> 1n);
 
 function firstLine(log) {
   if (!log) return "";

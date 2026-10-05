@@ -44,7 +44,15 @@ walletBtn.addEventListener("click", async () => {
     alert(e.message);
   }
 });
-if (!wallet.hasWallet()) walletBtn.title = "Install Adena to send transactions";
+const signerSelect = document.querySelector("#signer");
+signerSelect.value = wallet.signer();
+const drawSigner = () => { walletBtn.hidden = signerSelect.value !== "adena"; };
+signerSelect.addEventListener("change", () => { wallet.setSigner(signerSelect.value); drawSigner(); });
+drawSigner();
+if (!wallet.hasWallet()) {
+  signerSelect.querySelector('[value="adena"]').textContent = "Adena (not installed)";
+  walletBtn.title = "Install Adena from https://adena.app";
+}
 
 async function loadCatalog() {
   if (catalog) return catalog;
@@ -122,7 +130,7 @@ async function viewRealm(route) {
     unmount = mod.mount(main.querySelector("#custom"), {
       client, net, path: pkgpath,
       wallet,
-      call: (func, a = [], send = "") => wallet.call(NETWORKS[net].chainId, pkgpath, func, a, send),
+      call: (func, a = [], send = "") => wallet.call(net, pkgpath, func, a, send),
     });
   }
 
@@ -176,8 +184,8 @@ async function paneFuncs(pane, pkgpath) {
       const values = inputs.map((x) => form.elements[x.Name].value);
       try {
         if (crossing) {
-          const tx = await wallet.call(NETWORKS[net].chainId, pkgpath, f.FuncName, values);
-          out.textContent = `included at height ${tx.height}\nhash ${tx.hash}`;
+          const tx = await wallet.call(net, pkgpath, f.FuncName, values);
+          out.textContent = tx.manual ? "sent with gnokey" : `included at height ${tx.height}\nhash ${tx.hash}`;
         } else {
           const lits = inputs.map((x, i) => goLiteral(values[i], x.Type.replace(".uverse.", "")));
           out.textContent = await client.eval(pkgpath, `${f.FuncName}(${lits.join(", ")})`);
