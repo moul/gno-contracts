@@ -159,3 +159,10 @@ func TestRenderEscapesGuestOutput(cur realm, t *testing.T) {
 	// the eight operators do.
 	uassert.Equal(t, "+++[-]<>", operatorsOnly("+++ this is a comment [-] </script>"))
 }
+
+// Output sits in a code span, where markdown escapes show verbatim: only the
+// pipe is escaped there, and nothing else.
+func TestCodeCell(t *testing.T) {
+	uassert.Equal(t, "`Hello, gno.land\\n`", codeCell("Hello, gno.land\\n"))
+	uassert.Equal(t, "`a\\|b`", codeCell("a|b"))
+}
