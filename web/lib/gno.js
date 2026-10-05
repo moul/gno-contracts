@@ -59,12 +59,23 @@ export class Client {
     const r = (await res.json()).result?.response;
     if (!r) throw new QueryError("simulate: no answer");
     if (r.ResponseBase.Error) throw new QueryError(firstLine(r.ResponseBase.Log) || r.ResponseBase.Error["@type"]);
-    // Value is amino binary of the result: 1=ResponseBase{1=Error,2=Data,4=Log}, 2=GasWanted, 3=GasUsed.
+    // Value is amino binary of the result: 1=ResponseBase{1=Error,2=Data,3=Events,4=Log}, 2=GasWanted, 3=GasUsed.
     const top = protoFields(Uint8Array.from(atob(r.Value || ""), (c) => c.charCodeAt(0)));
-    const base = protoFields(top.get(1) || new Uint8Array());
-    const log = new TextDecoder().decode(base.get(4) || new Uint8Array());
-    if (base.get(1)) throw new QueryError(firstLine(log) || "simulation failed");
-    return { gasUsed: unzigzag(top.get(3) || 0n), data: new TextDecoder().decode(base.get(2) || new Uint8Array()).trim() };
+    const base = protoFields(one(top, 1));
+    const log = text(one(base, 4));
+    const out = { gasUsed: unzigzag(top.get(3)?.[0] || 0n), data: text(one(base, 2)).trim(), events: [], deposits: [] };
+    for (const ev of base.get(3) || []) {
+      const a = protoFields(ev), type = text(one(a, 1)), v = protoFields(one(a, 2));
+      if (type === "/tm.Event") {
+        out.events.push({ type: text(one(v, 1)), pkg: text(one(v, 3)), attrs: (v.get(2) || []).map((kv) => { const f = protoFields(kv); return [text(one(f, 1)), text(one(f, 2))]; }) });
+      } else if (/Storage(Deposit|Unlock)Event$/.test(type)) {
+        out.deposits.push({ kind: type.includes("Unlock") ? "unlock" : "deposit", bytes: unzigzag(v.get(1)?.[0] || 0n), amount: text(one(v, 2)), pkg: text(one(v, 3)) });
+      } else {
+        out.events.push({ type: type.replace(/^\//, ""), pkg: "", attrs: [] });
+      }
+    }
+    if (one(base, 1).length) out.error = firstLine(log) || "the call would fail";
+    return out;
   }
 
   // render returns the markdown a realm's Render(path) produces.
@@ -89,21 +100,24 @@ export class Client {
   }
 }
 
-// protoFields reads one level of protobuf: field number -> last value seen
-// (a BigInt for a varint, bytes for a length-delimited field).
+// protoFields reads one level of protobuf: field number -> every value seen,
+// in order (a BigInt for a varint, bytes for a length-delimited field).
 function protoFields(buf) {
   const out = new Map();
+  const add = (f, v) => (out.get(f) || out.set(f, []).get(f)).push(v);
   let i = 0;
   const varint = () => { let x = 0n, sh = 0n, b; do { b = buf[i++]; x |= BigInt(b & 0x7f) << sh; sh += 7n; } while (b & 0x80); return x; };
   while (i < buf.length) {
     const t = Number(varint());
-    if ((t & 7) === 0) out.set(t >> 3, varint());
-    else if ((t & 7) === 2) { const n = Number(varint()); out.set(t >> 3, buf.subarray(i, i + n)); i += n; }
+    if ((t & 7) === 0) add(t >> 3, varint());
+    else if ((t & 7) === 2) { const n = Number(varint()); add(t >> 3, buf.subarray(i, i + n)); i += n; }
     else break;
   }
   return out;
 }
 
+const one = (m, f) => m.get(f)?.[0] || new Uint8Array();
+const text = (b) => new TextDecoder().decode(b);
 const unzigzag = (z) => Number(z & 1n ? -(z >> 1n) - 1n : z >> 1n);
 
 function firstLine(log) {
