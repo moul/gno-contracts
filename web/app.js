@@ -127,7 +127,7 @@ async function viewRealm(route) {
     unmount = mod.mount(main.querySelector("#custom"), {
       client, net, path: pkgpath,
       wallet,
-      call: (func, a = [], send = "") => wallet.call(net, pkgpath, func, a, send, { slot: main.querySelector("#sim-slot") }),
+      call: (func, a = [], opts = {}) => wallet.call(net, pkgpath, func, a, opts.send || "", { slot: main.querySelector("#sim-slot"), onSubmit: opts.onSubmit }),
     });
   }
 

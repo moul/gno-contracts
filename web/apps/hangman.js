@@ -1,6 +1,9 @@
 // Hangman: one shared word a day. The realm exposes no getter, so this reads
 // the public Render and lifts the gallows, the word and the guesses out of it,
-// then turns the alphabet into Guess buttons.
+// then turns the alphabet into Guess buttons. A clicked letter shows at once
+// as pending, until the chain lists it among the guesses.
+
+import { Queue } from "../lib/optimistic.js";
 
 export function mount(el, { client, path, call, wallet }) {
   el.innerHTML = `
@@ -12,6 +15,15 @@ export function mount(el, { client, path, call, wallet }) {
       <p class="muted" data-msg></p>
     </div>`;
   const $ = (s) => el.querySelector(s);
+  let guessed = new Set(), over = false;
+  const queue = new Queue({ onExpire: (x) => { $("[data-msg]").textContent = `“${x.letter}” not seen on chain after 3 minutes, rolled back`; drawKeys(); } });
+  const drawKeys = () => {
+    const pending = new Set(queue.items.map((x) => x.letter));
+    el.querySelectorAll("[data-c]").forEach((b) => {
+      b.disabled = over || guessed.has(b.dataset.c) || pending.has(b.dataset.c);
+      b.classList.toggle("pending", pending.has(b.dataset.c));
+    });
+  };
 
   const refresh = async () => {
     try {
@@ -22,9 +34,12 @@ export function mount(el, { client, path, call, wallet }) {
       const status = (md.match(/## Status\s+([^\n]+)/) || [, ""])[1].replace(/Call `[^`]+`.*$/, "").replace(/\*\*/g, "").trim();
       $("[data-s]").textContent = `wrong ${wrong} · ${status}`;
       const guessedLine = (md.match(/Guessed letters: ([^\n]*)/) || [, ""])[1];
-      const guessed = new Set([...guessedLine.matchAll(/`([a-z])`|\b([a-z])\b/g)].map((m) => m[1] || m[2]));
-      const over = /solved|game over/i.test(status);
-      el.querySelectorAll("[data-c]").forEach((b) => { b.disabled = over || guessed.has(b.dataset.c); });
+      guessed = new Set([...guessedLine.matchAll(/`([a-z])`|\b([a-z])\b/g)].map((m) => m[1] || m[2]));
+      over = /solved|game over/i.test(status);
+      const before = queue.size;
+      queue.settle((x) => guessed.has(x.letter));
+      if (before && !queue.size) $("[data-msg]").textContent = "confirmed on chain";
+      drawKeys();
     } catch (e) {
       $("[data-msg]").textContent = e.message;
     }
@@ -32,11 +47,13 @@ export function mount(el, { client, path, call, wallet }) {
 
   el.querySelectorAll("[data-c]").forEach((b) => b.addEventListener("click", async () => {
     $("[data-msg]").textContent = `guessing “${b.dataset.c}”, waiting for the wallet…`;
+    let item = null;
     try {
-      const tx = await call("Guess", [b.dataset.c]);
+      const tx = await call("Guess", [b.dataset.c], { onSubmit: () => { item = queue.add({ letter: b.dataset.c }); drawKeys(); } });
       $("[data-msg]").textContent = wallet.describe(tx);
       refresh();
     } catch (e) {
+      if (item) { queue.remove(item); drawKeys(); }
       $("[data-msg]").textContent = e.message;
     }
   }));

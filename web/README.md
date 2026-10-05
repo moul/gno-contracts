@@ -57,12 +57,24 @@ list, and sorts first. Today:
 | `x/daily/hangman/v0` | [`hangman.js`](./apps/hangman.js) | gallows and word lifted from `Render`, an A to Z keyboard of `Guess` calls |
 | `x/daily/eightball/v1` | [`eightball.js`](./apps/eightball.js) | a question box, the answer the transaction returned |
 
+## Optimistic UI
+
+A live app shows a write the moment it leaves, before the chain has it: the counter
+moves, the die spins, the letter is marked, the 8-ball shakes, all styled as pending
+with an "N pending" chip. "Leaves" is the wallet popup opening, or the visitor
+clicking "I sent it" in the gnokey modal; a dry run never counts. Each refresh tells
+[`lib/optimistic.js`](./lib/optimistic.js)'s queue how far the chain has caught up
+(a count like `Total()`, or the change itself, like a guessed letter). A rejected
+popup rolls the change back at once. A change the chain never shows rolls back after
+3 minutes.
+
 ## Adding a demo
 
 1. A line in [`apps/index.js`](./apps/index.js): `{ path, title, blurb }`. It shows on
    the front page and opens in the generic view.
 2. When it deserves its own UI, write `apps/<name>.js` exporting
-   `mount(el, { client, net, path, call, wallet })`, return a cleanup function, and add
+   `mount(el, { client, net, path, call, wallet })`, where
+   `call(func, args, { onSubmit })` fires `onSubmit` as the transaction leaves. Return a cleanup function, and add
    `module: "<name>"` to its line. [`apps/counter.js`](./apps/counter.js) is the
    worked example: it polls `Value()` and turns `Inc` / `Dec` into buttons.
 

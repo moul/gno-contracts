@@ -16,12 +16,15 @@ export const current = () => identity.get();
 // describe says what happened, for a status line.
 export function describe(tx) {
   if (tx.simulated) return tx.error ? `dry run: would fail, ${tx.error}` : "dry run: nothing was sent";
-  return tx.manual ? "sent with gnokey, refreshing" : `included at height ${tx.height}`;
+  return tx.manual ? "sent with gnokey, waiting for the chain" : `included at height ${tx.height}`;
 }
 
 // call sends one MsgCall. args are strings, without the `cur realm` parameter.
-// slot is where a dry run draws its result.
-export async function call(net, pkgPath, func, args = [], send = "", { slot } = {}) {
+// slot is where a dry run draws its result. onSubmit fires the moment the
+// transaction is on its way (the wallet popup opens, or the visitor says they
+// pasted the gnokey command): that is when an app shows it optimistically.
+// It never fires for a dry run.
+export async function call(net, pkgPath, func, args = [], send = "", { slot, onSubmit = () => {} } = {}) {
   const cfg = NETWORKS[net];
   let id = identity.get();
 
@@ -35,7 +38,9 @@ export async function call(net, pkgPath, func, args = [], send = "", { slot } = 
   }
 
   if (id?.mode !== "adena" || !adena()) {
-    return gnokey.open({ net, cfg, pkgPath, func, args, send, address: id?.address || "", key: id?.key || "" });
+    const tx = await gnokey.open({ net, cfg, pkgPath, func, args, send, address: id?.address || "", key: id?.key || "" });
+    onSubmit();
+    return tx;
   }
 
   if (id.chainId !== cfg.chainId) {
@@ -46,6 +51,7 @@ export async function call(net, pkgPath, func, args = [], send = "", { slot } = 
     id = { ...id, ...(await identity.connectAdena()) };
     if (id.chainId !== cfg.chainId) throw new Error(`the wallet is on ${id.chainId}, this page on ${cfg.chainId}`);
   }
+  onSubmit();
   const res = await adena().DoContract({
     messages: [{ type: "/vm.m_call", value: { caller: id.address, send, pkg_path: pkgPath, func, args } }],
   });
