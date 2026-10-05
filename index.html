@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>moul's gno dapps</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+</head>
+<body>
+<header>
+  <a class="brand" href="#/">🧪 moul's gno dapps</a>
+  <span class="spacer"></span>
+  <select id="net" aria-label="network"></select>
+  <button id="dryrun" aria-pressed="false" title="Simulate transactions instead of sending them">🧪 dry run</button>
+  <button id="connect">Connect</button>
+</header>
+<main></main>
+<footer class="muted">
+  Reads straight from the chain's RPC, writes through <a href="https://adena.app" target="_blank" rel="noopener">Adena</a> or a pasted gnokey command.
+  Contracts: <a href="https://github.com/moul/gno-contracts">moul/gno-contracts</a> ·
+  static previews: <a href="https://moul.github.io/gno-contracts-previews/main/">gno-contracts-previews</a>
+</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
