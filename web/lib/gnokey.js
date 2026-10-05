@@ -3,6 +3,7 @@
 // address, the call is simulated and the command carries the measured figure.
 
 import { Client } from "./gno.js";
+import * as identity from "./identity.js";
 
 const GAS_HEADROOM = 1.3; // gas_wanted over measured use; a ceiling, not charged
 const FEE_PER_GAS_DEN = 1000; // the ante handler wants gas_fee >= gas_wanted / 1000 ugnot
@@ -27,10 +28,10 @@ export function command({ net, cfg, pkgPath, func, args, send, key, gasWanted, g
 
 // open shows the modal and resolves when the visitor says they sent it, or
 // rejects when they close it.
-export function open({ net, cfg, pkgPath, func, args = [], send = "" }) {
+export function open({ net, cfg, pkgPath, func, args = [], send = "", address = "", key = "" }) {
   return new Promise((resolve, reject) => {
     const dlg = document.createElement("dialog");
-    dlg.className = "gnokey";
+    dlg.className = "modal";
     dlg.innerHTML = `
       <form method="dialog">
         <h3>Send it with gnokey</h3>
@@ -53,8 +54,8 @@ export function open({ net, cfg, pkgPath, func, args = [], send = "" }) {
     document.body.append(dlg);
     const $ = (s) => dlg.querySelector(s);
     const f = dlg.querySelector("form").elements;
-    f.addr.value = localStorage.getItem("gnokey.addr") || "";
-    f.key.value = localStorage.getItem("gnokey.key") || "";
+    f.addr.value = address;
+    f.key.value = key;
     let gas = {};
 
     const draw = () => { $("[data-cmd]").textContent = command({ net, cfg, pkgPath, func, args, send, key: f.key.value.trim(), ...gas }); };
@@ -63,11 +64,12 @@ export function open({ net, cfg, pkgPath, func, args = [], send = "" }) {
       gas = {};
       draw();
       if (!/^g1[02-9ac-hj-np-z]{38}$/.test(addr)) { $("[data-sim]").textContent = addr ? "not a g1 address" : ""; return; }
-      localStorage.setItem("gnokey.addr", addr);
+      if (!identity.get()) identity.set("manual", addr);
       if (send) { $("[data-sim]").textContent = "this call sends coins, which this page cannot simulate: size the gas yourself"; return; }
       $("[data-sim]").textContent = "simulating…";
       try {
         const sim = await new Client(net).simulate(addr, pkgPath, func, args);
+        if (sim.error) throw new Error(sim.error);
         const gasWanted = Math.ceil(sim.gasUsed * GAS_HEADROOM);
         gas = { gasWanted, gasFee: Math.ceil(gasWanted / FEE_PER_GAS_DEN) * FEE_MARGIN };
         $("[data-sim]").innerHTML = `simulated on ${esc(net)}: <b>${sim.gasUsed.toLocaleString()}</b> gas used${sim.data ? `, would return <code>${esc(sim.data)}</code>` : ""}. Fee ${(gas.gasFee / 1e6).toFixed(6).replace(/0+$/, "")} GNOT, plus any storage deposit.`;
@@ -80,7 +82,7 @@ export function open({ net, cfg, pkgPath, func, args = [], send = "" }) {
     };
 
     f.addr.addEventListener("input", measure);
-    f.key.addEventListener("input", () => { localStorage.setItem("gnokey.key", f.key.value.trim()); draw(); });
+    f.key.addEventListener("input", () => { identity.setKey(f.key.value.trim()); draw(); });
     $("[data-copy]").addEventListener("click", async () => {
       await navigator.clipboard.writeText($("[data-cmd]").textContent.replace(/^# .*\n/, ""));
       $("[data-copy]").textContent = "Copied";

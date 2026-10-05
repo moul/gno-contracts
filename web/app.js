@@ -6,6 +6,7 @@
 import { Client, NETWORKS, goLiteral, isRealmParam } from "./lib/gno.js";
 import { render as renderMD, makeLinker } from "./lib/md.js";
 import * as wallet from "./lib/wallet.js";
+import * as identity from "./lib/identity.js";
 import { FEATURED } from "./apps/index.js";
 
 const CATALOG = "https://raw.githubusercontent.com/moul/gno-contracts/main/contracts.json";
@@ -13,7 +14,8 @@ const REPO = "https://github.com/moul/gno-contracts/tree/main/";
 
 const main = document.querySelector("main");
 const netSelect = document.querySelector("#net");
-const walletBtn = document.querySelector("#wallet");
+const connectBtn = document.querySelector("#connect");
+const dryBtn = document.querySelector("#dryrun");
 
 let net = new URLSearchParams(location.search).get("net") || localStorage.getItem("net") || "mainnet";
 if (!NETWORKS[net]) net = "mainnet";
@@ -36,23 +38,18 @@ netSelect.addEventListener("change", () => {
   route();
 });
 
-walletBtn.addEventListener("click", async () => {
-  try {
-    const acc = await wallet.connect();
-    walletBtn.textContent = `${acc.address.slice(0, 8)}…${acc.address.slice(-4)} · ${acc.chainId}`;
-  } catch (e) {
-    alert(e.message);
-  }
-});
-const signerSelect = document.querySelector("#signer");
-signerSelect.value = wallet.signer();
-const drawSigner = () => { walletBtn.hidden = signerSelect.value !== "adena"; };
-signerSelect.addEventListener("change", () => { wallet.setSigner(signerSelect.value); drawSigner(); });
-drawSigner();
-if (!wallet.hasWallet()) {
-  signerSelect.querySelector('[value="adena"]').textContent = "Adena (not installed)";
-  walletBtn.title = "Install Adena from https://adena.app";
-}
+// One Connect button: it opens the modal that picks Adena or a typed address,
+// and shows who the page acts for. Next to it, the dry-run switch.
+const drawHeader = (id = identity.get()) => {
+  connectBtn.textContent = id ? `${identity.label(id)} · ${id.mode === "adena" ? "Adena" : "by hand"}` : "Connect";
+  connectBtn.classList.toggle("on", Boolean(id));
+  dryBtn.setAttribute("aria-pressed", String(identity.dryRun()));
+  document.body.classList.toggle("dryrun", identity.dryRun());
+};
+connectBtn.addEventListener("click", () => identity.open());
+dryBtn.addEventListener("click", () => identity.setDryRun(!identity.dryRun()));
+identity.onChange(drawHeader);
+drawHeader();
 
 async function loadCatalog() {
   if (catalog) return catalog;
@@ -72,7 +69,7 @@ const live = (c) => net === "local" || c.published?.[net]?.uploaded;
 async function viewHome() {
   main.innerHTML = `
     <section><h2>Featured</h2>
-      <p class="muted">${LIVE} marks a custom interactive app: live data, buttons wired to your wallet. The rest open in the generic view.</p>
+      <p class="muted">${LIVE} marks a custom interactive app: live data, buttons wired to your wallet or to gnokey. Turn on 🧪 dry run to see what a transaction would do without sending it. The rest open in the generic view.</p>
       <div class="grid" id="featured"></div></section>
     <section>
       <h2>Every realm <span class="muted" id="count"></span></h2>
@@ -121,7 +118,7 @@ async function viewRealm(route) {
       <a href="${web}${short(pkgpath)}${args ? ":" + esc(args) : ""}" target="_blank" rel="noopener">gnoweb ↗</a>
       ${entry ? `<a href="${REPO}${esc(entry.dir)}" target="_blank" rel="noopener">repo ↗</a>` : ""}
     </nav>
-    ${app?.module ? '<section class="custom" id="custom"></section>' : ""}
+    ${app?.module ? '<section class="custom" id="custom"></section><div id="sim-slot"></div>' : ""}
     <div class="tabs"><button data-tab="render" class="on">Render</button><button data-tab="funcs">Functions</button><button data-tab="source">Source</button></div>
     <section id="pane"></section>`;
 
@@ -130,7 +127,7 @@ async function viewRealm(route) {
     unmount = mod.mount(main.querySelector("#custom"), {
       client, net, path: pkgpath,
       wallet,
-      call: (func, a = [], send = "") => wallet.call(net, pkgpath, func, a, send),
+      call: (func, a = [], send = "") => wallet.call(net, pkgpath, func, a, send, { slot: main.querySelector("#sim-slot") }),
     });
   }
 
@@ -173,8 +170,9 @@ async function paneFuncs(pane, pkgpath) {
         <div><strong>${esc(f.FuncName)}</strong>(${inputs.map((x) => `${esc(x.Name)} <span class="muted">${esc(x.Type.replace(".uverse.", ""))}</span>`).join(", ")})
           ${results ? `<span class="muted">→ ${esc(results)}</span>` : ""} ${crossing ? '<span class="tag">tx</span>' : '<span class="tag">read</span>'}</div>
         <div class="row">${inputs.map((x) => `<input name="${esc(x.Name)}" placeholder="${esc(x.Name)}">`).join("")}
-          ${crossing ? "<button>Send tx</button>" : "<button>Query</button>"}</div>
+          ${crossing ? '<button class="txbtn">Send tx</button>' : "<button>Query</button>"}</div>
         <pre class="out" hidden></pre>
+        <div class="sim-slot"></div>
       </form>`);
     form.addEventListener("submit", async (ev) => {
       ev.preventDefault();
@@ -184,8 +182,9 @@ async function paneFuncs(pane, pkgpath) {
       const values = inputs.map((x) => form.elements[x.Name].value);
       try {
         if (crossing) {
-          const tx = await wallet.call(net, pkgpath, f.FuncName, values);
-          out.textContent = tx.manual ? "sent with gnokey" : `included at height ${tx.height}\nhash ${tx.hash}`;
+          const tx = await wallet.call(net, pkgpath, f.FuncName, values, "", { slot: form.querySelector(".sim-slot") });
+          if (tx.simulated) out.hidden = true;
+          else out.textContent = tx.manual ? "sent with gnokey" : `included at height ${tx.height}\nhash ${tx.hash}`;
         } else {
           const lits = inputs.map((x, i) => goLiteral(values[i], x.Type.replace(".uverse.", "")));
           out.textContent = await client.eval(pkgpath, `${f.FuncName}(${lits.join(", ")})`);
