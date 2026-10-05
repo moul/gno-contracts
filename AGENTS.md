@@ -155,10 +155,14 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   crosses right afterwards (claim, approve) DOES work, which is exactly what makes this
   hard to spot. Switch accounts INLINE in the test body. `testing.SkipHeights` in between
   is safe, it does not clear the actor (checked 2026-09-19).
-- **`ufmt` supports NO width or padding flags.** `ufmt.Sprintf("%03d", 7)` returns `"7"`,
-  silently. That matters for avl keys: unpadded numeric keys sort `"0","1","10","11","2"`,
-  so anything keyed that way loses insertion order past nine entries. Pad by hand
-  (`padIdx` in `r/moul/demo/importdemo`).
+- **`p/nt/ufmt/v0` supports NO width or padding flags**, no `%X`, and `%x` only on a
+  `uint8`. `ufmt.Sprintf("%03d", 7)` returns `"7"` silently, and `"0x%08X"` prints
+  `0x(unhandled verb: %X)` (`r/moul/x/vm/riscvdemo` shipped a register dump of nothing
+  else). `gno.land/p/moul/vendor/nt/ufmt/v2` is Go's `fmt` (flags, widths, every verb,
+  checked against Go on 210 cases), a preview of the not yet published `p/nt/ufmt/v2`:
+  import it for anything with a width or hex. It matters for avl keys too: unpadded
+  numeric keys sort `"0","1","10","11","2"`, so anything keyed that way loses insertion
+  order past nine entries.
 - **`uassert.AbortsContains` takes a `func()`, not a `func(realm)`.** With the
   `func(realm)` form the helper does its own `cross(rlm)` first, which consumes the pending
   `testing.SetRealm`, so the abort under test runs with the realm itself as caller and

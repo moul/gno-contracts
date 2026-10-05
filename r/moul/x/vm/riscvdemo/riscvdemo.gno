@@ -23,7 +23,7 @@ import (
 	"gno.land/p/moul/x/vm/vmkit/v0"
 	"gno.land/p/nt/avl/v0"
 	"gno.land/p/nt/seqid/v0"
-	"gno.land/p/nt/ufmt/v0"
+	"gno.land/p/moul/vendor/nt/ufmt/v2"
 )
 
 // Caps. Everything a caller can grow is bounded, because all of it is storage

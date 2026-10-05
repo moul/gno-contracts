@@ -1,0 +1,63 @@
+# p/moul/vendor/nt/ufmt (v2 preview)
+
+**This is ufmt v2, published here before its real path exists.** The expected
+home is [`gno.land/p/nt/ufmt/v2`](/p/nt/ufmt/v2), which is not published yet.
+Until it is, import:
+
+```go
+import "gno.land/p/moul/vendor/nt/ufmt/v2"
+```
+
+When `gno.land/p/nt/ufmt/v2` goes live, change the import and nothing else.
+This path is then frozen: it keeps working, it never gets another fix.
+
+## Why
+
+[`p/nt/ufmt/v0`](/p/nt/ufmt/v0) knows a handful of verbs and no flags, and it
+fails quietly. `Sprintf("0x%08X", pc)` prints `0x(unhandled verb: %X)`,
+`Sprintf("%08x", w)` prints `(unhandled)`, and `Sprintf("%03d", 7)` prints `7`.
+[`r/moul/x/vm/riscvdemo`](/r/moul/x/vm/riscvdemo/v0) shipped a register dump
+that was nothing but those.
+
+v2 is Go's `fmt`, as far as gno can follow it:
+
+| | |
+|---|---|
+| flags | `+` `-` `#` ` ` `0` |
+| width, precision | `%8d`, `%.2f`, `%*d`, `%.*f`, `%.3s` in runes |
+| argument indexes | `%[2]d %[1]s`, `%[1]*[2]d` |
+| integers | `%b %c %d %o %O %q %x %X %U`, every int and uint type |
+| floats | `%b %e %E %f %F %g %G %x %X`, float32 and float64 |
+| strings, `[]byte` | `%s %q %x %X`, `% x`, `%#q` |
+| methods | `Formatter`, `GoStringer`, `error`, `Stringer`, in Go's order |
+| errors | `Errorf` with `%w`, one or several, seen by `errors.Is` |
+| composites | slices of the basic types, `[]any`, `map[string]T` sorted by key |
+
+A mistake is printed, never panicked, with Go's strings: `%!d(string=hi)`,
+`%!d(MISSING)`, `%!(EXTRA int=1)`, `%!(NOVERB)`. A `Render` cannot be taken down
+by a format string.
+
+## How it is tested
+
+`gofmt_test.gno` is 210 cases whose expected output was produced by running
+each one through Go's `fmt.Sprintf` (go1.27.1), so a failure there is, by
+construction, a place v2 and Go disagree. It also costs less gas than v0 on the
+calls realms make most: about 211k against 254k per `Sprintf("id %d is %s
+(%t)", ...)`, measured with `gno test`.
+
+## What it cannot do
+
+gno has no `reflect`. A struct, a pointer, or a named type without a `String`
+method prints `(unhandled)`, and `%T` names only the types it knows. Give the
+type a `String` method. `%p` is not supported.
+
+## Migrating from v0
+
+Mostly a change of import, with these differences, all of them toward Go:
+
+- `Sprint` adds a space only between two operands that are both non-strings.
+- a float prints in its shortest form from `%v` and `Sprint` (`3.14`, not
+  `3.140000`), and `%e` defaults to 6 digits.
+- `%v` of a `[]byte` is `[104 105]`; use `%s` for the text.
+- a missing or extra argument is written into the output instead of panicking.
+- `error` wins over `String` when a value has both.
