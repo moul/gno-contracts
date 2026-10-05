@@ -74,7 +74,7 @@ popup rolls the change back at once. A change the chain never shows rolls back a
    the front page and opens in the generic view.
 2. When it deserves its own UI, write `apps/<name>.js` exporting
    `mount(el, { client, net, path, call, wallet })`, where
-   `call(func, args, { onSubmit })` fires `onSubmit` as the transaction leaves,, return a cleanup function, and add
+   `call(func, args, { onSubmit })` fires `onSubmit` as the transaction leaves. Return a cleanup function, and add
    `module: "<name>"` to its line. [`apps/counter.js`](./apps/counter.js) is the
    worked example: it polls `Value()` and turns `Inc` / `Dec` into buttons.
 
