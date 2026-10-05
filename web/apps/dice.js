@@ -43,7 +43,7 @@ export function mount(el, { client, path, call, wallet }) {
       const tx = await call("Roll");
       const v = parseEval(wallet.result(tx));
       $("[data-last]").textContent = typeof v === "number" ? `${FACES[v - 1]} ${v}` : "";
-      $("[data-msg]").textContent = `included at height ${tx.height}`;
+      $("[data-msg]").textContent = wallet.describe(tx);
       refresh();
     } catch (e) {
       $("[data-msg]").textContent = e.message;

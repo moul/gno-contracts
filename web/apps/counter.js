@@ -4,7 +4,7 @@
 
 import { parseEval } from "../lib/gno.js";
 
-export function mount(el, { client, path, call }) {
+export function mount(el, { client, path, call, wallet }) {
   el.innerHTML = `
     <div class="counter">
       <div class="big" data-v>…</div>
@@ -32,7 +32,7 @@ export function mount(el, { client, path, call }) {
       $("[data-msg]").textContent = "waiting for the wallet…";
       try {
         const tx = await call(b.dataset.f);
-        $("[data-msg]").textContent = `included at height ${tx.height}`;
+        $("[data-msg]").textContent = wallet.describe(tx);
         refresh();
       } catch (e) {
         $("[data-msg]").textContent = e.message;

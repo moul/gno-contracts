@@ -12,11 +12,15 @@
   <a class="brand" href="#/">🧪 moul's gno dapps</a>
   <span class="spacer"></span>
   <select id="net" aria-label="network"></select>
+  <select id="signer" aria-label="sign with">
+    <option value="adena">Adena</option>
+    <option value="gnokey">gnokey (copy, paste)</option>
+  </select>
   <button id="wallet">Connect wallet</button>
 </header>
 <main></main>
 <footer class="muted">
-  Reads straight from the chain's RPC, writes through <a href="https://adena.app" target="_blank" rel="noopener">Adena</a>.
+  Reads straight from the chain's RPC, writes through <a href="https://adena.app" target="_blank" rel="noopener">Adena</a> or a pasted gnokey command.
   Contracts: <a href="https://github.com/moul/gno-contracts">moul/gno-contracts</a> ·
   static previews: <a href="https://moul.github.io/gno-contracts-previews/main/">gno-contracts-previews</a>
 </footer>

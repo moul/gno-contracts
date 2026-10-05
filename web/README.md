@@ -6,10 +6,17 @@ Published at <https://moul.github.io/gno-contracts/>.
 - **Reads** go to the chain's JSON-RPC (`vm/qrender`, `vm/qeval`, `vm/qfuncs`,
   `vm/qfile`). Every public gno RPC sends `access-control-allow-origin: *`, so no
   server or proxy sits in between.
-- **Writes** go through [Adena](https://adena.app). The page never sets gas: the
-  wallet simulates the call and shows the fee before signing.
+- **Writes** go through one of two signers, picked in the header:
+  - [Adena](https://adena.app). The page never sets gas: the wallet simulates the
+    call and shows the fee before signing.
+  - **gnokey**, no wallet at all. A modal shows the `gnokey maketx call` to paste. Once
+    the visitor types their address, the page runs the call through `.app/simulate`
+    (no signature needed for a call) and fills in the measured gas plus 30% and a
+    fee at twice the chain's floor. It never prints a gas figure it did not measure.
 - **No build step, no dependency.** Plain ES modules; what is in this folder is what
-  is served.
+  is served. [`lib/amino.js`](./lib/amino.js), the encoder simulation needs, is copied
+  from [moul/gno4](https://github.com/moul/gno4/blob/main/web/amino.js), where it is
+  tested byte for byte against gnokey.
 
 ## Run it locally
 

@@ -2,7 +2,7 @@
 // the public Render and lifts the gallows, the word and the guesses out of it,
 // then turns the alphabet into Guess buttons.
 
-export function mount(el, { client, path, call }) {
+export function mount(el, { client, path, call, wallet }) {
   el.innerHTML = `
     <div class="app-panel">
       <pre class="gallows" data-g></pre>
@@ -34,7 +34,7 @@ export function mount(el, { client, path, call }) {
     $("[data-msg]").textContent = `guessing “${b.dataset.c}”, waiting for the wallet…`;
     try {
       const tx = await call("Guess", [b.dataset.c]);
-      $("[data-msg]").textContent = `included at height ${tx.height}`;
+      $("[data-msg]").textContent = wallet.describe(tx);
       refresh();
     } catch (e) {
       $("[data-msg]").textContent = e.message;

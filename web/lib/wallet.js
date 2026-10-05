@@ -1,8 +1,16 @@
-// Adena, the gno.land browser wallet, injects `window.adena`. Reads never need
-// it; only a transaction does. Gas is left out of every message on purpose: the
-// wallet simulates and sizes it, and shows it to the user before signing.
+// Two ways to sign, picked in the header. Reads never need either.
+//   adena    the gno.land browser wallet, `window.adena`. Gas is left out of
+//            every message on purpose: the wallet simulates and sizes it.
+//   gnokey   no wallet at all: a modal with the command to paste, its gas
+//            measured by simulation (lib/gnokey.js).
+
+import * as gnokey from "./gnokey.js";
+import { NETWORKS } from "./gno.js";
 
 const adena = () => window.adena;
+
+export const signer = () => localStorage.getItem("signer") || (adena() ? "adena" : "gnokey");
+export const setSigner = (s) => localStorage.setItem("signer", s);
 
 export const hasWallet = () => Boolean(adena());
 
@@ -17,10 +25,24 @@ export async function connect() {
   return account;
 }
 
-export const current = () => account;
+// current is who the page acts for: the connected wallet, or the address
+// typed into the gnokey modal.
+export function current() {
+  if (signer() === "gnokey") {
+    const address = localStorage.getItem("gnokey.addr");
+    return address ? { address } : null;
+  }
+  return account;
+}
+
+// describe says what happened, for a status line.
+export const describe = (tx) => (tx.manual ? "sent with gnokey, refreshing" : `included at height ${tx.height}`);
 
 // call sends one MsgCall. args are strings, without the `cur realm` parameter.
-export async function call(chainId, pkgPath, func, args = [], send = "") {
+export async function call(net, pkgPath, func, args = [], send = "") {
+  const cfg = NETWORKS[net];
+  if (signer() === "gnokey" || !adena()) return gnokey.open({ net, cfg, pkgPath, func, args, send });
+  const chainId = cfg.chainId;
   const acc = account || (await connect());
   if (acc.chainId !== chainId) {
     if (adena().SwitchNetwork) {
