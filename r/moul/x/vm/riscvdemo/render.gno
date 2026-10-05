@@ -61,7 +61,7 @@ func renderHome() string {
 			i.Status.String(),
 			ufmt.Sprintf("%d", i.FuelUsed),
 			ufmt.Sprintf("%d", i.Slices),
-			"`"+ui.Cell(printable(i.Output, 24))+"`",
+			codeCell(printable(i.Output, 24)),
 		)
 		return false
 	})
@@ -241,4 +241,13 @@ func printable(b []byte, max int) string {
 		sb.WriteString("…")
 	}
 	return sb.String()
+}
+
+// codeCell puts already-printable text in a code span inside a table cell.
+// Inside backticks markdown escapes are not applied, so ui.Cell's backslashes
+// would reach the reader verbatim ("Hello, gno\.land"); the one character a
+// table cell still needs escaped there is the pipe. printable has already
+// removed the backtick and the newline, the other two that could break out.
+func codeCell(s string) string {
+	return "`" + strings.ReplaceAll(s, "|", "\\|") + "`"
 }

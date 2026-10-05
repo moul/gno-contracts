@@ -191,6 +191,21 @@ func TestRenderInstanceHex(cur realm, t *testing.T) {
 	uassert.True(t, strings.Contains(out, "05d00893 00000073"), out)
 }
 
+// The instance list shows output in a code span, where markdown escapes do
+// not apply: ui.Cell's backslashes used to reach the reader as
+// `Hello, gno\.land\\n`. Only the pipe needs escaping inside the span.
+func TestRenderOutputCell(cur realm, t *testing.T) {
+	resetState()
+	testing.SetRealm(testing.NewUserRealm(alice()))
+
+	id := UploadSample(cross(cur), "hello", "", 0)
+	Step(cross(cur), id, 0)
+
+	out := Render("")
+	uassert.True(t, strings.Contains(out, "| `Hello, gno.land\\n` |"), out)
+	uassert.Equal(t, "`a\\|b`", codeCell("a|b"))
+}
+
 func TestRenderUnknownInstance(t *testing.T) {
 	uassert.True(t, strings.Contains(Render("/nope"), "No such instance"))
 }
