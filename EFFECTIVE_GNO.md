@@ -442,7 +442,8 @@ func Render(path string) string {
 The zero value is usable, `Named` only improves the panic message, and `Page` /
 `PageReverse` / `Pages` mean you do not also import a pager for the common case.
 
-**Do not pad ids by hand with `ufmt`.** `ufmt` supports no width flags at all:
+**Do not pad ids by hand with `ufmt`.** `p/nt/ufmt/v0` supports no width flags at all
+(`gno.land/p/moul/vendor/nt/ufmt/v2` does, for display):
 `ufmt.Sprintf("%03d", 7)` returns `"7"`, silently, and unpadded numeric keys sort
 `"0","1","10","11","2"`, so your list loses insertion order at the tenth entry. Use
 `store`, whose key is a `seqid` binary encoding with no width to overflow, or
@@ -752,7 +753,8 @@ txlink.NewLink("Donate").AddArgs("message", "thanks").SetSend("1000000ugnot").UR
 | an amount in ugnot | `num.GNOTf(v)` | `"1.234567 GNOT"` |
 | the same in a column | `num.DecFixed(v, 6)` | constant width, no trimmed zeros |
 | a fee or a share in basis points | `num.Pct(bps)` | `Pct(1234)` is `"12.34%"` |
-| a zero-padded number, for display | `num.Pad(v, 3)` | `"007"`, which `ufmt` cannot do |
+| a zero-padded number, for display | `num.Pad(v, 3)` | `"007"`, which `ufmt/v0` cannot do |
+| a width, a padding, hex, `%X`, `%q`, `%e` | `ufmt.Sprintf` from `p/moul/vendor/nt/ufmt/v2` | Go's `fmt`; v0 prints `(unhandled)` |
 | a rank | `ui.Podium(i)` | the medal for the first three, nothing after |
 | nothing at all | `ui.Empty(msg)`, `t.OrEmpty(msg)` | a sentence instead of a blank page |
 | optional sections | `ui.Join("\n\n", parts…)` | skips the empty ones, no stray separators |
@@ -1222,7 +1224,8 @@ live. If you are about to write a helper, look here first.
 | `min`, `max`, `clamp`, `abs`, `sign` for a numeric type | [`xmath`](./p/moul/xmath), one concrete function per type |
 | `a*b/c` that might overflow halfway | [`xmath`](./p/moul/xmath) `MulDiv`, `MulDivUp` |
 | an amount formatter for ugnot | [`kit/num`](./p/moul/kit/num) |
-| a zero-padding helper, because `ufmt` has no width flags | [`kit/num`](./p/moul/kit/num) `Pad` |
+| a zero-padding helper, because `ufmt` has no width flags | [`kit/num`](./p/moul/kit/num) `Pad`, or [`vendor/nt/ufmt`](./p/moul/vendor/nt/ufmt) v2, which has them |
+| a `Sprintf` that is Go's, flags and verbs included | [`vendor/nt/ufmt`](./p/moul/vendor/nt/ufmt), `gno.land/p/moul/vendor/nt/ufmt/v2` |
 | an auto-incrementing id plus a padded avl key | [`kit/store`](./p/moul/kit/store) |
 | a `key -> id` lookup beside a store | [`kit/index`](./p/moul/kit/index) |
 | a `Len`/`Swap`/`Less` for a leaderboard | [`kit/tally`](./p/moul/kit/tally) |

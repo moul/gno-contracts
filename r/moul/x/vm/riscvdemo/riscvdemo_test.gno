@@ -174,6 +174,23 @@ func TestRenderInstanceShowsTheRegisterFile(cur realm, t *testing.T) {
 	uassert.True(t, strings.Contains(out, "halted"), "the status")
 }
 
+// The instance page is all hex: the pc, every register, the image dump.
+// gno.land/p/nt/ufmt/v0 has no %X and no width flags, so this page shipped
+// printing "0x(unhandled verb: %X)" in every cell; the test pins the fix.
+func TestRenderInstanceHex(cur realm, t *testing.T) {
+	resetState()
+	testing.SetRealm(testing.NewUserRealm(alice()))
+
+	// addi a7, zero, 93 ; ecall (exit)
+	id := Upload(cross(cur), "0x9308d005 73000000", "", 0)
+	Step(cross(cur), id, 0)
+
+	out := Render("/" + id)
+	uassert.False(t, strings.Contains(out, "unhandled"), out)
+	uassert.True(t, strings.Contains(out, "| a7 | 0x0000005D | 93 | 93 |"), out)
+	uassert.True(t, strings.Contains(out, "05d00893 00000073"), out)
+}
+
 func TestRenderUnknownInstance(t *testing.T) {
 	uassert.True(t, strings.Contains(Render("/nope"), "No such instance"))
 }

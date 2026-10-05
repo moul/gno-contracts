@@ -216,6 +216,10 @@ module = "gno.land/p/moul/ulist/v1"
 source = { dir = "p/moul/ulist" }
 
 [[module]]
+module = "gno.land/p/moul/vendor/nt/ufmt/v2"
+source = { dir = "p/moul/vendor/nt/ufmt" }
+
+[[module]]
 module = "gno.land/p/moul/vesting/v0"
 source = { dir = "p/moul/vesting" }
 

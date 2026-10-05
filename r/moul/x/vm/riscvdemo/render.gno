@@ -6,7 +6,7 @@ import (
 	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/x/vm/riscv/v0"
 	"gno.land/p/moul/x/vm/vmkit/v0"
-	"gno.land/p/nt/ufmt/v0"
+	"gno.land/p/moul/vendor/nt/ufmt/v2"
 )
 
 // regNames are the ABI names, because nobody reading a register dump thinks in
