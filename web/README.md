@@ -27,17 +27,29 @@ The `local` network targets a `gnodev` on `127.0.0.1:26657`.
 |---|---|
 | Render | the markdown `Render()` returns, links rewired to stay in the dashboard |
 | Functions | every exported function: a read one becomes a `qeval` form, a crossing one (`cur realm` first) a wallet transaction |
-| Source | the deployed files, as the chain has them |
+| Source | every deployed file on one page, code first, then tests, then the rest |
 
 The list of realms comes from `contracts.json` on `main`, filtered to what is
 uploaded on the selected network.
+
+## Custom apps
+
+A realm with its own page carries a **⚡ live app** badge, on its card and in the
+list, and sorts first. Today:
+
+| realm | page | what it adds |
+|---|---|---|
+| `x/daily/counter/v0` | [`counter.js`](./apps/counter.js) | live value, Inc / Dec buttons |
+| `x/daily/dice/v0` | [`dice.js`](./apps/dice.js) | the distribution as bars, Roll, your own rolls |
+| `x/daily/hangman/v0` | [`hangman.js`](./apps/hangman.js) | gallows and word lifted from `Render`, an A to Z keyboard of `Guess` calls |
+| `x/daily/eightball/v1` | [`eightball.js`](./apps/eightball.js) | a question box, the answer the transaction returned |
 
 ## Adding a demo
 
 1. A line in [`apps/index.js`](./apps/index.js): `{ path, title, blurb }`. It shows on
    the front page and opens in the generic view.
 2. When it deserves its own UI, write `apps/<name>.js` exporting
-   `mount(el, { client, net, path, call })`, return a cleanup function, and add
+   `mount(el, { client, net, path, call, wallet })`, return a cleanup function, and add
    `module: "<name>"` to its line. [`apps/counter.js`](./apps/counter.js) is the
    worked example: it polls `Value()` and turns `Inc` / `Dec` into buttons.
 

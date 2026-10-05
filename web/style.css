@@ -32,6 +32,8 @@ input { min-width: 0; }
 .card.off { opacity: .55; }
 .card code { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 .tag { display: inline-block; font-size: 11px; padding: 0 .4rem; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.live { display: inline-block; font-size: 11px; font-weight: 600; padding: 0 .45rem; border-radius: 999px; background: var(--accent); color: var(--bg); white-space: nowrap; }
+.card.app { border-color: var(--accent); }
 .tag.warn { color: var(--warn); border-color: var(--warn); }
 
 .catalog { list-style: none; padding: 0; margin: 0; columns: 2 22rem; }
@@ -51,7 +53,20 @@ input { min-width: 0; }
 
 .func { padding: .7rem 0; border-bottom: 1px solid var(--line); }
 .out, .src, .md pre { background: var(--code); padding: .7rem; border-radius: 6px; overflow: auto; white-space: pre-wrap; }
-.src { max-height: 70vh; white-space: pre; }
+.src { white-space: pre; }
+.file h3 { font: 600 14px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 1.4rem 0 .4rem; }
+.bars { display: flex; gap: .6rem; align-items: flex-end; justify-content: center; height: 7rem; margin: 1.6rem 0 1rem; }
+.bars div { width: 2.6rem; background: var(--accent); border-radius: 4px 4px 0 0; position: relative; min-height: 2px; }
+.bars span { position: absolute; bottom: -1.6rem; left: 0; right: 0; text-align: center; font-size: 1.3rem; }
+.bars b { position: absolute; top: -1.3rem; left: 0; right: 0; text-align: center; font-size: 12px; }
+.keys { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: center; max-width: 34rem; margin: 1rem auto; }
+.keys button { width: 2.3rem; padding: .35rem 0; font-weight: 600; }
+.keys button:disabled { opacity: .3; cursor: default; }
+.word { font: 700 2rem/1.3 ui-monospace, Menlo, monospace; letter-spacing: .4rem; }
+.gallows { display: inline-block; text-align: left; background: none; }
+.answer { font-size: 1.6rem; font-weight: 700; margin: 1rem 0; }
+.app-panel { text-align: center; }
+.app-panel input { width: min(28rem, 100%); }
 
 .md img { max-width: 100%; }
 .md .table { overflow-x: auto; }

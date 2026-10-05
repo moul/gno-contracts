@@ -24,6 +24,8 @@ let catalog = null;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const h = (html) => Object.assign(document.createElement("div"), { innerHTML: html }).firstElementChild;
 const short = (p) => p.replace(/^gno\.land/, "");
+const LIVE = '<span class="live" title="A custom interactive app: try it">⚡ live app</span>';
+const CUSTOM = new Set(FEATURED.filter((a) => a.module).map((a) => a.path));
 
 for (const name of Object.keys(NETWORKS)) netSelect.add(new Option(`${name} (${NETWORKS[name].chainId})`, name));
 netSelect.value = net;
@@ -61,7 +63,9 @@ const live = (c) => net === "local" || c.published?.[net]?.uploaded;
 
 async function viewHome() {
   main.innerHTML = `
-    <section><h2>Featured</h2><div class="grid" id="featured"></div></section>
+    <section><h2>Featured</h2>
+      <p class="muted">${LIVE} marks a custom interactive app: live data, buttons wired to your wallet. The rest open in the generic view.</p>
+      <div class="grid" id="featured"></div></section>
     <section>
       <h2>Every realm <span class="muted" id="count"></span></h2>
       <input id="filter" placeholder="filter: counter, x/daily, amm…" autocomplete="off">
@@ -73,8 +77,8 @@ async function viewHome() {
     const c = byPath.get(app.path);
     const off = c && !live(c);
     main.querySelector("#featured").append(h(`
-      <a class="card${off ? " off" : ""}" href="#${short(app.path)}">
-        <div><strong>${esc(app.title)}</strong>${app.module ? ' <span class="tag">custom</span>' : ""}</div>
+      <a class="card${app.module ? " app" : ""}${off ? " off" : ""}" href="#${short(app.path)}">
+        <div><strong>${esc(app.title)}</strong>${app.module ? ` ${LIVE}` : ""}</div>
         <span class="muted">${esc(app.blurb || c?.description || "")}</span>
         <code>${esc(short(app.path))}</code>
         ${off ? `<span class="tag warn">not on ${net}</span>` : ""}
@@ -83,10 +87,11 @@ async function viewHome() {
 
   const list = main.querySelector("#all");
   const draw = (q) => {
-    const rows = [...byPath.values()].filter((c) => live(c) && c.pkgpath.includes(q));
+    const rows = [...byPath.values()].filter((c) => live(c) && c.pkgpath.includes(q))
+      .sort((a, b) => CUSTOM.has(b.pkgpath) - CUSTOM.has(a.pkgpath));
     main.querySelector("#count").textContent = `${rows.length} on ${net}`;
     list.innerHTML = rows.map((c) =>
-      `<li><a href="#${short(c.pkgpath)}">${esc(short(c.pkgpath))}</a> <span class="muted">${esc(c.description || "")}</span></li>`).join("");
+      `<li><a href="#${short(c.pkgpath)}">${esc(short(c.pkgpath))}</a>${CUSTOM.has(c.pkgpath) ? ` ${LIVE}` : ""} <span class="muted">${esc(c.description || "")}</span></li>`).join("");
   };
   main.querySelector("#filter").addEventListener("input", (e) => draw(e.target.value.trim()));
   draw("");
@@ -116,6 +121,7 @@ async function viewRealm(route) {
     const mod = await import(`./apps/${app.module}.js`);
     unmount = mod.mount(main.querySelector("#custom"), {
       client, net, path: pkgpath,
+      wallet,
       call: (func, a = [], send = "") => wallet.call(NETWORKS[net].chainId, pkgpath, func, a, send),
     });
   }
@@ -187,12 +193,14 @@ async function paneFuncs(pane, pkgpath) {
 async function paneSource(pane, pkgpath) {
   pane.innerHTML = '<p class="muted">loading…</p>';
   try {
-    const files = (await client.file(pkgpath)).split("\n").filter(Boolean);
-    pane.innerHTML = `<div class="row files">${files.map((f) => `<button>${esc(f)}</button>`).join("")}</div><pre class="src"></pre>`;
-    const show = async (f) => { pane.querySelector(".src").textContent = await client.file(`${pkgpath}/${f}`); };
-    pane.querySelectorAll(".files button").forEach((b) => b.addEventListener("click", () => show(b.textContent)));
-    const first = files.find((f) => f.endsWith(".gno") && !f.endsWith("_test.gno"));
-    if (first) show(first);
+    // Every file on one page, in reading order: code, then tests, then the rest.
+    const rank = (f) => (f.endsWith("_test.gno") ? 1 : f.endsWith(".gno") ? 0 : 2);
+    const files = (await client.file(pkgpath)).split("\n").filter(Boolean)
+      .sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+    const bodies = await Promise.all(files.map((f) => client.file(`${pkgpath}/${f}`)));
+    pane.innerHTML = files.map((f, i) => `
+      <section class="file"><h3 id="src-${esc(f)}">${esc(f)} <span class="muted">${bodies[i].split("\n").length} lines</span></h3>
+      <pre class="src">${esc(bodies[i])}</pre></section>`).join("");
   } catch (e) {
     pane.innerHTML = `<p class="err">${esc(e.message)}</p>`;
   }
