@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-06T03:41:10Z",
+  "status_checked_at": "2026-10-06T04:39:18Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -787,7 +787,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -1664,7 +1665,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -3297,7 +3299,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -3321,7 +3324,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -3342,7 +3346,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -3367,7 +3372,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -3392,7 +3398,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -3419,7 +3426,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -3748,7 +3756,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -5780,7 +5789,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -7387,7 +7397,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -8000,7 +8011,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -9648,7 +9660,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -9965,7 +9978,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -10277,7 +10291,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -10344,7 +10359,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -10476,7 +10492,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -10505,7 +10522,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -10535,7 +10553,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -10564,7 +10583,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -10592,7 +10612,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
@@ -11280,7 +11301,8 @@
       "draft": false,
       "published": {
         "mainnet": {
-          "uploaded": false
+          "uploaded": true,
+          "which": "ours"
         },
         "onyx": {
           "uploaded": false
