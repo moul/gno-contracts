@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-05T23:31:37Z",
+  "status_checked_at": "2026-10-06T00:52:06Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -3272,6 +3272,156 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/social/coin/v0",
+      "dir": "p/moul/x/social/coin",
+      "kind": "p",
+      "name": "x/social/coin",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/num/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/nt/grc20/v0",
+        "gno.land/p/nt/seqid/v0",
+        "gno.land/p/nt/ufmt/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/social/crew/v0",
+      "dir": "p/moul/x/social/crew",
+      "kind": "p",
+      "name": "x/social/crew",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/xmath/v1"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/social/curated/v0",
+      "dir": "p/moul/x/social/curated",
+      "kind": "p",
+      "name": "x/social/curated",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/social/patron/v0",
+      "dir": "p/moul/x/social/patron",
+      "kind": "p",
+      "name": "x/social/patron",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/x/daily/pullpayment/v0",
+        "gno.land/p/moul/xmath/v1"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/social/threads/v0",
+      "dir": "p/moul/x/social/threads",
+      "kind": "p",
+      "name": "x/social/threads",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/social/vouch/v0",
+      "dir": "p/moul/x/social/vouch",
+      "kind": "p",
+      "name": "x/social/vouch",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/addrset/v1",
+        "gno.land/p/moul/kit/num/v0",
+        "gno.land/p/moul/kit/tally/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/pullpayment/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -10299,6 +10449,152 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/social/crews/v0",
+      "dir": "r/moul/x/social/crews",
+      "kind": "r",
+      "name": "x/social/crews",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/num/v0",
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/envelope/v0",
+        "gno.land/p/moul/x/social/crew/v0",
+        "gno.land/p/moul/xmath/v1"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/social/curated/v0",
+      "dir": "r/moul/x/social/curated",
+      "kind": "r",
+      "name": "x/social/curated",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/num/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/p/moul/x/envelope/v0",
+        "gno.land/p/moul/x/social/curated/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/social/patron/v0",
+      "dir": "r/moul/x/social/patron",
+      "kind": "r",
+      "name": "x/social/patron",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/num/v0",
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/txlink/v0",
+        "gno.land/p/moul/x/envelope/v0",
+        "gno.land/p/moul/x/social/patron/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/social/threads/v0",
+      "dir": "r/moul/x/social/threads",
+      "kind": "r",
+      "name": "x/social/threads",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/store/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/social/coin/v0",
+        "gno.land/p/moul/x/social/threads/v0",
+        "gno.land/r/nt/grc20reg/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/social/vouch/v0",
+      "dir": "r/moul/x/social/vouch",
+      "kind": "r",
+      "name": "x/social/vouch",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/num/v0",
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/envelope/v0",
+        "gno.land/p/moul/x/social/vouch/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {

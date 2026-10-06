@@ -266,6 +266,12 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/plan9/ns/v0`](p/moul/x/plan9/ns) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/ns/v0) | — | — | 2 |
 | [`p/moul/x/plan9/rc/v0`](p/moul/x/plan9/rc) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/rc/v0) | — | — | 3 |
 | [`p/moul/x/plan9/synfs/v0`](p/moul/x/plan9/synfs) 📦 | — | [✅](https://gno.land/p/moul/x/plan9/synfs/v0) | — | — | 2 |
+| [`p/moul/x/social/coin/v0`](p/moul/x/social/coin) 📦 | — | — | — | — | 6 |
+| [`p/moul/x/social/crew/v0`](p/moul/x/social/crew) 📦 | — | — | — | — | 2 |
+| [`p/moul/x/social/curated/v0`](p/moul/x/social/curated) 📦 | — | — | — | — | — |
+| [`p/moul/x/social/patron/v0`](p/moul/x/social/patron) 📦 | — | — | — | — | 3 |
+| [`p/moul/x/social/threads/v0`](p/moul/x/social/threads) 📦 | — | — | — | — | 3 |
+| [`p/moul/x/social/vouch/v0`](p/moul/x/social/vouch) 📦 | — | — | — | — | 5 |
 | [`p/moul/x/storagecost/v0`](https://github.com/moul/gno-contracts/tree/96f8aef268ca00444bde83349a6d95c021cb71bf/p/moul/x/storagecost) 📦 🧊 | — | [✅](https://gno.land/p/moul/x/storagecost/v0) | — | — | 1 |
 | [`p/moul/x/storagecost/v1`](p/moul/x/storagecost) 📦 | — | [✅](https://gno.land/p/moul/x/storagecost/v1) | — | — | 2 |
 | [`p/moul/x/vm/bf/v0`](p/moul/x/vm/bf) 📦 | — | [✅](https://gno.land/p/moul/x/vm/bf/v0) | — | — | 2 |
@@ -483,6 +489,11 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/provable/v0`](r/moul/x/provable) 🏛️ | — | [✅](https://gno.land/r/moul/x/provable/v0) | — | — | 2 |
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
 | [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | [✅](https://gno.land/r/moul/x/reaper/v1) | — | — | 5 |
+| [`r/moul/x/social/crews/v0`](r/moul/x/social/crews) 🏛️ | — | — | — | — | 8 |
+| [`r/moul/x/social/curated/v0`](r/moul/x/social/curated) 🏛️ | — | — | — | — | 7 |
+| [`r/moul/x/social/patron/v0`](r/moul/x/social/patron) 🏛️ | — | — | — | — | 8 |
+| [`r/moul/x/social/threads/v0`](r/moul/x/social/threads) 🏛️ | — | — | — | — | 7 |
+| [`r/moul/x/social/vouch/v0`](r/moul/x/social/vouch) 🏛️ | — | — | — | — | 6 |
 | [`r/moul/x/upgrade/adminreg/facade/v0`](r/moul/x/upgrade/adminreg/facade) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/adminreg/facade/v0) | — | — | 3 |
 | [`r/moul/x/upgrade/adminreg/impl/v0`](r/moul/x/upgrade/adminreg/impl/gen0) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/adminreg/impl/v0) | — | — | 1 |
 | [`r/moul/x/upgrade/adminreg/impl/v1`](r/moul/x/upgrade/adminreg/impl/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/adminreg/impl/v1) | — | — | 1 |
@@ -512,7 +523,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-05T23:31:37Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-06T00:52:06Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
