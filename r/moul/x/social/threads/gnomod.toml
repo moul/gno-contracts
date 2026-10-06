@@ -1,0 +1,15 @@
+module = "gno.land/r/moul/x/social/threads/v0"
+gno = "0.9"
+
+# public: the entire point of this realm is that other realms import it and
+# call RenderBlock() inside their own Render, exactly as r/moul/reactions does.
+# A private realm cannot be imported at all, so `private = true` here would
+# delete the feature rather than trade against it.
+#
+# It also issues a GRC20 and registers it with r/nt/grc20reg, which hands an
+# object to another realm: a private realm panics at runtime when it does that.
+#
+# What private would have bought, redeploy-in-place, is given up deliberately.
+# Every thread, every balance and every pin under this path belongs to the
+# people who wrote them, so a fix ships as a v1 beside it rather than as a
+# redeploy that silently wipes the lot.
