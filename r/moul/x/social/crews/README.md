@@ -1,0 +1,80 @@
+# crews
+
+A crew is three to fifteen people with a shared pot, a way to decide, and a way
+to leave with their share. One transaction to start one.
+
+The chain wiring for [`p/moul/x/social/crew`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/social/crew), which
+holds the share math and the proposal state. This realm reads the caller, reads
+the coins attached to the call, asks the engine, and renders the result.
+
+## The API
+
+| call | |
+|---|---|
+| `Create(name)` | payable. You become the crew's first member, your shares bought out of what you sent at `InitialPricePerShare`. |
+| `Join(crewID)` | payable. Mints shares at what a share is worth **now**: `amount * totalShares / treasury`, rounded down. |
+| `Fund(crewID)` | payable. Adds to the treasury and mints nothing, so every existing share is worth more. |
+| `Propose(crewID, text)` | any member. Open for `VoteBlocks` blocks. |
+| `Vote(proposalID, yes)` | weighted by the shares you hold right now, changeable while it is open. |
+| `Close(proposalID)` | anyone, after the deadline. Records passed or failed by share weight. |
+| `Ragequit(crewID)` | burn every share you hold, be credited your pro-rata of the treasury, leave. |
+| `Withdraw()` | collect what you were credited. |
+
+Reads: `Get`, `Count`, `SharesOf`, `MemberCount`, `Treasury`, `ValuePerShare`,
+`ProposalOf`, `Tally`, `CreditOf`, `TotalOwed`.
+
+`Render` serves three views: the index, `:crew/<id>`, and `:proposal/<id>`.
+
+## Shares are the token, and that is the answer
+
+The shares **are** the token. They are the vote weight and the claim on the
+treasury at once, minted by joining and burned by leaving, so nothing about
+them is decorative and nobody has to be persuaded they are worth something.
+
+v0 keeps them as an internal ledger rather than one GRC20 per crew, because a
+GRC20 per crew means a realm per crew. A transferable share belongs in
+[`p/moul/x/social/coin`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/social/coin), the sibling that refuses to
+exist until its mint rule, sink and buyer are declared. This realm does not
+import it.
+
+## The custody caveat, which is real
+
+**One realm address holds every crew's treasury**, with per-crew accounting
+inside it. The chain sees one balance; which crew owns which part of it is a
+number in this realm's state.
+
+So a bug in that accounting is a bug **across** crews, not inside one. An
+arithmetic error that over-credits one crew's ragequit pays it out of another
+crew's money, and nothing at the bank layer would refuse that transfer: as far
+as the chain is concerned it is all the same address paying itself out.
+
+The fix is the instance-per-realm pattern
+(`EFFECTIVE_GNO.md` section 1.4, in this repository): one realm
+per crew, each holding its own coins at its own address, with
+`p/moul/x/social/crew` as the shared engine. That is v1. It is not v0 because
+deploying a realm per crew is a publish per crew, which is the opposite of
+"create it in one transaction", and the one transaction is the whole product
+claim.
+
+## Payouts are pulled, never pushed
+
+A ragequit credits an internal ledger and the leaver calls `Withdraw`
+themselves. One address that cannot be paid cannot wedge anybody else, and the
+credit is zeroed before the coins move, so a reentrant call finds nothing left
+to take.
+
+## What a proposal does not do
+
+Nothing. A v0 proposal is advisory text: passing one records that the crew
+agreed by share weight at a point in time, and moves no coins, changes no
+membership and binds no code. Executing a payout is the next step, and it is
+what would turn this into a treasury contract rather than a notice board.
+
+## Why this realm is private
+
+`private = true`, so it can be redeployed at this path by its creator, and no
+other realm may import it. The trade is the usual one: a redeploy wipes every
+package-level variable, so every crew, every share and every credit would go
+with it while the coins stayed at the address. Nothing imports this realm and
+nothing is meant to, so the redeploy door is worth more than the import one
+while the design is still moving. The v1 above is the move that closes it.
