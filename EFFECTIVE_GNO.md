@@ -106,6 +106,7 @@ section if you need the reasoning.
 | refuse a call that did not pay enough | `envelope.RequireAtLeast` | [4.2](#42-receiving-coins-is-envelope) |
 | pay many people | credit a ledger, let them withdraw: [`x/daily/pullpayment`](./p/moul/x/daily/pullpayment) | [4.3](#43-paying-out-is-a-pull-never-a-push) |
 | issue a token | `p/nt/grc20`, not a hand-rolled balance map | [4.1](#41-coins-or-a-grc20) |
+| issue one for an app, and be sure it is not decoration | [`p/moul/x/social/coin`](./p/moul/x/social/coin) | [4.1](#41-coins-or-a-grc20) |
 | wrap a token I do not control | [`p/moul/x/grc20wrap`](./p/moul/x/grc20wrap) | [4.1](#41-coins-or-a-grc20) |
 | split an amount N ways and have it add up | [`x/games/prorata`](./p/moul/x/games/prorata) | [4.5](#45-rounding-is-the-money-question) |
 | multiply then divide without overflowing | `xmath.MulDiv` / `MulDivUp` | [4.5](#45-rounding-is-the-money-question) |
@@ -671,6 +672,29 @@ site that builds the markdown:
 | `ui.Cell(s)` | a table cell, which must not open a new column |
 | `ui.Excerpt(s, n)` | the same, truncated, without ever stranding a backslash |
 
+**A link is not a safe place to put caller text inside a table.** `md.Link`
+escapes its title for you, with `sanitize.InlineText`, and that escaper
+deliberately leaves `|` alone: a pipe means nothing in a sentence. Only
+`ui.Cell` rewrites it, because only a table cell cares. So
+`md.Link(callerText, url)` in a `ui.NewTable` row renders
+`| [a | pipe](...) |` and opens a column, exactly the thing the table helper
+exists to prevent, and wrapping the title in `ui.Cell` is not the fix either:
+`md.Link` escapes again on top and the backslashes render.
+
+Make the link title **yours** and give the caller's text its own cell:
+
+```gno
+t.Row(
+	md.Link("#"+id.String(), itemURL(id)),   // chrome, no caller bytes in it
+	ui.Cell(ui.ShortN(body, 60, 0)),         // cut first, then escape once
+)
+```
+
+`ui.ShortN(s, n, 0)` truncates without escaping, which is what makes the
+cut-then-escape order possible; `ui.Excerpt` escapes as it cuts and is right
+only where `ui.Inline` would have been. Found three times independently while
+writing `x/social`, in three different realms, from the same one-line pattern.
+
 This repository enforces it with a CI guard rather than a review, and the reason is §1.1: a
 public package path is immutable, so a realm that ships an unescaped `Render` keeps it
 forever and the only fix is a new path. It was a convention until 2026-09-22 and the
@@ -806,6 +830,12 @@ banker, and a realm holds them at its own address. Use them when the thing *is* 
 **A GRC20** is a realm-level ledger implemented by `p/nt/grc20`. Use it when you are
 issuing something: shares, points, a wrapped asset. Do not hand-roll a `map[address]int64`
 and call it a token; you will get the allowance semantics wrong and nothing will index it.
+
+**A token for an app is [`p/moul/x/social/coin`](./p/moul/x/social/coin)**, which
+is `p/nt/grc20` plus the three declarations a social app's token usually dodges:
+what mints it, what burns it, and who has a reason to buy it. `New` panics on a
+blank one, so the decision happens before the first unit exists rather than in a
+README written afterwards. A mint rule with no sink is a scoreboard with a price.
 
 Wrapping a token you do not control is [`p/moul/x/grc20wrap`](./p/moul/x/grc20wrap):
 `Vault` escrows an existing token and issues its own against it, `Basket` does it over
@@ -1242,6 +1272,8 @@ live. If you are about to write a helper, look here first.
 | a multi-error | [`errs`](./p/moul/errs) |
 | base58, base32, crc32, a Merkle proof, semver | [`x/daily/*`](./README.md#contracts), [`x/merkle`](./p/moul/x/merkle) |
 | a reaction bar under a page | [`reactions`](./p/moul/reactions) |
+| a discussion attached to a page, realm or proposal | [`x/social/threads`](./p/moul/x/social/threads) |
+| a GRC20 for an app, with its sink declared up front | [`x/social/coin`](./p/moul/x/social/coin) |
 | a one-time init guard | [`once`](./p/moul/once) |
 | an SVG | [`svg`](./p/moul/svg) |
 

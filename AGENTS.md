@@ -170,6 +170,13 @@ monorepo checkout held that day rather than the copy committed under `vendor/`.
   pin. Use a no-arg closure that crosses with the outer `cur`, as `r/moul/x/wesh` and
   `r/moul/forge` do:
   `uassert.AbortsContains(t, cur, "stale ref", func() { SetRef(cross(cur), …) })`.
+- **A uassert custom message is a FORMAT STRING.** `fail` ends in
+  `t.Errorf(failureMessage, args...)` with your message concatenated into the
+  format, so the usual `uassert.True(t, cond, "...: "+got)` turns every `%` in
+  `got` into a verb: a rendered page carrying a percent-encoded URL reports
+  `page=gno.land%!F(MISSING)r%!F(MISSING)moul`, which reads exactly like a
+  broken link builder and is not one. The output under test is fine; only the
+  failure text is mangled. Cost half an hour chasing `txlink` 2026-10-06.
 - **`recover()` cannot catch a panic from a crossing call.** A panic raised across
   `cross(cur)` is a realm abort and a `defer`/`recover()` in the caller never fires, even
   when the test is in the realm's own package: the test dies with

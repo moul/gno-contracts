@@ -434,6 +434,30 @@ module = "gno.land/p/moul/x/plan9/synfs/v0"
 source = { dir = "p/moul/x/plan9/synfs" }
 
 [[module]]
+module = "gno.land/p/moul/x/social/coin/v0"
+source = { dir = "p/moul/x/social/coin" }
+
+[[module]]
+module = "gno.land/p/moul/x/social/crew/v0"
+source = { dir = "p/moul/x/social/crew" }
+
+[[module]]
+module = "gno.land/p/moul/x/social/curated/v0"
+source = { dir = "p/moul/x/social/curated" }
+
+[[module]]
+module = "gno.land/p/moul/x/social/patron/v0"
+source = { dir = "p/moul/x/social/patron" }
+
+[[module]]
+module = "gno.land/p/moul/x/social/threads/v0"
+source = { dir = "p/moul/x/social/threads" }
+
+[[module]]
+module = "gno.land/p/moul/x/social/vouch/v0"
+source = { dir = "p/moul/x/social/vouch" }
+
+[[module]]
 module = "gno.land/p/moul/x/storagecost/v0"
 source = { commit = "96f8aef268ca00444bde83349a6d95c021cb71bf", dir = "p/moul/x/storagecost" }
 hash = "h1:aeV/DDJOCbvdbPvmPJwkOKUrUoL3i7hluggcTh2teDU="
@@ -1347,6 +1371,26 @@ hash = "h1:xg0zO8jrplmDs08h8bapn//8jlz1uOWZpvUyqXHt8Zk="
 [[module]]
 module = "gno.land/r/moul/x/reaper/v1"
 source = { dir = "r/moul/x/reaper" }
+
+[[module]]
+module = "gno.land/r/moul/x/social/crews/v0"
+source = { dir = "r/moul/x/social/crews" }
+
+[[module]]
+module = "gno.land/r/moul/x/social/curated/v0"
+source = { dir = "r/moul/x/social/curated" }
+
+[[module]]
+module = "gno.land/r/moul/x/social/patron/v0"
+source = { dir = "r/moul/x/social/patron" }
+
+[[module]]
+module = "gno.land/r/moul/x/social/threads/v0"
+source = { dir = "r/moul/x/social/threads" }
+
+[[module]]
+module = "gno.land/r/moul/x/social/vouch/v0"
+source = { dir = "r/moul/x/social/vouch" }
 
 [[module]]
 module = "gno.land/r/moul/x/upgrade/adminreg/facade/v0"
