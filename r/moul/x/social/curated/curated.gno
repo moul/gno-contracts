@@ -91,7 +91,21 @@ var list = cu.New(Deposit, ChallengeBlocks)
 // key is a slug: lowercase ASCII letters, digits, '-', '_' and '.', starting
 // alphanumeric. A key whose entry was removed is free to apply for again.
 func Apply(cur realm, key, url, description string) {
-	who := caller(cur)
+	// Both checks are inlined rather than hidden behind caller(), and in this
+	// order. cur.IsCurrent() before cur.Previous() is the realm-token rule;
+	// IsUserCall before the envelope read is the payment one, because the
+	// envelope reports what the SIGNER attached to the transaction and not
+	// what reached this realm. Without it a realm the user called keeps the
+	// coins and calls in here as often as it likes, every call reading the
+	// same send: that is r/moul/grant Fund, which recorded 5 donations of
+	// 1 GNOT from one 1 GNOT send with nothing in the treasury.
+	if !cur.IsCurrent() {
+		panic("spoofed realm: cur is not the live crossing frame")
+	}
+	if !cur.Previous().IsUserCall() {
+		panic("curated: paying in must be a direct user transaction")
+	}
+	who := cur.Previous().Address()
 	paid := envelope.RequireExactly(Denom, Deposit)
 	if err := list.Apply(key, url, description, who, paid, runtime.ChainHeight()); err != nil {
 		panic(err.Error())
@@ -106,7 +120,14 @@ func Apply(cur realm, key, url, description string) {
 // An owner cannot challenge their own entry: it would cost them nothing and
 // would make the entry immune to a real challenge for the whole window.
 func Challenge(cur realm, key string) {
-	who := caller(cur)
+	// The two guards every payable call needs, inlined; see Apply.
+	if !cur.IsCurrent() {
+		panic("spoofed realm: cur is not the live crossing frame")
+	}
+	if !cur.Previous().IsUserCall() {
+		panic("curated: paying in must be a direct user transaction")
+	}
+	who := cur.Previous().Address()
 	// The bond is read before the envelope is, so somebody who attaches coins
 	// to a challenge of something unchallengeable is told which of the two is
 	// wrong.

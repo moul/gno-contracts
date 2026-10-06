@@ -384,3 +384,31 @@ func TestRender(cur realm, t *testing.T) {
 	uassert.Equal(t, "# Curated\nNo entry named nope", Render("entry/nope"))
 	uassert.True(t, strings.HasPrefix(Render("elsewhere"), "# Not found"))
 }
+
+// A realm that forwards a user's call must not be able to spend the user's
+// envelope as if it were its own. OriginSend reports what the SIGNER attached
+// to the transaction, so without the IsUserCall guard a realm that received
+// one GNOT could call in here repeatedly, each call reading the same send and
+// listing another entry for free. That is r/moul/grant Fund, and gnovet's
+// origin-send-unguarded rule caught this exact shape here in CI after the
+// local gate had passed.
+func TestOnlyAUserCanPayIn(cur realm, t *testing.T) {
+	reset()
+
+	pay(Deposit)
+	testing.SetRealm(testing.NewCodeRealm("gno.land/r/g1relay/forwarder"))
+	uassert.AbortsContains(t, cur, "must be a direct user transaction", func() {
+		Apply(cross(cur), "relayed", "/r/x", "paid with somebody else's coins")
+	})
+	uassert.Equal(t, 0, Count(), "nothing was listed")
+
+	apply(cur, alice, "real", "/r/real", "a real entry")
+
+	pay(Deposit)
+	testing.SetRealm(testing.NewCodeRealm("gno.land/r/g1relay/forwarder"))
+	uassert.AbortsContains(t, cur, "must be a direct user transaction", func() {
+		Challenge(cross(cur), "real")
+	})
+	_, _, _, _, _, open := ChallengeOf("real")
+	uassert.False(t, open, "no challenge was opened")
+}
