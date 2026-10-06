@@ -1,0 +1,86 @@
+# crew
+
+Small-group coordination as a product rather than as a framework: three to
+fifteen people with a shared pot, a way to decide, and a way to leave with their
+share. The pure engine behind
+[`r/moul/x/social/crews`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/social/crews), which is the chain wiring.
+
+The targets are real and already exist: a validator set, a working group, a
+hackathon team, a five-person company. `p/moul/grants` and daokit are the
+framework layer; this is the thing you can create in one transaction.
+
+## The API
+
+```go
+cs := crew.New()
+
+id, err := cs.Create("validators", founder, amount, height)  // founder gets amount/InitialPricePerShare shares
+shares, err := cs.Join(id, who, amount)                      // minted at the CURRENT per-share value
+err := cs.Fund(id, amount)                                   // mints nothing, every share is worth more
+pid, err := cs.Propose(id, who, "ship v1", height)           // any member, open for VoteBlocks
+err := cs.Vote(pid, who, true, height)                       // weighted by shares held right now
+passed, err := cs.Close(pid, height)                         // anyone, after the deadline
+shares, amount, err := cs.Ragequit(id, who)                  // burn the shares, be credited the slice
+amount, err := cs.Withdraw(who)                              // collect, zeroed before it returns
+```
+
+Reads: `Get`, `Proposal`, `Len`, `ProposalCount`, `List`, `CreditOf`,
+`TotalOwed`, and on a `*Crew`: `SharesOf`, `IsMember`, `MemberCount`, `Members`,
+`Proposals`, `ValuePerShare`, `PricePerShare`.
+
+It returns errors and declares no crossing function. The caller, the height and
+the amount all arrive as plain arguments, and the realm decides what to abort
+on.
+
+## Shares are the token
+
+A share is the vote weight and the claim on the treasury at the same moment,
+minted by paying in and burned by leaving. There is no second asset to issue,
+distribute, or fail to make meaningful, and the exit price is the same number
+that votes: a member outvoted on everything can still leave with their part of
+what the crew built, and nobody has to agree to let them.
+
+## The trap it avoids: which way the division rounds
+
+Both divisions round **down**, so both round in the crew's favour.
+
+| | |
+|---|---|
+| joining | `amount * totalShares / treasury`, so a late joiner buys at what a share is worth **now**. Rounding up would hand them a sliver of value the existing members built. |
+| ragequitting | `shares * treasury / totalShares`, so a leaver takes no more than their slice and the remainder stays with the people who stayed. |
+
+Both go through `xmath.MulDiv`, which computes through a 128-bit intermediate
+and refuses rather than returning a wrong number: the naive `a*b/c` wraps to a
+plausible-looking figure, which is how a payout split leaks money without
+anything failing.
+
+The dust that accrues is never stranded. The last member out holds every
+outstanding share, so their division is exact and the treasury empties to the
+last ugnot. `TestEveryoneRagequittingEmptiesTheTreasury` pins it on a treasury
+of 3002 over three shares, which divides by nothing.
+
+## What v0 does not do
+
+A proposal is **advisory text**. Passing one records that the crew agreed by
+share weight and executes nothing: it moves no coins, changes no membership and
+binds no code. Executing a payout is the next step, and it is what turns this
+into a treasury contract rather than a notice board.
+
+A vote keeps the weight it was cast with. A member who votes and then ragequits
+leaves their weight behind in the tally, because unwinding it would mean
+reweighing every ballot on every share change.
+
+There is no quorum. A crew where one member votes and the rest ignore it passes
+the proposal, which is exactly as advisory as the text it carries. A tie fails.
+
+## Two write-time rules worth knowing
+
+`ValidName` refuses a pipe. A name is rendered as the title of a link inside a
+table cell, `md.Link` escapes with the inline-text escaper, and that escaper
+deliberately leaves `|` alone because a pipe is markdown-inert outside a table.
+Wrapping the title in `ui.Cell` on top would double-escape and render the
+backslashes, so the character is refused at write time instead.
+
+`ValidText` allows a pipe, because free prose legitimately contains one, and
+the render escapes it with `ui.Cell`. A validator and an escaper protect
+against different mistakes.

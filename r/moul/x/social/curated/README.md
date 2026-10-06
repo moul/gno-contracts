@@ -1,0 +1,84 @@
+# r/moul/x/social/curated
+
+A curated list with skin in the game. Anyone lists an entry by locking a deposit, anyone
+challenges an entry by matching that deposit with a bond, and after a voting window the
+loser's money goes to the winner. The deposit does not make an entry good. It makes a bad
+one expensive to leave standing, which is the only reason a list anybody can write to is
+worth reading at all.
+
+The engine is [`p/moul/x/social/curated/v0`](../../../../../p/moul/x/social/curated), a
+pure package that returns errors and moves no coins. This realm is the chain wiring: the
+envelope, the banker, the events and `Render`.
+
+## The API
+
+| call | pays | does |
+|---|---|---|
+| `Apply(key, url, description)` | exactly 1 GNOT | lists the entry immediately |
+| `Challenge(key)` | exactly that entry's deposit | opens a vote for 1000 blocks |
+| `Vote(key, keep)` | nothing | one address, one vote, while the window is open |
+| `Resolve(key)` | nothing | anyone, after the window: pays the winner |
+| `Unlist(key)` | nothing | the owner takes their own entry down, if unchallenged |
+| `Withdraw()` | nothing | collects everything credited to the caller |
+
+Reads: `Get`, `Count`, `Listed`, `IsListed`, `ChallengeOf`, `CreditOf`.
+
+A key is a slug: lowercase ASCII letters, digits, `-`, `_` and `.`, starting alphanumeric,
+at most 64 bytes. A key whose entry was removed is free to apply for again: a challenge
+that wins removes an entry, it does not burn the name.
+
+A majority of `keep` votes keeps the entry and credits its owner the challenger's bond.
+Otherwise the entry is removed and the challenger is credited the bond plus the deposit.
+**A tie keeps the entry**, including the tie of nobody voting at all: the incumbent paid
+first and is already at risk, so the burden is on the challenger to produce a reason. If
+ties went the other way, a challenge that convinced nobody would still win and listing
+anything would be pointless.
+
+## The trap it avoids
+
+**Nothing is ever sent to you.** Every payout is a credit in an internal ledger, and the
+payee calls `Withdraw()` for their own. A realm that looped over winners and sent to each
+one would fail entirely when one of them could not be paid, and would hand a griefer a
+denial of service for the price of one entry. `Withdraw` zeroes the credit before the
+coins move, so a reentrant call finds nothing left to take.
+
+The consequence is an invariant worth knowing: every ugnot at this realm's address is
+either backing a live entry or an open challenge, or already assigned to somebody. The
+tests assert exactly that, against the chain balance rather than against the realm's own
+books.
+
+## Voting is sybil-prone, deliberately and visibly
+
+`Vote` is one address, one vote, unweighted, and an address is free. A resolution says
+"nobody with a stake objected enough", never "this is true". Deciding who counts as a
+person is a different problem with its own realm behind it, `r/moul/x/social/vouch`, a
+sibling in this family; until a vote is gated on a vouched identity, the two addresses
+with money on the outcome are the only ones whose vote means anything.
+
+Which is the second thing: **voters are paid nothing in v0**. Voting costs gas and returns
+nothing, so there is no reason for a disinterested address to show up at all. A share of
+the loser's stake for the winning side is the standard answer, and it is the first thing
+this realm should grow. After that, an application period, so a bad entry is not visible
+before anybody can object to it.
+
+## Why the bonds are GNOT and not a token of this list's own
+
+A bond has to be denominated in something the challenger already holds. A list that minted
+its own token and demanded it as the bond would be asking a newcomer to acquire a token
+whose only use is challenging entries on a list nobody reads yet, which is the
+chicken-and-egg problem in its purest form: the token is worth something once the list is
+worth gaming, and the list cannot become worth gaming until challenges work.
+
+So v0 bonds are native GNOT, which every account on the chain already has.
+
+The answer becomes yes under one condition: **the list is valuable enough that being on it
+is contested, and the challenge flow is busy enough that a bond denominated in a list
+token would have a real market price.** Concretely, a steady stream of challenges from
+addresses that are not the two parties, and a reason to hold the token between challenges.
+At that point the token earns its own job, and it can pay the voters the paragraph above
+says go unpaid, which is the sink a bond alone does not provide.
+
+The slot it would drop into is `p/moul/x/social/coin/v0`, a GRC20 in this family that
+refuses to exist until its mint rule, its sink and its buyer are all declared. This realm
+deliberately does not import it: the three answers are not available yet, and a token
+issued before they are is a token with no reason to be held.

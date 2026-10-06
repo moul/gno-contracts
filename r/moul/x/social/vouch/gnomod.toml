@@ -1,0 +1,23 @@
+module = "gno.land/r/moul/x/social/vouch/v0"
+gno = "0.9"
+
+# public: other realms are expected to IMPORT IsTrusted and call it inside
+# their own crossing functions. A private realm can still be READ from outside
+# (vm/qrender and vm/qeval are unaffected by private), but a gate that only
+# answers over the chain is not a gate: a realm cannot pause mid-transaction to
+# query itself, so gating a mint or a vote on this graph requires the import.
+# Making it private would leave the product intact for humans and remove it for
+# the callers it was written for.
+#
+# The second reason is the money, and it is the one that settles it. Every
+# vouch, every bond and the ledger that says who is owed a refund are
+# package-level variables, while the ugnot backing them sits at this realm's
+# address. A redeploy wipes the first and keeps the second, so the convenience
+# private buys would, the one time it were used, strand other people's bonds
+# with no record of whose they were. A realm holding somebody else's coins
+# should not be able to forget who they belong to.
+#
+# What private would have bought, redeploy-in-place, is given up deliberately.
+# The vouch graph belongs to the people who wrote it, not to whoever deployed
+# this path, so a fix ships as a v1 beside it rather than as a redeploy that
+# silently erases the lot.

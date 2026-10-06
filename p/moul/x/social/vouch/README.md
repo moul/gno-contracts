@@ -1,0 +1,48 @@
+# `gno.land/p/moul/x/social/vouch/v0`
+
+**The engine behind a web of trust**: `NewGraph`, `Record`, `Revoke`,
+`Withdraw`, `ScoreOf`, `IsTrusted`, `VouchedBy`, `VouchesOf`, `Mutual`,
+`Leaderboard`.
+
+```go
+g := vouch.NewGraph()
+g.Record(alice, bob, "worked with them for a year", 1_000_000, height)
+g.IsTrusted(bob, 2)   // the one call another realm makes
+g.Revoke(alice, bob)  // credits the bond back, withdrawn separately
+```
+
+**It is a sybil gate, and it exists because the apps around it do not have
+one.** A realm that mints a point per distinct replier is farmed by two
+addresses replying to each other; a realm that counts one vote per address is
+farmed by holding a hundred. Neither can fix that alone, because neither knows
+anything about the people behind the addresses. This package knows one thing:
+who was willing to say, on chain and under their own name, that an address is
+somebody they stand behind.
+
+**A score counts people, not transactions.** A vouch is directed and at most one
+exists per ordered pair, so a second `Record` from the same address to the same
+target updates the reason and adds to the bond rather than counting twice. An
+address cannot vouch for itself. A pair vouching for each other both reach a
+score of one, which is exactly why a real gate asks for two.
+
+**The engine counts the bond, it never moves it.** The amount arrives as an
+argument, `Revoke` moves it into a withdrawal ledger, and the realm holding the
+coins transfers only after `Withdraw` has zeroed the credit. That ordering is
+the pull-payment pattern and it is not optional.
+
+**There is no slashing in v0, and the missing half is not the accounting.**
+Slashing needs an arbiter: somebody has to decide that a vouch was a lie. A DAO
+vote is a popularity contest against whoever is unpopular this month, a
+challenge market pays whoever is loudest, an oracle is one key that can
+confiscate anybody's money. Shipping any of them by default is shipping the
+wrong one. The bond is still worth having: an illiquid deposit is a cost a
+hundred throwaway addresses cannot all pay at once.
+
+Ordering is a total order on the address everywhere it matters, so two identical
+`Render` calls produce identical bytes: the sets are `p/moul/addrset`, the
+leaderboard breaks ties on the address, and nothing is built by ranging a map.
+A reason is free text, bounded to one line of `MaxReasonLen` bytes with control
+characters refused, and still has to be escaped where it is shown.
+
+**Live realm:** [`r/moul/x/social/vouch`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/social/vouch),
+which also carries the reasoning for why this one issues no token.

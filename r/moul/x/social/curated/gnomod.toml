@@ -1,0 +1,15 @@
+module = "gno.land/r/moul/x/social/curated/v0"
+gno = "0.9"
+private = true
+
+# private: nothing imports this realm. It is an application, not a library: the
+# engine every other realm would want is the p/ package, and the list itself is
+# read through Render or through the plain reads below, neither of which needs
+# an import.
+#
+# The price is the one private always charges, and it is sharper here than
+# usual because this realm holds coins: a redeploy keeps the balance at the
+# realm address and wipes every package-level variable, so the entries, the
+# challenges and the credit ledger would all go while the money they account
+# for stayed. A redeploy of a live list is therefore a migration and not a fix,
+# and anything beyond a patch ships as a v1 beside it.

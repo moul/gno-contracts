@@ -1,0 +1,60 @@
+# `gno.land/r/moul/x/social/patron/v0`
+
+**Recurring support for a builder, on chain.** A creator opens a plan with a
+price per period and a period measured in blocks; a supporter attaches ugnot to
+`Subscribe` and buys whole periods of it; anyone can ask at any height whether
+a given address is still active.
+
+```
+Open(title, description, pricePerPeriod, periodBlocks) -> planID
+Subscribe(planID)            payable, returns the new paid-through height
+Close(planID) / Reopen(planID)   creator only
+Withdraw()                   earnings and change leave the same way
+IsActive(planID, who)        the one question a tip jar cannot answer
+```
+
+**There is no cron on chain, so a renewal is a pull and not a push.** Nothing
+here can charge anybody: a renewal happens because the supporter sends another
+payment, never because a timer fired, and a native coin cannot be pulled at
+all. A reader arriving from web2 expects a standing mandate on a card; there is
+nothing of the kind anywhere on this chain, and that is the single most
+important sentence on this page.
+
+`r/moul/x/daily/tipjar` is the one-shot version and is already live. The
+recurrence is the whole difference, and it makes this the one app in the
+`x/social` family that produces a recurring write rather than a one-off.
+
+**Renewing early never discards time already paid for**: an extension runs from
+whichever is later, now or the current paid-through. Renewing after lapsing runs
+from now. A payment short of one period is refused rather than partially
+credited, and the remainder under a whole period is **credited back to the
+supporter**, because keeping it would be a silent fee and a subscription realm
+is exactly where a silent fee must not be.
+
+**Earnings are credited at payment time, not streamed.** The creator can
+withdraw the full price the instant it is paid, and a supporter who stops being
+active is not refunded. That is a deliberate v0 limitation: escrowed streaming,
+where the creator claims only what has elapsed and the supporter reclaims the
+rest, needs a claim schedule and a refund path, which is a larger realm rather
+than a flag on this one.
+
+Both halves of what the realm owes, a creator's earnings and a supporter's
+change, land in one credit ledger and leave through `Withdraw`, which zeroes the
+credit before any coin moves. `EarnedBy` and `CreditOf` are deliberately
+different numbers: lifetime credited against withdrawable now.
+
+`Subscribe` is payable and therefore has to be called **directly by a user**. A
+realm called by another realm cannot forward the envelope and `maketx run`
+cannot reach a payable function at all, so there is no path where another
+contract subscribes on somebody's behalf.
+
+## The token question
+
+**v0 ships none, and the condition for yes is written down** in
+[the engine's README](https://github.com/moul/gno-contracts/tree/main/p/moul/x/social/patron):
+a creator coin is easy to mint and has no sink, because what a supporter would
+redeem it for is a promise made off chain. What would change the answer is a
+redeem the chain can enforce. The slot it would drop into is
+[`p/moul/x/social/coin`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/social/coin),
+a GRC20 that refuses to exist until its mint rule, its sink and its buyer are
+declared.

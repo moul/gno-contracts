@@ -1,0 +1,8 @@
+module = "gno.land/r/moul/x/social/crews/v0"
+gno = "0.9"
+private = true
+
+# private: nothing imports this realm and nothing is meant to. The trade is the
+# usual one, a redeploy wipes every crew, share and credit while the coins stay
+# at the address, and it is worth taking while the design is still moving. The
+# v1 in README.md, one realm per crew, is the move that closes the door.

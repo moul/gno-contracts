@@ -1,0 +1,49 @@
+# `gno.land/p/moul/x/social/coin/v0`
+
+**A GRC20 that refuses to exist until its mint rule, its sink and its buyer are
+written down**: `New`, `Earn`, `Spend`, `Supply`, `Earned`, `Spent`, `Render`.
+
+```go
+import "gno.land/p/moul/x/social/coin/v0"
+
+var points = coin.New("Thread Points", "THREAD", 0, 0, coin.Policy{
+	Mint:  "1 per distinct address that replies to your thread",
+	Sink:  "burned to pin a thread to the top of its page",
+	Buyer: "anyone who wants placement and has not earned it",
+}, 0, cur)
+
+points.Earn(author, 1)   // the mint rule, with exactly one call site
+points.Spend(buyer, 10)  // the sink, which is the only thing that removes supply
+```
+
+The three strings are the whole point. `New` panics on a blank one, so the
+declaration happens before the first unit exists rather than in a README written
+afterwards, and `Render` prints all three on the issuing realm's own page, where
+being wrong about them is visible to the people holding the token.
+
+**A mint rule with no sink is a scoreboard with a price.** Supply only grows, the
+number is the product, and a holder has no reason to buy one from an earner.
+Nothing in a package can check that a declared sink is real, which is exactly why
+it is a declaration and not a validation: the cheap failure is forgetting to
+decide, not lying.
+
+`Earned` and `Spent` are kept separately from the supply because a sink that
+never fires is invisible in the supply alone. A flat line reads the same as no
+sink at all; two counters say which it is.
+
+`Earn` of a non-positive amount is a no-op rather than an abort. A mint rule that
+computes zero means nothing new happened, and that should not fail the
+transaction that discovered it. `Spend` is the opposite and aborts naming both
+numbers, because its caller is a user about to be told they cannot afford
+something.
+
+Everything else is the embedded [`p/nt/grc20`](https://gno.land/p/nt/grc20/v0):
+transfers, approvals, balances and events are an ordinary GRC20, so wallets and
+indexers need to know nothing about this package. `Token()` hands it over for the
+realm to expose and to register with a token registry.
+
+The trailing `_ int, rlm realm` on `New` is the shape a pure package has to use
+to reach the caller's frame: a `p/` may not declare a crossing function, so the
+realm token is threaded as a later parameter, exactly as grc20's own tellers do.
+
+**Live user:** [`r/moul/x/social/threads`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/social/threads).
