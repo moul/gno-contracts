@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/b58/v0"
 )
 
@@ -79,7 +80,12 @@ func renderHex(arg string) string {
 	raw, err := hex.DecodeString(arg)
 	if err != nil {
 		sb.WriteString("**Invalid hex input.**\n\n")
-		sb.WriteString("`" + arg + "` is not a valid hex string. ")
+		// arg is the visitor's URL path and this branch is the one ANY
+		// non-hex path reaches, so the span has to be built by something that
+		// sizes its fence past a backtick in the content. Hand-rolled
+		// backticks here let a crafted path close the span and render its own
+		// markdown on a gno.land page.
+		sb.WriteString(md.InlineCode(arg) + " is not a valid hex string. ")
 		sb.WriteString("Provide an even number of hex digits, e.g. `/deadbeef`.\n")
 		return sb.String()
 	}
