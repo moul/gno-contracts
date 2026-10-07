@@ -9,10 +9,10 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
 	"chain"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -151,7 +151,7 @@ func Render(path string) string {
 	if path != "" {
 		v := topics.Get(path)
 		if v == nil {
-			return "# Reaction Board\n\nTopic not found: `" + path + "`\n"
+			return "# Reaction Board\n\nTopic not found: " + md.InlineCode(path) + "\n"
 		}
 		t := v.(*topic)
 		var sb strings.Builder

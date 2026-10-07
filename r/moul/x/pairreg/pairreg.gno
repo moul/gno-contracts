@@ -39,6 +39,7 @@ import (
 	"chain/runtime"
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/pair/v0"
 	"gno.land/p/nt/avl/v0"
 	"gno.land/p/nt/ufmt/v0"
@@ -125,7 +126,7 @@ func Render(path string) string {
 	if path != "" {
 		e := Get(path)
 		if e == nil {
-			return "# 404\n\nNo instance registered at `" + path + "`.\n"
+			return "# 404\n\nNo instance registered at " + md.InlineCode(path) + ".\n"
 		}
 		out := e.Pair.Render("")
 		out += "\n---\n\n"

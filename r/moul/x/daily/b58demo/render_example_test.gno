@@ -1,5 +1,12 @@
 package b58demo
 
+import (
+	"strings"
+	"testing"
+
+	"gno.land/p/nt/uassert/v0"
+)
+
 // ExampleRender pins the realm's Render output as a gno testable example.
 func ExampleRender() {
 	print(Render(""))
@@ -39,4 +46,27 @@ func ExampleRender() {
 	// - `/68656c6c6f` — the bytes for "hello"
 	// - `/00000000` — four zero bytes
 	// - `/deadbeef`
+}
+
+// The invalid-hex branch puts the visitor's raw URL path into a code span, and
+// ANY non-hex path reaches it. Building that span by hand let a backtick in the
+// path close it early, so the rest of the path rendered as markdown on a
+// gno.land page: a crafted link produced attacker-authored headings and links.
+// Measured through goldmark v1.8.2 with gnoweb's extension set.
+func TestInvalidHexPathCannotEscapeItsCodeSpan(t *testing.T) {
+	out := Render("/zz")
+	uassert.True(t, strings.Contains(out, "`zz`"),
+		"a plain invalid path is not shown verbatim in a code span")
+
+	// One backtick in the path must widen the fence, not close the span.
+	out = Render("/a`b")
+	uassert.True(t, strings.Contains(out, "``a`b``"),
+		"the fence does not outscan the caller's backtick, so the span closes early")
+
+	// The markdown that follows a closing backtick must stay inert.
+	out = Render("/x` and [CLICK](https://evil.example) `")
+	uassert.False(t, strings.Contains(out, "] and [CLICK]"),
+		"caller markdown escaped the code span")
+	uassert.True(t, strings.Contains(out, "is not a valid hex string"),
+		"the realm's own sentence did not survive")
 }
