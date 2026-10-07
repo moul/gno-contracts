@@ -506,6 +506,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/allinone/textlab/v0" -> "gno.land/p/moul/x/daily/rot13/v0";
   "gno.land/r/moul/x/allinone/textlab/v0" -> "gno.land/p/moul/x/daily/soundex/v0";
   "gno.land/r/moul/x/allinone/textlab/v0" -> "gno.land/r/moul/config/v1";
+  "gno.land/r/moul/x/amm/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/amm/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/amm/v0" -> "gno.land/p/nt/grc20/v0";
   "gno.land/r/moul/x/amm/v0" -> "gno.land/p/nt/seqid/v0";
@@ -519,6 +520,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/moul/kit/store/v0";
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/b58demo/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/b58demo/v0" -> "gno.land/p/moul/x/daily/b58/v0";
   "gno.land/r/moul/x/daily/ballot/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/base32demo/v0" -> "gno.land/p/moul/x/daily/base32/v0";
@@ -603,13 +605,16 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/polls/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/polls/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/pullpaymentdemo/v0" -> "gno.land/p/moul/x/daily/pullpayment/v0";
+  "gno.land/r/moul/x/daily/quizstreak/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/quizstreak/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/qvote/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/qvote/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/ratelimitdemo/v0" -> "gno.land/p/moul/x/daily/ratelimit/v0";
+  "gno.land/r/moul/x/daily/reactions/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/reactions/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/ringbufferdemo/v0" -> "gno.land/p/moul/x/daily/ringbuffer/v0";
   "gno.land/r/moul/x/daily/rledemo/v0" -> "gno.land/p/moul/x/daily/rle/v0";
+  "gno.land/r/moul/x/daily/romannumdemo/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/romannumdemo/v0" -> "gno.land/p/moul/x/daily/romannum/v0";
   "gno.land/r/moul/x/daily/rot13demo/v0" -> "gno.land/p/moul/x/daily/rot13/v0";
   "gno.land/r/moul/x/daily/rpgroom/v0" -> "gno.land/p/nt/avl/v0";
@@ -632,8 +637,10 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/staking/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/streak/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/streaks/v1" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/streaks/v1" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/streaks/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/tamagotchi/v1" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/tamagotchi/v1" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/tamagotchi/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/tictactoe/v1" -> "gno.land/p/moul/kit/store/v0";
   "gno.land/r/moul/x/daily/tictactoe/v1" -> "gno.land/p/nt/avl/v0";
@@ -704,6 +711,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/nativereg/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/nativereg/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/nativereg/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/moul/x/pair/v0";
   "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/pairreg/v0" -> "gno.land/p/nt/ufmt/v0";

@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-07T17:36:33Z",
+  "status_checked_at": "2026-10-07T17:44:35Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -5066,6 +5066,7 @@
       "version": "v0",
       "description": "",
       "deps": [
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/grc20/v0",
         "gno.land/p/nt/seqid/v0",
@@ -5198,6 +5199,7 @@
       "version": "v0",
       "description": "",
       "deps": [
+        "gno.land/p/moul/md/v0",
         "gno.land/p/moul/x/daily/b58/v0"
       ],
       "draft": false,
@@ -8064,6 +8066,7 @@
       "version": "v0",
       "description": "",
       "deps": [
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -8227,6 +8230,7 @@
       "version": "v0",
       "description": "",
       "deps": [
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -8357,6 +8361,7 @@
       "version": "v0",
       "description": "",
       "deps": [
+        "gno.land/p/moul/md/v0",
         "gno.land/p/moul/x/daily/romannum/v0"
       ],
       "draft": false,
@@ -9054,6 +9059,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -9120,6 +9126,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -10092,6 +10099,7 @@
       "version": "v0",
       "description": "",
       "deps": [
+        "gno.land/p/moul/md/v0",
         "gno.land/p/moul/x/pair/v0",
         "gno.land/p/nt/avl/v0",
         "gno.land/p/nt/ufmt/v0"
