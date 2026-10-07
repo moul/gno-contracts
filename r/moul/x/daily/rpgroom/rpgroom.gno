@@ -298,7 +298,7 @@ func renderRoom() string {
 func renderHero(addr string) string {
 	v := heroes.Get(addr)
 	if v == nil {
-		return "> [!WARNING]\n> No hero found for `" + sanitize.InlineText(addr) + "`.\n"
+		return "> [!WARNING]\n> No hero found for " + sanitize.InlineCode(addr) + ".\n"
 	}
 	h := v.(*Hero)
 	var b strings.Builder

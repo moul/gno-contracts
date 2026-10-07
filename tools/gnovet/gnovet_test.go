@@ -226,3 +226,35 @@ func TestEveryShapeInAMultiShapeBadFires(t *testing.T) {
 		}
 	}
 }
+
+// The vendor skip is root-relative. A package under p/<ns>/vendor/ is written
+// here and published as ours, so it must still be scanned; only a vendor/
+// directory at the repository root is third-party. An earlier version matched
+// "/vendor/" anywhere and silently dropped p/moul/vendor/nt/ufmt.
+func TestVendorSkipIsRootRelative(t *testing.T) {
+	dir := t.TempDir()
+	body := []byte(trimSpaceAsValidity.Bad)
+	for _, rel := range []string{
+		"vendor/third/party.gno",    // root vendor: skipped
+		"p/moul/vendor/nt/ours.gno", // our namespace: scanned
+	} {
+		p := filepath.Join(dir, rel)
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, body, 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	hits, err := RunRules(dir, []Rule{trimSpaceAsValidity})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got []string
+	for _, h := range hits {
+		got = append(got, filepath.ToSlash(h.File))
+	}
+	if len(got) != 1 || got[0] != "p/moul/vendor/nt/ours.gno" {
+		t.Fatalf("want only p/moul/vendor/nt/ours.gno scanned, got %v", got)
+	}
+}

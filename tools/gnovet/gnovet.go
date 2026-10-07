@@ -234,12 +234,15 @@ func gnoFiles(dir string) ([]string, error) {
 		if err != nil || d.IsDir() {
 			return err
 		}
-		// Vendored third-party code is not ours to fix, and a house rule
-		// fired on it is noise the baseline would then enshrine. No rule had
-		// reached vendor/ before trimspace-as-validity did (the baseline has
-		// zero vendor rows), which is why this was never needed until now.
-		if strings.Contains(filepath.ToSlash(p), "/vendor/") ||
-			strings.HasPrefix(filepath.ToSlash(p), "vendor/") {
+		// Third-party code vendored at the REPOSITORY ROOT is not ours to fix.
+		// The match has to be root-relative: an earlier version matched the
+		// substring "/vendor/" anywhere in the absolute path, which excluded
+		// p/moul/vendor/nt/ufmt, a module written here and published to
+		// mainnet as ours, from every rule. It also never reached the root
+		// vendor/ it was written for, because the only caller walks p/moul and
+		// r/moul. gno-contracts#326 review, 2026-10-07.
+		if rel, err := filepath.Rel(dir, p); err == nil &&
+			strings.HasPrefix(filepath.ToSlash(rel), "vendor/") {
 			return nil
 		}
 		name := d.Name()

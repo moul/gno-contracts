@@ -89,3 +89,19 @@ func TestRenderMonsterHPBar(t *testing.T) {
 	uassert.True(t, strings.Contains(Render(""), hpBar(monster.HP, monster.MaxHP)),
 		"the room should render the monster's current HP bar")
 }
+
+// The not-found line puts the caller's path in a code span. Building that span
+// by hand around sanitize.InlineText put an escaper INSIDE it, where markdown
+// escapes do not apply: the backslashes reach the reader and a caller backtick
+// closes the span early. gno-contracts#326 review, 2026-10-07.
+func TestNoHeroFoundShowsThePathVerbatim(t *testing.T) {
+	out := Render("gno.land_x-y")
+	uassert.True(t, strings.Contains(out, "`gno.land_x-y`"),
+		"the path is not shown verbatim in a code span")
+	uassert.False(t, strings.Contains(out, `gno\.land`),
+		"an inline escaper ran inside a code span, so its backslashes reach the reader")
+
+	out = Render("a`b")
+	uassert.True(t, strings.Contains(out, "``a`b``"),
+		"the fence does not outscan the caller's backtick, so the span closes early")
+}

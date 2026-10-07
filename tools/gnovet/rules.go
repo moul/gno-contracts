@@ -486,9 +486,22 @@ var colonRelativeLink = Rule{
 // a call to one of the markdown escapers, in either order. It runs over
 // Literal, not Code, because the backtick being matched lives INSIDE a string
 // literal and Code blanks those.
+// escaperInCodeSpanRe matches a string literal ENDING in a backtick that is
+// concatenated with a markdown escaper call, or the mirror on the closing side.
+//
+// The first version required the literal to be exactly one backtick and the
+// escaper to be named Inline, Cell or Escape. It therefore missed
+// r/moul/x/daily/rpgroom, whose literal is "...found for `" and whose escaper
+// is sanitize.InlineText, and the rule shipped claiming zero instances left
+// (gno-contracts#326 review, 2026-10-07).
+//
+// It runs over Literal, not Code: the backtick lives inside a string literal
+// and Code blanks those.
+var escaperName = `(?:Inline\w*|Cell|Escape\w*|TableCell|LinkTitle|Excerpt)`
+
 var escaperInCodeSpanRe = regexp.MustCompile(
-	"(\"`\"\\s*\\+\\s*\\w+\\.(?:Inline|Cell|Escape)\\()" +
-		"|((?:Inline|Cell|Escape)\\([^)]*\\)\\s*\\+\\s*\"`)")
+	`"[^"\n]*` + "`" + `"\s*\+\s*\w+\.` + escaperName + `\s*\(` +
+		`|\.` + escaperName + `\s*\([^()]*\)\s*\+\s*"` + "`")
 
 var escaperInCodeSpan = Rule{
 	ID:   "escaper-in-code-span",
@@ -501,10 +514,10 @@ var escaperInCodeSpan = Rule{
 	Fix: "Use md.InlineCode, which sizes the fence past any backtick run in the content, " +
 		"pads a leading or trailing space, returns \"\" for empty input, and applies no " +
 		"inline escapes.",
-	Finding: "gno-contracts#324, post-merge review 2026-10-07; the same shape was still live " +
-		"in r/moul/vesting/render.gno:35 after the PR fixed riscvdemo and bfdemo",
+	Finding: "gno-contracts#324, post-merge review 2026-10-07; widened after the #326 review " +
+		"showed the first pattern missed r/moul/x/daily/rpgroom, which is live on mainnet",
 	Bad: "package x\n\nfunc f() string {\n\t" +
-		"return ui.Empty(\"`\" + ui.Inline(target) + \"` is not an address.\")\n}\n",
+		"return ui.Empty(\"no hero found for `\" + sanitize.InlineText(a) + \"`.\")\n}\n",
 	Good: "package x\n\nfunc f() string {\n\t" +
 		"return ui.Empty(md.InlineCode(target) + \" is not an address.\")\n}\n",
 	Check: func(f File) []int {
