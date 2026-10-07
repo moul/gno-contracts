@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-07T14:36:18Z",
+  "status_checked_at": "2026-10-07T14:59:48Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -921,7 +921,7 @@
       "version": "v0",
       "description": "",
       "upstream": "gno.land/p/moul/md/v0",
-      "upstream_match": "gno",
+      "upstream_match": "diff",
       "deps": [
         "gno.land/p/nt/markdown/sanitize/v0"
       ],
@@ -4922,6 +4922,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
         "gno.land/p/moul/realmpath/v0",
         "gno.land/p/moul/vesting/v0",
         "gno.land/p/nt/avl/v0",

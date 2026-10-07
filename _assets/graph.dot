@@ -526,6 +526,7 @@ digraph gnocontracts {
   "gno.land/r/moul/reactions/v0" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/reactions/v0" -> "gno.land/p/moul/reactions/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/realmpath/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/vesting/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/nt/avl/v0";
