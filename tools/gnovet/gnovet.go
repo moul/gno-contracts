@@ -234,6 +234,14 @@ func gnoFiles(dir string) ([]string, error) {
 		if err != nil || d.IsDir() {
 			return err
 		}
+		// Vendored third-party code is not ours to fix, and a house rule
+		// fired on it is noise the baseline would then enshrine. No rule had
+		// reached vendor/ before trimspace-as-validity did (the baseline has
+		// zero vendor rows), which is why this was never needed until now.
+		if strings.Contains(filepath.ToSlash(p), "/vendor/") ||
+			strings.HasPrefix(filepath.ToSlash(p), "vendor/") {
+			return nil
+		}
 		name := d.Name()
 		if !strings.HasSuffix(name, ".gno") ||
 			strings.HasSuffix(name, "_test.gno") ||

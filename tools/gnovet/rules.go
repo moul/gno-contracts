@@ -20,6 +20,8 @@ var Rules = []Rule{
 	uncallableCrossingArg,
 	originSendUnguarded,
 	colonRelativeLink,
+	escaperInCodeSpan,
+	trimSpaceAsValidity,
 }
 
 // ---------------------------------------------------------------------------
@@ -471,6 +473,83 @@ var colonRelativeLink = Rule{
 		var out []int
 		for i, ln := range f.Literal {
 			if strings.Contains(ln, "](:") {
+				out = append(out, i)
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+// escaperInCodeSpanRe matches a backtick-only string literal concatenated with
+// a call to one of the markdown escapers, in either order. It runs over
+// Literal, not Code, because the backtick being matched lives INSIDE a string
+// literal and Code blanks those.
+var escaperInCodeSpanRe = regexp.MustCompile(
+	"(\"`\"\\s*\\+\\s*\\w+\\.(?:Inline|Cell|Escape)\\()" +
+		"|((?:Inline|Cell|Escape)\\([^)]*\\)\\s*\\+\\s*\"`)")
+
+var escaperInCodeSpan = Rule{
+	ID:   "escaper-in-code-span",
+	What: "builds a code span by hand around a markdown escaper's output",
+	Why: "Markdown escapes do not apply inside a code span, so the backslashes the escaper " +
+		"added are inert and reach the reader: `gno\\.land\\_x\\-y` renders with every " +
+		"backslash visible. Worse, an escaped backtick still CLOSES the span, so a caller " +
+		"who puts a backtick in the value chooses where the monospace region ends and pulls " +
+		"the realm's own sentence out of it.",
+	Fix: "Use md.InlineCode, which sizes the fence past any backtick run in the content, " +
+		"pads a leading or trailing space, returns \"\" for empty input, and applies no " +
+		"inline escapes.",
+	Finding: "gno-contracts#324, post-merge review 2026-10-07; the same shape was still live " +
+		"in r/moul/vesting/render.gno:35 after the PR fixed riscvdemo and bfdemo",
+	Bad: "package x\n\nfunc f() string {\n\t" +
+		"return ui.Empty(\"`\" + ui.Inline(target) + \"` is not an address.\")\n}\n",
+	Good: "package x\n\nfunc f() string {\n\t" +
+		"return ui.Empty(md.InlineCode(target) + \" is not an address.\")\n}\n",
+	Check: func(f File) []int {
+		var out []int
+		for i, ln := range f.Literal {
+			if escaperInCodeSpanRe.MatchString(ln) {
+				out = append(out, i)
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+// trimSpaceValidityRe matches strings.TrimSpace(x) compared directly against
+// the empty string. The comparison must follow the closing paren immediately,
+// so ui.Inline(strings.TrimSpace(s)) != "" (the fix) does not match.
+//
+// It runs over Literal, not Code: Code blanks a string literal INCLUDING its
+// quotes, so "" becomes two spaces there and the rule could never fire. Found
+// by watching the Bad fixture stay silent.
+var trimSpaceValidityRe = regexp.MustCompile(`strings\.TrimSpace\([^()]*\)\s*[!=]=\s*""`)
+
+var trimSpaceAsValidity = Rule{
+	ID:   "trimspace-as-validity",
+	What: "decides a required field is present with strings.TrimSpace(s) != \"\"",
+	Why: "strings.TrimSpace uses unicode.IsSpace, which does NOT include U+200B and the " +
+		"other zero-width characters, while every escaper on the output side calls " +
+		"StripBidiAndZeroWidth, which does. So a field of zero-width characters is stored " +
+		"as present and renders as nothing. Where that field is the only link title in a " +
+		"table row, the record becomes unreachable from its own index.",
+	Fix: "Validate against the RENDERED form: ui.Inline(strings.TrimSpace(s)) != \"\". " +
+		"What the reader will see is the thing that has to be non-empty.",
+	Finding: "gno-contracts#325, post-merge review 2026-10-07; seven sites in one PR, " +
+		"crew.gno:566 and :587, vouch.gno:386, patron.gno:467, threads.gno:293, " +
+		"curated.gno:593 and :574",
+	Bad: "package x\n\nfunc ValidName(s string) bool {\n\t" +
+		"return strings.TrimSpace(s) != \"\"\n}\n",
+	Good: "package x\n\nfunc ValidName(s string) bool {\n\t" +
+		"return ui.Inline(strings.TrimSpace(s)) != \"\"\n}\n",
+	Check: func(f File) []int {
+		var out []int
+		for i, ln := range f.Literal {
+			if trimSpaceValidityRe.MatchString(ln) {
 				out = append(out, i)
 			}
 		}
