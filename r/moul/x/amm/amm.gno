@@ -61,6 +61,7 @@ import (
 	"math/bits"
 	"strconv"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 	"gno.land/p/nt/grc20/v0"
 	"gno.land/p/nt/seqid/v0"
@@ -422,7 +423,7 @@ func Render(path string) string {
 	if path != "" {
 		v := pools.Get(path)
 		if v == nil {
-			return "# 404\n\nNo pool `" + path + "`.\n"
+			return "# 404\n\nNo pool " + md.InlineCode(path) + ".\n"
 		}
 		p := v.(*pool)
 		out := "# " + p.tokA.GetSymbol() + " / " + p.tokB.GetSymbol() + "\n\n"

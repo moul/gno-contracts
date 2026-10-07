@@ -8,10 +8,10 @@ package tamagotchi
 import (
 	"sort"
 	"strconv"
-
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -284,7 +284,7 @@ func Render(path string) string {
 		owner := address(path)
 		p, ok := get(owner)
 		if !ok {
-			return out + "_No pet found for `" + path + "`._\n"
+			return out + "_No pet found for " + md.InlineCode(path) + "._\n"
 		}
 		return out + renderCard(p, height)
 	}

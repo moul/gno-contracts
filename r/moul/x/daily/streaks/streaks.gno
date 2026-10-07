@@ -8,10 +8,10 @@ package streaks
 import (
 	"sort"
 	"strconv"
-
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -142,7 +142,7 @@ func Render(path string) string {
 	if path != "" {
 		r, ok := get(address(path))
 		if !ok {
-			return out + "_No check-ins yet for `" + path + "`._\n"
+			return out + "_No check-ins yet for " + md.InlineCode(path) + "._\n"
 		}
 		return out + renderDetail(r, height)
 	}

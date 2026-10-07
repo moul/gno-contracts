@@ -14,10 +14,10 @@ package quizstreak
 import (
 	"strconv"
 	"strings"
-
 	"chain"
 	"chain/runtime"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
@@ -175,10 +175,10 @@ func Render(path string) string {
 
 	if path != "" {
 		if v, ok := players.Get(path).(*playerState); ok {
-			b.WriteString("## Your question (`" + path + "`)\n\n")
+			b.WriteString("## Your question (" + md.InlineCode(path) + ")\n\n")
 			renderQuestion(&b, v)
 		} else {
-			b.WriteString("## `" + path + "`\n\n_No answers submitted yet — call `Answer` to get your first question._\n\n")
+			b.WriteString("## " + md.InlineCode(path) + "\n\n_No answers submitted yet — call `Answer` to get your first question._\n\n")
 		}
 	}
 

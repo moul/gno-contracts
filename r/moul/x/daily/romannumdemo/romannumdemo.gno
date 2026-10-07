@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/romannum/v0"
 )
 
@@ -37,7 +38,7 @@ func Render(path string) string {
 func renderToRoman(arg string) string {
 	n, err := strconv.Atoi(strings.TrimSpace(arg))
 	if err != nil {
-		return "# Roman numeral converter\n\nCould not parse `" + arg +
+		return "# Roman numeral converter\n\nCould not parse " + md.InlineCode(arg) +
 			"` as an integer.\n\n" + usage()
 	}
 	if n < 1 || n > 3999 {
@@ -64,8 +65,8 @@ func renderFromRoman(arg string) string {
 	arg = strings.TrimSpace(arg)
 	n, ok := tryFromRoman(arg)
 	if !ok {
-		return "# Roman numeral converter\n\n`" + arg +
-			"` is not a valid Roman numeral (1..3999).\n\n" + usage()
+		return "# Roman numeral converter\n\n" + md.InlineCode(arg) +
+			" is not a valid Roman numeral (1..3999).\n\n" + usage()
 	}
 	up := strings.ToUpper(arg)
 	var b strings.Builder
