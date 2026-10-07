@@ -184,6 +184,7 @@ func TodoItem(item string, done bool) string {
 func Nested(content, prefix string) string {
 	lines := strings.Split(content, "\n")
 	for i := range lines {
+		//gnovet:ignore trimspace-as-validity this indents content lines, it does not validate a stored field: a zero-width-only line is content and must be indented
 		if strings.TrimSpace(lines[i]) != "" {
 			lines[i] = prefix + lines[i]
 		}

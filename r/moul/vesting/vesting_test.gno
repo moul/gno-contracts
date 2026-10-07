@@ -237,6 +237,28 @@ func TestRenderEscapesWhatTheCallerTyped(t *testing.T) {
 		"a markdown link typed into the path reached the page unescaped")
 }
 
+// The not-an-address line puts the caller's text in a code span. Markdown
+// escapes do not apply inside one, so an escaper there is not merely useless,
+// its backslashes reach the reader, and an escaped backtick still CLOSES the
+// span. Reverting render.gno:35 to the hand-rolled backticks makes both halves
+// of this fail.
+func TestNotAnAddressPutsThePathInACodeSpanWithoutEscapes(t *testing.T) {
+	out := Render("gno.land_x-y")
+	uassert.True(t, strings.Contains(out, "`gno.land_x-y`"),
+		"the path is not shown verbatim in a code span")
+	uassert.False(t, strings.Contains(out, `gno\.land`),
+		"an inline escaper ran inside a code span, so its backslashes reach the reader")
+
+	// A backtick in the path must not end the span early and pull the realm's
+	// own sentence out of it. The fence has to outscan the content, so a single
+	// internal backtick means a DOUBLE backtick fence.
+	out = Render("a`b")
+	uassert.True(t, strings.Contains(out, "``a`b``"),
+		"the fence does not outscan the caller's backtick, so the span closes early")
+	uassert.True(t, strings.Contains(out, "is not a gno.land address."),
+		"the sentence did not survive a backtick in the path")
+}
+
 // TestRenderQueryRejectsGarbage keeps a typo readable instead of rendering a
 // schedule of zeroes as though it were real.
 func TestRenderQueryRejectsGarbage(t *testing.T) {

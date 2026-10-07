@@ -7,6 +7,7 @@ import (
 	"gno.land/p/nt/ufmt/v0"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/realmpath/v0"
 	"gno.land/p/moul/vesting/v0"
 )
@@ -32,7 +33,7 @@ func Render(path string) string {
 		return renderIndex()
 	}
 	if !isAddr(target) {
-		return header() + ui.Empty("`"+ui.Inline(target)+"` is not a gno.land address.") +
+		return header() + ui.Empty(md.InlineCode(target)+" is not a gno.land address.") +
 			"\n" + lookupForm()
 	}
 	addr := address(target)
