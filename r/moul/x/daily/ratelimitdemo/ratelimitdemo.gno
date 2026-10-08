@@ -14,6 +14,7 @@ import (
 	"chain/runtime"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/ratelimit/v0"
 )
 
@@ -54,7 +55,7 @@ func Render(path string) string {
 	if len(path) > 6 && path[:6] == "/addr/" {
 		key := path[6:]
 		out := "# Rate Limiter — caller\n\n"
-		out += "Address: `" + key + "`\n\n"
+		out += "Address: " + md.InlineCode(key) + "\n\n"
 		out += "- Current tokens: **" + strconv.Itoa(limiter.Tokens(key, now)) + "** / " + ftoa(burst) + "\n"
 		out += "- Now (height): " + strconv.FormatInt(now, 10) + "\n"
 		return out
@@ -75,7 +76,7 @@ func Render(path string) string {
 	} else {
 		out += "| Address | Tokens | Last height |\n|---|---|---|\n"
 		limiter.Iterate(now, func(key string, tokens int, last int64) bool {
-			out += "| `" + key + "` | " + strconv.Itoa(tokens) +
+			out += "| " + md.InlineCode(key) + " | " + strconv.Itoa(tokens) +
 				" | " + strconv.FormatInt(last, 10) + " |\n"
 			return false
 		})

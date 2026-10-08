@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/wesh/v0"
 )
 
@@ -60,7 +61,7 @@ func renderIndex() string {
 func renderIdentity(name string) string {
 	id := lookup(name)
 	if id == nil {
-		return "# Not found\n\nNo identity named `" + name + "`. [Back to the directory](/r/moul/x/wesh/v0).\n"
+		return "# Not found\n\nNo identity named " + md.InlineCode(name) + ". [Back to the directory](/r/moul/x/wesh/v0).\n"
 	}
 
 	var b strings.Builder

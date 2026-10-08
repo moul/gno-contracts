@@ -427,9 +427,9 @@ func Render(path string) string {
 		}
 		p := v.(*pool)
 		out := "# " + p.tokA.GetSymbol() + " / " + p.tokB.GetSymbol() + "\n\n"
-		out += "- **" + p.tokA.GetSymbol() + "** reserve: " + itoa(p.resA) + " (`" + p.keyA + "`)\n"
-		out += "- **" + p.tokB.GetSymbol() + "** reserve: " + itoa(p.resB) + " (`" + p.keyB + "`)\n"
-		out += "- **LP token**: `" + p.lpKey + "` (" + p.lp.GetSymbol() + ")\n"
+		out += "- **" + p.tokA.GetSymbol() + "** reserve: " + itoa(p.resA) + " (" + md.InlineCode(p.keyA) + ")\n"
+		out += "- **" + p.tokB.GetSymbol() + "** reserve: " + itoa(p.resB) + " (" + md.InlineCode(p.keyB) + ")\n"
+		out += "- **LP token**: " + md.InlineCode(p.lpKey) + " (" + p.lp.GetSymbol() + ")\n"
 		out += "- **LP shares**: " + itoa(p.lp.TotalSupply()) + " across " + strconv.Itoa(p.lp.KnownAccounts()) + " holder(s)\n"
 		return out
 	}

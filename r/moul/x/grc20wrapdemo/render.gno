@@ -1,6 +1,7 @@
 package grc20wrapdemo
 
 import (
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/ufmt/v0"
 )
 
@@ -63,7 +64,7 @@ func renderIndex() string {
 func renderOne(symbol string) string {
 	e := byName.Get(symbol)
 	if e == nil {
-		return "# 404\n\nThis realm has not issued `" + symbol + "`.\n"
+		return "# 404\n\nThis realm has not issued " + md.InlineCode(symbol) + ".\n"
 	}
 	en := e.(*entry)
 

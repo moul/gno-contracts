@@ -368,6 +368,7 @@ func Render(path string) string {
 func renderCmd(key, line, title string) string {
 	var b strings.Builder
 	b.WriteString("# " + ui.Inline(title) + "\n\n")
+	//gnovet:ignore render-path-in-code-span key is checked against address(key).IsValid() at the top of Render
 	b.WriteString("namespace: `" + key + "`\n\n")
 	out, err := Run(key, line)
 	if err != nil {
@@ -399,6 +400,7 @@ func renderHome(key string) string {
 		b.WriteString("| name | posted by | since |\n|---|---|---|\n")
 		services.Iterate("", "", func(k string, v any) bool {
 			s := v.(*service)
+			//gnovet:ignore render-path-in-code-span owner is the creating caller address, recorded by the realm, not a path
 			b.WriteString("| " + ui.Cell(k) + " | [`" + s.owner + "`](" +
 				strings.TrimPrefix(s.owner, "gno.land") + ") | " +
 				strconv.FormatInt(s.since, 10) + " |\n")

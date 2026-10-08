@@ -40,6 +40,7 @@ func Render(path string) string {
 		if s == "" {
 			b.WriteString("_(empty)_")
 		} else {
+			//gnovet:ignore render-path-in-code-span s ranges over a fixed sample list, never over the URL path
 			b.WriteString("`" + s + "`")
 		}
 		b.WriteString(" | `")
