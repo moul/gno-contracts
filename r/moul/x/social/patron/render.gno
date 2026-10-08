@@ -168,16 +168,32 @@ func planTable(items []pt.Listing, now int64) string {
 	return t.OrEmpty("No plans yet.")
 }
 
+// supporterTable lists a plan's supporters.
+//
+// Finding 325-cost-at-caps-1: this rendered every all-time supporter.
+// Subscribe is permissionless and nothing ever removes a supporter, so the
+// page every reader pays for grew without a bound anybody controls, and the
+// cheapest way to make it expensive was to subscribe from many addresses.
 func supporterTable(p *pt.Plan, now int64) string {
+	all := p.Supporters()
+	shown := all
+	if len(shown) > pageSize {
+		shown = shown[len(shown)-pageSize:]
+	}
 	t := ui.NewTable("supporter", "paid through block", "active")
-	for _, who := range p.Supporters() {
+	for _, who := range shown {
 		active := "no"
 		if p.IsActive(who, now) {
 			active = "yes"
 		}
 		t.Row(ui.Addr(who), strconv.FormatInt(p.PaidThrough(who), 10), active)
 	}
-	return t.OrEmpty("Nobody supports this plan yet.")
+	out := t.OrEmpty("Nobody supports this plan yet.")
+	if len(all) > pageSize {
+		out += md.Italic("Showing the newest "+strconv.Itoa(pageSize)+" of "+
+			strconv.Itoa(len(all))+" supporters.") + "\n"
+	}
+	return out
 }
 
 // pageNum reads ?page= and falls back to the first page for anything it

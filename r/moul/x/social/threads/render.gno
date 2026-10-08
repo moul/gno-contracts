@@ -19,6 +19,12 @@ import (
 // A page key contains slashes, so "page/<key>" is split on the prefix rather
 // than by path element: realmpath gives the parts, and rejoining them would
 // only be a way to get it wrong.
+// perPage bounds every list this realm renders. A Render is paid for by every
+// reader, so its cost has to be bounded by what it SHOWS rather than by what
+// anybody has ever written, and both Post and Reply are permissionless with no
+// delete path. 20 matches what the index already shows with board.Recent(20).
+const perPage = 20
+
 func Render(path string) string {
 	req := realmpath.Parse(path)
 
@@ -67,7 +73,19 @@ func renderPage(page string) string {
 	}
 	out := md.H1("Threads on " + ui.Inline(page))
 	out += md.Link("the page itself", th.RealmURL(page)) + "\n\n"
-	out += listing(board.List(page, runtime.ChainHeight(), 0), false)
+
+	// Finding 325-cost-at-caps-1: this passed limit 0, which means "every
+	// thread anybody ever posted on this page". Post is permissionless and
+	// the page key is any string, so a visitor fills a page they do not own
+	// and every reader of it pays. There is no delete path, so it is
+	// irreversible.
+	total := board.PageLen(page)
+	out += listing(board.List(page, runtime.ChainHeight(), perPage), false)
+	if total > perPage {
+		out += md.Italic("Showing " + strconv.Itoa(perPage) + " of " +
+			strconv.Itoa(total) + " threads, newest and pinned first.") + "\n"
+	}
+
 	out += "\n" + ui.Action("💬 Post here", "Post", "page", page, "body", "") + "\n"
 	return out
 }
@@ -96,11 +114,24 @@ func renderThread(raw string) string {
 	if len(t.Replies) == 0 {
 		out += ui.Empty("Nobody has replied yet.")
 	} else {
+		// Finding 325-cost-at-caps-1: this rendered every reply ever
+		// written. Reply is permissionless and nothing deletes one, so the
+		// page a reader pays for grows without a bound anybody controls.
+		// The newest are shown, because that is what a reader of a thread
+		// came for.
+		shown := t.Replies
+		if len(shown) > perPage {
+			shown = shown[len(shown)-perPage:]
+		}
 		r := ui.NewTable("by", "said", "block")
-		for _, rep := range t.Replies {
+		for _, rep := range shown {
 			r.Row(ui.Addr(rep.Author), ui.Cell(rep.Body), strconv.FormatInt(rep.At, 10))
 		}
 		out += r.String()
+		if len(t.Replies) > perPage {
+			out += md.Italic("Showing the newest " + strconv.Itoa(perPage) + " of " +
+				strconv.Itoa(len(t.Replies)) + " replies.") + "\n"
+		}
 	}
 
 	out += "\n" + ui.Action("💬 Reply", "Reply", "threadID", id.String(), "body", "") +

@@ -99,8 +99,17 @@ func (rr Renderer) index() string {
 	if len(all) == 0 {
 		b.WriteString("Nothing has been asked of this board yet. `Apply` is open to anyone.\n\n")
 	} else {
+		// Finding 325-cost-at-caps-1: this rendered every request ever
+		// made, and Apply is open to anyone with nothing that removes one,
+		// so the cost every reader of the board pays was set by whoever
+		// applied the most. Newest first, because that is what a reader of
+		// an open board came for.
+		shown := all
+		if len(shown) > IndexRequests {
+			shown = shown[len(shown)-IndexRequests:]
+		}
 		b.WriteString("| # | Kind | Title | For | Asking | Status | Ballots |\n|---|---|---|---|---|---|---|\n")
-		for _, r := range all {
+		for _, r := range shown {
 			yes, no := p.Board.Standing(r)
 			b.WriteString("| [" + strconv.Itoa(r.ID) + "](" + rr.Link + ":request/" + strconv.Itoa(r.ID) + ")" +
 				" | " + r.Kind.String() +
@@ -110,6 +119,10 @@ func (rr Renderer) index() string {
 				" | " + r.Status.String() +
 				" | " + strconv.Itoa(yes) + " for, " + strconv.Itoa(no) + " against" +
 				" |\n")
+		}
+		if len(all) > IndexRequests {
+			b.WriteString("\n_Showing the newest " + strconv.Itoa(IndexRequests) + " of " +
+				strconv.Itoa(len(all)) + " requests._\n")
 		}
 		b.WriteString("\n")
 	}

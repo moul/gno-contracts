@@ -85,6 +85,13 @@ var (
 	ErrBadSpec       = errors.New("grants: milestones must read \"title:amount,title:amount\"")
 )
 
+// IndexRequests is how many requests a board's page lists.
+//
+// Finding 325-cost-at-caps-1: the page rendered every request ever made, and
+// Apply is open to anyone with no removal path, so the cost every reader paid
+// was set by whoever had applied the most.
+const IndexRequests = 20
+
 // Limits every input is checked against. Exported so a UI can pre-validate.
 const (
 	MaxTitle      = 100
