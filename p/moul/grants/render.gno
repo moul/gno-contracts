@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/nt/markdown/sanitize/v0"
 )
 
@@ -53,7 +54,7 @@ func (rr Renderer) Render(path string) string {
 	case strings.HasPrefix(path, "request/"):
 		return rr.request(strings.TrimPrefix(path, "request/"))
 	}
-	return "# " + rr.Title + "\n\nNo page `" + path + "`. Try [the board](" + rr.Link +
+	return "# " + rr.Title + "\n\nNo page " + md.InlineCode(path) + ". Try [the board](" + rr.Link +
 		") or [the ledger](" + rr.Link + ":ledger).\n"
 }
 

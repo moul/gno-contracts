@@ -21,6 +21,7 @@ var Rules = []Rule{
 	originSendUnguarded,
 	colonRelativeLink,
 	escaperInCodeSpan,
+	renderPathInCodeSpan,
 	trimSpaceAsValidity,
 }
 
@@ -525,6 +526,138 @@ var escaperInCodeSpan = Rule{
 		for i, ln := range f.Literal {
 			if escaperInCodeSpanRe.MatchString(ln) {
 				out = append(out, i)
+			}
+		}
+		return out
+	},
+}
+
+// ---------------------------------------------------------------------------
+
+var (
+	renderFuncRe = regexp.MustCompile(`^\s*func\s+(?:\([^)]*\)\s*)?Render\s*\(\s*(\w+)\s+string`)
+	funcDeclRe   = regexp.MustCompile(`^\s*func\s+(?:\([^)]*\)\s*)?(\w+)\s*\(([^)]*)\)`)
+	assignRe     = regexp.MustCompile(`^\s*(\w+(?:\s*,\s*\w+)*)\s*:?=\s*(.+)$`)
+	callRe       = regexp.MustCompile(`(\w+)\s*\(([^()]*)\)`)
+	passThrough  = map[string]bool{
+		"TrimSpace": true, "TrimPrefix": true, "TrimSuffix": true, "Trim": true,
+		"TrimLeft": true, "TrimRight": true, "ToLower": true, "ToUpper": true,
+		"Parse": true, "PathParts": true, "Get": true, "Join": true, "Split": true,
+		"SplitN": true, "Fields": true, "Replace": true, "ReplaceAll": true,
+		"Title": true, "string": true, "Cut": true,
+	}
+	identRe = regexp.MustCompile(`[A-Za-z_]\w*`)
+	// A bare identifier between a code span's two backticks, inside a string
+	// built by concatenation: "`" + x + "`". Run over Literal, where the
+	// backticks are still there.
+	bareSpanRe = regexp.MustCompile("`\"\\s*\\+\\s*([A-Za-z_]\\w*)(?:\\.\\w+)*\\s*\\+\\s*\"`")
+)
+
+// taintedNames returns the identifiers a file derives from Render's path
+// parameter: the parameter itself, anything assigned from an expression that
+// mentions one, and the parameters of any function called with one. It is a
+// file-wide fixed point over names, not a data-flow analysis, so it over-taints
+// on a shadowed name; that costs an ignore comment with a reason, where
+// missing a real flow costs a live phishing vector.
+func taintedNames(code []string) map[string]bool {
+	t := map[string]bool{}
+	for _, ln := range code {
+		if m := renderFuncRe.FindStringSubmatch(ln); m != nil {
+			t[m[1]] = true
+		}
+	}
+	if len(t) == 0 {
+		return t
+	}
+	// An assignment carries taint only through calls that hand the text back
+	// (trimming, splitting, parsing the path); a lookup keyed by it, like
+	// p := pools.Get(path), returns something the realm stored.
+	passes := func(expr string) bool {
+		for _, c := range callRe.FindAllStringSubmatch(expr, -1) {
+			if !passThrough[c[1]] {
+				return false
+			}
+		}
+		return true
+	}
+	mentions := func(expr string) bool {
+		for _, id := range identRe.FindAllString(expr, -1) {
+			if t[id] {
+				return true
+			}
+		}
+		return false
+	}
+	params := map[string][]string{}
+	for _, ln := range code {
+		if m := funcDeclRe.FindStringSubmatch(ln); m != nil {
+			var names []string
+			for _, p := range strings.Split(m[2], ",") {
+				if f := strings.Fields(p); len(f) > 0 {
+					names = append(names, f[0])
+				} else {
+					names = append(names, "")
+				}
+			}
+			params[m[1]] = names
+		}
+	}
+	for changed := true; changed; {
+		changed = false
+		for _, ln := range code {
+			if m := assignRe.FindStringSubmatch(ln); m != nil && mentions(m[2]) && passes(m[2]) {
+				for _, id := range identRe.FindAllString(m[1], -1) {
+					if !t[id] {
+						t[id], changed = true, true
+					}
+				}
+			}
+			for _, c := range callRe.FindAllStringSubmatch(ln, -1) {
+				names, ok := params[c[1]]
+				if !ok {
+					continue
+				}
+				for i, a := range strings.Split(c[2], ",") {
+					if i < len(names) && names[i] != "" && mentions(a) && !t[names[i]] {
+						t[names[i]], changed = true, true
+					}
+				}
+			}
+		}
+	}
+	return t
+}
+
+var renderPathInCodeSpan = Rule{
+	ID:   "render-path-in-code-span",
+	What: "builds a code span by hand around a value derived from Render's path argument",
+	Why: "The path is whatever the visitor typed. A backtick in it closes the span, so the " +
+		"rest of the URL renders as markdown the realm appears to have written: a live link " +
+		"under the realm's own sentence, which is a phishing vector on a page that looks " +
+		"first-party. Interpolating the bare variable is strictly worse than " +
+		"escaper-in-code-span, which needs an escaper call and so only catches the case " +
+		"where somebody already tried.",
+	Fix: "Use md.InlineCode, which sizes the fence past any backtick run. Where the value is " +
+		"validated before it gets there (an address, a hex string), say so with " +
+		"//gnovet:ignore render-path-in-code-span <why>.",
+	Finding: "gno-contracts#328, 2026-10-07: eight live realms, every one a bare variable " +
+		"that escaper-in-code-span missed",
+	Bad: "package x\n\nfunc Render(path string) string {\n\t" +
+		"return \"no page `\" + path + \"`.\"\n}\n",
+	Good: "package x\n\nfunc Render(path string) string {\n\t" +
+		"return \"no page \" + md.InlineCode(path) + \".\"\n}\n",
+	Check: func(f File) []int {
+		t := taintedNames(f.Code)
+		if len(t) == 0 {
+			return nil
+		}
+		// Joined, because a span's closing half often sits on the next line
+		// of a wrapped concatenation.
+		joined := strings.Join(f.Literal, "\n")
+		var out []int
+		for _, m := range bareSpanRe.FindAllStringSubmatchIndex(joined, -1) {
+			if t[joined[m[2]:m[3]]] {
+				out = append(out, strings.Count(joined[:m[2]], "\n"))
 			}
 		}
 		return out

@@ -108,6 +108,7 @@ func renderHex(arg string) string {
 	}
 
 	sb.WriteString("| step | value |\n|---|---|\n")
+	//gnovet:ignore render-path-in-code-span inHex is the output of a successful hex.DecodeString, so [0-9a-fA-F] only
 	sb.WriteString("| hex input | `" + inHex + "` |\n")
 	sb.WriteString("| bytes | `" + byteList(raw) + "` |\n")
 	sb.WriteString("| **Base58** | `" + enc + "` |\n")

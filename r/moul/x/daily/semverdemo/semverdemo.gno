@@ -18,6 +18,7 @@ import (
 	"chain"
 	"chain/runtime/unsafe"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/semver/v0"
 	"gno.land/p/nt/avl/v0"
 )
@@ -105,6 +106,7 @@ func renderCompare(a, b string) string {
 	}
 	c := semver.Compare(a, b)
 	sb.WriteString("\n## Result\n\n")
+	//gnovet:ignore render-path-in-code-span a and b passed semver.Parse above, so neither can carry a backtick
 	sb.WriteString("`" + a + "` **" + word(c) + "** `" + b + "`  ")
 	sb.WriteString("→ `Compare = " + strconv.Itoa(c) + "`\n")
 	return sb.String()
@@ -113,7 +115,7 @@ func renderCompare(a, b string) string {
 func describe(label, s string) string {
 	v, err := semver.Parse(s)
 	if err != nil {
-		return "## " + label + ": `" + s + "`\n\n> invalid\n\n"
+		return "## " + label + ": " + md.InlineCode(s) + "\n\n> invalid\n\n"
 	}
 	pre := "—"
 	if len(v.Pre) > 0 {
@@ -121,6 +123,7 @@ func describe(label, s string) string {
 	}
 	build := "—"
 	if v.Build != "" {
+		//gnovet:ignore render-path-in-code-span Build passed semver.Parse, whose build metadata is [0-9A-Za-z-.] only
 		build = "`" + v.Build + "`"
 	}
 	return "## " + label + ": `" + v.Canonical() + "`\n\n" +
