@@ -192,8 +192,16 @@ func crewTable(items []crew.Listing) string {
 // goes through ui.Cell, which is the escaper that knows it is in a table.
 func proposalTable(ids []store.ID) string {
 	now := runtime.ChainHeight()
+	// Finding 325-cost-at-caps-1: this rendered every proposal a crew has
+	// ever had, and proposing is open to every member with no delete path.
+	// Newest first already, so the bound is on where the walk stops.
+	total := len(ids)
+	stop := 0
+	if total > IndexProposals {
+		stop = total - IndexProposals
+	}
 	t := ui.NewTable("#", "proposal", "state", "yes", "no")
-	for i := len(ids) - 1; i >= 0; i-- {
+	for i := total - 1; i >= stop; i-- {
 		p, ok := crews.Proposal(ids[i])
 		if !ok {
 			continue
@@ -208,7 +216,12 @@ func proposalTable(ids []store.ID) string {
 			strconv.FormatInt(p.No, 10),
 		)
 	}
-	return t.OrEmpty("Nothing has been proposed yet.")
+	out := t.OrEmpty("Nothing has been proposed yet.")
+	if total > IndexProposals {
+		out += md.Italic("Showing the newest "+strconv.Itoa(IndexProposals)+" of "+
+			strconv.Itoa(total)+" proposals.") + "\n"
+	}
+	return out
 }
 
 // state is the one word a proposal is in at height now.

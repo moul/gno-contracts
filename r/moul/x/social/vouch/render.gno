@@ -10,6 +10,15 @@ import (
 	vo "gno.land/p/moul/x/social/vouch/v0"
 )
 
+// IndexEdges is how many vouch edges one address's page lists in each
+// direction.
+//
+// Finding 325-cost-at-caps-1: both tables rendered every edge. Anyone can add
+// an edge to somebody else's page, with a zero bond, and nothing sweeps them,
+// so the cost every reader of that page pays was set by whoever had been most
+// persistent.
+const IndexEdges = 20
+
 // Render routes two views: the realm's own index, and one address's page.
 //
 // An address carries no slash, so the per-address route is a path element and
@@ -119,8 +128,12 @@ func inbound(addr address) string {
 	if len(from) == 0 {
 		return ui.Empty("Nobody vouches for this address.")
 	}
+	shown := from
+	if len(shown) > IndexEdges {
+		shown = shown[len(shown)-IndexEdges:]
+	}
 	t := ui.NewTable("voucher", "reason", "bond", "mutual", "since")
-	for _, f := range from {
+	for _, f := range shown {
 		v, ok := graph.Get(f, addr)
 		if !ok {
 			continue
@@ -133,7 +146,12 @@ func inbound(addr address) string {
 			strconv.FormatInt(v.At, 10),
 		)
 	}
-	return t.String()
+	out := t.String()
+	if len(from) > IndexEdges {
+		out += md.Italic("Showing "+strconv.Itoa(IndexEdges)+" of "+
+			strconv.Itoa(len(from))+" vouchers.") + "\n"
+	}
+	return out
 }
 
 func outbound(addr address) string {
@@ -141,8 +159,12 @@ func outbound(addr address) string {
 	if len(to) == 0 {
 		return ui.Empty("This address vouches for nobody.")
 	}
+	shownTo := to
+	if len(shownTo) > IndexEdges {
+		shownTo = shownTo[len(shownTo)-IndexEdges:]
+	}
 	t := ui.NewTable("for", "reason", "bond", "their vouchers")
-	for _, target := range to {
+	for _, target := range shownTo {
 		v, ok := graph.Get(addr, target)
 		if !ok {
 			continue
@@ -154,7 +176,12 @@ func outbound(addr address) string {
 			strconv.Itoa(graph.ScoreOf(target)),
 		)
 	}
-	return t.String()
+	out := t.String()
+	if len(to) > IndexEdges {
+		out += md.Italic("Showing "+strconv.Itoa(IndexEdges)+" of "+
+			strconv.Itoa(len(to))+" vouches.") + "\n"
+	}
+	return out
 }
 
 func yesno(b bool) string {

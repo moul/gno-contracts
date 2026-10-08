@@ -74,6 +74,13 @@ const denom = "ugnot"
 // IndexCrews is how many crews the index page lists.
 const IndexCrews = 20
 
+// IndexProposals is how many of a crew's proposals its page lists.
+//
+// Finding 325-cost-at-caps-1: the page rendered every proposal a crew had ever
+// had. Proposing is open to every member and nothing deletes one, so the cost
+// every reader pays grew without a bound anybody controls.
+const IndexProposals = 20
+
 // crews holds every crew, every proposal and the credit ledger. A redeploy
 // wipes it, which is the trade gnomod.toml's private = true makes: see the
 // comment there.
