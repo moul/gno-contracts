@@ -69,6 +69,7 @@
 package patron
 
 import (
+	"chain/markdown"
 	"errors"
 	"strings"
 
@@ -457,14 +458,15 @@ func (r *Registry) List(page, size int) []Listing {
 // Pages is how many pages of the given size the registry holds.
 func (r *Registry) Pages(size int) int { return r.plans.Pages(size) }
 
-// ValidTitle reports whether title can be stored: non-empty after trimming,
+// ValidTitle reports whether title can be stored: non-empty after the
+// render's own stripping and trimming,
 // within [MaxTitleLen], and free of control characters including newlines.
 //
 // A title is one line by construction, so a newline in one is refused rather
 // than stripped: silently rewriting what somebody typed is worse than telling
 // them it was refused.
 func ValidTitle(title string) bool {
-	if len(title) > MaxTitleLen || strings.TrimSpace(title) == "" {
+	if len(title) > MaxTitleLen || strings.TrimSpace(markdown.StripBidiAndZeroWidth(title)) == "" {
 		return false
 	}
 	for i := 0; i < len(title); i++ {

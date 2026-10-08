@@ -5,6 +5,7 @@
 package governor
 
 import (
+	"chain/markdown"
 	"strconv"
 	"strings"
 
@@ -56,7 +57,7 @@ var proposals = store.Named("governor: proposal")
 // Propose opens a new proposal and returns its id. The snapshot height and
 // deadline are recorded from the current chain height.
 func Propose(cur realm, description string) int64 {
-	if strings.TrimSpace(description) == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(description)) == "" {
 		panic("governor: empty description")
 	}
 	proposer := unsafe.PreviousRealm().Address()

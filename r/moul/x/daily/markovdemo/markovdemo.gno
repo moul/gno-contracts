@@ -11,6 +11,7 @@
 package markovdemo
 
 import (
+	"chain/markdown"
 	"chain"
 	"chain/runtime"
 	"strconv"
@@ -44,7 +45,7 @@ func seedFor() uint64 {
 // Feed appends text to the on-chain corpus, extending the Markov chain. Any
 // caller may enrich the corpus — this is the open-membership demo model.
 func Feed(cur realm, text string) string {
-	if strings.TrimSpace(text) == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(text)) == "" {
 		panic("markov: empty text")
 	}
 	added := mc.Build(text)

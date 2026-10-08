@@ -8,6 +8,7 @@
 package splitter
 
 import (
+	"chain/markdown"
 	"errors"
 	"strconv"
 	"strings"
@@ -151,7 +152,7 @@ func Render(path string) string {
 
 // splitTrim splits on commas and trims whitespace around each element.
 func splitTrim(s string) []string {
-	if strings.TrimSpace(s) == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(s)) == "" {
 		return nil
 	}
 	parts := strings.Split(s, ",")

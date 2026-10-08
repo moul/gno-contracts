@@ -7,6 +7,7 @@
 package cowsaydemo
 
 import (
+	"chain/markdown"
 	"strings"
 
 	"gno.land/p/moul/x/daily/cowsay/v0"
@@ -22,7 +23,7 @@ func Render(path string) string {
 
 	var b strings.Builder
 	b.WriteString("# cowsay\n\n")
-	if strings.TrimSpace(msg) == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(msg)) == "" {
 		b.WriteString("_Tip: pass a message in the path, e.g._ `/Hello, gno.land!`\n\n")
 	}
 	b.WriteString("```\n")
