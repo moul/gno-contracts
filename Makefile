@@ -133,7 +133,15 @@ publish: ## publish what the chain is missing, in dependency order; PRINT=1 plan
 # A bare `make republish` only PLANS: every live private realm that drifted would be
 # redeployed, and a redeploy resets its state (faucet, forge, vesting, grant, ...). Name what
 # you mean with PKG=<substring>, or say ALL=1.
-republish: ## replace live PRIVATE realms whose source drifted from the chain (resets their state); no PKG= and no ALL=1 only plans; KEY= names the gnokey key
+#
+# It is also SLOW, and that is not a bug to wait out. Comparing one package to the chain is a
+# read of its gnomod.toml, a read of its file list, then one per file, so a bare run is
+# thousands of round trips: tens of minutes against rpc.gno.land, whose limiter sustains about
+# 90 reads a minute. `make republish PKG=moul/home PRINT=1` answers in well under one.
+#
+# PKG= alone SIGNS: -print is added only when neither PKG= nor ALL= is set, so naming a package
+# removes it. Add PRINT=1 to keep planning.
+republish: ## replace live PRIVATE realms whose source drifted from the chain (resets their state); no PKG= and no ALL=1 only plans; slow without PKG=; KEY= names the gnokey key
 	$(GNOPM) publish -republish $(if $(or $(PRINT),$(if $(or $(PKG),$(ALL)),,1)),-print,) $(if $(KEY),-key $(KEY),) $(PKG)
 
 status: ## refresh on-chain upload status for every network; needs gnokey
