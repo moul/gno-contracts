@@ -24,7 +24,7 @@ HOME_TX      ?= /tmp/home.tx.json
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render bench bench-report \
 	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update review-advice \
 	verify deps deps-chain bump-deps manifest readme readmes gen check \
-	sync graph publish status home-push home-packages report preview site web clean
+	sync graph publish republish status home-push home-packages report preview site web clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^##@/{printf "\n%s\n",substr($$0,5)} /^[a-z][a-z-]*:.*?## /{printf "  %-14s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -129,6 +129,12 @@ check: ## fail if contracts.json or the README table is stale
 
 publish: ## publish what the chain is missing, in dependency order; PRINT=1 plans without acting, KEY= names the gnokey key, PKG= filters
 	$(GNOPM) publish $(if $(PRINT),-print,) $(if $(KEY),-key $(KEY),) $(PKG)
+
+# A bare `make republish` only PLANS: every live private realm that drifted would be
+# redeployed, and a redeploy resets its state (faucet, forge, vesting, grant, ...). Name what
+# you mean with PKG=<substring>, or say ALL=1.
+republish: ## replace live PRIVATE realms whose source drifted from the chain (resets their state); no PKG= and no ALL=1 only plans; KEY= names the gnokey key
+	$(GNOPM) publish -republish $(if $(or $(PRINT),$(if $(or $(PKG),$(ALL)),,1)),-print,) $(if $(KEY),-key $(KEY),) $(PKG)
 
 status: ## refresh on-chain upload status for every network; needs gnokey
 	$(GNOCONTRACTS) status $(if $(NET),-net $(NET),)
