@@ -181,7 +181,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/forge/v1`](p/moul/forge) 📦 | — | [✅](https://gno.land/p/moul/forge/v1) | — | — | 1 |
 | [`p/moul/fp/v0`](p/moul/fp) 📦 | — | [✅](https://gno.land/p/moul/fp/v0) | — | — | — |
 | [`p/moul/gnopm/v0`](p/moul/gnopm) 📦 | — | [✅](https://gno.land/p/moul/gnopm/v0) | — | — | 1 |
-| [`p/moul/grants/v0`](p/moul/grants) 📦 | — | [✅](https://gno.land/p/moul/grants/v0) | — | — | 3 |
+| [`p/moul/grants/v0`](p/moul/grants) 📦 | — | [✅](https://gno.land/p/moul/grants/v0) | — | — | 4 |
 | [`p/moul/greet/v0`](p/moul/greet) 📦 | — | [✅](https://gno.land/p/moul/greet/v0) | — | — | — |
 | [`p/moul/helplink/v0`](p/moul/helplink) 📦 | [🗄️](https://onyx.testnets.gno.land/p/moul/helplink/v0) | [🗄️](https://gno.land/p/moul/helplink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/helplink/v0) ≈ | 1 |
 | [`p/moul/kit/index/v0`](p/moul/kit/index) 📦 | — | [✅](https://gno.land/p/moul/kit/index/v0) | — | — | 2 |
@@ -419,7 +419,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/quotes/v0`](r/moul/x/daily/quotes) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/quotes/v0) | — | — | — |
 | [`r/moul/x/daily/qvote/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/qvote) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/qvote/v0) | — | — | 1 |
 | [`r/moul/x/daily/qvote/v1`](r/moul/x/daily/qvote) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/qvote/v1) | — | — | 2 |
-| [`r/moul/x/daily/ratelimitdemo/v0`](r/moul/x/daily/ratelimitdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ratelimitdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/ratelimitdemo/v0`](r/moul/x/daily/ratelimitdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ratelimitdemo/v0) | — | — | 2 |
 | [`r/moul/x/daily/reactions/v0`](r/moul/x/daily/reactions) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/reactions/v0) | — | — | 2 |
 | [`r/moul/x/daily/ringbufferdemo/v0`](r/moul/x/daily/ringbufferdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ringbufferdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/ringlog/v0`](r/moul/x/daily/ringlog) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ringlog/v0) | — | — | — |
@@ -435,7 +435,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsmatch/v1) | — | — | 2 |
 | [`r/moul/x/daily/rpsoracle/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/rpsoracle) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rpsoracle/v0) | — | — | 1 |
 | [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsoracle/v1) | — | — | 2 |
-| [`r/moul/x/daily/semverdemo/v0`](r/moul/x/daily/semverdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/semverdemo/v0) | — | — | 2 |
+| [`r/moul/x/daily/semverdemo/v0`](r/moul/x/daily/semverdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/semverdemo/v0) | — | — | 3 |
 | [`r/moul/x/daily/sievedemo/v0`](r/moul/x/daily/sievedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/sievedemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/soundexdemo/v0`](r/moul/x/daily/soundexdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/soundexdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/sparklinedemo/v0`](r/moul/x/daily/sparklinedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/sparklinedemo/v0) | — | — | 1 |
@@ -471,7 +471,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/games/idle/v0`](r/moul/x/games/idle) 🏛️ | — | [✅](https://gno.land/r/moul/x/games/idle/v0) | — | — | 3 |
 | [`r/moul/x/games/lastwords/v0`](r/moul/x/games/lastwords) 🏛️ | — | [✅](https://gno.land/r/moul/x/games/lastwords/v0) | — | — | 5 |
 | [`r/moul/x/grc20faucet/v0`](r/moul/x/grc20faucet) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20faucet/v0) | — | — | 4 |
-| [`r/moul/x/grc20wrapdemo/v0`](r/moul/x/grc20wrapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20wrapdemo/v0) | — | — | 6 |
+| [`r/moul/x/grc20wrapdemo/v0`](r/moul/x/grc20wrapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20wrapdemo/v0) | — | — | 7 |
 | [`r/moul/x/gsdash/v0`](r/moul/x/gsdash) 🏛️ | — | ⏳ | — | — | 7 |
 | [`r/moul/x/kitindexdemo/v0`](r/moul/x/kitindexdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/kitindexdemo/v0) | — | — | 5 |
 | [`r/moul/x/moultest/v0`](r/moul/x/moultest) 🏛️ | — | [✅](https://gno.land/r/moul/x/moultest/v0) | — | — | 4 |
@@ -515,7 +515,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/upgrade/wrap/v1`](r/moul/x/upgrade/wrap/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/wrap/v1) | — | — | 2 |
 | [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/bfdemo/v0) | — | — | 6 |
 | [`r/moul/x/vm/riscvdemo/v0`](r/moul/x/vm/riscvdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/riscvdemo/v0) | — | — | 6 |
-| [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | — | [✅](https://gno.land/r/moul/x/wesh/v0) | — | — | 2 |
+| [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | — | [✅](https://gno.land/r/moul/x/wesh/v0) | — | — | 3 |
 | [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | — | [✅](https://gno.land/r/moul/x/wiki/v0) | — | — | 8 |
 | [`r/moul/zones/v0`](r/moul/zones) 🏛️ | — | [✅](https://gno.land/r/moul/zones/v0) | — | — | 5 |
 
@@ -523,7 +523,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-07T23:33:45Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-08T00:41:39Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
