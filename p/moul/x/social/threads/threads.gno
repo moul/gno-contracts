@@ -48,6 +48,7 @@
 package threads
 
 import (
+	"chain/markdown"
 	"errors"
 	"strconv"
 	"strings"
@@ -281,7 +282,8 @@ func ValidPage(page string) bool {
 	return true
 }
 
-// ValidBody reports whether body can be stored: non-empty after trimming,
+// ValidBody reports whether body can be stored: non-empty after the render's
+// own stripping and trimming,
 // within [MaxBodyLen], and free of control characters.
 //
 // Control characters are refused rather than stripped because a body is shown
@@ -290,7 +292,7 @@ func ValidPage(page string) bool {
 // render time, since a validator and an escaper protect against different
 // mistakes.
 func ValidBody(body string) bool {
-	if len(body) > MaxBodyLen || strings.TrimSpace(body) == "" {
+	if len(body) > MaxBodyLen || strings.TrimSpace(markdown.StripBidiAndZeroWidth(body)) == "" {
 		return false
 	}
 	for i := 0; i < len(body); i++ {

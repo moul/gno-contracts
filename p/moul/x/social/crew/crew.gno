@@ -59,6 +59,7 @@
 package crew
 
 import (
+	"chain/markdown"
 	"errors"
 	"strings"
 
@@ -547,7 +548,8 @@ func (cs *Crews) List(limit int) []Listing {
 	return out
 }
 
-// ValidName reports whether name can be stored: non-empty after trimming,
+// ValidName reports whether name can be stored: non-empty after the render's
+// own stripping and trimming,
 // within [MaxNameLen], free of control characters including newlines, and
 // free of the pipe character.
 //
@@ -563,7 +565,7 @@ func (cs *Crews) List(limit int) []Listing {
 // render escapes it with ui.Cell, because free prose legitimately contains one
 // and a name does not.
 func ValidName(name string) bool {
-	if len(name) > MaxNameLen || strings.TrimSpace(name) == "" {
+	if len(name) > MaxNameLen || strings.TrimSpace(markdown.StripBidiAndZeroWidth(name)) == "" {
 		return false
 	}
 	for i := 0; i < len(name); i++ {
@@ -576,7 +578,7 @@ func ValidName(name string) bool {
 }
 
 // ValidText reports whether a proposal body can be stored: non-empty after
-// trimming, within [MaxTextLen], and free of control characters other than
+// the render's own stripping and trimming, within [MaxTextLen], and free of control characters other than
 // newline and tab.
 //
 // Control characters are refused rather than stripped because the text is shown
@@ -584,7 +586,7 @@ func ValidName(name string) bool {
 // telling them it was refused. Everything else is allowed and escaped at render
 // time: a validator and an escaper protect against different mistakes.
 func ValidText(text string) bool {
-	if len(text) > MaxTextLen || strings.TrimSpace(text) == "" {
+	if len(text) > MaxTextLen || strings.TrimSpace(markdown.StripBidiAndZeroWidth(text)) == "" {
 		return false
 	}
 	for i := 0; i < len(text); i++ {

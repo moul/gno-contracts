@@ -53,6 +53,7 @@
 package curated
 
 import (
+	"chain/markdown"
 	"errors"
 	"strings"
 )
@@ -560,7 +561,8 @@ func ValidKey(key string) bool {
 	return true
 }
 
-// ValidURL reports whether url can be stored: non-empty, within [MaxURLLen],
+// ValidURL reports whether url can be stored: non-empty after the render's own
+// stripping and trimming, within [MaxURLLen],
 // and free of spaces and control characters.
 //
 // No scheme is required, because a list of on-chain things is the obvious use
@@ -571,7 +573,7 @@ func ValidKey(key string) bool {
 // Nothing here checks that the target exists: a deposit backs the claim that
 // the entry is worth listing, not the claim that it resolves.
 func ValidURL(url string) bool {
-	if url == "" || len(url) > MaxURLLen {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(url)) == "" || len(url) > MaxURLLen {
 		return false
 	}
 	for i := 0; i < len(url); i++ {
@@ -583,14 +585,14 @@ func ValidURL(url string) bool {
 }
 
 // ValidDescription reports whether description can be stored: non-empty after
-// trimming, within [MaxDescLen], and a single line.
+// the render's own stripping and trimming, within [MaxDescLen], and a single line.
 //
 // Newlines and tabs are refused rather than stripped, because a description is
 // shown back to the person who wrote it and silently rewriting it is worse than
 // telling them it was refused. It lives in a table cell, which a newline would
 // break out of and an escaper would then have to repair.
 func ValidDescription(description string) bool {
-	if len(description) > MaxDescLen || strings.TrimSpace(description) == "" {
+	if len(description) > MaxDescLen || strings.TrimSpace(markdown.StripBidiAndZeroWidth(description)) == "" {
 		return false
 	}
 	for i := 0; i < len(description); i++ {

@@ -59,6 +59,7 @@
 package vouch
 
 import (
+	"chain/markdown"
 	"errors"
 	"strconv"
 	"strings"
@@ -370,7 +371,8 @@ func (g *Graph) Leaderboard(limit int) []Ranked {
 	return out
 }
 
-// ValidReason reports whether reason can be stored: non-empty after trimming,
+// ValidReason reports whether reason can be stored: non-empty after the
+// render's own stripping and trimming,
 // within [MaxReasonLen], on one line, and free of control characters.
 //
 // One line is a deliberate bound rather than a rendering workaround. A reason
@@ -383,7 +385,7 @@ func (g *Graph) Leaderboard(limit int) []Ranked {
 // escaped at render time, since a validator and an escaper protect against
 // different mistakes.
 func ValidReason(reason string) bool {
-	if len(reason) > MaxReasonLen || strings.TrimSpace(reason) == "" {
+	if len(reason) > MaxReasonLen || strings.TrimSpace(markdown.StripBidiAndZeroWidth(reason)) == "" {
 		return false
 	}
 	for i := 0; i < len(reason); i++ {

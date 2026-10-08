@@ -16,6 +16,7 @@
 package kitindexdemo
 
 import (
+	"chain/markdown"
 	"strconv"
 	"strings"
 
@@ -169,7 +170,7 @@ func assertRoom(who address) {
 }
 
 func assertBody(body string) {
-	if strings.TrimSpace(body) == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(body)) == "" {
 		panic("kitindexdemo: the body is empty")
 	}
 	if len(body) > MaxBody {
