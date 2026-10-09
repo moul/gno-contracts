@@ -82,11 +82,14 @@ func NameOf(input string) string {
 	return name
 }
 
-// Display returns what a page should print for an input: the username when
-// there is one, and the input unchanged when there is not.
+// Display returns what a page should print for an input: "@name" when there is
+// a username, and the input unchanged when there is not.
 //
-// It never returns "", which is what makes it usable inline: a caller that has
-// to check for an empty string would have called [NameOf].
+// So it is total over every input a page actually has, and a caller never has
+// to branch on "not found" the way [NameOf] makes it. The one input it has
+// nothing to say about is "", which it returns unchanged: an empty answer to an
+// empty question, rather than a placeholder a page would then have to special
+// case anyway.
 func Display(input string) string {
 	if name := NameOf(input); name != "" {
 		return "@" + name

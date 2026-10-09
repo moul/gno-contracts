@@ -41,7 +41,7 @@ func (c *Catalog) Set(t Tool) error {
 	if err := t.Validate(); err != nil {
 		return err
 	}
-	c.tools.Set(t.Slug, t)
+	c.tools.Set(t.Slug, copyTool(t))
 	return nil
 }
 
@@ -60,7 +60,7 @@ func (c *Catalog) Get(slug string) (Tool, bool) {
 	if v == nil {
 		return Tool{}, false
 	}
-	return v.(Tool), true
+	return copyTool(v.(Tool)), true
 }
 
 // Has reports whether slug is in the catalog.
@@ -73,7 +73,7 @@ func (c *Catalog) Len() int { return c.tools.Size() }
 func (c *Catalog) List() []Tool {
 	out := make([]Tool, 0, c.tools.Size())
 	c.tools.Iterate("", "", func(_ string, v any) bool {
-		out = append(out, v.(Tool))
+		out = append(out, copyTool(v.(Tool)))
 		return false
 	})
 	return out
@@ -88,7 +88,7 @@ func (c *Catalog) ByTag(tag string) []Tool {
 	var out []Tool
 	c.tools.Iterate("", "", func(_ string, v any) bool {
 		if t := v.(Tool); t.HasTag(tag) {
-			out = append(out, t)
+			out = append(out, copyTool(t))
 		}
 		return false
 	})
@@ -108,6 +108,23 @@ func (c *Catalog) Tags() []string {
 		return false
 	})
 	return out
+}
+
+// copyTool deep-copies the one field that is not a scalar.
+//
+// A Tool is a value, so handing one out already copies Slug, Path, Title and
+// Desc. Tags is a slice: the struct copy duplicates the header and shares the
+// backing array, so `c.List()[0].Tags[0] = "x"` would reach into the catalog
+// and change what every later read returns. Copied on the way in as well as on
+// the way out, or the caller of Set keeps a handle on stored state.
+func copyTool(t Tool) Tool {
+	if t.Tags == nil {
+		return t
+	}
+	tags := make([]string, len(t.Tags))
+	copy(tags, t.Tags)
+	t.Tags = tags
+	return t
 }
 
 func contains(haystack []string, needle string) bool {

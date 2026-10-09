@@ -94,19 +94,60 @@ func TestCatalogGetAndRemove(t *testing.T) {
 	uassert.Equal(t, "usernames", got2[1])
 }
 
-// TestCatalogListIsACopy: the tree stores Tool by value, so what List hands
-// back is a copy and a caller rewriting an element cannot reach the directory
-// through it. Pinned because storing *Tool instead would silently break it.
+// TestCatalogListIsACopy: a caller rewriting what List handed back must not
+// reach the directory through it. The struct copy covers the string fields on
+// its own; Tags is a slice, so without copyTool the header is duplicated and
+// the backing array is shared, and the write below would land in the catalog.
 func TestCatalogListIsACopy(t *testing.T) {
 	var c Catalog
-	uassert.NoError(t, c.Set(tool("usernames")))
+	uassert.NoError(t, c.Set(tool("usernames", "identity")))
 
 	got := c.List()
 	got[0].Title = "hijacked"
+	got[0].Tags[0] = "hijacked"
 
 	kept, ok := c.Get("usernames")
 	uassert.True(t, ok)
 	uassert.Equal(t, "usernames", kept.Title)
+	uassert.Equal(t, "identity", kept.Tags[0])
+}
+
+// TestCatalogDoesNotAliasTheCallersTags is the same hole from the other side:
+// Set must not keep a handle on the slice the caller still holds.
+func TestCatalogDoesNotAliasTheCallersTags(t *testing.T) {
+	var c Catalog
+	tags := []string{"identity"}
+	uassert.NoError(t, c.Set(Tool{
+		Slug:  "usernames",
+		Path:  "gno.land/r/moul/toolbox/usernames",
+		Title: "Usernames",
+		Tags:  tags,
+	}))
+
+	tags[0] = "hijacked"
+
+	kept, ok := c.Get("usernames")
+	uassert.True(t, ok)
+	uassert.Equal(t, "identity", kept.Tags[0])
+	uassert.Equal(t, 1, len(c.ByTag("identity")))
+	uassert.Equal(t, 0, len(c.ByTag("hijacked")))
+}
+
+// TestCatalogGetIsACopyToo: ByTag and Get hand out the same values List does.
+func TestCatalogGetIsACopyToo(t *testing.T) {
+	var c Catalog
+	uassert.NoError(t, c.Set(tool("usernames", "identity")))
+
+	got, ok := c.Get("usernames")
+	uassert.True(t, ok)
+	got.Tags[0] = "hijacked"
+
+	byTag := c.ByTag("identity")
+	uassert.Equal(t, 1, len(byTag))
+	byTag[0].Tags[0] = "hijacked-again"
+
+	kept, _ := c.Get("usernames")
+	uassert.Equal(t, "identity", kept.Tags[0])
 }
 
 func TestCatalogByTagAndTags(t *testing.T) {

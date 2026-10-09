@@ -28,16 +28,37 @@ func TestIndexEmpty(t *testing.T) {
 }
 
 // TestIndexEscapesCells pins the escaping contract: a description is written
-// by whoever wrote the entry, and a pipe in one would otherwise add a column
-// to every row below it.
+// by whoever wrote the entry, and a pipe in one would otherwise add a column to
+// every row below it. The title is link text inside a cell, so it needs the
+// pipe escaped there too.
 func TestIndexEscapesCells(t *testing.T) {
 	got := Index([]Tool{{
 		Slug:  "evil",
-		Path:  "gno.land/r/moul/toolbox/evil/v0",
-		Title: "Evil",
+		Path:  "gno.land/r/moul/toolbox/evil",
+		Title: "Ev|il",
 		Desc:  "a | b",
+		Tags:  []string{"x|y"},
 	}})
 	uassert.False(t, strings.Contains(got, "a | b"))
+	uassert.True(t, strings.Contains(got, `[Ev\|il](/r/moul/toolbox/evil)`))
+	uassert.True(t, strings.Contains(got, `x\|y`))
+}
+
+// TestIndexEscapesTitleExactlyOnce is the double-wrap regression, and the
+// values are copied from what the escapers actually produce rather than
+// guessed: md.Link runs its text through sanitize.InlineText itself, so
+// md.Link(ui.Cell(title), url) yields `[a\\\*b]` where one pass yields
+// `[a\*b]`, and the reader sees a stray backslash.
+func TestIndexEscapesTitleExactlyOnce(t *testing.T) {
+	got := Index([]Tool{{
+		Slug:  "star",
+		Path:  "gno.land/r/moul/toolbox/star",
+		Title: "a*b",
+		Desc:  "c*d",
+	}})
+	uassert.True(t, strings.Contains(got, `[a\*b](/r/moul/toolbox/star)`))
+	uassert.False(t, strings.Contains(got, `a\\`))
+	uassert.True(t, strings.Contains(got, `c\*d`))
 }
 
 func TestCard(t *testing.T) {

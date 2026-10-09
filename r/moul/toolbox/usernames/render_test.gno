@@ -58,14 +58,28 @@ func TestRenderTooManyParts(cur realm, t *testing.T) {
 // TestRenderEscapesInput: the query parameter is attacker-chosen and a live
 // realm can never be fixed, so this is the test that must be seen to fail
 // before it is believed.
+//
+// The property is that the echo is INERT, not that particular bytes are
+// absent. A code span makes link syntax inert without removing it, so an
+// assertion that the substring is gone would pass for the wrong reason under
+// one escaper and fail for the wrong reason under the other.
 func TestRenderEscapesInput(cur realm, t *testing.T) {
 	seed(cur, t)
 
+	const link = "[x](javascript:alert(1))"
 	got := Render("lookup?q=" + "%5Bx%5D%28javascript%3Aalert%281%29%29")
-	uassert.False(t, strings.Contains(got, "](javascript:"))
+	uassert.True(t, strings.Contains(got, "`"+link+"`"))
+	uassert.False(t, strings.Contains(got, " "+link+" "))
 
-	pipe := Render("lookup?q=a%7Cb")
-	uassert.False(t, strings.Contains(pipe, "| a|b |"))
+	// A backtick in the input cannot close the span early: the fence widens.
+	tick := Render("lookup?q=a%60b")
+	uassert.True(t, strings.Contains(tick, "``"))
+	uassert.False(t, strings.Contains(tick, "under `a`b`."))
+
+	// A heading marker cannot open a block of its own: the echo stays on the
+	// line it was put on.
+	head := Render("lookup?q=%0A%23%20pwned")
+	uassert.False(t, strings.Contains(head, "\n# pwned"))
 }
 
 // TestRenderOmitsTheCommandForUnsafeInput: nothing escapes inside a fenced

@@ -1,9 +1,9 @@
 package toolbox
 
 import (
+	"net/url"
 	"strings"
 
-	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/realmpath/v0"
 	tb "gno.land/p/moul/toolbox/v0"
@@ -39,17 +39,15 @@ func renderIndex(tag string) string {
 	list := catalog.List()
 	if tag != "" {
 		list = catalog.ByTag(tag)
-		b.WriteString("\nFiltered to " + md.InlineCode(ui.Inline(tag)) + ". " +
+		b.WriteString("\nFiltered to " + md.InlineCode(tag) + ". " +
 			md.Link("Show all", hubURL) + "\n")
 	}
 	b.WriteString("\n" + tb.Index(list))
 
-	if tags := catalog.Tags(); len(tags) > 0 && tag == "" {
-		links := make([]string, 0, len(tags))
-		for _, name := range tags {
-			links = append(links, md.Link(ui.Inline(name), hubURL+"?tag="+name))
+	if tag == "" {
+		if links := tagLinks(catalog, hubURL); links != "" {
+			b.WriteString("\nTags: " + links + "\n")
 		}
-		b.WriteString("\nTags: " + strings.Join(links, " · ") + "\n")
 	}
 
 	b.WriteString("\n" + md.H2("What a tool is"))
@@ -59,6 +57,23 @@ func renderIndex(tag string) string {
 		"Composed from contracts already on chain, so the toolbox adds the view and not the data.",
 	}))
 	return b.String()
+}
+
+// tagLinks renders the tag filter row, or "" when nothing is tagged.
+//
+// QueryEscape, not plain concatenation: a tag is an arbitrary string on Tool,
+// and "a&b" would otherwise become a second query parameter while "a#b" would
+// become a fragment, in both cases linking to a filter nobody asked for.
+func tagLinks(c *tb.Catalog, base string) string {
+	tags := c.Tags()
+	if len(tags) == 0 {
+		return ""
+	}
+	links := make([]string, 0, len(tags))
+	for _, name := range tags {
+		links = append(links, md.Link(name, base+"?tag="+url.QueryEscape(name)))
+	}
+	return strings.Join(links, " · ")
 }
 
 func renderTool(t tb.Tool) string {
@@ -71,7 +86,7 @@ func renderTool(t tb.Tool) string {
 func renderUnknown(slug string) string {
 	var b strings.Builder
 	b.WriteString(md.H1("Not found"))
-	b.WriteString("\nNo tool called " + md.InlineCode(ui.Inline(slug)) + ".\n")
+	b.WriteString("\nNo tool called " + md.InlineCode(slug) + ".\n")
 	b.WriteString("\n" + md.Link("Back to the toolbox", hubURL) + "\n")
 	return b.String()
 }

@@ -3,6 +3,7 @@ package usernames
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"gno.land/p/nt/uassert/v0"
 	"gno.land/p/nt/urequire/v0"
@@ -176,4 +177,24 @@ func TestTrim(t *testing.T) {
 	uassert.Equal(t, "moul", trim("moul"))
 	long := strings.Repeat("a", maxInput+10)
 	uassert.Equal(t, strings.Repeat("a", maxInput)+"…", trim(long))
+}
+
+// TestTrimCutsOnARuneBoundary: a byte cut at maxInput lands inside the
+// multi-byte character here and leaves half of it, which no escaper
+// downstream can do anything sensible with.
+func TestTrimCutsOnARuneBoundary(t *testing.T) {
+	in := strings.Repeat("a", maxInput-1) + "é" + "tail"
+	got := trim(in)
+	uassert.Equal(t, strings.Repeat("a", maxInput-1)+"é"+"…", got)
+	uassert.True(t, utf8.ValidString(got))
+
+	// And the cap counts characters, not bytes, so an all-multibyte input
+	// keeps maxInput of them rather than half as many.
+	accents := strings.Repeat("é", maxInput+5)
+	uassert.Equal(t, strings.Repeat("é", maxInput)+"…", trim(accents))
+}
+
+// TestDisplayOnEmpty pins the one input Display has nothing to say about.
+func TestDisplayOnEmpty(t *testing.T) {
+	uassert.Equal(t, "", Display(""))
 }

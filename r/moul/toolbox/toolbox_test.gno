@@ -69,6 +69,29 @@ func TestRenderTagFilter(t *testing.T) {
 	uassert.False(t, strings.Contains(empty, "[Usernames]"))
 }
 
+// TestTagLinkIsURLEscaped: a tag is an arbitrary string on Tool, and
+// concatenating one into a query string unescaped turns "a&b" into two
+// parameters and "a#b" into a fragment, so the link filters by something
+// nobody asked for. Values copied from what QueryEscape actually emits.
+func TestTagLinkIsURLEscaped(t *testing.T) {
+	var c tb.Catalog
+	uassert.NoError(t, c.Set(tb.Tool{
+		Slug:  "weird",
+		Path:  "gno.land/r/moul/toolbox/weird",
+		Title: "Weird",
+		Tags:  []string{"a&b c"},
+	}))
+
+	got := tagLinks(&c, hubURL)
+	uassert.True(t, strings.Contains(got, "?tag=a%26b+c"))
+	uassert.False(t, strings.Contains(got, "?tag=a&b c"))
+}
+
+func TestTagLinksEmpty(t *testing.T) {
+	var c tb.Catalog
+	uassert.Equal(t, "", tagLinks(&c, hubURL))
+}
+
 func TestRenderTool(t *testing.T) {
 	got := Render("usernames")
 	uassert.True(t, strings.Contains(got, "[toolbox](/r/moul/toolbox)"))

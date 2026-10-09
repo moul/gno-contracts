@@ -9,16 +9,24 @@ import (
 
 // Index renders a catalog as a markdown table: tool, what it does, tags.
 //
-// Every cell that came from a [Tool] goes through [ui.Cell] first. A tool
-// description is written by whoever wrote the entry, which in a hub that
-// accepts runtime registration is not necessarily whoever owns the hub, and a
-// pipe or a backtick in a description would otherwise rewrite the table around
-// it.
+// Every cell that came from a [Tool] is escaped exactly once, with the helper
+// for the slot it lands in. A tool description is written by whoever wrote the
+// entry, which in a hub that accepts runtime registration is not necessarily
+// whoever owns the hub, and a pipe or a backtick in one would otherwise
+// rewrite the table around it.
+//
+// The title link is built by hand rather than with [md.Link], which is the one
+// place the obvious call is wrong: md.Link runs its text through
+// sanitize.InlineText itself, so md.Link(ui.Cell(title), url) escapes twice and
+// a title with an asterisk in it renders as a backslash. The slot here is link
+// text INSIDE a table cell, and the helper for that is [ui.Cell] (InlineText
+// plus the pipe escape InlineText deliberately leaves alone), with the URL
+// escaped once by [md.EscapeURL].
 func Index(tools []Tool) string {
 	t := ui.NewTable("Tool", "What it does", "Tags")
 	for _, tool := range tools {
 		t.Row(
-			md.Link(ui.Cell(tool.Title), tool.URL()),
+			"["+ui.Cell(tool.Title)+"]("+md.EscapeURL(tool.URL())+")",
 			ui.Cell(tool.Desc),
 			ui.Cell(strings.Join(tool.Tags, ", ")),
 		)
@@ -39,7 +47,7 @@ func Card(tool Tool) string {
 		"Path: " + md.InlineCode(tool.Path),
 	}))
 	if len(tool.Tags) > 0 {
-		b.WriteString("\nTags: " + ui.Cell(strings.Join(tool.Tags, ", ")) + "\n")
+		b.WriteString("\nTags: " + ui.Inline(strings.Join(tool.Tags, ", ")) + "\n")
 	}
 	return b.String()
 }

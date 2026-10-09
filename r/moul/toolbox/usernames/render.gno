@@ -68,7 +68,6 @@ func renderHome() string {
 
 func renderResult(input string) string {
 	var b strings.Builder
-	shown := ui.Inline(trim(input))
 	b.WriteString(md.H1("Usernames"))
 	b.WriteString("\n" + form())
 
@@ -79,13 +78,21 @@ func renderResult(input string) string {
 	}
 
 	t := ui.NewTable("Field", "Value")
+	// RenderLink builds `[@name](/u/name)` with no escaping of its own, which
+	// is safe only because r/sys/users validates a name against
+	// ^[a-z][a-z0-9]*([_-][a-z0-9]+)*$ before storing it: no pipe, no bracket,
+	// nothing a table cell or a link would notice.
 	t.Row("Username", data.RenderLink(""))
 	t.Row("Address", ui.AddrFull(data.Addr()))
 	if current := CurrentName(input); current != "" {
-		t.Row("Note", "You asked for "+md.InlineCode(shown)+
-			", which is an earlier name. The current one is "+md.InlineCode(ui.Inline(current))+".")
+		// One ui.Cell over the whole sentence, not a code span per name: a
+		// code span escapes for running prose and leaves the `|` that would
+		// split the row, and wrapping an already-escaped string again is the
+		// double-wrap sanitize refuses to be idempotent about.
+		t.Row("Note", ui.Cell("You asked for "+trim(input)+
+			", which is an earlier name. The current one is "+current+"."))
 	}
-	t.Row("Canonical", md.InlineCode(ui.Inline(users.Canonicalize(data.Name()))))
+	t.Row("Canonical", ui.Cell(users.Canonicalize(data.Name())))
 	b.WriteString("\n" + t.String())
 
 	if cmd := qevalCommand(input); cmd != "" {
@@ -96,7 +103,7 @@ func renderResult(input string) string {
 
 func notFound(input string) string {
 	var b strings.Builder
-	b.WriteString("Nothing registered under " + md.InlineCode(ui.Inline(trim(input))) + ".\n")
+	b.WriteString("Nothing registered under " + md.InlineCode(trim(input)) + ".\n")
 	b.WriteString("\n" + md.BulletList(notFoundHints(input)))
 	return b.String()
 }
@@ -115,8 +122,8 @@ func notFoundHints(input string) []string {
 		"Nobody holds it, or the account was deleted: a deleted name keeps its tombstone and resolves to nothing.",
 	}
 	if owner := CanonicalOwner(trimmed); owner != "" {
-		hints = append(hints, "A lookalike is taken: "+md.InlineCode(ui.Inline(owner))+
-			" already holds the canonical key "+md.InlineCode(ui.Inline(users.Canonicalize(trimmed)))+".")
+		hints = append(hints, "A lookalike is taken: "+md.InlineCode(owner)+
+			" already holds the canonical key "+md.InlineCode(users.Canonicalize(trimmed))+".")
 	} else if Taken(trimmed) {
 		hints = append(hints, "The name IS taken, by an account that was deleted or renamed. Registering it would still fail.")
 	}
@@ -163,9 +170,18 @@ func safeArg(s string) bool {
 
 // trim bounds an echoed input. Everything downstream escapes it; this only
 // stops one query from rendering a page of arbitrary size.
+//
+// Cut on a rune boundary, not a byte one: s[:maxInput] on a multi-byte
+// character leaves half of it, and half a rune is not a character the escapers
+// downstream can do anything sensible with. Counting runes also makes the cap
+// mean the same thing for every alphabet.
 func trim(s string) string {
-	if len(s) > maxInput {
-		return s[:maxInput] + "…"
+	n := 0
+	for i := range s {
+		if n == maxInput {
+			return s[:i] + "…"
+		}
+		n++
 	}
 	return s
 }
