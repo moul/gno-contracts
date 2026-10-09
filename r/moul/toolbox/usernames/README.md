@@ -1,0 +1,56 @@
+# `gno.land/r/moul/toolbox/usernames/v0`
+
+**Who holds a name, and what name an address holds.** Type either one into the box.
+
+It is the page form of
+
+```sh
+gnokey query vm/qeval -remote https://rpc.gno.land \
+  -data 'gno.land/r/sys/users.ResolveName("akkadia")'
+```
+
+with the three follow-up questions already asked: whether the name you typed is the user's
+**current** name or one they renamed away from, what canonical key it collapses to, and whether
+a lookalike of it is already taken.
+
+```
+/r/moul/toolbox/usernames/v0                 the form
+/r/moul/toolbox/usernames/v0:lookup?q=moul   the result, where the form submits
+/r/moul/toolbox/usernames/v0:moul            the same result, addressable directly
+/r/moul/toolbox/usernames/v0:g1manfred...    the same, by address
+```
+
+## `ResolveAny` is the trap this tool exists not to repeat
+
+`r/sys/users.ResolveAny` returns `(*UserData, bool)` and the bool does not mean "found". For an
+input that parses as an address it returns `(ResolveAddress(addr), true)` whatever the lookup
+produced, so an unregistered address comes back as `(nil, true)`. Every caller that reads the
+bool and dereferences the pointer panics on the first address nobody claimed. This realm
+branches on the input itself and checks the pointer, and pins the upstream behaviour in a test
+so a later fix is visible here.
+
+## The read API
+
+```sh
+gnokey query vm/qeval -remote https://rpc.gno.land \
+  -data 'gno.land/r/moul/toolbox/usernames/v0.Resolve("moul")'
+gnokey query vm/qeval -remote https://rpc.gno.land \
+  -data 'gno.land/r/moul/toolbox/usernames/v0.AddressOf("moul")'
+```
+
+`AddressOf` is the call another realm would want and the one it cannot have: this realm is
+`private = true`, so nothing can import it. Over `vm/qeval` it is the whole point.
+
+Three behaviours worth knowing:
+
+- **Not found means three different things**, and the page says which: a valid address with no
+  username, a name nobody ever held, and a name that **is** taken by an account that was deleted
+  or renamed away. The last one still refuses a registration, which is why it is not folded into
+  the second.
+- **An address is only ever looked up as an address.** A bech32 address is not a legal username,
+  so trying both would only widen what a typo can hit.
+- **The terminal hint disappears for input it cannot quote.** Nothing escapes inside a fenced
+  code block, so an input carrying a backtick gets no command block rather than a broken page.
+  Everything else the page reflects is escaped first.
+
+Part of [r/moul/toolbox](https://gno.land/r/moul/toolbox/v0).
