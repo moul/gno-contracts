@@ -24,6 +24,40 @@ func slugs(tools []Tool) []string {
 	return out
 }
 
+// TestCatalogCopyIsAHandle is the shape bug the state pointer exists to stop.
+// With the tree embedded by value, the root is a pointer and the size an int,
+// so a write through a copy threaded the node onto the tree both of them saw
+// while incrementing only the copy's counter: a.Len() said 1 while a.Get found
+// the second entry.
+func TestCatalogCopyIsAHandle(t *testing.T) {
+	a := New()
+	uassert.NoError(t, a.Set(tool("amm")))
+
+	b := *a
+	uassert.NoError(t, b.Set(tool("usernames")))
+
+	uassert.Equal(t, 2, a.Len())
+	uassert.Equal(t, 2, b.Len())
+	uassert.Equal(t, a.Len(), len(a.List()))
+	uassert.True(t, a.Has("usernames"))
+
+	uassert.NoError(t, b.Remove("amm"))
+	uassert.Equal(t, 1, a.Len())
+	uassert.False(t, a.Has("amm"))
+}
+
+// TestCatalogCopyOfAZeroValueIsSeparate: nothing has been allocated yet, so
+// there is no directory to share. Stated because it is the one case where
+// copying does NOT alias, and a reader would otherwise have to guess.
+func TestCatalogCopyOfAZeroValueIsSeparate(t *testing.T) {
+	var a Catalog
+	b := a
+	uassert.NoError(t, b.Set(tool("usernames")))
+
+	uassert.Equal(t, 0, a.Len())
+	uassert.Equal(t, 1, b.Len())
+}
+
 func TestCatalogZeroValue(t *testing.T) {
 	var c Catalog
 	uassert.Equal(t, 0, c.Len())

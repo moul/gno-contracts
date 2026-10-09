@@ -17,8 +17,14 @@ irreversible.
   files in place so git diffs the change. **Never create a `vN` directory, never copy a
   package to bump it.** New contracts start at `v0`; non-breaking work (new functions,
   tests, comments, docs) edits the current version.
-- **`r/moul/home` carries no version at all**, because gnoweb builds `/r/<user>/home` by
-  concatenation for `gno.land/u/<user>` and resolves no version. Do not generalise it.
+- **An unversioned path needs one of two grounds**, and the allowlist with the reason per entry
+  is `unversionedContracts` in `tools/gnocontracts/model.go`. Either an external consumer
+  hard-codes the path (`r/moul/home`, because gnoweb builds `/r/<user>/home` by concatenation
+  for `gno.land/u/<user>` and resolves no version; `r/moul/blog`, because of every link already
+  pasted somewhere), or it is a **private** realm whose URL a human types (`r/moul/toolbox`),
+  since a private realm is redeployable and its version could never increment. An experiment
+  under `x/` is private too and nobody bookmarks it, so there the suffix stays. Decided before
+  the first publish and never after: renaming a live realm's module line publishes a second copy.
 - **`gnomod.lock` is source and a pull request carries it.** Unlike `contracts.json` it is
   not regenerated on `main`: a bump has to ship the pin that keeps the outgoing version
   resolvable, or CI cannot build what still imports it. `gnopm sync` after adding or

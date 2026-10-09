@@ -4,12 +4,10 @@ import "gno.land/p/nt/bptree/v0"
 
 // Catalog is the directory itself: tools keyed by slug, ordered by it.
 //
-// The zero value is an empty, usable catalog. The tree is embedded by value
-// rather than held behind a pointer, which is one fewer persisted object and
-// is also what makes the zero value work: [bptree.BPTree]'s own zero value is
-// an empty tree that takes fanout 32 on its first write, which is the fanout
-// wanted here anyway (wide nodes lose most on removal, and a tool can be
-// unregistered).
+// The zero value is an empty, usable catalog. A Catalog is a HANDLE: copying
+// one shares the directory, and a write through either copy is seen through
+// both, the way copying a map does. A copy of a zero value that was never
+// written is a separate empty catalog.
 //
 // # Why a tree and not a sorted slice
 //
@@ -29,7 +27,41 @@ import "gno.land/p/nt/bptree/v0"
 // is the order every listing here wants, rather than a hand-rolled binary
 // search that has to be kept correct.
 type Catalog struct {
-	tools bptree.BPTree
+	s *state
+}
+
+// state is everything a Catalog holds, behind one pointer so that a copy of
+// the handle cannot split the tree from the counter that describes it.
+//
+// Embedding [bptree.BPTree] by value was the first shape here and it is wrong
+// for exactly that reason: the tree's root is a pointer and its size is an int,
+// so `b := a; b.Set(x)` would thread the new node onto the tree both of them
+// see while incrementing only b's size. a.Len() would say 1 while a.Get(x)
+// found the entry. One pointer, or two readers of the same directory disagree
+// about how big it is.
+type state struct {
+	tools *bptree.BPTree
+}
+
+// Fanout is the B+ tree fanout this package uses.
+//
+// 32 rather than 128 because a tool can be unregistered, and wide nodes lose
+// most on removal: a removal shifts every later value in its leaf and rewrites
+// each one. Same choice, and the same reason, as
+// [gno.land/p/moul/kit/index](/p/moul/kit/index/v0).
+const Fanout = 32
+
+// New returns an empty catalog. It is the zero value, spelled out for a caller
+// who prefers a constructor.
+func New() *Catalog { return &Catalog{} }
+
+// init materialises the state. Called by every mutating method, so the zero
+// value works without a constructor. The tree is created with the state, so a
+// non-nil state always has one.
+func (c *Catalog) init() {
+	if c.s == nil {
+		c.s = &state{tools: bptree.NewBPTreeN(Fanout)}
+	}
 }
 
 // Set inserts t, replacing any tool already under its slug.
@@ -41,14 +73,18 @@ func (c *Catalog) Set(t Tool) error {
 	if err := t.Validate(); err != nil {
 		return err
 	}
-	c.tools.Set(t.Slug, copyTool(t))
+	c.init()
+	c.s.tools.Set(t.Slug, copyTool(t))
 	return nil
 }
 
 // Remove deletes the tool under slug. It returns [ErrUnknownSlug] when there
 // is none, so a realm removing an entry it believes in learns that it is gone.
 func (c *Catalog) Remove(slug string) error {
-	if _, removed := c.tools.Remove(slug); !removed {
+	if c.s == nil {
+		return ErrUnknownSlug
+	}
+	if _, removed := c.s.tools.Remove(slug); !removed {
 		return ErrUnknownSlug
 	}
 	return nil
@@ -56,7 +92,10 @@ func (c *Catalog) Remove(slug string) error {
 
 // Get returns the tool under slug.
 func (c *Catalog) Get(slug string) (Tool, bool) {
-	v := c.tools.Get(slug)
+	if c.s == nil {
+		return Tool{}, false
+	}
+	v := c.s.tools.Get(slug)
 	if v == nil {
 		return Tool{}, false
 	}
@@ -64,15 +103,25 @@ func (c *Catalog) Get(slug string) (Tool, bool) {
 }
 
 // Has reports whether slug is in the catalog.
-func (c *Catalog) Has(slug string) bool { return c.tools.Has(slug) }
+func (c *Catalog) Has(slug string) bool {
+	return c.s != nil && c.s.tools.Has(slug)
+}
 
 // Len is how many tools the catalog holds.
-func (c *Catalog) Len() int { return c.tools.Size() }
+func (c *Catalog) Len() int {
+	if c.s == nil {
+		return 0
+	}
+	return c.s.tools.Size()
+}
 
 // List returns every tool, in slug order.
 func (c *Catalog) List() []Tool {
-	out := make([]Tool, 0, c.tools.Size())
-	c.tools.Iterate("", "", func(_ string, v any) bool {
+	if c.s == nil {
+		return nil
+	}
+	out := make([]Tool, 0, c.s.tools.Size())
+	c.s.tools.Iterate("", "", func(_ string, v any) bool {
 		out = append(out, copyTool(v.(Tool)))
 		return false
 	})
@@ -82,11 +131,11 @@ func (c *Catalog) List() []Tool {
 // ByTag returns every tool carrying tag, in slug order. An empty tag matches
 // nothing rather than everything: it is almost always an unset field.
 func (c *Catalog) ByTag(tag string) []Tool {
-	if tag == "" {
+	if tag == "" || c.s == nil {
 		return nil
 	}
 	var out []Tool
-	c.tools.Iterate("", "", func(_ string, v any) bool {
+	c.s.tools.Iterate("", "", func(_ string, v any) bool {
 		if t := v.(Tool); t.HasTag(tag) {
 			out = append(out, copyTool(t))
 		}
@@ -98,8 +147,11 @@ func (c *Catalog) ByTag(tag string) []Tool {
 // Tags returns every tag used by any tool, each once, in first-seen order
 // within slug order. Deterministic, which iterating a map would not be.
 func (c *Catalog) Tags() []string {
+	if c.s == nil {
+		return nil
+	}
 	var out []string
-	c.tools.Iterate("", "", func(_ string, v any) bool {
+	c.s.tools.Iterate("", "", func(_ string, v any) bool {
 		for _, tag := range v.(Tool).Tags {
 			if !contains(out, tag) {
 				out = append(out, tag)
