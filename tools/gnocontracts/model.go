@@ -359,9 +359,18 @@ func parseModuleIgnore(gnomodPath string) bool {
 }
 
 // unversionedContracts lists the module paths exempt from rule 1 of AGENTS.md
-// ("every contract path ends in an explicit /vN"). The exemption is only ever
-// granted where an EXTERNAL CONSUMER hard-codes the path, so the bare path is
-// an interface and not a naming choice:
+// ("every contract path ends in an explicit /vN").
+//
+// There are two grounds for the exemption and both are about the path being an
+// INTERFACE rather than a naming choice. The first is an external consumer that
+// hard-codes it. The second is a private realm whose URL a human types: a
+// private realm is redeployable at its own path, so its version can never
+// increment, and a suffix that can never change is a promise the realm cannot
+// keep. The second ground is narrow on purpose, and the narrow part is "a
+// human types it": an experiment under x/ is private too and nobody bookmarks
+// it, so there the suffix costs nothing and stays.
+//
+// Granted on the first ground:
 //
 //   - gno.land/r/moul/home: gnoweb serves gno.land/u/<username> by calling
 //     Render("") on the realm at exactly /r/<username>/home, with no version
@@ -377,16 +386,31 @@ func parseModuleIgnore(gnomodPath string) bool {
 //     code change is a redeploy of this path, and tools/gnoblog pushes the
 //     posts back from the local markdown after the wipe.
 //
+// Granted on the second ground:
+//
+//   - gno.land/r/moul/toolbox: the directory of small utilities. The URL is the
+//     product, bookmarked and linked the way a blog post is, and the realm is
+//     private and holds no state, so a redeploy replaces it in full and nothing
+//     could ever make a /v1 necessary.
+//
+//   - gno.land/r/moul/toolbox/usernames: a tool of that directory, reached by
+//     the same kind of typed URL and private for the same reason. Dropping the
+//     suffix here also makes the hub the literal namespace root of its tools,
+//     which is what a prefix check expects.
+//
 // Such a contract has an empty Version. Both version-aware helpers already cope:
 // splitVersion reports ok=false (so latestOwn skips it, correctly: an
 // unversioned path is its own family) and basePath returns the path unchanged.
 //
-// Do not add an entry without an external consumer of that shape: a reader
-// outside this repo that would break if the path moved. "The name is nicer" is
-// not one.
+// Do not add an entry on either ground without the property that grounds it: a
+// reader outside this repo that would break if the path moved, or a private
+// realm whose URL is itself the thing being shipped. "The name is nicer" is
+// still not one, and neither is "it is private", on its own.
 var unversionedContracts = map[string]bool{
-	"gno.land/r/moul/home": true,
-	"gno.land/r/moul/blog": true,
+	"gno.land/r/moul/home":              true,
+	"gno.land/r/moul/blog":              true,
+	"gno.land/r/moul/toolbox":           true,
+	"gno.land/r/moul/toolbox/usernames": true,
 }
 
 // deriveContract builds a Contract from a module path such as

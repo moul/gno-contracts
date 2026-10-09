@@ -37,15 +37,30 @@ ignores the path.
 - **A superseded version has no directory.** It is pinned in `gnomod.lock` to a commit
   that still holds it and rebuilt into the gitignored `.gnopm/`, so anything importing
   `.../md/v0` still resolves, lints and tests. See [gnopm](https://github.com/moul/gnopm).
-- **The one unversioned path is `r/moul/home`.** gnoweb serves `gno.land/u/<username>` by
-  calling `Render("")` on the realm at exactly `/r/<username>/home`
-  (`gno.land/pkg/gnoweb/handler_http.go`, `GetUserView`: built by string concatenation,
-  with no version resolution anywhere in the lookup), so a `/v0` would publish where
-  `/u/moul` never looks. The bare module line is an interface with gnoweb, which is why
-  `gnopm bump` refuses the package: there is no `/vN` to increment. It versions inside
-  instead, content in mutable storage and `private = true` in `gnomod.toml` so the code
-  can be replaced in place. Do not generalise this without an external consumer that
-  hard-codes the path.
+- **An unversioned path is the exception, and there are exactly two grounds for it.**
+  The allowlist is `unversionedContracts` in `tools/gnocontracts/model.go`, which carries
+  the reason for every entry; a path not in it and not ending in `/vN` fails the scan.
+  Both grounds are the same claim: the path is an INTERFACE, not a naming choice.
+  - *An external consumer hard-codes it.* `r/moul/home` is the original case: gnoweb
+    serves `gno.land/u/<username>` by calling `Render("")` on the realm at exactly
+    `/r/<username>/home` (`gno.land/pkg/gnoweb/handler_http.go`, `GetUserView`: built by
+    string concatenation, with no version resolution anywhere in the lookup), so a `/v0`
+    would publish where `/u/moul` never looks. `r/moul/blog`'s consumer is every link
+    already pasted somewhere this repo cannot rewrite.
+  - *A private realm whose URL a human types.* `/vN` exists because a PUBLIC path can
+    never be redeployed, so a fix there means a new path. A private realm is redeployable
+    by its creator, so its version can never increment and the suffix is a promise the
+    realm cannot keep. `r/moul/toolbox` and `r/moul/toolbox/usernames` are this case.
+    **The narrow part is "a human types it"**: an experiment under `x/` is private too and
+    nobody bookmarks it, so there the suffix costs nothing and stays.
+
+  Either way the path versions INSIDE instead: content in mutable storage, `private = true`
+  so the code is replaced in place, and `gnopm bump` refuses the package because there is
+  no `/vN` to increment. **This is decided before the first publish and never after**: the
+  chain holds whichever path was deployed, so renaming the module line of a live realm
+  publishes a SECOND copy at the new path and pays the deposit twice. Measured 2026-10-09:
+  of 79 private realms in the tree, 75 are already live on mainnet and therefore frozen
+  where they are.
 - **The twelve mirrored `v0` are frozen.** For the packages that also live in
   `gnolang/gno` examples (see *Drift*), every `.gno` file and the `gnomod.toml` is a
   byte-for-byte copy of the monorepo's and is **never hand-edited**, not a comment, not a

@@ -191,6 +191,10 @@ module = "gno.land/p/moul/template/v0"
 source = { dir = "p/moul/template" }
 
 [[module]]
+module = "gno.land/p/moul/toolbox/v0"
+source = { dir = "p/moul/toolbox" }
+
+[[module]]
 module = "gno.land/p/moul/txlink/v0"
 source = { dir = "p/moul/txlink" }
 
@@ -649,6 +653,14 @@ source = { dir = "r/moul/reactions" }
 [[module]]
 module = "gno.land/r/moul/sapin/v0"
 source = { dir = "r/moul/sapin" }
+
+[[module]]
+module = "gno.land/r/moul/toolbox"
+source = { dir = "r/moul/toolbox" }
+
+[[module]]
+module = "gno.land/r/moul/toolbox/usernames"
+source = { dir = "r/moul/toolbox/usernames" }
 
 [[module]]
 module = "gno.land/r/moul/vesting/v0"

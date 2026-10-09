@@ -1,0 +1,5 @@
+module = "gno.land/r/moul/toolbox/usernames"
+gno = "0.9"
+
+# Private, and therefore unversioned. See the hub at r/moul/toolbox.
+private = true
