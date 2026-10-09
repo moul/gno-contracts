@@ -36,12 +36,12 @@ import "gno.land/p/moul/toolbox/v0"
 // hubPath is this realm's own path. A realm can ask the chain for it, but a
 // constant is what [p/moul/toolbox.SlugOf] is checked against in tests, where
 // there is no chain frame to ask.
-const hubPath = "gno.land/r/moul/toolbox/v0"
+const hubPath = "gno.land/r/moul/toolbox"
 
 // hubURL is the gnoweb path of this realm, which every tool page links back
 // to. A tool cannot import this realm to read it, so each one repeats it; this
 // is the copy that is authoritative.
-const hubURL = "/r/moul/toolbox/v0"
+const hubURL = "/r/moul/toolbox"
 
 // tools is the directory. Adding one here and redeploying is how the toolbox
 // grows; see the package doc for why it is not a registration call.
@@ -52,7 +52,7 @@ const hubURL = "/r/moul/toolbox/v0"
 var tools = []toolbox.Tool{
 	{
 		Slug:  "usernames",
-		Path:  "gno.land/r/moul/toolbox/usernames/v0",
+		Path:  "gno.land/r/moul/toolbox/usernames",
 		Title: "Usernames",
 		Desc:  "Resolve a gno.land username to an address, or an address to a username.",
 		Tags:  []string{"identity", "read"},
@@ -81,7 +81,7 @@ func Count() int { return catalog.Len() }
 
 // Slugs lists every tool's slug, in directory order.
 //
-//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/v0.Slugs()'
+//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox.Slugs()'
 func Slugs() []string {
 	out := make([]string, 0, catalog.Len())
 	for _, t := range catalog.List() {
@@ -95,7 +95,7 @@ func Slugs() []string {
 // object prints as an opaque `ref(...)` over `vm/qeval`, so a read API that is
 // meant to be queried returns scalars.
 //
-//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/v0.PathOf("usernames")'
+//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox.PathOf("usernames")'
 func PathOf(slug string) string {
 	t, ok := catalog.Get(slug)
 	if !ok {

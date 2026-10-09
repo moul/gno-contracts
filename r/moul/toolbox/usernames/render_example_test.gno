@@ -8,7 +8,7 @@ package usernames
 func ExampleRender() {
 	print(Render(""))
 	// Output:
-	// [toolbox](/r/moul/toolbox/v0) / **Usernames**
+	// [toolbox](/r/moul/toolbox) / **Usernames**
 	//
 	// # Usernames
 	//
@@ -30,8 +30,8 @@ func ExampleRender() {
 	//
 	// ```sh
 	// gnokey query vm/qeval -remote https://rpc.gno.land \
-	//   -data 'gno.land/r/moul/toolbox/usernames/v0.Resolve("moul")'
+	//   -data 'gno.land/r/moul/toolbox/usernames.Resolve("moul")'
 	// ```
 	//
-	// Try [moul](/r/moul/toolbox/usernames/v0:moul), or paste an address into the box above.
+	// Try [moul](/r/moul/toolbox/usernames:moul), or paste an address into the box above.
 }

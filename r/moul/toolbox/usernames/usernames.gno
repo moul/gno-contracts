@@ -20,7 +20,7 @@
 // pointer panics on the first address nobody claimed. [lookup] branches on the
 // input itself and checks the pointer instead.
 //
-// Part of [r/moul/toolbox](/r/moul/toolbox/v0).
+// Part of [r/moul/toolbox](/r/moul/toolbox).
 package usernames
 
 import "gno.land/r/sys/users"
@@ -47,7 +47,7 @@ func lookup(input string) *users.UserData {
 // found is false when nobody holds it, which is also the answer for a deleted
 // user: `r/sys/users` keeps the tombstone and resolves it to nothing.
 //
-//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/usernames/v0.Resolve("moul")'
+//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/usernames.Resolve("moul")'
 func Resolve(input string) (name string, addr string, found bool) {
 	data := lookup(input)
 	if data == nil {
@@ -63,7 +63,7 @@ func Resolve(input string) (name string, addr string, found bool) {
 // realm is `private = true`, so nothing can import it. Over `vm/qeval` it is
 // the whole point.
 //
-//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/usernames/v0.AddressOf("moul")'
+//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/usernames.AddressOf("moul")'
 func AddressOf(input string) string {
 	_, addr, found := Resolve(input)
 	if !found {
@@ -118,7 +118,7 @@ func CurrentName(input string) string {
 // same canonical form cannot both be registered, which is how `r/sys/users`
 // refuses a lookalike of an existing account.
 //
-//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/usernames/v0.Canonical("M0ul")'
+//	gnokey query vm/qeval -data 'gno.land/r/moul/toolbox/usernames.Canonical("M0ul")'
 func Canonical(name string) string { return users.Canonicalize(name) }
 
 // Taken reports whether the exact name is registered, including names that

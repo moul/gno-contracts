@@ -1,4 +1,4 @@
-# `gno.land/r/moul/toolbox/v0`
+# `gno.land/r/moul/toolbox`
 
 **A home for small utilities on gno.land.** One page listing every tool; each tool is its own
 realm at `r/moul/toolbox/<slug>`.
@@ -7,9 +7,9 @@ A tool composes contracts that are already on chain and renders the answer, so y
 instead of composing a query. The toolbox adds the view, not the data.
 
 ```
-/r/moul/toolbox/v0                  the directory
-/r/moul/toolbox/v0?tag=identity     the directory, filtered to one tag
-/r/moul/toolbox/v0:usernames        one tool
+/r/moul/toolbox                  the directory
+/r/moul/toolbox?tag=identity     the directory, filtered to one tag
+/r/moul/toolbox:usernames        one tool
 ```
 
 ## The catalog is compiled in, and that is the interesting part
@@ -45,7 +45,7 @@ over `vm/qeval`:
 
 ```sh
 gnokey query vm/qeval -remote https://rpc.gno.land \
-  -data 'gno.land/r/moul/toolbox/v0.Slugs()'
+  -data 'gno.land/r/moul/toolbox.Slugs()'
 gnokey query vm/qeval -remote https://rpc.gno.land \
-  -data 'gno.land/r/moul/toolbox/v0.PathOf("usernames")'
+  -data 'gno.land/r/moul/toolbox.PathOf("usernames")'
 ```

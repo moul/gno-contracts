@@ -47,7 +47,7 @@ func Card(tool Tool) string {
 // Nav renders the one line every tool page carries above its content: a link
 // back to the hub, then the tool's own title.
 //
-// hubURL is a gnoweb path ("/r/moul/toolbox/v0"), not a package path. A tool
+// hubURL is a gnoweb path ("/r/moul/toolbox"), not a package path. A tool
 // cannot import the hub to ask, so it states it, and this is the one place the
 // two have to agree.
 func Nav(hubURL, title string) string {

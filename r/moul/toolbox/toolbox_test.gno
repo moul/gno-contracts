@@ -23,7 +23,7 @@ func TestReadAPI(t *testing.T) {
 	uassert.Equal(t, len(tools), Count())
 	uassert.True(t, Has("usernames"))
 	uassert.False(t, Has("nope"))
-	uassert.Equal(t, "gno.land/r/moul/toolbox/usernames/v0", PathOf("usernames"))
+	uassert.Equal(t, "gno.land/r/moul/toolbox/usernames", PathOf("usernames"))
 	uassert.Equal(t, "Usernames", TitleOf("usernames"))
 	uassert.True(t, strings.Contains(DescOf("usernames"), "address"))
 
@@ -55,13 +55,13 @@ func TestTags(t *testing.T) {
 func TestRenderIndex(t *testing.T) {
 	got := Render("")
 	uassert.True(t, strings.Contains(got, "# Toolbox"))
-	uassert.True(t, strings.Contains(got, "[Usernames](/r/moul/toolbox/usernames/v0)"))
+	uassert.True(t, strings.Contains(got, "[Usernames](/r/moul/toolbox/usernames)"))
 	uassert.True(t, strings.Contains(got, "Tags:"))
 }
 
 func TestRenderTagFilter(t *testing.T) {
 	kept := Render("?tag=identity")
-	uassert.True(t, strings.Contains(kept, "[Usernames](/r/moul/toolbox/usernames/v0)"))
+	uassert.True(t, strings.Contains(kept, "[Usernames](/r/moul/toolbox/usernames)"))
 	uassert.True(t, strings.Contains(kept, "Show all"))
 
 	empty := Render("?tag=nope")
@@ -71,9 +71,9 @@ func TestRenderTagFilter(t *testing.T) {
 
 func TestRenderTool(t *testing.T) {
 	got := Render("usernames")
-	uassert.True(t, strings.Contains(got, "[toolbox](/r/moul/toolbox/v0)"))
+	uassert.True(t, strings.Contains(got, "[toolbox](/r/moul/toolbox)"))
 	uassert.True(t, strings.Contains(got, "## Usernames"))
-	uassert.True(t, strings.Contains(got, "`gno.land/r/moul/toolbox/usernames/v0`"))
+	uassert.True(t, strings.Contains(got, "`gno.land/r/moul/toolbox/usernames`"))
 }
 
 func TestRenderUnknown(t *testing.T) {

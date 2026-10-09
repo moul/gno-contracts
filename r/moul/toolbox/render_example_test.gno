@@ -12,9 +12,9 @@ func ExampleRender() {
 	//
 	// | Tool | What it does | Tags |
 	// | --- | --- | --- |
-	// | [Usernames](/r/moul/toolbox/usernames/v0) | Resolve a gno\.land username to an address, or an address to a username\. | identity, read |
+	// | [Usernames](/r/moul/toolbox/usernames) | Resolve a gno\.land username to an address, or an address to a username\. | identity, read |
 	//
-	// Tags: [identity](/r/moul/toolbox/v0?tag=identity) · [read](/r/moul/toolbox/v0?tag=read)
+	// Tags: [identity](/r/moul/toolbox?tag=identity) · [read](/r/moul/toolbox?tag=read)
 	//
 	// ## What a tool is
 	//

@@ -11,14 +11,14 @@ func TestIndex(t *testing.T) {
 	var c Catalog
 	uassert.NoError(t, c.Set(Tool{
 		Slug:  "usernames",
-		Path:  "gno.land/r/moul/toolbox/usernames/v0",
+		Path:  "gno.land/r/moul/toolbox/usernames",
 		Title: "Usernames",
 		Desc:  "resolve a username or an address",
 		Tags:  []string{"identity", "read"},
 	}))
 
 	got := Index(c.List())
-	uassert.True(t, strings.Contains(got, "[Usernames](/r/moul/toolbox/usernames/v0)"))
+	uassert.True(t, strings.Contains(got, "[Usernames](/r/moul/toolbox/usernames)"))
 	uassert.True(t, strings.Contains(got, "resolve a username or an address"))
 	uassert.True(t, strings.Contains(got, "identity, read"))
 }
@@ -43,15 +43,15 @@ func TestIndexEscapesCells(t *testing.T) {
 func TestCard(t *testing.T) {
 	got := Card(Tool{
 		Slug:  "usernames",
-		Path:  "gno.land/r/moul/toolbox/usernames/v0",
+		Path:  "gno.land/r/moul/toolbox/usernames",
 		Title: "Usernames",
 		Desc:  "resolve a username or an address",
 		Tags:  []string{"identity"},
 	})
 	uassert.True(t, strings.Contains(got, "## Usernames"))
 	uassert.True(t, strings.Contains(got, "resolve a username or an address"))
-	uassert.True(t, strings.Contains(got, "`gno.land/r/moul/toolbox/usernames/v0`"))
-	uassert.True(t, strings.Contains(got, "/r/moul/toolbox/usernames/v0"))
+	uassert.True(t, strings.Contains(got, "`gno.land/r/moul/toolbox/usernames`"))
+	uassert.True(t, strings.Contains(got, "/r/moul/toolbox/usernames"))
 	uassert.True(t, strings.Contains(got, "Tags: identity"))
 }
 
@@ -62,6 +62,6 @@ func TestCardMinimal(t *testing.T) {
 }
 
 func TestNav(t *testing.T) {
-	uassert.Equal(t, "[toolbox](/r/moul/toolbox/v0) / **Usernames**\n",
-		Nav("/r/moul/toolbox/v0", "Usernames"))
+	uassert.Equal(t, "[toolbox](/r/moul/toolbox) / **Usernames**\n",
+		Nav("/r/moul/toolbox", "Usernames"))
 }

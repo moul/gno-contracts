@@ -94,8 +94,9 @@ func TestCatalogGetAndRemove(t *testing.T) {
 	uassert.Equal(t, "usernames", got2[1])
 }
 
-// TestCatalogListIsACopy is the reason List allocates: a caller holding the
-// slice must not be able to rewrite the directory through it.
+// TestCatalogListIsACopy: the tree stores Tool by value, so what List hands
+// back is a copy and a caller rewriting an element cannot reach the directory
+// through it. Pinned because storing *Tool instead would silently break it.
 func TestCatalogListIsACopy(t *testing.T) {
 	var c Catalog
 	uassert.NoError(t, c.Set(tool("usernames")))

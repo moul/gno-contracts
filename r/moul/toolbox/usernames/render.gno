@@ -13,7 +13,7 @@ import (
 // hubURL is the toolbox this tool belongs to. A private realm cannot import
 // the hub, so the link is a constant on this side; `r/moul/toolbox` holds the
 // authoritative copy and its tests check that the tool path matches.
-const hubURL = "/r/moul/toolbox/v0"
+const hubURL = "/r/moul/toolbox"
 
 // maxInput bounds what is echoed back into the page. A render that reflects an
 // unbounded query parameter is a page anyone can make arbitrarily large.
@@ -61,7 +61,7 @@ func renderHome() string {
 	b.WriteString("\nThis page is " + md.InlineCode("r/sys/users") +
 		" read through " + md.InlineCode("vm/qeval") + ", with the follow-up questions already asked:\n")
 	b.WriteString("\n" + md.LanguageCodeBlock("sh", qevalCommand("moul")))
-	b.WriteString("\nTry " + md.Link("moul", "/r/moul/toolbox/usernames/v0:moul") +
+	b.WriteString("\nTry " + md.Link("moul", "/r/moul/toolbox/usernames:moul") +
 		", or paste an address into the box above.\n")
 	return b.String()
 }
@@ -137,7 +137,7 @@ func qevalCommand(input string) string {
 		return ""
 	}
 	return "gnokey query vm/qeval -remote https://rpc.gno.land \\\n" +
-		"  -data 'gno.land/r/moul/toolbox/usernames/v0.Resolve(\"" + arg + "\")'"
+		"  -data 'gno.land/r/moul/toolbox/usernames.Resolve(\"" + arg + "\")'"
 }
 
 // safeArg reports whether s can be interpolated into a shell single-quoted

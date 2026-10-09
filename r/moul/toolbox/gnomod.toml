@@ -1,3 +1,9 @@
-module = "gno.land/r/moul/toolbox/v0"
+module = "gno.land/r/moul/toolbox"
 gno = "0.9"
+
+# Private, and therefore unversioned. The /vN suffix exists because a PUBLIC
+# path can never be redeployed, so a fix there means a new path; a private realm
+# is redeployable by its creator, so the version could never increment and the
+# suffix would be a promise this realm cannot keep. The directory URL is the
+# thing people bookmark, so it is the one that should not carry it.
 private = true

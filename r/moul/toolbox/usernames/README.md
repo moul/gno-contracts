@@ -1,4 +1,4 @@
-# `gno.land/r/moul/toolbox/usernames/v0`
+# `gno.land/r/moul/toolbox/usernames`
 
 **Who holds a name, and what name an address holds.** Type either one into the box.
 
@@ -14,10 +14,10 @@ with the three follow-up questions already asked: whether the name you typed is 
 a lookalike of it is already taken.
 
 ```
-/r/moul/toolbox/usernames/v0                 the form
-/r/moul/toolbox/usernames/v0:lookup?q=moul   the result, where the form submits
-/r/moul/toolbox/usernames/v0:moul            the same result, addressable directly
-/r/moul/toolbox/usernames/v0:g1manfred...    the same, by address
+/r/moul/toolbox/usernames                 the form
+/r/moul/toolbox/usernames:lookup?q=moul   the result, where the form submits
+/r/moul/toolbox/usernames:moul            the same result, addressable directly
+/r/moul/toolbox/usernames:g1manfred...    the same, by address
 ```
 
 ## `ResolveAny` is the trap this tool exists not to repeat
@@ -33,9 +33,9 @@ so a later fix is visible here.
 
 ```sh
 gnokey query vm/qeval -remote https://rpc.gno.land \
-  -data 'gno.land/r/moul/toolbox/usernames/v0.Resolve("moul")'
+  -data 'gno.land/r/moul/toolbox/usernames.Resolve("moul")'
 gnokey query vm/qeval -remote https://rpc.gno.land \
-  -data 'gno.land/r/moul/toolbox/usernames/v0.AddressOf("moul")'
+  -data 'gno.land/r/moul/toolbox/usernames.AddressOf("moul")'
 ```
 
 `AddressOf` is the call another realm would want and the one it cannot have: this realm is
@@ -53,4 +53,4 @@ Three behaviours worth knowing:
   code block, so an input carrying a backtick gets no command block rather than a broken page.
   Everything else the page reflects is escaped first.
 
-Part of [r/moul/toolbox](https://gno.land/r/moul/toolbox/v0).
+Part of [r/moul/toolbox](https://gno.land/r/moul/toolbox).

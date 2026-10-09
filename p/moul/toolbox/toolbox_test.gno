@@ -80,6 +80,24 @@ func TestIsUnderAndSlugOf(t *testing.T) {
 	}
 }
 
+// TestIsUnderIgnoresEitherSideVersion is the claim the package doc makes: a
+// hub and a tool may each carry a version or not, independently, and all four
+// combinations answer the same. The live shape is the unversioned one, since a
+// private realm is redeployable and its version could never increment.
+func TestIsUnderIgnoresEitherSideVersion(t *testing.T) {
+	hubs := []string{"gno.land/r/moul/toolbox", "gno.land/r/moul/toolbox/v0"}
+	tools := []string{"gno.land/r/moul/toolbox/usernames", "gno.land/r/moul/toolbox/usernames/v2"}
+	for _, hub := range hubs {
+		for _, tool := range tools {
+			t.Run(hub+" <- "+tool, func(t *testing.T) {
+				uassert.True(t, IsUnder(hub, tool))
+				uassert.Equal(t, "usernames", SlugOf(hub, tool))
+				uassert.False(t, IsUnder(hub, hub))
+			})
+		}
+	}
+}
+
 // TestIsUnderEmptyHub pins the one input that would otherwise make every path
 // a tool: an empty hub path has no family to be below.
 func TestIsUnderEmptyHub(t *testing.T) {

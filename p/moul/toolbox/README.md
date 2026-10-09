@@ -1,6 +1,6 @@
 # `gno.land/p/moul/toolbox/v0`
 
-**The directory model behind [r/moul/toolbox](https://gno.land/r/moul/toolbox/v0)**: `Tool`,
+**The directory model behind [r/moul/toolbox](https://gno.land/r/moul/toolbox)**: `Tool`,
 `Catalog`, `BasePath`, `SlugOf`, `NewQuery`, `Index`, `Card`, `Nav`.
 
 ```go
@@ -9,15 +9,15 @@ import "gno.land/p/moul/toolbox/v0"
 var c toolbox.Catalog
 c.Set(toolbox.Tool{
     Slug:  "usernames",
-    Path:  "gno.land/r/moul/toolbox/usernames/v0",
+    Path:  "gno.land/r/moul/toolbox/usernames",
     Title: "Usernames",
     Desc:  "Resolve a username to an address, or an address to a username.",
     Tags:  []string{"identity", "read"},
 })
 
 toolbox.Index(c.List())                       // → the markdown table of the directory
-toolbox.SlugOf("gno.land/r/moul/toolbox/v0",
-               "gno.land/r/moul/toolbox/usernames/v0") // → "usernames"
+toolbox.SlugOf("gno.land/r/moul/toolbox",
+               "gno.land/r/moul/toolbox/usernames") // → "usernames"
 toolbox.NewQuery("lookup").Field("q", "username or g1 address").String()
 ```
 
@@ -29,8 +29,8 @@ of code by importing each other, and everything they must agree about lives here
 **Versioned paths break the obvious nesting check, deliberately not papered over.**
 [`p/moul/nestedpkg`](https://gno.land/p/moul/nestedpkg/v0) decides "is the caller below me" by
 prefixing one package path with the other, which is right for unversioned paths and wrong for
-every path in this repository: `gno.land/r/moul/toolbox/usernames/v0` does not begin with
-`gno.land/r/moul/toolbox/v0`. `BasePath` strips the trailing `/vN` so the comparison is about
+every path in this repository: `gno.land/r/moul/toolbox/usernames` does not begin with
+`gno.land/r/moul/toolbox`. `BasePath` strips the trailing `/vN` so the comparison is about
 the family rather than the version, and `IsUnder` and `SlugOf` are built on it. A sibling whose
 name merely starts with the hub's (`toolboxtwo`) is not under it, because the comparison is
 against the base plus a slash.

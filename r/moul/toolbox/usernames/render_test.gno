@@ -11,7 +11,7 @@ func TestRenderHome(cur realm, t *testing.T) {
 	seed(cur, t)
 
 	got := Render("")
-	uassert.True(t, strings.Contains(got, "[toolbox](/r/moul/toolbox/v0)"))
+	uassert.True(t, strings.Contains(got, "[toolbox](/r/moul/toolbox)"))
 	uassert.True(t, strings.Contains(got, "# Usernames"))
 	uassert.True(t, strings.Contains(got, `<gno-form path="lookup">`))
 	uassert.True(t, strings.Contains(got, `<gno-input name="q"`))

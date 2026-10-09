@@ -10,7 +10,7 @@ import "strings"
 //
 //	NewQuery("lookup").Field("q", "username or g1 address").String()
 //
-// posts to the realm and redirects to `/r/moul/toolbox/usernames/v0:lookup?q=moul`
+// posts to the realm and redirects to `/r/moul/toolbox/usernames:lookup?q=moul`
 // (`gno.land/pkg/gnoweb/handler_http.go`, `Post`: the `path` attribute travels
 // as the hidden `__gno_path` field and becomes the render args, every other
 // field becomes a query parameter). Nothing is signed and no transaction is

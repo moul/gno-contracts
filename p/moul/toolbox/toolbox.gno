@@ -1,5 +1,5 @@
 // Package toolbox is the directory model behind
-// [r/moul/toolbox](/r/moul/toolbox/v0): a list of small gno.land utilities,
+// [r/moul/toolbox](/r/moul/toolbox): a list of small gno.land utilities,
 // each one a realm of its own, rendered as a single index.
 //
 // A tool is a [Tool]: a slug, the realm path that serves it, a title and one
@@ -17,18 +17,22 @@
 // entry looks like, how the index is rendered, how a query form is spelled)
 // has to live in a `p/`, which is this one.
 //
-// # Versioned paths break the usual nesting check
+// # Nesting is checked on the base path, not on the full one
 //
 // [p/moul/nestedpkg](/p/moul/nestedpkg/v0) decides "is the caller below me" by
-// prefixing one package path with the other. That is correct for unversioned
-// paths and wrong for every path in this repository: the hub is
-// `gno.land/r/moul/toolbox/v0` and a tool is
-// `gno.land/r/moul/toolbox/usernames/v0`, and the second does not begin with
-// the first. [BasePath] removes the trailing `/vN` so the comparison is about
-// the family rather than about the version, which is what [IsUnder] and
-// [SlugOf] are built on.
+// prefixing one package path with the other. That is exactly right when
+// neither path carries a version, which is the case for a private hub: it is
+// redeployable, so its version could never increment and it does not carry
+// one. It breaks the moment either side does, because
+// `gno.land/r/moul/toolbox/usernames/v0` does not begin with
+// `gno.land/r/moul/toolbox/v0`.
 //
-// Live: [r/moul/toolbox](/r/moul/toolbox/v0).
+// [BasePath] removes a trailing `/vN` so the comparison is about the family
+// rather than the version, and [IsUnder] and [SlugOf] are built on it. A hub
+// and a tool may each be versioned or not, independently, and all four
+// combinations answer the same.
+//
+// Live: [r/moul/toolbox](/r/moul/toolbox).
 package toolbox
 
 import (
@@ -75,8 +79,8 @@ type Tool struct {
 	// Slug is the key, the URL segment and the sort order: "usernames".
 	Slug string
 
-	// Path is the full package path serving the tool, version included:
-	// "gno.land/r/moul/toolbox/usernames/v0".
+	// Path is the package path serving the tool, with its version if it has
+	// one: "gno.land/r/moul/toolbox/usernames".
 	Path string
 
 	// Title is the human name: "Usernames".
@@ -116,7 +120,7 @@ func (t Tool) HasTag(tag string) bool {
 }
 
 // URL is the gnoweb path of the tool, the package path with the chain domain
-// removed: "/r/moul/toolbox/usernames/v0".
+// removed: "/r/moul/toolbox/usernames".
 //
 // It is derived rather than stored so an entry cannot carry a link that
 // disagrees with its own path.
@@ -151,7 +155,7 @@ func ValidSlug(s string) bool {
 }
 
 // BasePath returns pkgPath with a trailing version element removed:
-// "gno.land/r/moul/toolbox/v0" becomes "gno.land/r/moul/toolbox".
+// "gno.land/p/moul/toolbox/v0" becomes "gno.land/p/moul/toolbox".
 //
 // A path with no version element is returned unchanged, so calling it twice is
 // the same as calling it once.

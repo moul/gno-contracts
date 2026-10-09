@@ -1,94 +1,81 @@
 package toolbox
 
-// Catalog is the directory itself: tools kept sorted by slug.
+import "gno.land/p/nt/bptree/v0"
+
+// Catalog is the directory itself: tools keyed by slug, ordered by it.
 //
-// The zero value is an empty, usable catalog.
+// The zero value is an empty, usable catalog. The tree is embedded by value
+// rather than held behind a pointer, which is one fewer persisted object and
+// is also what makes the zero value work: [bptree.BPTree]'s own zero value is
+// an empty tree that takes fanout 32 on its first write, which is the fanout
+// wanted here anyway (wide nodes lose most on removal, and a tool can be
+// unregistered).
 //
-// # Why a sorted slice and not a tree
+// # Why a tree and not a sorted slice
 //
-// A directory of tools is tens of entries, not thousands, and it is read far
-// more often than it is written. At n = 100 a sorted slice costs 92,571 gas
-// for one cold operation against `avl`'s 164,812 (gnobench, gno master
-// 1fc4c140e, 2026-09-29), and the whole container is one persisted object
-// rather than one per node. The crossover where a tree wins a read is around
-// n = 750; a toolbox that reaches it has a different problem.
+// A sorted slice is cheaper to READ at the size a directory actually reaches:
+// at n = 100 one cold operation costs 92,571 gas against a fanout-128 tree's
+// 230,754 (`gnobench`, gno master 1fc4c140e, 2026-09-29). It is still the
+// wrong structure, for two reasons that outlive the gas.
 //
-// Sorted, rather than insertion-ordered, because the order has to be the same
-// on every call. A Render that reshuffles between two identical queries is a
-// bug, and slug order is the one ordering that does not depend on when an
-// entry was written.
+// A slice is ONE persisted object, so every write rewrites all of it: O(n) per
+// transaction and O(n^2) over n of them. That costs nothing for a hub whose
+// catalog is compiled in and never written after deploy, and it is the whole
+// bill for one that accepts registration, which is the other half of what this
+// package is for. Removing is worse than writing: shortening a slice in place
+// keeps the peak allocation charged and refunds no deposit at all.
+//
+// And the ordering comes free. A slug-keyed tree iterates in slug order, which
+// is the order every listing here wants, rather than a hand-rolled binary
+// search that has to be kept correct.
 type Catalog struct {
-	tools []Tool
+	tools bptree.BPTree
 }
 
 // Set inserts t, replacing any tool already under its slug.
 //
-// Replacing rather than refusing is what makes a hub's init idempotent: the
-// catalog is rebuilt from source on every redeploy, and a second Set of the
-// same slug is a corrected description rather than a collision.
+// Replacing rather than refusing is what makes a hub's init idempotent: a
+// compiled-in catalog is rebuilt from source on every redeploy, and a second
+// Set of the same slug is a corrected description rather than a collision.
 func (c *Catalog) Set(t Tool) error {
 	if err := t.Validate(); err != nil {
 		return err
 	}
-	i, found := c.search(t.Slug)
-	if found {
-		c.tools[i] = t
-		return nil
-	}
-	// A fresh slice of the exact size, not append-and-shift. A slice is one
-	// persisted object sized by its backing array, so append's spare capacity
-	// is deposit charged for entries that do not exist. Same O(n) copy either
-	// way, and this one leaves nothing over.
-	longer := make([]Tool, len(c.tools)+1)
-	copy(longer, c.tools[:i])
-	longer[i] = t
-	copy(longer[i+1:], c.tools[i:])
-	c.tools = longer
+	c.tools.Set(t.Slug, t)
 	return nil
 }
 
 // Remove deletes the tool under slug. It returns [ErrUnknownSlug] when there
 // is none, so a realm removing an entry it believes in learns that it is gone.
 func (c *Catalog) Remove(slug string) error {
-	i, found := c.search(slug)
-	if !found {
+	if _, removed := c.tools.Remove(slug); !removed {
 		return ErrUnknownSlug
 	}
-	// Not append(s[:i], s[i+1:]...): that shortens the slice header and leaves
-	// the backing array at its peak, so the deposit for the removed entry is
-	// never refunded. A fresh exact-size slice drops the old array.
-	shorter := make([]Tool, len(c.tools)-1)
-	copy(shorter, c.tools[:i])
-	copy(shorter[i:], c.tools[i+1:])
-	c.tools = shorter
 	return nil
 }
 
 // Get returns the tool under slug.
 func (c *Catalog) Get(slug string) (Tool, bool) {
-	i, found := c.search(slug)
-	if !found {
+	v := c.tools.Get(slug)
+	if v == nil {
 		return Tool{}, false
 	}
-	return c.tools[i], true
+	return v.(Tool), true
 }
 
 // Has reports whether slug is in the catalog.
-func (c *Catalog) Has(slug string) bool {
-	_, found := c.search(slug)
-	return found
-}
+func (c *Catalog) Has(slug string) bool { return c.tools.Has(slug) }
 
 // Len is how many tools the catalog holds.
-func (c *Catalog) Len() int { return len(c.tools) }
+func (c *Catalog) Len() int { return c.tools.Size() }
 
-// List returns every tool, sorted by slug.
-//
-// The slice is a copy: a caller appending to it, or rewriting an element,
-// cannot reach the catalog's own storage.
+// List returns every tool, in slug order.
 func (c *Catalog) List() []Tool {
-	out := make([]Tool, len(c.tools))
-	copy(out, c.tools)
+	out := make([]Tool, 0, c.tools.Size())
+	c.tools.Iterate("", "", func(_ string, v any) bool {
+		out = append(out, v.(Tool))
+		return false
+	})
 	return out
 }
 
@@ -99,11 +86,12 @@ func (c *Catalog) ByTag(tag string) []Tool {
 		return nil
 	}
 	var out []Tool
-	for _, t := range c.tools {
-		if t.HasTag(tag) {
+	c.tools.Iterate("", "", func(_ string, v any) bool {
+		if t := v.(Tool); t.HasTag(tag) {
 			out = append(out, t)
 		}
-	}
+		return false
+	})
 	return out
 }
 
@@ -111,31 +99,15 @@ func (c *Catalog) ByTag(tag string) []Tool {
 // within slug order. Deterministic, which iterating a map would not be.
 func (c *Catalog) Tags() []string {
 	var out []string
-	for _, t := range c.tools {
-		for _, tag := range t.Tags {
+	c.tools.Iterate("", "", func(_ string, v any) bool {
+		for _, tag := range v.(Tool).Tags {
 			if !contains(out, tag) {
 				out = append(out, tag)
 			}
 		}
-	}
+		return false
+	})
 	return out
-}
-
-// search returns the index slug belongs at, and whether it is already there.
-func (c *Catalog) search(slug string) (int, bool) {
-	lo, hi := 0, len(c.tools)
-	for lo < hi {
-		mid := int(uint(lo+hi) >> 1)
-		if c.tools[mid].Slug < slug {
-			lo = mid + 1
-		} else {
-			hi = mid
-		}
-	}
-	if lo < len(c.tools) && c.tools[lo].Slug == slug {
-		return lo, true
-	}
-	return lo, false
 }
 
 func contains(haystack []string, needle string) bool {
