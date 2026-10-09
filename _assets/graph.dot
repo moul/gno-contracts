@@ -38,6 +38,7 @@ digraph gnocontracts {
   "gno.land/p/moul/realmpath/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/svg/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/template/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/toolbox/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/txlink/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/typeutil/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/udao/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -157,6 +158,8 @@ digraph gnocontracts {
   "gno.land/r/moul/present/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/reactions/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/sapin/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/toolbox" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/toolbox/usernames" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/vesting/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/across/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/allinone/devtools/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -393,6 +396,9 @@ digraph gnocontracts {
   "gno.land/p/moul/template/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/p/moul/template/v0" -> "gno.land/p/moul/typeutil/v0";
   "gno.land/p/moul/template/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/p/moul/toolbox/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/p/moul/toolbox/v0" -> "gno.land/p/moul/md/v0";
+  "gno.land/p/moul/toolbox/v0" -> "gno.land/p/nt/bptree/v0";
   "gno.land/p/moul/ulist/lplist/v0" -> "gno.land/p/moul/ulist/v0";
   "gno.land/p/moul/web25/v0" -> "gno.land/p/moul/realmpath/v0";
   "gno.land/p/moul/x/daily/markov/v0" -> "gno.land/p/nt/avl/v0";
@@ -526,6 +532,14 @@ digraph gnocontracts {
   "gno.land/r/moul/present/v0" -> "gno.land/p/nt/ufmt/v0";
   "gno.land/r/moul/reactions/v0" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/reactions/v0" -> "gno.land/p/moul/reactions/v0";
+  "gno.land/r/moul/toolbox" -> "gno.land/p/moul/md/v0";
+  "gno.land/r/moul/toolbox" -> "gno.land/p/moul/realmpath/v0";
+  "gno.land/r/moul/toolbox" -> "gno.land/p/moul/toolbox/v0";
+  "gno.land/r/moul/toolbox/usernames" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/toolbox/usernames" -> "gno.land/p/moul/md/v0";
+  "gno.land/r/moul/toolbox/usernames" -> "gno.land/p/moul/realmpath/v0";
+  "gno.land/r/moul/toolbox/usernames" -> "gno.land/p/moul/toolbox/v0";
+  "gno.land/r/moul/toolbox/usernames" -> "gno.land/r/sys/users";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/vesting/v0" -> "gno.land/p/moul/realmpath/v0";

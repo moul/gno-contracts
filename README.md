@@ -206,6 +206,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/safe/v0`](p/moul/safe) 📦 | — | [✅](https://gno.land/p/moul/safe/v0) | — | — | — |
 | [`p/moul/svg/v0`](p/moul/svg) 📦 | — | [✅](https://gno.land/p/moul/svg/v0) | — | — | 2 |
 | [`p/moul/template/v0`](p/moul/template) 📦 | — | [✅](https://gno.land/p/moul/template/v0) | — | — | 3 |
+| [`p/moul/toolbox/v0`](p/moul/toolbox) 📦 | — | — | — | — | 3 |
 | [`p/moul/txlink/v0`](p/moul/txlink) 📦 | [🗄️](https://onyx.testnets.gno.land/p/moul/txlink/v0) | [🗄️](https://gno.land/p/moul/txlink/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/txlink/v0) ≈ | — |
 | [`p/moul/typeutil/v0`](p/moul/typeutil) 📦 | — | [🗄️](https://gno.land/p/moul/typeutil/v0) | — | [src](https://github.com/gnolang/gno/tree/master/examples/gno.land/p/moul/typeutil/v0) ≈ | — |
 | [`p/moul/udao/v0`](p/moul/udao) 📦 | — | [✅](https://gno.land/p/moul/udao/v0) | — | — | — |
@@ -319,6 +320,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/present/v0`](r/moul/present) 🏛️ | — | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
 | [`r/moul/reactions/v0`](r/moul/reactions) 🏛️ | — | [✅](https://gno.land/r/moul/reactions/v0) | — | — | 2 |
 | [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | — | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
+| [`r/moul/toolbox`](r/moul/toolbox) 🏛️ | — | — | — | — | 3 |
+| [`r/moul/toolbox/usernames`](r/moul/toolbox/usernames) 🏛️ | — | — | — | — | 5 |
 | [`r/moul/vesting/v0`](r/moul/vesting) 🏛️ | — | [✅](https://gno.land/r/moul/vesting/v0) | — | — | 6 |
 | [`r/moul/x/across/v0`](r/moul/x/across) 🏛️ | — | [✅](https://gno.land/r/moul/x/across/v0) | — | — | 16 |
 | [`r/moul/x/allinone/devtools/v0`](r/moul/x/allinone/devtools) 🏛️ | — | [✅](https://gno.land/r/moul/x/allinone/devtools/v0) | — | — | 10 |
@@ -523,7 +526,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-09T13:38:02Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-09T14:23:16Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
