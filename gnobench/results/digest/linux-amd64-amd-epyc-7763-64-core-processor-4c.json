@@ -7,13 +7,13 @@
     "arch": "amd64",
     "cpu": "AMD EPYC 7763 64-Core Processor",
     "cpus": 4,
-    "host": "runnervm8df0l",
+    "host": "runnervmmprz5",
     "go_version": "go1.25.9",
-    "gnobench_commit": "ecd062a",
-    "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216",
-    "gno_commit_date": "2026-10-01"
+    "gnobench_commit": "08f737c2",
+    "gno_commit": "02606904e30753f7775246624bfec96cb4749891",
+    "gno_commit_date": "2026-10-10"
   },
-  "updated_at": "2026-10-01T15:36:39Z",
+  "updated_at": "2026-10-12T06:11:21Z",
   "rows": {
     "crypto/keccak256|str|warm|base|1024": {
       "structure": "crypto/keccak256",
@@ -25,13 +25,13 @@
       "ops": 1,
       "gas": 2937094,
       "bytes": 0,
-      "wall_ns": 3502698,
+      "wall_ns": 3470646,
       "d_gas": 2937094,
       "d_bytes": 0,
-      "d_wall_ns": 3502698,
+      "d_wall_ns": 3470646,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|base|256": {
       "structure": "crypto/keccak256",
@@ -43,13 +43,13 @@
       "ops": 1,
       "gas": 755802,
       "bytes": 0,
-      "wall_ns": 2245363,
+      "wall_ns": 2144878,
       "d_gas": 755802,
       "d_bytes": 0,
-      "d_wall_ns": 2245363,
+      "d_wall_ns": 2144878,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|base|32": {
       "structure": "crypto/keccak256",
@@ -61,13 +61,13 @@
       "ops": 1,
       "gas": 119565,
       "bytes": 0,
-      "wall_ns": 1832555,
+      "wall_ns": 1764387,
       "d_gas": 119565,
       "d_bytes": 0,
-      "d_wall_ns": 1832555,
+      "d_wall_ns": 1764387,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|base|8192": {
       "structure": "crypto/keccak256",
@@ -79,13 +79,13 @@
       "ops": 1,
       "gas": 23295593,
       "bytes": 0,
-      "wall_ns": 16746116,
+      "wall_ns": 16485345,
       "d_gas": 23295593,
       "d_bytes": 0,
-      "d_wall_ns": 16746116,
+      "d_wall_ns": 16485345,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|chunked32|1024": {
       "structure": "crypto/keccak256",
@@ -97,13 +97,13 @@
       "ops": 32,
       "gas": 3321198,
       "bytes": 0,
-      "wall_ns": 4101010,
+      "wall_ns": 4054937,
       "d_gas": 384104,
       "d_bytes": 0,
-      "d_wall_ns": 598312,
+      "d_wall_ns": 584291,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|chunked32|256": {
       "structure": "crypto/keccak256",
@@ -115,13 +115,13 @@
       "ops": 8,
       "gas": 859148,
       "bytes": 0,
-      "wall_ns": 2612204,
+      "wall_ns": 2508938,
       "d_gas": 103346,
       "d_bytes": 0,
-      "d_wall_ns": 366841,
+      "d_wall_ns": 364060,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|chunked32|32": {
       "structure": "crypto/keccak256",
@@ -133,13 +133,13 @@
       "ops": 1,
       "gas": 141019,
       "bytes": 0,
-      "wall_ns": 2092888,
+      "wall_ns": 2035995,
       "d_gas": 21454,
       "d_bytes": 0,
-      "d_wall_ns": 260333,
+      "d_wall_ns": 271608,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|chunked32|8192": {
       "structure": "crypto/keccak256",
@@ -151,13 +151,13 @@
       "ops": 256,
       "gas": 26300049,
       "bytes": 0,
-      "wall_ns": 17972045,
+      "wall_ns": 18519646,
       "d_gas": 3004456,
       "d_bytes": 0,
-      "d_wall_ns": 1225929,
+      "d_wall_ns": 2034301,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|once|1024": {
       "structure": "crypto/keccak256",
@@ -169,13 +169,13 @@
       "ops": 1,
       "gas": 2977948,
       "bytes": 0,
-      "wall_ns": 3747764,
+      "wall_ns": 3666151,
       "d_gas": 40854,
       "d_bytes": 0,
-      "d_wall_ns": 245066,
+      "d_wall_ns": 195505,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|once|256": {
       "structure": "crypto/keccak256",
@@ -187,13 +187,13 @@
       "ops": 1,
       "gas": 778909,
       "bytes": 0,
-      "wall_ns": 2714554,
+      "wall_ns": 2469003,
       "d_gas": 23107,
       "d_bytes": 0,
-      "d_wall_ns": 469191,
+      "d_wall_ns": 324125,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|once|32": {
       "structure": "crypto/keccak256",
@@ -205,13 +205,13 @@
       "ops": 1,
       "gas": 137492,
       "bytes": 0,
-      "wall_ns": 2053946,
+      "wall_ns": 1876666,
       "d_gas": 17927,
       "d_bytes": 0,
-      "d_wall_ns": 221391,
+      "d_wall_ns": 112279,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|once|8192": {
       "structure": "crypto/keccak256",
@@ -223,13 +223,13 @@
       "ops": 1,
       "gas": 23502025,
       "bytes": 0,
-      "wall_ns": 16547279,
+      "wall_ns": 16520881,
       "d_gas": 206432,
       "d_bytes": 0,
-      "d_wall_ns": -198837,
+      "d_wall_ns": 35536,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|x64|1024": {
       "structure": "crypto/keccak256",
@@ -241,13 +241,13 @@
       "ops": 64,
       "gas": 5088320,
       "bytes": 0,
-      "wall_ns": 4346747,
+      "wall_ns": 4547046,
       "d_gas": 2151226,
       "d_bytes": 0,
-      "d_wall_ns": 844049,
+      "d_wall_ns": 1076400,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|x64|256": {
       "structure": "crypto/keccak256",
@@ -259,13 +259,13 @@
       "ops": 64,
       "gas": 1771598,
       "bytes": 0,
-      "wall_ns": 2878138,
+      "wall_ns": 2774334,
       "d_gas": 1015796,
       "d_bytes": 0,
-      "d_wall_ns": 632775,
+      "d_wall_ns": 629456,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|x64|32": {
       "structure": "crypto/keccak256",
@@ -277,13 +277,13 @@
       "ops": 64,
       "gas": 804219,
       "bytes": 0,
-      "wall_ns": 2465451,
+      "wall_ns": 2384275,
       "d_gas": 684654,
       "d_bytes": 0,
-      "d_wall_ns": 632896,
+      "d_wall_ns": 619888,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/keccak256|str|warm|x64|8192": {
       "structure": "crypto/keccak256",
@@ -295,13 +295,13 @@
       "ops": 64,
       "gas": 36043811,
       "bytes": 0,
-      "wall_ns": 18402204,
+      "wall_ns": 18264448,
       "d_gas": 12748218,
       "d_bytes": 0,
-      "d_wall_ns": 1656088,
+      "d_wall_ns": 1779103,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|base|1024": {
       "structure": "crypto/sha256",
@@ -313,13 +313,13 @@
       "ops": 1,
       "gas": 2937031,
       "bytes": 0,
-      "wall_ns": 3578996,
+      "wall_ns": 3449465,
       "d_gas": 2937031,
       "d_bytes": 0,
-      "d_wall_ns": 3578996,
+      "d_wall_ns": 3449465,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|base|256": {
       "structure": "crypto/sha256",
@@ -331,13 +331,13 @@
       "ops": 1,
       "gas": 755739,
       "bytes": 0,
-      "wall_ns": 2237581,
+      "wall_ns": 2131373,
       "d_gas": 755739,
       "d_bytes": 0,
-      "d_wall_ns": 2237581,
+      "d_wall_ns": 2131373,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|base|32": {
       "structure": "crypto/sha256",
@@ -349,13 +349,13 @@
       "ops": 1,
       "gas": 119502,
       "bytes": 0,
-      "wall_ns": 1828230,
+      "wall_ns": 1727418,
       "d_gas": 119502,
       "d_bytes": 0,
-      "d_wall_ns": 1828230,
+      "d_wall_ns": 1727418,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|base|8192": {
       "structure": "crypto/sha256",
@@ -367,13 +367,13 @@
       "ops": 1,
       "gas": 23295530,
       "bytes": 0,
-      "wall_ns": 16038367,
+      "wall_ns": 16377613,
       "d_gas": 23295530,
       "d_bytes": 0,
-      "d_wall_ns": 16038367,
+      "d_wall_ns": 16377613,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|chunked32|1024": {
       "structure": "crypto/sha256",
@@ -385,13 +385,13 @@
       "ops": 32,
       "gas": 3175126,
       "bytes": 0,
-      "wall_ns": 4103029,
+      "wall_ns": 4099089,
       "d_gas": 238095,
       "d_bytes": 0,
-      "d_wall_ns": 524033,
+      "d_wall_ns": 649624,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|chunked32|256": {
       "structure": "crypto/sha256",
@@ -403,13 +403,13 @@
       "ops": 8,
       "gas": 822468,
       "bytes": 0,
-      "wall_ns": 2656290,
+      "wall_ns": 2607512,
       "d_gas": 66729,
       "d_bytes": 0,
-      "d_wall_ns": 418709,
+      "d_wall_ns": 476139,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|chunked32|32": {
       "structure": "crypto/sha256",
@@ -421,13 +421,13 @@
       "ops": 1,
       "gas": 136245,
       "bytes": 0,
-      "wall_ns": 2085378,
+      "wall_ns": 2089815,
       "d_gas": 16743,
       "d_bytes": 0,
-      "d_wall_ns": 257148,
+      "d_wall_ns": 362397,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|chunked32|8192": {
       "structure": "crypto/sha256",
@@ -439,13 +439,13 @@
       "ops": 256,
       "gas": 25132985,
       "bytes": 0,
-      "wall_ns": 18070367,
+      "wall_ns": 18342144,
       "d_gas": 1837455,
       "d_bytes": 0,
-      "d_wall_ns": 2032000,
+      "d_wall_ns": 1964531,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|once|1024": {
       "structure": "crypto/sha256",
@@ -457,13 +457,13 @@
       "ops": 1,
       "gas": 2958887,
       "bytes": 0,
-      "wall_ns": 3672990,
+      "wall_ns": 3678043,
       "d_gas": 21856,
       "d_bytes": 0,
-      "d_wall_ns": 93994,
+      "d_wall_ns": 228578,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|once|256": {
       "structure": "crypto/sha256",
@@ -475,13 +475,13 @@
       "ops": 1,
       "gas": 770909,
       "bytes": 0,
-      "wall_ns": 2444116,
+      "wall_ns": 2421234,
       "d_gas": 15170,
       "d_bytes": 0,
-      "d_wall_ns": 206535,
+      "d_wall_ns": 289861,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|once|32": {
       "structure": "crypto/sha256",
@@ -493,13 +493,13 @@
       "ops": 1,
       "gas": 132718,
       "bytes": 0,
-      "wall_ns": 2188540,
+      "wall_ns": 1939134,
       "d_gas": 13216,
       "d_bytes": 0,
-      "d_wall_ns": 360310,
+      "d_wall_ns": 211716,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|once|8192": {
       "structure": "crypto/sha256",
@@ -511,13 +511,13 @@
       "ops": 1,
       "gas": 23379728,
       "bytes": 0,
-      "wall_ns": 16785616,
+      "wall_ns": 16672063,
       "d_gas": 84198,
       "d_bytes": 0,
-      "d_wall_ns": 747249,
+      "d_wall_ns": 294450,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|x64|1024": {
       "structure": "crypto/sha256",
@@ -529,13 +529,13 @@
       "ops": 64,
       "gas": 3882024,
       "bytes": 0,
-      "wall_ns": 4218976,
+      "wall_ns": 4119328,
       "d_gas": 944993,
       "d_bytes": 0,
-      "d_wall_ns": 639980,
+      "d_wall_ns": 669863,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|x64|256": {
       "structure": "crypto/sha256",
@@ -547,13 +547,13 @@
       "ops": 64,
       "gas": 1273206,
       "bytes": 0,
-      "wall_ns": 2802091,
+      "wall_ns": 2667825,
       "d_gas": 517467,
       "d_bytes": 0,
-      "d_wall_ns": 564510,
+      "d_wall_ns": 536452,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|x64|32": {
       "structure": "crypto/sha256",
@@ -565,13 +565,13 @@
       "ops": 64,
       "gas": 512291,
       "bytes": 0,
-      "wall_ns": 2399583,
+      "wall_ns": 2264481,
       "d_gas": 392789,
       "d_bytes": 0,
-      "d_wall_ns": 571353,
+      "d_wall_ns": 537063,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "crypto/sha256|str|warm|x64|8192": {
       "structure": "crypto/sha256",
@@ -583,13 +583,13 @@
       "ops": 64,
       "gas": 28230411,
       "bytes": 0,
-      "wall_ns": 17483184,
+      "wall_ns": 17444848,
       "d_gas": 4934881,
       "d_bytes": 0,
-      "d_wall_ns": 1444817,
+      "d_wall_ns": 1067235,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|base|1024": {
       "structure": "encoding/base32",
@@ -601,13 +601,13 @@
       "ops": 1,
       "gas": 2937026,
       "bytes": 0,
-      "wall_ns": 1047182807,
+      "wall_ns": 995642219,
       "d_gas": 2937026,
       "d_bytes": 0,
-      "d_wall_ns": 1047182807,
+      "d_wall_ns": 995642219,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|base|256": {
       "structure": "encoding/base32",
@@ -619,13 +619,13 @@
       "ops": 1,
       "gas": 755734,
       "bytes": 0,
-      "wall_ns": 999329464,
+      "wall_ns": 953833768,
       "d_gas": 755734,
       "d_bytes": 0,
-      "d_wall_ns": 999329464,
+      "d_wall_ns": 953833768,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|base|32": {
       "structure": "encoding/base32",
@@ -637,13 +637,13 @@
       "ops": 1,
       "gas": 119497,
       "bytes": 0,
-      "wall_ns": 1026101039,
+      "wall_ns": 972463377,
       "d_gas": 119497,
       "d_bytes": 0,
-      "d_wall_ns": 1026101039,
+      "d_wall_ns": 972463377,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|base|8192": {
       "structure": "encoding/base32",
@@ -655,13 +655,13 @@
       "ops": 1,
       "gas": 23295525,
       "bytes": 0,
-      "wall_ns": 1000194470,
+      "wall_ns": 983921746,
       "d_gas": 23295525,
       "d_bytes": 0,
-      "d_wall_ns": 1000194470,
+      "d_wall_ns": 983921746,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|chunked32|1024": {
       "structure": "encoding/base32",
@@ -673,13 +673,13 @@
       "ops": 32,
       "gas": 8946184,
       "bytes": 0,
-      "wall_ns": 1043003019,
+      "wall_ns": 963166794,
       "d_gas": 6009158,
       "d_bytes": 0,
-      "d_wall_ns": -4179788,
+      "d_wall_ns": -32475425,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|chunked32|256": {
       "structure": "encoding/base32",
@@ -691,13 +691,13 @@
       "ops": 8,
       "gas": 2383950,
       "bytes": 0,
-      "wall_ns": 1004715738,
+      "wall_ns": 996997838,
       "d_gas": 1628216,
       "d_bytes": 0,
-      "d_wall_ns": 5386274,
+      "d_wall_ns": 43164070,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|chunked32|32": {
       "structure": "encoding/base32",
@@ -709,13 +709,13 @@
       "ops": 1,
       "gas": 469934,
       "bytes": 0,
-      "wall_ns": 1002764202,
+      "wall_ns": 963248769,
       "d_gas": 350437,
       "d_bytes": 0,
-      "d_wall_ns": -23336837,
+      "d_wall_ns": -9214608,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|chunked32|8192": {
       "structure": "encoding/base32",
@@ -727,13 +727,13 @@
       "ops": 256,
       "gas": 70193419,
       "bytes": 0,
-      "wall_ns": 1039064950,
+      "wall_ns": 1015511520,
       "d_gas": 46897894,
       "d_bytes": 0,
-      "d_wall_ns": 38870480,
+      "d_wall_ns": 31589774,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|once|1024": {
       "structure": "encoding/base32",
@@ -745,13 +745,13 @@
       "ops": 1,
       "gas": 7477274,
       "bytes": 0,
-      "wall_ns": 1045842353,
+      "wall_ns": 997198360,
       "d_gas": 4540248,
       "d_bytes": 0,
-      "d_wall_ns": -1340454,
+      "d_wall_ns": 1556141,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|once|256": {
       "structure": "encoding/base32",
@@ -763,13 +763,13 @@
       "ops": 1,
       "gas": 2054356,
       "bytes": 0,
-      "wall_ns": 985302469,
+      "wall_ns": 973451220,
       "d_gas": 1298622,
       "d_bytes": 0,
-      "d_wall_ns": -14026995,
+      "d_wall_ns": 19617452,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|once|32": {
       "structure": "encoding/base32",
@@ -781,13 +781,13 @@
       "ops": 1,
       "gas": 466407,
       "bytes": 0,
-      "wall_ns": 1021090884,
+      "wall_ns": 977278374,
       "d_gas": 346910,
       "d_bytes": 0,
-      "d_wall_ns": -5010155,
+      "d_wall_ns": 4814997,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|once|8192": {
       "structure": "encoding/base32",
@@ -799,13 +799,13 @@
       "ops": 1,
       "gas": 58189932,
       "bytes": 0,
-      "wall_ns": 1105325225,
+      "wall_ns": 999687105,
       "d_gas": 34894407,
       "d_bytes": 0,
-      "d_wall_ns": 105130755,
+      "d_wall_ns": 15765359,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|x64|1024": {
       "structure": "encoding/base32",
@@ -817,13 +817,13 @@
       "ops": 64,
       "gas": 283086522,
       "bytes": 0,
-      "wall_ns": 1196649297,
+      "wall_ns": 1129601980,
       "d_gas": 280149496,
       "d_bytes": 0,
-      "d_wall_ns": 149466490,
+      "d_wall_ns": 133959761,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|x64|256": {
       "structure": "encoding/base32",
@@ -835,13 +835,13 @@
       "ops": 64,
       "gas": 73441544,
       "bytes": 0,
-      "wall_ns": 1051513259,
+      "wall_ns": 1023473998,
       "d_gas": 72685810,
       "d_bytes": 0,
-      "d_wall_ns": 52183795,
+      "d_wall_ns": 69640230,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|x64|32": {
       "structure": "encoding/base32",
@@ -853,13 +853,13 @@
       "ops": 64,
       "gas": 11896117,
       "bytes": 0,
-      "wall_ns": 1019249851,
+      "wall_ns": 967969525,
       "d_gas": 11776620,
       "d_bytes": 0,
-      "d_wall_ns": -6851188,
+      "d_wall_ns": -4493852,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base32|str|warm|x64|8192": {
       "structure": "encoding/base32",
@@ -871,13 +871,13 @@
       "ops": 64,
       "gas": 2246111197,
       "bytes": 0,
-      "wall_ns": 2161661314,
+      "wall_ns": 2115561710,
       "d_gas": 2222815672,
       "d_bytes": 0,
-      "d_wall_ns": 1161466844,
+      "d_wall_ns": 1131639964,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|base|1024": {
       "structure": "encoding/base64",
@@ -889,13 +889,13 @@
       "ops": 1,
       "gas": 2937026,
       "bytes": 0,
-      "wall_ns": 1044586844,
+      "wall_ns": 984312335,
       "d_gas": 2937026,
       "d_bytes": 0,
-      "d_wall_ns": 1044586844,
+      "d_wall_ns": 984312335,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|base|256": {
       "structure": "encoding/base64",
@@ -907,13 +907,13 @@
       "ops": 1,
       "gas": 755734,
       "bytes": 0,
-      "wall_ns": 1071291166,
+      "wall_ns": 991199204,
       "d_gas": 755734,
       "d_bytes": 0,
-      "d_wall_ns": 1071291166,
+      "d_wall_ns": 991199204,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|base|32": {
       "structure": "encoding/base64",
@@ -925,13 +925,13 @@
       "ops": 1,
       "gas": 119497,
       "bytes": 0,
-      "wall_ns": 1013682273,
+      "wall_ns": 977286286,
       "d_gas": 119497,
       "d_bytes": 0,
-      "d_wall_ns": 1013682273,
+      "d_wall_ns": 977286286,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|base|8192": {
       "structure": "encoding/base64",
@@ -943,13 +943,13 @@
       "ops": 1,
       "gas": 23295525,
       "bytes": 0,
-      "wall_ns": 1060847301,
+      "wall_ns": 982556202,
       "d_gas": 23295525,
       "d_bytes": 0,
-      "d_wall_ns": 1060847301,
+      "d_wall_ns": 982556202,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|chunked32|1024": {
       "structure": "encoding/base64",
@@ -961,13 +961,13 @@
       "ops": 32,
       "gas": 8167319,
       "bytes": 0,
-      "wall_ns": 1064514579,
+      "wall_ns": 1000644220,
       "d_gas": 5230293,
       "d_bytes": 0,
-      "d_wall_ns": 19927735,
+      "d_wall_ns": 16331885,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|chunked32|256": {
       "structure": "encoding/base64",
@@ -979,13 +979,13 @@
       "ops": 8,
       "gas": 2178661,
       "bytes": 0,
-      "wall_ns": 1035436272,
+      "wall_ns": 1002354221,
       "d_gas": 1422927,
       "d_bytes": 0,
-      "d_wall_ns": -35854894,
+      "d_wall_ns": 11155017,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|chunked32|32": {
       "structure": "encoding/base64",
@@ -997,13 +997,13 @@
       "ops": 1,
       "gas": 431938,
       "bytes": 0,
-      "wall_ns": 1052818949,
+      "wall_ns": 967513559,
       "d_gas": 312441,
       "d_bytes": 0,
-      "d_wall_ns": 39136676,
+      "d_wall_ns": -9772727,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|chunked32|8192": {
       "structure": "encoding/base64",
@@ -1015,13 +1015,13 @@
       "ops": 256,
       "gas": 64061178,
       "bytes": 0,
-      "wall_ns": 1075037415,
+      "wall_ns": 1024187304,
       "d_gas": 40765653,
       "d_bytes": 0,
-      "d_wall_ns": 14190114,
+      "d_wall_ns": 41631102,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|once|1024": {
       "structure": "encoding/base64",
@@ -1033,13 +1033,13 @@
       "ops": 1,
       "gas": 6997499,
       "bytes": 0,
-      "wall_ns": 1020820092,
+      "wall_ns": 965195174,
       "d_gas": 4060473,
       "d_bytes": 0,
-      "d_wall_ns": -23766752,
+      "d_wall_ns": -19117161,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|once|256": {
       "structure": "encoding/base64",
@@ -1051,13 +1051,13 @@
       "ops": 1,
       "gas": 1913514,
       "bytes": 0,
-      "wall_ns": 1046093153,
+      "wall_ns": 994416062,
       "d_gas": 1157780,
       "d_bytes": 0,
-      "d_wall_ns": -25198013,
+      "d_wall_ns": 3216858,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|once|32": {
       "structure": "encoding/base64",
@@ -1069,13 +1069,13 @@
       "ops": 1,
       "gas": 428411,
       "bytes": 0,
-      "wall_ns": 1019845090,
+      "wall_ns": 987204132,
       "d_gas": 308914,
       "d_bytes": 0,
-      "d_wall_ns": 6162817,
+      "d_wall_ns": 9917846,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|once|8192": {
       "structure": "encoding/base64",
@@ -1087,13 +1087,13 @@
       "ops": 1,
       "gas": 54445049,
       "bytes": 0,
-      "wall_ns": 1045216261,
+      "wall_ns": 1008440229,
       "d_gas": 31149524,
       "d_bytes": 0,
-      "d_wall_ns": -15631040,
+      "d_wall_ns": 25884027,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|x64|1024": {
       "structure": "encoding/base64",
@@ -1105,13 +1105,13 @@
       "ops": 64,
       "gas": 253269033,
       "bytes": 0,
-      "wall_ns": 1158165335,
+      "wall_ns": 1113859735,
       "d_gas": 250332007,
       "d_bytes": 0,
-      "d_wall_ns": 113578491,
+      "d_wall_ns": 129547400,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|x64|256": {
       "structure": "encoding/base64",
@@ -1123,13 +1123,13 @@
       "ops": 64,
       "gas": 65315767,
       "bytes": 0,
-      "wall_ns": 1084695483,
+      "wall_ns": 1008869675,
       "d_gas": 64560033,
       "d_bytes": 0,
-      "d_wall_ns": 13404317,
+      "d_wall_ns": 17670471,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|x64|32": {
       "structure": "encoding/base64",
@@ -1141,13 +1141,13 @@
       "ops": 64,
       "gas": 10352484,
       "bytes": 0,
-      "wall_ns": 1044609406,
+      "wall_ns": 969774653,
       "d_gas": 10232987,
       "d_bytes": 0,
-      "d_wall_ns": 30927133,
+      "d_wall_ns": -7511633,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/base64|str|warm|x64|8192": {
       "structure": "encoding/base64",
@@ -1159,13 +1159,13 @@
       "ops": 64,
       "gas": 2007326796,
       "bytes": 0,
-      "wall_ns": 1995815560,
+      "wall_ns": 1947733664,
       "d_gas": 1984031271,
       "d_bytes": 0,
-      "d_wall_ns": 934968259,
+      "d_wall_ns": 965177462,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|base|1024": {
       "structure": "encoding/hex",
@@ -1177,13 +1177,13 @@
       "ops": 1,
       "gas": 2936946,
       "bytes": 0,
-      "wall_ns": 1005248076,
+      "wall_ns": 956055343,
       "d_gas": 2936946,
       "d_bytes": 0,
-      "d_wall_ns": 1005248076,
+      "d_wall_ns": 956055343,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|base|256": {
       "structure": "encoding/hex",
@@ -1195,13 +1195,13 @@
       "ops": 1,
       "gas": 755654,
       "bytes": 0,
-      "wall_ns": 971943736,
+      "wall_ns": 953169856,
       "d_gas": 755654,
       "d_bytes": 0,
-      "d_wall_ns": 971943736,
+      "d_wall_ns": 953169856,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|base|32": {
       "structure": "encoding/hex",
@@ -1213,13 +1213,13 @@
       "ops": 1,
       "gas": 119417,
       "bytes": 0,
-      "wall_ns": 974825065,
+      "wall_ns": 920143224,
       "d_gas": 119417,
       "d_bytes": 0,
-      "d_wall_ns": 974825065,
+      "d_wall_ns": 920143224,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|base|8192": {
       "structure": "encoding/hex",
@@ -1231,13 +1231,13 @@
       "ops": 1,
       "gas": 23295445,
       "bytes": 0,
-      "wall_ns": 1002175391,
+      "wall_ns": 963476890,
       "d_gas": 23295445,
       "d_bytes": 0,
-      "d_wall_ns": 1002175391,
+      "d_wall_ns": 963476890,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|chunked32|1024": {
       "structure": "encoding/hex",
@@ -1249,13 +1249,13 @@
       "ops": 32,
       "gas": 7059361,
       "bytes": 0,
-      "wall_ns": 1016025482,
+      "wall_ns": 950413396,
       "d_gas": 4122415,
       "d_bytes": 0,
-      "d_wall_ns": 10777406,
+      "d_wall_ns": -5641947,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|chunked32|256": {
       "structure": "encoding/hex",
@@ -1267,13 +1267,13 @@
       "ops": 8,
       "gas": 1883295,
       "bytes": 0,
-      "wall_ns": 1027079131,
+      "wall_ns": 932792578,
       "d_gas": 1127641,
       "d_bytes": 0,
-      "d_wall_ns": 55135395,
+      "d_wall_ns": -20377278,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|chunked32|32": {
       "structure": "encoding/hex",
@@ -1285,13 +1285,13 @@
       "ops": 1,
       "gas": 373578,
       "bytes": 0,
-      "wall_ns": 1004172637,
+      "wall_ns": 956960788,
       "d_gas": 254161,
       "d_bytes": 0,
-      "d_wall_ns": 29347572,
+      "d_wall_ns": 36817564,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|chunked32|8192": {
       "structure": "encoding/hex",
@@ -1303,13 +1303,13 @@
       "ops": 256,
       "gas": 55369028,
       "bytes": 0,
-      "wall_ns": 1032107612,
+      "wall_ns": 961880949,
       "d_gas": 32073583,
       "d_bytes": 0,
-      "d_wall_ns": 29932221,
+      "d_wall_ns": -1595941,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|once|1024": {
       "structure": "encoding/hex",
@@ -1321,13 +1321,13 @@
       "ops": 1,
       "gas": 6437222,
       "bytes": 0,
-      "wall_ns": 968214821,
+      "wall_ns": 944815923,
       "d_gas": 3500276,
       "d_bytes": 0,
-      "d_wall_ns": -37033255,
+      "d_wall_ns": -11239420,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|once|256": {
       "structure": "encoding/hex",
@@ -1339,13 +1339,13 @@
       "ops": 1,
       "gas": 1740097,
       "bytes": 0,
-      "wall_ns": 994633435,
+      "wall_ns": 964833807,
       "d_gas": 984443,
       "d_bytes": 0,
-      "d_wall_ns": 22689699,
+      "d_wall_ns": 11663951,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|once|32": {
       "structure": "encoding/hex",
@@ -1357,13 +1357,13 @@
       "ops": 1,
       "gas": 370051,
       "bytes": 0,
-      "wall_ns": 978206817,
+      "wall_ns": 987170825,
       "d_gas": 250634,
       "d_bytes": 0,
-      "d_wall_ns": 3381752,
+      "d_wall_ns": 67027601,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|once|8192": {
       "structure": "encoding/hex",
@@ -1375,13 +1375,13 @@
       "ops": 1,
       "gas": 50275593,
       "bytes": 0,
-      "wall_ns": 1018217428,
+      "wall_ns": 975111900,
       "d_gas": 26980148,
       "d_bytes": 0,
-      "d_wall_ns": 16042037,
+      "d_wall_ns": 11635010,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|x64|1024": {
       "structure": "encoding/hex",
@@ -1393,13 +1393,13 @@
       "ops": 64,
       "gas": 218954931,
       "bytes": 0,
-      "wall_ns": 1072217774,
+      "wall_ns": 1058168256,
       "d_gas": 216017985,
       "d_bytes": 0,
-      "d_wall_ns": 66969698,
+      "d_wall_ns": 102112913,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|x64|256": {
       "structure": "encoding/hex",
@@ -1411,13 +1411,13 @@
       "ops": 64,
       "gas": 55760705,
       "bytes": 0,
-      "wall_ns": 1000180847,
+      "wall_ns": 974279671,
       "d_gas": 55005051,
       "d_bytes": 0,
-      "d_wall_ns": 28237111,
+      "d_wall_ns": 21109815,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|x64|32": {
       "structure": "encoding/hex",
@@ -1429,13 +1429,13 @@
       "ops": 64,
       "gas": 8161070,
       "bytes": 0,
-      "wall_ns": 971012787,
+      "wall_ns": 940944019,
       "d_gas": 8041653,
       "d_bytes": 0,
-      "d_wall_ns": -3812278,
+      "d_wall_ns": 20800795,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "encoding/hex|str|warm|x64|8192": {
       "structure": "encoding/hex",
@@ -1447,13 +1447,13 @@
       "ops": 64,
       "gas": 1742025238,
       "bytes": 0,
-      "wall_ns": 1776515679,
+      "wall_ns": 1735383292,
       "d_gas": 1718729793,
       "d_bytes": 0,
-      "d_wall_ns": 774340288,
+      "d_wall_ns": 771906402,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|base|1024": {
       "structure": "hash/adler32",
@@ -1465,13 +1465,13 @@
       "ops": 1,
       "gas": 2936946,
       "bytes": 0,
-      "wall_ns": 24993899,
+      "wall_ns": 23351930,
       "d_gas": 2936946,
       "d_bytes": 0,
-      "d_wall_ns": 24993899,
+      "d_wall_ns": 23351930,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|base|256": {
       "structure": "hash/adler32",
@@ -1483,13 +1483,13 @@
       "ops": 1,
       "gas": 755654,
       "bytes": 0,
-      "wall_ns": 25520187,
+      "wall_ns": 21938419,
       "d_gas": 755654,
       "d_bytes": 0,
-      "d_wall_ns": 25520187,
+      "d_wall_ns": 21938419,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|base|32": {
       "structure": "hash/adler32",
@@ -1501,13 +1501,13 @@
       "ops": 1,
       "gas": 119417,
       "bytes": 0,
-      "wall_ns": 24706401,
+      "wall_ns": 21859610,
       "d_gas": 119417,
       "d_bytes": 0,
-      "d_wall_ns": 24706401,
+      "d_wall_ns": 21859610,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|base|8192": {
       "structure": "hash/adler32",
@@ -1519,13 +1519,13 @@
       "ops": 1,
       "gas": 23295445,
       "bytes": 0,
-      "wall_ns": 38748202,
+      "wall_ns": 36229288,
       "d_gas": 23295445,
       "d_bytes": 0,
-      "d_wall_ns": 38748202,
+      "d_wall_ns": 36229288,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|chunked32|1024": {
       "structure": "hash/adler32",
@@ -1537,13 +1537,13 @@
       "ops": 32,
       "gas": 5925753,
       "bytes": 0,
-      "wall_ns": 26654447,
+      "wall_ns": 25338739,
       "d_gas": 2988807,
       "d_bytes": 0,
-      "d_wall_ns": 1660548,
+      "d_wall_ns": 1986809,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|chunked32|256": {
       "structure": "hash/adler32",
@@ -1555,13 +1555,13 @@
       "ops": 8,
       "gas": 1525559,
       "bytes": 0,
-      "wall_ns": 23156265,
+      "wall_ns": 22823233,
       "d_gas": 769905,
       "d_bytes": 0,
-      "d_wall_ns": -2363922,
+      "d_wall_ns": 884814,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|chunked32|32": {
       "structure": "hash/adler32",
@@ -1573,13 +1573,13 @@
       "ops": 1,
       "gas": 242138,
       "bytes": 0,
-      "wall_ns": 22694319,
+      "wall_ns": 22421649,
       "d_gas": 122721,
       "d_bytes": 0,
-      "d_wall_ns": -2012082,
+      "d_wall_ns": 562039,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|chunked32|8192": {
       "structure": "hash/adler32",
@@ -1591,13 +1591,13 @@
       "ops": 256,
       "gas": 46993948,
       "bytes": 0,
-      "wall_ns": 50021156,
+      "wall_ns": 47441617,
       "d_gas": 23698503,
       "d_bytes": 0,
-      "d_wall_ns": 11272954,
+      "d_wall_ns": 11212329,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|once|1024": {
       "structure": "hash/adler32",
@@ -1609,13 +1609,13 @@
       "ops": 1,
       "gas": 5183496,
       "bytes": 0,
-      "wall_ns": 25897834,
+      "wall_ns": 24340021,
       "d_gas": 2246550,
       "d_bytes": 0,
-      "d_wall_ns": 903935,
+      "d_wall_ns": 988091,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|once|256": {
       "structure": "hash/adler32",
@@ -1627,13 +1627,13 @@
       "ops": 1,
       "gas": 1355222,
       "bytes": 0,
-      "wall_ns": 23151566,
+      "wall_ns": 21687831,
       "d_gas": 599568,
       "d_bytes": 0,
-      "d_wall_ns": -2368621,
+      "d_wall_ns": -250588,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|once|32": {
       "structure": "hash/adler32",
@@ -1645,13 +1645,13 @@
       "ops": 1,
       "gas": 238611,
       "bytes": 0,
-      "wall_ns": 24147733,
+      "wall_ns": 22609873,
       "d_gas": 119194,
       "d_bytes": 0,
-      "d_wall_ns": -558668,
+      "d_wall_ns": 750263,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|once|8192": {
       "structure": "hash/adler32",
@@ -1663,13 +1663,13 @@
       "ops": 1,
       "gas": 40927525,
       "bytes": 0,
-      "wall_ns": 46191092,
+      "wall_ns": 44239389,
       "d_gas": 17632080,
       "d_bytes": 0,
-      "d_wall_ns": 7442890,
+      "d_wall_ns": 8010101,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|x64|1024": {
       "structure": "hash/adler32",
@@ -1681,13 +1681,13 @@
       "ops": 64,
       "gas": 144960523,
       "bytes": 0,
-      "wall_ns": 90799206,
+      "wall_ns": 90426857,
       "d_gas": 142023577,
       "d_bytes": 0,
-      "d_wall_ns": 65805307,
+      "d_wall_ns": 67074927,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|x64|256": {
       "structure": "hash/adler32",
@@ -1699,13 +1699,13 @@
       "ops": 64,
       "gas": 37372761,
       "bytes": 0,
-      "wall_ns": 39012149,
+      "wall_ns": 40170262,
       "d_gas": 36617107,
       "d_bytes": 0,
-      "d_wall_ns": 13491962,
+      "d_wall_ns": 18231843,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|x64|32": {
       "structure": "hash/adler32",
@@ -1717,13 +1717,13 @@
       "ops": 64,
       "gas": 5992966,
       "bytes": 0,
-      "wall_ns": 25313723,
+      "wall_ns": 26350564,
       "d_gas": 5873549,
       "d_bytes": 0,
-      "d_wall_ns": 607322,
+      "d_wall_ns": 4490954,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "hash/adler32|str|warm|x64|8192": {
       "structure": "hash/adler32",
@@ -1735,13 +1735,13 @@
       "ops": 64,
       "gas": 1149992942,
       "bytes": 0,
-      "wall_ns": 551206581,
+      "wall_ns": 554047300,
       "d_gas": 1126697497,
       "d_bytes": 0,
-      "d_wall_ns": 512458379,
+      "d_wall_ns": 517818012,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|base|1024": {
       "structure": "strconv (hand-rolled hex)",
@@ -1753,13 +1753,13 @@
       "ops": 1,
       "gas": 2937368,
       "bytes": 0,
-      "wall_ns": 306099221,
+      "wall_ns": 277330682,
       "d_gas": 2937368,
       "d_bytes": 0,
-      "d_wall_ns": 306099221,
+      "d_wall_ns": 277330682,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|base|256": {
       "structure": "strconv (hand-rolled hex)",
@@ -1771,13 +1771,13 @@
       "ops": 1,
       "gas": 756076,
       "bytes": 0,
-      "wall_ns": 299913570,
+      "wall_ns": 268937072,
       "d_gas": 756076,
       "d_bytes": 0,
-      "d_wall_ns": 299913570,
+      "d_wall_ns": 268937072,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|base|32": {
       "structure": "strconv (hand-rolled hex)",
@@ -1789,13 +1789,13 @@
       "ops": 1,
       "gas": 119839,
       "bytes": 0,
-      "wall_ns": 272529717,
+      "wall_ns": 272169422,
       "d_gas": 119839,
       "d_bytes": 0,
-      "d_wall_ns": 272529717,
+      "d_wall_ns": 272169422,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|base|8192": {
       "structure": "strconv (hand-rolled hex)",
@@ -1807,13 +1807,13 @@
       "ops": 1,
       "gas": 23295867,
       "bytes": 0,
-      "wall_ns": 313334590,
+      "wall_ns": 290063546,
       "d_gas": 23295867,
       "d_bytes": 0,
-      "d_wall_ns": 313334590,
+      "d_wall_ns": 290063546,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|chunked32|1024": {
       "structure": "strconv (hand-rolled hex)",
@@ -1825,13 +1825,13 @@
       "ops": 32,
       "gas": 44015649,
       "bytes": 0,
-      "wall_ns": 309834410,
+      "wall_ns": 310346140,
       "d_gas": 41078281,
       "d_bytes": 0,
-      "d_wall_ns": 3735189,
+      "d_wall_ns": 33015458,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|chunked32|256": {
       "structure": "strconv (hand-rolled hex)",
@@ -1843,13 +1843,13 @@
       "ops": 8,
       "gas": 11171644,
       "bytes": 0,
-      "wall_ns": 287757077,
+      "wall_ns": 292987280,
       "d_gas": 10415568,
       "d_bytes": 0,
-      "d_wall_ns": -12156493,
+      "d_wall_ns": 24050208,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|chunked32|32": {
       "structure": "strconv (hand-rolled hex)",
@@ -1861,13 +1861,13 @@
       "ops": 1,
       "gas": 1590130,
       "bytes": 0,
-      "wall_ns": 281466366,
+      "wall_ns": 281546601,
       "d_gas": 1470291,
       "d_bytes": 0,
-      "d_wall_ns": 8936649,
+      "d_wall_ns": 9377179,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|chunked32|8192": {
       "structure": "strconv (hand-rolled hex)",
@@ -1879,13 +1879,13 @@
       "ops": 256,
       "gas": 350588455,
       "bytes": 0,
-      "wall_ns": 469756098,
+      "wall_ns": 469069215,
       "d_gas": 327292588,
       "d_bytes": 0,
-      "d_wall_ns": 156421508,
+      "d_wall_ns": 179005669,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|once|1024": {
       "structure": "strconv (hand-rolled hex)",
@@ -1897,13 +1897,13 @@
       "ops": 1,
       "gas": 43926115,
       "bytes": 0,
-      "wall_ns": 317548437,
+      "wall_ns": 296389886,
       "d_gas": 40988747,
       "d_bytes": 0,
-      "d_wall_ns": 11449216,
+      "d_wall_ns": 19059204,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|once|256": {
       "structure": "strconv (hand-rolled hex)",
@@ -1915,13 +1915,13 @@
       "ops": 1,
       "gas": 11113097,
       "bytes": 0,
-      "wall_ns": 296918878,
+      "wall_ns": 294375204,
       "d_gas": 10357021,
       "d_bytes": 0,
-      "d_wall_ns": -2994692,
+      "d_wall_ns": 25438132,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|once|32": {
       "structure": "strconv (hand-rolled hex)",
@@ -1933,13 +1933,13 @@
       "ops": 1,
       "gas": 1586603,
       "bytes": 0,
-      "wall_ns": 315027598,
+      "wall_ns": 273181773,
       "d_gas": 1466764,
       "d_bytes": 0,
-      "d_wall_ns": 42497881,
+      "d_wall_ns": 1012351,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|once|8192": {
       "structure": "strconv (hand-rolled hex)",
@@ -1951,13 +1951,13 @@
       "ops": 1,
       "gas": 360360203,
       "bytes": 0,
-      "wall_ns": 512883737,
+      "wall_ns": 503827874,
       "d_gas": 337064336,
       "d_bytes": 0,
-      "d_wall_ns": 199549147,
+      "d_wall_ns": 213764328,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|x64|1024": {
       "structure": "strconv (hand-rolled hex)",
@@ -1969,13 +1969,13 @@
       "ops": 64,
       "gas": 2614258640,
       "bytes": 0,
-      "wall_ns": 1658920151,
+      "wall_ns": 1650460308,
       "d_gas": 2611321272,
       "d_bytes": 0,
-      "d_wall_ns": 1352820930,
+      "d_wall_ns": 1373129626,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|x64|256": {
       "structure": "strconv (hand-rolled hex)",
@@ -1987,13 +1987,13 @@
       "ops": 64,
       "gas": 651647262,
       "bytes": 0,
-      "wall_ns": 614626463,
+      "wall_ns": 619410961,
       "d_gas": 650891186,
       "d_bytes": 0,
-      "d_wall_ns": 314712893,
+      "d_wall_ns": 350473889,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|x64|32": {
       "structure": "strconv (hand-rolled hex)",
@@ -2005,13 +2005,13 @@
       "ops": 64,
       "gas": 82034955,
       "bytes": 0,
-      "wall_ns": 340729072,
+      "wall_ns": 324080111,
       "d_gas": 81915116,
       "d_bytes": 0,
-      "d_wall_ns": 68199355,
+      "d_wall_ns": 51910689,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     },
     "strconv (hand-rolled hex)|str|warm|x64|8192": {
       "structure": "strconv (hand-rolled hex)",
@@ -2023,13 +2023,13 @@
       "ops": 64,
       "gas": 21583454835,
       "bytes": 0,
-      "wall_ns": 12815376604,
+      "wall_ns": 12725683150,
       "d_gas": 21560158968,
       "d_bytes": 0,
-      "d_wall_ns": 12502042014,
+      "d_wall_ns": 12435619604,
       "stable": true,
-      "measured_at": "2026-10-01T15:34:11Z",
-      "gno_commit": "3cc494ec4bd30aba90a8bde9c2c863d7da998216"
+      "measured_at": "2026-10-12T06:08:59Z",
+      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
     }
   }
 }
