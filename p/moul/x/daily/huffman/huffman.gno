@@ -181,17 +181,30 @@ func (e *Encoded) writeBits(v uint32, n int) {
 // Everything it checks is something a hand-built or storage-read Encoded can
 // get wrong: an empty or over-long table, a zero length, a table out of
 // canonical order, a repeated symbol, Bits that disagree with the lengths, a
-// code set that is not a complete prefix code, more bits claimed than Data
-// holds, a stream ending mid-code, and a decoded length that is not Size.
+// code set that is not a complete prefix code, a zero-bit or zero-size
+// payload, a Data slice that is not exactly the bytes NBits needs, nonzero
+// padding in the last byte, a stream ending mid-code, and a decoded length
+// that is not Size.
 func (e *Encoded) Decode() (string, error) {
-	if len(e.Codes) == 0 || len(e.Codes) > 256 || e.NBits < 0 || e.Size < 0 {
-		return "", ErrCorrupt
-	}
-	if e.NBits > len(e.Data)*8 {
+	if len(e.Codes) == 0 || len(e.Codes) > 256 || e.NBits < 1 || e.Size < 1 {
+		// Encode refuses an empty input, so a zero-bit or zero-size payload
+		// is not one this package produced. Accepting it would make "" a
+		// valid decoding of a table that was never used.
 		return "", ErrCorrupt
 	}
 	if e.Size > MaxLen {
 		return "", ErrCorrupt
+	}
+	// Data holds exactly the bytes NBits needs, and the padding in the last
+	// one is zero. Neither is cosmetic: spare bytes and dirty padding are two
+	// ways to carry a second payload that decodes to the same string.
+	if len(e.Data) != (e.NBits+7)/8 {
+		return "", ErrCorrupt
+	}
+	if pad := len(e.Data)*8 - e.NBits; pad > 0 {
+		if e.Data[len(e.Data)-1]&byte((1<<uint(pad))-1) != 0 {
+			return "", ErrCorrupt
+		}
 	}
 
 	var count [maxCodeLen + 1]int

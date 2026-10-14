@@ -26,9 +26,12 @@ exported fields, so a caller can build one by hand or read one back out of
 storage, and a decoder that trusts what it is handed returns a string nobody
 ever encoded. `Decode` rebuilds the canonical table from the lengths it was
 given and refuses a payload whose own `Bits` disagree, checks the Kraft
-equality so the code set is a complete prefix code, checks that `NBits` fits in
-`Data`, refuses a stream that ends mid-code, and refuses a result whose length
-is not `Size`.
+equality so the code set is a complete prefix code, requires `Data` to be
+exactly the bytes `NBits` needs with zero padding in the last one, refuses a
+zero-bit or zero-size payload because `Encode` never produces one, refuses a
+stream that ends mid-code, and refuses a result whose length is not `Size`.
+Spare bytes and dirty padding are not cosmetic: both are a way to carry a
+second payload that decodes to the same string.
 
 Three behaviours worth knowing before you use it:
 

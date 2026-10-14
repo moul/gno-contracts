@@ -135,6 +135,8 @@ func TestDecodeRejectsCorruptPayloads(t *testing.T) {
 		{"truncated stream", func(e *Encoded) { e.NBits = 2 }},
 		{"size disagrees", func(e *Encoded) { e.Size = 3 }},
 		{"incomplete code", func(e *Encoded) { e.Codes = e.Codes[:4] }},
+		{"empty payload", func(e *Encoded) { e.NBits, e.Size = 0, 0 }},
+		{"padding bits are not zero", func(e *Encoded) { e.Data[len(e.Data)-1] |= 1 }},
 	}
 	for _, c := range cases {
 		e := &Encoded{
