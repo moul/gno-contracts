@@ -84,12 +84,12 @@ func renderCrew(raw string) string {
 	out += md.Italic("crew #"+id.String()+" · opened at block "+
 		strconv.FormatInt(c.CreatedAt, 10)) + "\n\n"
 
-	t := ui.NewTable("members", "shares", "treasury", "per share")
+	t := ui.NewTable("members", "shares", "treasury", "to join")
 	t.Row(
 		strconv.Itoa(c.MemberCount())+" of "+strconv.Itoa(crew.MaxMembers),
 		strconv.FormatInt(c.TotalShares, 10),
 		num.GNOTf(c.Treasury),
-		num.GNOTf(c.ValuePerShare()),
+		num.GNOTf(joinPrice(c)),
 	)
 	out += t.String()
 
