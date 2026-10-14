@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/vm/riscv/v0"
 	"gno.land/p/moul/x/vm/vmkit/v0"
 	"gno.land/p/moul/vendor/nt/ufmt/v2"
@@ -245,9 +246,11 @@ func printable(b []byte, max int) string {
 
 // codeCell puts already-printable text in a code span inside a table cell.
 // Inside backticks markdown escapes are not applied, so ui.Cell's backslashes
-// would reach the reader verbatim ("Hello, gno\.land"); the one character a
-// table cell still needs escaped there is the pipe. printable has already
-// removed the backtick and the newline, the other two that could break out.
+// would reach the reader verbatim ("Hello, gno\.land"). md.InlineCode builds
+// the span: empty text is no span at all (two bare backticks render as two
+// backticks), a space at either end is padded so CommonMark's strip does not
+// eat it, and the fence outscans any backtick run. The GFM row splitter runs
+// before inline parsing, so the pipe is escaped on top.
 func codeCell(s string) string {
-	return "`" + strings.ReplaceAll(s, "|", "\\|") + "`"
+	return strings.ReplaceAll(md.InlineCode(s), "|", "\\|")
 }

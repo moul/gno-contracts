@@ -223,3 +223,39 @@ func ExampleRender() {
 	//
 	// **No such instance.** It was never uploaded, or its owner removed it.
 }
+
+// An instance that has written nothing yet shows an empty output cell. Two
+// adjacent backticks are not an empty code span, they render as two
+// backticks.
+func TestRenderEmptyOutputCell(cur realm, t *testing.T) {
+	resetState()
+	testing.SetRealm(testing.NewUserRealm(alice()))
+	UploadSample(cross(cur), "hello", "", 0)
+
+	row := ""
+	for _, line := range strings.Split(Render(""), "\n") {
+		if strings.HasPrefix(line, "| [") {
+			row = line
+		}
+	}
+	uassert.True(t, row != "", "an instance row is rendered")
+	uassert.True(t, strings.HasSuffix(row, "| 0 |  |"), row)
+}
+
+// codeCell follows the three rules of a code span, not only the pipe: empty
+// content is not a span, a space at either end needs a pad, and the fence
+// outscans any backtick run in the content.
+func TestCodeCellRules(t *testing.T) {
+	cases := []struct{ in, want string }{
+		{"", ""},
+		{"Hello, gno.land\\n", "`Hello, gno.land\\n`"},
+		{"a|b", "`a\\|b`"},
+		{" hi ", "`  hi  `"},
+		{" hi", "`  hi `"},
+		{"hi ", "` hi  `"},
+		{"a`b", "``a`b``"},
+	}
+	for _, c := range cases {
+		uassert.Equal(t, c.want, codeCell(c.in), "codeCell("+c.in+")")
+	}
+}

@@ -166,3 +166,67 @@ func TestCodeCell(t *testing.T) {
 	uassert.Equal(t, "`Hello, gno.land\\n`", codeCell("Hello, gno.land\\n"))
 	uassert.Equal(t, "`a\\|b`", codeCell("a|b"))
 }
+
+// emit returns a program that prints s, one byte at a time, so a test can put
+// any text in the output column without hand-writing Brainfuck.
+func emit(s string) string {
+	var sb strings.Builder
+	for i := 0; i < len(s); i++ {
+		sb.WriteString("[-]" + strings.Repeat("+", int(s[i])) + ".")
+	}
+	return sb.String()
+}
+
+// instanceRow returns the first instance row of the home page.
+func instanceRow(t *testing.T) string {
+	for _, line := range strings.Split(Render(""), "\n") {
+		if strings.HasPrefix(line, "| [") {
+			return line
+		}
+	}
+	t.Fatalf("no instance row on the home page")
+	return ""
+}
+
+// The output column is pinned on the rendered page, not only through the
+// helper, so the call site cannot drift back to ui.Cell inside backticks
+// (which would show `a\.b`) with the suite green.
+func TestRenderOutputCell(cur realm, t *testing.T) {
+	cases := []struct {
+		name, out, cell string
+	}{
+		{"an escapable character shows as written", "a.b", "| `a.b` |"},
+		{"no output is an empty cell, not two backticks", "", "| 0 |  |"},
+		{"a space at each end is padded in the markdown, past CommonMark's strip", " a ", "| `  a  ` |"},
+		{"a guest pipe stays inside its cell", "a|b", "| `a\\|b` |"},
+	}
+	for _, c := range cases {
+		resetState()
+		testing.SetRealm(testing.NewUserRealm(testutils.TestAddress("alice")))
+		id := Upload(cross(cur), emit(c.out), "", 0)
+		if c.out != "" {
+			Step(cross(cur), id, 0)
+			uassert.Equal(t, c.out, string(store.Get(id).Output))
+		}
+		row := instanceRow(t)
+		uassert.True(t, strings.HasSuffix(row, c.cell), c.name+": "+row)
+	}
+}
+
+// codeCell follows the three rules of a code span, not only the pipe: empty
+// content is not a span, a space at either end needs a pad, and the fence
+// outscans any backtick run in the content.
+func TestCodeCellRules(t *testing.T) {
+	cases := []struct{ in, want string }{
+		{"", ""},
+		{"Hello World", "`Hello World`"},
+		{"a|b", "`a\\|b`"},
+		{" hi ", "`  hi  `"},
+		{" hi", "`  hi `"},
+		{"hi ", "` hi  `"},
+		{"a`b", "``a`b``"},
+	}
+	for _, c := range cases {
+		uassert.Equal(t, c.want, codeCell(c.in), "codeCell("+c.in+")")
+	}
+}
