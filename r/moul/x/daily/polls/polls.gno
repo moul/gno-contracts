@@ -8,6 +8,7 @@ package polls
 
 import (
 	"chain"
+	"chain/markdown"
 	"strconv"
 	"strings"
 
@@ -41,7 +42,7 @@ func CreatePoll(cur realm, question string, options string) int {
 	creator := caller(cur).String()
 
 	q := strings.TrimSpace(question)
-	if q == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(q)) == "" {
 		panic("question must not be empty")
 	}
 
@@ -113,7 +114,7 @@ func parseOptions(options string) []string {
 	var out []string
 	for _, raw := range strings.Split(options, ",") {
 		o := strings.TrimSpace(raw)
-		if o != "" {
+		if strings.TrimSpace(markdown.StripBidiAndZeroWidth(o)) != "" {
 			out = append(out, o)
 		}
 	}

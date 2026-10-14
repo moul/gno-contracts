@@ -38,6 +38,7 @@ import (
 	"strconv"
 	"strings"
 
+	"chain/markdown"
 	"chain/runtime"
 
 	"gno.land/p/nt/avl/v0"
@@ -193,7 +194,7 @@ func Set(cur realm, slug, title, date, tags, body string) {
 		panic("invalid date: want YYYY-MM-DD, got " + strconv.Quote(date))
 	}
 	title = strings.TrimSpace(title)
-	if title == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(title)) == "" {
 		panic("a post needs a title")
 	}
 

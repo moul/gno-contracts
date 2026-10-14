@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 
+	"chain/markdown"
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
@@ -205,7 +206,7 @@ func rename(e *egg, name string) string {
 		panic("egg #" + e.ID + " hasn't hatched yet — nothing to name")
 	}
 	name = strings.TrimSpace(name)
-	if name == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(name)) == "" {
 		panic("name cannot be empty")
 	}
 	old := e.Name

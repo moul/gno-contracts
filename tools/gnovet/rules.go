@@ -677,7 +677,7 @@ var trimSpaceValidityRe = regexp.MustCompile(`strings\.TrimSpace\([^()]*\)\s*[!=
 
 var trimSpaceAsValidity = Rule{
 	ID:   "trimspace-as-validity",
-	What: "decides a required field is present with strings.TrimSpace(s) != \"\"",
+	What: "decides a required field is present with strings.TrimSpace(s) != \"\", in one statement or in two (trim, then compare and panic)",
 	Why: "strings.TrimSpace uses unicode.IsSpace, which does NOT include U+200B and the " +
 		"other zero-width characters, while every escaper on the output side calls " +
 		"StripBidiAndZeroWidth, which does. So a field of zero-width characters is stored " +
@@ -699,6 +699,70 @@ var trimSpaceAsValidity = Rule{
 				out = append(out, i)
 			}
 		}
-		return out
+		return append(out, trimSpaceTwoStatement(f.Literal)...)
 	},
+}
+
+// trimSpaceAssignRe matches the first half of the two-statement spelling,
+// x := strings.TrimSpace(...) or x = strings.TrimSpace(...), and captures x.
+var trimSpaceAssignRe = regexp.MustCompile(`^\s*(\w+)\s*:?=\s*strings\.TrimSpace\(`)
+
+// trimSpaceWindow is how many lines after the assignment the comparison may
+// sit. Five covers two fields trimmed together and checked one after the
+// other, where the second check sits behind the first one's three-line panic
+// (daily/blog Publish). Three missed that one; eight or fifteen find nothing
+// more on today's tree.
+const trimSpaceWindow = 5
+
+// trimSpaceTwoStatement finds x = strings.TrimSpace(...) followed within
+// trimSpaceWindow lines by x == "" whose branch panics: the same presence
+// check as the one-line form, on a field the caller is required to supply.
+// The panic is what makes it a presence check. The same two statements with a
+// different branch ask a different question (a Render path falling back to
+// its index, a list parser skipping an empty element, a default value), and
+// those stay silent. A reassignment of x in between ends the search, so a
+// value stripped before it is compared does not fire. It reports the
+// comparison line.
+func trimSpaceTwoStatement(lines []string) []int {
+	var out []int
+	for i, ln := range lines {
+		m := trimSpaceAssignRe.FindStringSubmatch(ln)
+		if m == nil {
+			continue
+		}
+		v := regexp.QuoteMeta(m[1])
+		cmp := regexp.MustCompile(`\b` + v + `\s*==\s*""|""\s*==\s*` + v + `\b`)
+		reassign := regexp.MustCompile(`^\s*` + v + `\s*:?=[^=]`)
+		for j := i + 1; j <= i+trimSpaceWindow && j < len(lines); j++ {
+			if loc := cmp.FindStringIndex(lines[j]); loc != nil {
+				if branchPanics(lines, j, loc[1]) {
+					out = append(out, j)
+				}
+				break
+			}
+			if reassign.MatchString(lines[j]) {
+				break
+			}
+		}
+	}
+	return out
+}
+
+// branchPanics reports whether the if-branch opened on lines[j] after column
+// col starts with a panic, on the same line or on the next non-blank one.
+func branchPanics(lines []string, j, col int) bool {
+	rest := lines[j][col:]
+	k := strings.Index(rest, "{")
+	if k < 0 {
+		return false
+	}
+	if tail := strings.TrimSpace(rest[k+1:]); tail != "" {
+		return strings.HasPrefix(tail, "panic(")
+	}
+	for n := j + 1; n < len(lines); n++ {
+		if t := strings.TrimSpace(lines[n]); t != "" {
+			return strings.HasPrefix(t, "panic(")
+		}
+	}
+	return false
 }

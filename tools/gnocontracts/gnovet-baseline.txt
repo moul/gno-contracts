@@ -121,6 +121,14 @@ page-offset-overflow r/moul/gnopm/registry/render.gno 1
 page-offset-overflow r/moul/x/daily/microblog/microblog.gno 1
 root-relative-link r/moul/x/across/across.gno 1
 slice-inplace-remove p/moul/x/daily/orderedmap/orderedmap.gno 1
+trimspace-as-validity r/moul/x/daily/calc/calc.gno 1
+trimspace-as-validity r/moul/x/daily/dutchauction/dutchauction.gno 1
+trimspace-as-validity r/moul/x/daily/eightball/eightball.gno 1
+trimspace-as-validity r/moul/x/daily/kudos/kudos.gno 1
+trimspace-as-validity r/moul/x/daily/reactions/reactions.gno 3
+trimspace-as-validity r/moul/x/daily/rpgroom/rpgroom.gno 1
+trimspace-as-validity r/moul/x/daily/todos/todos.gno 1
+trimspace-as-validity r/moul/x/provable/provable.gno 1
 uncallable-crossing-arg r/moul/config/config.gno 1
 uncallable-crossing-arg r/moul/gns/gns.gno 6
 uncallable-crossing-arg r/moul/x/pairreg/pairreg.gno 1

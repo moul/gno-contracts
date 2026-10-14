@@ -41,6 +41,7 @@ import (
 	"strconv"
 	"strings"
 
+	"chain/markdown"
 	"chain/runtime"
 	"chain/runtime/unsafe"
 
@@ -89,7 +90,7 @@ func Add(cur realm, body string) {
 	config.AssertWritableFor(realmPath)
 
 	body = strings.TrimSpace(body)
-	if body == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(body)) == "" {
 		panic("empty note")
 	}
 	if len(body) > 200 {

@@ -258,3 +258,52 @@ func TestVendorSkipIsRootRelative(t *testing.T) {
 		t.Fatalf("want only p/moul/vendor/nt/ours.gno scanned, got %v", got)
 	}
 }
+
+// The same presence check is more often written in two statements, the value
+// trimmed into a variable and the variable compared to "". The one-line regexp
+// never sees it, which is how five realms kept accepting zero-width-only input
+// after the one-line sites were fixed. Only a REQUIRED field fires: the
+// comparison has to reject with a panic. A Render path that falls back to its
+// index, a list parser that skips an empty element and a default value are the
+// same two statements and a different question, so they stay silent. Each row
+// is one spelling; want is the number of hits.
+func TestTrimSpaceValidityCatchesTheTwoStatementSpelling(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		body string
+		want int
+	}{
+		{"define then compare", "msg := strings.TrimSpace(message)\n\tif msg == \"\" {\n\t\tpanic(\"empty\")\n\t}", 1},
+		{"assign then compare", "name = strings.TrimSpace(name)\n\tif name == \"\" {\n\t\tpanic(\"empty\")\n\t}", 1},
+		{"reversed operands", "q := strings.TrimSpace(s)\n\tif \"\" == q {\n\t\tpanic(\"empty\")\n\t}", 1},
+		{"one statement between", "title = strings.TrimSpace(title)\n\tbody = strings.TrimSpace(body)\n\tif title == \"\" {\n\t\tpanic(\"empty\")\n\t}", 1},
+		{"blank line between", "target := strings.TrimSpace(p)\n\n\tif target == \"\" {\n\t\tpanic(\"empty\")\n\t}", 1},
+		{"nested call inside TrimSpace", "p := strings.TrimSpace(strings.Trim(path, \"/\"))\n\tif p == \"\" {\n\t\tpanic(\"empty\")\n\t}", 1},
+		{"second of two trims, checked after the first", "title = strings.TrimSpace(title)\n\tbody = strings.TrimSpace(body)\n\tif title == \"\" {\n\t\tpanic(\"empty\")\n\t}\n\tif body == \"\" {\n\t\tpanic(\"empty\")\n\t}", 2},
+		{"panic on the same line", "s := strings.TrimSpace(raw)\n\tif s == \"\" { panic(\"empty\") }", 1},
+		{"the one-line form still fires once", "if strings.TrimSpace(s) == \"\" {\n\t\tpanic(\"empty\")\n\t}", 1},
+
+		{"the fix: compare the stripped form", "msg := strings.TrimSpace(message)\n\tif strings.TrimSpace(markdown.StripBidiAndZeroWidth(msg)) == \"\" {\n\t\tpanic(\"empty\")\n\t}", 0},
+		{"reassigned before the compare", "s := strings.TrimSpace(raw)\n\ts = markdown.StripBidiAndZeroWidth(s)\n\tif s == \"\" {\n\t\tpanic(\"empty\")\n\t}", 0},
+		{"a different variable compared", "s := strings.TrimSpace(raw)\n\tif t == \"\" {\n\t\tpanic(\"empty\")\n\t}", 0},
+		{"a prefix of the name compared", "msg := strings.TrimSpace(raw)\n\tif msgs == \"\" {\n\t\tpanic(\"empty\")\n\t}", 0},
+		{"compared far below", "s := strings.TrimSpace(raw)\n\ta()\n\tb()\n\tc()\n\td()\n\te()\n\tif s == \"\" {\n\t\tpanic(\"empty\")\n\t}", 0},
+		{"no TrimSpace at all", "s := raw\n\tif s == \"\" {\n\t\tpanic(\"empty\")\n\t}", 0},
+		{"render path falls back to the index", "path = strings.TrimSpace(path)\n\tif path == \"\" {\n\t\treturn renderIndex()\n\t}", 0},
+		{"list parser skips an empty element", "raw = strings.TrimSpace(raw)\n\tif raw == \"\" {\n\t\tcontinue\n\t}", 0},
+		{"keeps a non-empty element", "o := strings.TrimSpace(raw)\n\tif o != \"\" {\n\t\tout = append(out, o)\n\t}", 0},
+		{"default value", "name = strings.TrimSpace(name)\n\tif name == \"\" {\n\t\tname = \"world\"\n\t}", 0},
+		{"not-empty then panic is not a presence check", "s := strings.TrimSpace(raw)\n\tif s != \"\" {\n\t\tpanic(\"must be empty\")\n\t}", 0},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			src := "package x\n\nfunc f(message, name, raw, s, path, p, title, body string) {\n\t" + tc.body + "\n}\n"
+			hits, err := RunRules(write(t, "x.gno", src), []Rule{trimSpaceAsValidity})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(hits) != tc.want {
+				t.Errorf("%d hit(s), want %d: %v\n--- source ---\n%s", len(hits), tc.want, hits, src)
+			}
+		})
+	}
+}

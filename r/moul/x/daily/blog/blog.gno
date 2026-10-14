@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"chain"
+	"chain/markdown"
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/store/v0"
@@ -43,10 +44,10 @@ func Publish(cur realm, title string, body string) int {
 	}
 	title = strings.TrimSpace(title)
 	body = strings.TrimSpace(body)
-	if title == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(title)) == "" {
 		panic("blog: title must not be empty")
 	}
-	if body == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(body)) == "" {
 		panic("blog: body must not be empty")
 	}
 
