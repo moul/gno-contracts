@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"chain"
+	"chain/markdown"
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
@@ -86,14 +87,14 @@ func CreatePoll(cur realm, question string, optionsCSV string) string {
 	creator := cur.Previous().Address()
 
 	question = strings.TrimSpace(question)
-	if question == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(question)) == "" {
 		panic("question must not be empty")
 	}
 
 	var options []string
 	for _, raw := range strings.Split(optionsCSV, ",") {
 		opt := strings.TrimSpace(raw)
-		if opt == "" {
+		if strings.TrimSpace(markdown.StripBidiAndZeroWidth(opt)) == "" {
 			continue
 		}
 		options = append(options, opt)

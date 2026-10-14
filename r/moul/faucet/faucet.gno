@@ -63,6 +63,7 @@ import (
 
 	"chain"
 	"chain/banker"
+	"chain/markdown"
 	"chain/runtime"
 	"chain/runtime/unsafe"
 
@@ -249,7 +250,7 @@ func Request(cur realm, to string, amount int64, reason string) int64 {
 			" is over the per-request cap of " + strconv.FormatInt(maxPerRequest, 10) + Denom)
 	}
 	reason = strings.TrimSpace(reason)
-	if reason == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(reason)) == "" {
 		panic("faucet: say what it is for")
 	}
 	if len(reason) > MaxReasonLen {
@@ -345,7 +346,7 @@ func Deny(cur realm, id int64, why string) {
 		panic("faucet: request " + strconv.FormatInt(id, 10) + " is already " + r.Status)
 	}
 	why = strings.TrimSpace(why)
-	if why == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(why)) == "" {
 		panic("faucet: say why")
 	}
 	if len(why) > MaxReasonLen {

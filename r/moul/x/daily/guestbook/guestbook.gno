@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	"chain"
+	"chain/markdown"
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/store/v0"
@@ -63,7 +64,7 @@ func Sign(cur realm, message string) {
 // Panics (aborting the tx, reverting state) on an invalid message.
 func addEntry(author, message string, height int64) (store.ID, *Entry) {
 	msg := strings.TrimSpace(message)
-	if msg == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(msg)) == "" {
 		panic("guestbook: message must not be empty")
 	}
 	if len(msg) > maxMessageLen {

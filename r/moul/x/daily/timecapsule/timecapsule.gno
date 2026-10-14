@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"chain"
+	"chain/markdown"
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/store/v0"
@@ -42,7 +43,7 @@ func Leave(cur realm, message string, delayBlocks int64) int64 {
 	}
 
 	message = strings.TrimSpace(message)
-	if message == "" {
+	if strings.TrimSpace(markdown.StripBidiAndZeroWidth(message)) == "" {
 		panic("message must not be empty")
 	}
 	if len(message) > maxMessageLen {
