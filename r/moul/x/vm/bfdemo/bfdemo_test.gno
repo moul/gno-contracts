@@ -166,3 +166,21 @@ func TestCodeCell(t *testing.T) {
 	uassert.Equal(t, "`Hello, gno.land\\n`", codeCell("Hello, gno.land\\n"))
 	uassert.Equal(t, "`a\\|b`", codeCell("a|b"))
 }
+
+// codeCell follows the three rules of a code span, not only the pipe: empty
+// content is not a span, a space at either end needs a pad, and the fence
+// outscans any backtick run in the content.
+func TestCodeCellRules(t *testing.T) {
+	cases := []struct{ in, want string }{
+		{"", ""},
+		{"Hello World", "`Hello World`"},
+		{"a|b", "`a\\|b`"},
+		{" hi ", "`  hi  `"},
+		{" hi", "`  hi `"},
+		{"hi ", "` hi  `"},
+		{"a`b", "``a`b``"},
+	}
+	for _, c := range cases {
+		uassert.Equal(t, c.want, codeCell(c.in), "codeCell("+c.in+")")
+	}
+}
