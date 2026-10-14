@@ -17,6 +17,7 @@
 export class Queue {
   constructor({ ttl = 180_000, onExpire = () => {} } = {}) {
     this.items = [];
+    this.spent = new Set(); // keys of the observations that already settled an entry
     this.ttl = ttl;
     this.onExpire = onExpire;
   }
@@ -53,25 +54,25 @@ export class Queue {
   // claim settles entries against writes the chain shows for the acting
   // address. Each entry carries `after`, the position (a change number, a
   // history index) last read before it was sent; each observation carries
-  // `at`, its own position. An observation settles the oldest entry it fits
-  // that is still waiting for a position past `after`, and each observation
-  // settles at most one entry: the entries after the one it settled now wait
-  // for a position past it, so the same observation, seen again on the next
-  // refresh, cannot settle them too. The result also lists the `claimed`
-  // entries, oldest first, each keeping its observation as `seen`.
+  // `at`, its own position, and optionally a `key` (default `at`) naming it
+  // across refreshes. An observation settles the oldest entry it fits whose
+  // `after` it is past, and it settles at most one entry ever: its key is
+  // spent, so the same observation, seen again on the next refresh, cannot
+  // settle a second one. The spent keys are forgotten once the queue is
+  // empty: a later entry's `after` is read after them, so they cannot match.
+  // The result also lists the `claimed` entries, oldest first, each keeping
+  // its observation as `seen`.
   claim(observations, fits = () => true) {
-    const used = new Set();
     const claimed = [];
-    const items = this.items;
     const r = this.settle((x) => {
-      const o = observations.find((o) => !used.has(o) && o.at > x.after && fits(x, o));
+      const o = observations.find((o) => !this.spent.has(o.key ?? o.at) && o.at > x.after && fits(x, o));
       if (!o) return false;
-      used.add(o);
+      this.spent.add(o.key ?? o.at);
       x.seen = o;
       claimed.push(x);
-      for (const y of items.slice(items.indexOf(x) + 1)) y.after = Math.max(y.after, o.at);
       return true;
     });
+    if (!this.items.length) this.spent.clear();
     return { ...r, claimed };
   }
 }

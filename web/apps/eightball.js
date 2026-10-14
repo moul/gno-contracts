@@ -13,9 +13,12 @@ const short = (a) => `${a.slice(0, 8)}…${a.slice(-4)}`;
 // shakes lifts the count and the history table out of Render: the last 15
 // questions, oldest first, each with its number (`at`), asker, question and
 // answer. The realm writes the question into its cell unescaped, so the
-// columns are read from both ends (a question may hold " | "), and a table
-// whose rows are not exactly the run of numbers the count implies (a question
-// holding a newline, or a row forged inside one) is not trusted at all.
+// columns are read from both ends (a question may hold " | "), and rows are
+// trusted one by one: a line that is not a well-formed row (half of a question
+// holding a newline) is skipped, and so is every row whose number is outside
+// the window the count implies or begins more than one line. A row forged
+// inside a question then collides with the real row of that number, or with
+// the broken first half of the forger's own, and both drop.
 const shakes = (md) => {
   const m = md.match(/\*\*Questions asked:\*\* (\d+)/);
   if (!m) throw new Error("unexpected Render layout");
@@ -23,17 +26,19 @@ const shakes = (md) => {
   const sep = "|---|---|---|---|---|\n";
   const i = md.indexOf(sep);
   if (i < 0) return { asked, rows: [] };
-  const rows = md.slice(i + sep.length).split("\n").filter((l) => l !== "").map((l) => {
+  const lines = md.slice(i + sep.length).split("\n");
+  const starts = new Map();
+  for (const l of lines) {
+    const n = (l.match(/^\| (\d+) \| /) || [])[1];
+    if (n) starts.set(n, (starts.get(n) || 0) + 1);
+  }
+  const rows = lines.map((l) => {
     const c = l.split(" | ");
-    return c.length < 5 ? null : {
-      at: Number(c[0].replace(/^\| /, "")),
-      asker: c[1].replace(/^`|`$/g, ""),
-      question: c.slice(2, -2).join(" | "),
-      answer: c[c.length - 2],
-    };
+    const at = (c[0].match(/^\| (\d+)$/) || [])[1];
+    if (c.length < 5 || !at || starts.get(at) !== 1 || !/^`[^`]+`$/.test(c[1])) return null;
+    return { at: Number(at), asker: c[1].slice(1, -1), question: c.slice(2, -2).join(" | "), answer: c[c.length - 2] };
   });
-  const ok = rows.length === Math.min(15, asked) && rows.every((r, k) => r && r.at === asked - k);
-  return { asked, rows: ok ? rows.reverse() : [] };
+  return { asked, rows: rows.filter((r) => r && r.at <= asked && r.at > asked - 15).reverse() };
 };
 
 export function mount(el, { client, path, call, wallet }) {

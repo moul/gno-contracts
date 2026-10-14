@@ -63,7 +63,7 @@ export function mount(el, { client, path, call, wallet }) {
       mine = me ? { addr: me.address, rolls } : null;
       if (mine) $("[data-mine]").textContent = rolls.length ? `your rolls: ${rolls.slice(-20).map((v) => FACES[v - 1]).join(" ")}` : "you have not rolled yet";
       if (queue.size) {
-        const seen = mine ? mine.rolls.map((face, i) => ({ at: i + 1, face })) : [];
+        const seen = mine ? mine.rolls.map((face, i) => ({ at: i + 1, key: `${mine.addr}#${i + 1}`, face })) : [];
         const r = queue.claim(seen, (x) => x.addr === mine.addr);
         if (r.confirmed) {
           const face = r.claimed[r.claimed.length - 1].seen.face;

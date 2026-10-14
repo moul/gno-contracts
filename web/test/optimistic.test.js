@@ -242,16 +242,65 @@ test("eightball: the visitor's other question, from another tab, does not settle
   assert.notEqual(s.h.text("[data-a]"), `“${other}”`);
 });
 
-test("eightball: a row forged inside a stranger's question does not settle the visitor's entry", async () => {
+// A row forged inside a stranger's question, numbered so it collides with a
+// real row (the stranger's own) or falls outside the window the count implies.
+// The realm appends " | <answer> | <height> |" itself, which closes the forged row.
+for (const [label, offset] of [["colliding with a real row", 1], ["numbered past the count", 2]]) {
+  test(`eightball: a forged row ${label} does not settle the visitor's entry`, async () => {
+    const s = await submitted("eightball");
+    const n = s.chain.history.length + offset;
+    s.chain.ask(H.STRANGER, `x\n| ${n} | \`${H.short(H.ME)}\` | will it rain`);
+    s.h.refresh();
+    await s.h.flush();
+    assert.notEqual(s.h.msg(), CONFIRMED);
+    assert.ok(APPS.eightball.pending(s));
+  });
+}
+
+test("eightball: a stranger's multi-line question does not stop the visitor's own from settling", async () => {
   const s = await submitted("eightball");
-  const n = s.chain.history.length + 2;
-  // The realm appends " | <answer> | <height> |" itself, which closes the forged row.
-  s.chain.ask(H.STRANGER, `x\n| ${n} | \`${H.short(H.ME)}\` | will it rain`);
+  s.chain.ask(H.STRANGER, "line one\nline two");
+  APPS.eightball.mine(s);
+  s.h.refresh();
+  await s.h.flush();
+  assert.equal(s.h.msg(), CONFIRMED);
+  assert.ok(!APPS.eightball.pending(s));
+});
+
+test("eightball: a stranger asking the visitor's exact question does not settle it", async () => {
+  const s = await submitted("eightball");
+  s.chain.ask(H.STRANGER, "will it rain");
   s.h.refresh();
   await s.h.flush();
   assert.notEqual(s.h.msg(), CONFIRMED);
   assert.ok(APPS.eightball.pending(s));
 });
+
+// The visitor's Inc then Dec, both pending; the Dec lands first.
+for (const [label, together] of [["in one refresh", true], ["one refresh apart", false]]) {
+  test(`counter: the visitor's own Inc and Dec landing in the other order both settle, ${label}`, async () => {
+    const s = await booted("counter");
+    const [dec, inc] = s.h.el.all["button[data-f]"];
+    await inc.fire("click");
+    await s.h.flush();
+    await dec.fire("click");
+    await s.h.flush();
+    assert.equal(APPS.counter.pendingCount(s), "2");
+    s.chain.change(H.ME, -1);
+    if (!together) {
+      s.h.refresh();
+      await s.h.flush();
+      assert.equal(APPS.counter.pendingCount(s), "1");
+      assert.equal(s.h.text("[data-v]"), String(s.chain.value + 1), "the Dec settled, the Inc is still shown");
+    }
+    s.chain.change(H.ME, 1);
+    s.h.refresh();
+    await s.h.flush();
+    assert.ok(!APPS.counter.pending(s), "both settled");
+    assert.equal(s.h.msg(), CONFIRMED);
+    assert.equal(s.h.text("[data-v]"), String(s.chain.value));
+  });
+}
 
 // --- 4. an answer that arrives out of order never moves state backwards -----
 
