@@ -197,7 +197,8 @@ func TestRenderOutputCell(cur realm, t *testing.T) {
 	}{
 		{"an escapable character shows as written", "a.b", "| `a.b` |"},
 		{"no output is an empty cell, not two backticks", "", "| 0 |  |"},
-		{"a space at each end survives CommonMark's strip", " a ", "| `  a  ` |"},
+		{"a space at each end is padded in the markdown, past CommonMark's strip", " a ", "| `  a  ` |"},
+		{"a guest pipe stays inside its cell", "a|b", "| `a\\|b` |"},
 	}
 	for _, c := range cases {
 		resetState()
