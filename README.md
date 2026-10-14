@@ -516,8 +516,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/upgrade/store/root/v0`](r/moul/x/upgrade/store/root) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/store/root/v0) | — | — | 2 |
 | [`r/moul/x/upgrade/wrap/v0`](r/moul/x/upgrade/wrap/gen0) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/wrap/v0) | — | — | 1 |
 | [`r/moul/x/upgrade/wrap/v1`](r/moul/x/upgrade/wrap/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/wrap/v1) | — | — | 2 |
-| [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/bfdemo/v0) | — | — | 6 |
-| [`r/moul/x/vm/riscvdemo/v0`](r/moul/x/vm/riscvdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/riscvdemo/v0) | — | — | 6 |
+| [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/bfdemo/v0) | — | — | 7 |
+| [`r/moul/x/vm/riscvdemo/v0`](r/moul/x/vm/riscvdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/riscvdemo/v0) | — | — | 7 |
 | [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | — | [✅](https://gno.land/r/moul/x/wesh/v0) | — | — | 3 |
 | [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | — | [✅](https://gno.land/r/moul/x/wiki/v0) | — | — | 8 |
 | [`r/moul/zones/v0`](r/moul/zones) 🏛️ | — | [✅](https://gno.land/r/moul/zones/v0) | — | — | 5 |
@@ -526,7 +526,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-14T06:58:49Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-14T07:24:27Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
