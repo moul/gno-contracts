@@ -207,7 +207,10 @@ func (e *Encoded) Decode() (string, error) {
 		}
 	}
 
-	var count [maxCodeLen + 1]int
+	var (
+		count [maxCodeLen + 1]int
+		seen  [256]bool
+	)
 	for i, c := range e.Codes {
 		if c.Len < 1 || c.Len > maxCodeLen {
 			return "", ErrCorrupt
@@ -218,6 +221,14 @@ func (e *Encoded) Decode() (string, error) {
 				return "", ErrCorrupt
 			}
 		}
+		// The order check only compares neighbours, so it catches a repeat at
+		// the same length and misses one at two different lengths. Encode
+		// never emits two codes for one byte, and a decoder that accepted it
+		// would map two streams to the same string.
+		if seen[c.Symbol] {
+			return "", ErrCorrupt
+		}
+		seen[c.Symbol] = true
 		count[c.Len]++
 	}
 

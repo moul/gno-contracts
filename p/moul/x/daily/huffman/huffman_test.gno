@@ -131,6 +131,7 @@ func TestDecodeRejectsCorruptPayloads(t *testing.T) {
 		{"bits disagree with the canonical table", func(e *Encoded) { e.Codes[1].Bits = 7 }},
 		{"table out of order", func(e *Encoded) { e.Codes[0], e.Codes[1] = e.Codes[1], e.Codes[0] }},
 		{"duplicate symbol", func(e *Encoded) { e.Codes[2].Symbol = e.Codes[1].Symbol }},
+		{"duplicate symbol at another length", func(e *Encoded) { e.Codes[1].Symbol = e.Codes[0].Symbol }},
 		{"more bits than data", func(e *Encoded) { e.NBits = len(e.Data)*8 + 1 }},
 		{"truncated stream", func(e *Encoded) { e.NBits = 2 }},
 		{"size disagrees", func(e *Encoded) { e.Size = 3 }},
