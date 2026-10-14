@@ -12,7 +12,7 @@ the coins attached to the call, asks the engine, and renders the result.
 | call | |
 |---|---|
 | `Create(name)` | payable. You become the crew's first member, your shares bought out of what you sent at `InitialPricePerShare`. |
-| `Join(crewID)` | payable. Mints shares at what a share is worth **now**: `amount * totalShares / treasury`, rounded down. |
+| `Join(crewID)` | payable. Mints shares at what a share is worth **now**: `amount * totalShares / treasury`, rounded down. Send at least the crew page's *to join* figure, `treasury / totalShares` rounded up, or no whole share is minted. |
 | `Fund(crewID)` | payable. Adds to the treasury and mints nothing, so every existing share is worth more. |
 | `Propose(crewID, text)` | any member. Open for `VoteBlocks` blocks. |
 | `Vote(proposalID, yes)` | weighted by the shares you hold right now, changeable while it is open. |
