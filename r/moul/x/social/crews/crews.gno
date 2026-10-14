@@ -58,6 +58,7 @@ import (
 	"gno.land/p/moul/kit/store/v0"
 	"gno.land/p/moul/x/envelope/v0"
 	"gno.land/p/moul/x/social/crew/v0"
+	"gno.land/p/moul/xmath/v1"
 )
 
 // realmPath is this realm's own path, the one its gnomod.toml module line
@@ -124,7 +125,8 @@ func Create(cur realm, name string) int64 {
 //
 // The price is amount * totalShares / treasury, rounded down, so somebody
 // joining a crew that has tripled its money pays three times what the founders
-// did. Send at least ValuePerShare ugnot, or there is no whole share to mint.
+// did. Send at least the crew page's join price, treasury / totalShares rounded
+// up, or there is no whole share to mint.
 func Join(cur realm, crewID int64) int64 {
 	// The two guards every payable call needs; see Create.
 	if !cur.IsCurrent() {
@@ -139,7 +141,7 @@ func Join(cur realm, crewID int64) int64 {
 	if !ok {
 		panic(crew.ErrNoCrew.Error())
 	}
-	amount := envelope.RequireAtLeast(denom, c.PricePerShare())
+	amount := envelope.RequireAtLeast(denom, joinPrice(c))
 
 	shares, err := crews.Join(id, who, amount)
 	if err != nil {
@@ -152,6 +154,24 @@ func Join(cur realm, crewID int64) int64 {
 		"shares", strconv.FormatInt(shares, 10),
 	)
 	return shares
+}
+
+// joinPrice is the least a joiner can send and still be minted a share: the
+// floor Join's envelope guard enforces, and the price a crew page quotes.
+//
+// The engine mints amount * totalShares / treasury, rounded down, so one whole
+// share needs treasury / totalShares rounded UP. crew.Crew.PricePerShare rounds
+// down, which is one ugnot short whenever the treasury is not an exact multiple
+// of the share count, the ordinary state after any Fund: a joiner paying the
+// quoted price passed the guard and then reverted on "buys no whole share".
+// That method lives in a published package and cannot change in place, so the
+// rule is here, next to the only guard that uses it. A crew nobody holds a
+// share in is back at the opening price, the same branch Join takes.
+func joinPrice(c *crew.Crew) int64 {
+	if c.TotalShares == 0 || c.Treasury == 0 {
+		return crew.InitialPricePerShare
+	}
+	return xmath.MulDivUp(1, c.Treasury, c.TotalShares)
 }
 
 // Fund adds what the caller sent to a crew's treasury and mints nothing, so
