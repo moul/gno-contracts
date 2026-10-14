@@ -710,7 +710,8 @@ var trimSpaceAssignRe = regexp.MustCompile(`^\s*(\w+)\s*:?=\s*strings\.TrimSpace
 // trimSpaceWindow is how many lines after the assignment the comparison may
 // sit. Five covers two fields trimmed together and checked one after the
 // other, where the second check sits behind the first one's three-line panic
-// (daily/blog Publish). Widening it to eight added one hit on the tree.
+// (daily/blog Publish). Three missed that one; eight or fifteen find nothing
+// more on today's tree.
 const trimSpaceWindow = 5
 
 // trimSpaceTwoStatement finds x = strings.TrimSpace(...) followed within
