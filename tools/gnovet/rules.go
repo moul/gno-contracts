@@ -677,7 +677,7 @@ var trimSpaceValidityRe = regexp.MustCompile(`strings\.TrimSpace\([^()]*\)\s*[!=
 
 var trimSpaceAsValidity = Rule{
 	ID:   "trimspace-as-validity",
-	What: "decides a required field is present with strings.TrimSpace(s) != \"\"",
+	What: "decides a required field is present with strings.TrimSpace(s) != \"\", in one statement or two",
 	Why: "strings.TrimSpace uses unicode.IsSpace, which does NOT include U+200B and the " +
 		"other zero-width characters, while every escaper on the output side calls " +
 		"StripBidiAndZeroWidth, which does. So a field of zero-width characters is stored " +
@@ -699,6 +699,42 @@ var trimSpaceAsValidity = Rule{
 				out = append(out, i)
 			}
 		}
-		return out
+		return append(out, trimSpaceTwoStatement(f.Literal)...)
 	},
+}
+
+// trimSpaceAssignRe matches the first half of the two-statement spelling,
+// x := strings.TrimSpace(...) or x = strings.TrimSpace(...), and captures x.
+var trimSpaceAssignRe = regexp.MustCompile(`^\s*(\w+)\s*:?=\s*strings\.TrimSpace\(`)
+
+// trimSpaceWindow is how many lines after the assignment the comparison may
+// sit: one more trim or a blank line between the two is the common shape.
+const trimSpaceWindow = 3
+
+// trimSpaceTwoStatement finds x = strings.TrimSpace(...) followed within
+// trimSpaceWindow lines by x == "" or x != "", which is the same presence
+// check as the one-line form. A reassignment of x in between ends the search,
+// so a value stripped before it is compared does not fire. It reports the
+// comparison line.
+func trimSpaceTwoStatement(lines []string) []int {
+	var out []int
+	for i, ln := range lines {
+		m := trimSpaceAssignRe.FindStringSubmatch(ln)
+		if m == nil {
+			continue
+		}
+		v := regexp.QuoteMeta(m[1])
+		cmp := regexp.MustCompile(`\b` + v + `\s*[!=]=\s*""|""\s*[!=]=\s*` + v + `\b`)
+		reassign := regexp.MustCompile(`^\s*` + v + `\s*:?=[^=]`)
+		for j := i + 1; j <= i+trimSpaceWindow && j < len(lines); j++ {
+			if cmp.MatchString(lines[j]) {
+				out = append(out, j)
+				break
+			}
+			if reassign.MatchString(lines[j]) {
+				break
+			}
+		}
+	}
+	return out
 }
