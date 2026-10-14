@@ -127,7 +127,12 @@ async function viewRealm(route) {
     unmount = mod.mount(main.querySelector("#custom"), {
       client, net, path: pkgpath,
       wallet,
-      call: (func, a = [], opts = {}) => wallet.call(net, pkgpath, func, a, opts.send || "", { slot: main.querySelector("#sim-slot"), onSubmit: opts.onSubmit }),
+      call: (func, a = [], opts = {}) => {
+        // The third argument used to be the amount to send. A string there now
+        // would be read as `"100ugnot".send`, undefined, and go out with no coins.
+        if (typeof opts === "string") throw new Error("call(func, args, { send, onSubmit }): pass the amount as { send }");
+        return wallet.call(net, pkgpath, func, a, opts.send || "", { slot: main.querySelector("#sim-slot"), onSubmit: opts.onSubmit });
+      },
     });
   }
 

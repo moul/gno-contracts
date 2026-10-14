@@ -28,6 +28,7 @@ Published at <https://moul.github.io/gno-contracts/>.
 
 ```bash
 make web            # http://127.0.0.1:8080
+make test-web       # the live apps under node, against a scripted chain (test/)
 ```
 
 The `local` network targets a `gnodev` on `127.0.0.1:26657`.
@@ -63,10 +64,14 @@ A live app shows a write the moment it leaves, before the chain has it: the coun
 moves, the die spins, the letter is marked, the 8-ball shakes, all styled as pending
 with an "N pending" chip. "Leaves" is the wallet popup opening, or the visitor
 clicking "I sent it" in the gnokey modal; a dry run never counts. Each refresh tells
-[`lib/optimistic.js`](./lib/optimistic.js)'s queue how far the chain has caught up
-(a count like `Total()`, or the change itself, like a guessed letter). A rejected
-popup rolls the change back at once. A change the chain never shows rolls back after
-3 minutes.
+[`lib/optimistic.js`](./lib/optimistic.js)'s queue what the chain now shows, and only
+the visitor's own change settles the visitor's entry: a row of the realm's history with
+their address on it (counter, 8-ball), their own `RollsOf` (dice). A realm-wide count
+like `Total()` moves for everyone, so it never settles anything. Hangman's guesses carry
+no address, so a letter settles on the letter. A rejected popup rolls the change back at
+once. A change the chain never shows rolls back after 3 minutes, and says so. Nothing is
+shown as pending before the page has read the realm once, or without a connected
+address to attribute it to.
 
 ## Adding a demo
 
@@ -74,7 +79,8 @@ popup rolls the change back at once. A change the chain never shows rolls back a
    the front page and opens in the generic view.
 2. When it deserves its own UI, write `apps/<name>.js` exporting
    `mount(el, { client, net, path, call, wallet })`, where
-   `call(func, args, { onSubmit })` fires `onSubmit` as the transaction leaves. Return a cleanup function, and add
+   `call(func, args, { send, onSubmit })` sends `send` (e.g. `"1000000ugnot"`) with the
+   call and fires `onSubmit` as the transaction leaves. Return a cleanup function, and add
    `module: "<name>"` to its line. [`apps/counter.js`](./apps/counter.js) is the
    worked example: it polls `Value()` and turns `Inc` / `Dec` into buttons.
 

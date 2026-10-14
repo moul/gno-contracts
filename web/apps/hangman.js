@@ -3,7 +3,7 @@
 // then turns the alphabet into Guess buttons. A clicked letter shows at once
 // as pending, until the chain lists it among the guesses.
 
-import { Queue } from "../lib/optimistic.js";
+import { Queue, ordered } from "../lib/optimistic.js";
 
 export function mount(el, { client, path, call, wallet }) {
   el.innerHTML = `
@@ -16,6 +16,7 @@ export function mount(el, { client, path, call, wallet }) {
     </div>`;
   const $ = (s) => el.querySelector(s);
   let guessed = new Set(), over = false;
+  const fresh = ordered();
   const queue = new Queue({ onExpire: (x) => { $("[data-msg]").textContent = `“${x.letter}” not seen on chain after 3 minutes, rolled back`; drawKeys(); } });
   const drawKeys = () => {
     const pending = new Set(queue.items.map((x) => x.letter));
@@ -26,8 +27,10 @@ export function mount(el, { client, path, call, wallet }) {
   };
 
   const refresh = async () => {
+    const current = fresh();
     try {
       const md = await client.render(path, "");
+      if (!current()) return;
       $("[data-g]").textContent = (md.match(/```\n([\s\S]*?)```/) || [, ""])[1];
       $("[data-w]").textContent = (md.match(/## Word\s+`([^`]*)`/) || [, "?"])[1];
       const wrong = (md.match(/Wrong: \*\*([^*]+)\*\*/) || [, "?"])[1];
@@ -36,12 +39,10 @@ export function mount(el, { client, path, call, wallet }) {
       const guessedLine = (md.match(/Guessed letters: ([^\n]*)/) || [, ""])[1];
       guessed = new Set([...guessedLine.matchAll(/`([a-z])`|\b([a-z])\b/g)].map((m) => m[1] || m[2]));
       over = /solved|game over/i.test(status);
-      const before = queue.size;
-      queue.settle((x) => guessed.has(x.letter));
-      if (before && !queue.size) $("[data-msg]").textContent = "confirmed on chain";
+      if (queue.settle((x) => guessed.has(x.letter)).confirmed) $("[data-msg]").textContent = "confirmed on chain";
       drawKeys();
     } catch (e) {
-      $("[data-msg]").textContent = e.message;
+      if (current()) $("[data-msg]").textContent = e.message;
     }
   };
 

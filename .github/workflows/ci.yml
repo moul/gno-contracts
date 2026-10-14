@@ -94,6 +94,14 @@ jobs:
       - name: Test tools
         run: go -C tools test ./...
 
+      # web/ is plain ES modules with no build step and no dependency: its
+      # tests drive the live apps against a scripted chain and need only node.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test web/
+        run: make test-web
+
       # Committed vendor/ is the pinned, authoritative source of gno.land/*
       # dependencies. We do NOT re-vendor from live master here (that would
       # couple CI to monorepo drift). lint/test resolve deps from vendor/ via
