@@ -246,3 +246,33 @@ func TestLinesEnforcesTheLineCap(cur realm, t *testing.T) {
 	uassert.PanicsWithMessage(t, cur, "myersdiff: input exceeds MaxLines", func() { Unified("", over, 1) })
 	uassert.NotPanics(t, cur, func() { Lines(atCap, atCap) })
 }
+
+// TestEffectiveRounds pins the one number that decides how much memory the
+// search can be made to allocate. The frontier is snapshotted once per round,
+// so the round count is the memory bound, and before MaxBudget existed a caller
+// could ask for 8,192 rounds by passing a large budget with two MaxLines
+// documents. This is asserted directly rather than through a diff, because the
+// inputs that would show it behaviourally take minutes to run.
+func TestEffectiveRounds(t *testing.T) {
+	cases := []struct {
+		name   string
+		budget int
+		n, m   int
+		want   int
+	}{
+		{"default applies when unset", 0, 1000, 1000, DefaultBudget},
+		{"default applies when negative", -7, 1000, 1000, DefaultBudget},
+		{"a small budget is kept", 5, 100, 100, 5},
+		{"no script is longer than n+m", 0, 10, 10, 20},
+		{"a large budget is capped at MaxBudget", 100000, MaxLines, MaxLines, MaxBudget},
+		{"MaxBudget never exceeds n+m either", 100000, 3, 4, 7},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			uassert.Equal(t, tc.want, effectiveRounds(tc.budget, tc.n, tc.m))
+		})
+	}
+
+	uassert.True(t, MaxBudget >= DefaultBudget, "the cap must leave the default reachable")
+}

@@ -118,7 +118,32 @@ func (s Script) Apply(a []string) ([]string, bool) {
 // the number of differing lines, so two similar documents are cheap at any size
 // and two unrelated ones are quadratic. On chain the caller picks the input, so
 // the cost has to be bounded by something the caller does not control.
+//
+// The threshold this sets is worth stating plainly, because it is not a size:
+// the default gives up past 256 changed lines, at any file size. Two 4,000-line
+// documents differing in 10 lines are diffed minimally; two 300-line documents
+// sharing nothing are not. A caller whose documents are large and similar is
+// well inside it; a caller diffing unrelated text is always outside it and
+// should pass a small budget rather than pay for the search before the
+// fallback.
+//
+// The cost is in gas, not just in time: a search that runs to the default
+// ceiling against two MaxLines documents was measured in the billions of gas
+// against a 3,000,000,000 block limit during the review of this package, before
+// the frontier was resized to the round ceiling. Treat a full-ceiling search as
+// something to avoid rather than something to budget for.
 const DefaultBudget = 256
+
+// MaxBudget is the hard ceiling on the rounds any caller can ask for, whatever
+// budget it passes.
+//
+// It exists because the round count, not the input size, is what the search
+// allocates against: one snapshot of the frontier is kept per round so the
+// script can be walked back out of them. Without the ceiling, two documents at
+// MaxLines and a large budget would permit 8,192 snapshots, and the budget
+// parameter would hand a caller the memory bill as a dial. The useful direction
+// for a caller is downwards.
+const MaxBudget = 1024
 
 // MaxLines caps each side of the comparison. The algorithm allocates two slices
 // proportional to n+m before it compares anything, so the size is checked before
@@ -174,7 +199,7 @@ func Budget(a, b []string, budget int) Script {
 	if budget <= 0 {
 		budget = DefaultBudget
 	}
-	edits, ok := search(a, b, budget)
+	edits, ok := search(a, b, effectiveRounds(budget, len(a), len(b)))
 	if !ok {
 		return Script{Edits: replaceAll(a, b), Minimal: false}
 	}
@@ -192,19 +217,36 @@ func replaceAll(a, b []string) []Edit {
 	return edits
 }
 
+// effectiveRounds is how many rounds the search may run: the caller's budget,
+// defaulted when unset and capped by both MaxBudget and n+m, since no minimal
+// script is longer than n+m.
+func effectiveRounds(budget, n, m int) int {
+	if budget <= 0 {
+		budget = DefaultBudget
+	}
+	if budget > MaxBudget {
+		budget = MaxBudget
+	}
+	if budget > n+m {
+		budget = n + m
+	}
+	return budget
+}
+
 // search runs the greedy forward pass, recording one snapshot of the frontier
 // per round, then walks the snapshots backwards into an edit script. It reports
 // false when the budget ran out before the two ends met.
 func search(a, b []string, budget int) ([]Edit, bool) {
 	n := len(a)
 	m := len(b)
-	maxD := n + m
-	if budget < maxD {
-		maxD = budget
-	}
+	maxD := budget
 
-	offset := n + m
-	v := make([]int, 2*(n+m)+2)
+	// At round d only the diagonals -d..d are live, and d never exceeds maxD,
+	// so the frontier is sized by the round ceiling rather than by the input.
+	// That is what keeps a snapshot small when two large documents are being
+	// compared under a small budget.
+	offset := maxD + 1
+	v := make([]int, 2*maxD+3)
 	trace := [][]int{}
 
 	for d := 0; d <= maxD; d++ {
