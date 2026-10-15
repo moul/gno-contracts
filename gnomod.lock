@@ -326,6 +326,10 @@ module = "gno.land/p/moul/x/daily/multiset/v0"
 source = { dir = "p/moul/x/daily/multiset" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/myersdiff/v0"
+source = { dir = "p/moul/x/daily/myersdiff" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/orderedmap/v0"
 source = { dir = "p/moul/x/daily/orderedmap" }
 
@@ -1041,6 +1045,10 @@ source = { dir = "r/moul/x/daily/multisetdemo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/multisig/v0"
 source = { dir = "r/moul/x/daily/multisig" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/myersdiffdemo/v0"
+source = { dir = "r/moul/x/daily/myersdiffdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/numguess/v0"
