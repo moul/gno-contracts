@@ -155,7 +155,7 @@ func renderIndex() string {
 
 	sb.WriteString("## API\n\n")
 	sb.WriteString("- `Lines(a, b string) Script` is the whole surface for text.\n")
-	sb.WriteString("- `Script.Apply(a []string) []string` replays the script, so a stored one can be verified.\n")
+	sb.WriteString("- `Script.Apply(a []string) ([]string, bool)` replays the script and says whether it describes that document.\n")
 	sb.WriteString("- `Hunks(s Script, context int) []Hunk` groups the script the way a review tool prints it.\n")
 	sb.WriteString("- `Unified(a, b string, context int) string` is the two above, as text.\n")
 	return sb.String()
@@ -210,7 +210,10 @@ func diffOf(sc scenario) myersdiff.Script {
 // applies is the demo asserting the library's own claim rather than repeating
 // it: the rendered answer comes from running Apply, not from a constant.
 func applies(sc scenario, s myersdiff.Script) bool {
-	got := s.Apply(lines(sc.a))
+	got, ok := s.Apply(lines(sc.a))
+	if !ok {
+		return false
+	}
 	want := lines(sc.b)
 	if len(got) != len(want) {
 		return false

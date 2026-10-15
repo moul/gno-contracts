@@ -76,17 +76,41 @@ func (s Script) count(op Op) int {
 	return n
 }
 
-// Apply replays the script and returns the lines it produces, which is b when
-// the script came from Slices(a, b). It exists so a caller can verify a stored
-// script rather than trust it.
-func (s Script) Apply(a []string) []string {
+// Apply replays the script against a and returns the lines it produces, which
+// is b when the script came from Slices(a, b).
+//
+// The second return reports whether a is the document the script describes:
+// every Equal and Delete edit has to match the line it consumes, and the script
+// has to consume all of a. It is false for a script built against a different
+// document, which is the check that makes a stored diff verifiable rather than
+// merely replayable. The lines are returned either way, because they are what
+// the script says and a caller deciding what to do about a mismatch usually
+// wants to see both.
+func (s Script) Apply(a []string) ([]string, bool) {
 	out := []string{}
+	ok := true
+	i := 0
 	for _, e := range s.Edits {
-		if e.Op == Equal || e.Op == Insert {
+		switch e.Op {
+		case Equal:
+			if i >= len(a) || a[i] != e.Line {
+				ok = false
+			}
+			i++
+			out = append(out, e.Line)
+		case Delete:
+			if i >= len(a) || a[i] != e.Line {
+				ok = false
+			}
+			i++
+		case Insert:
 			out = append(out, e.Line)
 		}
 	}
-	return out
+	if i != len(a) {
+		ok = false
+	}
+	return out, ok
 }
 
 // DefaultBudget caps the number of rounds the search may run before it gives up
@@ -106,7 +130,22 @@ const MaxLines = 4096
 // A trailing newline produces a trailing empty line on that side, which is what
 // makes "a\n" and "a" different documents here, as they are to diff(1).
 func Lines(a, b string) Script {
+	checkLineCap(a)
+	checkLineCap(b)
 	return Slices(split(a), split(b))
+}
+
+// checkLineCap refuses an oversized document before strings.Split allocates a
+// slice for it. MaxLines is checked again in Budget, for a caller that supplies
+// its own slices; this is the copy that matters, because counting newlines
+// allocates nothing and splitting them allocates everything.
+func checkLineCap(s string) {
+	if s == "" {
+		return
+	}
+	if strings.Count(s, "\n")+1 > MaxLines {
+		panic("myersdiff: input exceeds MaxLines")
+	}
 }
 
 func split(s string) []string {

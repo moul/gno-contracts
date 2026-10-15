@@ -96,8 +96,9 @@ func TestApplyRoundTrips(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			s := Budget(split(tc.a), split(tc.b), tc.budget)
-			got := strings.Join(s.Apply(split(tc.a)), "\n")
-			uassert.Equal(t, tc.b, got)
+			lines, ok := s.Apply(split(tc.a))
+			uassert.True(t, ok, "the script should describe its own source")
+			uassert.Equal(t, tc.b, strings.Join(lines, "\n"))
 		})
 	}
 }
@@ -116,7 +117,9 @@ func TestBudgetFallback(t *testing.T) {
 
 	full := Budget(a, b, 0)
 	uassert.True(t, full.Minimal, "the default budget is enough for six lines")
-	uassert.Equal(t, strings.Join(b, "\n"), strings.Join(full.Apply(a), "\n"))
+	applied, ok := full.Apply(a)
+	uassert.True(t, ok, "the minimal script should describe its own source")
+	uassert.Equal(t, strings.Join(b, "\n"), strings.Join(applied, "\n"))
 
 	// A budget above what the script needs changes nothing, and a budget larger
 	// than any possible script is not an error.
@@ -198,4 +201,48 @@ func TestMaxLines(cur realm, t *testing.T) {
 	// MaxLines identical lines is the cheap case: d is zero, so the search ends
 	// in the first round whatever the size.
 	uassert.NotPanics(t, cur, func() { Budget(ok, ok, 0) })
+}
+
+// TestApplyChecksTheSourceIsWhatTheScriptDescribes closes the gap a review
+// found on the first pass: Apply used to ignore its argument entirely, so it
+// replayed any script into the script's own right-hand side and reported
+// nothing. The round trip then proved only that the script agreed with itself,
+// and the demo's applies() check was vacuous for the same reason.
+func TestApplyChecksTheSourceIsWhatTheScriptDescribes(t *testing.T) {
+	s := Lines("a\nb\nc", "a\nx\nc")
+
+	got, ok := s.Apply([]string{"a", "b", "c"})
+	uassert.True(t, ok, "the script's own source should be accepted")
+	uassert.Equal(t, "a\nx\nc", strings.Join(got, "\n"))
+
+	_, ok = s.Apply([]string{"q", "b", "c"})
+	uassert.False(t, ok, "an Equal line absent from the source is not a script for it")
+
+	_, ok = s.Apply([]string{"a", "q", "c"})
+	uassert.False(t, ok, "a Delete line absent from the source is not a script for it")
+
+	_, ok = s.Apply([]string{"a", "b"})
+	uassert.False(t, ok, "a source shorter than the script consumes")
+
+	_, ok = s.Apply([]string{"a", "b", "c", "d"})
+	uassert.False(t, ok, "a source with a line the script never consumed")
+
+	_, ok = s.Apply([]string{})
+	uassert.False(t, ok, "an empty source against a three-line script")
+}
+
+// TestLinesEnforcesTheLineCap covers the other half of the same review:
+// MaxLines guarded the comparison but not the strings.Split in front of it, so
+// a caller could force an arbitrarily large line slice and only then be
+// refused. Nothing here distinguishes the two orders, because the difference is
+// an allocation and gno test cannot observe one. What it does pin is that Lines
+// and Unified enforce the cap at all, which nothing asserted before.
+func TestLinesEnforcesTheLineCap(cur realm, t *testing.T) {
+	over := strings.Repeat("x\n", MaxLines)
+	atCap := strings.Repeat("x\n", MaxLines-1) + "x"
+
+	uassert.PanicsWithMessage(t, cur, "myersdiff: input exceeds MaxLines", func() { Lines(over, "") })
+	uassert.PanicsWithMessage(t, cur, "myersdiff: input exceeds MaxLines", func() { Lines("", over) })
+	uassert.PanicsWithMessage(t, cur, "myersdiff: input exceeds MaxLines", func() { Unified("", over, 1) })
+	uassert.NotPanics(t, cur, func() { Lines(atCap, atCap) })
 }

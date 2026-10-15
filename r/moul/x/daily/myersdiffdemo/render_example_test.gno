@@ -30,7 +30,7 @@ func ExampleRender() {
 	// ## API
 	//
 	// - `Lines(a, b string) Script` is the whole surface for text.
-	// - `Script.Apply(a []string) []string` replays the script, so a stored one can be verified.
+	// - `Script.Apply(a []string) ([]string, bool)` replays the script and says whether it describes that document.
 	// - `Hunks(s Script, context int) []Hunk` groups the script the way a review tool prints it.
 	// - `Unified(a, b string, context int) string` is the two above, as text.
 }
