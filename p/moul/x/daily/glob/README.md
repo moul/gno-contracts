@@ -74,6 +74,17 @@ A `-` at either end of a class is a literal dash, as POSIX has it.
   names, all ASCII. It is **not** the package for matching prose, and a
   `[a-z]` class will not do what you want to a non-ASCII name.
 
+## The separator belongs to the grammar, so the split has to know about it
+
+In `MatchPath` a `/` that is escaped (`a\/b`) or that sits inside a character
+class (`[/]`) is part of its segment and does not split the pattern. Splitting
+there would cut an escape pair or a bracket expression in half and hand the
+matcher a piece it would read past the end of, which is an abort out of a
+`Render` that can never be redeployed. Such a pattern matches nothing, because
+a name segment can never contain a separator, and it says so by returning
+false. A negated class is the exception worth knowing: `[!/]` is a perfectly
+ordinary one-segment pattern meaning any byte but a separator.
+
 ## What it is not
 
 Not a regular expression engine, and not a path cleaner: it compares the

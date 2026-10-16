@@ -65,13 +65,17 @@ func Match(pattern, name string) bool {
 // `**` only crosses as a whole segment. Glued to anything else, as in `a**b`,
 // it is an ordinary star confined to its segment.
 //
+// A [Separator] that is escaped (`a\/b`) or inside a class (`[/]`) belongs to
+// its segment and does not split the pattern. Such a pattern matches nothing,
+// because a name segment can never contain a separator, and it says so by
+// returning false rather than by aborting.
+//
 // An invalid pattern matches nothing, as in [Match].
 func MatchPath(pattern, name string) bool {
 	if !Valid(pattern) {
 		return false
 	}
-	sep := string(Separator)
-	return matchSegments(strings.Split(pattern, sep), strings.Split(name, sep))
+	return matchSegments(splitPattern(pattern), splitName(name))
 }
 
 // Valid reports whether pattern is well formed.
@@ -139,10 +143,9 @@ func FilterPath(pattern string, names []string) []string {
 	if !Valid(pattern) {
 		return out
 	}
-	sep := string(Separator)
-	psegs := strings.Split(pattern, sep)
+	psegs := splitPattern(pattern)
 	for _, n := range names {
-		if matchSegments(psegs, strings.Split(n, sep)) {
+		if matchSegments(psegs, splitName(n)) {
 			out = append(out, n)
 		}
 	}
@@ -279,6 +282,49 @@ func matchClass(pattern string, px int, b byte) (bool, int) {
 		}
 	}
 	return found != negated, i + 1
+}
+
+// splitName splits a subject on [Separator]. A name carries no pattern syntax,
+// so there is nothing to protect and a plain split is right.
+func splitName(name string) []string {
+	return strings.Split(name, string(Separator))
+}
+
+// splitPattern splits a pattern on every [Separator] that is not escaped and
+// not inside a character class.
+//
+// A plain strings.Split is wrong here, and wrong by aborting rather than by
+// answering: it cuts `a\/b` into `a\` and `b`, handing matchBytes a segment
+// whose trailing backslash has nothing after it, and `[/]` into `[` and `]`,
+// handing matchClass a bracket with no closing one. Both then index past the
+// end of the piece they were given, out of a Render that cannot be redeployed.
+// Splitting with the escape and the class in mind keeps every pattern element
+// whole, so each segment is itself a valid pattern.
+//
+// The resulting segment can still never match, since a name segment cannot
+// contain a separator. That is the correct answer and this returns it.
+func splitPattern(pattern string) []string {
+	segs := []string{}
+	start := 0
+	inClass := false
+	for i := 0; i < len(pattern); i++ {
+		switch pattern[i] {
+		case '\\':
+			// Valid has established there is a byte after it.
+			i++
+		case '[':
+			inClass = true
+		case ']':
+			inClass = false
+		case Separator:
+			if inClass {
+				continue
+			}
+			segs = append(segs, pattern[start:i])
+			start = i + 1
+		}
+	}
+	return append(segs, pattern[start:])
 }
 
 // matchSegments is matchBytes one level up: the same single-backtrack walk,

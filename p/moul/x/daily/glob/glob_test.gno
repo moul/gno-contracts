@@ -309,3 +309,47 @@ func TestStarIsGreedyButBacktracks(t *testing.T) {
 	uassert.True(t, Match("a*b*c*d", "a1b2c3d"))
 	uassert.False(t, Match("a*b*c*d", "a1b2c3"))
 }
+
+// TestMatchPathSeparatorInsidePatternSyntax pins the one place the two layers
+// of this package can disagree: a '/' that is escaped, or that sits inside a
+// character class, belongs to its segment and must not split the pattern.
+// Splitting there cuts an escape pair or a bracket expression in half, and the
+// matcher then reads past the end of the piece it was handed.
+//
+// No name segment can contain a separator, so such a pattern matches nothing.
+// The requirement is that it answers rather than aborts: a Render that panics
+// on a stored pattern is a page that is broken for good.
+func TestMatchPathSeparatorInsidePatternSyntax(t *testing.T) {
+	cases := []struct {
+		pattern string
+		name    string
+	}{
+		{`a\/b`, "ax/b"},
+		{`a\/b`, "a/b"},
+		{`a\/b`, "ab"},
+		{`a\/b`, ""},
+		{"[/]", "x/y"},
+		{"[/]", "x"},
+		{"[a-/]", "x"},
+		{`**/a\/b`, "x/y"},
+		{`a\/b/c`, "a/b/c"},
+	}
+	for _, tc := range cases {
+		uassert.False(t, MatchPath(tc.pattern, tc.name),
+			"MatchPath("+tc.pattern+", "+tc.name+")")
+	}
+
+	// FilterPath and AnyPath split the same way and must be total too.
+	uassert.Equal(t, 0, len(FilterPath(`a\/b`, []string{"ax/b", "a/b"})))
+	uassert.Equal(t, 0, len(FilterPath("[/]", []string{"x/y", "x"})))
+	uassert.False(t, AnyPath([]string{"[/]", `a\/b`}, "x/y"))
+
+	// A separator that is neither escaped nor in a class still splits, and a
+	// class holding one still works on the segment it belongs to.
+	uassert.True(t, MatchPath(`a\*b/c`, "a*b/c"), `MatchPath(a\*b/c, a*b/c)`)
+	uassert.True(t, MatchPath("[abc]/x", "b/x"), "MatchPath([abc]/x, b/x)")
+	// A negated class holding the separator is the one shape here that does
+	// match: it is a single segment meaning "any byte but a separator", which
+	// is what every name segment is.
+	uassert.True(t, MatchPath("[!/]", "x"), "MatchPath([!/], x)")
+}
