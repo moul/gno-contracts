@@ -3,7 +3,7 @@
 This repository is [gno.land](https://gno.land) contracts: pure packages under `p/moul/*`
 and realms under `r/moul/*`, written in **gno**, which is Go-like and is not Go.
 
-**329 of the 331 contracts here are live on mainnet, and a public package path is
+**Nearly every contract here is already live on mainnet, and a public package path is
 immutable.** `AddPackage` refuses a path already occupied unless the live package is
 private, so a defect that ships renders forever and the only fix is a new version at a new
 path that every importer has to move to. That single fact is why review here is worth more

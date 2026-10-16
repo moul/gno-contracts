@@ -642,7 +642,7 @@ separator row by hand, against a baseline of the 100 that predate the guard. The
 `// handrolled-table: <what the dashes really are>`, which exists because a cow's horn in
 ASCII art is `||----w |`.
 
-**And the baseline is permanent, which is the real lesson.** 329 of the 331 contracts here are
+**And the baseline is permanent, which is the real lesson.** Nearly every contract here is
 live on mainnet, and a public package path is immutable: `AddPackage` refuses a path already
 occupied unless the live package is private. So a realm that shipped a hand-rolled table
 renders it forever, and the fix is a `vN+1` at a new path that every importer has to move to.

@@ -524,8 +524,8 @@ that is what the opt-out is for.
 
 The single most repeated mistake in this repository's history: **102 files built a markdown
 table by concatenating pipes**, and the package that tells everyone else not to,
-`p/moul/pilot`, is one of them. Present tense, because it cannot be fixed: `329 of the 331`
-contracts in the catalog are live on mainnet, `p/moul/pilot/v0` among them, and a public
+`p/moul/pilot`, is one of them. Present tense, because it cannot be fixed: nearly every
+contract in the catalog is live on mainnet, `p/moul/pilot/v0` among them, and a public
 package path is immutable. That is the whole argument for the guard.
 
 Four things a hand-rolled table gets wrong, every time, none of them visible in a diff:
@@ -621,8 +621,10 @@ out of restraint:
 
 > **Review exactly what is about to become permanent.**
 
-331 of the 333 contracts in the catalog are live on mainnet, and a public package path is
-immutable. A finding against a package that is **already live** cannot be acted on in place:
+Nearly every contract in the catalog is already live on mainnet, and a public package path is
+immutable. The count has one owner and it is not prose: `contracts.json`, regenerated hourly
+on `main`, and the status columns of the README table generated from it. A finding against a
+package that is **already live** cannot be acted on in place:
 it needs a new version at a new path and every importer moved, which is a human decision a
 review does not unblock. A package **not yet live** is one merge from being frozen forever,
 and that is the only moment a review changes the outcome.
