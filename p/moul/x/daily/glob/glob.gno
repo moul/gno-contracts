@@ -5,10 +5,14 @@
 // The reason to have it on chain is the allowlist. A realm that decides what a
 // caller may touch writes the rule as a pattern (gno.land/r/moul/**), and the
 // obvious alternative, strings.HasPrefix, is wrong in a way that only shows up
-// in production: the prefix gno.land/r/moul/ also matches gno.land/r/moulier/,
-// a different namespace owned by a different person. A separator-aware matcher
-// cannot make that mistake, because a boundary is part of the grammar rather
-// than something the caller remembered to append.
+// in production: the prefix gno.land/r/moul/home also matches
+// gno.land/r/moul/homeless, and the prefix a caller gets by trimming /** off
+// the rule above, gno.land/r/moul, also matches gno.land/r/moulier/drain, a
+// different namespace owned by a different person. A separator-aware matcher
+// cannot make either mistake, because a boundary is part of the grammar rather
+// than something the caller remembered to append. Remembering to append it is
+// no answer either: gno.land/r/moul/home with a slash on the end stops being a
+// rule that matches the path it names.
 //
 // The matcher is iterative with a single backtrack point, so it runs in
 // O(len(pattern) * len(name)) time and constant space. That is not a style

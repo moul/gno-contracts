@@ -23,11 +23,17 @@ Live demo: [`r/moul/x/daily/globdemo`](/r/moul/x/daily/globdemo/v0).
 
 Every realm that decides what a caller may touch eventually writes an
 allowlist, and the first version of it is a prefix check. The prefix
-`gno.land/r/moul/` also matches `gno.land/r/moulier/`, which is a different
-namespace owned by a different person; the prefix `gno.land/r/moul/home` also
-matches `gno.land/r/moul/homeless`. Registering a sibling name one byte longer
+`gno.land/r/moul/home` also matches `gno.land/r/moul/homeless`; the prefix a
+caller gets by trimming `/**` off `gno.land/r/moul/x/daily/**` also matches
+`gno.land/r/moul/x/dailyevil/drain`. Registering a sibling name one byte longer
 than an allowed one is cheap, and the check cannot tell the difference, because
 a prefix has no idea where a path segment ends.
+
+Appending the separator by hand is not the fix, it is the other half of the
+same bug: `gno.land/r/moul/home/` no longer matches the one path the rule was
+written to name, and `gno.land/r/moul/` no longer matches `gno.land/r/moul`.
+The boundary has to be something the matcher knows about, not something every
+call site remembers.
 
 `MatchPath` makes the boundary part of the grammar rather than something the
 caller remembered to append. `*`, `?` and a character class stay inside one
