@@ -35,9 +35,20 @@ original bytes. `TestCanonicalIsAFixedPoint` pins that property.
 encoder would emit it" is a different message to show a user than "this is not
 bencode".
 
-A nil never reaches the encoding: `Set` ignores a nil value and `NewList`
-drops a nil item, because a nil would encode to nothing and emit a
-dictionary or a list that this package's own `Decode` rejects.
+Nothing that encodes to nothing can be stored: `Set` and `NewList` ignore a
+nil and the zero `Value`, because either one would emit a key with no value,
+or a list whose `Len` disagrees with its encoding, and `Decode` would then
+reject what `Encode` produced.
+
+`Encode` is total. It returns `""` for anything with no canonical encoding,
+which means a value nested deeper than `MaxDepth` and therefore any cycle a
+caller assembled by hand. `Set` refuses the direct case (a dictionary holding
+itself) outright; two dictionaries holding each other cannot be caught at
+insert time without walking the whole structure, so the depth bound in
+`Encode` is what keeps them from aborting the call. `""` is not a legal
+bencode document, so a caller can test for it. `Set` also never writes through
+the slices an earlier `Set` produced, so copying the struct behind the pointer
+cannot leave two values partially aliased.
 
 Accessors never panic. `Int`, `Text`, `Len`, `At` and `Get` return the zero
 value for the wrong kind or a nil receiver, so walking a document of unknown

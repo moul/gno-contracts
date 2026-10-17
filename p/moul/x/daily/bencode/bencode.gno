@@ -99,13 +99,13 @@ func NewInt(n int64) *Value { return &Value{kind: KindInt, num: n} }
 // NewString returns a byte-string value.
 func NewString(s string) *Value { return &Value{kind: KindString, text: s} }
 
-// NewList returns a list of the given items, in order. A nil item is dropped:
-// it would encode to nothing, turning a three item list into a two item one
-// that still claims three.
+// NewList returns a list of the given items, in order. A nil item, and the
+// zero Value, are dropped: both encode to nothing, which would turn a three
+// item list into a two item encoding that still reports a length of three.
 func NewList(items ...*Value) *Value {
 	l := &Value{kind: KindList, elems: []*Value{}}
 	for _, it := range items {
-		if it == nil {
+		if it.Kind() == KindInvalid {
 			continue
 		}
 		l.elems = append(l.elems, it)
@@ -204,25 +204,35 @@ func (v *Value) Keys() []string {
 }
 
 // Set inserts or replaces a dictionary entry and returns the dictionary, so
-// calls chain. It is a no-op on any other kind, and a no-op for a nil value:
-// a nil encodes to nothing, so storing one would emit a key with no value and
-// produce a dictionary this package's own Decode rejects. Removing an entry is
-// deliberately not spelled "set it to nil"; nothing here removes.
+// calls chain. Four things are refused rather than stored, each because it
+// would make the encoding disagree with the structure: a receiver that is not
+// a dictionary, a nil value, the zero Value, and the dictionary itself. The
+// first three encode to nothing, which would emit a key with no value and
+// produce a dictionary this package's own Decode rejects; the fourth is a
+// cycle. Removing an entry is deliberately not spelled "set it to nil",
+// because nothing here removes.
+//
+// An indirect cycle (two dictionaries holding each other) is not detectable
+// here without walking the whole structure on every insert, so it is caught by
+// [Value.Encode] instead, which is depth-bounded and returns "".
+//
+// It never writes through the slices a previous Set produced. gno lets a
+// caller copy the struct behind the pointer, and two copies sharing a backing
+// array would see each other's replacements but not each other's insertions.
 func (v *Value) Set(key string, val *Value) *Value {
-	if v == nil || v.kind != KindDict || val == nil {
+	if v == nil || v.kind != KindDict || val.Kind() == KindInvalid || val == v {
 		return v
 	}
 	i, found := v.find(key)
+	rest := i
 	if found {
-		v.vals[i] = val
-		return v
+		rest = i + 1
 	}
-	v.keys = append(v.keys, "")
-	v.vals = append(v.vals, nil)
-	copy(v.keys[i+1:], v.keys[i:])
-	copy(v.vals[i+1:], v.vals[i:])
-	v.keys[i] = key
-	v.vals[i] = val
+	keys := make([]string, 0, len(v.keys)+1)
+	vals := make([]*Value, 0, len(v.vals)+1)
+	keys = append(append(append(keys, v.keys[:i]...), key), v.keys[rest:]...)
+	vals = append(append(append(vals, v.vals[:i]...), val), v.vals[rest:]...)
+	v.keys, v.vals = keys, vals
 	return v
 }
 
@@ -240,17 +250,29 @@ func (v *Value) find(key string) (int, bool) {
 	return lo, lo < len(v.keys) && v.keys[lo] == key
 }
 
-// Encode returns the canonical bencoding of the value. A nil value encodes to
-// the empty string.
+// Encode returns the canonical bencoding of the value, or "" for a value that
+// has no canonical encoding: a nil, the zero Value, anything nested deeper
+// than [MaxDepth], and therefore any cycle a caller assembled by hand. "" is
+// not a legal bencode document, so a caller can test for it.
+//
+// Encode has no error to return and is called from a realm's Render, so it is
+// total by construction: the depth bound is what keeps a structure the decoder
+// could never have produced from aborting the call that encodes it.
 func (v *Value) Encode() string {
 	var b strings.Builder
-	v.writeTo(&b)
+	if !v.writeTo(&b, 0) {
+		return ""
+	}
 	return b.String()
 }
 
-func (v *Value) writeTo(b *strings.Builder) {
+// writeTo reports whether the whole value fit within MaxDepth. The bound is
+// counted on containers only, exactly as the decoder counts it, so the two
+// agree about which structures exist. A false leaves b holding a partial
+// encoding, which is why Encode discards it.
+func (v *Value) writeTo(b *strings.Builder, depth int) bool {
 	if v == nil {
-		return
+		return true
 	}
 	switch v.kind {
 	case KindInt:
@@ -262,21 +284,32 @@ func (v *Value) writeTo(b *strings.Builder) {
 		b.WriteString(":")
 		b.WriteString(v.text)
 	case KindList:
+		if depth >= MaxDepth {
+			return false
+		}
 		b.WriteString("l")
 		for _, e := range v.elems {
-			e.writeTo(b)
+			if !e.writeTo(b, depth+1) {
+				return false
+			}
 		}
 		b.WriteString("e")
 	case KindDict:
+		if depth >= MaxDepth {
+			return false
+		}
 		b.WriteString("d")
 		for i, k := range v.keys {
 			b.WriteString(strconv.Itoa(len(k)))
 			b.WriteString(":")
 			b.WriteString(k)
-			v.vals[i].writeTo(b)
+			if !v.vals[i].writeTo(b, depth+1) {
+				return false
+			}
 		}
 		b.WriteString("e")
 	}
+	return true
 }
 
 // Decode parses one bencode value and rejects anything after it. It also

@@ -229,3 +229,62 @@ func TestStringLengthNeverOverflows(t *testing.T) {
 		uassert.True(t, v == nil)
 	}
 }
+
+func TestEncodeIsTotal(t *testing.T) {
+	// A caller can build what no input can produce: a cycle, or nesting past
+	// MaxDepth. Encode has no error to return, so it must not be the thing
+	// that aborts a realm call.
+	d := NewDict()
+	d.Set("self", d)
+	uassert.Equal(t, 0, d.Len(), "a dictionary cannot hold itself")
+	uassert.Equal(t, "de", d.Encode())
+
+	a, b := NewDict(), NewDict()
+	a.Set("b", b)
+	b.Set("a", a)
+	uassert.Equal(t, "", a.Encode(), "an indirect cycle encodes to nothing")
+	uassert.Equal(t, "", b.Encode())
+
+	deep := NewList()
+	for i := 0; i < MaxDepth; i++ {
+		deep = NewList(deep)
+	}
+	uassert.Equal(t, "", deep.Encode(), "past MaxDepth there is no canonical encoding")
+
+	shallow := NewList()
+	for i := 0; i < MaxDepth-1; i++ {
+		shallow = NewList(shallow)
+	}
+	_, err := Decode(shallow.Encode())
+	uassert.NoError(t, err, "and everything under it still round-trips")
+}
+
+func TestZeroValuesNeverReachTheEncoding(t *testing.T) {
+	// Value is zero-constructible from outside the package, and that zero is
+	// KindInvalid, which writes nothing. Retaining one would make Len lie.
+	l := NewList(NewInt(1), &Value{}, NewString("x"))
+	uassert.Equal(t, 2, l.Len())
+	uassert.Equal(t, "li1e1:xe", l.Encode())
+
+	d := NewDict()
+	d.Set("k", &Value{})
+	uassert.Equal(t, 0, d.Len())
+	uassert.Equal(t, "de", d.Encode())
+}
+
+func TestSetNeverWritesThroughAStructCopy(t *testing.T) {
+	// *Value is the intended handle, but the struct is copyable, and slice
+	// headers in a copied struct share their backing array.
+	d := NewDict()
+	d.Set("a", NewInt(1))
+	d.Set("b", NewInt(2))
+
+	c := *d
+	c.Set("a", NewInt(99))
+	uassert.Equal(t, int64(1), d.Get("a").Int(), "the original is untouched")
+	uassert.Equal(t, int64(99), c.Get("a").Int())
+
+	c.Set("c", NewInt(3))
+	uassert.Equal(t, 2, d.Len(), "and an insertion does not leak either")
+	uassert.Equal(t, 3, c.Len())
+}
