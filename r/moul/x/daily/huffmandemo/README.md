@@ -1,0 +1,29 @@
+# Huffman coding
+
+Shows the code table for `abracadabra`, the packed bit stream it produces, what
+the skew is worth across four inputs, and the two cases that break a naive
+implementation.
+
+```
+/r/moul/x/daily/huffmandemo/v0              → the worked example and the ratios
+/r/moul/x/daily/huffmandemo/v0:mississippi  → encode your own text
+```
+
+Demo of the [`p/moul/x/daily/huffman`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/huffman)
+library, no codec logic lives here. Stateless, so `Render` is deterministic:
+every figure comes from the fixed strings at the top of the file and never from
+chain state, which is what lets the pinned example test assert the whole page.
+
+The comparison table is the honest part. A flat alphabet of eight bytes still
+shows a 62% saving, because the floor is the size of the alphabet and not the
+cleverness of the code: three bits per symbol is what a fixed-width code would
+have spent too. Everything past that floor is bought with skew, which is why
+the last row, thirty `a` and three other bytes, reaches 85%.
+
+Text taken from the path is attacker-controlled markdown, so it goes through
+`ui.Inline` and `ui.Cell` before it is rendered back. A symbol is shown by its
+byte: anything outside printable ASCII renders as hex, because converting a
+byte above 127 with `string(b)` would print a character the code does not
+stand for.
+
+Built for gno 0.9.
