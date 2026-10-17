@@ -99,10 +99,15 @@ func NewInt(n int64) *Value { return &Value{kind: KindInt, num: n} }
 // NewString returns a byte-string value.
 func NewString(s string) *Value { return &Value{kind: KindString, text: s} }
 
-// NewList returns a list of the given items, in order.
+// NewList returns a list of the given items, in order. A nil item is dropped:
+// it would encode to nothing, turning a three item list into a two item one
+// that still claims three.
 func NewList(items ...*Value) *Value {
 	l := &Value{kind: KindList, elems: []*Value{}}
 	for _, it := range items {
+		if it == nil {
+			continue
+		}
 		l.elems = append(l.elems, it)
 	}
 	return l
@@ -199,9 +204,12 @@ func (v *Value) Keys() []string {
 }
 
 // Set inserts or replaces a dictionary entry and returns the dictionary, so
-// calls chain. It is a no-op on any other kind.
+// calls chain. It is a no-op on any other kind, and a no-op for a nil value:
+// a nil encodes to nothing, so storing one would emit a key with no value and
+// produce a dictionary this package's own Decode rejects. Removing an entry is
+// deliberately not spelled "set it to nil"; nothing here removes.
 func (v *Value) Set(key string, val *Value) *Value {
-	if v == nil || v.kind != KindDict {
+	if v == nil || v.kind != KindDict || val == nil {
 		return v
 	}
 	i, found := v.find(key)
@@ -369,7 +377,10 @@ func decodeString(s string, i int) (*Value, int, error) {
 		return nil, i, ErrSyntax
 	}
 	start := colon + 1
-	if start+n > len(s) {
+	// Compare against what is left rather than computing start+n: the length
+	// literal is bounded only by MaxLen, so a 19-digit length fits in the
+	// input and in an int64, and the sum would wrap to a negative slice bound.
+	if n > len(s)-start {
 		return nil, i, ErrSyntax
 	}
 	return NewString(s[start : start+n]), start + n, nil

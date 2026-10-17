@@ -35,6 +35,10 @@ original bytes. `TestCanonicalIsAFixedPoint` pins that property.
 encoder would emit it" is a different message to show a user than "this is not
 bencode".
 
+A nil never reaches the encoding: `Set` ignores a nil value and `NewList`
+drops a nil item, because a nil would encode to nothing and emit a
+dictionary or a list that this package's own `Decode` rejects.
+
 Accessors never panic. `Int`, `Text`, `Len`, `At` and `Get` return the zero
 value for the wrong kind or a nil receiver, so walking a document of unknown
 shape cannot abort a realm call. Input is bounded by `MaxLen` (8192 bytes) and

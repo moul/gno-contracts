@@ -18,7 +18,10 @@ library, no codec logic lives here. Stateless, so `Render` is deterministic.
 The whole render path after the colon is taken as the value to decode, not a
 path segment: a bencoded value is full of colons and digits, and splitting on
 them would mangle the input before the decoder ever sees it. Caller text is
-escaped with `ui.Inline` before it reaches the page.
+escaped with `ui.Inline` before it reaches the page. Nothing is trimmed
+either: a trailing space is part of the string that declared its length,
+so trimming it would reject a valid value for the trim rather than for
+itself.
 
 The page refuses an input over 512 bytes, which is tighter than the library's
 own 8192. A `Render` runs under the chain's query gas meter and gnoweb does not

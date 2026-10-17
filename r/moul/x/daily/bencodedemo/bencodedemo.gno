@@ -198,6 +198,9 @@ func leaf(v *bencode.Value) string {
 
 // parseArg takes the whole render path as the value to decode: a bencoded
 // string contains colons and digits, and splitting on them would mangle it.
+// Only the routing slash comes off. Trimming whitespace would eat a byte the
+// caller declared the length of, so "6:hello " would arrive as a five byte
+// string claiming six and be rejected for the trim rather than for itself.
 func parseArg(path string) string {
-	return strings.TrimPrefix(strings.TrimSpace(path), "/")
+	return strings.TrimPrefix(path, "/")
 }

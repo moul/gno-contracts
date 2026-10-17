@@ -191,3 +191,41 @@ func TestCanonicalIsAFixedPoint(t *testing.T) {
 	uassert.NoError(t, err)
 	uassert.Equal(t, first, v.Encode())
 }
+
+func TestNilValuesNeverReachTheEncoding(t *testing.T) {
+	// A nil child would encode to nothing, which silently produces a
+	// dictionary or a list that this package's own Decode rejects.
+	d := NewDict()
+	d.Set("k", nil)
+	uassert.Equal(t, 0, d.Len())
+	uassert.Equal(t, "de", d.Encode())
+
+	d.Set("k", NewInt(1))
+	d.Set("k", nil)
+	uassert.Equal(t, int64(1), d.Get("k").Int(), "a nil never removes a live entry")
+
+	l := NewList(NewInt(1), nil, NewString("x"))
+	uassert.Equal(t, 2, l.Len())
+	uassert.Equal(t, "li1e1:xe", l.Encode())
+
+	// The property that matters: anything Encode emits, Decode accepts.
+	for _, enc := range []string{d.Encode(), l.Encode()} {
+		_, err := Decode(enc)
+		uassert.NoError(t, err)
+	}
+}
+
+func TestStringLengthNeverOverflows(t *testing.T) {
+	// The length literal is bounded by nothing but MaxLen, so a 19-digit
+	// length fits in the input and in an int64. start+n must not be the
+	// thing that decides whether the slice is in range.
+	for _, in := range []string{
+		"9223372036854775807:x",
+		"9223372036854775806:x",
+		"8000000000000000000:x",
+	} {
+		v, err := Decode(in)
+		uassert.Error(t, err)
+		uassert.True(t, v == nil)
+	}
+}

@@ -26,7 +26,19 @@ func TestRenderRefusesOversizedInput(t *testing.T) {
 // TestRenderEscapesCallerMarkdown pins the escaping, which a pinned example
 // cannot show convincingly: the input there would have to be hostile.
 func TestRenderEscapesCallerMarkdown(t *testing.T) {
-	got := Render("/d3:cow9:[x](/evil)e")
+	// 10 bytes, not 9: a wrong length is rejected before the decoded leaf is
+	// ever rendered, and the test would then only cover the echoed heading.
+	got := Render("/d3:cow10:[x](/evil)e")
+	uassert.False(t, strings.Contains(got, "Rejected"), "the input must decode")
 	uassert.False(t, strings.Contains(got, "[x](/evil)"), "the link must not survive")
-	uassert.True(t, strings.Contains(got, `\[x\]`), "it is escaped instead")
+	uassert.True(t, strings.Contains(got, "**cow**: string "), "the decoded leaf is rendered")
+	uassert.Equal(t, 3, strings.Count(got, `\[x\]`), "escaped in the heading, the leaf and the re-encoding")
+}
+
+// TestRenderKeepsCallerBytes pins that the page does not trim the value it was
+// handed: a trailing space is part of a six byte string, not routing noise.
+func TestRenderKeepsCallerBytes(t *testing.T) {
+	got := Render("/6:hello ")
+	uassert.True(t, strings.Contains(got, "string hello"), "the space-bearing string decodes")
+	uassert.False(t, strings.Contains(got, "Rejected"), "and is not rejected")
 }
