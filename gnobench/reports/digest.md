@@ -10,7 +10,7 @@ Digests and encoders a gno realm can call, measured on gas alone: nothing here p
 | machine | hardware | go | gno revision | gnobench | rows | updated |
 |---|---|---|---|---|--:|---|
 | `darwin-arm64-apple-m4-max-16c` | darwin/arm64, Apple M4 Max, 16 cores, 64 GB | go1.25.9 | `1fc4c140e (2026-09-14)` | `c2e56e29` | 112 | 2026-09-29T12:51:37Z |
-| `linux-amd64-amd-epyc-7763-64-core-processor-4c` | linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores | go1.25.9 | `02606904e (2026-10-10)` | `08f737c2` | 112 | 2026-10-12T06:11:21Z |
+| `linux-amd64-amd-epyc-7763-64-core-processor-4c` | linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores | go1.25.9 | `6c49f5420 (2026-10-15)` | `90c6ac69` | 112 | 2026-10-19T06:03:02Z |
 | `linux-amd64-intel-r-xeon-r-6973p-c-4c` | linux/amd64, Intel(R) Xeon(R) 6973P-C, 4 cores | go1.25.9 | `156777e0d (2026-10-03)` | `45f818b` | 112 | 2026-10-05T06:07:11Z |
 
 ## How to read this
@@ -264,118 +264,118 @@ phase deserialises every object it touches. A deployed realm is always cold.
 
 | candidate | value | mode | workload | n | ops | gas | bytes | d_gas | d_bytes | wall ms | measured | note |
 |---|---|---|---|--:|--:|--:|--:|--:|--:|--:|---|---|
-| `crypto/keccak256` | str | warm | base | 1024 | 1 | 2937094 | 0 | 2937094 | 0 | 3.5 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | base | 256 | 1 | 755802 | 0 | 755802 | 0 | 2.1 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | base | 32 | 1 | 119565 | 0 | 119565 | 0 | 1.8 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | base | 8192 | 1 | 23295593 | 0 | 23295593 | 0 | 16.5 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | chunked32 | 1024 | 32 | 3321198 | 0 | 384104 | 0 | 0.6 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | chunked32 | 256 | 8 | 859148 | 0 | 103346 | 0 | 0.4 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | chunked32 | 32 | 1 | 141019 | 0 | 21454 | 0 | 0.3 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | chunked32 | 8192 | 256 | 26300049 | 0 | 3004456 | 0 | 2.0 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | once | 1024 | 1 | 2977948 | 0 | 40854 | 0 | 0.2 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | once | 256 | 1 | 778909 | 0 | 23107 | 0 | 0.3 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | once | 32 | 1 | 137492 | 0 | 17927 | 0 | 0.1 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | once | 8192 | 1 | 23502025 | 0 | 206432 | 0 | 0.0 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | x64 | 1024 | 64 | 5088320 | 0 | 2151226 | 0 | 1.1 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | x64 | 256 | 64 | 1771598 | 0 | 1015796 | 0 | 0.6 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | x64 | 32 | 64 | 804219 | 0 | 684654 | 0 | 0.6 | 2026-10-12 |  |
-| `crypto/keccak256` | str | warm | x64 | 8192 | 64 | 36043811 | 0 | 12748218 | 0 | 1.8 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | base | 1024 | 1 | 2937031 | 0 | 2937031 | 0 | 3.4 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | base | 256 | 1 | 755739 | 0 | 755739 | 0 | 2.1 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | base | 32 | 1 | 119502 | 0 | 119502 | 0 | 1.7 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | base | 8192 | 1 | 23295530 | 0 | 23295530 | 0 | 16.4 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | chunked32 | 1024 | 32 | 3175126 | 0 | 238095 | 0 | 0.6 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | chunked32 | 256 | 8 | 822468 | 0 | 66729 | 0 | 0.5 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | chunked32 | 32 | 1 | 136245 | 0 | 16743 | 0 | 0.4 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | chunked32 | 8192 | 256 | 25132985 | 0 | 1837455 | 0 | 2.0 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | once | 1024 | 1 | 2958887 | 0 | 21856 | 0 | 0.2 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | once | 256 | 1 | 770909 | 0 | 15170 | 0 | 0.3 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | once | 32 | 1 | 132718 | 0 | 13216 | 0 | 0.2 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | once | 8192 | 1 | 23379728 | 0 | 84198 | 0 | 0.3 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | x64 | 1024 | 64 | 3882024 | 0 | 944993 | 0 | 0.7 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | x64 | 256 | 64 | 1273206 | 0 | 517467 | 0 | 0.5 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | x64 | 32 | 64 | 512291 | 0 | 392789 | 0 | 0.5 | 2026-10-12 |  |
-| `crypto/sha256` | str | warm | x64 | 8192 | 64 | 28230411 | 0 | 4934881 | 0 | 1.1 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | base | 1024 | 1 | 2937026 | 0 | 2937026 | 0 | 995.6 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | base | 256 | 1 | 755734 | 0 | 755734 | 0 | 953.8 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | base | 32 | 1 | 119497 | 0 | 119497 | 0 | 972.5 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | base | 8192 | 1 | 23295525 | 0 | 23295525 | 0 | 983.9 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | chunked32 | 1024 | 32 | 8946184 | 0 | 6009158 | 0 | -32.5 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | chunked32 | 256 | 8 | 2383950 | 0 | 1628216 | 0 | 43.2 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | chunked32 | 32 | 1 | 469934 | 0 | 350437 | 0 | -9.2 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | chunked32 | 8192 | 256 | 70193419 | 0 | 46897894 | 0 | 31.6 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | once | 1024 | 1 | 7477274 | 0 | 4540248 | 0 | 1.6 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | once | 256 | 1 | 2054356 | 0 | 1298622 | 0 | 19.6 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | once | 32 | 1 | 466407 | 0 | 346910 | 0 | 4.8 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | once | 8192 | 1 | 58189932 | 0 | 34894407 | 0 | 15.8 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | x64 | 1024 | 64 | 283086522 | 0 | 280149496 | 0 | 134.0 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | x64 | 256 | 64 | 73441544 | 0 | 72685810 | 0 | 69.6 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | x64 | 32 | 64 | 11896117 | 0 | 11776620 | 0 | -4.5 | 2026-10-12 |  |
-| `encoding/base32` | str | warm | x64 | 8192 | 64 | 2246111197 | 0 | 2222815672 | 0 | 1131.6 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | base | 1024 | 1 | 2937026 | 0 | 2937026 | 0 | 984.3 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | base | 256 | 1 | 755734 | 0 | 755734 | 0 | 991.2 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | base | 32 | 1 | 119497 | 0 | 119497 | 0 | 977.3 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | base | 8192 | 1 | 23295525 | 0 | 23295525 | 0 | 982.6 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | chunked32 | 1024 | 32 | 8167319 | 0 | 5230293 | 0 | 16.3 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | chunked32 | 256 | 8 | 2178661 | 0 | 1422927 | 0 | 11.2 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | chunked32 | 32 | 1 | 431938 | 0 | 312441 | 0 | -9.8 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | chunked32 | 8192 | 256 | 64061178 | 0 | 40765653 | 0 | 41.6 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | once | 1024 | 1 | 6997499 | 0 | 4060473 | 0 | -19.1 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | once | 256 | 1 | 1913514 | 0 | 1157780 | 0 | 3.2 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | once | 32 | 1 | 428411 | 0 | 308914 | 0 | 9.9 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | once | 8192 | 1 | 54445049 | 0 | 31149524 | 0 | 25.9 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | x64 | 1024 | 64 | 253269033 | 0 | 250332007 | 0 | 129.5 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | x64 | 256 | 64 | 65315767 | 0 | 64560033 | 0 | 17.7 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | x64 | 32 | 64 | 10352484 | 0 | 10232987 | 0 | -7.5 | 2026-10-12 |  |
-| `encoding/base64` | str | warm | x64 | 8192 | 64 | 2007326796 | 0 | 1984031271 | 0 | 965.2 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | base | 1024 | 1 | 2936946 | 0 | 2936946 | 0 | 956.1 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | base | 256 | 1 | 755654 | 0 | 755654 | 0 | 953.2 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | base | 32 | 1 | 119417 | 0 | 119417 | 0 | 920.1 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | base | 8192 | 1 | 23295445 | 0 | 23295445 | 0 | 963.5 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | chunked32 | 1024 | 32 | 7059361 | 0 | 4122415 | 0 | -5.6 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | chunked32 | 256 | 8 | 1883295 | 0 | 1127641 | 0 | -20.4 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | chunked32 | 32 | 1 | 373578 | 0 | 254161 | 0 | 36.8 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | chunked32 | 8192 | 256 | 55369028 | 0 | 32073583 | 0 | -1.6 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | once | 1024 | 1 | 6437222 | 0 | 3500276 | 0 | -11.2 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | once | 256 | 1 | 1740097 | 0 | 984443 | 0 | 11.7 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | once | 32 | 1 | 370051 | 0 | 250634 | 0 | 67.0 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | once | 8192 | 1 | 50275593 | 0 | 26980148 | 0 | 11.6 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | x64 | 1024 | 64 | 218954931 | 0 | 216017985 | 0 | 102.1 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | x64 | 256 | 64 | 55760705 | 0 | 55005051 | 0 | 21.1 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | x64 | 32 | 64 | 8161070 | 0 | 8041653 | 0 | 20.8 | 2026-10-12 |  |
-| `encoding/hex` | str | warm | x64 | 8192 | 64 | 1742025238 | 0 | 1718729793 | 0 | 771.9 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | base | 1024 | 1 | 2936946 | 0 | 2936946 | 0 | 23.4 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | base | 256 | 1 | 755654 | 0 | 755654 | 0 | 21.9 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | base | 32 | 1 | 119417 | 0 | 119417 | 0 | 21.9 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | base | 8192 | 1 | 23295445 | 0 | 23295445 | 0 | 36.2 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | chunked32 | 1024 | 32 | 5925753 | 0 | 2988807 | 0 | 2.0 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | chunked32 | 256 | 8 | 1525559 | 0 | 769905 | 0 | 0.9 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | chunked32 | 32 | 1 | 242138 | 0 | 122721 | 0 | 0.6 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | chunked32 | 8192 | 256 | 46993948 | 0 | 23698503 | 0 | 11.2 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | once | 1024 | 1 | 5183496 | 0 | 2246550 | 0 | 1.0 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | once | 256 | 1 | 1355222 | 0 | 599568 | 0 | -0.3 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | once | 32 | 1 | 238611 | 0 | 119194 | 0 | 0.8 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | once | 8192 | 1 | 40927525 | 0 | 17632080 | 0 | 8.0 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | x64 | 1024 | 64 | 144960523 | 0 | 142023577 | 0 | 67.1 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | x64 | 256 | 64 | 37372761 | 0 | 36617107 | 0 | 18.2 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | x64 | 32 | 64 | 5992966 | 0 | 5873549 | 0 | 4.5 | 2026-10-12 |  |
-| `hash/adler32` | str | warm | x64 | 8192 | 64 | 1149992942 | 0 | 1126697497 | 0 | 517.8 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | base | 1024 | 1 | 2937368 | 0 | 2937368 | 0 | 277.3 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | base | 256 | 1 | 756076 | 0 | 756076 | 0 | 268.9 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | base | 32 | 1 | 119839 | 0 | 119839 | 0 | 272.2 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | base | 8192 | 1 | 23295867 | 0 | 23295867 | 0 | 290.1 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | chunked32 | 1024 | 32 | 44015649 | 0 | 41078281 | 0 | 33.0 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | chunked32 | 256 | 8 | 11171644 | 0 | 10415568 | 0 | 24.1 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | chunked32 | 32 | 1 | 1590130 | 0 | 1470291 | 0 | 9.4 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | chunked32 | 8192 | 256 | 350588455 | 0 | 327292588 | 0 | 179.0 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | once | 1024 | 1 | 43926115 | 0 | 40988747 | 0 | 19.1 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | once | 256 | 1 | 11113097 | 0 | 10357021 | 0 | 25.4 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | once | 32 | 1 | 1586603 | 0 | 1466764 | 0 | 1.0 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | once | 8192 | 1 | 360360203 | 0 | 337064336 | 0 | 213.8 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | x64 | 1024 | 64 | 2614258640 | 0 | 2611321272 | 0 | 1373.1 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | x64 | 256 | 64 | 651647262 | 0 | 650891186 | 0 | 350.5 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | x64 | 32 | 64 | 82034955 | 0 | 81915116 | 0 | 51.9 | 2026-10-12 |  |
-| `strconv (hand-rolled hex)` | str | warm | x64 | 8192 | 64 | 21583454835 | 0 | 21560158968 | 0 | 12435.6 | 2026-10-12 |  |
+| `crypto/keccak256` | str | warm | base | 1024 | 1 | 2937094 | 0 | 2937094 | 0 | 3.5 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | base | 256 | 1 | 755802 | 0 | 755802 | 0 | 2.2 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | base | 32 | 1 | 119565 | 0 | 119565 | 0 | 1.7 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | base | 8192 | 1 | 23295593 | 0 | 23295593 | 0 | 16.5 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | chunked32 | 1024 | 32 | 3321198 | 0 | 384104 | 0 | 0.5 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | chunked32 | 256 | 8 | 859148 | 0 | 103346 | 0 | 0.3 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | chunked32 | 32 | 1 | 141019 | 0 | 21454 | 0 | 0.4 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | chunked32 | 8192 | 256 | 26300049 | 0 | 3004456 | 0 | 1.7 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | once | 1024 | 1 | 2977948 | 0 | 40854 | 0 | 0.1 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | once | 256 | 1 | 778909 | 0 | 23107 | 0 | 0.2 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | once | 32 | 1 | 137492 | 0 | 17927 | 0 | 0.3 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | once | 8192 | 1 | 23502025 | 0 | 206432 | 0 | 0.1 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | x64 | 1024 | 64 | 5088320 | 0 | 2151226 | 0 | 1.0 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | x64 | 256 | 64 | 1771598 | 0 | 1015796 | 0 | 0.6 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | x64 | 32 | 64 | 804219 | 0 | 684654 | 0 | 0.6 | 2026-10-19 |  |
+| `crypto/keccak256` | str | warm | x64 | 8192 | 64 | 36043811 | 0 | 12748218 | 0 | 2.3 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | base | 1024 | 1 | 2937031 | 0 | 2937031 | 0 | 3.5 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | base | 256 | 1 | 755739 | 0 | 755739 | 0 | 2.2 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | base | 32 | 1 | 119502 | 0 | 119502 | 0 | 1.8 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | base | 8192 | 1 | 23295530 | 0 | 23295530 | 0 | 16.6 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | chunked32 | 1024 | 32 | 3175126 | 0 | 238095 | 0 | 0.6 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | chunked32 | 256 | 8 | 822468 | 0 | 66729 | 0 | 0.3 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | chunked32 | 32 | 1 | 136245 | 0 | 16743 | 0 | 0.3 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | chunked32 | 8192 | 256 | 25132985 | 0 | 1837455 | 0 | 1.7 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | once | 1024 | 1 | 2958887 | 0 | 21856 | 0 | 0.2 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | once | 256 | 1 | 770909 | 0 | 15170 | 0 | 0.2 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | once | 32 | 1 | 132718 | 0 | 13216 | 0 | 0.2 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | once | 8192 | 1 | 23379728 | 0 | 84198 | 0 | -0.3 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | x64 | 1024 | 64 | 3882024 | 0 | 944993 | 0 | 0.7 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | x64 | 256 | 64 | 1273206 | 0 | 517467 | 0 | 0.5 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | x64 | 32 | 64 | 512291 | 0 | 392789 | 0 | 0.6 | 2026-10-19 |  |
+| `crypto/sha256` | str | warm | x64 | 8192 | 64 | 28230411 | 0 | 4934881 | 0 | 1.0 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | base | 1024 | 1 | 2937026 | 0 | 2937026 | 0 | 1014.5 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | base | 256 | 1 | 755734 | 0 | 755734 | 0 | 1000.7 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | base | 32 | 1 | 119497 | 0 | 119497 | 0 | 987.2 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | base | 8192 | 1 | 23295525 | 0 | 23295525 | 0 | 1024.3 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | chunked32 | 1024 | 32 | 8946184 | 0 | 6009158 | 0 | 29.2 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | chunked32 | 256 | 8 | 2383950 | 0 | 1628216 | 0 | 8.1 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | chunked32 | 32 | 1 | 469934 | 0 | 350437 | 0 | -3.2 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | chunked32 | 8192 | 256 | 70193419 | 0 | 46897894 | 0 | 68.4 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | once | 1024 | 1 | 7477274 | 0 | 4540248 | 0 | -9.4 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | once | 256 | 1 | 2054356 | 0 | 1298622 | 0 | 29.9 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | once | 32 | 1 | 466407 | 0 | 346910 | 0 | -9.6 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | once | 8192 | 1 | 58189932 | 0 | 34894407 | 0 | 6.8 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | x64 | 1024 | 64 | 283086522 | 0 | 280149496 | 0 | 163.2 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | x64 | 256 | 64 | 73441544 | 0 | 72685810 | 0 | 60.7 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | x64 | 32 | 64 | 11896117 | 0 | 11776620 | 0 | 15.7 | 2026-10-19 |  |
+| `encoding/base32` | str | warm | x64 | 8192 | 64 | 2246111197 | 0 | 2222815672 | 0 | 1154.8 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | base | 1024 | 1 | 2937026 | 0 | 2937026 | 0 | 1000.1 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | base | 256 | 1 | 755734 | 0 | 755734 | 0 | 992.8 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | base | 32 | 1 | 119497 | 0 | 119497 | 0 | 1011.1 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | base | 8192 | 1 | 23295525 | 0 | 23295525 | 0 | 1023.0 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | chunked32 | 1024 | 32 | 8167319 | 0 | 5230293 | 0 | 18.0 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | chunked32 | 256 | 8 | 2178661 | 0 | 1422927 | 0 | 5.6 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | chunked32 | 32 | 1 | 431938 | 0 | 312441 | 0 | -5.1 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | chunked32 | 8192 | 256 | 64061178 | 0 | 40765653 | 0 | 38.2 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | once | 1024 | 1 | 6997499 | 0 | 4060473 | 0 | 20.4 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | once | 256 | 1 | 1913514 | 0 | 1157780 | 0 | 13.1 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | once | 32 | 1 | 428411 | 0 | 308914 | 0 | -0.8 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | once | 8192 | 1 | 54445049 | 0 | 31149524 | 0 | 15.8 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | x64 | 1024 | 64 | 253269033 | 0 | 250332007 | 0 | 140.7 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | x64 | 256 | 64 | 65315767 | 0 | 64560033 | 0 | 72.9 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | x64 | 32 | 64 | 10352484 | 0 | 10232987 | 0 | 21.2 | 2026-10-19 |  |
+| `encoding/base64` | str | warm | x64 | 8192 | 64 | 2007326796 | 0 | 1984031271 | 0 | 962.3 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | base | 1024 | 1 | 2936946 | 0 | 2936946 | 0 | 960.0 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | base | 256 | 1 | 755654 | 0 | 755654 | 0 | 955.2 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | base | 32 | 1 | 119417 | 0 | 119417 | 0 | 938.6 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | base | 8192 | 1 | 23295445 | 0 | 23295445 | 0 | 983.2 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | chunked32 | 1024 | 32 | 7059361 | 0 | 4122415 | 0 | 9.9 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | chunked32 | 256 | 8 | 1883295 | 0 | 1127641 | 0 | 4.6 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | chunked32 | 32 | 1 | 373578 | 0 | 254161 | 0 | 48.1 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | chunked32 | 8192 | 256 | 55369028 | 0 | 32073583 | 0 | 14.4 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | once | 1024 | 1 | 6437222 | 0 | 3500276 | 0 | -2.6 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | once | 256 | 1 | 1740097 | 0 | 984443 | 0 | 19.0 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | once | 32 | 1 | 370051 | 0 | 250634 | 0 | 22.9 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | once | 8192 | 1 | 50275593 | 0 | 26980148 | 0 | 17.9 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | x64 | 1024 | 64 | 218954931 | 0 | 216017985 | 0 | 122.6 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | x64 | 256 | 64 | 55760705 | 0 | 55005051 | 0 | 56.2 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | x64 | 32 | 64 | 8161070 | 0 | 8041653 | 0 | 27.1 | 2026-10-19 |  |
+| `encoding/hex` | str | warm | x64 | 8192 | 64 | 1742025238 | 0 | 1718729793 | 0 | 755.9 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | base | 1024 | 1 | 2936946 | 0 | 2936946 | 0 | 24.1 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | base | 256 | 1 | 755654 | 0 | 755654 | 0 | 22.2 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | base | 32 | 1 | 119417 | 0 | 119417 | 0 | 22.9 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | base | 8192 | 1 | 23295445 | 0 | 23295445 | 0 | 36.7 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | chunked32 | 1024 | 32 | 5925753 | 0 | 2988807 | 0 | 0.5 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | chunked32 | 256 | 8 | 1525559 | 0 | 769905 | 0 | 0.2 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | chunked32 | 32 | 1 | 242138 | 0 | 122721 | 0 | -0.1 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | chunked32 | 8192 | 256 | 46993948 | 0 | 23698503 | 0 | 10.9 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | once | 1024 | 1 | 5183496 | 0 | 2246550 | 0 | 0.6 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | once | 256 | 1 | 1355222 | 0 | 599568 | 0 | 0.2 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | once | 32 | 1 | 238611 | 0 | 119194 | 0 | -1.0 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | once | 8192 | 1 | 40927525 | 0 | 17632080 | 0 | 7.7 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | x64 | 1024 | 64 | 144960523 | 0 | 142023577 | 0 | 65.1 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | x64 | 256 | 64 | 37372761 | 0 | 36617107 | 0 | 17.7 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | x64 | 32 | 64 | 5992966 | 0 | 5873549 | 0 | 2.0 | 2026-10-19 |  |
+| `hash/adler32` | str | warm | x64 | 8192 | 64 | 1149992942 | 0 | 1126697497 | 0 | 513.4 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | base | 1024 | 1 | 2937368 | 0 | 2937368 | 0 | 300.1 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | base | 256 | 1 | 756076 | 0 | 756076 | 0 | 285.3 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | base | 32 | 1 | 119839 | 0 | 119839 | 0 | 292.4 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | base | 8192 | 1 | 23295867 | 0 | 23295867 | 0 | 306.1 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | chunked32 | 1024 | 32 | 44015649 | 0 | 41078281 | 0 | 5.8 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | chunked32 | 256 | 8 | 11171644 | 0 | 10415568 | 0 | 13.5 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | chunked32 | 32 | 1 | 1590130 | 0 | 1470291 | 0 | -7.4 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | chunked32 | 8192 | 256 | 350588455 | 0 | 327292588 | 0 | 165.2 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | once | 1024 | 1 | 43926115 | 0 | 40988747 | 0 | 4.4 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | once | 256 | 1 | 11113097 | 0 | 10357021 | 0 | 14.6 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | once | 32 | 1 | 1586603 | 0 | 1466764 | 0 | -0.4 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | once | 8192 | 1 | 360360203 | 0 | 337064336 | 0 | 198.1 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | x64 | 1024 | 64 | 2614258640 | 0 | 2611321272 | 0 | 1345.5 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | x64 | 256 | 64 | 651647262 | 0 | 650891186 | 0 | 336.7 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | x64 | 32 | 64 | 82034955 | 0 | 81915116 | 0 | 45.7 | 2026-10-19 |  |
+| `strconv (hand-rolled hex)` | str | warm | x64 | 8192 | 64 | 21583454835 | 0 | 21560158968 | 0 | 12459.8 | 2026-10-19 |  |
 
 </details>
 

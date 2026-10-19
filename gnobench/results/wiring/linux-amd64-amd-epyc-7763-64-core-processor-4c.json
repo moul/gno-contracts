@@ -7,13 +7,13 @@
     "arch": "amd64",
     "cpu": "AMD EPYC 7763 64-Core Processor",
     "cpus": 4,
-    "host": "runnervmmprz5",
+    "host": "runnervm8k3b6",
     "go_version": "go1.25.9",
-    "gnobench_commit": "08f737c2",
-    "gno_commit": "02606904e30753f7775246624bfec96cb4749891",
-    "gno_commit_date": "2026-10-10"
+    "gnobench_commit": "90c6ac69",
+    "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37",
+    "gno_commit_date": "2026-10-15"
   },
-  "updated_at": "2026-10-12T06:08:59Z",
+  "updated_at": "2026-10-19T06:00:37Z",
   "rows": {
     "builtin []string|str|cold|one_tx|100": {
       "structure": "builtin []string",
@@ -25,10 +25,10 @@
       "ops": 100,
       "gas": 2679253,
       "bytes": 8223,
-      "wall_ns": 13786936,
+      "wall_ns": 14870368,
       "d_gas": 2679253,
       "d_bytes": 8223,
-      "d_wall_ns": 13786936,
+      "d_wall_ns": 14870368,
       "kv_sets": 5,
       "kv_set_bytes": 10064,
       "kv_key_bytes": 4896,
@@ -37,8 +37,8 @@
       "kv_dels": 99,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:02Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:39Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|one_tx|1000": {
       "structure": "builtin []string",
@@ -50,10 +50,10 @@
       "ops": 1000,
       "gas": 154349043,
       "bytes": 79328,
-      "wall_ns": 386202716,
+      "wall_ns": 417867887,
       "d_gas": 154349043,
       "d_bytes": 79328,
-      "d_wall_ns": 386202716,
+      "d_wall_ns": 417867887,
       "kv_sets": 5,
       "kv_set_bytes": 81170,
       "kv_key_bytes": 48106,
@@ -62,8 +62,8 @@
       "kv_dels": 999,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:02Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:40Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|op_base|100": {
       "structure": "builtin []string",
@@ -75,7 +75,7 @@
       "ops": 1,
       "gas": 11552,
       "bytes": 0,
-      "wall_ns": 201227,
+      "wall_ns": 232787,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -83,8 +83,8 @@
       "kv_get_bytes": 2862,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:02Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:40Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|op_base|1000": {
       "structure": "builtin []string",
@@ -96,7 +96,7 @@
       "ops": 1,
       "gas": 11558,
       "bytes": 0,
-      "wall_ns": 288749,
+      "wall_ns": 293662,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -104,8 +104,8 @@
       "kv_get_bytes": 2864,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:07Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:44Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|op_read|100": {
       "structure": "builtin []string",
@@ -117,18 +117,18 @@
       "ops": 1,
       "gas": 38262,
       "bytes": 0,
-      "wall_ns": 468626,
+      "wall_ns": 508655,
       "d_gas": 26710,
       "d_bytes": 0,
-      "d_wall_ns": 267399,
+      "d_wall_ns": 275868,
       "kv_gets": 7,
       "kv_get_bytes": 11346,
       "d_kv_gets": 2,
       "d_kv_get_bytes": 8484,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:02Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:40Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|op_read|1000": {
       "structure": "builtin []string",
@@ -140,18 +140,18 @@
       "ops": 1,
       "gas": 257385,
       "bytes": 0,
-      "wall_ns": 2606767,
+      "wall_ns": 2649347,
       "d_gas": 245827,
       "d_bytes": 0,
-      "d_wall_ns": 2318018,
+      "d_wall_ns": 2355685,
       "kv_gets": 7,
       "kv_get_bytes": 82452,
       "d_kv_gets": 2,
       "d_kv_get_bytes": 79588,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:08Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:45Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|op_write|100": {
       "structure": "builtin []string",
@@ -163,10 +163,10 @@
       "ops": 1,
       "gas": 68433,
       "bytes": -3,
-      "wall_ns": 594421,
+      "wall_ns": 644090,
       "d_gas": 56881,
       "d_bytes": -3,
-      "d_wall_ns": 393194,
+      "d_wall_ns": 411303,
       "kv_sets": 4,
       "kv_set_bytes": 9992,
       "kv_key_bytes": 182,
@@ -178,8 +178,8 @@
       "d_kv_set_bytes": 9992,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:02Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:40Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|op_write|1000": {
       "structure": "builtin []string",
@@ -191,10 +191,10 @@
       "ops": 1,
       "gas": 500877,
       "bytes": -1,
-      "wall_ns": 3150892,
+      "wall_ns": 3212986,
       "d_gas": 489319,
       "d_bytes": -1,
-      "d_wall_ns": 2862143,
+      "d_wall_ns": 2919324,
       "kv_sets": 4,
       "kv_set_bytes": 81099,
       "kv_key_bytes": 183,
@@ -206,8 +206,8 @@
       "d_kv_set_bytes": 81099,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:08Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:46Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|tx_each|100": {
       "structure": "builtin []string",
@@ -219,10 +219,10 @@
       "ops": 100,
       "gas": 5030493,
       "bytes": 8223,
-      "wall_ns": 45743437,
+      "wall_ns": 57419527,
       "d_gas": 5030493,
       "d_bytes": 8223,
-      "d_wall_ns": 45743437,
+      "d_wall_ns": 57419527,
       "kv_sets": 500,
       "kv_set_bytes": 615044,
       "kv_key_bytes": 27972,
@@ -231,8 +231,8 @@
       "kv_dels": 99,
       "txs": 100,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:02Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:39Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin []string|str|cold|tx_each|1000": {
       "structure": "builtin []string",
@@ -244,10 +244,10 @@
       "ops": 1000,
       "gas": 287617450,
       "bytes": 79328,
-      "wall_ns": 1807050707,
+      "wall_ns": 1834195187,
       "d_gas": 287617450,
       "d_bytes": 79328,
-      "d_wall_ns": 1807050707,
+      "d_wall_ns": 1834195187,
       "kv_sets": 5000,
       "kv_set_bytes": 41706654,
       "kv_key_bytes": 281791,
@@ -256,8 +256,8 @@
       "kv_dels": 999,
       "txs": 1000,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:03Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:41Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|one_tx|100": {
       "structure": "builtin map[string]string",
@@ -269,10 +269,10 @@
       "ops": 100,
       "gas": 3242294,
       "bytes": 15317,
-      "wall_ns": 14485412,
+      "wall_ns": 15315399,
       "d_gas": 3242294,
       "d_bytes": 15317,
-      "d_wall_ns": 14485412,
+      "d_wall_ns": 15315399,
       "kv_sets": 4,
       "kv_set_bytes": 17395,
       "kv_key_bytes": 180,
@@ -280,8 +280,8 @@
       "kv_get_bytes": 3424,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:09Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:47Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|one_tx|1000": {
       "structure": "builtin map[string]string",
@@ -293,10 +293,10 @@
       "ops": 1000,
       "gas": 238878905,
       "bytes": 153019,
-      "wall_ns": 677802721,
+      "wall_ns": 652287583,
       "d_gas": 238878905,
       "d_bytes": 153019,
-      "d_wall_ns": 677802721,
+      "d_wall_ns": 652287583,
       "kv_sets": 4,
       "kv_set_bytes": 155097,
       "kv_key_bytes": 180,
@@ -304,8 +304,8 @@
       "kv_get_bytes": 3424,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:09Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:47Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|op_base|100": {
       "structure": "builtin map[string]string",
@@ -317,7 +317,7 @@
       "ops": 1,
       "gas": 11558,
       "bytes": 0,
-      "wall_ns": 211545,
+      "wall_ns": 222848,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -325,8 +325,8 @@
       "kv_get_bytes": 2864,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:09Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:47Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|op_base|1000": {
       "structure": "builtin map[string]string",
@@ -338,7 +338,7 @@
       "ops": 1,
       "gas": 11558,
       "bytes": 0,
-      "wall_ns": 269433,
+      "wall_ns": 270218,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -346,8 +346,8 @@
       "kv_get_bytes": 2864,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:18Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:55Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|op_read|100": {
       "structure": "builtin map[string]string",
@@ -359,18 +359,18 @@
       "ops": 1,
       "gas": 69937,
       "bytes": 0,
-      "wall_ns": 762423,
+      "wall_ns": 759627,
       "d_gas": 58379,
       "d_bytes": 0,
-      "d_wall_ns": 550878,
+      "d_wall_ns": 536779,
       "kv_gets": 7,
       "kv_get_bytes": 18746,
       "d_kv_gets": 2,
       "d_kv_get_bytes": 15882,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:09Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:47Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|op_read|1000": {
       "structure": "builtin map[string]string",
@@ -382,18 +382,18 @@
       "ops": 1,
       "gas": 572302,
       "bytes": 0,
-      "wall_ns": 5061215,
+      "wall_ns": 5163069,
       "d_gas": 560744,
       "d_bytes": 0,
-      "d_wall_ns": 4791782,
+      "d_wall_ns": 4892851,
       "kv_gets": 7,
       "kv_get_bytes": 156448,
       "d_kv_gets": 2,
       "d_kv_get_bytes": 153584,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:19Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:56Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|op_write|100": {
       "structure": "builtin map[string]string",
@@ -405,10 +405,10 @@
       "ops": 1,
       "gas": 122293,
       "bytes": -8,
-      "wall_ns": 884481,
+      "wall_ns": 925027,
       "d_gas": 110735,
       "d_bytes": -8,
-      "d_wall_ns": 672936,
+      "d_wall_ns": 702179,
       "kv_sets": 4,
       "kv_set_bytes": 17387,
       "kv_key_bytes": 180,
@@ -420,8 +420,8 @@
       "d_kv_set_bytes": 17387,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:09Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:47Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|op_write|1000": {
       "structure": "builtin map[string]string",
@@ -433,10 +433,10 @@
       "ops": 1,
       "gas": 1037764,
       "bytes": -8,
-      "wall_ns": 7074540,
+      "wall_ns": 6238640,
       "d_gas": 1026206,
       "d_bytes": -8,
-      "d_wall_ns": 6805107,
+      "d_wall_ns": 5968422,
       "kv_sets": 4,
       "kv_set_bytes": 155089,
       "kv_key_bytes": 180,
@@ -448,8 +448,8 @@
       "d_kv_set_bytes": 155089,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:20Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:58Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|tx_each|100": {
       "structure": "builtin map[string]string",
@@ -461,10 +461,10 @@
       "ops": 100,
       "gas": 7133016,
       "bytes": 15317,
-      "wall_ns": 60198406,
+      "wall_ns": 62051501,
       "d_gas": 7133016,
       "d_bytes": 15317,
-      "d_wall_ns": 60198406,
+      "d_wall_ns": 62051501,
       "kv_sets": 400,
       "kv_set_bytes": 982097,
       "kv_key_bytes": 18000,
@@ -472,8 +472,8 @@
       "kv_get_bytes": 1101380,
       "txs": 100,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:09Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:47Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "builtin map[string]string|str|cold|tx_each|1000": {
       "structure": "builtin map[string]string",
@@ -485,10 +485,10 @@
       "ops": 1000,
       "gas": 528957620,
       "bytes": 153019,
-      "wall_ns": 3382911569,
+      "wall_ns": 3447351873,
       "d_gas": 528957620,
       "d_bytes": 153019,
-      "d_wall_ns": 3382911569,
+      "d_wall_ns": 3447351873,
       "kv_sets": 4000,
       "kv_set_bytes": 78673234,
       "kv_key_bytes": 180000,
@@ -496,8 +496,8 @@
       "kv_get_bytes": 79866215,
       "txs": 1000,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:11Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:48Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|one_tx|100": {
       "structure": "p/moul/ulist/v1",
@@ -509,10 +509,10 @@
       "ops": 100,
       "gas": 6824344,
       "bytes": 92261,
-      "wall_ns": 26205788,
+      "wall_ns": 24259685,
       "d_gas": 6824344,
       "d_bytes": 92261,
-      "d_wall_ns": 26205788,
+      "d_wall_ns": 24259685,
       "kv_sets": 206,
       "kv_set_bytes": 94943,
       "kv_key_bytes": 9790,
@@ -520,8 +520,8 @@
       "kv_get_bytes": 20492,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:53Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:31Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|one_tx|1000": {
       "structure": "p/moul/ulist/v1",
@@ -533,10 +533,10 @@
       "ops": 1000,
       "gas": 91791018,
       "bytes": 928212,
-      "wall_ns": 303270672,
+      "wall_ns": 305923503,
       "d_gas": 91791018,
       "d_bytes": 928212,
-      "d_wall_ns": 303270672,
+      "d_wall_ns": 305923503,
       "kv_sets": 2006,
       "kv_set_bytes": 930894,
       "kv_key_bytes": 97202,
@@ -544,8 +544,8 @@
       "kv_get_bytes": 20492,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:54Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:32Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|op_base|100": {
       "structure": "p/moul/ulist/v1",
@@ -557,7 +557,7 @@
       "ops": 1,
       "gas": 12089,
       "bytes": 0,
-      "wall_ns": 232755,
+      "wall_ns": 243197,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -565,8 +565,8 @@
       "kv_get_bytes": 3032,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:53Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:32Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|op_base|1000": {
       "structure": "p/moul/ulist/v1",
@@ -578,7 +578,7 @@
       "ops": 1,
       "gas": 12089,
       "bytes": 0,
-      "wall_ns": 307024,
+      "wall_ns": 307488,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -586,8 +586,8 @@
       "kv_get_bytes": 3032,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:57Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:35Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|op_read|100": {
       "structure": "p/moul/ulist/v1",
@@ -599,18 +599,18 @@
       "ops": 1,
       "gas": 129439,
       "bytes": 0,
-      "wall_ns": 817437,
+      "wall_ns": 781799,
       "d_gas": 117350,
       "d_bytes": 0,
-      "d_wall_ns": 584682,
+      "d_wall_ns": 538602,
       "kv_gets": 28,
       "kv_get_bytes": 26716,
       "d_kv_gets": 23,
       "d_kv_get_bytes": 23684,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:53Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:32Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|op_read|1000": {
       "structure": "p/moul/ulist/v1",
@@ -622,18 +622,18 @@
       "ops": 1,
       "gas": 152710,
       "bytes": 0,
-      "wall_ns": 1007603,
+      "wall_ns": 938362,
       "d_gas": 140621,
       "d_bytes": 0,
-      "d_wall_ns": 700579,
+      "d_wall_ns": 630874,
       "kv_gets": 34,
       "kv_get_bytes": 29914,
       "d_kv_gets": 29,
       "d_kv_get_bytes": 26882,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:57Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:36Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|op_write|100": {
       "structure": "p/moul/ulist/v1",
@@ -645,10 +645,10 @@
       "ops": 1,
       "gas": 158814,
       "bytes": 6,
-      "wall_ns": 992875,
+      "wall_ns": 952469,
       "d_gas": 146725,
       "d_bytes": 6,
-      "d_wall_ns": 760120,
+      "d_wall_ns": 709272,
       "kv_sets": 17,
       "kv_set_bytes": 8835,
       "kv_key_bytes": 792,
@@ -660,8 +660,8 @@
       "d_kv_set_bytes": 8835,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:54Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:32Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|op_write|1000": {
       "structure": "p/moul/ulist/v1",
@@ -673,10 +673,10 @@
       "ops": 1,
       "gas": 191313,
       "bytes": 4,
-      "wall_ns": 1255436,
+      "wall_ns": 1219982,
       "d_gas": 179224,
       "d_bytes": 4,
-      "d_wall_ns": 948412,
+      "d_wall_ns": 912494,
       "kv_sets": 23,
       "kv_set_bytes": 12031,
       "kv_key_bytes": 1082,
@@ -688,8 +688,8 @@
       "d_kv_set_bytes": 12031,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:58Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:36Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|tx_each|100": {
       "structure": "p/moul/ulist/v1",
@@ -701,10 +701,10 @@
       "ops": 100,
       "gas": 14792370,
       "bytes": 92261,
-      "wall_ns": 92873562,
+      "wall_ns": 92906178,
       "d_gas": 14792370,
       "d_bytes": 92261,
-      "d_wall_ns": 92873562,
+      "d_wall_ns": 92906178,
       "kv_sets": 1760,
       "kv_set_bytes": 861442,
       "kv_key_bytes": 82456,
@@ -712,8 +712,8 @@
       "kv_get_bytes": 2550280,
       "txs": 100,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:53Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:31Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/moul/ulist/v1|str|cold|tx_each|1000": {
       "structure": "p/moul/ulist/v1",
@@ -725,10 +725,10 @@
       "ops": 1000,
       "gas": 182485184,
       "bytes": 928212,
-      "wall_ns": 1121355551,
+      "wall_ns": 1136892559,
       "d_gas": 182485184,
       "d_bytes": 928212,
-      "d_wall_ns": 1121355551,
+      "d_wall_ns": 1136892559,
       "kv_sets": 23974,
       "kv_set_bytes": 12012091,
       "kv_key_bytes": 1131064,
@@ -736,8 +736,8 @@
       "kv_get_bytes": 28894878,
       "txs": 1000,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:54Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:33Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|one_tx|100": {
       "structure": "p/nt/avl/v0",
@@ -749,10 +749,10 @@
       "ops": 100,
       "gas": 30498701,
       "bytes": 202563,
-      "wall_ns": 59988873,
+      "wall_ns": 60048606,
       "d_gas": 30498701,
       "d_bytes": 202563,
-      "d_wall_ns": 59988873,
+      "d_wall_ns": 60048606,
       "kv_sets": 404,
       "kv_set_bytes": 205153,
       "kv_key_bytes": 74172,
@@ -761,8 +761,8 @@
       "kv_dels": 1132,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:22Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:59Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|one_tx|1000": {
       "structure": "p/nt/avl/v0",
@@ -774,10 +774,10 @@
       "ops": 1000,
       "gas": 441098958,
       "bytes": 2049561,
-      "wall_ns": 812061831,
+      "wall_ns": 835802324,
       "d_gas": 441098958,
       "d_bytes": 2049561,
-      "d_wall_ns": 812061831,
+      "d_wall_ns": 835802324,
       "kv_sets": 4004,
       "kv_set_bytes": 2052152,
       "kv_key_bytes": 1085814,
@@ -786,8 +786,8 @@
       "kv_dels": 17934,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:23Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:00Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|op_base|100": {
       "structure": "p/nt/avl/v0",
@@ -799,7 +799,7 @@
       "ops": 1,
       "gas": 12074,
       "bytes": 0,
-      "wall_ns": 279413,
+      "wall_ns": 285035,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -807,8 +807,8 @@
       "kv_get_bytes": 3027,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:22Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:00Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|op_base|1000": {
       "structure": "p/nt/avl/v0",
@@ -820,7 +820,7 @@
       "ops": 1,
       "gas": 12080,
       "bytes": 0,
-      "wall_ns": 306823,
+      "wall_ns": 320633,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -828,8 +828,8 @@
       "kv_get_bytes": 3029,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:29Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:06Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|op_read|100": {
       "structure": "p/nt/avl/v0",
@@ -841,18 +841,18 @@
       "ops": 1,
       "gas": 192559,
       "bytes": 0,
-      "wall_ns": 944515,
+      "wall_ns": 1001010,
       "d_gas": 180485,
       "d_bytes": 0,
-      "d_wall_ns": 665102,
+      "d_wall_ns": 715975,
       "kv_gets": 32,
       "kv_get_bytes": 42055,
       "d_kv_gets": 27,
       "d_kv_get_bytes": 39028,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:22Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:00Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|op_read|1000": {
       "structure": "p/nt/avl/v0",
@@ -864,18 +864,18 @@
       "ops": 1,
       "gas": 229333,
       "bytes": 0,
-      "wall_ns": 1200954,
+      "wall_ns": 1329007,
       "d_gas": 217253,
       "d_bytes": 0,
-      "d_wall_ns": 894131,
+      "d_wall_ns": 1008374,
       "kv_gets": 38,
       "kv_get_bytes": 45522,
       "d_kv_gets": 33,
       "d_kv_get_bytes": 42493,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:30Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:08Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|op_write|100": {
       "structure": "p/nt/avl/v0",
@@ -887,10 +887,10 @@
       "ops": 1,
       "gas": 303370,
       "bytes": -20,
-      "wall_ns": 1603887,
+      "wall_ns": 1631043,
       "d_gas": 291296,
       "d_bytes": -20,
-      "d_wall_ns": 1324474,
+      "d_wall_ns": 1346008,
       "kv_sets": 29,
       "kv_set_bytes": 13933,
       "kv_key_bytes": 2175,
@@ -904,8 +904,8 @@
       "d_kv_dels": 16,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:22Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:00Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|op_write|1000": {
       "structure": "p/nt/avl/v0",
@@ -917,10 +917,10 @@
       "ops": 1,
       "gas": 378253,
       "bytes": -47,
-      "wall_ns": 2189732,
+      "wall_ns": 2307715,
       "d_gas": 366173,
       "d_bytes": -47,
-      "d_wall_ns": 1882909,
+      "d_wall_ns": 1987082,
       "kv_sets": 38,
       "kv_set_bytes": 18477,
       "kv_key_bytes": 2972,
@@ -934,8 +934,8 @@
       "d_kv_dels": 22,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:32Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:10Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|tx_each|100": {
       "structure": "p/nt/avl/v0",
@@ -947,10 +947,10 @@
       "ops": 100,
       "gas": 45576329,
       "bytes": 202563,
-      "wall_ns": 171530508,
+      "wall_ns": 174935567,
       "d_gas": 45576329,
       "d_bytes": 202563,
-      "d_wall_ns": 171530508,
+      "d_wall_ns": 174935567,
       "kv_sets": 2795,
       "kv_set_bytes": 1339577,
       "kv_key_bytes": 188451,
@@ -959,8 +959,8 @@
       "kv_dels": 1132,
       "txs": 100,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:22Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T05:59:59Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/avl/v0|str|cold|tx_each|1000": {
       "structure": "p/nt/avl/v0",
@@ -972,10 +972,10 @@
       "ops": 1000,
       "gas": 618052802,
       "bytes": 2049561,
-      "wall_ns": 2222937667,
+      "wall_ns": 2298426199,
       "d_gas": 618052802,
       "d_bytes": 2049561,
-      "d_wall_ns": 2222937667,
+      "d_wall_ns": 2298426199,
       "kv_sets": 37898,
       "kv_set_bytes": 18384325,
       "kv_key_bytes": 2744204,
@@ -984,8 +984,8 @@
       "kv_dels": 17934,
       "txs": 1000,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:24Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:02Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|one_tx|100": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -997,10 +997,10 @@
       "ops": 100,
       "gas": 13799446,
       "bytes": 55813,
-      "wall_ns": 43871824,
+      "wall_ns": 46354432,
       "d_gas": 13799446,
       "d_bytes": 55813,
-      "d_wall_ns": 43871824,
+      "d_wall_ns": 46354432,
       "kv_sets": 110,
       "kv_set_bytes": 58421,
       "kv_key_bytes": 5182,
@@ -1008,8 +1008,8 @@
       "kv_get_bytes": 35307,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:42Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:20Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|one_tx|1000": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1021,10 +1021,10 @@
       "ops": 1000,
       "gas": 190039480,
       "bytes": 553811,
-      "wall_ns": 558083698,
+      "wall_ns": 575192467,
       "d_gas": 190039480,
       "d_bytes": 553811,
-      "d_wall_ns": 558083698,
+      "d_wall_ns": 575192467,
       "kv_sets": 1043,
       "kv_set_bytes": 556420,
       "kv_key_bytes": 50701,
@@ -1033,8 +1033,8 @@
       "kv_dels": 14,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:43Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:21Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|op_base|100": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1046,7 +1046,7 @@
       "ops": 1,
       "gas": 12080,
       "bytes": 0,
-      "wall_ns": 238405,
+      "wall_ns": 280397,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -1054,8 +1054,8 @@
       "kv_get_bytes": 3029,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:42Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:20Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|op_base|1000": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1067,7 +1067,7 @@
       "ops": 1,
       "gas": 12086,
       "bytes": 0,
-      "wall_ns": 291565,
+      "wall_ns": 289393,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -1075,8 +1075,8 @@
       "kv_get_bytes": 3031,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:50Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:28Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|op_read|100": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1088,18 +1088,18 @@
       "ops": 1,
       "gas": 241454,
       "bytes": 0,
-      "wall_ns": 1850137,
+      "wall_ns": 1923493,
       "d_gas": 229374,
       "d_bytes": 0,
-      "d_wall_ns": 1611732,
+      "d_wall_ns": 1643096,
       "kv_gets": 25,
       "kv_get_bytes": 64933,
       "d_kv_gets": 20,
       "d_kv_get_bytes": 61904,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:42Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:21Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|op_read|1000": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1111,18 +1111,18 @@
       "ops": 1,
       "gas": 310160,
       "bytes": 0,
-      "wall_ns": 2342356,
+      "wall_ns": 2452938,
       "d_gas": 298074,
       "d_bytes": 0,
-      "d_wall_ns": 2050791,
+      "d_wall_ns": 2163545,
       "kv_gets": 29,
       "kv_get_bytes": 79463,
       "d_kv_gets": 24,
       "d_kv_get_bytes": 76432,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:51Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:29Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|op_write|100": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1134,10 +1134,10 @@
       "ops": 1,
       "gas": 316711,
       "bytes": -3,
-      "wall_ns": 2207886,
+      "wall_ns": 2246960,
       "d_gas": 304631,
       "d_bytes": -3,
-      "d_wall_ns": 1969481,
+      "d_wall_ns": 1966563,
       "kv_sets": 9,
       "kv_set_bytes": 24345,
       "kv_key_bytes": 414,
@@ -1149,8 +1149,8 @@
       "d_kv_set_bytes": 24345,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:43Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:21Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|op_write|1000": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1162,10 +1162,10 @@
       "ops": 1,
       "gas": 318338,
       "bytes": -8,
-      "wall_ns": 2444628,
+      "wall_ns": 2429534,
       "d_gas": 306252,
       "d_bytes": -8,
-      "d_wall_ns": 2153063,
+      "d_wall_ns": 2140141,
       "kv_sets": 1,
       "kv_set_bytes": 259,
       "kv_key_bytes": 48,
@@ -1177,8 +1177,8 @@
       "d_kv_set_bytes": 259,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:52Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:30Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|tx_each|100": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1190,10 +1190,10 @@
       "ops": 100,
       "gas": 31081642,
       "bytes": 55813,
-      "wall_ns": 202547425,
+      "wall_ns": 209058171,
       "d_gas": 31081642,
       "d_bytes": 55813,
-      "d_wall_ns": 202547425,
+      "d_wall_ns": 209058171,
       "kv_sets": 1100,
       "kv_set_bytes": 2466320,
       "kv_key_bytes": 51316,
@@ -1201,8 +1201,8 @@
       "kv_get_bytes": 5627343,
       "txs": 100,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:42Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:20Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=128|str|cold|tx_each|1000": {
       "structure": "p/nt/bptree/v0 fanout=128",
@@ -1214,10 +1214,10 @@
       "ops": 1000,
       "gas": 412126219,
       "bytes": 553811,
-      "wall_ns": 2756788685,
+      "wall_ns": 2770334673,
       "d_gas": 412126219,
       "d_bytes": 553811,
-      "d_wall_ns": 2756788685,
+      "d_wall_ns": 2770334673,
       "kv_sets": 15419,
       "kv_set_bytes": 35304540,
       "kv_key_bytes": 730163,
@@ -1226,8 +1226,8 @@
       "kv_dels": 14,
       "txs": 1000,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:44Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:22Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|one_tx|100": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1239,10 +1239,10 @@
       "ops": 100,
       "gas": 11420488,
       "bytes": 66050,
-      "wall_ns": 36028704,
+      "wall_ns": 36609123,
       "d_gas": 11420488,
       "d_bytes": 66050,
-      "d_wall_ns": 36028704,
+      "d_wall_ns": 36609123,
       "kv_sets": 127,
       "kv_set_bytes": 68659,
       "kv_key_bytes": 6286,
@@ -1251,8 +1251,8 @@
       "kv_dels": 6,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:34Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:12Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|one_tx|1000": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1264,10 +1264,10 @@
       "ops": 1000,
       "gas": 139932849,
       "bytes": 601139,
-      "wall_ns": 397191538,
+      "wall_ns": 419085769,
       "d_gas": 139932849,
       "d_bytes": 601139,
-      "d_wall_ns": 397191538,
+      "d_wall_ns": 419085769,
       "kv_sets": 1153,
       "kv_set_bytes": 603748,
       "kv_key_bytes": 58688,
@@ -1276,8 +1276,8 @@
       "kv_dels": 67,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:35Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:13Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|op_base|100": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1289,7 +1289,7 @@
       "ops": 1,
       "gas": 12086,
       "bytes": 0,
-      "wall_ns": 265716,
+      "wall_ns": 288482,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -1297,8 +1297,8 @@
       "kv_get_bytes": 3031,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:34Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:12Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|op_base|1000": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1310,7 +1310,7 @@
       "ops": 1,
       "gas": 12086,
       "bytes": 0,
-      "wall_ns": 290583,
+      "wall_ns": 282761,
       "d_gas": 0,
       "d_bytes": 0,
       "d_wall_ns": 0,
@@ -1318,8 +1318,8 @@
       "kv_get_bytes": 3031,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:39Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:17Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|op_read|100": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1331,18 +1331,18 @@
       "ops": 1,
       "gas": 205069,
       "bytes": 0,
-      "wall_ns": 1209420,
+      "wall_ns": 1273151,
       "d_gas": 192983,
       "d_bytes": 0,
-      "d_wall_ns": 943704,
+      "d_wall_ns": 984669,
       "kv_gets": 29,
       "kv_get_bytes": 48739,
       "d_kv_gets": 24,
       "d_kv_get_bytes": 45708,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:34Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:12Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|op_read|1000": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1354,18 +1354,18 @@
       "ops": 1,
       "gas": 247423,
       "bytes": 0,
-      "wall_ns": 1527046,
+      "wall_ns": 1582863,
       "d_gas": 235337,
       "d_bytes": 0,
-      "d_wall_ns": 1236463,
+      "d_wall_ns": 1300102,
       "kv_gets": 33,
       "kv_get_bytes": 55484,
       "d_kv_gets": 28,
       "d_kv_get_bytes": 52453,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:40Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:18Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|op_write|100": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1377,10 +1377,10 @@
       "ops": 1,
       "gas": 213241,
       "bytes": -7,
-      "wall_ns": 1266426,
+      "wall_ns": 1259626,
       "d_gas": 201155,
       "d_bytes": -7,
-      "d_wall_ns": 1000710,
+      "d_wall_ns": 971144,
       "kv_sets": 1,
       "kv_set_bytes": 257,
       "kv_key_bytes": 47,
@@ -1392,8 +1392,8 @@
       "d_kv_set_bytes": 257,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:35Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:13Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|op_write|1000": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1405,10 +1405,10 @@
       "ops": 1,
       "gas": 260460,
       "bytes": -8,
-      "wall_ns": 1616273,
+      "wall_ns": 1606648,
       "d_gas": 248374,
       "d_bytes": -8,
-      "d_wall_ns": 1325690,
+      "d_wall_ns": 1323887,
       "kv_sets": 1,
       "kv_set_bytes": 259,
       "kv_key_bytes": 48,
@@ -1420,8 +1420,8 @@
       "d_kv_set_bytes": 259,
       "txs": 1,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:41Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:19Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|tx_each|100": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1433,10 +1433,10 @@
       "ops": 100,
       "gas": 25412763,
       "bytes": 66050,
-      "wall_ns": 152167657,
+      "wall_ns": 153652964,
       "d_gas": 25412763,
       "d_bytes": 66050,
-      "d_wall_ns": 152167657,
+      "d_wall_ns": 153652964,
       "kv_sets": 1483,
       "kv_set_bytes": 1308771,
       "kv_key_bytes": 69669,
@@ -1445,8 +1445,8 @@
       "kv_dels": 6,
       "txs": 100,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:34Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:12Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     },
     "p/nt/bptree/v0 fanout=32|str|cold|tx_each|1000": {
       "structure": "p/nt/bptree/v0 fanout=32",
@@ -1458,10 +1458,10 @@
       "ops": 1000,
       "gas": 296566878,
       "bytes": 601139,
-      "wall_ns": 1751507416,
+      "wall_ns": 1762243059,
       "d_gas": 296566878,
       "d_bytes": 601139,
-      "d_wall_ns": 1751507416,
+      "d_wall_ns": 1762243059,
       "kv_sets": 16121,
       "kv_set_bytes": 17285362,
       "kv_key_bytes": 763710,
@@ -1470,8 +1470,8 @@
       "kv_dels": 67,
       "txs": 1000,
       "stable": true,
-      "measured_at": "2026-10-12T06:08:36Z",
-      "gno_commit": "02606904e30753f7775246624bfec96cb4749891"
+      "measured_at": "2026-10-19T06:00:14Z",
+      "gno_commit": "6c49f5420ec9c8ad0933b6869461656f889a9a37"
     }
   }
 }
