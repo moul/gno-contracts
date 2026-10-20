@@ -36,7 +36,10 @@ re-encodes to the same 40 characters.
 Strict where it matters: mixed case is rejected rather than folded, the 90
 character cap of BIP-173 is enforced (it is what keeps a wrong character
 locatable, and a decode bounded in gas), and `ConvertBits` going back to 8 bits
-refuses leftover bits rather than inventing a trailing zero byte.
+refuses leftover bits rather than inventing a trailing zero byte. A `Variant`
+that is neither constant is refused rather than quietly encoded as Bech32, and
+`EncodeBytes` checks `MaxPayloadLen(hrp)` before it regroups anything, so an
+oversized payload costs a comparison and not a full scan.
 
 **Live demo:** [`r/moul/x/daily/bech32demo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/bech32demo)
 · render it at [`/r/moul/x/daily/bech32demo/v0`](https://gno.land/r/moul/x/daily/bech32demo/v0).

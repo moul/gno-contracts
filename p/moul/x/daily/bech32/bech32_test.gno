@@ -174,3 +174,57 @@ func TestLengthExtensionWeakness(t *testing.T) {
 	uassert.NoError(t, err4)
 	uassert.Equal(t, "bech32m", vm.String())
 }
+
+// Variant is an exported int, so a caller can hand over a value that is neither
+// constant. Encoding one as Bech32 anyway would answer a question nobody asked.
+func TestUnknownVariant(t *testing.T) {
+	_, err := EncodeVariant("a", nil, Variant(2))
+	uassert.ErrorIs(t, err, ErrInvalidVariant)
+	_, err2 := EncodeVariant("a", nil, Variant(-1))
+	uassert.ErrorIs(t, err2, ErrInvalidVariant)
+	uassert.Equal(t, "invalid", Variant(2).String())
+}
+
+// ConvertBits promises ErrInvalidPadding, and a round trip never reaches it:
+// the padded direction always lands on a group boundary.
+func TestConvertBitsPadding(t *testing.T) {
+	// Five bits in, eight out, unpadded: one group is not a whole byte.
+	_, err := ConvertBits([]byte{1}, 5, 8, false)
+	uassert.ErrorIs(t, err, ErrInvalidPadding)
+	// Ten bits in, eight out: the two leftover bits are not zero, so they are
+	// data the caller would lose rather than padding the encoder added.
+	_, err2 := ConvertBits([]byte{0, 1}, 5, 8, false)
+	uassert.ErrorIs(t, err2, ErrInvalidPadding)
+	// The same ten bits with zero leftovers convert cleanly.
+	out, err3 := ConvertBits([]byte{0, 4}, 5, 8, false)
+	uassert.NoError(t, err3)
+	uassert.Equal(t, 1, len(out))
+}
+
+// An oversized payload is refused before it is regrouped, so the work stays
+// bounded by the 90-character format rather than by what the caller sent.
+func TestEncodeBytesBoundsBeforeWork(t *testing.T) {
+	// "g" plus the separator plus six checksum characters leaves 82 groups,
+	// which is 51 whole bytes.
+	uassert.Equal(t, 51, MaxPayloadLen("g"))
+
+	ok, err := EncodeBytes("g", make([]byte, MaxPayloadLen("g")))
+	uassert.NoError(t, err)
+	uassert.Equal(t, MaxLen, len(ok))
+
+	_, err2 := EncodeBytes("g", make([]byte, MaxPayloadLen("g")+1))
+	uassert.ErrorIs(t, err2, ErrTooLong)
+
+	// A human-readable part that leaves no room at all.
+	uassert.Equal(t, 0, MaxPayloadLen(longHRP()))
+	_, err3 := EncodeBytes(longHRP(), []byte{1})
+	uassert.ErrorIs(t, err3, ErrTooLong)
+}
+
+func longHRP() string {
+	s := ""
+	for i := 0; i < MaxLen; i++ {
+		s += "a"
+	}
+	return s
+}
