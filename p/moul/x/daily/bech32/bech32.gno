@@ -44,10 +44,13 @@ const (
 
 // String names the variant, "bech32" or "bech32m".
 func (v Variant) String() string {
-	if v == Bech32m {
+	switch v {
+	case Bech32:
+		return "bech32"
+	case Bech32m:
 		return "bech32m"
 	}
-	return "bech32"
+	return "invalid"
 }
 
 func (v Variant) constant() uint32 {
@@ -78,7 +81,10 @@ var (
 	ErrInvalidBits = errors.New("bech32: invalid bit width")
 	// ErrInvalidPadding is returned when unpadded conversion leaves bits over.
 	ErrInvalidPadding = errors.New("bech32: invalid padding")
+	// ErrInvalidVariant is returned for a Variant that is neither constant.
+	ErrInvalidVariant = errors.New("bech32: invalid variant")
 )
+
 
 // MaxLen is BIP-173's cap on the whole encoded string, separator and checksum
 // included. It exists so that a wrong character can always be located, and it is
@@ -102,6 +108,9 @@ func Encode(hrp string, data []byte) (string, error) {
 // hrp is lowercased; every data byte must be below 32. The result is always
 // lowercase, which is the form BIP-173 requires anything machine-generated to use.
 func EncodeVariant(hrp string, data []byte, v Variant) (string, error) {
+	if v != Bech32 && v != Bech32m {
+		return "", ErrInvalidVariant
+	}
 	hrp = toLower(hrp)
 	if err := checkHRP(hrp); err != nil {
 		return "", err
@@ -225,6 +234,14 @@ func ConvertBits(data []byte, from, to uint8, pad bool) ([]byte, error) {
 // EncodeBytes encodes an 8-bit payload as Bech32, converting to 5-bit groups
 // first. This is the call an address wants.
 func EncodeBytes(hrp string, payload []byte) (string, error) {
+	if err := checkHRP(toLower(hrp)); err != nil {
+		return "", err
+	}
+	// Refuse before regrouping, not after: ConvertBits would otherwise scan and
+	// materialise a payload of any size only for Encode to reject the result.
+	if len(payload) > MaxPayloadLen(hrp) {
+		return "", ErrTooLong
+	}
 	data, err := ConvertBits(payload, 8, 5, true)
 	if err != nil {
 		return "", err
@@ -243,6 +260,19 @@ func DecodeBytes(s string) (string, []byte, Variant, error) {
 		return "", nil, Bech32, err
 	}
 	return hrp, payload, v, nil
+}
+
+// MaxPayloadLen is the largest 8-bit payload [EncodeBytes] can fit under hrp
+// without passing MaxLen. It is 51 bytes for a gno.land address, whose
+// human-readable part is one character, and 0 when hrp leaves no room at all.
+func MaxPayloadLen(hrp string) int {
+	groups := MaxLen - len(hrp) - 1 - ChecksumLen
+	if groups <= 0 {
+		return 0
+	}
+	// A payload of b bytes needs ceil(8b/5) groups, so b groups fit exactly
+	// while 8b <= 5*groups.
+	return groups * 5 / 8
 }
 
 // checksum returns the six 5-bit groups that terminate the data part.
