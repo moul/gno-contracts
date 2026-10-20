@@ -20,10 +20,15 @@ The last table is the argument for the library, and it is computed on the page
 rather than asserted: `a1q3g6mnsp` and `a1q3g6mnsqp` both come back accepted
 under Bech32, and the Bech32m pair beside them does not.
 
-A human-readable part is any printable ASCII, so it can hold a pipe or a
-backtick. It is escaped with `ui.Cell` before it reaches a table cell, and the
+A human-readable part is any printable ASCII, so it can hold a pipe, a backtick
+or a slash. It is escaped with `ui.Cell` before it reaches a table cell, and the
 argument itself with `ui.Inline`, which is what the realm's own test breaks to
 check.
+
+The whole render path after the colon is taken as the string to decode, and
+nothing is trimmed. A slash is legal in a human-readable part, so splitting on
+one would refuse a valid string, and trimming whitespace would render a clean
+decode beside a value the page had quietly altered.
 
 The hex column comes from [`p/moul/x/daily/hexdump`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/hexdump),
 which owns the digits: `ufmt/v0` has no `%x` for a byte slice.
