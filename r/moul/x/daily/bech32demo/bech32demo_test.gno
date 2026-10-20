@@ -30,3 +30,19 @@ func TestRenderEscapesArgument(t *testing.T) {
 	uassert.False(t, strings.Contains(got, "Decoding *boom*"))
 	uassert.True(t, strings.Contains(got, "Decoding \\*boom\\*"), got)
 }
+
+// A slash is legal in a human-readable part, so the argument is taken whole
+// rather than cut at the first one.
+func TestRenderSlashInHRP(t *testing.T) {
+	got := Render("/a/b1mqd7sj")
+	uassert.True(t, strings.Contains(got, "human-readable part | a/b |"), got)
+}
+
+// Nothing is trimmed. A trailing non-breaking space is part of the string the
+// caller submitted, and the library refuses it: trimming it first would render
+// a clean decode of a string nobody typed.
+func TestRenderDoesNotTrim(t *testing.T) {
+	got := Render("/g1manfred47kzduec920z88wfr64ylksmdcedlf5 ")
+	uassert.True(t, strings.Contains(got, "bech32: invalid data character"), got)
+	uassert.False(t, strings.Contains(got, "20 bytes"))
+}

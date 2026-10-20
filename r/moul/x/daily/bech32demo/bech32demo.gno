@@ -119,11 +119,10 @@ func hexOf(payload []byte) string {
 	return b.String()
 }
 
+// parseArg strips the one routing slash in front of the argument and returns
+// the rest verbatim. Nothing else is removed: a slash is legal in a
+// human-readable part, so cutting at one refuses a valid string, and trimming
+// whitespace would render a clean decode of a string nobody typed.
 func parseArg(path string) string {
-	s := strings.TrimSpace(path)
-	s = strings.TrimPrefix(s, "/")
-	if i := strings.IndexByte(s, '/'); i >= 0 {
-		s = s[:i]
-	}
-	return s
+	return strings.TrimPrefix(path, "/")
 }
