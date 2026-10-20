@@ -475,7 +475,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/games/lastwords/v0`](r/moul/x/games/lastwords) 🏛️ | — | [✅](https://gno.land/r/moul/x/games/lastwords/v0) | — | — | 5 |
 | [`r/moul/x/grc20faucet/v0`](r/moul/x/grc20faucet) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20faucet/v0) | — | — | 4 |
 | [`r/moul/x/grc20wrapdemo/v0`](r/moul/x/grc20wrapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/grc20wrapdemo/v0) | — | — | 7 |
-| [`r/moul/x/gsdash/v0`](r/moul/x/gsdash) 🏛️ | — | ⏳ | — | — | 7 |
+| [`r/moul/x/gsdash/v0`](r/moul/x/gsdash) 🏛️ | — | [✅](https://gno.land/r/moul/x/gsdash/v0) | — | — | 7 |
 | [`r/moul/x/kitindexdemo/v0`](r/moul/x/kitindexdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/kitindexdemo/v0) | — | — | 5 |
 | [`r/moul/x/moultest/v0`](r/moul/x/moultest) 🏛️ | — | [✅](https://gno.land/r/moul/x/moultest/v0) | — | — | 4 |
 | [`r/moul/x/nativeify/v0`](r/moul/x/nativeify) 🏛️ | — | [✅](https://gno.land/r/moul/x/nativeify/v0) | — | — | 8 |
@@ -526,7 +526,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-20T15:33:46Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-20T16:36:04Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
