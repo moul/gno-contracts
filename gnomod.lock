@@ -240,6 +240,10 @@ module = "gno.land/p/moul/x/daily/base32/v0"
 source = { dir = "p/moul/x/daily/base32" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/bech32/v0"
+source = { dir = "p/moul/x/daily/bech32" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/bidimap/v0"
 source = { dir = "p/moul/x/daily/bidimap" }
 
@@ -706,6 +710,10 @@ source = { dir = "r/moul/x/daily/ballot" }
 [[module]]
 module = "gno.land/r/moul/x/daily/base32demo/v0"
 source = { dir = "r/moul/x/daily/base32demo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/bech32demo/v0"
+source = { dir = "r/moul/x/daily/bech32demo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/bidimapdemo/v0"

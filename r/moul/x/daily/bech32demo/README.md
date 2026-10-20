@@ -1,0 +1,31 @@
+# Bech32
+
+> ⚠️ **Experimental, generated with no human supervision** by the daily pipeline to exercise gno tooling. Not audited. See [r/moul/x/daily](https://github.com/moul/gno-contracts/blob/main/r/moul/x/daily/README.md).
+
+---
+
+Takes a real gno.land address apart, shows the BIP-173 and BIP-350 vectors side
+by side, and reproduces the length-extension weakness that Bech32m was created
+to close.
+
+```
+/r/moul/x/daily/bech32demo/v0            → the address, the vectors, the weakness
+/r/moul/x/daily/bech32demo/v0:a1lqfn3a   → decode your own string
+```
+
+Demo of the [`p/moul/x/daily/bech32`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/bech32)
+library, no codec logic lives here. Stateless, so `Render` is deterministic.
+
+The last table is the argument for the library, and it is computed on the page
+rather than asserted: `a1q3g6mnsp` and `a1q3g6mnsqp` both come back accepted
+under Bech32, and the Bech32m pair beside them does not.
+
+A human-readable part is any printable ASCII, so it can hold a pipe or a
+backtick. It is escaped with `ui.Cell` before it reaches a table cell, and the
+argument itself with `ui.Inline`, which is what the realm's own test breaks to
+check.
+
+The hex column comes from [`p/moul/x/daily/hexdump`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/hexdump),
+which owns the digits: `ufmt/v0` has no `%x` for a byte slice.
+
+Built for gno 0.9.
