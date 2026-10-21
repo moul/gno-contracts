@@ -33,18 +33,22 @@ var (
 
 // PutUvarint returns the canonical encoding of x.
 func PutUvarint(x uint64) string {
-	return AppendUvarint("", x)
+	return string(AppendUvarint(make([]byte, 0, MaxLen), x))
 }
 
-// AppendUvarint appends the encoding of x to dst and returns the result.
-func AppendUvarint(dst string, x uint64) string {
-	buf := make([]byte, 0, MaxLen)
+// AppendUvarint appends the encoding of x to dst and returns the extended
+// slice, the same shape as Go's encoding/binary.
+//
+// It takes a byte slice and not a string on purpose: a string accumulator
+// copies the whole prefix on every append, which makes packing a sequence
+// quadratic in the encoded size. On chain that is gas paid to rebuild bytes
+// the caller already had.
+func AppendUvarint(dst []byte, x uint64) []byte {
 	for x >= 0x80 {
-		buf = append(buf, byte(x)|0x80)
+		dst = append(dst, byte(x)|0x80)
 		x >>= 7
 	}
-	buf = append(buf, byte(x))
-	return dst + string(buf)
+	return append(dst, byte(x))
 }
 
 // PutVarint returns the canonical encoding of x, zigzagged first.
@@ -53,7 +57,7 @@ func PutVarint(x int64) string {
 }
 
 // AppendVarint appends the zigzagged encoding of x to dst.
-func AppendVarint(dst string, x int64) string {
+func AppendVarint(dst []byte, x int64) []byte {
 	return AppendUvarint(dst, ZigZag(x))
 }
 
@@ -120,13 +124,13 @@ func UnZigZag(u uint64) int64 {
 	return int64(u>>1) ^ -int64(u&1)
 }
 
-// PutUvarints encodes every value in xs back to back.
+// PutUvarints encodes every value in xs back to back, into one buffer.
 func PutUvarints(xs []uint64) string {
-	out := ""
+	buf := make([]byte, 0, len(xs)+1)
 	for _, x := range xs {
-		out = AppendUvarint(out, x)
+		buf = AppendUvarint(buf, x)
 	}
-	return out
+	return string(buf)
 }
 
 // Uvarints decodes a string that is nothing but varints. It fails rather than
@@ -147,13 +151,14 @@ func Uvarints(s string) ([]uint64, error) {
 	return out, nil
 }
 
-// PutVarints encodes every value in xs back to back, zigzagged.
+// PutVarints encodes every value in xs back to back, zigzagged, into one
+// buffer.
 func PutVarints(xs []int64) string {
-	out := ""
+	buf := make([]byte, 0, len(xs)+1)
 	for _, x := range xs {
-		out = AppendVarint(out, x)
+		buf = AppendVarint(buf, x)
 	}
-	return out
+	return string(buf)
 }
 
 // Varints decodes a string that is nothing but zigzagged varints.

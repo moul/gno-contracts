@@ -194,8 +194,8 @@ func TestSequenceRefusesTrailingFragment(t *testing.T) {
 }
 
 func TestAppendBuildsInPlace(t *testing.T) {
-	s := ""
-	s = AppendUvarint(s, 300)
-	s = AppendVarint(s, -1)
-	uassert.Equal(t, "ac0201", hex(s))
+	var buf []byte
+	buf = AppendUvarint(buf, 300)
+	buf = AppendVarint(buf, -1)
+	uassert.Equal(t, "ac0201", hex(string(buf)))
 }

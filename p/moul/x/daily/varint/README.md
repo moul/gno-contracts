@@ -35,6 +35,11 @@ Three behaviours worth knowing before you use it:
   value it decoded, so a stream is read by reslicing. `Uvarints` is the all-at-once form, and
   it refuses a trailing fragment with `ErrTrailing` rather than returning a silently short
   list: a partial value at the end is corruption, not data.
+- **Encoding appends to a byte slice, decoding reads a string.** `AppendUvarint(dst []byte,
+  x uint64) []byte` is Go's `encoding/binary` shape, and it is a slice rather than a string
+  because a string accumulator copies the whole prefix on every append, which makes packing a
+  sequence quadratic in the encoded size. Decoding takes a string because that is what a realm
+  has stored.
 - **The errors are distinct for a reason.** `ErrTruncated` means more input would have
   helped, `ErrOverflow` means the value cannot fit in 64 bits, `ErrNotCanonical` means the
   bytes decode fine but should never have been written. A caller validating untrusted input
@@ -42,6 +47,6 @@ Three behaviours worth knowing before you use it:
 
 Encoding is O(bytes out), at most ten iterations, and `Len` answers the size question without
 allocating. There is no streaming writer: the unit is a value, and a realm packing many of
-them calls `AppendUvarint` in a loop, which is what `PutUvarints` does.
+them calls `AppendUvarint` into one buffer in a loop, which is what `PutUvarints` does.
 
 Live demo: [r/moul/x/daily/varintdemo](/r/moul/x/daily/varintdemo/v0).

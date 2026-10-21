@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/varint/v0"
 )
 
@@ -80,18 +81,30 @@ func Render(path string) string {
 }
 
 // renderOne encodes a single integer supplied in the path.
+//
+// The argument is the visitor's text and it is shown inside a code span, so
+// it goes through md.InlineCode and not ui.Cell: a cell escaper backslashes
+// a backtick, and a backslash does not close a backtick inside a span. Only
+// a fence wider than anything in the argument does, which is what
+// md.InlineCode picks.
 func renderOne(arg string) string {
 	var b strings.Builder
-	b.WriteString("## `")
-	b.WriteString(ui.Cell(arg))
-	b.WriteString("`\n\n")
+	b.WriteString("## ")
+	b.WriteString(md.InlineCode(arg))
+	b.WriteString("\n\n")
 
+	unsigned := false
 	if u, err := strconv.ParseUint(arg, 10, 64); err == nil {
+		unsigned = true
 		b.WriteString("- unsigned: `" + hex(varint.PutUvarint(u)) + "` (" + strconv.Itoa(varint.Len(u)) + " bytes)\n")
 	}
 	i, err := strconv.ParseInt(arg, 10, 64)
 	if err != nil {
-		b.WriteString("Not an integer this codec can carry: 64 bits, signed or unsigned.\n")
+		// Above MaxInt64 the unsigned line above is the whole answer: the
+		// codec carries the value, only the signed form cannot hold it.
+		if !unsigned {
+			b.WriteString("Not an integer this codec can carry: 64 bits, signed or unsigned.\n")
+		}
 		return b.String()
 	}
 	b.WriteString("- zigzag: `" + strconv.FormatUint(varint.ZigZag(i), 10) + "`\n")
@@ -114,11 +127,10 @@ func hex(s string) string {
 	return b.String()
 }
 
+// parseArg takes the one routing slash off and nothing else. It does not cut
+// at a later slash and it does not trim: a page that offers to encode what
+// the caller typed either encodes that string or says it refused it, and
+// never quietly substitutes a shorter or tidier one.
 func parseArg(path string) string {
-	s := strings.TrimSpace(path)
-	s = strings.TrimPrefix(s, "/")
-	if i := strings.IndexByte(s, '/'); i >= 0 {
-		s = s[:i]
-	}
-	return s
+	return strings.TrimPrefix(path, "/")
 }

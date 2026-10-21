@@ -19,6 +19,13 @@ would hide it.
 level constant. Output that moved with the block height could not be pinned by
 `ExampleRender`, and an unpinned `Render` is how a realm ships a page nobody ever read.
 
-The path argument is caller-supplied, so it goes through `ui.Cell` before it is rendered: a
-realm's `Render` can never be fixed once the path is live, and an unescaped argument is how a
-caller rewrites the page around it. `ExampleRender_one` pins the escaped form.
+The path argument is caller-supplied, so it goes through `md.InlineCode` before it is
+rendered, and not through `ui.Cell`: it sits inside a code span, a cell escaper backslashes a
+backtick, and a backslash does not close a backtick inside a span. Only a fence wider than
+anything in the argument does, which is what `md.InlineCode` picks. A realm's `Render` can
+never be fixed once the path is live, and an unescaped argument is how a caller rewrites the
+page around it.
+
+`parseArg` takes the one routing slash off and nothing else: it does not cut at a later slash
+and it does not trim. A page that offers to encode what the caller typed either encodes that
+string or says it refused it, and never quietly substitutes a shorter or tidier one.

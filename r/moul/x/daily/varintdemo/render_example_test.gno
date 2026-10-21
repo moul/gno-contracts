@@ -63,7 +63,7 @@ func ExampleRender_one() {
 	//
 	// LEB128 base-128 integers, demoing the [`p/moul/x/daily/varint`](/p/moul/x/daily/varint/v0) library.
 	//
-	// ## `\-300`
+	// ## `-300`
 	//
 	// - zigzag: `599`
 	// - signed: `d7 04` (2 bytes)
