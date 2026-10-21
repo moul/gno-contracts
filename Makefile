@@ -22,7 +22,7 @@ HOME_TX      ?= /tmp/home.tx.json
 
 .DEFAULT_GOAL := help
 .PHONY: help lint test fmt guards toolcheck guard-examples guard-render bench bench-report \
-	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update review-advice \
+	guard-readmes guard-private guard-untrusted-render guard-tables guard-tables-update audit-patterns audit-patterns-update gnovet gnovet-update review-advice \
 	verify deps deps-chain bump-deps manifest readme readmes gen check \
 	sync graph publish republish status home-push home-packages report preview site web test-web clean
 
@@ -40,7 +40,13 @@ test: guards ## run the guards, then gno test every contract
 fmt: ## gno fmt every contract in place
 	$(GNOCONTRACTS) gno fmt $(ARGS) $(PKG)
 
-guards: toolcheck guard-examples guard-render guard-readmes guard-private guard-untrusted-render guard-tables ## every guard CI enforces
+# What a contributor runs before committing, so it holds every CI guard that
+# reads nothing but this tree. Two CI steps stay out, both deliberately:
+# `audit-patterns` takes 13s against 1.5s for `gnovet` and lives in its own
+# workflow beside the upstream-drift step that needs a gno master checkout, and
+# `guard-generated` takes a base and a head ref, so it only means anything on a
+# pull request (.github/workflows/audit-patterns.yml, .github/workflows/ci.yml).
+guards: toolcheck guard-examples guard-render guard-readmes guard-private guard-untrusted-render guard-tables gnovet ## every CI guard that reads only this tree
 
 toolcheck: ## fail if this gno skips example tests, which would make them false-green
 	@$(GNOCONTRACTS) gno toolcheck
