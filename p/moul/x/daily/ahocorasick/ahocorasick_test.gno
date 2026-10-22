@@ -232,3 +232,29 @@ func TestPathologicalSetStaysOnePass(t *testing.T) {
 	// Every (start, length) pair with start+length <= 64: 64*65/2.
 	uassert.Equal(t, 2080, len(ms))
 }
+
+// The merged output lists are what the package doc calls its one departure
+// from the paper, so the shape that costs the most is pinned rather than
+// asserted in prose. A nested set of k patterns stores 1+2+...+k entries,
+// quadratic in k, where a dictionary of distinct words stores one per node.
+func TestMergedOutputsAreQuadraticOnANestedSet(t *testing.T) {
+	nested := make([]string, 0, 64)
+	for i := 1; i <= 64; i++ {
+		nested = append(nested, strings.Repeat("a", i))
+	}
+	uassert.Equal(t, 2080, totalOutputs(New(nested)))
+
+	// Four distinct words, no nesting: one entry per terminal node.
+	uassert.Equal(t, 4, totalOutputs(New([]string{"fox", "lazy", "over", "quick"})))
+
+	// he/she/his/hers nests once, "he" inside "she", so one node carries two.
+	uassert.Equal(t, 5, totalOutputs(New([]string{"he", "she", "his", "hers"})))
+}
+
+func totalOutputs(m *Matcher) int {
+	n := 0
+	for _, nd := range m.nodes {
+		n += len(nd.out)
+	}
+	return n
+}

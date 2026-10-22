@@ -15,8 +15,8 @@ Searching for k patterns by running a single-pattern scan k times costs O(k\*n):
 word in the dictionary is another full pass over the text. Aho-Corasick builds one automaton
 from the whole set, a trie of the patterns plus a failure link on every node pointing at the
 longest proper suffix that is also a prefix of some pattern, and then reads the text once.
-Building costs O(total pattern length), scanning costs O(n + matches), and k does not appear
-in either.
+Building the trie and the links costs O(total pattern length), scanning costs O(n + matches),
+and k does not appear in either.
 
 **The text cursor never moves backwards, and that is why it belongs on chain.** The worst
 case equals the best case, so a dictionary and a text chosen by an attacker cost what a
@@ -45,6 +45,14 @@ Four behaviours worth knowing before you use it:
   Empty patterns are dropped, since the empty string matches at every offset and that is a
   different question. A `nil` matcher answers every method, so the result of `New` can go
   straight into a scan without a check.
+
+**Each node stores the patterns matching there, merged from its failure target at build
+time**, rather than a link to be walked at every offset. That is a departure from the paper
+and it is a trade: a reported match costs O(1) instead of a walk up the failure chain, and
+the build pays memory in exactly one shape, a set whose patterns nest (`a`, `aa`, `aaa`, and
+so on), where the merged lists are quadratic in the number of patterns rather than linear.
+`MaxPatterns` is what bounds that, and nothing else does. A dictionary of distinct words is
+nowhere near it: the lists are one entry per node.
 
 Node lookup is a binary search over the edges a node actually has, kept sorted by label,
 rather than a 256-entry row per node. A dictionary of words touches a few dozen distinct

@@ -6,8 +6,17 @@
 // text. Aho-Corasick builds one automaton from the whole set, a trie of the
 // patterns plus a failure link on every node pointing at the longest proper
 // suffix that is also a prefix of some pattern, and then reads the text once.
-// The cost is O(total pattern length) to build and O(n + matches) to scan,
-// whatever k is, and the text cursor never moves backwards.
+// Building the trie and the failure links costs O(total pattern length) and
+// scanning costs O(n + matches), whatever k is, and the text cursor never moves
+// backwards.
+//
+// One deliberate departure from the paper: each node stores the full list of
+// patterns matching there, merged from its failure target at build time, rather
+// than a link to be walked at every offset. That makes a reported match O(1)
+// instead of a walk up the failure chain, and it costs build memory in exactly
+// one shape, a set whose patterns nest ("a", "aa", "aaa", ...), where the
+// merged lists are quadratic in k rather than linear. MaxPatterns is what
+// bounds that, and nothing else does.
 //
 // That last property is why it is worth having on chain: the worst case equals
 // the best case, so a dictionary and a text chosen by an attacker cost the same
@@ -114,6 +123,9 @@ func New(patterns []string) *Matcher {
 // instead of a walk up the failure chain at every offset, and the breadth-first
 // order is what makes it correct: a node's failure target is always shallower,
 // so it has already been merged.
+//
+// It is also where the memory goes: a nested set makes the merged lists
+// quadratic in the number of patterns. See the package doc.
 func (m *Matcher) link() {
 	queue := make([]int, 0, len(m.nodes))
 	for _, e := range m.nodes[0].edges {
