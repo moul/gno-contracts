@@ -289,6 +289,10 @@ module = "gno.land/p/moul/x/daily/fraction/v0"
 source = { dir = "p/moul/x/daily/fraction" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/geohash/v0"
+source = { dir = "p/moul/x/daily/geohash" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/heap/v0"
 source = { dir = "p/moul/x/daily/heap" }
 
@@ -900,6 +904,10 @@ source = { dir = "r/moul/x/daily/flatmapdemo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/fractiondemo/v0"
 source = { dir = "r/moul/x/daily/fractiondemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/geohashdemo/v0"
+source = { dir = "r/moul/x/daily/geohashdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/governor/v0"
