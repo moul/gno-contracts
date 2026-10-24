@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/daily/shuntingyarddemo/v0"
+gno = "0.9"
+private = true
