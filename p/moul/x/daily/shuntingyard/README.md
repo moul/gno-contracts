@@ -1,0 +1,63 @@
+# `gno.land/p/moul/x/daily/shuntingyard/v0`
+
+**Infix arithmetic to reverse Polish notation, and back to a number**: `Tokenize`, `ToRPN`, `EvalRPN`, `Eval`, `FormatRPN`, `Operators`.
+
+```go
+import "gno.land/p/moul/x/daily/shuntingyard/v0"
+
+shuntingyard.Eval("2+3*4")        // 14, nil
+shuntingyard.Eval("-3^2")         // -9, nil        a prefix minus binds looser than ^
+shuntingyard.Eval("1/0")          // 0, ErrDivByZero
+shuntingyard.Eval("2^64")         // 0, ErrOverflow
+
+toks, _ := shuntingyard.Tokenize("(2+3)*4")
+rpn, _ := shuntingyard.ToRPN(toks)
+shuntingyard.FormatRPN(rpn)       // "2 3 + 4 *"
+```
+
+A realm that wants to take a formula from a caller has two bad options and this
+one. Hard-coding the arithmetic means a new package path for every new formula,
+and a public path can never be redeployed. Accepting a pre-built RPN string
+pushes the parsing onto whoever is sending the transaction, who then has to be
+trusted to have parsed it the same way the realm would have. Parsing infix on
+chain keeps the formula a piece of data and the meaning a piece of code.
+
+**Every arithmetic result is checked, deliberately.** An expression that would
+wrap `int64` returns `ErrOverflow` rather than a plausible wrong number. The
+usual reason to evaluate a caller's formula is to compute an amount, and a
+wrapped amount is indistinguishable from a correct one until it is spent.
+
+Four behaviours worth knowing before you use it:
+
+- **Nothing panics.** Every refusal is an error value, including a malformed
+  expression, an overflow and a division by zero. A `Render` that evaluates a
+  stored expression therefore cannot be made permanently unreadable by one bad
+  input, which matters because the page cannot be redeployed to fix it.
+- **The prefix minus is its own operator, `u-`.** It takes one operand and sits
+  below `^` in the precedence table, so `-3^2` is `-9` and not `9`. Treating it
+  as a flag on binary `-` is the classic way to get that wrong, and the RPN is
+  where it becomes visible: `3 2 ^ u-`, never `3 u- 2 ^`.
+- **Parsing and evaluation are separate passes.** `ToRPN` answers whether an
+  expression is well formed; the RPN it returns is a bounded program a realm can
+  store and re-run without parsing again. `EvalRPN` re-validates what it is
+  given rather than trusting it, because by the time a stored program is read
+  back it is an input like any other.
+- **Integers only, and division truncates toward zero.** `-7/2` is `-3` and
+  `-7%2` is `-1`. There is no float type worth having on chain: a `Render` has
+  to be byte-identical on every validating node, and that is exactly what
+  floating point does not promise. A caller who needs a fraction scales by a
+  power of ten and divides at the end.
+
+Syntax errors carry the byte offset where the problem was noticed
+(`shuntingyard: unexpected number at offset 2`), so a realm can point at the
+character rather than reporting that something, somewhere, was wrong.
+
+`MaxTokens` caps an expression at 1024 tokens. Evaluation is linear in the token
+count, so the cap is not about time: it is there so a caller cannot size the two
+stacks from unbounded input and make the allocation itself the attack.
+
+The operator set is `+ - * / % ^`, parentheses, and the two prefix forms. There
+are no variables, no functions and no floats. Adding an operator is a row in
+`operators`, which `Operators()` hands out as a copy.
+
+Live demo: [`r/moul/x/daily/shuntingyarddemo`](/r/moul/x/daily/shuntingyarddemo/v0).
