@@ -297,6 +297,10 @@ module = "gno.land/p/moul/x/daily/hexdump/v0"
 source = { dir = "p/moul/x/daily/hexdump" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/huffman/v0"
+source = { dir = "p/moul/x/daily/huffman" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/humanize/v0"
 source = { commit = "96f8aef268ca00444bde83349a6d95c021cb71bf", dir = "p/moul/x/daily/humanize" }
 hash = "h1:aUnlv51DsT3EGCHCwtXZigny4CqMK741j5ngN0+JczQ="
@@ -939,6 +943,10 @@ source = { dir = "r/moul/x/daily/heapdemo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/hexdumpdemo/v0"
 source = { dir = "r/moul/x/daily/hexdumpdemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/huffmandemo/v0"
+source = { dir = "r/moul/x/daily/huffmandemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/humanizedemo/v0"

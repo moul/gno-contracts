@@ -1,0 +1,58 @@
+# `gno.land/p/moul/x/daily/huffman/v0`
+
+**Canonical Huffman codes, with a decoder that validates**: `Table`, `Encode`,
+`Encoded.Decode`, `Encoded.BitString`, `Encoded.Saved`.
+
+```go
+import "gno.land/p/moul/x/daily/huffman/v0"
+
+codes, _ := huffman.Table("abracadabra")  // a=0, b=100, c=101, d=110, r=111
+enc, _ := huffman.Encode("abracadabra")   // 23 bits against 88 raw
+enc.BitString()                           // "01001110101011001001110"
+enc.Decode()                              // "abracadabra", or ErrCorrupt
+```
+
+A Huffman tree is **not unique**. Two equally optimal trees give the same total
+bit count and different codes, and which one you get depends on how ties are
+broken while merging, which means a naive implementation can hand two callers
+different tables for the same input. Canonical coding throws the tree away and
+keeps only the code **lengths**, then re-derives the bits by sorting on
+(length, symbol). That is what makes the output deterministic enough for a
+`Render` and small enough to store: the header a decoder needs is one integer
+per symbol, not a tree.
+
+**The decoder validates, deliberately.** `Encoded` is a plain struct with
+exported fields, so a caller can build one by hand or read one back out of
+storage, and a decoder that trusts what it is handed returns a string nobody
+ever encoded. `Decode` rebuilds the canonical table from the lengths it was
+given and refuses a payload whose own `Bits` disagree, checks the Kraft
+equality so the code set is a complete prefix code, requires `Data` to be
+exactly the bytes `NBits` needs with zero padding in the last one, refuses a
+zero-bit or zero-size payload because `Encode` never produces one, refuses a
+stream that ends mid-code, and refuses a result whose length is not `Size`.
+Spare bytes and dirty padding are not cosmetic: both are a way to carry a
+second payload that decodes to the same string.
+
+Three behaviours worth knowing before you use it:
+
+- **A one-symbol alphabet gets a one-bit code.** Its leaf has no sibling, so
+  the tree walk would give it a zero-bit code and `"aaaaa"` would encode to an
+  empty stream that decodes to nothing. It is the only incomplete code this
+  package emits (Kraft sum 1/2), and `Decode` allows exactly that one case.
+- **Symbols are bytes, not runes.** The alphabet is 0 to 255 and a multi-byte
+  UTF-8 character is several symbols. Round-tripping is byte-exact either way;
+  only a per-symbol display has to care.
+- **Ties prefer the leaf queue.** The merge uses the two-queue variant, leaves
+  pre-sorted by (frequency, symbol) and merged nodes appended in creation
+  order, so no priority queue, no map iteration and nothing that could reorder
+  between two runs.
+
+`MaxLen` is 4096 bytes. That bound is also what keeps a code under 18 bits: the
+worst case for Huffman is a Fibonacci frequency distribution, where reaching a
+32-bit code needs megabytes of input. `ErrTooDeep` exists for the overflow
+anyway, returned rather than panicked, because a realm's `Render` can never be
+fixed once its path is published.
+
+Live demo: [`r/moul/x/daily/huffmandemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/huffmandemo).
+
+Built for gno 0.9.
