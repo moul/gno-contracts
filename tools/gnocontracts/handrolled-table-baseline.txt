@@ -12,8 +12,8 @@
 # an empty header. Why each of those matters: EFFECTIVE_GNO.md section 3.2.
 #
 # Nearly all of these are already live on a chain, where a public path is
-# immutable and Render can never be replaced: 329 of the 331 contracts in the
-# catalog are on mainnet. So this file is a record, not a backlog. What the guard
+# immutable and Render can never be replaced: nearly every contract in the
+# catalog is on mainnet. So this file is a record, not a backlog. What the guard
 # buys is the next one, before it is deployed.
 
 p/moul/grants	p/moul/grants/render.gno:72

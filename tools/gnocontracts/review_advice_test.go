@@ -42,7 +42,7 @@ func TestAdviseReviewsAPackageThatIsNotYetLive(t *testing.T) {
 	}
 }
 
-// The inverse, which is where the money is saved: 331 of 333 contracts are
+// The inverse, which is where the money is saved: nearly every contract is
 // live, and a finding against one of those cannot be acted on in place.
 func TestAdviseSkipsAPackageAlreadyLive(t *testing.T) {
 	a := analysis(

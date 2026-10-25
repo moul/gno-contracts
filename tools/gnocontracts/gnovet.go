@@ -244,8 +244,8 @@ const gnovetBaselineHeader = `# House-rule hits this tree already has, one row p
 #   make gnovet-update
 #
 # A row here is NOT a statement that the code is fine. It is a statement that
-# the hit predates the rule, and almost all of it is unfixable in place: 331 of
-# 333 contracts are live on mainnet and a public path is immutable. What this
+# the hit predates the rule, and almost all of it is unfixable in place: nearly
+# every contract is live on mainnet and a public path is immutable. What this
 # file buys is the next one, before it ships.
 #
 # Every rule was a real defect found in this repository before it became a rule.

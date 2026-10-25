@@ -27,8 +27,8 @@ import (
 // of them: p/moul/pilot, which cannot be fixed, because p/moul/pilot/v0 is live
 // on mainnet and a public package path is immutable.
 //
-// That is the whole reason this is a guard and not a cleanup task. 329 of the
-// 331 contracts in the catalog are live. The baseline below is not a backlog, it
+// That is the whole reason this is a guard and not a cleanup task. Nearly every
+// contract in the catalog is live. The baseline below is not a backlog, it
 // is a record: almost none of it can ever be cleared in place. What the guard
 // buys is the 101st file.
 //
@@ -243,8 +243,8 @@ const tableBaselineHeader = `# Packages that build a markdown table separator ro
 # an empty header. Why each of those matters: EFFECTIVE_GNO.md section 3.2.
 #
 # Nearly all of these are already live on a chain, where a public path is
-# immutable and Render can never be replaced: 329 of the 331 contracts in the
-# catalog are on mainnet. So this file is a record, not a backlog. What the guard
+# immutable and Render can never be replaced: nearly every contract in the
+# catalog is on mainnet. So this file is a record, not a backlog. What the guard
 # buys is the next one, before it is deployed.
 
 `

@@ -58,7 +58,7 @@ import (
 //
 //	REVIEW EXACTLY WHAT IS ABOUT TO BECOME PERMANENT.
 //
-// 331 of the 333 contracts in the catalog are live on mainnet, and a public
+// Nearly every contract in the catalog is live on mainnet, and a public
 // package path is immutable: AddPackage refuses an occupied path unless the
 // live package is private. A finding against a package that is already live
 // cannot be acted on in place at all; it needs a new version at a new path and
