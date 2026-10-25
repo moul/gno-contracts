@@ -1,0 +1,3 @@
+module = "gno.land/r/moul/x/daily/dijkstrademo/v0"
+gno = "0.9"
+private = true
