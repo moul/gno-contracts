@@ -59,7 +59,8 @@ source = { dir = "p/moul/dynreplacer" }
 
 [[module]]
 module = "gno.land/p/moul/entity/v0"
-source = { dir = "p/moul/entity" }
+source = { commit = "d867ce001a6934a82c5e602c06e925829cf1bcbb", dir = "p/moul/entity" }
+hash = "h1:DRhS6A83VX86ptC2LhKWoDrAywvqBIu7i+P8ywXQWm0="
 
 [[module]]
 module = "gno.land/p/moul/entropy/v0"
@@ -128,7 +129,8 @@ source = { dir = "p/moul/md" }
 
 [[module]]
 module = "gno.land/p/moul/mdlist/v0"
-source = { dir = "p/moul/mdlist" }
+source = { commit = "d867ce001a6934a82c5e602c06e925829cf1bcbb", dir = "p/moul/mdlist" }
+hash = "h1:Uy8XCsID/DHptI5SYnlZqFYCNkDFPpZNSnFxX9OgmYo="
 
 [[module]]
 module = "gno.land/p/moul/mdtable/v0"
@@ -152,7 +154,8 @@ source = { dir = "p/moul/once" }
 
 [[module]]
 module = "gno.land/p/moul/ownable/v0"
-source = { dir = "p/moul/ownable" }
+source = { commit = "d867ce001a6934a82c5e602c06e925829cf1bcbb", dir = "p/moul/ownable" }
+hash = "h1:XOTOF6kdNe1SoIbWSA+yMR1WW2AairPijRFLI86y+Q0="
 
 [[module]]
 module = "gno.land/p/moul/pageable/v0"
@@ -180,7 +183,8 @@ source = { dir = "p/moul/realmpath" }
 
 [[module]]
 module = "gno.land/p/moul/safe/v0"
-source = { dir = "p/moul/safe" }
+source = { commit = "d867ce001a6934a82c5e602c06e925829cf1bcbb", dir = "p/moul/safe" }
+hash = "h1:VFa3WU84/aG04X4WMdao2ZG7mvOCebYR8e6oiozIeyM="
 
 [[module]]
 module = "gno.land/p/moul/svg/v0"
@@ -188,7 +192,8 @@ source = { dir = "p/moul/svg" }
 
 [[module]]
 module = "gno.land/p/moul/template/v0"
-source = { dir = "p/moul/template" }
+source = { commit = "d867ce001a6934a82c5e602c06e925829cf1bcbb", dir = "p/moul/template" }
+hash = "h1:bofZoBCLp1xzYm1aYD+3kB9XmsLo6ztM6HHRuriCRHw="
 
 [[module]]
 module = "gno.land/p/moul/toolbox/v0"
@@ -204,7 +209,8 @@ source = { dir = "p/moul/typeutil" }
 
 [[module]]
 module = "gno.land/p/moul/udao/v0"
-source = { dir = "p/moul/udao" }
+source = { commit = "d867ce001a6934a82c5e602c06e925829cf1bcbb", dir = "p/moul/udao" }
+hash = "h1:+TnpJ0v7bVjWFa9ixmxob6li+ZLOMuraXfESWQse/iY="
 
 [[module]]
 module = "gno.land/p/moul/ulist/lplist/v0"
@@ -536,7 +542,8 @@ source = { dir = "p/moul/x/wiki" }
 
 [[module]]
 module = "gno.land/p/moul/xdao/v0"
-source = { dir = "p/moul/xdao" }
+source = { commit = "d867ce001a6934a82c5e602c06e925829cf1bcbb", dir = "p/moul/xdao" }
+hash = "h1:ghJoksUHnc4c+PP3QHLbT6TPQKlhfNT3sCtoXntEmus="
 
 [[module]]
 module = "gno.land/p/moul/xmath/v0"
