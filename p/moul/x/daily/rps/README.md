@@ -1,0 +1,20 @@
+# `gno.land/p/moul/x/daily/rps/v0`
+
+**The rock-paper-scissors move**: `Parse`, `Move.String`, `Beats`. Stateless, so
+every realm that plays the game agrees on what `"r"` means and who wins.
+
+```go
+import "gno.land/p/moul/x/daily/rps/v0"
+
+m, ok := rps.Parse(" Paper ") // rps.Paper, true; "p" works too
+m.String()                    // "paper"
+rps.Beats(rps.Paper, rps.Rock) // 1: the first move wins (0 tie, 2 the second wins)
+```
+
+`Move` is ordered rock, paper, scissors so that `(a - b) mod 3` is the verdict.
+
+**Consumers:** [`rps`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/rps),
+[`rpsmatch`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/rpsmatch),
+[`rpsoracle`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/rpsoracle),
+[`rpsduel`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/rpsduel), each of
+which carried its own copy of this logic before.

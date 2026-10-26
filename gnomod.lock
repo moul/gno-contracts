@@ -400,6 +400,10 @@ module = "gno.land/p/moul/x/daily/rot13/v0"
 source = { dir = "p/moul/x/daily/rot13" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/rps/v0"
+source = { dir = "p/moul/x/daily/rps" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/semver/v0"
 source = { dir = "p/moul/x/daily/semver" }
 

@@ -8,17 +8,9 @@ import (
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/x/daily/rps/v0"
 	"gno.land/p/nt/avl/v0"
 )
-
-// Moves.
-const (
-	rock     = 0
-	paper    = 1
-	scissors = 2
-)
-
-var moveNames = [3]string{"rock", "paper", "scissors"}
 
 // Outcomes.
 const (
@@ -39,8 +31,8 @@ type tally struct {
 type round struct {
 	player   address
 	height   int64
-	player_m int // player move
-	house_m  int // house move
+	player_m rps.Move
+	house_m  rps.Move
 	outcome  int
 }
 
@@ -58,40 +50,26 @@ var (
 
 const maxRecent = 8
 
-// parseChoice maps a choice string to a move index; ok=false if invalid.
-func parseChoice(choice string) (int, bool) {
-	switch strings.ToLower(strings.TrimSpace(choice)) {
-	case "rock", "r":
-		return rock, true
-	case "paper", "p":
-		return paper, true
-	case "scissors", "s":
-		return scissors, true
-	}
-	return 0, false
-}
-
 // houseMove derives the house move deterministically from the chain height
 // and the caller's play count (so repeated calls in the same block differ).
-func houseMove(height int64, playCount int) int {
+func houseMove(height int64, playCount int) rps.Move {
 	x := height + int64(playCount)*7
 	m := x % 3
 	if m < 0 {
 		m += 3
 	}
-	return int(m)
+	return rps.Move(m)
 }
 
 // decide returns the outcome from the player's perspective.
-func decide(playerMove, houseM int) int {
-	if playerMove == houseM {
-		return outDraw
-	}
-	// player beats (player+1)%3 ... rock(0) beats scissors(2), etc.
-	if (playerMove+2)%3 == houseM {
+func decide(playerMove, houseM rps.Move) int {
+	switch rps.Beats(playerMove, houseM) {
+	case 1:
 		return outWin
+	case 2:
+		return outLose
 	}
-	return outLose
+	return outDraw
 }
 
 func getTally(key string) *tally {
@@ -104,7 +82,7 @@ func getTally(key string) *tally {
 // Play plays one round against the chain. choice is "rock"|"paper"|"scissors"
 // (single-letter shortcuts accepted). It panics on an invalid choice.
 func Play(cur realm, choice string) {
-	mv, ok := parseChoice(choice)
+	mv, ok := rps.Parse(choice)
 	if !ok {
 		panic("invalid choice: use rock, paper, or scissors")
 	}
@@ -147,8 +125,8 @@ func Play(cur realm, choice string) {
 	chain.Emit(
 		"RoundPlayed",
 		"player", key,
-		"choice", moveNames[mv],
-		"house", moveNames[hm],
+		"choice", mv.String(),
+		"house", hm.String(),
 		"outcome", outcomeName(outcome),
 	)
 }
@@ -227,8 +205,8 @@ func Render(path string) string {
 			r := rounds[i]
 			b.WriteString("| " + strconv.FormatInt(r.height, 10))
 			b.WriteString(" | " + ui.Addr(r.player))
-			b.WriteString(" | " + moveNames[r.player_m])
-			b.WriteString(" | " + moveNames[r.house_m])
+			b.WriteString(" | " + r.player_m.String())
+			b.WriteString(" | " + r.house_m.String())
 			b.WriteString(" | " + outcomeName(r.outcome) + " |\n")
 		}
 	}

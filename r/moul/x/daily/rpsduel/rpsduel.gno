@@ -17,49 +17,9 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/x/daily/rps/v0"
 	"gno.land/p/nt/avl/v0"
 )
-
-// Move is one of rock, paper, or scissors, ordered so that
-// (winner - loser + 3) % 3 == 1 for every winning pair.
-type Move int
-
-const (
-	Rock Move = iota
-	Paper
-	Scissors
-)
-
-func moveName(m Move) string {
-	switch m {
-	case Rock:
-		return "rock"
-	case Paper:
-		return "paper"
-	case Scissors:
-		return "scissors"
-	default:
-		return "?"
-	}
-}
-
-func parseMove(s string) (Move, bool) {
-	switch strings.ToLower(strings.TrimSpace(s)) {
-	case "rock", "r":
-		return Rock, true
-	case "paper", "p":
-		return Paper, true
-	case "scissors", "s":
-		return Scissors, true
-	default:
-		return 0, false
-	}
-}
-
-// judge returns 0 for a tie, 1 if p beats h, 2 if h beats p.
-func judge(p, h Move) int {
-	return (int(p) - int(h) + 3) % 3
-}
 
 // revealWindow is how many blocks the challenger gets to reveal after the
 // opponent accepts before the opponent can claim a forfeit win.
@@ -100,7 +60,7 @@ type duel struct {
 	Challenger     address
 	Opponent       address
 	Commit         string // hex sha256 of "<move>:<salt>"
-	OpponentMove   Move
+	OpponentMove   rps.Move
 	Status         duelStatus
 	Result         string // "challenger" | "opponent" | "draw" once settled
 	Winner         address
@@ -133,11 +93,11 @@ var (
 // a caller can compute their commitment (e.g. via a read-only query) before
 // calling Open, then remember the salt to pass to Reveal later.
 func ComputeCommit(moveStr, salt string) string {
-	m, ok := parseMove(moveStr)
+	m, ok := rps.Parse(moveStr)
 	if !ok {
 		panic("invalid move: use rock, paper, or scissors (r/p/s)")
 	}
-	sum := sha256.Sum256([]byte(moveName(m) + ":" + salt))
+	sum := sha256.Sum256([]byte(m.String() + ":" + salt))
 	return hex.EncodeToString(sum[:])
 }
 
@@ -159,7 +119,7 @@ func bumpChampion(addr address, wins int) {
 }
 
 // settle scores a revealed round and updates both players' records.
-func settle(d *duel, challengerMove Move, result int) {
+func settle(d *duel, challengerMove rps.Move, result int) {
 	cs := getOrCreate(d.Challenger)
 	os := getOrCreate(d.Opponent)
 	cs.Duels++
@@ -249,7 +209,7 @@ func Accept(cur realm, id string, moveStr string) string {
 		panic("only the challenged opponent can accept this duel")
 	}
 
-	m, ok := parseMove(moveStr)
+	m, ok := rps.Parse(moveStr)
 	if !ok {
 		panic("invalid move: use rock, paper, or scissors (r/p/s)")
 	}
@@ -259,9 +219,9 @@ func Accept(cur realm, id string, moveStr string) string {
 	d.AcceptedAt = runtime.ChainHeight()
 	d.RevealDeadline = d.AcceptedAt + revealWindow
 
-	chain.Emit("DuelAccepted", "id", id, "opponentMove", moveName(m))
+	chain.Emit("DuelAccepted", "id", id, "opponentMove", m.String())
 
-	return "you played " + moveName(m) + " in duel #" + id +
+	return "you played " + m.String() + " in duel #" + id +
 		" -- waiting for " + d.Challenger.String() + " to reveal by block " +
 		strconv.Itoa(int(d.RevealDeadline))
 }
@@ -284,26 +244,26 @@ func Reveal(cur realm, id string, moveStr string, salt string) string {
 		panic("only the challenger can reveal")
 	}
 
-	m, ok := parseMove(moveStr)
+	m, ok := rps.Parse(moveStr)
 	if !ok {
 		panic("invalid move: use rock, paper, or scissors (r/p/s)")
 	}
-	sum := sha256.Sum256([]byte(moveName(m) + ":" + salt))
+	sum := sha256.Sum256([]byte(m.String() + ":" + salt))
 	if hex.EncodeToString(sum[:]) != d.Commit {
 		panic("revealed move+salt doesn't match your original commitment")
 	}
 
-	result := judge(m, d.OpponentMove)
+	result := rps.Beats(m, d.OpponentMove)
 	settle(d, m, result)
 
 	chain.Emit("DuelResolved",
 		"id", id,
 		"result", d.Result,
-		"challengerMove", moveName(m),
-		"opponentMove", moveName(d.OpponentMove),
+		"challengerMove", m.String(),
+		"opponentMove", d.OpponentMove.String(),
 	)
 
-	return "you revealed " + moveName(m) + " vs " + moveName(d.OpponentMove) + " -- " + outcomeMsg(d)
+	return "you revealed " + m.String() + " vs " + d.OpponentMove.String() + " -- " + outcomeMsg(d)
 }
 
 func outcomeMsg(d *duel) string {
@@ -443,7 +403,7 @@ func renderDuel(id string) string {
 	b.WriteString("- Status: " + d.Status.String() + "\n")
 
 	if d.Status == statusAwaitingReveal {
-		b.WriteString("- Opponent played: **" + moveName(d.OpponentMove) + "**\n")
+		b.WriteString("- Opponent played: **" + d.OpponentMove.String() + "**\n")
 		b.WriteString("- Reveal deadline: block " + strconv.Itoa(int(d.RevealDeadline)) + "\n")
 	}
 	if d.Status == statusResolved || d.Status == statusForfeited {

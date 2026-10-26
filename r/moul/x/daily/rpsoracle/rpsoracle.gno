@@ -13,53 +13,13 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/x/daily/rps/v0"
 	"gno.land/p/nt/avl/v0"
 )
 
-// Move is one of rock, paper, or scissors, ordered so that
-// (winner - loser + 3) % 3 == 1 for every winning pair.
-type Move int
-
-const (
-	Rock Move = iota
-	Paper
-	Scissors
-)
-
-func moveName(m Move) string {
-	switch m {
-	case Rock:
-		return "rock"
-	case Paper:
-		return "paper"
-	case Scissors:
-		return "scissors"
-	default:
-		return "?"
-	}
-}
-
-func parseMove(s string) (Move, bool) {
-	switch strings.ToLower(strings.TrimSpace(s)) {
-	case "rock", "r":
-		return Rock, true
-	case "paper", "p":
-		return Paper, true
-	case "scissors", "s":
-		return Scissors, true
-	default:
-		return 0, false
-	}
-}
-
-// judge returns 0 for a tie, 1 if p beats h, 2 if h beats p.
-func judge(p, h Move) int {
-	return (int(p) - int(h) + 3) % 3
-}
-
 // beats returns the move that defeats m.
-func beats(m Move) Move {
-	return Move((int(m) + 1) % 3)
+func beats(m rps.Move) rps.Move {
+	return rps.Move((int(m) + 1) % 3)
 }
 
 // playerState is the persisted record for one address.
@@ -98,16 +58,16 @@ func getOrCreate(addr address) *playerState {
 // history so far. Ties (including a fresh player's all-zero history) fall
 // back to a chain-height-derived seed so the oracle doesn't always break
 // ties the same way.
-func predict(ps *playerState, seed int64) Move {
-	best := Rock
-	bestCount := ps.Counts[Rock]
-	tied := []Move{Rock}
-	for _, m := range []Move{Paper, Scissors} {
+func predict(ps *playerState, seed int64) rps.Move {
+	best := rps.Rock
+	bestCount := ps.Counts[rps.Rock]
+	tied := []rps.Move{rps.Rock}
+	for _, m := range []rps.Move{rps.Paper, rps.Scissors} {
 		switch {
 		case ps.Counts[m] > bestCount:
 			bestCount = ps.Counts[m]
 			best = m
-			tied = []Move{m}
+			tied = []rps.Move{m}
 		case ps.Counts[m] == bestCount:
 			tied = append(tied, m)
 		}
@@ -130,7 +90,7 @@ func Play(cur realm, moveStr string) string {
 	}
 	caller := cur.Previous().Address()
 
-	playerMove, ok := parseMove(moveStr)
+	playerMove, ok := rps.Parse(moveStr)
 	if !ok {
 		panic("invalid move: use rock, paper, or scissors (r/p/s)")
 	}
@@ -142,7 +102,7 @@ func Play(cur realm, moveStr string) string {
 	predicted := predict(ps, seed)
 	oracleMove := beats(predicted)
 
-	result := judge(playerMove, oracleMove)
+	result := rps.Beats(playerMove, oracleMove)
 
 	ps.Counts[playerMove]++
 	ps.Rounds++
@@ -174,14 +134,14 @@ func Play(cur realm, moveStr string) string {
 
 	chain.Emit("RoundPlayed",
 		"player", caller.String(),
-		"playerMove", moveName(playerMove),
-		"oraclePredicted", moveName(predicted),
-		"oracleMove", moveName(oracleMove),
+		"playerMove", playerMove.String(),
+		"oraclePredicted", predicted.String(),
+		"oracleMove", oracleMove.String(),
 		"result", strconv.Itoa(result),
 	)
 
-	return "you played " + moveName(playerMove) + ", the oracle predicted " +
-		moveName(predicted) + " and threw " + moveName(oracleMove) + " -> " + msg
+	return "you played " + playerMove.String() + ", the oracle predicted " +
+		predicted.String() + " and threw " + oracleMove.String() + " -> " + msg
 }
 
 func renderHome() string {
@@ -228,12 +188,12 @@ func renderPlayer(rawAddr string) string {
 	b.WriteString("- Lost to the oracle: " + strconv.Itoa(ps.Losses) + "\n")
 	b.WriteString("- Draws: " + strconv.Itoa(ps.Draws) + "\n")
 	b.WriteString("- Best win streak vs oracle: " + strconv.Itoa(ps.BestStreak) + "\n")
-	b.WriteString("- Move history — rock: " + strconv.Itoa(ps.Counts[Rock]) +
-		", paper: " + strconv.Itoa(ps.Counts[Paper]) +
-		", scissors: " + strconv.Itoa(ps.Counts[Scissors]) + "\n")
+	b.WriteString("- Move history — rock: " + strconv.Itoa(ps.Counts[rps.Rock]) +
+		", paper: " + strconv.Itoa(ps.Counts[rps.Paper]) +
+		", scissors: " + strconv.Itoa(ps.Counts[rps.Scissors]) + "\n")
 
 	if ps.Rounds > 0 {
-		maxCount := ps.Counts[Rock]
+		maxCount := ps.Counts[rps.Rock]
 		for _, c := range ps.Counts[1:] {
 			if c > maxCount {
 				maxCount = c

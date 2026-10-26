@@ -12,17 +12,8 @@ import (
 	"chain/runtime"
 
 	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/x/daily/rps/v0"
 	"gno.land/p/nt/avl/v0"
-)
-
-// Move is one of rock, paper, or scissors, ordered so that
-// (winner - loser + 3) % 3 == 1 for every winning pair.
-type Move int
-
-const (
-	Rock Move = iota
-	Paper
-	Scissors
 )
 
 // winsNeeded is the number of round wins required to take a match.
@@ -54,41 +45,10 @@ var (
 	championWins int
 )
 
-func moveName(m Move) string {
-	switch m {
-	case Rock:
-		return "rock"
-	case Paper:
-		return "paper"
-	case Scissors:
-		return "scissors"
-	default:
-		return "?"
-	}
-}
-
-func parseMove(s string) (Move, bool) {
-	switch strings.ToLower(strings.TrimSpace(s)) {
-	case "rock", "r":
-		return Rock, true
-	case "paper", "p":
-		return Paper, true
-	case "scissors", "s":
-		return Scissors, true
-	default:
-		return 0, false
-	}
-}
-
-// judge returns 0 for a tie, 1 if p beats h, 2 if h beats p.
-func judge(p, h Move) int {
-	return (int(p) - int(h) + 3) % 3
-}
-
 // pickHouseMove derives a deterministic pseudo-random move from the current
 // chain height, a monotonic per-realm nonce, and the caller's address, so
 // repeated throws in the same block still diverge.
-func pickHouseMove(caller address, n int) Move {
+func pickHouseMove(caller address, n int) rps.Move {
 	seed := runtime.ChainHeight() + int64(n)
 	s := caller.String()
 	for i := 0; i < len(s); i++ {
@@ -97,7 +57,7 @@ func pickHouseMove(caller address, n int) Move {
 	if seed < 0 {
 		seed = -seed
 	}
-	return Move(seed % 3)
+	return rps.Move(seed % 3)
 }
 
 func getOrCreate(addr address) *playerState {
@@ -119,7 +79,7 @@ func Throw(cur realm, moveStr string) string {
 	}
 	caller := cur.Previous().Address()
 
-	playerMove, ok := parseMove(moveStr)
+	playerMove, ok := rps.Parse(moveStr)
 	if !ok {
 		panic("invalid move: use rock, paper, or scissors (r/p/s)")
 	}
@@ -132,7 +92,7 @@ func Throw(cur realm, moveStr string) string {
 
 	nonce++
 	houseMove := pickHouseMove(caller, nonce)
-	round := judge(playerMove, houseMove)
+	round := rps.Beats(playerMove, houseMove)
 
 	m.Rounds++
 	totalRounds++
@@ -150,8 +110,8 @@ func Throw(cur realm, moveStr string) string {
 		roundMsg = "round tied"
 	}
 
-	out := "round " + strconv.Itoa(m.Rounds) + ": you played " + moveName(playerMove) +
-		", house played " + moveName(houseMove) + " -> " + roundMsg +
+	out := "round " + strconv.Itoa(m.Rounds) + ": you played " + playerMove.String() +
+		", house played " + houseMove.String() + " -> " + roundMsg +
 		" (score " + strconv.Itoa(m.PlayerWins) + "-" + strconv.Itoa(m.HouseWins) + ")"
 
 	if m.PlayerWins >= winsNeeded || m.HouseWins >= winsNeeded {
@@ -178,8 +138,8 @@ func Throw(cur realm, moveStr string) string {
 
 	chain.Emit("RoundPlayed",
 		"player", caller.String(),
-		"playerMove", moveName(playerMove),
-		"houseMove", moveName(houseMove),
+		"playerMove", playerMove.String(),
+		"houseMove", houseMove.String(),
 		"result", strconv.Itoa(round),
 	)
 
