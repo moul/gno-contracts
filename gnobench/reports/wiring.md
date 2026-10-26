@@ -10,7 +10,7 @@ The same n writes, batched into one transaction and spread across n transactions
 | machine | hardware | go | gno revision | gnobench | rows | updated |
 |---|---|---|---|---|--:|---|
 | `darwin-arm64-apple-m4-max-16c` | darwin/arm64, Apple M4 Max, 16 cores, 64 GB | go1.25.9 | `1fc4c140e (2026-09-14)` | `a346e802` | 258 | 2026-10-01T15:51:16Z |
-| `linux-amd64-amd-epyc-7763-64-core-processor-4c` | linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores | go1.25.9 | `6c49f5420 (2026-10-15)` | `90c6ac69` | 60 | 2026-10-19T06:00:37Z |
+| `linux-amd64-amd-epyc-7763-64-core-processor-4c` | linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores | go1.25.9 | `4f6104831 (2026-10-23)` | `196c40cd` | 60 | 2026-10-26T06:03:45Z |
 | `linux-amd64-intel-r-xeon-r-6973p-c-4c` | linux/amd64, Intel(R) Xeon(R) 6973P-C, 4 cores | go1.25.9 | `156777e0d (2026-10-03)` | `45f818b` | 60 | 2026-10-05T06:05:26Z |
 
 ## How to read this
@@ -701,66 +701,66 @@ the cache emits a delete either way, so the chain charges either way.
 
 | candidate | value | mode | workload | n | ops | gas | bytes | d_gas | d_bytes | wall ms | measured | note |
 |---|---|---|---|--:|--:|--:|--:|--:|--:|--:|---|---|
-| `builtin []string` | str | cold | one_tx | 100 | 100 | 2679253 | 8223 | 2679253 | 8223 | 14.9 | 2026-10-19 |  |
-| `builtin []string` | str | cold | one_tx | 1000 | 1000 | 154349043 | 79328 | 154349043 | 79328 | 417.9 | 2026-10-19 |  |
-| `builtin []string` | str | cold | op_base | 100 | 1 | 11552 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `builtin []string` | str | cold | op_base | 1000 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `builtin []string` | str | cold | op_read | 100 | 1 | 38262 | 0 | 26710 | 0 | 0.3 | 2026-10-19 |  |
-| `builtin []string` | str | cold | op_read | 1000 | 1 | 257385 | 0 | 245827 | 0 | 2.4 | 2026-10-19 |  |
-| `builtin []string` | str | cold | op_write | 100 | 1 | 68433 | -3 | 56881 | -3 | 0.4 | 2026-10-19 |  |
-| `builtin []string` | str | cold | op_write | 1000 | 1 | 500877 | -1 | 489319 | -1 | 2.9 | 2026-10-19 |  |
-| `builtin []string` | str | cold | tx_each | 100 | 100 | 5030493 | 8223 | 5030493 | 8223 | 57.4 | 2026-10-19 |  |
-| `builtin []string` | str | cold | tx_each | 1000 | 1000 | 287617450 | 79328 | 287617450 | 79328 | 1834.2 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | one_tx | 100 | 100 | 3242294 | 15317 | 3242294 | 15317 | 15.3 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | one_tx | 1000 | 1000 | 238878905 | 153019 | 238878905 | 153019 | 652.3 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | op_base | 100 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | op_base | 1000 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | op_read | 100 | 1 | 69937 | 0 | 58379 | 0 | 0.5 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | op_read | 1000 | 1 | 572302 | 0 | 560744 | 0 | 4.9 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | op_write | 100 | 1 | 122293 | -8 | 110735 | -8 | 0.7 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | op_write | 1000 | 1 | 1037764 | -8 | 1026206 | -8 | 6.0 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | tx_each | 100 | 100 | 7133016 | 15317 | 7133016 | 15317 | 62.1 | 2026-10-19 |  |
-| `builtin map[string]string` | str | cold | tx_each | 1000 | 1000 | 528957620 | 153019 | 528957620 | 153019 | 3447.4 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | one_tx | 100 | 100 | 6824344 | 92261 | 6824344 | 92261 | 24.3 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | one_tx | 1000 | 1000 | 91791018 | 928212 | 91791018 | 928212 | 305.9 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | op_base | 100 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | op_base | 1000 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | op_read | 100 | 1 | 129439 | 0 | 117350 | 0 | 0.5 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | op_read | 1000 | 1 | 152710 | 0 | 140621 | 0 | 0.6 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | op_write | 100 | 1 | 158814 | 6 | 146725 | 6 | 0.7 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | op_write | 1000 | 1 | 191313 | 4 | 179224 | 4 | 0.9 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | tx_each | 100 | 100 | 14792370 | 92261 | 14792370 | 92261 | 92.9 | 2026-10-19 |  |
-| `p/moul/ulist/v1` | str | cold | tx_each | 1000 | 1000 | 182485184 | 928212 | 182485184 | 928212 | 1136.9 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | one_tx | 100 | 100 | 30498701 | 202563 | 30498701 | 202563 | 60.0 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | one_tx | 1000 | 1000 | 441098958 | 2049561 | 441098958 | 2049561 | 835.8 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | op_base | 100 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | op_base | 1000 | 1 | 12080 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | op_read | 100 | 1 | 192559 | 0 | 180485 | 0 | 0.7 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | op_read | 1000 | 1 | 229333 | 0 | 217253 | 0 | 1.0 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | op_write | 100 | 1 | 303370 | -20 | 291296 | -20 | 1.3 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | op_write | 1000 | 1 | 378253 | -47 | 366173 | -47 | 2.0 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | tx_each | 100 | 100 | 45576329 | 202563 | 45576329 | 202563 | 174.9 | 2026-10-19 |  |
-| `p/nt/avl/v0` | str | cold | tx_each | 1000 | 1000 | 618052802 | 2049561 | 618052802 | 2049561 | 2298.4 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | one_tx | 100 | 100 | 13799446 | 55813 | 13799446 | 55813 | 46.4 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | one_tx | 1000 | 1000 | 190039480 | 553811 | 190039480 | 553811 | 575.2 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 100 | 1 | 12080 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 1000 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 100 | 1 | 241454 | 0 | 229374 | 0 | 1.6 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 1000 | 1 | 310160 | 0 | 298074 | 0 | 2.2 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 100 | 1 | 316711 | -3 | 304631 | -3 | 2.0 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 1000 | 1 | 318338 | -8 | 306252 | -8 | 2.1 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | tx_each | 100 | 100 | 31081642 | 55813 | 31081642 | 55813 | 209.1 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=128` | str | cold | tx_each | 1000 | 1000 | 412126219 | 553811 | 412126219 | 553811 | 2770.3 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | one_tx | 100 | 100 | 11420488 | 66050 | 11420488 | 66050 | 36.6 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | one_tx | 1000 | 1000 | 139932849 | 601139 | 139932849 | 601139 | 419.1 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 100 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 1000 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 100 | 1 | 205069 | 0 | 192983 | 0 | 1.0 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 1000 | 1 | 247423 | 0 | 235337 | 0 | 1.3 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 100 | 1 | 213241 | -7 | 201155 | -7 | 1.0 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 1000 | 1 | 260460 | -8 | 248374 | -8 | 1.3 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | tx_each | 100 | 100 | 25412763 | 66050 | 25412763 | 66050 | 153.7 | 2026-10-19 |  |
-| `p/nt/bptree/v0 fanout=32` | str | cold | tx_each | 1000 | 1000 | 296566878 | 601139 | 296566878 | 601139 | 1762.2 | 2026-10-19 |  |
+| `builtin []string` | str | cold | one_tx | 100 | 100 | 2679253 | 8223 | 2679253 | 8223 | 15.0 | 2026-10-26 |  |
+| `builtin []string` | str | cold | one_tx | 1000 | 1000 | 154349043 | 79328 | 154349043 | 79328 | 391.2 | 2026-10-26 |  |
+| `builtin []string` | str | cold | op_base | 100 | 1 | 11552 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `builtin []string` | str | cold | op_base | 1000 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `builtin []string` | str | cold | op_read | 100 | 1 | 38262 | 0 | 26710 | 0 | 0.2 | 2026-10-26 |  |
+| `builtin []string` | str | cold | op_read | 1000 | 1 | 257385 | 0 | 245827 | 0 | 2.4 | 2026-10-26 |  |
+| `builtin []string` | str | cold | op_write | 100 | 1 | 68433 | -3 | 56881 | -3 | 0.4 | 2026-10-26 |  |
+| `builtin []string` | str | cold | op_write | 1000 | 1 | 500877 | -1 | 489319 | -1 | 2.9 | 2026-10-26 |  |
+| `builtin []string` | str | cold | tx_each | 100 | 100 | 5030493 | 8223 | 5030493 | 8223 | 47.5 | 2026-10-26 |  |
+| `builtin []string` | str | cold | tx_each | 1000 | 1000 | 287617450 | 79328 | 287617450 | 79328 | 1831.6 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | one_tx | 100 | 100 | 3242294 | 15317 | 3242294 | 15317 | 14.7 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | one_tx | 1000 | 1000 | 238878905 | 153019 | 238878905 | 153019 | 689.8 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | op_base | 100 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | op_base | 1000 | 1 | 11558 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | op_read | 100 | 1 | 69937 | 0 | 58379 | 0 | 0.5 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | op_read | 1000 | 1 | 572302 | 0 | 560744 | 0 | 4.9 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | op_write | 100 | 1 | 122293 | -8 | 110735 | -8 | 0.7 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | op_write | 1000 | 1 | 1037764 | -8 | 1026206 | -8 | 6.0 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | tx_each | 100 | 100 | 7133016 | 15317 | 7133016 | 15317 | 62.4 | 2026-10-26 |  |
+| `builtin map[string]string` | str | cold | tx_each | 1000 | 1000 | 528957620 | 153019 | 528957620 | 153019 | 3464.0 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | one_tx | 100 | 100 | 6824344 | 92261 | 6824344 | 92261 | 24.5 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | one_tx | 1000 | 1000 | 91791018 | 928212 | 91791018 | 928212 | 315.1 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | op_base | 100 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | op_base | 1000 | 1 | 12089 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | op_read | 100 | 1 | 129439 | 0 | 117350 | 0 | 0.5 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | op_read | 1000 | 1 | 152710 | 0 | 140621 | 0 | 0.7 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | op_write | 100 | 1 | 158814 | 6 | 146725 | 6 | 0.7 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | op_write | 1000 | 1 | 191313 | 4 | 179224 | 4 | 1.0 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | tx_each | 100 | 100 | 14792370 | 92261 | 14792370 | 92261 | 98.7 | 2026-10-26 |  |
+| `p/moul/ulist/v1` | str | cold | tx_each | 1000 | 1000 | 182485184 | 928212 | 182485184 | 928212 | 1181.2 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | one_tx | 100 | 100 | 30498701 | 202563 | 30498701 | 202563 | 62.2 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | one_tx | 1000 | 1000 | 441098958 | 2049561 | 441098958 | 2049561 | 860.2 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | op_base | 100 | 1 | 12074 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | op_base | 1000 | 1 | 12080 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | op_read | 100 | 1 | 192559 | 0 | 180485 | 0 | 0.7 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | op_read | 1000 | 1 | 229333 | 0 | 217253 | 0 | 0.9 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | op_write | 100 | 1 | 303370 | -20 | 291296 | -20 | 1.4 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | op_write | 1000 | 1 | 378253 | -47 | 366173 | -47 | 1.9 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | tx_each | 100 | 100 | 45576329 | 202563 | 45576329 | 202563 | 176.6 | 2026-10-26 |  |
+| `p/nt/avl/v0` | str | cold | tx_each | 1000 | 1000 | 618052802 | 2049561 | 618052802 | 2049561 | 2349.4 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | one_tx | 100 | 100 | 13799446 | 55813 | 13799446 | 55813 | 45.3 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | one_tx | 1000 | 1000 | 190039480 | 553811 | 190039480 | 553811 | 579.1 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 100 | 1 | 12080 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_base | 1000 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 100 | 1 | 241454 | 0 | 229374 | 0 | 1.7 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_read | 1000 | 1 | 310160 | 0 | 298074 | 0 | 2.1 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 100 | 1 | 316711 | -3 | 304631 | -3 | 2.0 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | op_write | 1000 | 1 | 318338 | -8 | 306252 | -8 | 2.2 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | tx_each | 100 | 100 | 31081642 | 55813 | 31081642 | 55813 | 211.5 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=128` | str | cold | tx_each | 1000 | 1000 | 412126219 | 553811 | 412126219 | 553811 | 2848.8 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | one_tx | 100 | 100 | 11420488 | 66050 | 11420488 | 66050 | 37.7 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | one_tx | 1000 | 1000 | 139932849 | 601139 | 139932849 | 601139 | 414.1 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 100 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_base | 1000 | 1 | 12086 | 0 | 0 | 0 | 0.0 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 100 | 1 | 205069 | 0 | 192983 | 0 | 1.0 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_read | 1000 | 1 | 247423 | 0 | 235337 | 0 | 1.4 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 100 | 1 | 213241 | -7 | 201155 | -7 | 1.0 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | op_write | 1000 | 1 | 260460 | -8 | 248374 | -8 | 1.4 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | tx_each | 100 | 100 | 25412763 | 66050 | 25412763 | 66050 | 159.4 | 2026-10-26 |  |
+| `p/nt/bptree/v0 fanout=32` | str | cold | tx_each | 1000 | 1000 | 296566878 | 601139 | 296566878 | 601139 | 1823.9 | 2026-10-26 |  |
 
 </details>
 

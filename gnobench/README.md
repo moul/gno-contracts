@@ -26,7 +26,7 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 ### `digest`: Hashing and encoding a realm's bytes
 
 - **112** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-09-29.
-- **112** measured rows on `linux-amd64-amd-epyc-7763-64-core-processor-4c` (linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores), Go 1.25.9, gno `6c49f5420 (2026-10-15)`, last updated 2026-10-19.
+- **112** measured rows on `linux-amd64-amd-epyc-7763-64-core-processor-4c` (linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores), Go 1.25.9, gno `4f6104831 (2026-10-23)`, last updated 2026-10-26.
 - **112** measured rows on `linux-amd64-intel-r-xeon-r-6973p-c-4c` (linux/amd64, Intel(R) Xeon(R) 6973P-C, 4 cores), Go 1.25.9, gno `156777e0d (2026-10-03)`, last updated 2026-10-05.
 - On an 8,192-byte input: **`crypto/sha256` at 77,108 gas per call**, against `strconv (hand-rolled hex)` at 336,877,484. A **4,369x** spread, and it tracks native against interpreted, not algorithm against algorithm.
 
@@ -42,7 +42,7 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 ### `storage`: Where a realm puts its data
 
 - **1,698** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-10-01.
-- **1,312** measured rows on `linux-amd64-amd-epyc-7763-64-core-processor-4c` (linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores), Go 1.25.9, gno `6c49f5420 (2026-10-15)`, last updated 2026-10-19.
+- **1,312** measured rows on `linux-amd64-amd-epyc-7763-64-core-processor-4c` (linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores), Go 1.25.9, gno `4f6104831 (2026-10-23)`, last updated 2026-10-26.
 - **1,312** measured rows on `linux-amd64-intel-r-xeon-r-6973p-c-4c` (linux/amd64, Intel(R) Xeon(R) 6973P-C, 4 cores), Go 1.25.9, gno `156777e0d (2026-10-03)`, last updated 2026-10-05.
 - One cold read against 10,000 entries: **`p/nt/avl/v0` at 253,035 gas**, against `builtin map[string]string` at 5,594,956. A **22.1x** spread.
 - Storage per entry, keyed containers: **`builtin map[string]any` at 153 bytes**, against `p/moul/cow/v0` at 2,054. At 100k entries that is 1,530 GNOT of deposit against 20,536.
@@ -77,7 +77,7 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
 ### `wiring`: What it costs to write one change at a time
 
 - **258** measured rows on `darwin-arm64-apple-m4-max-16c` (darwin/arm64, Apple M4 Max, 16 cores, 64 GB), Go 1.25.9, gno `1fc4c140e (2026-09-14)`, last updated 2026-10-01.
-- **60** measured rows on `linux-amd64-amd-epyc-7763-64-core-processor-4c` (linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores), Go 1.25.9, gno `6c49f5420 (2026-10-15)`, last updated 2026-10-19.
+- **60** measured rows on `linux-amd64-amd-epyc-7763-64-core-processor-4c` (linux/amd64, AMD EPYC 7763 64-Core Processor, 4 cores), Go 1.25.9, gno `4f6104831 (2026-10-23)`, last updated 2026-10-26.
 - **60** measured rows on `linux-amd64-intel-r-xeon-r-6973p-c-4c` (linux/amd64, Intel(R) Xeon(R) 6973P-C, 4 cores), Go 1.25.9, gno `156777e0d (2026-10-03)`, last updated 2026-10-05.
 
 [Full report](reports/wiring.md) `·` [Dashboard, filterable](reports/wiring.html) `·` [Raw rows](results/wiring/)
