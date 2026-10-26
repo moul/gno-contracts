@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-26T09:57:53Z",
+  "status_checked_at": "2026-10-26T10:10:52Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -1844,6 +1844,27 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/bech32/v0",
+      "dir": "p/moul/x/daily/bech32",
+      "kind": "p",
+      "name": "x/daily/bech32",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/bencode/v0",
       "dir": "p/moul/x/daily/bencode",
       "kind": "p",
@@ -2109,6 +2130,27 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/cron/v0",
+      "dir": "p/moul/x/daily/cron",
+      "kind": "p",
+      "name": "x/daily/cron",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/dijkstra/v0",
       "dir": "p/moul/x/daily/dijkstra",
       "kind": "p",
@@ -2240,6 +2282,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/geohash/v0",
+      "dir": "p/moul/x/daily/geohash",
+      "kind": "p",
+      "name": "x/daily/geohash",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -5563,6 +5626,32 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/bech32demo/v0",
+      "dir": "r/moul/x/daily/bech32demo",
+      "kind": "r",
+      "name": "x/daily/bech32demo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/bech32/v0",
+        "gno.land/p/moul/x/daily/hexdump/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/bencodedemo/v0",
       "dir": "r/moul/x/daily/bencodedemo",
       "kind": "r",
@@ -6363,6 +6452,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/crondemo/v0",
+      "dir": "r/moul/x/daily/crondemo",
+      "kind": "r",
+      "name": "x/daily/crondemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/cron/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/crowdfund/v0",
       "dir": "r/moul/x/daily/crowdfund",
       "kind": "r",
@@ -7066,6 +7179,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/geohashdemo/v0",
+      "dir": "r/moul/x/daily/geohashdemo",
+      "kind": "r",
+      "name": "x/daily/geohashdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/x/daily/geohash/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
