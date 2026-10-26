@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-26T11:38:46Z",
+  "status_checked_at": "2026-10-26T14:08:09Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -439,6 +439,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "d867ce001a6934a82c5e602c06e925829cf1bcbb",
       "published": {
         "betanet": {
           "uploaded": false
@@ -961,6 +963,8 @@
         "gno.land/p/moul/md/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d867ce001a6934a82c5e602c06e925829cf1bcbb",
       "published": {
         "betanet": {
           "uploaded": false
@@ -1153,6 +1157,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "d867ce001a6934a82c5e602c06e925829cf1bcbb",
       "published": {
         "betanet": {
           "uploaded": false
@@ -1369,6 +1375,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "d867ce001a6934a82c5e602c06e925829cf1bcbb",
       "published": {
         "betanet": {
           "uploaded": false
@@ -1438,6 +1446,8 @@
         "gno.land/p/nt/ufmt/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d867ce001a6934a82c5e602c06e925829cf1bcbb",
       "published": {
         "betanet": {
           "uploaded": false
@@ -1561,6 +1571,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "d867ce001a6934a82c5e602c06e925829cf1bcbb",
       "published": {
         "betanet": {
           "uploaded": false
@@ -3918,6 +3930,8 @@
         "gno.land/p/moul/udao/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d867ce001a6934a82c5e602c06e925829cf1bcbb",
       "published": {
         "betanet": {
           "uploaded": false
