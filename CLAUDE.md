@@ -15,8 +15,13 @@ irreversible.
   breaking change (removing or renaming an exported symbol, changing a signature or an
   on-chain behavior, swapping the backing storage) is `gnopm bump <name>`, then edit the
   files in place so git diffs the change. **Never create a `vN` directory, never copy a
-  package to bump it.** New contracts start at `v0`; non-breaking work (new functions,
-  tests, comments, docs) edits the current version.
+  package to bump it.** New contracts start at `v0`.
+- **Non-breaking work edits the current version in place only while that version is not on
+  the chain.** Semver says a new function needs no bump; the chain says a public path takes
+  one `MsgAddPackage`, ever. `gnopm tool ci` decides, per package whose production `.gno` a
+  branch changes: absent is silent, a live `private` realm gets a non-fatal "needs a
+  redeploy", and live public or parked **fails CI** (`gnopm bump -if-published <name>`).
+  Tests and READMEs never trip it.
 - **An unversioned path needs one of two grounds**, and the allowlist with the reason per entry
   is `unversionedContracts` in `tools/gnocontracts/model.go`. Either an external consumer
   hard-codes the path (`r/moul/home`, because gnoweb builds `/r/<user>/home` by concatenation

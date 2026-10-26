@@ -99,7 +99,10 @@ edit. The version it replaces keeps working for existing callers, pinned in
 [`gnomod.lock`](./gnomod.lock) to the commit that still holds it and rebuilt into `.gnopm/`
 on demand, so anything still importing `.../md/v0` resolves, lints and tests exactly as
 before. Non-breaking work, new functions, tests, comments and docs, edits the current
-version in place.
+version in place while that version is not yet on the chain. Once it is live on a public
+path, no transaction can carry a change to its code, so `gnopm tool ci` fails the pull
+request and even an added function is a bump ([AGENTS.md](./AGENTS.md#the-three-rules),
+rule 1).
 
 This used to be a directory copy, `p/moul/md/v0` to `p/moul/md/v1`, files and all. git
 pairs nothing across a copy, so the review diff of a version bump was a pile of added
@@ -556,6 +559,11 @@ _On-chain status last checked: 2026-10-26T16:39:35Z (✅ = published from this r
 The table is generated from [`contracts.json`](./contracts.json) by `make readme`, on
 `main` and never in a pull request. Descriptions and upload status are hand-authored or
 queried, and preserved across regenerations.
+
+A 🧊 row whose source link points at an old commit has no directory any more. Either a
+newer version superseded it, or it was retired with no successor:
+[`archive_obsolete/`](./archive_obsolete/README.md) lists the retired ones, why each went,
+and what to use instead.
 
 ## Dependency graph
 
