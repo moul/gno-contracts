@@ -1,0 +1,45 @@
+# `gno.land/p/moul/x/daily/bech32/v0`
+
+**Bech32 and Bech32m, BIP-173 and BIP-350**: `Encode`, `EncodeVariant`,
+`Decode`, `ConvertBits`, `EncodeBytes`, `DecodeBytes`.
+
+```go
+import "gno.land/p/moul/x/daily/bech32/v0"
+
+hrp, payload, v, err := bech32.DecodeBytes("g1manfred47kzduec920z88wfr64ylksmdcedlf5")
+// hrp == "g", payload is the 20-byte address, v.String() == "bech32"
+
+bech32.EncodeBytes("g", payload)              // back to the same string
+bech32.EncodeVariant("a", nil, bech32.Bech32m) // "a1lqfn3a"
+```
+
+**What the format buys.** A human-readable part, the separator `1`, and a data
+part in a 32-character alphabet that ends in a six-character BCH checksum. The
+checksum is the point: it detects every error of up to four characters, and the
+alphabet leaves out `1`, `b`, `i` and `o`, the four that are easiest to misread.
+That is why a gno.land address, a Bitcoin segwit address and a Cosmos account
+address all look the way they do.
+
+**Two variants, one constant apart.** Bech32 xors its checksum with `1`,
+Bech32m with `0x2bc830a3`. `Decode` accepts either and reports which one
+verified, so a caller that cares can check instead of assuming.
+
+**Why the second one exists**, reproduced as a test rather than quoted: a Bech32
+string ending in `p` keeps a valid checksum when `q` characters are inserted in
+front of that final `p`. `a1q3g6mnsp` and `a1q3g6mnsqp` both verify, and decode
+to different data. The same insertion on a Bech32m string is refused.
+
+Verified against the BIP-173 and BIP-350 vectors, and against a live mainnet
+address, which is the externally anchored check: it decodes to 20 bytes and
+re-encodes to the same 40 characters.
+
+Strict where it matters: mixed case is rejected rather than folded, the 90
+character cap of BIP-173 is enforced (it is what keeps a wrong character
+locatable, and a decode bounded in gas), and `ConvertBits` going back to 8 bits
+refuses leftover bits rather than inventing a trailing zero byte. A `Variant`
+that is neither constant is refused rather than quietly encoded as Bech32, and
+`EncodeBytes` checks `MaxPayloadLen(hrp)` before it regroups anything, so an
+oversized payload costs a comparison and not a full scan.
+
+**Live demo:** [`r/moul/x/daily/bech32demo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/bech32demo)
+· render it at [`/r/moul/x/daily/bech32demo/v0`](https://gno.land/r/moul/x/daily/bech32demo/v0).
