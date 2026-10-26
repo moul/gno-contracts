@@ -475,7 +475,7 @@ block the failure prints. Worked examples: the `x/daily/*demo` realms.
 an `// Output:` block, like Go, and a lot of markdown `Render`s produce them. Assert those
 in a normal `Test` with `uassert.Equal(t, expected, got)` and a backtick literal, which
 preserves blank lines exactly, stays in-package and needs no `fmt`. Worked example:
-`p/moul/mdlist` `TestEntriesRendering`.
+`r/moul/x/kitindexdemo` `TestRenderRoot`.
 
 Order of preference: **example test**, then **`Test` + `uassert.Equal`** (blank-line or
 aborting output), then **filetest** (`filetests/*_filetest.gno`, auto-populated by

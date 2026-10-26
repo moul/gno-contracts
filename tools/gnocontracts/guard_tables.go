@@ -61,11 +61,9 @@ const minTableReason = 20
 // because emitting one correctly is what they are for. Everything else goes
 // through one of these.
 var tableExempt = map[string]bool{
-	"p/moul/kit/ui":   true, // the house table
-	"p/moul/mdtable":  true, // the frozen monorepo mirror
-	"p/moul/md":       true, // Columns() lays a table out as a grid
-	"p/moul/mdlist":   true,
-	"p/moul/template": true, // a table can arrive as a user's template string
+	"p/moul/kit/ui":  true, // the house table
+	"p/moul/mdtable": true, // the frozen monorepo mirror
+	"p/moul/md":      true, // Columns() lays a table out as a grid
 }
 
 // tableBaselineFile lists the packages that already build tables by hand.

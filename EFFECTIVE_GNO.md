@@ -225,7 +225,7 @@ it when that realm forwards its own `cur`.
 Upstream says this and it is worth repeating with the local consequence: a type declared in
 a realm is unusable by anyone else, and a **private** realm's type is unusable by anyone
 else *and* poisons any object that retains it. Interfaces, value types and errors go in a
-`p/`. [`p/moul/udao`](./p/moul/udao) is the shape: the DAO interface written from the
+`p/`. [`p/moul/udao/v0`](https://gno.land/p/moul/udao/v0) is the shape: the DAO interface written from the
 outside, deliberately exposing only what a non-member can act on.
 
 ---
@@ -1007,7 +1007,7 @@ unparseable pause setting means paused.
 
 ### 5.5 Collective decisions
 
-[`p/moul/udao`](./p/moul/udao) is the minimal DAO interface, deliberately written from the
+[`p/moul/udao/v0`](https://gno.land/p/moul/udao/v0) is the minimal DAO interface, deliberately written from the
 outside: no members, no votes, because those differ per DAO and a non-member cannot act on
 them anyway.
 
@@ -1266,7 +1266,7 @@ live. If you are about to write a helper, look here first.
 | a "nothing here yet" line | [`kit/ui`](./p/moul/kit/ui) `Empty`, `Table.OrEmpty` |
 | a bytes / ordinal / plural formatter | [`x/daily/humanize`](./p/moul/x/daily/humanize) |
 | a set of addresses | [`addrset`](./p/moul/addrset) |
-| a template with `{{ }}` | [`template`](./p/moul/template), or [`dynreplacer`](./p/moul/dynreplacer) |
+| a template with `{{ }}` | [`dynreplacer`](./p/moul/dynreplacer) |
 | map / filter / reduce over `[]any` | [`fp`](./p/moul/fp) |
 | a "convert anything to a string" helper | [`typeutil`](./p/moul/typeutil) |
 | a multi-error | [`errs`](./p/moul/errs) |
@@ -1277,9 +1277,9 @@ live. If you are about to write a helper, look here first.
 | a one-time init guard | [`once`](./p/moul/once) |
 | an SVG | [`svg`](./p/moul/svg) |
 
-And the three marked 🚧, which are declared but **not implemented**, so do not import them
-expecting behaviour: [`entity`](./p/moul/entity), [`ownable`](./p/moul/ownable) (use
-`p/nt/ownable`), [`safe`](./p/moul/safe), and [`xdao`](./p/moul/xdao) is partial.
+An owner check is `p/nt/ownable`. `p/moul/ownable`, `entity`, `safe` and `xdao` were
+declared but never implemented, and left this tree with `udao`, `template` and `mdlist`
+(#356): their `v0` stays on chain, frozen, and nothing should import it.
 
 ---
 
