@@ -12,10 +12,10 @@ func ExampleRender() {
 	//
 	// ## Try one
 	//
-	// - [`/co`](/r/moul/x/daily/triedemo/v0:co) — 10 words
-	// - [`/gno`](/r/moul/x/daily/triedemo/v0:gno) — 5 words
-	// - [`/re`](/r/moul/x/daily/triedemo/v0:re) — 6 words
-	// - [`/tr`](/r/moul/x/daily/triedemo/v0:tr) — 5 words
+	// - [`/co`](/r/moul/x/daily/triedemo/v1:co) — 10 words
+	// - [`/gno`](/r/moul/x/daily/triedemo/v1:gno) — 5 words
+	// - [`/re`](/r/moul/x/daily/triedemo/v1:re) — 6 words
+	// - [`/tr`](/r/moul/x/daily/triedemo/v1:tr) — 5 words
 }
 
 // ExampleRender_prefix pins a prefix walk: the completions come out in

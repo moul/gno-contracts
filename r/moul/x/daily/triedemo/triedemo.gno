@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/trie/v0"
 )
 
@@ -56,7 +57,7 @@ func Render(path string) string {
 		for _, p := range []string{"co", "gno", "re", "tr"} {
 			b.WriteString("- [`/")
 			b.WriteString(p)
-			b.WriteString("`](/r/moul/x/daily/triedemo/v0:")
+			b.WriteString("`](/r/moul/x/daily/triedemo/v1:")
 			b.WriteString(p)
 			b.WriteString(") — ")
 			b.WriteString(strconv.Itoa(len(dict.Complete(p, 0))))
@@ -65,14 +66,11 @@ func Render(path string) string {
 		return b.String()
 	}
 
-	b.WriteString("## Completions for `")
-	b.WriteString(prefix)
-	b.WriteString("`\n\n")
+	b.WriteString("## Completions for " + md.InlineCode(prefix) + "\n\n")
 
 	if !dict.HasPrefix(prefix) {
-		b.WriteString("_No word starts with `")
-		b.WriteString(prefix)
-		b.WriteString("`._\n\n> Try `/co`, `/gno`, `/tr` or `/re`.\n")
+		b.WriteString("_No word starts with " + md.InlineCode(prefix))
+		b.WriteString("._\n\n> Try `/co`, `/gno`, `/tr` or `/re`.\n")
 		return b.String()
 	}
 

@@ -10,6 +10,7 @@ package piglatindemo
 import (
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
 	"gno.land/p/moul/x/daily/piglatin/v0"
 )
 
@@ -37,7 +38,7 @@ func Render(path string) string {
 		for _, ex := range []string{"hello world", "The quick brown fox", "I love Gno!"} {
 			b.WriteString("- [`/")
 			b.WriteString(ex)
-			b.WriteString("`](/r/moul/x/daily/piglatindemo/v0:/")
+			b.WriteString("`](/r/moul/x/daily/piglatindemo/v1:/")
 			b.WriteString(ex)
 			b.WriteString(") → `")
 			b.WriteString(piglatin.Translate(ex))
@@ -57,9 +58,9 @@ func Render(path string) string {
 
 	b.WriteString("# Pig Latin\n\n")
 	b.WriteString("**Original:**\n\n> ")
-	b.WriteString(sentence)
+	b.WriteString(ui.Inline(sentence))
 	b.WriteString("\n\n**Pig Latin:**\n\n> ")
-	b.WriteString(piglatin.Translate(sentence))
-	b.WriteString("\n\n---\n\n[← rules & examples](/r/moul/x/daily/piglatindemo/v0)\n")
+	b.WriteString(ui.Inline(piglatin.Translate(sentence)))
+	b.WriteString("\n\n---\n\n[← rules & examples](/r/moul/x/daily/piglatindemo/v1)\n")
 	return b.String()
 }

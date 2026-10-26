@@ -20,15 +20,14 @@ func ExampleRender() {
 }
 
 // ExampleRender_rejectsDigits pins the refusal path: digits cannot be encoded
-// because they are indistinguishable from a run count on the way back.
+// because they are indistinguishable from a run count on the way back, and a
+// refused input is not echoed.
 func ExampleRender_rejectsDigits() {
 	print(Render("/ab3c"))
 	// Output:
 	// # Run-Length Encoding
 	//
 	// `<count><char>` pairs, demoing the [`p/moul/x/daily/rle`](/p/moul/x/daily/rle/v0) library.
-	//
-	// ## `ab3c`
 	//
 	// _rle: input must not contain digits_
 }

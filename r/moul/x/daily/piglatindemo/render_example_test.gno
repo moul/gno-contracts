@@ -20,9 +20,9 @@ func ExampleRender() {
 	//
 	// Append a sentence to the path — spaces are fine:
 	//
-	// - [`/hello world`](/r/moul/x/daily/piglatindemo/v0:/hello world) → `ellohay orldway`
-	// - [`/The quick brown fox`](/r/moul/x/daily/piglatindemo/v0:/The quick brown fox) → `Ethay uickqay ownbray oxfay`
-	// - [`/I love Gno!`](/r/moul/x/daily/piglatindemo/v0:/I love Gno!) → `Iway ovelay Ognay!`
+	// - [`/hello world`](/r/moul/x/daily/piglatindemo/v1:/hello world) → `ellohay orldway`
+	// - [`/The quick brown fox`](/r/moul/x/daily/piglatindemo/v1:/The quick brown fox) → `Ethay uickqay ownbray oxfay`
+	// - [`/I love Gno!`](/r/moul/x/daily/piglatindemo/v1:/I love Gno!) → `Iway ovelay Ognay!`
 	//
 	// ## Examples
 	//

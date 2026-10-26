@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/kit/ui/v0"
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/levenshtein/v0"
 )
 
@@ -28,8 +30,8 @@ func Render(path string) string {
 	if len(parts) != 2 {
 		var sb strings.Builder
 		sb.WriteString("# Levenshtein\n\n")
-		sb.WriteString("Provide two words as `/<a>/<b>`, e.g. [`/kitten/sitting`](/r/moul/x/daily/levenshteindemo/v0:kitten/sitting).\n\n")
-		sb.WriteString("[← back](/r/moul/x/daily/levenshteindemo/v0)\n")
+		sb.WriteString("Provide two words as `/<a>/<b>`, e.g. [`/kitten/sitting`](/r/moul/x/daily/levenshteindemo/v1:kitten/sitting).\n\n")
+		sb.WriteString("[← back](/r/moul/x/daily/levenshteindemo/v1)\n")
 		return sb.String()
 	}
 
@@ -40,11 +42,7 @@ func Render(path string) string {
 
 	var sb strings.Builder
 	sb.WriteString("# Levenshtein distance\n\n")
-	sb.WriteString("Transforming **`")
-	sb.WriteString(a)
-	sb.WriteString("`** → **`")
-	sb.WriteString(b)
-	sb.WriteString("`**\n\n")
+	sb.WriteString("Transforming **" + md.InlineCode(a) + "** → **" + md.InlineCode(b) + "**\n\n")
 	sb.WriteString("- **Edit distance:** `")
 	sb.WriteString(strconv.Itoa(dist))
 	sb.WriteString("` single-character edits (insert / delete / substitute)\n")
@@ -53,13 +51,13 @@ func Render(path string) string {
 	sb.WriteString("%`\n\n")
 
 	sb.WriteString("## DP table\n\n")
-	sb.WriteString("Each cell `d[i][j]` is the distance between the first *i* runes of `")
-	sb.WriteString(a)
-	sb.WriteString("` and the first *j* runes of `")
-	sb.WriteString(b)
-	sb.WriteString("`. The bottom-right cell is the answer.\n\n")
+	sb.WriteString("Each cell `d[i][j]` is the distance between the first *i* runes of ")
+	sb.WriteString(md.InlineCode(a))
+	sb.WriteString(" and the first *j* runes of ")
+	sb.WriteString(md.InlineCode(b))
+	sb.WriteString(". The bottom-right cell is the answer.\n\n")
 	sb.WriteString(renderTable(a, b))
-	sb.WriteString("\n[← back](/r/moul/x/daily/levenshteindemo/v0)\n")
+	sb.WriteString("\n[← back](/r/moul/x/daily/levenshteindemo/v1)\n")
 	return sb.String()
 }
 
@@ -87,7 +85,7 @@ func renderHome() string {
 		sb.WriteString(a)
 		sb.WriteString("/")
 		sb.WriteString(b)
-		sb.WriteString("`](/r/moul/x/daily/levenshteindemo/v0:")
+		sb.WriteString("`](/r/moul/x/daily/levenshteindemo/v1:")
 		sb.WriteString(a)
 		sb.WriteString("/")
 		sb.WriteString(b)
@@ -119,9 +117,9 @@ func renderTable(a, b string) string {
 	// Header row: blank | "" | each rune of b.
 	sb.WriteString("|   | ε |")
 	for _, r := range rb {
-		sb.WriteString(" `")
-		sb.WriteString(string(r))
-		sb.WriteString("` |")
+		sb.WriteString(" ")
+		sb.WriteString(ui.Cell(string(r)))
+		sb.WriteString(" |")
 	}
 	sb.WriteString("\n")
 	// Separator.
@@ -135,9 +133,9 @@ func renderTable(a, b string) string {
 		if i == 0 {
 			sb.WriteString("| **ε** |")
 		} else {
-			sb.WriteString("| **`")
-			sb.WriteString(string(ra[i-1]))
-			sb.WriteString("`** |")
+			sb.WriteString("| **")
+			sb.WriteString(ui.Cell(string(ra[i-1])))
+			sb.WriteString("** |")
 		}
 		for j := 0; j <= len(rb); j++ {
 			sb.WriteString(" ")

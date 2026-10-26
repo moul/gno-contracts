@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/luhn/v0"
 )
 
@@ -58,9 +59,7 @@ func Render(path string) string {
 		return b.String()
 	}
 
-	b.WriteString("## `")
-	b.WriteString(in)
-	b.WriteString("`\n\n")
+	b.WriteString("## " + md.InlineCode(in) + "\n\n")
 
 	if luhn.Valid(in) {
 		b.WriteString("**Valid** — the check digit matches.\n")

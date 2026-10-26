@@ -178,11 +178,11 @@ func Render(path string) string {
 	}
 	id, err := strconv.Atoi(p)
 	if err != nil {
-		return "# Tic-Tac-Toe\n\nInvalid game id: " + p + "\n"
+		return "# Tic-Tac-Toe\n\nInvalid game id.\n"
 	}
 	g, gerr := GetGame(id)
 	if gerr != nil {
-		return "# Tic-Tac-Toe\n\nGame " + p + " not found.\n"
+		return "# Tic-Tac-Toe\n\nGame " + strconv.Itoa(id) + " not found.\n"
 	}
 	var sb strings.Builder
 	sb.WriteString("# Tic-Tac-Toe — Game #")
