@@ -307,3 +307,67 @@ func TestTrimSpaceValidityCatchesTheTwoStatementSpelling(t *testing.T) {
 		})
 	}
 }
+
+// RenderPathRaw lives outside Rules because it runs in an audit family's slot,
+// so the two contracts every rule signs have to be checked for it by name.
+func TestRenderPathRawSignsTheRuleContract(t *testing.T) {
+	r := RenderPathRaw
+	if len(r.Finding) < 20 || r.What == "" || r.Why == "" || r.Fix == "" {
+		t.Fatalf("%s is missing a required field", r.ID)
+	}
+	if _, dup := ByID(r.ID); dup {
+		t.Fatalf("%s is also in Rules, so it would run twice", r.ID)
+	}
+	bad, err := RunRules(write(t, "bad.gno", r.Bad), []Rule{r})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(bad) != 1 || bad[0].Text != "b.WriteString(q)" {
+		t.Fatalf("the Bad fixture should fire once, on the raw write: %v", bad)
+	}
+	good, err := RunRules(write(t, "good.gno", r.Good), []Rule{r})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(good) != 0 {
+		t.Fatalf("the Good fixture fires at %v", good)
+	}
+}
+
+// Taint is scoped to the func that derived it. The file-wide version tainted
+// every `s` in the file once Render had one, and fired on 189 lines of this
+// tree, most of them a stored record's fields.
+func TestRenderPathRawScopesTaintToAFunc(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		src  string
+		want int
+	}{
+		{"same name in an unrelated func", "package x\n\n" +
+			"func Render(path string) string {\n\ts := strings.TrimSpace(path)\n\treturn renderOne(len(s))\n}\n\n" +
+			"func short(s string) string {\n\treturn s[:8] + \"…\"\n}\n", 0},
+		{"a lookup keyed by the path returns stored data", "package x\n\n" +
+			"func Render(path string) string {\n\td := duels.Get(path)\n\treturn \"# Duel \" + d.ID\n}\n", 0},
+		{"taint crosses into a helper's parameter", "package x\n\n" +
+			"func Render(path string) string {\n\treturn renderOne(path)\n}\n\n" +
+			"func renderOne(q string) string {\n\treturn \"# \" + q + \"\\n\"\n}\n", 1},
+		{"Sprintf wrapping onto the next line", "package x\n\n" +
+			"func Render(path string) string {\n\treturn ufmt.Sprintf(\"Balance of `%s`\",\n\t\tpath)\n}\n", 1},
+		{"an escaper ends the trail", "package x\n\n" +
+			"func Render(path string) string {\n\tvar b strings.Builder\n\tb.WriteString(ui.Inline(path))\n\treturn b.String()\n}\n", 0},
+		{"Render returning the path as the page", "package x\n\n" +
+			"func Render(path string) string {\n\treturn path\n}\n", 1},
+		{"a field named like the parameter is not it", "package x\n\n" +
+			"func Render(path string) string {\n\treturn \"# \" + c.path\n}\n", 0},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			hits, err := RunRules(write(t, "x.gno", tc.src), []Rule{RenderPathRaw})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(hits) != tc.want {
+				t.Fatalf("want %d hit(s), got %v", tc.want, hits)
+			}
+		})
+	}
+}

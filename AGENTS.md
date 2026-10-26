@@ -841,7 +841,7 @@ that the code is fine; it is a statement that the hit predates the guard, and th
 exactly that file. The families and why each is a finding:
 [EFFECTIVE_GNO.md § 5.7](./EFFECTIVE_GNO.md#57-the-anti-pattern-list).
 
-Three scoping decisions, each one stated in the code rather than discovered later:
+Four scoping decisions, each one stated in the code rather than discovered later:
 
 - **Eight of the ten rules are scanned in `r/` only.** That is upstream's own framing: its
   expected records title them "accepted by a realm" and "returned from a realm", and its
@@ -858,6 +858,11 @@ Three scoping decisions, each one stated in the code rather than discovered late
   the file's SHA256 in its header, and `audit-patterns -drift <gnoroot>` re-hashes the
   original. A mirror nobody verifies is a fork with a misleading comment on top. **Do not
   hand-edit it; re-mirror.** The real fix is an upstream pull request exporting the package.
+- **A family whose detector is wrong here gets ours, not an edit to the mirror.**
+  `auditLocal` in `tools/gnocontracts/audit_patterns.go` runs a gnovet rule in that family's
+  slot, keeping its name and its baseline rows. One entry: `render_markdown_escape`, whose
+  upstream detector keyed on the word `escape` and was wrong 45 times out of 45 (#359); it
+  runs `gnovet.RenderPathRaw`, which follows the value from Render's path to the write.
 
 CI runs it as its **own workflow** (`.github/workflows/audit-patterns.yml`), not a step in
 `ci`: it needs no gno toolchain, so it answers in seconds where `ci` takes minutes, and a

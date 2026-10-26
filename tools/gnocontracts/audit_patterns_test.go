@@ -120,3 +120,78 @@ func mustAudit(t *testing.T, root string, args ...string) {
 		t.Fatalf("audit-patterns %v: %v", args, err)
 	}
 }
+
+// render_markdown_escape runs gnovet.RenderPathRaw, not the mirror's detector
+// (gno-contracts#359). The regression case is soundexdemo's own Render, which
+// the mirror could not see because the raw write has no `return` on its line;
+// the counter-case is amm's 404, which the mirror flagged although it already
+// escapes through md.InlineCode.
+func TestAuditRenderMarkdownEscapeFollowsThePathNotTheWordEscape(t *testing.T) {
+	const soundexdemo = "package x\n\n" +
+		"func Render(path string) string {\n" +
+		"\tvar b strings.Builder\n" +
+		"\tb.WriteString(\"# Soundex\\n\\n\")\n" +
+		"\tif q := parseArg(path); q != \"\" {\n" +
+		"\t\tk := soundex.Encode(q)\n" +
+		"\t\tb.WriteString(\"## `\")\n" +
+		"\t\tb.WriteString(q)\n" +
+		"\t\tb.WriteString(\"`\\n\\n\")\n" +
+		"\t\tb.WriteString(k)\n" +
+		"\t\treturn b.String()\n" +
+		"\t}\n" +
+		"\treturn b.String()\n" +
+		"}\n\n" +
+		"func parseArg(path string) string {\n" +
+		"\ts := strings.TrimSpace(path)\n" +
+		"\ts = strings.TrimPrefix(s, \"/\")\n" +
+		"\tif i := strings.IndexByte(s, '/'); i >= 0 {\n" +
+		"\t\ts = s[:i]\n" +
+		"\t}\n" +
+		"\treturn s\n" +
+		"}\n"
+	const amm = "package x\n\n" +
+		"func Render(path string) string {\n" +
+		"\tif path != \"\" {\n" +
+		"\t\tv := pools.Get(path)\n" +
+		"\t\tif v == nil {\n" +
+		"\t\t\treturn \"# 404\\n\\nNo pool \" + md.InlineCode(path) + \".\\n\"\n" +
+		"\t\t}\n" +
+		"\t\treturn renderPool(v)\n" +
+		"\t}\n" +
+		"\treturn renderCase(parseID(path))\n" +
+		"}\n"
+
+	root := auditFixture(t, map[string]string{
+		"r/moul/soundexdemo": soundexdemo,
+		"r/moul/amm":         amm,
+	})
+	hits := auditJSON(t, root, "render_markdown_escape")
+	if len(hits) != 1 {
+		t.Fatalf("want exactly soundexdemo's raw heading, got %d hit(s): %+v", len(hits), hits)
+	}
+	if h := hits[0]; h.Dir != "r/moul/soundexdemo" || h.Line != 9 || h.Text != "b.WriteString(q)" {
+		t.Fatalf("want r/moul/soundexdemo x.gno:9 b.WriteString(q), got %+v", h)
+	}
+}
+
+// auditJSON runs one rule with -json and decodes what it printed.
+func auditJSON(t *testing.T, root, rule string) []auditHit {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	stdout := os.Stdout
+	os.Stdout = w
+	runErr := cmdAuditPatterns(root, []string{"-json", "-rule", rule})
+	os.Stdout = stdout
+	w.Close()
+	var hits []auditHit
+	if err := json.NewDecoder(r).Decode(&hits); err != nil {
+		t.Fatal(err)
+	}
+	if runErr != nil {
+		t.Fatal(runErr)
+	}
+	return hits
+}

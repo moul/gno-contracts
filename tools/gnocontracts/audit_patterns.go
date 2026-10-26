@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/moul/gno-contracts/tools/auditpattern"
+	"github.com/moul/gno-contracts/tools/gnovet"
 )
 
 // The audit patterns, and why this repository runs somebody else's rules.
@@ -73,6 +74,42 @@ var auditRealmOnly = map[string]bool{
 	"payment_user_call":      true,
 	"origin_caller_auth":     true,
 	"unsafe_previous_realm":  true,
+}
+
+// auditLocal swaps a mirrored family's detector for this repository's own,
+// keeping the family's name and its rows in the baseline. The mirror stays
+// byte for byte upstream's; what changes is which function this command asks.
+//
+// One entry, and it has to justify itself the way this one does:
+//
+//   - render_markdown_escape: upstream flags a line in Render that contains
+//     `return` and `path` and not the word `escape`. On this tree that was 45
+//     hits in 36 packages, every one wrong (34 dispatch lines such as
+//     `return renderCase(parseID(path))`, 11 that already escaped through
+//     md.InlineCode or ui.Inline), and it could not see soundexdemo writing
+//     parseArg(path) into a heading with WriteString, because that line has no
+//     `return`. No helper could clear a hit; only renaming something to
+//     contain "escape" could. gnovet.RenderPathRaw follows the value instead.
+//     gno-contracts#359. The real fix is the same detector upstream.
+var auditLocal = map[string]gnovet.Rule{
+	"render_markdown_escape": gnovet.RenderPathRaw,
+}
+
+// auditRunRule is auditpattern.RunRule with auditLocal in front of it.
+func auditRunRule(rule, dir string) ([]auditpattern.Hit, error) {
+	r, ok := auditLocal[rule]
+	if !ok {
+		return auditpattern.RunRule(rule, dir)
+	}
+	found, err := gnovet.RunRules(dir, []gnovet.Rule{r})
+	if err != nil {
+		return nil, err
+	}
+	hits := make([]auditpattern.Hit, 0, len(found))
+	for _, h := range found {
+		hits = append(hits, auditpattern.Hit{File: h.File, Line: h.Line, Text: h.Text})
+	}
+	return hits, nil
 }
 
 // auditBaselineFile is where the per-package counts live, relative to the root.
@@ -153,7 +190,7 @@ func cmdAuditPatterns(root string, args []string) error {
 				continue
 			}
 			before := len(hits)
-			found, err := auditpattern.RunRule(rule, filepath.Join(root, filepath.FromSlash(dir)))
+			found, err := auditRunRule(rule, filepath.Join(root, filepath.FromSlash(dir)))
 			if err != nil {
 				return fmt.Errorf("%s in %s: %w", rule, dir, err)
 			}
