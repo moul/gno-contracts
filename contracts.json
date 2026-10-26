@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-26T09:54:37Z",
+  "status_checked_at": "2026-10-26T09:56:43Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -1761,6 +1761,27 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/ahocorasick/v0",
+      "dir": "p/moul/x/daily/ahocorasick",
+      "kind": "p",
+      "name": "x/daily/ahocorasick",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/b58/v0",
       "dir": "p/moul/x/daily/b58",
       "kind": "p",
@@ -2080,6 +2101,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/dijkstra/v0",
+      "dir": "p/moul/x/daily/dijkstra",
+      "kind": "p",
+      "name": "x/daily/dijkstra",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -2819,6 +2861,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/shuntingyard/v0",
+      "dir": "p/moul/x/daily/shuntingyard",
+      "kind": "p",
+      "name": "x/daily/shuntingyard",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -5308,6 +5371,31 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/ahocorasickdemo/v0",
+      "dir": "r/moul/x/daily/ahocorasickdemo",
+      "kind": "r",
+      "name": "x/daily/ahocorasickdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/ahocorasick/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/asciiart/v0",
       "dir": "r/moul/x/daily/asciiart",
       "kind": "r",
@@ -6366,6 +6454,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/dijkstrademo/v0",
+      "dir": "r/moul/x/daily/dijkstrademo",
+      "kind": "r",
+      "name": "x/daily/dijkstrademo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/dijkstra/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -9032,6 +9144,31 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/shuntingyarddemo/v0",
+      "dir": "r/moul/x/daily/shuntingyarddemo",
+      "kind": "r",
+      "name": "x/daily/shuntingyarddemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/realmpath/v0",
+        "gno.land/p/moul/x/daily/shuntingyard/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {

@@ -44,6 +44,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/vendor/nt/ufmt/v2" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/vesting/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/web25/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/ahocorasick/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/b58/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/base32/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/bencode/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -54,6 +55,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/daily/countminsketch/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/cowsay/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/crc32/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/dijkstra/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/disjointset/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/fenwick/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/flatmap/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -78,6 +80,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/daily/romannum/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/rot13/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/semver/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/shuntingyard/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/sieve/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/soundex/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/sparkline/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -163,6 +166,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/allinone/textlab/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/amm/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/compact/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/ahocorasickdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/asciiart/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/b58demo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/ballot/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -183,6 +187,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/crc32demo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/crowdfund/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/dice/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/dijkstrademo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/disjointsetdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/dutchauction/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/eggling/v1" [style=filled, fillcolor="#cfe2ff"];
@@ -240,6 +245,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/rpsmatch/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/rpsoracle/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/semverdemo/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/sievedemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/soundexdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/sparklinedemo/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -542,6 +548,9 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/compact/v0" -> "gno.land/p/moul/ulist/v1";
   "gno.land/r/moul/x/compact/v0" -> "gno.land/p/moul/x/storagecost/v1";
   "gno.land/r/moul/x/compact/v0" -> "gno.land/p/nt/ufmt/v0";
+  "gno.land/r/moul/x/daily/ahocorasickdemo/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/ahocorasickdemo/v0" -> "gno.land/p/moul/md/v0";
+  "gno.land/r/moul/x/daily/ahocorasickdemo/v0" -> "gno.land/p/moul/x/daily/ahocorasick/v0";
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/moul/kit/store/v0";
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/asciiart/v1" -> "gno.land/p/nt/avl/v0";
@@ -576,6 +585,8 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/crowdfund/v1" -> "gno.land/p/moul/kit/store/v0";
   "gno.land/r/moul/x/daily/crowdfund/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/dice/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/dijkstrademo/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/dijkstrademo/v0" -> "gno.land/p/moul/x/daily/dijkstra/v0";
   "gno.land/r/moul/x/daily/disjointsetdemo/v0" -> "gno.land/p/moul/x/daily/disjointset/v0";
   "gno.land/r/moul/x/daily/dutchauction/v0" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/eggling/v1" -> "gno.land/p/moul/kit/ui/v0";
@@ -666,6 +677,9 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/semverdemo/v0" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/semverdemo/v0" -> "gno.land/p/moul/x/daily/semver/v0";
   "gno.land/r/moul/x/daily/semverdemo/v0" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" -> "gno.land/p/moul/realmpath/v0";
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" -> "gno.land/p/moul/x/daily/shuntingyard/v0";
   "gno.land/r/moul/x/daily/sievedemo/v0" -> "gno.land/p/moul/x/daily/sieve/v0";
   "gno.land/r/moul/x/daily/soundexdemo/v0" -> "gno.land/p/moul/x/daily/soundex/v0";
   "gno.land/r/moul/x/daily/sparklinedemo/v0" -> "gno.land/p/moul/x/daily/sparkline/v0";

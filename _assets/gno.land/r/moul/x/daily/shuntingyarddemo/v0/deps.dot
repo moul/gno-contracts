@@ -1,0 +1,8 @@
+digraph deps {
+  rankdir=LR;
+  node [shape=box, fontname="sans-serif"];
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" -> "gno.land/p/moul/realmpath/v0";
+  "gno.land/r/moul/x/daily/shuntingyarddemo/v0" -> "gno.land/p/moul/x/daily/shuntingyard/v0";
+}
