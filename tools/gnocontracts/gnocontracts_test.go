@@ -91,6 +91,26 @@ func TestDeriveContractRejectsUnversioned(t *testing.T) {
 	}
 }
 
+func TestDeriveContractNamespaces(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, dir, "x.gno", "package x\n")
+	cases := []struct {
+		module string
+		ok     bool
+	}{
+		{"gno.land/r/moul/x/v0", true},
+		{"gno.land/r/nt/x/v0", true},
+		{"gno.land/r/mouI/x/v0", false},
+		{"gno.land/r/growth/x/v0", false},
+	}
+	for _, tc := range cases {
+		_, err := deriveContract(tc.module, "r/moul/x", dir)
+		if (err == nil) != tc.ok {
+			t.Errorf("deriveContract(%q) err = %v, want ok=%v", tc.module, err, tc.ok)
+		}
+	}
+}
+
 // The one documented break in rule 1: gnoweb serves gno.land/u/<username> by
 // rendering /r/<username>/home at exactly that path, with no version
 // resolution, so r/moul/home cannot carry a /vN and still be reachable. The

@@ -1,0 +1,62 @@
+package grants
+
+import (
+	"strings"
+	"testing"
+
+	"gno.land/p/nt/uassert/v0"
+)
+
+// The page as it ships, pinned. Not an ExampleRender: an example pins the
+// realm's path and address byte for byte, and the path lives on one line of
+// gnomod.toml so that changing it is that line alone. The two are substituted
+// in here instead.
+const atDeploy = `# Small grants
+
+Ask for a small amount of GNOT, for yourself or for someone else, in the open.
+The controllers below vote in public, and the vote that makes a majority pays
+the request out of this realm's balance in the same transaction.
+
+|  |  |
+| --- | --- |
+| Requests | open to everyone |
+| Cap per request | 100 GNOT |
+| Balance | **0 GNOT** |
+| Paid out | 0 GNOT over 0 grant(s) |
+| Decision | 2 yes of 3 controllers |
+| Fund it | a plain send to ` + "`ADDR`" + ` |
+
+## Ask
+` + "```" + `
+gnokey maketx call -pkgpath PATH -func Request \
+  -args <payee address> -args <amount in ugnot> \
+  -args '<title>' -args '<what it is for>' ...
+` + "```" + `
+
+## Open requests
+*Nothing is waiting for a decision.*
+
+## Recently decided
+*Nothing has been decided yet.*
+
+## Controllers
+- ` + "`g1m7nvpk9trgj5sqhwdu2r0p9v5e2pzemedglvzt`" + `
+- ` + "`g1ecsuj0q572jr0dhu29q9njtnmw03hyu7tyyvv6`" + `
+- ` + "`g1cgnrpdemae7r2qvtkd99x3vk6cvmppsavx8eqs`" + `
+
+## Motions
+*Nobody has proposed changing the controllers.*
+
+## Allowlist
+Who may still file while the realm is paused. Its own list, not the controllers.
+
+- ` + "`g1cgnrpdemae7r2qvtkd99x3vk6cvmppsavx8eqs`" + `
+- ` + "`g1ecsuj0q572jr0dhu29q9njtnmw03hyu7tyyvv6`" + `
+- ` + "`g1m7nvpk9trgj5sqhwdu2r0p9v5e2pzemedglvzt`" + `
+`
+
+func TestRenderAtDeploy(t *testing.T) {
+	reset()
+	want := strings.NewReplacer("ADDR", Address().String(), "PATH", selfPath).Replace(atDeploy)
+	uassert.Equal(t, want, Render(""))
+}
