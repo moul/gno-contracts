@@ -19,8 +19,8 @@ Current(addr)                    → live streak (0 once the window has lapsed)
 Best(addr)                       → record streak, never lowered
 Day()                            → current day index
 
-/r/moul/x/daily/streak/v0        → leaderboard, ranked by best streak
-/r/moul/x/daily/streak/v0:g1...  → one address's standing
+/r/moul/x/daily/streak/v1        → leaderboard, ranked by best streak
+/r/moul/x/daily/streak/v1:g1...  → one address's standing
 ```
 
 `Current` deliberately reports the *live* truth rather than the stored value:

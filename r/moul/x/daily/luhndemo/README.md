@@ -13,10 +13,10 @@ the package; this realm holds no checksum logic of its own. Read-only and
 stateless, so `Render` is fully deterministic.
 
 ```
-/r/moul/x/daily/luhndemo/v0                  → usage + worked samples
-/r/moul/x/daily/luhndemo/v0:79927398713      → valid
-/r/moul/x/daily/luhndemo/v0:79927398710      → invalid, suggests check digit 3
-/r/moul/x/daily/luhndemo/v0:4539-1488-0343-6467 → separators are ignored
+/r/moul/x/daily/luhndemo/v1                  → usage + worked samples
+/r/moul/x/daily/luhndemo/v1:79927398713      → valid
+/r/moul/x/daily/luhndemo/v1:79927398710      → invalid, suggests check digit 3
+/r/moul/x/daily/luhndemo/v1:4539-1488-0343-6467 → separators are ignored
 ```
 
 The samples on the root page are picked to show the two error classes Luhn

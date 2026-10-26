@@ -7,8 +7,8 @@
 Encodes a few samples, round-trips them, and reports the size ratio.
 
 ```
-/r/moul/x/daily/rledemo/v0          → the samples table
-/r/moul/x/daily/rledemo/v0:aaabbc   → encode your own text
+/r/moul/x/daily/rledemo/v1          → the samples table
+/r/moul/x/daily/rledemo/v1:aaabbc   → encode your own text
 ```
 
 Demo of the [`p/moul/x/daily/rle`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/rle)

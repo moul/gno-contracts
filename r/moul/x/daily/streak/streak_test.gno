@@ -167,3 +167,13 @@ func TestRenderRejectsBadAddress(t *testing.T) {
 	out := Render("/not-an-address")
 	uassert.True(t, strings.Contains(out, "Not a valid address"))
 }
+
+// TestRenderOneValidatesBeforeEcho pins the order in renderOne: a path that is
+// not an address is refused without being written back. v0 wrote it into a
+// heading between two backticks first, then checked it.
+func TestRenderOneValidatesBeforeEcho(t *testing.T) {
+	const payload = "x` ![p](https:e.io) `y"
+	got := Render("/" + payload)
+	uassert.True(t, strings.HasSuffix(got, "**\n\n_Not a valid address._\n"), "no refusal")
+	uassert.False(t, strings.Contains(got, "![p]"), "the path was echoed")
+}

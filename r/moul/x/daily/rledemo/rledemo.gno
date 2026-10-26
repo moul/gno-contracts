@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/rle/v0"
 )
 
@@ -63,11 +64,11 @@ func Render(path string) string {
 	return b.String()
 }
 
+// one encodes a caller's text. The encoder runs first, so a rejected input is
+// never echoed, and an accepted one still goes through md.InlineCode: rle
+// accepts a backtick, and its encoding carries it through.
 func one(in string) string {
 	var b strings.Builder
-	b.WriteString("## `")
-	b.WriteString(in)
-	b.WriteString("`\n\n")
 	enc, err := rle.Encode(in)
 	if err != nil {
 		b.WriteString("_")
@@ -75,10 +76,10 @@ func one(in string) string {
 		b.WriteString("_\n")
 		return b.String()
 	}
+	b.WriteString("## " + md.InlineCode(in) + "\n\n")
 	dec, _ := rle.Decode(enc)
-	b.WriteString("- encoded: `")
-	b.WriteString(enc)
-	b.WriteString("`\n- size: **")
+	b.WriteString("- encoded: " + md.InlineCode(enc))
+	b.WriteString("\n- size: **")
 	b.WriteString(strconv.Itoa(rle.Ratio(in, enc)))
 	b.WriteString("%**\n- round-trips: ")
 	if dec == in {

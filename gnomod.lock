@@ -637,6 +637,11 @@ source = { dir = "r/moul/demo/millipede" }
 
 [[module]]
 module = "gno.land/r/moul/demo/render/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/demo/render" }
+hash = "h1:pWXT78VxTDJrE4eFbZBJeRU3S9l4StnYLaIDUaXByW0="
+
+[[module]]
+module = "gno.land/r/moul/demo/render/v1"
 source = { dir = "r/moul/demo/render" }
 
 [[module]]
@@ -764,6 +769,11 @@ source = { dir = "r/moul/x/daily/ballot" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/base32demo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/base32demo" }
+hash = "h1:s1tqxem7Drgk00EfCQUfO/BQ/+htOGRDpaqqhbXitlg="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/base32demo/v1"
 source = { dir = "r/moul/x/daily/base32demo" }
 
 [[module]]
@@ -876,6 +886,11 @@ source = { dir = "r/moul/x/daily/cowsaydemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/crc32demo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/crc32demo" }
+hash = "h1:yGs2Vs2Mga5SS5sdRpguGunTf/UKBoADwhdU6g8O3hI="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/crc32demo/v1"
 source = { dir = "r/moul/x/daily/crc32demo" }
 
 [[module]]
@@ -1059,6 +1074,11 @@ source = { dir = "r/moul/x/daily/leaderboard" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/levenshteindemo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/levenshteindemo" }
+hash = "h1:881ikmOqFWCVXaWsMN7VDVvZgtpHQNFa1dNr2bQ+ogQ="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/levenshteindemo/v1"
 source = { dir = "r/moul/x/daily/levenshteindemo" }
 
 [[module]]
@@ -1084,6 +1104,11 @@ source = { dir = "r/moul/x/daily/lru" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/luhndemo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/luhndemo" }
+hash = "h1:I8X8zFUGhAViF6Sc3H0zyGyh0DiwaNpVvyNPuTzJeF4="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/luhndemo/v1"
 source = { dir = "r/moul/x/daily/luhndemo" }
 
 [[module]]
@@ -1143,6 +1168,11 @@ source = { dir = "r/moul/x/daily/orderedmapdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/piglatindemo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/piglatindemo" }
+hash = "h1:Pd3WqdSARUhtnYmo1FQVfn0qD08lCGKYnKs2+ZgLzbE="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/piglatindemo/v1"
 source = { dir = "r/moul/x/daily/piglatindemo" }
 
 [[module]]
@@ -1197,6 +1227,11 @@ source = { dir = "r/moul/x/daily/ringlog" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/rledemo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/rledemo" }
+hash = "h1:k9tH8HnrLy/uGQYfA9C0BKljwZz6FtAr/TZX5qFC/cU="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/rledemo/v1"
 source = { dir = "r/moul/x/daily/rledemo" }
 
 [[module]]
@@ -1261,6 +1296,11 @@ source = { dir = "r/moul/x/daily/sievedemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/soundexdemo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/soundexdemo" }
+hash = "h1:LZEZokwtELjA33d2wwKQ9FcvkEPRHZ8FUFBkyE+WMsA="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/soundexdemo/v1"
 source = { dir = "r/moul/x/daily/soundexdemo" }
 
 [[module]]
@@ -1286,6 +1326,11 @@ source = { dir = "r/moul/x/daily/staking" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/streak/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/streak" }
+hash = "h1:3wThBs1HWrvxNx7F7XuBLhsDgc8mpaB340XvysLOQ58="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/streak/v1"
 source = { dir = "r/moul/x/daily/streak" }
 
 [[module]]
@@ -1352,6 +1397,11 @@ source = { dir = "r/moul/x/daily/toposortdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/triedemo/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/daily/triedemo" }
+hash = "h1:dL6cl7x9neyDetVxOAPJNmDpVqMLzfZdGKevHp5UGNg="
+
+[[module]]
+module = "gno.land/r/moul/x/daily/triedemo/v1"
 source = { dir = "r/moul/x/daily/triedemo" }
 
 [[module]]

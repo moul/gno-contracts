@@ -205,13 +205,15 @@ func Render(path string) string {
 func renderOne(q string) string {
 	addr := address(q)
 	var b strings.Builder
-	b.WriteString("## `")
-	b.WriteString(q)
-	b.WriteString("`\n\n")
+	// Validate before echoing: a valid address is bech32, which cannot carry
+	// markdown, and an invalid one is never written back to the page.
 	if !addr.IsValid() {
 		b.WriteString("_Not a valid address._\n")
 		return b.String()
 	}
+	b.WriteString("## `")
+	b.WriteString(addr.String())
+	b.WriteString("`\n\n")
 	r := get(addr)
 	if r == nil {
 		b.WriteString("_No check-ins yet._\n")

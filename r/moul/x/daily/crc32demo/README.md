@@ -8,8 +8,8 @@ Checksums a few strings and shows that a one-character change moves the result
 completely.
 
 ```
-/r/moul/x/daily/crc32demo/v0        → the samples table
-/r/moul/x/daily/crc32demo/v0:abc    → checksum your own text
+/r/moul/x/daily/crc32demo/v1        → the samples table
+/r/moul/x/daily/crc32demo/v1:abc    → checksum your own text
 ```
 
 Demo of the [`p/moul/x/daily/crc32`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/crc32)

@@ -8,8 +8,8 @@ Shows the RFC 4648 vectors beside Crockford, then the forgiving decodes that
 Crockford allows.
 
 ```
-/r/moul/x/daily/base32demo/v0         → vectors + Crockford forgiveness
-/r/moul/x/daily/base32demo/v0:hello   → encode your own text both ways
+/r/moul/x/daily/base32demo/v1         → vectors + Crockford forgiveness
+/r/moul/x/daily/base32demo/v1:hello   → encode your own text both ways
 ```
 
 Demo of the [`p/moul/x/daily/base32`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/base32)

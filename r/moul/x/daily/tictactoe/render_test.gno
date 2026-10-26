@@ -70,7 +70,7 @@ func TestRenderFinishedStatus(cur realm, t *testing.T) {
 
 // TestRenderBadPaths covers the two error branches of Render.
 func TestRenderBadPaths(cur realm, t *testing.T) {
-	uassert.Equal(t, "# Tic-Tac-Toe\n\nInvalid game id: abc\n", Render("/abc"))
+	uassert.Equal(t, "# Tic-Tac-Toe\n\nInvalid game id.\n", Render("/abc"))
 	uassert.Equal(t, "# Tic-Tac-Toe\n\nGame 999999 not found.\n", Render("/999999"))
 }
 
@@ -83,4 +83,11 @@ func TestRenderList(cur realm, t *testing.T) {
 	uassert.True(t, strings.HasPrefix(out, "# Tic-Tac-Toe\n"), "expected the index header")
 	uassert.True(t, strings.Contains(out, "| # | X | O | Status |"), "expected the table header")
 	uassert.True(t, strings.Contains(out, "| "+strconv.Itoa(id)+" | `"+alice.String()+"`"), "expected the new game listed")
+}
+
+// TestRenderInvalidIDIsNotEchoed pins that a path Atoi refused is not written
+// back: v0 echoed it raw, after the parse had already failed.
+func TestRenderInvalidIDIsNotEchoed(t *testing.T) {
+	uassert.Equal(t, "# Tic-Tac-Toe\n\nInvalid game id.\n", Render("/x` ![p](https:e.io) `y"))
+	uassert.Equal(t, "# Tic-Tac-Toe\n\nGame 999999 not found.\n", Render("/+999999"))
 }

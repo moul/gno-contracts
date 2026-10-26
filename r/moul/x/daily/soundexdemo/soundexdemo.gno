@@ -11,6 +11,7 @@ package soundexdemo
 import (
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/soundex/v0"
 )
 
@@ -33,9 +34,7 @@ func Render(path string) string {
 
 	if q := parseArg(path); q != "" {
 		k := soundex.Encode(q)
-		b.WriteString("## `")
-		b.WriteString(q)
-		b.WriteString("`\n\n")
+		b.WriteString("## " + md.InlineCode(q) + "\n\n")
 		if k == "" {
 			b.WriteString("_No ASCII letters — no key._\n")
 		} else {

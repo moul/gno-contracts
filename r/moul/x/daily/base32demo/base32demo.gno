@@ -8,6 +8,7 @@ package base32demo
 import (
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/base32/v0"
 )
 
@@ -27,9 +28,8 @@ func Render(path string) string {
 	if in := parseArg(path); in != "" {
 		std, _ := base32.Encode(in)
 		ck, _ := base32.EncodeCrockford(in)
-		b.WriteString("## `")
-		b.WriteString(in)
-		b.WriteString("`\n\n- RFC 4648: `")
+		b.WriteString("## " + md.InlineCode(in))
+		b.WriteString("\n\n- RFC 4648: `")
 		b.WriteString(std)
 		b.WriteString("`\n- Crockford: `")
 		b.WriteString(ck)

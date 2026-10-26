@@ -1,13 +1,17 @@
 package render
 
-import "strings"
+import (
+	"strings"
+
+	"gno.land/p/moul/kit/ui/v0"
+)
 
 func Hello() string {
 	return "Hello World!"
 }
 
 func greetings(name string) string { // private
-	return "Welcome, " + name + "!"
+	return "Welcome, " + ui.Inline(name) + "!"
 }
 
 func Render(path string) string {

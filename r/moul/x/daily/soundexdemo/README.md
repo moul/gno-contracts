@@ -8,8 +8,8 @@ Keys a small name list and groups it by phonetic key, so the "sounds alike"
 clusters are visible.
 
 ```
-/r/moul/x/daily/soundexdemo/v0            → the table + clusters
-/r/moul/x/daily/soundexdemo/v0:Ashcroft   → one name's key
+/r/moul/x/daily/soundexdemo/v1            → the table + clusters
+/r/moul/x/daily/soundexdemo/v1:Ashcroft   → one name's key
 ```
 
 Demo of the [`p/moul/x/daily/soundex`](https://github.com/moul/gno-contracts/tree/main/p/moul/x/daily/soundex)

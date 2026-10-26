@@ -12,10 +12,10 @@ func ExampleRender() {
 	//
 	// Append two words as `/<a>/<b>`:
 	//
-	// - [`/kitten/sitting`](/r/moul/x/daily/levenshteindemo/v0:kitten/sitting) → distance **3**
-	// - [`/flaw/lawn`](/r/moul/x/daily/levenshteindemo/v0:flaw/lawn) → distance **2**
-	// - [`/sunday/saturday`](/r/moul/x/daily/levenshteindemo/v0:sunday/saturday) → distance **3**
-	// - [`/gno/gnoland`](/r/moul/x/daily/levenshteindemo/v0:gno/gnoland) → distance **4**
+	// - [`/kitten/sitting`](/r/moul/x/daily/levenshteindemo/v1:kitten/sitting) → distance **3**
+	// - [`/flaw/lawn`](/r/moul/x/daily/levenshteindemo/v1:flaw/lawn) → distance **2**
+	// - [`/sunday/saturday`](/r/moul/x/daily/levenshteindemo/v1:sunday/saturday) → distance **3**
+	// - [`/gno/gnoland`](/r/moul/x/daily/levenshteindemo/v1:gno/gnoland) → distance **4**
 	//
 	// ## The classic example
 	//

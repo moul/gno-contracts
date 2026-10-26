@@ -1,2 +1,3 @@
-module = "gno.land/r/moul/x/daily/levenshteindemo/v0"
+module = "gno.land/r/moul/x/daily/levenshteindemo/v1"
 gno = "0.9"
+private = true

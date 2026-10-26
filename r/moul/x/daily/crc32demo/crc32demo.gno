@@ -10,6 +10,7 @@ package crc32demo
 import (
 	"strings"
 
+	"gno.land/p/moul/md/v0"
 	"gno.land/p/moul/x/daily/crc32/v0"
 )
 
@@ -26,9 +27,8 @@ func Render(path string) string {
 	b.WriteString("[`p/moul/x/daily/crc32`](/p/moul/x/daily/crc32/v0) library.\n\n")
 
 	if in := parseArg(path); in != "" {
-		b.WriteString("## `")
-		b.WriteString(in)
-		b.WriteString("`\n\n`")
+		b.WriteString("## " + md.InlineCode(in))
+		b.WriteString("\n\n`")
 		b.WriteString(crc32.ChecksumHex(in))
 		b.WriteString("`\n")
 		return b.String()
