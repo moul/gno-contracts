@@ -1,4 +1,4 @@
-package grants
+package smallgrants
 
 import (
 	"strings"
@@ -11,11 +11,15 @@ import (
 // realm's path and address byte for byte, and the path lives on one line of
 // gnomod.toml so that changing it is that line alone. The two are substituted
 // in here instead.
-const atDeploy = `# Small grants
+const atDeploy = `# Small grants (demo)
+> **This is a demo.** A working preview of the small-grants desk I plan to
+> deploy under ` + "`gno.land/r/nt`" + ` or ` + "`gno.land/r/gnoland`" + `, once approved.
+> Requests, decisions and payouts here are real; only the address is temporary.
 
 Ask for a small amount of GNOT, for yourself or for someone else, in the open.
-The controllers below vote in public, and the vote that makes a majority pays
-the request out of this realm's balance in the same transaction.
+The controllers below decide in public: pay in full, pay a part, or refuse,
+each with an optional reason. The decision that makes a majority pays the
+request out of this realm's balance in the same transaction.
 
 |  |  |
 | --- | --- |

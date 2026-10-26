@@ -1,4 +1,4 @@
-package grants
+package smallgrants
 
 import (
 	"strconv"
@@ -11,6 +11,11 @@ import (
 )
 
 // untrusted-render: every title, reason and note goes through ui.Cell or ui.Inline at the line that renders it
+
+// banner opens the index: this page is a preview asking for its real home.
+const banner = "> **This is a demo.** A working preview of the small-grants desk I plan to\n" +
+	"> deploy under `gno.land/r/nt` or `gno.land/r/gnoland`, once approved.\n" +
+	"> Requests, decisions and payouts here are real; only the address is temporary.\n"
 
 // RecentDecided is how many decided requests the index shows. The page and
 // its query gas stay bounded however long the realm runs; older ones are each
@@ -33,10 +38,11 @@ func Render(path string) string {
 }
 
 func renderIndex() string {
-	out := md.H1("Small grants") + "\n"
+	out := md.H1("Small grants (demo)") + banner + "\n"
 	out += "Ask for a small amount of GNOT, for yourself or for someone else, in the open.\n" +
-		"The controllers below vote in public, and the vote that makes a majority pays\n" +
-		"the request out of this realm's balance in the same transaction.\n\n"
+		"The controllers below decide in public: pay in full, pay a part, or refuse,\n" +
+		"each with an optional reason. The decision that makes a majority pays the\n" +
+		"request out of this realm's balance in the same transaction.\n\n"
 
 	state := "open to everyone"
 	if paused {
@@ -71,7 +77,7 @@ func renderIndex() string {
 			return false
 		}
 		dt.Row(md.Link("#"+itoa(r.ID), requestLink(r.ID)), ui.Cell(ui.ShortN(r.Title, 60, 0)),
-			ui.Addr(r.To), num.GNOTf(r.Amount), r.Status)
+			ui.Addr(r.To), num.GNOTf(r.Amount), result(r))
 		return dt.Len() >= RecentDecided
 	})
 	out += dt.OrEmpty("Nothing has been decided yet.") + "\n"
@@ -114,8 +120,8 @@ func renderRequest(raw string) string {
 	}
 	out := md.H1("Request #"+itoa(r.ID)) + md.H2(ui.Inline(r.Title))
 	t := ui.NewTable("", "")
-	t.Row("Status", "**"+r.Status+"**")
-	t.Row("Amount", num.GNOTf(r.Amount))
+	t.Row("Status", "**"+result(r)+"**")
+	t.Row("Asked", num.GNOTf(r.Amount))
 	t.Row("Pays", ui.AddrFull(r.To))
 	t.Row("Filed by", ui.AddrFull(r.By))
 	t.Row("Filed at height", itoa(r.Height))
@@ -123,7 +129,7 @@ func renderRequest(raw string) string {
 		t.Row("Decided at height", itoa(r.Decided))
 	}
 	out += t.String() + "\n" + md.Blockquote(ui.Inline(r.Reason)) + "\n"
-	out += md.H2("Ballots") + ballots(r.Ballots)
+	out += md.H2("Decisions") + decisions(r)
 	return out
 }
 
@@ -159,6 +165,39 @@ func ballots(bs []ballot) string {
 		t.Row(ui.Addr(b.Voter), v, itoa(b.Height), ui.Cell(b.Note))
 	}
 	return t.OrEmpty("No ballots yet.")
+}
+
+func decisions(r *request) string {
+	t := ui.NewTable("Controller", "Decision", "Height", "Reason")
+	for _, b := range r.Ballots {
+		d := "refuse"
+		switch {
+		case b.Amount == r.Amount:
+			d = "pay in full"
+		case b.Amount > 0:
+			d = "pay " + num.GNOTf(b.Amount) + " of " + num.GNOTf(r.Amount)
+		}
+		if !isController(b.Voter) {
+			d += " (no longer a controller, not counted)"
+		}
+		why := ui.Cell(b.Note)
+		if b.Note == "" {
+			why = md.Italic("no reason given")
+		}
+		t.Row(ui.Addr(b.Voter), d, itoa(b.Height), why)
+	}
+	return t.OrEmpty("No decisions yet.")
+}
+
+// result is a request's state in words, with what it paid.
+func result(r *request) string {
+	switch {
+	case r.Status != StatusPaid:
+		return r.Status
+	case r.Paid == r.Amount:
+		return "paid in full"
+	}
+	return "paid " + num.GNOTf(r.Paid) + " of " + num.GNOTf(r.Amount)
 }
 
 func change(m *motion) string {

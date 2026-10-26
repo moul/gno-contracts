@@ -1,4 +1,4 @@
-package grants
+package smallgrants
 
 import (
 	"chain"
@@ -85,31 +85,105 @@ func TestTwoOfThreePays(cur realm, t *testing.T) {
 	id := Request(cross(cur), bob.String(), 20_000_000, "Port a lib", "bob has no gas")
 
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	uassert.Equal(t, StatusPending, Status(id), "one controller alone pays nothing")
 	uassert.Equal(t, before, balanceOf(bob))
 
 	testing.SetRealm(testing.NewUserRealm(Jaekwon))
-	Vote(cross(cur), id, true, "ok")
+	Accept(cross(cur), id, "ok")
 	uassert.Equal(t, StatusPaid, Status(id))
 	uassert.Equal(t, before+20_000_000, balanceOf(bob))
 	uassert.Equal(t, int64(10_000_000), Balance())
 	uassert.Equal(t, int64(20_000_000), TotalPaid())
 
 	testing.SetRealm(testing.NewUserRealm(Aeddi))
-	uassert.AbortsContains(t, cur, "already paid", func() { Vote(cross(cur), id, true, "") })
+	uassert.AbortsContains(t, cur, "already paid", func() { Accept(cross(cur), id, "") })
 }
 
-func TestTwoNoRejects(cur realm, t *testing.T) {
+func TestTwoRefusalsRefuse(cur realm, t *testing.T) {
 	reset()
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id := Request(cross(cur), bob.String(), 1, "t", "r")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, false, "not now")
+	Refuse(cross(cur), id, "not now")
 	uassert.Equal(t, StatusPending, Status(id))
 	testing.SetRealm(testing.NewUserRealm(Aeddi))
-	Vote(cross(cur), id, false, "")
-	uassert.Equal(t, StatusRejected, Status(id))
+	Refuse(cross(cur), id, "")
+	uassert.Equal(t, StatusRefused, Status(id))
+}
+
+// A part pays the smallest amount a counted yes named, and closes the request.
+func TestAcceptPartPaysTheAgreedPartAndCloses(cur realm, t *testing.T) {
+	reset()
+	fund(MaxGrant)
+	before := balanceOf(bob)
+	testing.SetRealm(testing.NewUserRealm(alice))
+	id := Request(cross(cur), bob.String(), MaxGrant, "t", "r")
+
+	testing.SetRealm(testing.NewUserRealm(Moul))
+	AcceptPart(cross(cur), id, 40_000_000, "start with this")
+	testing.SetRealm(testing.NewUserRealm(Jaekwon))
+	Accept(cross(cur), id, "")
+	uassert.Equal(t, StatusPaid, Status(id))
+	uassert.Equal(t, before+40_000_000, balanceOf(bob), "the yes that named less binds")
+	uassert.Equal(t, MaxGrant-40_000_000, Balance())
+	uassert.Equal(t, int64(40_000_000), TotalPaid())
+
+	testing.SetRealm(testing.NewUserRealm(Aeddi))
+	uassert.AbortsContains(t, cur, "already paid", func() {
+		AcceptPart(cross(cur), id, 1, "")
+	}, "no remainder stays open")
+	page := Render("request/1")
+	uassert.True(t, strings.Contains(page, "**paid 40 GNOT of 100 GNOT**"), page)
+	uassert.True(t, strings.Contains(page, "pay 40 GNOT of 100 GNOT"), page)
+}
+
+func TestAcceptPartIsBounded(cur realm, t *testing.T) {
+	cases := []struct {
+		name   string
+		amount int64
+		want   string
+	}{
+		{"zero", 0, "to pay nothing, Refuse"},
+		{"negative", -1, "to pay nothing, Refuse"},
+		{"over the request", 10_000_001, "more than the 10000000ugnot"},
+		{"over the cap", MaxGrant + 1, "more than the"},
+	}
+	for _, tc := range cases {
+		reset()
+		testing.SetRealm(testing.NewUserRealm(alice))
+		id := Request(cross(cur), bob.String(), 10_000_000, "t", "r")
+		testing.SetRealm(testing.NewUserRealm(Moul))
+		uassert.AbortsContains(t, cur, tc.want, func() {
+			AcceptPart(cross(cur), id, tc.amount, "")
+		}, tc.name)
+		uassert.Equal(t, 0, len(getRequest(id).Ballots), tc.name)
+	}
+	reset()
+	fund(10_000_000)
+	testing.SetRealm(testing.NewUserRealm(alice))
+	id := Request(cross(cur), bob.String(), 10_000_000, "t", "r")
+	testing.SetRealm(testing.NewUserRealm(Moul))
+	AcceptPart(cross(cur), id, 10_000_000, "")
+	testing.SetRealm(testing.NewUserRealm(Aeddi))
+	AcceptPart(cross(cur), id, 10_000_000, "")
+	uassert.Equal(t, "paid in full", result(getRequest(id)), "a part equal to the request is the whole of it")
+}
+
+// Every outcome is on the page, and a missing reason reads as a choice.
+func TestRenderShowsDecisionsAndMissingReasons(cur realm, t *testing.T) {
+	reset()
+	testing.SetRealm(testing.NewUserRealm(alice))
+	id := Request(cross(cur), bob.String(), 5, "t", "r")
+	testing.SetRealm(testing.NewUserRealm(Moul))
+	Refuse(cross(cur), id, "")
+	testing.SetRealm(testing.NewUserRealm(Jaekwon))
+	Refuse(cross(cur), id, "out of scope")
+	page := Render("request/1")
+	uassert.True(t, strings.Contains(page, "**refused**"), page)
+	uassert.True(t, strings.Contains(page, "| *no reason given* |"), page)
+	uassert.True(t, strings.Contains(page, "| out of scope |"), page)
+	uassert.True(t, strings.Contains(Render(""), "| refused |"), "the index shows the outcome")
 }
 
 func TestWhoMayVote(cur realm, t *testing.T) {
@@ -128,13 +202,13 @@ func TestWhoMayVote(cur realm, t *testing.T) {
 	}
 	for _, tc := range cases {
 		testing.SetRealm(testing.NewUserRealm(tc.voter))
-		uassert.AbortsContains(t, cur, tc.want, func() { Vote(cross(cur), id, true, "") }, tc.name)
+		uassert.AbortsContains(t, cur, tc.want, func() { Accept(cross(cur), id, "") }, tc.name)
 	}
 	// aeddi is the only one who may vote, and one yes of a quorum of two is
 	// not enough: a controller asking for a controller needs both others.
 	testing.SetRealm(testing.NewUserRealm(Aeddi))
-	Vote(cross(cur), id, true, "")
-	uassert.Equal(t, StatusRejected, Status(id), "nobody is left who could cast the second yes")
+	Accept(cross(cur), id, "")
+	uassert.Equal(t, StatusRefused, Status(id), "nobody is left who could cast the second yes")
 }
 
 func TestVoteTwice(cur realm, t *testing.T) {
@@ -142,9 +216,9 @@ func TestVoteTwice(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id := Request(cross(cur), bob.String(), 1, "t", "r")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	uassert.AbortsContains(t, cur, "already voted", func() { Vote(cross(cur), id, true, "") })
+	uassert.AbortsContains(t, cur, "already voted", func() { Accept(cross(cur), id, "") })
 }
 
 func TestUnderfundedVoteIsRefusedAndLeavesNoTrace(cur realm, t *testing.T) {
@@ -153,15 +227,15 @@ func TestUnderfundedVoteIsRefusedAndLeavesNoTrace(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id := Request(cross(cur), bob.String(), 10, "t", "r")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	testing.SetRealm(testing.NewUserRealm(Jaekwon))
-	uassert.AbortsContains(t, cur, "fund the realm first", func() { Vote(cross(cur), id, true, "") })
+	uassert.AbortsContains(t, cur, "fund the realm first", func() { Accept(cross(cur), id, "") })
 	uassert.Equal(t, StatusPending, Status(id))
 	uassert.Equal(t, 1, len(getRequest(id).Ballots), "the refused ballot was not recorded")
 
 	fund(5)
 	testing.SetRealm(testing.NewUserRealm(Jaekwon))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	uassert.Equal(t, StatusPaid, Status(id))
 }
 
@@ -221,11 +295,17 @@ func TestPauseRefusesOnlyNewRequestsOffTheAllowlist(cur realm, t *testing.T) {
 	Withdraw(cross(cur), withdrawable)
 	before := balanceOf(bob)
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), inflight, true, "")
+	AcceptPart(cross(cur), inflight, 4, "")
 	testing.SetRealm(testing.NewUserRealm(Jaekwon))
-	Vote(cross(cur), inflight, true, "")
+	Accept(cross(cur), inflight, "")
 	uassert.Equal(t, StatusPaid, Status(inflight), "paused never stops a payout")
-	uassert.Equal(t, before+10, balanceOf(bob))
+	uassert.Equal(t, before+4, balanceOf(bob))
+
+	// The decision verbs act on a filed request and never file one, so they
+	// open no way around the pause: a request that was never filed has no id.
+	testing.SetRealm(testing.NewUserRealm(Moul))
+	uassert.AbortsContains(t, cur, "no request", func() { Accept(cross(cur), 99, "") })
+	uassert.AbortsContains(t, cur, "no request", func() { AcceptPart(cross(cur), 99, 1, "") })
 
 	testing.SetRealm(testing.NewUserRealm(Jaekwon))
 	Resume(cross(cur))
@@ -283,11 +363,11 @@ func TestFourthControllerPays(cur realm, t *testing.T) {
 	id := Request(cross(cur), bob.String(), 5_000_000, "t", "r")
 	for _, v := range []address{Moul, Aeddi} {
 		testing.SetRealm(testing.NewUserRealm(v))
-		Vote(cross(cur), id, true, "")
+		Accept(cross(cur), id, "")
 	}
 	uassert.Equal(t, StatusPending, Status(id), "two of four is not a majority")
 	testing.SetRealm(testing.NewUserRealm(carol))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	uassert.Equal(t, StatusPaid, Status(id), "the fourth controller's yes is the one that pays")
 	uassert.Equal(t, before+5_000_000, balanceOf(bob))
 }
@@ -339,7 +419,7 @@ func TestTakeoverRemovalFiledAtThreeDiesAtTwo(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id := Request(cross(cur), carol.String(), 1, "sock", "filed by a friend")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	uassert.Equal(t, StatusPending, Status(id), "one controller paid alone")
 	uassert.Equal(t, int64(0), balanceOf(carol))
 }
@@ -352,11 +432,11 @@ func TestTakeoverTwoOneYesPaysNobody(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(Moul))
 	id := Request(cross(cur), carol.String(), 1, "sock", "r")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	uassert.AbortsContains(t, cur, "is a party", func() { Vote(cross(cur), id, true, "") })
+	uassert.AbortsContains(t, cur, "is a party", func() { Accept(cross(cur), id, "") })
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id = Request(cross(cur), carol.String(), 1, "sock", "filed by a friend")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	uassert.Equal(t, StatusPending, Status(id), "two controllers means two yes")
 	uassert.Equal(t, int64(1), Balance())
 }
@@ -380,13 +460,13 @@ func TestTakeoverRemovedControllersYesStopsCounting(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id := Request(cross(cur), bob.String(), 1, "t", "r")
 	testing.SetRealm(testing.NewUserRealm(Aeddi))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	shrinkToMoulAndJaekwon(cur, t) // removes aeddi
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	uassert.Equal(t, StatusPending, Status(id), "aeddi's ballot is on the record and carries no weight")
 	testing.SetRealm(testing.NewUserRealm(Jaekwon))
-	Vote(cross(cur), id, true, "")
+	Accept(cross(cur), id, "")
 	uassert.Equal(t, StatusPaid, Status(id))
 }
 
@@ -407,7 +487,7 @@ func TestRenderEscapesCallerText(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id := Request(cross(cur), bob.String(), 1, "a | b ![x](y)", "**bold** <script>")
 	testing.SetRealm(testing.NewUserRealm(Moul))
-	Vote(cross(cur), id, false, "c | d")
+	Refuse(cross(cur), id, "c | d")
 	index, page := Render(""), Render("request/1")
 	uassert.False(t, strings.Contains(index, "a | b"), "a pipe in a title would open a column")
 	uassert.False(t, strings.Contains(page, "c | d"), "a pipe in a note would open a column")

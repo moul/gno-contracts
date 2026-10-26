@@ -1,4 +1,4 @@
-module = "gno.land/r/nt/grants/v0"
+module = "gno.land/r/moul/smallgrants/v0"
 gno = "0.9"
 
 # The line above is the only place the published path is written. The code

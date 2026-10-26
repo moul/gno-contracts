@@ -413,19 +413,6 @@ var unversionedContracts = map[string]bool{
 	"gno.land/r/moul/toolbox/usernames": true,
 }
 
-// publishNamespaces are the namespaces a module line here may publish to.
-// Every contract lives in a directory under p/moul or r/moul, so every guard
-// walks it; only the module line may name another namespace, and only one
-// listed here, so a typo in it still fails.
-//
-//   - nt: the small-grants realm (r/moul/smallgrants) is meant for a shared
-//     namespace rather than a personal one. Publishing there needs the key that
-//     owns the name on chain, not moul's.
-var publishNamespaces = map[string]bool{
-	"moul": true,
-	"nt":   true,
-}
-
 // deriveContract builds a Contract from a module path such as
 // "gno.land/r/moul/hello/v0" or "gno.land/p/moul/defi/amm/v2".
 func deriveContract(module, dir, absDir string) (Contract, error) {
@@ -437,7 +424,7 @@ func deriveContract(module, dir, absDir string) (Contract, error) {
 	if unversioned {
 		minParts = 4
 	}
-	if len(parts) < minParts || parts[0] != "gno.land" || !publishNamespaces[parts[2]] {
+	if len(parts) < minParts || parts[0] != "gno.land" || parts[2] != "moul" {
 		return Contract{}, fmt.Errorf("unexpected module path %q (want gno.land/{p,r}/moul/<name>/vN)", module)
 	}
 	kind := parts[1]

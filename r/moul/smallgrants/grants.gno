@@ -1,9 +1,26 @@
-// Package grants is a small-grant desk, run in the open.
+// Package smallgrants is a small-grant desk, run in the open.
 //
 // Anyone files a request for a small amount of GNOT, for themselves or for
-// someone else. The controllers vote on it in public, and the vote that makes
-// a majority pays it, in the same transaction, out of this realm's own
-// balance. Every request, ballot and payout stays on the page.
+// someone else. The controllers decide on it in public, and the decision that
+// makes a majority pays it, in the same transaction, out of this realm's own
+// balance. Every request, decision and payout stays on the page.
+//
+// # A demo, asking for a home
+//
+// This deployment is a working preview. The real desk is meant for a shared
+// namespace, gno.land/r/nt or gno.land/r/gnoland, and this one exists so that the decision to put it there
+// is taken on something that runs. Single role on purpose: who decides grants
+// and who administers the deciders is a choice for the real deployment.
+//
+// # Decisions
+//
+// A controller decides a request one of three ways, each with an optional
+// reason: [Accept] pays it in full, [AcceptPart] pays a part the controller
+// names, [Refuse] pays nothing. When the yes side reaches a majority the
+// request pays the smallest amount any counted yes named, because that is the
+// one amount every one of them agreed to, and it is closed: a part payment
+// leaves no remainder open. The payee files a new request for the rest, and
+// that one is decided on its own, under the same cap.
 //
 // # Small, and only small
 //
@@ -39,7 +56,7 @@
 // controller set, though it starts with the same three addresses. Any single
 // controller may pause, resume and edit the allowlist: none of that moves
 // money or changes who may move it.
-package grants
+package smallgrants
 
 import (
 	"strconv"
@@ -84,7 +101,8 @@ const (
 const (
 	StatusPending   = "pending"
 	StatusPaid      = "paid"
-	StatusRejected  = "rejected"
+	StatusRejected  = "rejected" // a motion
+	StatusRefused   = "refused"  // a request
 	StatusWithdrawn = "withdrawn"
 	StatusAdopted   = "adopted"
 )
@@ -92,6 +110,7 @@ const (
 type ballot struct {
 	Voter  address
 	Yes    bool
+	Amount int64 // on a request: ugnot this ballot would pay, 0 for a refusal
 	Note   string
 	Height int64
 }
@@ -101,7 +120,8 @@ type request struct {
 	ID      int64
 	By      address // who filed it
 	To      address // who gets paid; often not the filer
-	Amount  int64   // ugnot
+	Amount  int64   // ugnot asked
+	Paid    int64   // ugnot paid; at most Amount, 0 unless paid
 	Title   string
 	Reason  string
 	Height  int64
@@ -227,20 +247,20 @@ func MotionStatus(id int64) string {
 func Request(cur realm, to string, amount int64, title, reason string) int64 {
 	by := caller(cur)
 	if paused && !allowlist.Has(by.String()) {
-		panic("grants: paused, new requests are open to the allowlist only")
+		panic("smallgrants: paused, new requests are open to the allowlist only")
 	}
 	dst := address(to)
 	if !dst.IsValid() {
-		panic("grants: " + to + " is not a valid address")
+		panic("smallgrants: " + to + " is not a valid address")
 	}
 	if dst == selfAddr {
-		panic("grants: this realm cannot pay itself")
+		panic("smallgrants: this realm cannot pay itself")
 	}
 	if amount <= 0 {
-		panic("grants: amount must be a positive number of " + Denom)
+		panic("smallgrants: amount must be a positive number of " + Denom)
 	}
 	if amount > MaxGrant {
-		panic("grants: " + strconv.FormatInt(amount, 10) + Denom +
+		panic("smallgrants: " + strconv.FormatInt(amount, 10) + Denom +
 			" is over the cap of " + strconv.FormatInt(MaxGrant, 10) + Denom)
 	}
 	title = text(title, "title", MaxTitleLen, true)
@@ -263,26 +283,57 @@ func Withdraw(cur realm, id int64) {
 	by := caller(cur)
 	r := mustPending(id)
 	if r.By != by {
-		panic("grants: only the filer may withdraw request " + itoa(id))
+		panic("smallgrants: only the filer may withdraw request " + itoa(id))
 	}
 	closeRequest(r, StatusWithdrawn)
 	chain.Emit("Withdraw", "id", itoa(id))
 }
 
-// Vote casts a controller's ballot on a request. The yes that reaches
-// [Quorum] pays the request in the same transaction; if the balance cannot
-// cover it, the vote is refused and nothing is recorded. note is optional.
-func Vote(cur realm, id int64, yes bool, note string) {
+// Accept votes to pay request id in full. Controllers only; reason is
+// optional and public. The yes that reaches [Quorum] pays in the same
+// transaction; if the balance cannot cover it, the call is refused and
+// nothing is recorded.
+func Accept(cur realm, id int64, reason string) {
+	decide(cur, id, mustPending(id).Amount, reason)
+}
+
+// AcceptPart votes to pay amount ugnot of request id, at most what it asked.
+// Otherwise exactly [Accept]: once the request pays, it pays the smallest
+// amount a counted yes named, and it is closed.
+func AcceptPart(cur realm, id int64, amount int64, reason string) {
+	r := mustPending(id)
+	if amount <= 0 {
+		panic("smallgrants: a part must be a positive amount of " + Denom + "; to pay nothing, Refuse")
+	}
+	// The request was capped when it was filed, so a part of it is too.
+	if amount > r.Amount {
+		panic("smallgrants: " + strconv.FormatInt(amount, 10) + Denom + " is more than the " +
+			strconv.FormatInt(r.Amount, 10) + Denom + " request " + itoa(id) + " asked for")
+	}
+	decide(cur, id, amount, reason)
+}
+
+// Refuse votes not to pay request id. reason is optional and public.
+func Refuse(cur realm, id int64, reason string) {
+	decide(cur, id, 0, reason)
+}
+
+// decide casts a ballot that pays amount, or refuses at 0, and settles the
+// request when the ballot decides it.
+func decide(cur realm, id, amount int64, reason string) {
 	voter := caller(cur)
 	r := mustPending(id)
-	note = text(note, "note", MaxNoteLen, false)
-	ballots := castBallot(r.Ballots, voter, yes, note, r.By, r.To)
+	reason = text(reason, "reason", MaxNoteLen, false)
+	ballots := castBallot(r.Ballots, voter, amount > 0, reason, r.By, r.To)
+	ballots[len(ballots)-1].Amount = amount
 	out := outcome(ballots, r.By, r.To)
-	// Checked before anything is written, so a refused vote leaves no trace.
+	pay := int64(0)
+	// Checked before anything is written, so a refused call leaves no trace.
 	if out == StatusAdopted {
-		if bal := Balance(); bal < r.Amount {
-			panic("grants: balance is " + strconv.FormatInt(bal, 10) + Denom +
-				", request " + itoa(id) + " needs " + strconv.FormatInt(r.Amount, 10) + Denom +
+		pay = agreed(ballots)
+		if bal := Balance(); bal < pay {
+			panic("smallgrants: balance is " + strconv.FormatInt(bal, 10) + Denom +
+				", request " + itoa(id) + " needs " + strconv.FormatInt(pay, 10) + Denom +
 				"; fund the realm first, nothing was recorded")
 		}
 	}
@@ -290,18 +341,31 @@ func Vote(cur realm, id int64, yes bool, note string) {
 
 	switch out {
 	case StatusAdopted:
+		r.Paid = pay
 		closeRequest(r, StatusPaid)
-		totalPaid += r.Amount
+		totalPaid += pay
 		paidCount++
 		banker.NewBanker(banker.BankerTypeRealmSend, cur).
-			SendCoins(selfAddr, r.To, chain.NewCoins(chain.NewCoin(Denom, r.Amount)))
+			SendCoins(selfAddr, r.To, chain.NewCoins(chain.NewCoin(Denom, pay)))
 		chain.Emit("Paid", "id", itoa(id), "to", r.To.String(),
-			"amount", strconv.FormatInt(r.Amount, 10))
+			"amount", strconv.FormatInt(pay, 10))
 	case StatusRejected:
-		closeRequest(r, StatusRejected)
+		closeRequest(r, StatusRefused)
 	}
-	chain.Emit("Vote", "id", itoa(id), "voter", voter.String(),
-		"yes", strconv.FormatBool(yes), "status", r.Status)
+	chain.Emit("Decide", "id", itoa(id), "voter", voter.String(),
+		"amount", strconv.FormatInt(amount, 10), "status", r.Status)
+}
+
+// agreed is what an adopted request pays: the smallest amount named by a
+// counted yes, the one amount all of them agreed to.
+func agreed(bs []ballot) int64 {
+	pay := int64(0)
+	for _, b := range bs {
+		if b.Yes && isController(b.Voter) && (pay == 0 || b.Amount < pay) {
+			pay = b.Amount
+		}
+	}
+	return pay
 }
 
 // ---- controllers
@@ -313,17 +377,17 @@ func Propose(cur realm, subject string, add bool, reason string) int64 {
 	mustControl(by)
 	s := address(subject)
 	if !s.IsValid() {
-		panic("grants: " + subject + " is not a valid address")
+		panic("smallgrants: " + subject + " is not a valid address")
 	}
 	if add && isController(s) {
-		panic("grants: " + subject + " is already a controller")
+		panic("smallgrants: " + subject + " is already a controller")
 	}
 	if !add {
 		if !isController(s) {
-			panic("grants: " + subject + " is not a controller")
+			panic("smallgrants: " + subject + " is not a controller")
 		}
 		if len(controllers) <= 2 {
-			panic("grants: a set of two cannot remove one of its own, add a third first")
+			panic("smallgrants: a set of two cannot remove one of its own, add a third first")
 		}
 	}
 	reason = text(reason, "reason", MaxReasonLen, true)
@@ -343,10 +407,10 @@ func Second(cur realm, id int64, yes bool, note string) {
 	voter := caller(cur)
 	m := getMotion(id)
 	if m == nil {
-		panic("grants: no motion " + itoa(id))
+		panic("smallgrants: no motion " + itoa(id))
 	}
 	if m.Status != StatusPending {
-		panic("grants: motion " + itoa(id) + " is already " + m.Status)
+		panic("smallgrants: motion " + itoa(id) + " is already " + m.Status)
 	}
 	note = text(note, "note", MaxNoteLen, false)
 	// Only a removal has a party who may not vote; an added address is not a
@@ -402,7 +466,7 @@ func Allow(cur realm, addr string) {
 	mustControl(caller(cur))
 	a := address(addr)
 	if !a.IsValid() {
-		panic("grants: " + addr + " is not a valid address")
+		panic("smallgrants: " + addr + " is not a valid address")
 	}
 	allowlist.Set(a.String(), true)
 	chain.Emit("Allow", "addr", a.String())
@@ -412,7 +476,7 @@ func Allow(cur realm, addr string) {
 func Disallow(cur realm, addr string) {
 	mustControl(caller(cur))
 	if _, removed := allowlist.Remove(addr); !removed {
-		panic("grants: " + addr + " is not on the allowlist")
+		panic("smallgrants: " + addr + " is not on the allowlist")
 	}
 	chain.Emit("Disallow", "addr", addr)
 }
@@ -425,12 +489,12 @@ func castBallot(bs []ballot, voter address, yes bool, note string, parties ...ad
 	mustControl(voter)
 	for _, p := range parties {
 		if voter == p {
-			panic("grants: " + voter.String() + " is a party to this decision and may not vote on it")
+			panic("smallgrants: " + voter.String() + " is a party to this decision and may not vote on it")
 		}
 	}
 	for _, b := range bs {
 		if b.Voter == voter {
-			panic("grants: " + voter.String() + " has already voted")
+			panic("smallgrants: " + voter.String() + " has already voted")
 		}
 	}
 	return append(bs, ballot{Voter: voter, Yes: yes, Note: note, Height: runtime.ChainHeight()})
@@ -472,14 +536,14 @@ func outcome(bs []ballot, parties ...address) string {
 
 func caller(cur realm) address {
 	if !cur.IsCurrent() {
-		panic("grants: spoofed realm")
+		panic("smallgrants: spoofed realm")
 	}
 	return cur.Previous().Address()
 }
 
 func mustControl(a address) {
 	if !isController(a) {
-		panic("grants: " + a.String() + " is not a controller")
+		panic("smallgrants: " + a.String() + " is not a controller")
 	}
 }
 
@@ -536,10 +600,10 @@ func getMotion(id int64) *motion {
 func mustPending(id int64) *request {
 	r := getRequest(id)
 	if r == nil {
-		panic("grants: no request " + itoa(id))
+		panic("smallgrants: no request " + itoa(id))
 	}
 	if r.Status != StatusPending {
-		panic("grants: request " + itoa(id) + " is already " + r.Status)
+		panic("smallgrants: request " + itoa(id) + " is already " + r.Status)
 	}
 	return r
 }
@@ -555,10 +619,10 @@ func closeRequest(r *request, status string) {
 func text(s, what string, max int, required bool) string {
 	s = strings.TrimSpace(s)
 	if required && strings.TrimSpace(markdown.StripBidiAndZeroWidth(s)) == "" {
-		panic("grants: the " + what + " is empty")
+		panic("smallgrants: the " + what + " is empty")
 	}
 	if len(s) > max {
-		panic("grants: the " + what + " is longer than " + strconv.Itoa(max) + " bytes")
+		panic("smallgrants: the " + what + " is longer than " + strconv.Itoa(max) + " bytes")
 	}
 	return s
 }
