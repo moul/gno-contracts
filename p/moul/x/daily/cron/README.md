@@ -1,0 +1,57 @@
+# `gno.land/p/moul/x/daily/cron/v0`
+
+**The five-field cron expression, parsed and answered**: `Parse`, `MustParse`, `Next`, `NextN`, `Matches`, `Expr`.
+
+```go
+import "gno.land/p/moul/x/daily/cron/v0"
+
+s, err := cron.Parse("30 8 * * mon-fri")
+next, ok := s.Next(time.Now())   // the first weekday 08:30 after now
+s.Matches(t)                     // does it fire during the minute holding t
+s.NextN(t, 5)                    // the next five, in order
+```
+
+The grammar is the one every crontab uses, in the order minute, hour,
+day-of-month, month, day-of-week. Each field is a comma-separated list whose
+items are a value, a range, a star, or any of those with a step: `5`, `5-30`,
+`*`, `*/15`, `5-30/5`, `5/20`. Months take `jan`..`dec`, weekdays `sun`..`sat`,
+and the seven `@macros` are accepted (`@hourly`, `@daily`, `@weekly`,
+`@monthly`, `@yearly`, `@annually`, `@midnight`).
+
+**A chain has no timer, so a schedule here is never a thing that runs.** Nothing
+on gno.land wakes a realm up. A schedule is a thing that is *checked*: the realm
+stores the expression, and whoever calls in next asks whether the due instant has
+passed. That is the whole reason to want `Next` on chain rather than a cron
+daemon off it, and it is why this package is a parser and a calendar walk with no
+scheduler attached.
+
+Four behaviours worth knowing before you use it:
+
+- **When both day fields are narrowed, the match is their UNION.** `0 0 13 * 5`
+  is the 13th of the month **or** any Friday, never the intersection, which is
+  why that expression also fires on ordinary Fridays. When only one of the two
+  is narrowed the other matches everything, so union and intersection coincide
+  and there is nothing to decide. This is the rule a reimplementation gets
+  wrong, and the one the package is worth importing for.
+- **`Next` returns `(time.Time, bool)`, and the bool is not decoration.**
+  `0 0 30 2 *` is a well formed expression with no instant behind it. The walk
+  gives up after five years and says so, rather than scanning forever or
+  returning a zero time a caller would use as a date.
+- **Everything is UTC.** A block timestamp carries no local zone, and a schedule
+  whose answer depended on one would not be the same schedule on every
+  validating node. `Next` converts whatever it is handed.
+- **Resolution is the minute, and `Next` is exclusive.** Seconds and smaller are
+  discarded, so a schedule handed its own firing time answers with the following
+  one rather than with itself. That is what makes `t = s.Next(t)` a loop and not
+  a fixed point.
+
+`Parse` validates the grammar and the ranges and nothing else. An expression
+that is legal but can never fire parses successfully, because only `Next` is in
+a position to discover that. Parse errors name the field they came from: five
+fields all accept numbers, so `out of range` on its own says nothing about which
+one to go and fix.
+
+A `Schedule` is immutable once parsed and holds no state, so `MustParse` at
+package scope is the intended way to keep a constant schedule in a realm.
+
+Live demo: [`r/moul/x/daily/crondemo`](/r/moul/x/daily/crondemo/v0).

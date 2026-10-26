@@ -285,6 +285,10 @@ module = "gno.land/p/moul/x/daily/crc32/v0"
 source = { dir = "p/moul/x/daily/crc32" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/cron/v0"
+source = { dir = "p/moul/x/daily/cron" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/dijkstra/v0"
 source = { dir = "p/moul/x/daily/dijkstra" }
 
@@ -862,6 +866,10 @@ source = { dir = "r/moul/x/daily/cowsaydemo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/crc32demo/v0"
 source = { dir = "r/moul/x/daily/crc32demo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/crondemo/v0"
+source = { dir = "r/moul/x/daily/crondemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/crowdfund/v0"
