@@ -1,4 +1,4 @@
-module = "gno.land/r/moul/x/grc20faucet/v0"
+module = "gno.land/r/moul/x/grc20faucet/v1"
 gno = "0.9"
 
 # public: its init registers the two tokens it owns with r/nt/grc20reg, so
