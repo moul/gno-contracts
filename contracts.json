@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-26T09:47:57Z",
+  "status_checked_at": "2026-10-26T09:51:20Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -1823,6 +1823,27 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/bencode/v0",
+      "dir": "p/moul/x/daily/bencode",
+      "kind": "p",
+      "name": "x/daily/bencode",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/bidimap/v0",
       "dir": "p/moul/x/daily/bidimap",
       "kind": "p",
@@ -2185,6 +2206,27 @@
       }
     },
     {
+      "pkgpath": "gno.land/p/moul/x/daily/glob/v0",
+      "dir": "p/moul/x/daily/glob",
+      "kind": "p",
+      "name": "x/daily/glob",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/p/moul/x/daily/heap/v0",
       "dir": "p/moul/x/daily/heap",
       "kind": "p",
@@ -2239,6 +2281,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/huffman/v0",
+      "dir": "p/moul/x/daily/huffman",
+      "kind": "p",
+      "name": "x/daily/huffman",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -2454,6 +2517,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/myersdiff/v0",
+      "dir": "p/moul/x/daily/myersdiff",
+      "kind": "p",
+      "name": "x/daily/myersdiff",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -5370,6 +5454,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/bencodedemo/v0",
+      "dir": "r/moul/x/daily/bencodedemo",
+      "kind": "r",
+      "name": "x/daily/bencodedemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/bencode/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/bidimapdemo/v0",
       "dir": "r/moul/x/daily/bidimapdemo",
       "kind": "r",
@@ -6833,6 +6941,30 @@
       }
     },
     {
+      "pkgpath": "gno.land/r/moul/x/daily/globdemo/v0",
+      "dir": "r/moul/x/daily/globdemo",
+      "kind": "r",
+      "name": "x/daily/globdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/glob/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
       "pkgpath": "gno.land/r/moul/x/daily/governor/v0",
       "dir": "r/moul/x/daily/governor",
       "kind": "r",
@@ -7125,6 +7257,31 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/huffmandemo/v0",
+      "dir": "r/moul/x/daily/huffmandemo",
+      "kind": "r",
+      "name": "x/daily/huffmandemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/huffman/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -7904,6 +8061,31 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/myersdiffdemo/v0",
+      "dir": "r/moul/x/daily/myersdiffdemo",
+      "kind": "r",
+      "name": "x/daily/myersdiffdemo",
+      "version": "v0",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/myersdiff/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {

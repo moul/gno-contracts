@@ -218,6 +218,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/web25/v0`](p/moul/web25) 📦 | — | [✅](https://gno.land/p/moul/web25/v0) | — | — | 1 |
 | [`p/moul/x/daily/b58/v0`](p/moul/x/daily/b58) 📦 | — | [✅](https://gno.land/p/moul/x/daily/b58/v0) | — | — | — |
 | [`p/moul/x/daily/base32/v0`](p/moul/x/daily/base32) 📦 | — | [✅](https://gno.land/p/moul/x/daily/base32/v0) | — | — | — |
+| [`p/moul/x/daily/bencode/v0`](p/moul/x/daily/bencode) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/bidimap/v0`](p/moul/x/daily/bidimap) 📦 | — | [✅](https://gno.land/p/moul/x/daily/bidimap/v0) | — | — | — |
 | [`p/moul/x/daily/bitset/v0`](p/moul/x/daily/bitset) 📦 | — | [✅](https://gno.land/p/moul/x/daily/bitset/v0) | — | — | — |
 | [`p/moul/x/daily/cliffvesting/v0`](https://github.com/moul/gno-contracts/tree/d9879cdf25236a55f92c93fbb523faad01c1e7ae/p/moul/x/daily/cliffvesting) 📦 🧊 | — | [✅](https://gno.land/p/moul/x/daily/cliffvesting/v0) | — | — | — |
@@ -230,8 +231,10 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/fenwick/v0`](p/moul/x/daily/fenwick) 📦 | — | [✅](https://gno.land/p/moul/x/daily/fenwick/v0) | — | — | — |
 | [`p/moul/x/daily/flatmap/v0`](p/moul/x/daily/flatmap) 📦 | — | [✅](https://gno.land/p/moul/x/daily/flatmap/v0) | — | — | — |
 | [`p/moul/x/daily/fraction/v0`](p/moul/x/daily/fraction) 📦 | — | [✅](https://gno.land/p/moul/x/daily/fraction/v0) | — | — | — |
+| [`p/moul/x/daily/glob/v0`](p/moul/x/daily/glob) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/heap/v0`](p/moul/x/daily/heap) 📦 | — | [✅](https://gno.land/p/moul/x/daily/heap/v0) | — | — | — |
 | [`p/moul/x/daily/hexdump/v0`](p/moul/x/daily/hexdump) 📦 | — | [✅](https://gno.land/p/moul/x/daily/hexdump/v0) | — | — | — |
+| [`p/moul/x/daily/huffman/v0`](p/moul/x/daily/huffman) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/humanize/v0`](https://github.com/moul/gno-contracts/tree/96f8aef268ca00444bde83349a6d95c021cb71bf/p/moul/x/daily/humanize) 📦 🧊 | — | [✅](https://gno.land/p/moul/x/daily/humanize/v0) | — | — | — |
 | [`p/moul/x/daily/humanize/v1`](p/moul/x/daily/humanize) 📦 | — | [✅](https://gno.land/p/moul/x/daily/humanize/v1) | — | — | — |
 | [`p/moul/x/daily/kmp/v0`](p/moul/x/daily/kmp) 📦 | — | [✅](https://gno.land/p/moul/x/daily/kmp/v0) | — | — | — |
@@ -239,6 +242,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/luhn/v0`](p/moul/x/daily/luhn) 📦 | — | [✅](https://gno.land/p/moul/x/daily/luhn/v0) | — | — | — |
 | [`p/moul/x/daily/markov/v0`](p/moul/x/daily/markov) 📦 | — | [✅](https://gno.land/p/moul/x/daily/markov/v0) | — | — | 1 |
 | [`p/moul/x/daily/multiset/v0`](p/moul/x/daily/multiset) 📦 | — | [✅](https://gno.land/p/moul/x/daily/multiset/v0) | — | — | — |
+| [`p/moul/x/daily/myersdiff/v0`](p/moul/x/daily/myersdiff) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/orderedmap/v0`](p/moul/x/daily/orderedmap) 📦 | — | [✅](https://gno.land/p/moul/x/daily/orderedmap/v0) | — | — | — |
 | [`p/moul/x/daily/piglatin/v0`](p/moul/x/daily/piglatin) 📦 | — | [✅](https://gno.land/p/moul/x/daily/piglatin/v0) | — | — | — |
 | [`p/moul/x/daily/pullpayment/v0`](p/moul/x/daily/pullpayment) 📦 | — | [✅](https://gno.land/p/moul/x/daily/pullpayment/v0) | — | — | — |
@@ -333,6 +337,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/b58demo/v0`](r/moul/x/daily/b58demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/b58demo/v0) | — | — | 2 |
 | [`r/moul/x/daily/ballot/v0`](r/moul/x/daily/ballot) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ballot/v0) | — | — | 1 |
 | [`r/moul/x/daily/base32demo/v0`](r/moul/x/daily/base32demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/base32demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/bencodedemo/v0`](r/moul/x/daily/bencodedemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/bidimapdemo/v0`](r/moul/x/daily/bidimapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/bidimapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/bitsetdemo/v0`](r/moul/x/daily/bitsetdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/bitsetdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/blog/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/blog) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/blog/v0) | — | — | 1 |
@@ -378,6 +383,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/fenwickdemo/v0`](r/moul/x/daily/fenwickdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/fenwickdemo/v0) | — | — | 2 |
 | [`r/moul/x/daily/flatmapdemo/v0`](r/moul/x/daily/flatmapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/flatmapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/fractiondemo/v0`](r/moul/x/daily/fractiondemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/fractiondemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/globdemo/v0`](r/moul/x/daily/globdemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/governor/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/governor) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/governor/v0) | — | — | 1 |
 | [`r/moul/x/daily/governor/v1`](r/moul/x/daily/governor) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/governor/v1) | — | — | 2 |
 | [`r/moul/x/daily/guestbook/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/guestbook) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/guestbook/v0) | — | — | 1 |
@@ -387,6 +393,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/hangman/v0`](r/moul/x/daily/hangman) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/hangman/v0) | — | — | 1 |
 | [`r/moul/x/daily/heapdemo/v0`](r/moul/x/daily/heapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/heapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/hexdumpdemo/v0`](r/moul/x/daily/hexdumpdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/hexdumpdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/huffmandemo/v0`](r/moul/x/daily/huffmandemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/humanizedemo/v0`](r/moul/x/daily/humanizedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/humanizedemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/kingofdice/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/kingofdice) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/kingofdice/v0) | — | — | 1 |
 | [`r/moul/x/daily/kingofdice/v1`](r/moul/x/daily/kingofdice) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/kingofdice/v1) | — | — | 2 |
@@ -411,6 +418,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/moodstone/v1`](r/moul/x/daily/moodstone) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/moodstone/v1) | — | — | 1 |
 | [`r/moul/x/daily/multisetdemo/v0`](r/moul/x/daily/multisetdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/multisetdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/multisig/v0`](r/moul/x/daily/multisig) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/multisig/v0) | — | — | 1 |
+| [`r/moul/x/daily/myersdiffdemo/v0`](r/moul/x/daily/myersdiffdemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/numguess/v0`](r/moul/x/daily/numguess) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/numguess/v0) | — | — | 1 |
 | [`r/moul/x/daily/orderedmapdemo/v0`](r/moul/x/daily/orderedmapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/orderedmapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/piglatindemo/v0`](r/moul/x/daily/piglatindemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/piglatindemo/v0) | — | — | 1 |
@@ -526,7 +534,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-26T09:47:57Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-26T09:51:20Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
