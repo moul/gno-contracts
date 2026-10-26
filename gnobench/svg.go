@@ -260,9 +260,9 @@ func trimOutliers(bars []bar, caption string) ([]bar, string) {
 	return kept, caption + ". Off the scale, cut so the rest is readable: " + strings.Join(cut, ", ") + "."
 }
 
-// chartSpecs picks what is worth a picture. Two for a suite that persists
-// things (what one transaction costs, and what one entry costs to keep), one
-// for a suite that does not.
+// chartSpecs picks what is worth a picture. Three for a suite that persists
+// things (what a read costs, what an update costs, and what an entry costs to
+// keep), one for a suite that does not.
 func chartSpecs(s *Suite, v view) []chartSpec {
 	sizes := v.sizes()
 	if len(sizes) == 0 {
@@ -283,7 +283,23 @@ func chartSpecs(s *Suite, v view) []chartSpec {
 			bars:    bars,
 		})
 	}
-	// 2. storage per entry.
+	// 2. one cold transaction, one update. The read chart alone hides the axis
+	// that separates the two persisted shapes: a single-object container is
+	// rewritten whole on every edit, so its update cost grows with n while a
+	// per-entry container's does not.
+	if bars := collect(s, v, "kv", "str", "cold", "tx_write", big, ""); len(bars) > 0 {
+		cap := "overwriting one existing key: a single-object container rewrites all " +
+			addCommas(itoa(big)) + " entries, a per-entry container rewrites one path"
+		bars, cap = trimOutliers(bars, cap)
+		specs = append(specs, chartSpec{
+			slug:    "tx-write",
+			title:   fmt.Sprintf("Gas for ONE update, cold, against %s entries", addCommas(itoa(big))),
+			caption: cap,
+			anchor:  "one-transaction-one-operation",
+			bars:    bars,
+		})
+	}
+	// 3. storage per entry.
 	if bars := collectBytes(s, v, "str", big, ""); len(bars) > 0 {
 		cap := "keyed and positional containers together, so read the labels: at storage_price 100 ugnot/byte this is the deposit, locked until something frees it"
 		bars, cap = trimOutliers(bars, cap)
@@ -295,7 +311,7 @@ func chartSpecs(s *Suite, v view) []chartSpec {
 			bars:    bars,
 		})
 	}
-	// 3. the wiring suite: what the node is actually asked to write.
+	// 4. the wiring suite: what the node is actually asked to write.
 	if s.Name == "wiring" {
 		var bars []bar
 		for _, c := range wiringCandidates {
@@ -325,7 +341,7 @@ func chartSpecs(s *Suite, v view) []chartSpec {
 		return specs
 	}
 
-	// 4. pure computation: gas per call at the largest input.
+	// 5. pure computation: gas per call at the largest input.
 	if bars := collect(s, v, "digest", "str", "warm", "x64", big, "gas"); len(bars) > 0 {
 		cap := "amortised over 64 calls, so the input build is subtracted out"
 		bars, cap = trimOutliers(bars, cap)

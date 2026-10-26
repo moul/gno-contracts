@@ -63,7 +63,7 @@ section if you need the reasoning.
 | I want to store | Use | § |
 |---|---|---|
 | one value, one struct, a counter | a package-level `var`. Nothing else | [2.2](#22-one-value-is-a-package-level-var) |
-| a keyed map, no ordering needed | a native gno **`map`**. 153 B/entry, O(1), deterministic | [2.4](#24-keyed-and-unordered-is-a-map) |
+| a keyed map, no ordering needed, under ~250 entries | a native gno **`map`**. 153 B/entry, deterministic. Above that its update goes O(n) | [2.4](#24-keyed-and-unordered-is-a-map) |
 | a keyed store you iterate in order, range or paginate | **`p/nt/bptree`**, at fanout 128 if entries are only added, 32 if they are removed | [2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout) |
 | the same, but you inherited `avl` | keep reading, but new code should not start there | [2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout) |
 | an append-only log under ~4,000 entries | a plain **`[]T`**. Nothing is cheaper | [2.6](#26-append-only-is-a-slice-until-about-4000-entries) |
@@ -236,7 +236,10 @@ outside, deliberately exposing only what a non-member can act on.
 
 Everything in this section follows from one table. Measured 2026-09-29 against
 `gnolang/gno` master `1fc4c140e`, from `Store.RealmStorageDiffs()`, which is the same
-number the chain charges the storage deposit on.
+number the chain charges the storage deposit on. The gas figures in this chapter come from
+the [`gnobench` storage suite](./gnobench/reports/storage.md): raw rows in
+[`gnobench/results/storage/`](./gnobench/results/storage), one file per machine, and
+nothing here was estimated where a row exists.
 
 | what | cost |
 |---|--:|
@@ -250,8 +253,15 @@ number the chain charges the storage deposit on.
 gno is a decision about how many objects you create, and a 400-byte structural tax dwarfs
 anything you will do to your keys.
 
-Two corollaries that save real money:
+Three corollaries that save real money:
 
+- **The object count is the update price too.** The deposit is charged once on the bytes
+  you keep; gas is charged again on every transaction that edits one of them, and that
+  second price follows the same rule. A container held in **one** persisted object is
+  rewritten whole when one entry changes, so its update is O(n); a container that persists
+  **one object per entry** rewrites one path, and its update is logarithmic. Bytes and
+  updates then run in opposite directions, and the structure has to be chosen against both
+  ([2.3](#23-the-decision-table), [2.4](#24-keyed-and-unordered-is-a-map)).
 - **`any` is free.** `[]string` and `[]any` holding the same strings are identical byte for
   byte, and so are `map[string]string` and `map[string]any`. Interface boxing costs about
   0.4% in gas and nothing in storage. Type your containers for readability.
@@ -271,11 +281,14 @@ variable goes back to its initializer on redeploy (§1.3).
 ### 2.3 The decision table
 
 n = 1,000, string values, measured as above. Gas figures are filetest gas, comparable to
-each other and not a fee estimate; the byte counts are real.
+each other and not a fee estimate; the byte counts are real. They are also **amortised**:
+n operations batched into one transaction. What a `Call()` pays for one operation from
+cold is a different and much larger number, and for a single-object container it grows
+with n ([2.4](#24-keyed-and-unordered-is-a-map)).
 
 | If you need | Use | Why |
 |---|---|---|
-| a keyed store, no ordering | **`map[string]T`** | 153 B/entry, 4.2k gas/read, 57k gas/write, all O(1) |
+| a keyed store, no ordering, under ~250 entries | **`map[string]T`** | 153 B/entry, 4.2k gas/read, 57k gas/write amortised; one update from cold is O(n) ([2.4](#24-keyed-and-unordered-is-a-map)) |
 | ordered iteration, range, pagination | **`p/nt/bptree` at fanout 128**, or 32 if entries are removed ([2.5](#25-keyed-and-ordered-is-a-b-tree-at-high-fanout)) | 592 B/entry, 64k gas/read, 8k gas per entry iterated |
 | a positional append-only log under ~4k entries | **a plain `[]T`** | 79 B/entry, 3.1k gas/read, nothing cheaper exists |
 | a log above ~4k entries, or one that deletes | [**`p/moul/ulist`**](./p/moul/ulist) | 923 B/entry buys stable indices, a flat append, a partial refund |
@@ -330,10 +343,45 @@ one:
 - **no range scan**
 - **no `GetByIndex`**
 - **pagination is O(n) per page.** A map has no ordered access, so page 50 means fifty full
-  scans. Measured: 22k gas per page at n=100, 213k at n=1,000, 2.1M at n=10,000. This is
-  the one trap in an otherwise flat structure.
+  scans. Measured: 22k gas per page at n=100, 213k at n=1,000, 2.1M at n=10,000.
 
-So: a map for lookup, a tree for anything a reader navigates.
+**And one persisted object cuts both ways.** Editing one entry rewrites the whole object,
+so a map's update is O(n) in the entries it holds while a tree's is logarithmic: the tree
+rewrites one root-to-leaf path and leaves the rest of the container alone. This is the
+second price in [2.1](#21-the-cost-model-in-four-numbers), and it is the one a warm
+benchmark hides. Workload `tx_write`, group `kv`, mode cold, baselined on `tx_base`
+(`tx_set_at`, group `list`, for the slice): the gas one overwrite of an existing key costs
+a `Call()`.
+
+| structure | n = 100 | n = 1,000 | n = 10,000 | scaling |
+|---|--:|--:|--:|---|
+| `map[string]string` | 118,685 | 1,034,165 | 10,195,084 | **O(n)**, ~1,017 gas per entry held |
+| `[]string`, by index | 64,277 | 496,700 | 4,818,873 | **O(n)**, ~480 gas per entry held |
+| `bptree` fanout 32 | 241,513 | 302,691 | 340,196 | logarithmic |
+| `avl` | 267,504 | 364,210 | 463,823 | logarithmic |
+
+The map fits `17k + 1017n` to within 0.06% across all three decades and the slice fits
+`16k + 480n` to within 0.05%, so the first column of the table in
+[2.3](#23-the-decision-table) only looks flat because it is amortised.
+
+**They cross at roughly n = 250**, and the suite carries the sizes that bracket it rather
+than an extrapolation: the map passes `bptree` fanout 32 between n = 220 (240,572 against
+245,359) and n = 280 (301,609 against 243,696), and passes `avl` between n = 280 and
+n = 300. That gives the map's "small" an actual number, and it is a number about size,
+not about how often you write:
+
+- **Under ~250 entries a map is cheaper on both prices, however hot it runs.** At n = 150
+  an update costs 169,464, below the cheapest tree figure anywhere in the suite. Fifty
+  entries rewritten every block is still a map.
+- **Bigger but cold**, say 1,000 entries edited once a year: still a map. That is 1.03M
+  gas a year against locking 3.9x the deposit for good.
+- **Bigger and hot**, edited on most calls: a tree. At n = 10,000 a map update is 10.2M
+  gas against `avl`'s 464k, 22x, on every call that touches one record.
+
+Heat alone never selects a tree, and size alone does not either: **n times heat** does.
+
+So: a map for lookup while it stays small, a tree for anything a reader navigates and for
+anything large that keeps changing.
 
 ### 2.5 Keyed and ordered is a B+ tree at high fanout
 

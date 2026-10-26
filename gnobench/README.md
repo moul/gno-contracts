@@ -55,6 +55,13 @@ _Every figure below is read out of `results/`. Do not edit: run `make report`._
   </picture>
 </a>
 
+<a href="reports/storage.md#one-transaction-one-operation">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="reports/storage-tx-write-dark.svg">
+    <img alt="Gas for ONE update, cold, against 10,000 entries" src="reports/storage-tx-write-light.svg" width="860">
+  </picture>
+</a>
+
 <a href="reports/storage.md#storage-per-entry">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="reports/storage-bytes-dark.svg">
