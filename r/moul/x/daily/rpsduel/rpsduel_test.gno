@@ -17,39 +17,6 @@ func resetState() {
 	championWins = 0
 }
 
-func TestParseMove(t *testing.T) {
-	for _, s := range []string{"rock", "Rock", " r ", "paper", "P", "scissors", "S"} {
-		if _, ok := parseMove(s); !ok {
-			t.Fatalf("parseMove(%q) should be valid", s)
-		}
-	}
-	if _, ok := parseMove("lizard"); ok {
-		t.Fatal(`parseMove("lizard") should be invalid`)
-	}
-}
-
-func TestJudge(t *testing.T) {
-	cases := []struct {
-		p, h Move
-		want int
-	}{
-		{Rock, Rock, 0},
-		{Paper, Paper, 0},
-		{Scissors, Scissors, 0},
-		{Paper, Rock, 1},
-		{Scissors, Paper, 1},
-		{Rock, Scissors, 1},
-		{Rock, Paper, 2},
-		{Paper, Scissors, 2},
-		{Scissors, Rock, 2},
-	}
-	for _, c := range cases {
-		if got := judge(c.p, c.h); got != c.want {
-			t.Fatalf("judge(%v,%v) = %d, want %d", c.p, c.h, got, c.want)
-		}
-	}
-}
-
 func TestComputeCommitDeterministicAndSalted(t *testing.T) {
 	a := ComputeCommit("rock", "salt1")
 	b := ComputeCommit("rock", "salt1")

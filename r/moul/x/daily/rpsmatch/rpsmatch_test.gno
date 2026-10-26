@@ -16,39 +16,6 @@ func resetState() {
 	championWins = 0
 }
 
-func TestJudge(t *testing.T) {
-	cases := []struct {
-		p, h Move
-		want int
-	}{
-		{Rock, Rock, 0},
-		{Paper, Paper, 0},
-		{Scissors, Scissors, 0},
-		{Paper, Rock, 1},
-		{Scissors, Paper, 1},
-		{Rock, Scissors, 1},
-		{Rock, Paper, 2},
-		{Paper, Scissors, 2},
-		{Scissors, Rock, 2},
-	}
-	for _, c := range cases {
-		if got := judge(c.p, c.h); got != c.want {
-			t.Fatalf("judge(%v,%v) = %d, want %d", c.p, c.h, got, c.want)
-		}
-	}
-}
-
-func TestParseMove(t *testing.T) {
-	for _, s := range []string{"rock", "Rock", " r ", "paper", "P", "scissors", "S"} {
-		if _, ok := parseMove(s); !ok {
-			t.Fatalf("parseMove(%q) should be valid", s)
-		}
-	}
-	if _, ok := parseMove("lizard"); ok {
-		t.Fatal("parseMove(\"lizard\") should be invalid")
-	}
-}
-
 // Crossing: Throw mutates realm state, so the test needs `cur realm`.
 func TestThrowUpdatesStats(cur realm, t *testing.T) {
 	resetState()

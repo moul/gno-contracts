@@ -4,43 +4,22 @@ import (
 	"strings"
 	"testing"
 
+	"gno.land/p/moul/x/daily/rps/v0"
 	"gno.land/p/nt/testutils/v0"
 	"gno.land/p/nt/uassert/v0"
 )
 
-func TestDecideAndParse(t *testing.T) {
-	// parseChoice.
-	cases := []struct {
-		in   string
-		want int
-		ok   bool
-	}{
-		{"rock", rock, true},
-		{"PAPER", paper, true},
-		{" scissors ", scissors, true},
-		{"r", rock, true},
-		{"p", paper, true},
-		{"s", scissors, true},
-		{"lizard", 0, false},
-	}
-	for _, c := range cases {
-		got, ok := parseChoice(c.in)
-		uassert.Equal(t, c.ok, ok, "ok for "+c.in)
-		if ok {
-			uassert.Equal(t, c.want, got, "move for "+c.in)
-		}
-	}
-
+func TestDecide(t *testing.T) {
 	// decide: player perspective.
-	uassert.Equal(t, outDraw, decide(rock, rock), "rock vs rock")
-	uassert.Equal(t, outWin, decide(rock, scissors), "rock beats scissors")
-	uassert.Equal(t, outLose, decide(rock, paper), "rock loses to paper")
-	uassert.Equal(t, outWin, decide(paper, rock), "paper beats rock")
-	uassert.Equal(t, outWin, decide(scissors, paper), "scissors beats paper")
-	uassert.Equal(t, outLose, decide(scissors, rock), "scissors loses to rock")
+	uassert.Equal(t, outDraw, decide(rps.Rock, rps.Rock), "rock vs rock")
+	uassert.Equal(t, outWin, decide(rps.Rock, rps.Scissors), "rock beats scissors")
+	uassert.Equal(t, outLose, decide(rps.Rock, rps.Paper), "rock loses to paper")
+	uassert.Equal(t, outWin, decide(rps.Paper, rps.Rock), "paper beats rock")
+	uassert.Equal(t, outWin, decide(rps.Scissors, rps.Paper), "scissors beats paper")
+	uassert.Equal(t, outLose, decide(rps.Scissors, rps.Rock), "scissors loses to rock")
 
 	// houseMove determinism.
-	uassert.Equal(t, houseMove(10, 0), houseMove(10, 0), "same inputs -> same move")
+	uassert.Equal(t, int(houseMove(10, 0)), int(houseMove(10, 0)), "same inputs -> same move")
 	if houseMove(10, 0) == houseMove(10, 1) && houseMove(10, 1) == houseMove(10, 2) {
 		t.Error("play count should vary house move across values")
 	}
