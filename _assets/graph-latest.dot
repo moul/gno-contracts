@@ -83,6 +83,7 @@ digraph gnocontracts_latest {
   "gno.land/p/moul/x/daily/sparkline/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/toposort/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/daily/trie/v0" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/p/moul/x/daily/varint/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/envelope/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/framelab/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/p/moul/x/games/accrual/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -256,6 +257,7 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/triedemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/trivia/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/urlshort/v1" [style=filled, fillcolor="#cfe2ff"];
+  "gno.land/r/moul/x/daily/varintdemo/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/vault/v1" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/vestoken/v0" [style=filled, fillcolor="#cfe2ff"];
   "gno.land/r/moul/x/daily/wrapped/v0" [style=filled, fillcolor="#cfe2ff"];
@@ -695,6 +697,9 @@ digraph gnocontracts_latest {
   "gno.land/r/moul/x/daily/urlshort/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/urlshort/v1" -> "gno.land/p/moul/md/v0";
   "gno.land/r/moul/x/daily/urlshort/v1" -> "gno.land/p/nt/avl/v0";
+  "gno.land/r/moul/x/daily/varintdemo/v0" -> "gno.land/p/moul/kit/ui/v0";
+  "gno.land/r/moul/x/daily/varintdemo/v0" -> "gno.land/p/moul/md/v0";
+  "gno.land/r/moul/x/daily/varintdemo/v0" -> "gno.land/p/moul/x/daily/varint/v0";
   "gno.land/r/moul/x/daily/vault/v1" -> "gno.land/p/moul/kit/ui/v0";
   "gno.land/r/moul/x/daily/vault/v1" -> "gno.land/p/nt/avl/v0";
   "gno.land/r/moul/x/daily/wrapped/v0" -> "gno.land/p/nt/avl/v0";

@@ -257,6 +257,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/sparkline/v0`](p/moul/x/daily/sparkline) 📦 | — | [✅](https://gno.land/p/moul/x/daily/sparkline/v0) | — | — | — |
 | [`p/moul/x/daily/toposort/v0`](p/moul/x/daily/toposort) 📦 | — | [✅](https://gno.land/p/moul/x/daily/toposort/v0) | — | — | — |
 | [`p/moul/x/daily/trie/v0`](p/moul/x/daily/trie) 📦 | — | [✅](https://gno.land/p/moul/x/daily/trie/v0) | — | — | — |
+| [`p/moul/x/daily/varint/v0`](p/moul/x/daily/varint) 📦 | — | — | — | — | — |
 | [`p/moul/x/envelope/v0`](p/moul/x/envelope) 📦 | — | [✅](https://gno.land/p/moul/x/envelope/v0) | — | — | 1 |
 | [`p/moul/x/framelab/v0`](p/moul/x/framelab) 📦 | — | [✅](https://gno.land/p/moul/x/framelab/v0) | — | — | 1 |
 | [`p/moul/x/games/accrual/v0`](p/moul/x/games/accrual) 📦 | — | [✅](https://gno.land/p/moul/x/games/accrual/v0) | — | — | — |
@@ -473,6 +474,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/trivia/v0`](r/moul/x/daily/trivia) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/trivia/v0) | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/urlshort) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/urlshort/v0) | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/urlshort/v1) | — | — | 3 |
+| [`r/moul/x/daily/varintdemo/v0`](r/moul/x/daily/varintdemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/vault/v0`](https://github.com/moul/gno-contracts/tree/64ba64c0f83f22fcbb7c2f5887d4d5731462237d/r/moul/x/daily/vault) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/vault/v0) | — | — | 1 |
 | [`r/moul/x/daily/vault/v1`](r/moul/x/daily/vault) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/vault/v1) | — | — | 2 |
 | [`r/moul/x/daily/vestoken/v0`](r/moul/x/daily/vestoken) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/vestoken/v0) | — | — | — |
@@ -534,7 +536,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-26T09:51:20Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-26T09:54:37Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
