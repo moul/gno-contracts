@@ -88,7 +88,6 @@ render_markdown_escape r/moul/x/daily/streak 1
 render_markdown_escape r/moul/x/daily/tictactoe 2
 render_markdown_escape r/moul/x/daily/triedemo 3
 render_markdown_escape r/moul/x/daily/urlshort 1
-render_markdown_escape r/moul/x/grc20faucet 1
 render_markdown_escape r/moul/x/plan9/ns 3
 unsafe_previous_realm r/moul/reactions 2
 unsafe_previous_realm r/moul/vesting 2
