@@ -90,10 +90,10 @@ irreversible.
   re-mirror and update the three constants at the top.
 - **Never build a markdown table by concatenating pipes.** `ui.NewTable` pads a short row
   instead of dropping its data, escapes a cell that would open a new column, and renders a
-  sentence instead of an empty header. `make guard-tables` is a ratchet over the 100 packages
-  that predate it, and it buys nothing retroactively: 329 of 331 contracts are live on
-  mainnet, where a public path is immutable. **Ask the chain (`gnopm publish -print`) before
-  editing any package, not after.** Opt-out: `// handrolled-table: <what the dashes are>`,
+  sentence instead of an empty header. `make guard-tables` is a ratchet over the packages that
+  predate it, and it buys nothing retroactively: nearly every contract in the catalog is
+  already live on mainnet, where a public path is immutable. **Ask the chain
+  (`gnopm publish -print`) before editing any package, not after.** Opt-out: `// handrolled-table: <what the dashes are>`,
   20 characters minimum, readable from a test file when production source is already live.
 
 ## Commits
