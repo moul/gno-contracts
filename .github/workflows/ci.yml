@@ -64,11 +64,13 @@ jobs:
       # living only on this branch would be), plus a fourth check `verify`
       # cannot make and a Markdown report in the job summary.
       #
-      # The fourth is a WARNING, not a failure: a pull request that changes a
-      # package's production .gno files without moving its module line, where
-      # that version is already live or parked on the chain. A public package
-      # path cannot be redeployed, so such an edit can never reach the chain
-      # and this tree silently stops matching what is deployed. That is how
+      # The fourth FAILS the run (gnopm v0.19.0, pkg/gnopm/edited.go): a pull
+      # request that changes a package's production .gno files without moving
+      # its module line, where that version is already parked, or live and not
+      # `private` on the chain. A public package path cannot be redeployed, so
+      # such an edit can never reach the chain and this tree silently stops
+      # matching what is deployed. A live `private` version only gets a
+      # non-fatal "needs a redeploy" note, since that is its one route. That is how
       # r/moul/x/reaper/v0 shipped a rendering fix it could never receive
       # (#193, corrected by #196): every check here was green, correctly, and
       # the lock is exactly what stays right while this goes wrong.

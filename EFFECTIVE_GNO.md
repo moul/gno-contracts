@@ -175,7 +175,11 @@ real content diff instead of a copied directory git cannot pair.
 
 Breaking, and therefore a `vN+1`: removing or renaming an exported symbol, changing a
 signature, changing on-chain behaviour, swapping the backing storage. Everything else,
-including new exported functions, edits the current version in place.
+including new exported functions, edits the current version in place **while that version
+is not on the chain**. A public path takes one `MsgAddPackage`, ever, so once it is live (or
+parked) even an added function is a `vN+1`, and a live `private` realm takes the edit only
+as a redeploy that resets its state. `gnopm tool ci` decides, and fails CI on the first
+case.
 
 Mechanics, and the tool that does it: [AGENTS.md § Bumping a
 contract](./AGENTS.md#bumping-a-contract).
@@ -1317,6 +1321,7 @@ live. If you are about to write a helper, look here first.
 | a template with `{{ }}` | [`dynreplacer`](./p/moul/dynreplacer) |
 | map / filter / reduce over `[]any` | [`fp`](./p/moul/fp) |
 | a "convert anything to a string" helper | [`typeutil`](./p/moul/typeutil) |
+| an `itoa` | `strconv.Itoa`, or `strconv.FormatInt` for an `int64`: gno's stdlib has both |
 | a multi-error | [`errs`](./p/moul/errs) |
 | base58, base32, crc32, a Merkle proof, semver | [`x/daily/*`](./README.md#contracts), [`x/merkle`](./p/moul/x/merkle) |
 | a reaction bar under a page | [`reactions`](./p/moul/reactions) |
@@ -1324,10 +1329,14 @@ live. If you are about to write a helper, look here first.
 | a GRC20 for an app, with its sink declared up front | [`x/social/coin`](./p/moul/x/social/coin) |
 | a one-time init guard | [`once`](./p/moul/once) |
 | an SVG | [`svg`](./p/moul/svg) |
+| `NewBanker(BankerTypeOriginSend, cur)` then `SendCoins(cur.Address(), to, …)`, to pass a payment on | [`x/envelope`](./p/moul/x/envelope) `Forward`, `ForwardAll` |
+| a rock-paper-scissors move and who beats whom | [`x/daily/rps`](./p/moul/x/daily/rps) `Parse`, `Beats`, as `rps`, `rpsmatch`, `rpsoracle` and `rpsduel` do |
 
 An owner check is `p/nt/ownable`. `p/moul/ownable`, `entity`, `safe` and `xdao` were
 declared but never implemented, and left this tree with `udao`, `template` and `mdlist`
-(#356): their `v0` stays on chain, frozen, and nothing should import it.
+(#356, deleted in #363): their `v0` stays on chain, frozen, and nothing should import it.
+[`archive_obsolete/`](./archive_obsolete/README.md) is the ledger of all seven, with the
+commit each is pinned to, why it went and what to use instead.
 
 ---
 

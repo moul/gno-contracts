@@ -31,12 +31,30 @@ ignores the path.
   nothing across a copy, so the review diff of the change that most needs reviewing
   becomes a pile of added files with no content diff. One port of 25 realms landed as
   +11,103 / 0 across 112 files that way.
-- **Everything non-breaking edits the current version in place**: new exported functions,
-  tests, comments, docs. Tests and READMEs are not part of the deployed package, so they
-  never change its on-chain hash.
+- **Non-breaking work edits the current version in place, but only until that version
+  reaches the chain.** Two rules meet here and answer different questions. Semver: a new
+  exported function, a comment or a test needs no new `/vN`. The chain: a public path takes
+  one `MsgAddPackage`, ever, so once a version is live there no transaction can carry any
+  change to its code, breaking or not. `gnopm tool ci` (the "Verify gnomod.lock" step of
+  `.github/workflows/ci.yml`; gnopm `pkg/gnopm/edited.go`) reconciles them for every package
+  whose production `.gno` the branch changes without moving its module line, and asks the
+  chain the path points at:
+  - *absent*: silent. Nobody was promised this version, so it is still the one to edit.
+  - *live, and the chain's copy declares `private`*: reported, never fatal. The edit reaches
+    the chain only through a redeploy, which re-runs `init()` and resets realm state.
+  - *live and public, or parked*: **CI fails**. Run `gnopm bump -if-published <name>`, which
+    bumps only when the outgoing version is on the chain, then edit.
+
+  `private` is read from the chain's copy, never from the tree: `r/moul/faucet/v0` declares
+  it and is public anyway (see `private = true` below). Test files, filetests and READMEs are
+  not counted: they travel with a `MsgAddPackage` but run nothing. A chain that does not
+  answer skips the check instead of failing it, so ask first with `gnopm publish -print`.
 - **A superseded version has no directory.** It is pinned in `gnomod.lock` to a commit
   that still holds it and rebuilt into the gitignored `.gnopm/`, so anything importing
   `.../md/v0` still resolves, lints and tests. See [gnopm](https://github.com/moul/gnopm).
+  A **retired** package (no successor, directory deleted, `v0` still on chain) is pinned the
+  same way, and [`archive_obsolete/README.md`](./archive_obsolete/README.md) is its ledger:
+  the pin, why it went, and what to use instead.
 - **An unversioned path is the exception, and there are exactly two grounds for it.**
   The allowlist is `unversionedContracts` in `tools/gnocontracts/model.go`, which carries
   the reason for every entry; a path not in it and not ending in `/vN` fails the scan.
@@ -96,6 +114,7 @@ contracts.json          catalog, generated on main
 gnomod.lock             where each version's source is (SOURCE, a PR carries it)
 gnowork.toml            workspace marker (enables local resolution)
 .gnopm/                 superseded versions, rebuilt from history (gitignored)
+archive_obsolete/       ledger of retired packages: README only, the source is pinned
 .gnoroot-view/          stdlib-only image of GNOROOT (gitignored, see below)
 Makefile                one line per target; `make help` groups them
 .github/workflows/      ci (the gate), pr (comment + preview), main (regen)
@@ -568,12 +587,13 @@ The opt-out is for dashes that are not a table:
 20-character floor on the reason, and an opted-out package leaves the baseline entirely, so
 one package is never answered for by two mechanisms. The opt-out is read from **every** file
 including tests, while the separator is detected only outside them: asymmetric on purpose,
-because a package whose production source is already live can never be edited again, so its
+because a public package whose production source is already live can never take a production
+edit again (`gnopm tool ci` fails one, rule 1), so its
 test file is the only place a true opt-out can still be written. `p/moul/x/daily/cowsay` is
 that case, and it is the first one.
 
-Five packages are exempt in code because emitting a separator correctly is what they are for:
-`kit/ui`, `mdtable`, `md`, `mdlist`, `template`.
+Three packages are exempt in code because emitting a separator correctly is what they are for:
+`kit/ui`, `mdtable`, `md`.
 
 ## When to spend a Copilot code review, and when not to
 
