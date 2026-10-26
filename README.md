@@ -317,7 +317,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/demo/importdemo/v0`](r/moul/demo/importdemo) 🏛️ | — | [✅](https://gno.land/r/moul/demo/importdemo/v0) | — | — | 2 |
 | [`r/moul/demo/microposts/v0`](r/moul/demo/microposts) 🏛️ | — | [✅](https://gno.land/r/moul/demo/microposts/v0) | — | — | — |
 | [`r/moul/demo/millipede/v0`](r/moul/demo/millipede) 🏛️ | — | [✅](https://gno.land/r/moul/demo/millipede/v0) | — | — | 1 |
-| [`r/moul/demo/render/v0`](r/moul/demo/render) 🏛️ | — | [✅](https://gno.land/r/moul/demo/render/v0) | — | — | — |
+| [`r/moul/demo/render/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/demo/render) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/demo/render/v0) | — | — | — |
+| [`r/moul/demo/render/v1`](r/moul/demo/render) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/demo/vault/v0`](r/moul/demo/vault) 🏛️ | — | [✅](https://gno.land/r/moul/demo/vault/v0) | — | — | 1 |
 | [`r/moul/demo/wikicoin/v0`](r/moul/demo/wikicoin) 🏛️ | — | [✅](https://gno.land/r/moul/demo/wikicoin/v0) | — | — | 2 |
 | [`r/moul/faucet/v0`](https://github.com/moul/gno-contracts/tree/a04bb0d9caf27fb01fe37c64629ce8c8ae4a77cf/r/moul/faucet) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/faucet/v0) | — | — | 2 |
@@ -348,7 +349,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/asciiart/v1) | — | — | 2 |
 | [`r/moul/x/daily/b58demo/v0`](r/moul/x/daily/b58demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/b58demo/v0) | — | — | 2 |
 | [`r/moul/x/daily/ballot/v0`](r/moul/x/daily/ballot) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ballot/v0) | — | — | 1 |
-| [`r/moul/x/daily/base32demo/v0`](r/moul/x/daily/base32demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/base32demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/base32demo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/base32demo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/base32demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/base32demo/v1`](r/moul/x/daily/base32demo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/bech32demo/v0`](r/moul/x/daily/bech32demo) 🏛️ | — | — | — | — | 4 |
 | [`r/moul/x/daily/bencodedemo/v0`](r/moul/x/daily/bencodedemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/bidimapdemo/v0`](r/moul/x/daily/bidimapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/bidimapdemo/v0) | — | — | 1 |
@@ -374,7 +376,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/counter/v0`](r/moul/x/daily/counter) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/counter/v0) | — | — | — |
 | [`r/moul/x/daily/countminsketchdemo/v0`](r/moul/x/daily/countminsketchdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/countminsketchdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/cowsaydemo/v0`](r/moul/x/daily/cowsaydemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/cowsaydemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/crc32demo/v0`](r/moul/x/daily/crc32demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/crc32demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/crc32demo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/crc32demo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/crc32demo/v0) | — | — | 1 |
+| [`r/moul/x/daily/crc32demo/v1`](r/moul/x/daily/crc32demo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/crondemo/v0`](r/moul/x/daily/crondemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/crowdfund/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/crowdfund) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/crowdfund/v0) | — | — | 1 |
 | [`r/moul/x/daily/crowdfund/v1`](r/moul/x/daily/crowdfund) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/crowdfund/v1) | — | — | 2 |
@@ -417,13 +420,15 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/kudos/v0`](r/moul/x/daily/kudos) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/kudos/v0) | — | — | 1 |
 | [`r/moul/x/daily/leaderboard/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/leaderboard) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/leaderboard/v0) | — | — | 1 |
 | [`r/moul/x/daily/leaderboard/v1`](r/moul/x/daily/leaderboard) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/leaderboard/v1) | — | — | 2 |
-| [`r/moul/x/daily/levenshteindemo/v0`](r/moul/x/daily/levenshteindemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/levenshteindemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/levenshteindemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/levenshteindemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/levenshteindemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/levenshteindemo/v1`](r/moul/x/daily/levenshteindemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/life/v0`](r/moul/x/daily/life) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/life/v0) | — | — | — |
 | [`r/moul/x/daily/linktree/v0`](https://github.com/moul/gno-contracts/tree/64ba64c0f83f22fcbb7c2f5887d4d5731462237d/r/moul/x/daily/linktree) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/linktree/v0) | — | — | 1 |
 | [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/linktree/v1) | — | — | 2 |
 | [`r/moul/x/daily/lottery/v0`](r/moul/x/daily/lottery) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/lottery/v0) | — | — | 1 |
 | [`r/moul/x/daily/lru/v0`](r/moul/x/daily/lru) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/lru/v0) | — | — | — |
-| [`r/moul/x/daily/luhndemo/v0`](r/moul/x/daily/luhndemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/luhndemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/luhndemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/luhndemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/luhndemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/luhndemo/v1`](r/moul/x/daily/luhndemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/markovdemo/v0`](r/moul/x/daily/markovdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/markovdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/memory/v0`](r/moul/x/daily/memory) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/memory/v0) | — | — | — |
 | [`r/moul/x/daily/merkledrop/v0`](https://github.com/moul/gno-contracts/tree/5b5c3384dcdb1be75699cedb99e03d7be11e0312/r/moul/x/daily/merkledrop) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/merkledrop/v0) | — | — | 1 |
@@ -437,7 +442,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/myersdiffdemo/v0`](r/moul/x/daily/myersdiffdemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/numguess/v0`](r/moul/x/daily/numguess) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/numguess/v0) | — | — | 1 |
 | [`r/moul/x/daily/orderedmapdemo/v0`](r/moul/x/daily/orderedmapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/orderedmapdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/piglatindemo/v0`](r/moul/x/daily/piglatindemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/piglatindemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/piglatindemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/piglatindemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/piglatindemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/piglatindemo/v1`](r/moul/x/daily/piglatindemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/pixelcanvas/v0`](r/moul/x/daily/pixelcanvas) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/pixelcanvas/v0) | — | — | 1 |
 | [`r/moul/x/daily/polls/v0`](https://github.com/moul/gno-contracts/tree/64ba64c0f83f22fcbb7c2f5887d4d5731462237d/r/moul/x/daily/polls) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/polls/v0) | — | — | 1 |
 | [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/polls/v1) | — | — | 2 |
@@ -450,7 +456,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/reactions/v0`](r/moul/x/daily/reactions) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/reactions/v0) | — | — | 2 |
 | [`r/moul/x/daily/ringbufferdemo/v0`](r/moul/x/daily/ringbufferdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ringbufferdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/ringlog/v0`](r/moul/x/daily/ringlog) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ringlog/v0) | — | — | — |
-| [`r/moul/x/daily/rledemo/v0`](r/moul/x/daily/rledemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rledemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/rledemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/rledemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rledemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/rledemo/v1`](r/moul/x/daily/rledemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/romannumdemo/v0`](r/moul/x/daily/romannumdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/romannumdemo/v0) | — | — | 2 |
 | [`r/moul/x/daily/rot13demo/v0`](r/moul/x/daily/rot13demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rot13demo/v0) | — | — | 1 |
 | [`r/moul/x/daily/rpgroom/v0`](r/moul/x/daily/rpgroom) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpgroom/v0) | — | — | 2 |
@@ -465,13 +472,15 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/semverdemo/v0`](r/moul/x/daily/semverdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/semverdemo/v0) | — | — | 3 |
 | [`r/moul/x/daily/shuntingyarddemo/v0`](r/moul/x/daily/shuntingyarddemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/sievedemo/v0`](r/moul/x/daily/sievedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/sievedemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/soundexdemo/v0`](r/moul/x/daily/soundexdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/soundexdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/soundexdemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/soundexdemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/soundexdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/soundexdemo/v1`](r/moul/x/daily/soundexdemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/sparklinedemo/v0`](r/moul/x/daily/sparklinedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/sparklinedemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/splitter/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/splitter) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/splitter/v0) | — | — | 1 |
 | [`r/moul/x/daily/splitter/v1`](r/moul/x/daily/splitter) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/splitter/v1) | — | — | 1 |
 | [`r/moul/x/daily/stack/v0`](r/moul/x/daily/stack) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/stack/v0) | — | — | — |
 | [`r/moul/x/daily/staking/v0`](r/moul/x/daily/staking) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/staking/v0) | — | — | 1 |
-| [`r/moul/x/daily/streak/v0`](r/moul/x/daily/streak) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/streak/v0) | — | — | 1 |
+| [`r/moul/x/daily/streak/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/streak) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/streak/v0) | — | — | 1 |
+| [`r/moul/x/daily/streak/v1`](r/moul/x/daily/streak) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/streaks/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/streaks) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/streaks/v0) | — | — | 1 |
 | [`r/moul/x/daily/streaks/v1`](r/moul/x/daily/streaks) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/streaks/v1) | — | — | 3 |
 | [`r/moul/x/daily/tamagotchi/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/tamagotchi) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/tamagotchi/v0) | — | — | 1 |
@@ -486,7 +495,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/todos/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/todos) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/todos/v0) | — | — | 1 |
 | [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/todos/v1) | — | — | 2 |
 | [`r/moul/x/daily/toposortdemo/v0`](r/moul/x/daily/toposortdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/toposortdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/triedemo/v0`](r/moul/x/daily/triedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/triedemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/triedemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/triedemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/triedemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/triedemo/v1`](r/moul/x/daily/triedemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/trivia/v0`](r/moul/x/daily/trivia) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/trivia/v0) | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/urlshort) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/urlshort/v0) | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/urlshort/v1) | — | — | 3 |
@@ -552,7 +562,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-26T20:35:39Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-26T21:29:21Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 

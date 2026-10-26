@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-26T20:35:39Z",
+  "status_checked_at": "2026-10-26T21:29:21Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -4637,6 +4637,8 @@
       "description": "",
       "deps": [],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -4652,6 +4654,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/demo/render/v1",
+      "dir": "r/moul/demo/render",
+      "kind": "r",
+      "name": "demo/render",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -5638,6 +5663,8 @@
         "gno.land/p/moul/x/daily/base32/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -5653,6 +5680,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/base32demo/v1",
+      "dir": "r/moul/x/daily/base32demo",
+      "kind": "r",
+      "name": "x/daily/base32demo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/base32/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -6464,6 +6515,8 @@
         "gno.land/p/moul/x/daily/crc32/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -6479,6 +6532,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/crc32demo/v1",
+      "dir": "r/moul/x/daily/crc32demo",
+      "kind": "r",
+      "name": "x/daily/crc32demo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/crc32/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -7837,6 +7914,8 @@
         "gno.land/p/moul/x/daily/levenshtein/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -7852,6 +7931,31 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/levenshteindemo/v1",
+      "dir": "r/moul/x/daily/levenshteindemo",
+      "kind": "r",
+      "name": "x/daily/levenshteindemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/levenshtein/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -8025,6 +8129,8 @@
         "gno.land/p/moul/x/daily/luhn/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -8040,6 +8146,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/luhndemo/v1",
+      "dir": "r/moul/x/daily/luhndemo",
+      "kind": "r",
+      "name": "x/daily/luhndemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/luhn/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -8474,6 +8604,8 @@
         "gno.land/p/moul/x/daily/piglatin/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -8489,6 +8621,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/piglatindemo/v1",
+      "dir": "r/moul/x/daily/piglatindemo",
+      "kind": "r",
+      "name": "x/daily/piglatindemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/piglatin/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -8896,6 +9052,8 @@
         "gno.land/p/moul/x/daily/rle/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -8911,6 +9069,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/rledemo/v1",
+      "dir": "r/moul/x/daily/rledemo",
+      "kind": "r",
+      "name": "x/daily/rledemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/rle/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -9395,6 +9577,8 @@
         "gno.land/p/moul/x/daily/soundex/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -9410,6 +9594,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/soundexdemo/v1",
+      "dir": "r/moul/x/daily/soundexdemo",
+      "kind": "r",
+      "name": "x/daily/soundexdemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/soundex/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -9588,6 +9796,8 @@
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -9603,6 +9813,29 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/streak/v1",
+      "dir": "r/moul/x/daily/streak",
+      "kind": "r",
+      "name": "x/daily/streak",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/nt/avl/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -10091,6 +10324,8 @@
         "gno.land/p/moul/x/daily/trie/v0"
       ],
       "draft": false,
+      "superseded": true,
+      "commit": "d1b0e4d7db74bfc19a72230919f7c3d310c56adc",
       "published": {
         "betanet": {
           "uploaded": false
@@ -10106,6 +10341,30 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/r/moul/x/daily/triedemo/v1",
+      "dir": "r/moul/x/daily/triedemo",
+      "kind": "r",
+      "name": "x/daily/triedemo",
+      "version": "v1",
+      "description": "",
+      "deps": [
+        "gno.land/p/moul/md/v0",
+        "gno.land/p/moul/x/daily/trie/v0"
+      ],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
