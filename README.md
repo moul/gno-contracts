@@ -256,6 +256,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/rle/v0`](p/moul/x/daily/rle) 📦 | — | [✅](https://gno.land/p/moul/x/daily/rle/v0) | — | — | — |
 | [`p/moul/x/daily/romannum/v0`](p/moul/x/daily/romannum) 📦 | — | [✅](https://gno.land/p/moul/x/daily/romannum/v0) | — | — | — |
 | [`p/moul/x/daily/rot13/v0`](p/moul/x/daily/rot13) 📦 | — | [✅](https://gno.land/p/moul/x/daily/rot13/v0) | — | — | — |
+| [`p/moul/x/daily/rps/v0`](p/moul/x/daily/rps) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/semver/v0`](p/moul/x/daily/semver) 📦 | — | [✅](https://gno.land/p/moul/x/daily/semver/v0) | — | — | — |
 | [`p/moul/x/daily/shuntingyard/v0`](p/moul/x/daily/shuntingyard) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/sieve/v0`](p/moul/x/daily/sieve) 📦 | — | [✅](https://gno.land/p/moul/x/daily/sieve/v0) | — | — | — |
@@ -451,13 +452,13 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/rot13demo/v0`](r/moul/x/daily/rot13demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rot13demo/v0) | — | — | 1 |
 | [`r/moul/x/daily/rpgroom/v0`](r/moul/x/daily/rpgroom) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpgroom/v0) | — | — | 2 |
 | [`r/moul/x/daily/rps/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/rps) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rps/v0) | — | — | 1 |
-| [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rps/v1) | — | — | 2 |
+| [`r/moul/x/daily/rps/v1`](r/moul/x/daily/rps) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rps/v1) | — | — | 3 |
 | [`r/moul/x/daily/rpsduel/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/rpsduel) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rpsduel/v0) | — | — | 1 |
-| [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsduel/v1) | — | — | 2 |
+| [`r/moul/x/daily/rpsduel/v1`](r/moul/x/daily/rpsduel) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsduel/v1) | — | — | 3 |
 | [`r/moul/x/daily/rpsmatch/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/rpsmatch) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rpsmatch/v0) | — | — | 1 |
-| [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsmatch/v1) | — | — | 2 |
+| [`r/moul/x/daily/rpsmatch/v1`](r/moul/x/daily/rpsmatch) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsmatch/v1) | — | — | 3 |
 | [`r/moul/x/daily/rpsoracle/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/rpsoracle) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rpsoracle/v0) | — | — | 1 |
-| [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsoracle/v1) | — | — | 2 |
+| [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpsoracle/v1) | — | — | 3 |
 | [`r/moul/x/daily/semverdemo/v0`](r/moul/x/daily/semverdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/semverdemo/v0) | — | — | 3 |
 | [`r/moul/x/daily/shuntingyarddemo/v0`](r/moul/x/daily/shuntingyarddemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/sievedemo/v0`](r/moul/x/daily/sievedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/sievedemo/v0) | — | — | 1 |
@@ -548,7 +549,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-10-26T15:17:15Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-10-26T15:35:50Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 

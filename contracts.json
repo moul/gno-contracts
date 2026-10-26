@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-10-26T15:17:15Z",
+  "status_checked_at": "2026-10-26T15:35:50Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -2905,6 +2905,27 @@
           "uploaded": false
         },
         "sapphire": {
+          "uploaded": false
+        },
+        "staging": {
+          "uploaded": false
+        }
+      }
+    },
+    {
+      "pkgpath": "gno.land/p/moul/x/daily/rps/v0",
+      "dir": "p/moul/x/daily/rps",
+      "kind": "p",
+      "name": "x/daily/rps",
+      "version": "v0",
+      "description": "",
+      "deps": [],
+      "draft": false,
+      "published": {
+        "mainnet": {
+          "uploaded": false
+        },
+        "onyx": {
           "uploaded": false
         },
         "staging": {
@@ -9042,6 +9063,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/rps/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -9109,6 +9131,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/rps/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -9176,6 +9199,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/rps/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
@@ -9243,6 +9267,7 @@
       "description": "",
       "deps": [
         "gno.land/p/moul/kit/ui/v0",
+        "gno.land/p/moul/x/daily/rps/v0",
         "gno.land/p/nt/avl/v0"
       ],
       "draft": false,
