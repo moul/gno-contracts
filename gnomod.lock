@@ -281,6 +281,10 @@ module = "gno.land/p/moul/x/daily/crc32/v0"
 source = { dir = "p/moul/x/daily/crc32" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/dijkstra/v0"
+source = { dir = "p/moul/x/daily/dijkstra" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/disjointset/v0"
 source = { dir = "p/moul/x/daily/disjointset" }
 
@@ -859,6 +863,10 @@ source = { dir = "r/moul/x/daily/crowdfund" }
 [[module]]
 module = "gno.land/r/moul/x/daily/dice/v0"
 source = { dir = "r/moul/x/daily/dice" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/dijkstrademo/v0"
+source = { dir = "r/moul/x/daily/dijkstrademo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/disjointsetdemo/v0"

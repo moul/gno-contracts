@@ -1,0 +1,34 @@
+# `gno.land/p/moul/x/daily/dijkstra/v0`
+
+**Cheapest route from one node to every other node of a weighted graph**: `AddEdge`, `From`, `Dist`, `Path`, `Order`.
+
+```go
+import "gno.land/p/moul/x/daily/dijkstra/v0"
+
+g := dijkstra.New()
+g.AddEdge("depot", "north", 2)
+g.AddEdge("depot", "east", 4)
+g.AddEdge("north", "east", 1)
+
+r := g.From("depot")
+r.Dist("east")              // → 3, true   (via north, not the direct arc of 4)
+r.Path("east")              // → ["depot", "north", "east"]
+r.Order()                   // → ["depot", "north", "east"], the settle sequence
+r.Dist("somewhere-else")    // → -1, false
+```
+
+A realm that routes anything (a fee across hops, a swap across pools, a delivery across a small map) needs the cheapest total, not the fewest steps. A breadth-first walk answers the second question and looks like it answered the first. This answers the first, in `O((V+E) log V)`.
+
+**The ordering is total, deliberately.** Distance first, then the index the node was added at. Two nodes at the same distance therefore settle in the order the caller built the graph in, identically on every machine that runs it. A search that broke the tie by map iteration order would make a `Render` built on it differ between validating nodes, which is a consensus bug and not a cosmetic one. An equal-cost relaxation also never displaces the incumbent predecessor, so `Path` returns the first cheapest route found rather than the last one tried.
+
+Three behaviours worth knowing before you use it:
+
+- **A negative weight panics at `AddEdge`, not at `From`.** It is the algorithm's precondition. A settled node is never revisited, so an accepted negative arc would not produce an error later, it would produce a confident wrong answer, and the caller would have no way to tell.
+- **The frontier is a binary min-heap keyed on node index, not a queue of stale entries.** That is why `MaxNodes` bounds the memory on its own: a node is in the heap at most once, and an improvement moves it rather than duplicating it. Arcs bound the work, not the size.
+- **`Dist` returns `(Unreachable, false)` for both an unreached node and an unknown name.** They are different mistakes with the same remedy, so call `Has` first when you need to tell them apart. `Path` returns `nil` in both cases, never a zero-length path that reads like success.
+
+`MaxNodes` is 512 and `MaxEdges` is 4000, both small on purpose: this is a routing table for a realm, not a road atlas, and a caller that can state the worst case up front can price the gas before it sends the transaction. Exceeding either panics at build time, where the caller can still do something about it.
+
+A `Result` is a snapshot. Mutating the graph afterwards does not update it, which is what makes it safe to compute once and hold across a `Render`.
+
+Live demo: [`r/moul/x/daily/dijkstrademo`](/r/moul/x/daily/dijkstrademo/v0).
