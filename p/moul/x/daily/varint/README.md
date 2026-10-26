@@ -1,0 +1,52 @@
+# `gno.land/p/moul/x/daily/varint/v0`
+
+**LEB128 / protobuf-style variable-length integers over strings, canonical form only**: `PutUvarint`, `Uvarint`, `PutVarint`, `Varint`, `ZigZag`, `Len`.
+
+```go
+import "gno.land/p/moul/x/daily/varint/v0"
+
+varint.PutUvarint(300)       // → "\xac\x02", two bytes instead of eight
+varint.PutVarint(-1)         // → "\x01", one byte instead of ten
+varint.Len(16384)            // → 3, without encoding anything
+varint.Uvarint("\xac\x02")   // → 300, 2, nil
+```
+
+A varint stores an integer in base 128, least significant group first, seven payload bits
+per byte and a continuation bit in the high position. Small numbers get small, which is the
+whole point: a counter under 128 costs one byte where a fixed `uint64` costs eight, and on
+chain every byte of a persisted key or packed record is paid for once at write and again at
+every read.
+
+**Only the canonical encoding decodes, deliberately.** Nothing in the base-128 scheme stops
+you padding a value with extra continuation groups: `80 00` and `00` both say zero. Protobuf
+accepts both. A realm that stores or hashes an encoded value cannot, because two spellings of
+one number are two different keys, two different hashes, and a cheap way to make the same
+state look like two states to anything comparing bytes. `Uvarint` returns `ErrNotCanonical`
+rather than quietly normalizing, so the caller finds out at the boundary instead of at the
+comparison.
+
+Three behaviours worth knowing before you use it:
+
+- **Signed values go through zigzag, not two's complement.** Encoding `-1` directly would
+  sign-extend it to ten bytes, which is worse than not encoding it at all. Zigzag maps
+  `0, -1, 1, -2, 2` onto `0, 1, 2, 3, 4`, so magnitude decides the cost and the sign does
+  not. `ZigZag` and `UnZigZag` are exported for callers packing their own frames.
+- **`Uvarint` reads one value and reports how many bytes it took.** It never looks past the
+  value it decoded, so a stream is read by reslicing. `Uvarints` is the all-at-once form, and
+  it refuses a trailing fragment with `ErrTrailing` rather than returning a silently short
+  list: a partial value at the end is corruption, not data.
+- **Encoding appends to a byte slice, decoding reads a string.** `AppendUvarint(dst []byte,
+  x uint64) []byte` is Go's `encoding/binary` shape, and it is a slice rather than a string
+  because a string accumulator copies the whole prefix on every append, which makes packing a
+  sequence quadratic in the encoded size. Decoding takes a string because that is what a realm
+  has stored.
+- **The errors are distinct for a reason.** `ErrTruncated` means more input would have
+  helped, `ErrOverflow` means the value cannot fit in 64 bits, `ErrNotCanonical` means the
+  bytes decode fine but should never have been written. A caller validating untrusted input
+  wants to tell the third from the first two.
+
+Encoding is O(bytes out), at most ten iterations, and `Len` answers the size question without
+allocating. There is no streaming writer: the unit is a value, and a realm packing many of
+them calls `AppendUvarint` into one buffer in a loop, which is what `PutUvarints` does.
+
+Live demo: [r/moul/x/daily/varintdemo](/r/moul/x/daily/varintdemo/v0).
