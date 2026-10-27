@@ -89,6 +89,10 @@ func (b *Board) SubmitMemberChange(proposer, subject address, add bool, body str
 		return nil, ErrNotMember
 	case !add && b.MemberCount() == 1:
 		return nil, ErrLastMember
+	case !add && b.MemberCount() == 2:
+		// The bar counts the subject's seat and the subject may not vote, so
+		// this could never carry. Refused now, not left pending forever.
+		return nil, ErrBoardTooSmall
 	}
 	title := "Remove " + subject.String()
 	if add {
