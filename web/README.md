@@ -82,7 +82,7 @@ and is not on this page; it shows what the controllers decided and why, and stop
   `gnokey maketx call` sits under the form and stays correct as you type; once the call has
   been simulated it carries the measured gas, and until then it says so instead of guessing.
 - **Not published yet is a first-class state**, not an error screen: it is what
-  `r/moul/smallgrants` shows today, and the form still validates and still prints the
+  `r/moul/smallgrants/v0` shows today, and the form still validates and still prints the
   command while it waits.
 
 When the realm grows a machine-readable getter for the list, `parseIndex` and `parseRequest`

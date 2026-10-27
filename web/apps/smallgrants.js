@@ -24,7 +24,7 @@
 //
 // # Before it is published
 //
-// `gno.land/r/moul/smallgrants` is not on any chain yet. That is not an error
+// `gno.land/r/moul/smallgrants/v0` is not on any chain yet. That is not an error
 // screen: it is the state this page spends its first week in, so it renders as
 // a deliberate "not published yet" with what it is waiting for, and the ask
 // form still validates and still prints the command, it just cannot send.
@@ -183,7 +183,16 @@ const STATES = {
   withdrawn: "withdrawn",
 };
 
-export const normalizeStatus = (s) => STATES[plain(s).toLowerCase()] || plain(s).toLowerCase();
+// normalizeStatus folds the realm's outcome wording into one of the five the
+// page draws. The realm does not write a bare "paid": it writes the payout in
+// the same breath, "paid in full" or "paid 40 GNOT of 100 GNOT" (render.gno
+// result()), so anything that starts with "paid" is the paid state. A word the
+// page has never seen keeps itself and draws neutrally.
+export const normalizeStatus = (s) => {
+  const w = plain(s).toLowerCase();
+  if (w.startsWith("paid")) return "paid";
+  return STATES[w] || w;
+};
 
 // parseIndex lifts the desk out of the realm's index page: the summary rows,
 // the open requests and the decided ones. Every field is optional, because the
@@ -196,8 +205,16 @@ export function parseIndex(md) {
     const id = Number(plain(row["#"] || row.id || "").replace(/^#/, ""));
     if (!Number.isInteger(id) || id <= 0) return;
     const asked = fromMarkdown(row.amount ?? row.asked ?? "");
-    const paid = row.paid !== undefined ? fromMarkdown(row.paid) : null;
     const outcome = plain(row.outcome ?? row.status ?? "");
+    // The decided table names the outcome in words and carries no Paid column:
+    // "paid 40 GNOT of 100 GNOT", or "paid in full". Lift the amount out of the
+    // words so a part-paid row reads right from the index alone, before its own
+    // page has been opened. A realm that later adds a Paid column still wins.
+    let paid = row.paid !== undefined ? fromMarkdown(row.paid) : null;
+    if (paid === null && /paid/i.test(outcome)) {
+      const m = outcome.match(/paid\s+(.+?)\s+of\s+/i);
+      paid = m ? fromMarkdown(m[1]) : /paid in full/i.test(outcome) ? asked : null;
+    }
     byId.set(id, {
       id,
       title: plain(row.title ?? ""),
@@ -224,42 +241,65 @@ export function parseIndex(md) {
 }
 
 // parseRequest lifts one request's own page: the labelled rows, the reason the
-// filer wrote, and the ballots. `extra` keeps every label this page has no
-// opinion about, so a field the realm adds tomorrow still reaches the reader.
+// filer wrote, and the controllers' decisions. `extra` keeps every label this
+// page has no opinion about, so a field the realm adds tomorrow still reaches
+// the reader.
 export function parseRequest(md) {
-  // Labels come from the body only: the ballots table below has its own
-  // headers, which would otherwise land in `extra` as if they were fields.
-  const body = String(md).split(/^##\s+Ballots/m)[0] || String(md);
+  // Labels come from the body only: the Decisions table below has its own
+  // headers (Controller | Decision | Height | Reason), which would otherwise
+  // land in `extra` as if they were fields.
+  const body = String(md).split(/^##\s+Decisions/m)[0] || String(md);
   const rows = labels(body);
   const known = new Set(["status", "amount", "asked", "paid", "pays", "to", "filed by", "by",
     "filed at height", "decided at height", "reason", "decision", "outcome"]);
   const quote = (body.match(/^>\s?(.*(?:\n>.*)*)/m) || [, ""])[1].replace(/\n>\s?/g, "\n").trim();
   const asked = fromMarkdown(pick(rows, "amount", "asked"));
+  const statusRaw = pick(rows, "status");
+  // The realm folds the payout into the status word ("paid 40 GNOT of 100
+  // GNOT") rather than a Paid row, so the amount comes out of there unless the
+  // realm later grows a Paid column.
   const paidRow = pick(rows, "paid");
+  let paid = paidRow ? fromMarkdown(paidRow) : null;
+  if (paid === null && /paid/i.test(plain(statusRaw))) {
+    const m = plain(statusRaw).match(/paid\s+(.+?)\s+of\s+/i);
+    paid = m ? fromMarkdown(m[1]) : /paid in full/i.test(plain(statusRaw)) ? asked : null;
+  }
+
+  // Each row is one controller's decision: pay in full, pay a part, or refuse,
+  // with the reason they wrote. An empty reason is rendered by the realm as the
+  // italic "no reason given" (render.gno decisions()), which is "none", not a
+  // reason that happens to read that way.
+  const decisions = table(section(md, "Decisions")).map((d) => ({
+    controller: (plain(d.controller ?? d.voter ?? "").match(/g1[0-9a-z]{38}/) || [plain(d.controller ?? d.voter ?? "")])[0],
+    decision: plain(d.decision ?? d.vote ?? ""),
+    height: plain(d.height ?? ""),
+    reason: noReason(d.reason) ? "" : plain(d.reason ?? ""),
+  }));
+
   return {
     title: plain((md.match(/^##\s+(.*)$/m) || [, ""])[1]),
-    status: normalizeStatus(pick(rows, "status")),
+    status: normalizeStatus(statusRaw),
     asked,
-    paid: paidRow ? fromMarkdown(paidRow) : null,
+    paid,
     to: (plain(pick(rows, "pays", "to")).match(/g1[0-9a-z]{38}/) || [plain(pick(rows, "pays", "to"))])[0],
     by: (plain(pick(rows, "filed by", "by")).match(/g1[0-9a-z]{38}/) || [plain(pick(rows, "filed by", "by"))])[0],
     filedAt: plain(pick(rows, "filed at height")),
     decidedAt: plain(pick(rows, "decided at height")),
     reason: plain(quote),
-    // The realm may carry the controllers' reason on the decision row or on a
-    // ballot note; take whichever it wrote.
-    decisionReason: plain(pick(rows, "reason", "decision", "outcome")) || firstNote(md),
-    ballots: table(section(md, "Ballots")).map((b) => ({
-      voter: plain(b.controller ?? b.voter ?? ""),
-      vote: plain(b.vote ?? ""),
-      height: plain(b.height ?? ""),
-      note: plain(b.note ?? ""),
-    })),
+    // The one sentence the list reads next to the outcome: the first reason a
+    // controller actually wrote. Decided with every reason blank is "", which
+    // outcomeOf reads as "there is none"; a page that has not been read at all
+    // leaves this undefined upstream, which reads as "not known yet".
+    decisionReason: decisions.map((d) => d.reason).find(Boolean) ?? "",
+    decisions,
     extra: rows.filter((r) => !known.has(r.key)),
   };
 }
 
-const firstNote = (md) => table(section(md, "Ballots")).map((b) => plain(b.note ?? "")).find(Boolean) || "";
+// noReason is the realm's rendering of a decision with no reason: the italic
+// "no reason given" cell. Matched on the raw cell, before plain() strips the
+// markers, so a reason a controller literally typed is never mistaken for it.
+const noReason = (cell) => /^\*\s*no reason given\s*\*$/.test(String(cell ?? "").trim());
 
 // outcomeOf is the sentence a decided request reads as. It is the part of this
 // page that had to be got right.
@@ -494,8 +534,8 @@ export function mount(el, ctx) {
         ${d.extra.map((x) => row(x.label, plain(x.value))).join("")}
       </div>
       ${d.reason ? `<blockquote>${esc(d.reason)}</blockquote>` : ""}
-      ${d.ballots.length ? `<table class="sg-ballots"><tr><th>controller</th><th>vote</th><th>said</th></tr>
-        ${d.ballots.map((b) => `<tr><td><code>${esc(b.voter)}</code></td><td>${esc(b.vote)}</td><td>${esc(b.note || "—")}</td></tr>`).join("")}</table>` : ""}
+      ${d.decisions.length ? `<table class="sg-ballots"><tr><th>controller</th><th>decision</th><th>reason</th></tr>
+        ${d.decisions.map((b) => `<tr><td><code>${esc(b.controller)}</code></td><td>${esc(b.decision)}</td><td>${esc(b.reason || "—")}</td></tr>`).join("")}</table>` : ""}
       <p class="muted"><a href="${esc(cfg?.web || "https://gno.land")}${esc(path.replace(/^gno\.land/, ""))}:request/${r.id}" target="_blank" rel="noopener">on gnoweb ↗</a></p>`;
   };
 
@@ -577,8 +617,13 @@ export function mount(el, ctx) {
       state.balance = idx.balance;
       state.paidOut = idx.paidOut;
       state.decision = idx.decision;
-      if (idx.cap !== null) { state.cap = idx.cap; state.capFromChain = true; }
-      if (idx.fundTo) state.realmAddress = idx.fundTo;
+      // The index cap and the "Fund it" address are a FALLBACK, used only until
+      // vm/qeval answers. MaxGrant and Address() are constants the realm holds,
+      // and reading them directly is the authority; scraping a markdown cell is
+      // not. So neither is latched here: once capFromChain is set by readCap the
+      // index never overwrites it, and the same for a qeval address.
+      if (idx.cap !== null && !state.capFromChain) state.cap = idx.cap;
+      if (idx.fundTo && !state.realmAddress) state.realmAddress = idx.fundTo;
       applyDetails();
       // A decided request's reason lives on its own page, and the list is
       // supposed to carry it. The realm bounds the decided table (RecentDecided),
@@ -589,11 +634,11 @@ export function mount(el, ctx) {
       // Asked once the realm answers at all, so an unpublished path costs no
       // failing queries, and a realm that goes live while the page is open
       // still gets its authoritative cap. Both are constants on chain, so
-      // asking once is asking enough.
+      // asking once is asking enough, and the answer overrides the index above.
       if (!state.probed) {
         state.probed = true;
-        if (!state.capFromChain) readCap();
-        if (!state.realmAddress) readAddress();
+        readCap();
+        readAddress();
       }
     } catch (e) {
       state.error = e.message || String(e);

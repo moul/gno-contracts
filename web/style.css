@@ -164,3 +164,26 @@ body.dryrun .custom button, body.dryrun .txbtn { border-style: dashed; border-co
 @keyframes pending-pulse { 50% { opacity: .25; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .pending, .spin { animation: none; } }
+
+/* --- small-grants surface (grants.html): the desk + network chooser --- */
+
+/* The chooser sits under the header. flex-wrap, so on a 390px phone the three
+   controls stack instead of pushing a horizontal scrollbar. Every control is
+   min-width:0 and width:100% inside its label, which is what actually stops the
+   select from refusing to shrink below its content. */
+.deskbar { max-width: 64rem; margin: 0 auto; padding: .7rem 1.2rem; display: flex; flex-wrap: wrap; align-items: end; gap: .7rem; }
+.deskbar label { flex: 1 1 12rem; min-width: 0; display: flex; flex-direction: column; gap: .2rem; font-size: 12px; color: var(--muted); }
+.deskbar select, .deskbar input { width: 100%; min-width: 0; max-width: 100%; }
+.deskbar .netpick { flex: 1 1 10rem; }
+.netbadge { flex: 0 0 auto; align-self: center; font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: .2rem .55rem; border-radius: 999px; white-space: nowrap; border: 1px solid var(--line); }
+.netbadge.mainnet { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.netbadge.testnet { background: var(--sim-bg); color: var(--warn); border-color: var(--sim); }
+.netbadge.local { background: var(--code); color: var(--muted); }
+
+/* The loud strip: anything that is not mainnet gets a full-width banner, not a
+   hint in the corner. */
+.netnote { max-width: 64rem; margin: 0 auto .4rem; padding: .55rem .9rem; border-radius: 6px; font-size: 13px; border: 1px solid var(--line); border-left: 3px solid var(--sim); }
+.netnote.testnet { background: var(--sim-bg); border-left-color: var(--sim); }
+.netnote.local { background: var(--code); border-left-color: var(--muted); color: var(--muted); }
+.netnote code { overflow-wrap: anywhere; }
+.grants-surface main { padding-top: .4rem; }

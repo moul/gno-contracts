@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 
 import * as app from "../apps/smallgrants.js";
 import { command, gasFor, sh } from "../lib/cmd.js";
-import { mount, grantsChain, ME, STRANGER } from "./harness.js";
+import { mount, grantsChain, ME, STRANGER, GRANTS } from "./harness.js";
 
 const GNOT = 1_000_000;
 const OK = { to: STRANGER, amount: "25", title: "A keyboard", reason: "Mine died." };
@@ -145,21 +145,24 @@ test("an outcome word the page has never seen is shown, not swallowed", () => {
 test("the index parses into the desk", () => {
   const c = grantsChain();
   const idx = app.parseIndex(c.index());
-  assert.equal(idx.balance, 250 * GNOT);
+  assert.equal(idx.balance, 190 * GNOT);
   assert.equal(idx.cap, 100 * GNOT);
-  assert.equal(idx.paidOut, 40 * GNOT);
+  assert.equal(idx.paidOut, 60 * GNOT);
   assert.equal(idx.decision, "2 yes of 3 controllers");
-  assert.equal(idx.fundTo, c.realm);
+  assert.equal(idx.fundTo, GRANTS.ADDR);
   assert.equal(idx.paused, false);
-  assert.deepEqual(idx.requests.map((r) => r.id), [4, 3, 2, 1], "newest first");
+  assert.deepEqual(idx.requests.map((r) => r.id), [6, 5, 4, 3, 2, 1], "newest first");
 
   const one = idx.requests.find((r) => r.id === 1);
   assert.equal(one.title, "A keyboard");
   assert.equal(one.asked, 100 * GNOT);
+  // The decided table carries no Paid column: the part is lifted out of the
+  // outcome words, "paid 40 GNOT of 100 GNOT".
   assert.equal(one.paid, 40 * GNOT);
   assert.equal(one.status, "paid");
   assert.equal(idx.requests.find((r) => r.id === 3).status, "pending");
   assert.equal(idx.requests.find((r) => r.id === 2).status, "refused");
+  assert.equal(idx.requests.find((r) => r.id === 6).status, "withdrawn");
 });
 
 test("paused is read off the summary, not guessed", () => {
@@ -171,29 +174,35 @@ test("paused is read off the summary, not guessed", () => {
 
 test("columns are read by name, so the realm may reorder them", () => {
   const c = grantsChain();
+  // Reverse the decided table's five columns, header and every row, and the
+  // desk must still parse: the page reads by header name, never by position.
   const shuffled = c.index()
-    .replace("| # | Title | To | Amount | Paid | Outcome |", "| Outcome | Amount | Paid | To | Title | # |")
-    .replace(/\| (\[#\d+\][^|]*) \| ([^|]*) \| (`[^|]*`) \| ([^|]*) \| ([^|]*) \| ([^|]*) \|/g, "| $6 | $4 | $5 | $3 | $2 | $1 |");
+    .replace("| # | Title | To | Amount | Outcome |", "| Outcome | Amount | To | Title | # |")
+    .replace(/\| (\[#\d+\]\([^)]*\)) \| ([^|]*?) \| (`[^|]*`) \| ([^|]*?) \| ([^|]*?) \|/g, "| $5 | $4 | $3 | $2 | $1 |");
   const idx = app.parseIndex(shuffled);
   const one = idx.requests.find((r) => r.id === 1);
   assert.equal(one.title, "A keyboard");
   assert.equal(one.asked, 100 * GNOT);
+  assert.equal(one.paid, 40 * GNOT, "the part still comes out of the reordered outcome cell");
   assert.equal(one.status, "paid");
 });
 
-test("a request's own page parses, ballots and all", () => {
+test("a request's own page parses, decisions and all", () => {
   const c = grantsChain();
   const d = app.parseRequest(c.page(1));
   assert.equal(d.title, "A keyboard");
   assert.equal(d.status, "paid");
   assert.equal(d.asked, 100 * GNOT);
-  assert.equal(d.paid, 40 * GNOT);
-  assert.equal(d.to, STRANGER);
-  assert.equal(d.by, ME);
-  assert.equal(d.reason, "Mine died.");
-  assert.equal(d.decisionReason, "Half of it, the rest next quarter.", "a ballot note is the controllers' reason today");
-  assert.equal(d.ballots.length, 1);
-  assert.deepEqual(d.extra, [], "the ballots table is not mistaken for a field");
+  assert.equal(d.paid, 40 * GNOT, "the part is lifted out of the status words");
+  assert.equal(d.to, GRANTS.bob);
+  assert.equal(d.by, GRANTS.alice);
+  assert.equal(d.reason, "bob needs a keyboard to keep porting the library");
+  assert.equal(d.decisionReason, "Half of it, the rest next quarter.", "the first reason a controller wrote");
+  assert.equal(d.decisions.length, 2);
+  assert.equal(d.decisions[0].decision, "pay 40 GNOT of 100 GNOT");
+  assert.equal(d.decisions[1].decision, "pay in full");
+  assert.equal(d.decisions[1].reason, "", "the italic 'no reason given' is none, not a reason that reads that way");
+  assert.deepEqual(d.extra, [], "the Decisions table is not mistaken for a field");
 });
 
 test("a field the realm adds tomorrow still reaches the reader", () => {
@@ -288,15 +297,16 @@ test("live: the desk, then every request with its outcome", async () => {
 
   const state = t.text("[data-state]");
   assert.match(state, /Open: anyone may file/);
-  assert.match(state, /250 GNOT/);
+  assert.match(state, /190 GNOT/);
   assert.match(state, /100 GNOT/);
 
   const list = t.text("[data-list]");
-  assert.match(list, /Requests 4/);
+  assert.match(list, /Requests 6/);
   assert.match(list, /Paid in part/);
   assert.match(list, /40 GNOT of the 100 GNOT asked/);
   assert.match(list, /Paid in full/);
   assert.match(list, /Refused/);
+  assert.match(list, /Withdrawn by whoever filed it/);
   assert.match(list, /Waiting for a decision/);
   // The reason a decided request carries on its own page reaches the list,
   // without the reader having to click anything.
@@ -310,7 +320,7 @@ test("one read per decided request, cached, and never per refresh", async () => 
   const answer = (kind, expr) => { if (kind === "render") reads.push(expr); return c.answer(kind, expr); };
   const t = mount(app, { answer });
   await t.flush();
-  assert.deepEqual(reads, ["", "request/4", "request/2", "request/1"], "the index, then the three decided ones");
+  assert.deepEqual(reads, ["", "request/6", "request/5", "request/4", "request/2", "request/1"], "the index, then the five decided ones");
 
   reads.length = 0;
   t.refresh();

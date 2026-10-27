@@ -3,6 +3,9 @@
 // the test's hands. No browser, no network: the apps only ever touch the page
 // through data-attribute selectors, which a map of stub nodes can answer.
 
+import { fixtures as GRANTS } from "./fixtures.js";
+export { GRANTS };
+
 export const ME = "g1manfred47kzduec920z88wfr64ylksmdcedlf5";
 export const STRANGER = "g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5";
 export const short = (a) => `${a.slice(0, 8)}…${a.slice(-4)}`;
@@ -208,24 +211,27 @@ export function hangmanChain() {
   return c;
 }
 
-// grantsChain answers the way r/moul/smallgrants renders: a labelled summary
-// in the preamble, an open table, a decided table, and a page per request. It
-// can also answer like a chain that has never heard of the realm, which is the
-// state the page spends its first week in.
+// grantsChain answers with the realm's REAL Render output: the markdown in
+// test/fixtures.js, which is generated from render.gno's own format by
+// test/gen-fixtures.mjs and locked to the realm's committed golden. This chain
+// only plays that fixture back and toggles the states a visitor lands in
+// (published / not, paused / not, reachable / not) and the on-chain constants
+// the page reads with vm/qeval. Nothing here is hand-written to agree with the
+// parser: if the realm's format changes, the fixture is regenerated and these
+// tests move with it.
 export function grantsChain() {
+  const ctrl = GRANTS.controllers;
   const c = {
-    published: true, paused: false, balance: 250_000_000, cap: 100_000_000, paidOut: 40_000_000,
-    realm: "g1grantsdeskxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    requests: [
-      { id: 1, title: "A keyboard", to: STRANGER, asked: 100_000_000, paid: 40_000_000, status: "paid", by: ME, reason: "Mine died.", note: "Half of it, the rest next quarter." },
-      { id: 2, title: "Conference ticket", to: ME, asked: 60_000_000, status: "rejected", by: ME, reason: "GnoCon, early bird.", note: "" },
-      { id: 3, title: "Deploy gas", to: ME, asked: 5_000_000, status: "pending", by: ME, reason: "Three realms to publish.", yes: 1 },
-      { id: 4, title: "Paid whole", to: STRANGER, asked: 20_000_000, paid: 20_000_000, status: "paid", by: ME, reason: "A domain.", note: "Fine." },
-    ],
-    sim: { gasUsed: 1_234_567, data: "(5 int)" },
+    published: true, paused: false, fail: false,
+    cap: 100_000_000,
+    realm: GRANTS.ADDR,
+    allow: new Set([ctrl.Moul, ctrl.Jaekwon, ctrl.Aeddi]),
+    sim: { gasUsed: 1_234_567, data: "(7 int)" },
   };
-  const gnot = (u) => `${(u / 1e6).toFixed(6).replace(/\.?0+$/, "")} GNOT`;
-  const notFound = () => { throw new Error("package not found: gno.land/r/moul/smallgrants"); };
+  const notFound = () => { throw new Error("package not found: " + GRANTS.PATH); };
+
+  c.index = () => (c.paused ? GRANTS.indexPaused : GRANTS.index);
+  c.page = (id) => GRANTS.requests[id] || `# Not found\n\nThere is no request \`${id}\`.\n`;
 
   c.answer = (kind, expr) => {
     if (!c.published) notFound();
@@ -233,51 +239,13 @@ export function grantsChain() {
     if (kind === "eval") {
       if (expr === "MaxGrant") return `(${c.cap} int64)`;
       if (expr === "Address()") return `("${c.realm}" .uverse.address)`;
-      if (expr.startsWith("IsAllowed(")) return `(${expr.includes(ME) ? "true" : "false"} bool)`;
+      const m = expr.match(/^IsAllowed\("(g1\w+)"\)$/);
+      if (m) return `(${c.allow.has(m[1]) ? "true" : "false"} bool)`;
       throw new Error(`unexpected eval ${expr}`);
     }
     if (kind === "simulate") return c.sim.error ? { error: c.sim.error } : { gasUsed: c.sim.gasUsed, data: c.sim.data, events: [], deposits: [] };
     const m = String(expr).match(/^request\/(\d+)$/);
     return m ? c.page(Number(m[1])) : c.index();
-  };
-
-  c.index = () => {
-    let md = "# Small grants\n\nAsk for a small amount of GNOT, in the open.\n\n";
-    md += "|  |  |\n| --- | --- |\n";
-    md += `| Requests | ${c.paused ? "**paused**: new requests from the allowlist only" : "open to everyone"} |\n`;
-    md += `| Cap per request | ${gnot(c.cap)} |\n| Balance | **${gnot(c.balance)}** |\n`;
-    md += `| Paid out | ${gnot(c.paidOut)} over 2 grant(s) |\n| Decision | 2 yes of 3 controllers |\n`;
-    md += `| Fund it | a plain send to \`${c.realm}\` |\n\n`;
-    md += "## Ask\n\n```\ngnokey maketx call -pkgpath gno.land/r/moul/smallgrants -func Request ...\n```\n\n";
-
-    const open = c.requests.filter((r) => r.status === "pending");
-    md += "## Open requests\n";
-    md += open.length
-      ? "| # | Title | To | Amount | Yes |\n| --- | --- | --- | --- | --- |\n" +
-        open.map((r) => `| [#${r.id}](/r/moul/smallgrants:request/${r.id}) | ${r.title} | \`${short(r.to)}\` | ${gnot(r.asked)} | ${r.yes || 0}/2 |\n`).join("")
-      : "_Nothing is waiting for a decision._\n";
-    md += "\n";
-
-    const done = c.requests.filter((r) => r.status !== "pending").reverse();
-    md += "## Recently decided\n";
-    md += done.length
-      ? "| # | Title | To | Amount | Paid | Outcome |\n| --- | --- | --- | --- | --- | --- |\n" +
-        done.map((r) => `| [#${r.id}](/r/moul/smallgrants:request/${r.id}) | ${r.title} | \`${short(r.to)}\` | ${gnot(r.asked)} | ${r.paid ? gnot(r.paid) : ""} | ${r.status} |\n`).join("")
-      : "_Nothing has been decided yet._\n";
-    return md + "\n## Controllers\n\n- `" + ME + "`\n";
-  };
-
-  c.page = (id) => {
-    const r = c.requests.find((x) => x.id === id);
-    if (!r) return `# Not found\n\nThere is no request \`${id}\`.\n`;
-    let md = `# Request #${r.id}\n## ${r.title}\n\n|  |  |\n| --- | --- |\n`;
-    md += `| Status | **${r.status}** |\n| Amount | ${gnot(r.asked)} |\n`;
-    if (r.paid) md += `| Paid | ${gnot(r.paid)} |\n`;
-    md += `| Pays | \`${r.to}\` |\n| Filed by | \`${r.by}\` |\n| Filed at height | 100 |\n`;
-    if (r.status !== "pending") md += "| Decided at height | 120 |\n";
-    md += `\n> ${r.reason}\n\n## Ballots\n| Controller | Vote | Height | Note |\n| --- | --- | --- | --- |\n`;
-    if (r.status !== "pending") md += `| \`${short(ME)}\` | ${r.status === "paid" ? "yes" : "no"} | 120 | ${r.note || ""} |\n`;
-    return md;
   };
   return c;
 }
