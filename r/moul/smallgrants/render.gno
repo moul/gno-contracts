@@ -41,7 +41,7 @@ func renderIndex() string {
 	out := md.H1("Small grants (demo)") + banner + "\n"
 	out += "Ask for a small amount of GNOT, for yourself or for someone else, in the open.\n" +
 		"The controllers below decide in public: pay in full, pay a part, or refuse,\n" +
-		"each with an optional reason. The decision that makes a majority pays the\n" +
+		"each with an optional reason. The yes that makes a majority pays the\n" +
 		"request out of this realm's balance in the same transaction.\n\n"
 
 	state := "open to everyone"
@@ -50,7 +50,7 @@ func renderIndex() string {
 	}
 	t := ui.NewTable("", "")
 	t.Row("Requests", state)
-	t.Row("Cap per request", num.GNOTf(MaxGrant))
+	t.Row("Cap", num.GNOTf(MaxGrant)+" per request, and per payee over 30 days")
 	t.Row("Balance", "**"+num.GNOTf(Balance())+"**")
 	t.Row("Paid out", num.GNOTf(totalPaid)+" over "+itoa(paidCount)+" grant(s)")
 	t.Row("Decision", strconv.Itoa(Quorum())+" yes of "+strconv.Itoa(len(controllers))+" controllers")
@@ -59,7 +59,9 @@ func renderIndex() string {
 
 	out += md.H2("Ask") + md.CodeBlock(askCommand()) + "\n"
 
-	out += md.H2("Open requests")
+	// open holds at most MaxOpen rows, and decided holds closed requests
+	// only, so neither table walks past rows it does not show.
+	out += md.H2("Open requests (" + strconv.Itoa(open.Size()) + " of " + strconv.Itoa(MaxOpen) + ")")
 	ot := ui.NewTable("#", "Title", "To", "Amount", "Yes")
 	open.Iterate("", "", func(k string, _ any) bool {
 		r := requests.Get(k).(*request)
@@ -71,11 +73,8 @@ func renderIndex() string {
 
 	out += md.H2("Recently decided")
 	dt := ui.NewTable("#", "Title", "To", "Amount", "Outcome")
-	requests.ReverseIterate("", "", func(k string, v any) bool {
-		r := v.(*request)
-		if r.Status == StatusPending {
-			return false
-		}
+	decided.ReverseIterate("", "", func(_ string, v any) bool {
+		r := requests.Get(v.(string)).(*request)
 		dt.Row(md.Link("#"+itoa(r.ID), requestLink(r.ID)), ui.Cell(ui.ShortN(r.Title, 60, 0)),
 			ui.Addr(r.To), num.GNOTf(r.Amount), result(r))
 		return dt.Len() >= RecentDecided
@@ -93,7 +92,7 @@ func renderIndex() string {
 	mt := ui.NewTable("#", "Change", "Status")
 	motions.ReverseIterate("", "", func(_ string, v any) bool {
 		m := v.(*motion)
-		mt.Row(md.Link("#"+itoa(m.ID), motionLink(m.ID)), change(m), m.Status)
+		mt.Row(md.Link("#"+itoa(m.ID), motionLink(m.ID)), change(m), motionState(m))
 		return mt.Len() >= RecentDecided
 	})
 	out += mt.OrEmpty("Nobody has proposed changing the controllers.") + "\n"
@@ -129,7 +128,7 @@ func renderRequest(raw string) string {
 		t.Row("Decided at height", itoa(r.Decided))
 	}
 	out += t.String() + "\n" + md.Blockquote(ui.Inline(r.Reason)) + "\n"
-	out += md.H2("Decisions") + decisions(r)
+	out += md.H2("Decisions") + decisions(r, counted(r.Status, r.Epoch))
 	return out
 }
 
@@ -141,33 +140,36 @@ func renderMotion(raw string) string {
 	out := md.H1("Motion #" + itoa(m.ID))
 	t := ui.NewTable("", "")
 	t.Row("Change", change(m))
-	t.Row("Status", "**"+m.Status+"**")
+	t.Row("Status", "**"+motionState(m)+"**")
 	t.Row("Proposed by", ui.AddrFull(m.By))
 	t.Row("Filed at height", itoa(m.Height))
 	if m.Status != StatusPending {
 		t.Row("Decided at height", itoa(m.Decided))
 	}
 	out += t.String() + "\n" + md.Blockquote(ui.Inline(m.Reason)) + "\n"
-	out += md.H2("Ballots") + ballots(m.Ballots)
+	out += md.H2("Ballots") + ballots(m.Ballots, counted(m.Status, m.Epoch))
 	return out
 }
 
-func ballots(bs []ballot) string {
+// voided marks a ballot cast under a set that did not decide.
+const voided = " (voided: the controllers changed)"
+
+func ballots(bs []ballot, e int64) string {
 	t := ui.NewTable("Controller", "Vote", "Height", "Note")
 	for _, b := range bs {
 		v := "no"
 		if b.Yes {
 			v = "yes"
 		}
-		if !isController(b.Voter) {
-			v += " (no longer a controller, not counted)"
+		if b.Epoch != e {
+			v += voided
 		}
 		t.Row(ui.Addr(b.Voter), v, itoa(b.Height), ui.Cell(b.Note))
 	}
 	return t.OrEmpty("No ballots yet.")
 }
 
-func decisions(r *request) string {
+func decisions(r *request, e int64) string {
 	t := ui.NewTable("Controller", "Decision", "Height", "Reason")
 	for _, b := range r.Ballots {
 		d := "refuse"
@@ -177,8 +179,8 @@ func decisions(r *request) string {
 		case b.Amount > 0:
 			d = "pay " + num.GNOTf(b.Amount) + " of " + num.GNOTf(r.Amount)
 		}
-		if !isController(b.Voter) {
-			d += " (no longer a controller, not counted)"
+		if b.Epoch != e {
+			d += voided
 		}
 		why := ui.Cell(b.Note)
 		if b.Note == "" {
@@ -200,6 +202,14 @@ func result(r *request) string {
 	return "paid " + num.GNOTf(r.Paid) + " of " + num.GNOTf(r.Amount)
 }
 
+// motionState is a motion's status, and on an addition the step it waits on.
+func motionState(m *motion) string {
+	if m.Status == StatusPending && m.Add && !m.Joined {
+		return "pending, " + ui.Addr(m.Subject) + " has not joined"
+	}
+	return m.Status
+}
+
 func change(m *motion) string {
 	if m.Add {
 		return "add " + ui.Addr(m.Subject)
@@ -210,7 +220,7 @@ func change(m *motion) string {
 func yesCount(bs []ballot) int {
 	n := 0
 	for _, b := range bs {
-		if b.Yes && isController(b.Voter) {
+		if b.Yes && b.Epoch == epoch {
 			n++
 		}
 	}

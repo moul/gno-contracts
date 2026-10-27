@@ -18,13 +18,13 @@ const atDeploy = `# Small grants (demo)
 
 Ask for a small amount of GNOT, for yourself or for someone else, in the open.
 The controllers below decide in public: pay in full, pay a part, or refuse,
-each with an optional reason. The decision that makes a majority pays the
+each with an optional reason. The yes that makes a majority pays the
 request out of this realm's balance in the same transaction.
 
 |  |  |
 | --- | --- |
 | Requests | open to everyone |
-| Cap per request | 100 GNOT |
+| Cap | 100 GNOT per request, and per payee over 30 days |
 | Balance | **0 GNOT** |
 | Paid out | 0 GNOT over 0 grant(s) |
 | Decision | 2 yes of 3 controllers |
@@ -37,7 +37,7 @@ gnokey maketx call -pkgpath PATH -func Request \
   -args '<title>' -args '<what it is for>' ...
 ` + "```" + `
 
-## Open requests
+## Open requests (0 of 30)
 *Nothing is waiting for a decision.*
 
 ## Recently decided

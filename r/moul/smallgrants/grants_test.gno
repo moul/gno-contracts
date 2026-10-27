@@ -243,11 +243,19 @@ func TestWithdraw(cur realm, t *testing.T) {
 	reset()
 	testing.SetRealm(testing.NewUserRealm(alice))
 	id := Request(cross(cur), bob.String(), 1, "t", "r")
-	testing.SetRealm(testing.NewUserRealm(bob))
-	uassert.AbortsContains(t, cur, "only the filer", func() { Withdraw(cross(cur), id) })
+	testing.SetRealm(testing.NewUserRealm(carol))
+	uassert.AbortsContains(t, cur, "only the filer or the payee", func() { Withdraw(cross(cur), id) })
 	testing.SetRealm(testing.NewUserRealm(alice))
 	Withdraw(cross(cur), id)
 	uassert.Equal(t, StatusWithdrawn, Status(id))
+
+	// The payee clears a request filed in its name, and gets its room back.
+	testing.SetRealm(testing.NewUserRealm(alice))
+	id = Request(cross(cur), bob.String(), MaxGrant, "t", "r")
+	uassert.Equal(t, int64(0), Room(bob.String()))
+	testing.SetRealm(testing.NewUserRealm(bob))
+	Withdraw(cross(cur), id)
+	uassert.Equal(t, MaxGrant, Room(bob.String()))
 }
 
 // Paused refuses NEW requests from anyone off the allowlist, and nothing else.
@@ -340,6 +348,13 @@ func TestAddAController(cur realm, t *testing.T) {
 	uassert.False(t, IsController(carol.String()), "one controller cannot seat anyone")
 	testing.SetRealm(testing.NewUserRealm(Aeddi))
 	Second(cross(cur), id, true, "")
+	uassert.Equal(t, StatusPending, MotionStatus(id), "a majority alone seats nobody")
+	uassert.False(t, IsController(carol.String()))
+	uassert.True(t, strings.Contains(Render("motion/1"), "has not joined"))
+	testing.SetRealm(testing.NewUserRealm(bob))
+	uassert.AbortsContains(t, cur, "only the address", func() { Join(cross(cur), id) })
+	testing.SetRealm(testing.NewUserRealm(carol))
+	Join(cross(cur), id)
 	uassert.Equal(t, StatusAdopted, MotionStatus(id))
 	uassert.True(t, IsController(carol.String()))
 	uassert.Equal(t, 3, Quorum(), "four controllers need three")
@@ -354,6 +369,8 @@ func TestFourthControllerPays(cur realm, t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(Moul))
 	mid := Propose(cross(cur), carol.String(), true, "a fourth")
 	Second(cross(cur), mid, true, "")
+	testing.SetRealm(testing.NewUserRealm(carol))
+	Join(cross(cur), mid) // before the second yes: the order does not matter
 	testing.SetRealm(testing.NewUserRealm(Jaekwon))
 	Second(cross(cur), mid, true, "")
 	urequire.True(t, IsController(carol.String()))
