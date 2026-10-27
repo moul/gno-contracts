@@ -1,0 +1,10 @@
+module = "gno.land/r/moul/smallgrants/v0"
+gno = "0.9"
+
+# The line above is the only place the published path is written. The code
+# reads its own path and address at init, so changing the path is this one
+# line and nothing else.
+#
+# public: it holds money funded by a multisig, and a private realm can be
+# redeployed by its creator with the coins kept and the code replaced, which
+# would put that money one signature away from whoever published it
