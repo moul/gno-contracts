@@ -1,30 +1,16 @@
 // The no-wallet path: a modal with the exact gnokey command a transaction
 // needs, ready to paste. Gas is never guessed: once the visitor gives their
 // address, the call is simulated and the command carries the measured figure.
+//
+// The command string itself is lib/cmd.js's, which is pure and tested.
 
 import { Client } from "./gno.js";
 import * as identity from "./identity.js";
+import { command, gasFor } from "./cmd.js";
 
-const GAS_HEADROOM = 1.3; // gas_wanted over measured use; a ceiling, not charged
-const FEE_PER_GAS_DEN = 1000; // the ante handler wants gas_fee >= gas_wanted / 1000 ugnot
-const FEE_MARGIN = 2; // fee over that floor; still a few thousandths of a GNOT
+export { command };
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-const sh = (s) => (/^[\w./:@=-]+$/.test(s) ? s : `'${String(s).replace(/'/g, `'\\''`)}'`);
-
-export function command({ net, cfg, pkgPath, func, args, send, key, gasWanted, gasFee }) {
-  const lines = [
-    "gnokey maketx call",
-    `-pkgpath ${pkgPath}`,
-    `-func ${func}`,
-    ...args.map((a) => `-args ${sh(a)}`),
-    ...(send ? [`-send ${send}`] : []),
-    gasWanted ? `-gas-wanted ${gasWanted} -gas-fee ${gasFee}ugnot` : "-gas-wanted <measure it: enter your address above> -gas-fee <same>",
-    `-broadcast -chainid ${cfg.chainId} -remote ${cfg.rpc}`,
-    key || "mykey",
-  ];
-  return `# ${net}\n` + lines.join(" \\\n  ");
-}
 
 // open shows the modal and resolves when the visitor says they sent it, or
 // rejects when they close it.
@@ -70,8 +56,7 @@ export function open({ net, cfg, pkgPath, func, args = [], send = "", address = 
       try {
         const sim = await new Client(net).simulate(addr, pkgPath, func, args);
         if (sim.error) throw new Error(sim.error);
-        const gasWanted = Math.ceil(sim.gasUsed * GAS_HEADROOM);
-        gas = { gasWanted, gasFee: Math.ceil(gasWanted / FEE_PER_GAS_DEN) * FEE_MARGIN };
+        gas = gasFor(sim.gasUsed);
         $("[data-sim]").innerHTML = `simulated on ${esc(net)}: <b>${sim.gasUsed.toLocaleString()}</b> gas used${sim.data ? `, would return <code>${esc(sim.data)}</code>` : ""}. Fee ${(gas.gasFee / 1e6).toFixed(6).replace(/0+$/, "")} GNOT, plus any storage deposit.`;
       } catch (e) {
         $("[data-sim]").textContent = `simulation failed: ${e.message}` +

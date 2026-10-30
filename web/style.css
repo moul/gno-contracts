@@ -14,7 +14,9 @@ code, pre { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .muted { color: var(--muted); }
 .err { color: var(--warn); }
 
-header { position: sticky; top: 0; display: flex; gap: .6rem; align-items: center; padding: .7rem 1.2rem; background: var(--bg); border-bottom: 1px solid var(--line); z-index: 1; }
+/* flex-wrap, because on a 390px phone the Connect button used to hang 30px
+   past the right edge and give the whole site a horizontal scrollbar. */
+header { position: sticky; top: 0; display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; padding: .7rem 1.2rem; background: var(--bg); border-bottom: 1px solid var(--line); z-index: 1; }
 .brand { font-weight: 700; color: var(--fg); }
 .spacer { flex: 1; }
 main { max-width: 64rem; margin: 0 auto; padding: 1rem 1.2rem 3rem; }
@@ -68,6 +70,66 @@ input { min-width: 0; }
 .app-panel { text-align: center; }
 .app-panel input { width: min(28rem, 100%); }
 
+/* smallgrants: the list, the states, the ask form */
+.sg { text-align: left; }
+.sg h3 { margin: 1.4rem 0 .5rem; }
+.sg-banner { padding: .7rem .9rem; border: 1px solid var(--line); border-left: 3px solid var(--muted); border-radius: 6px; }
+.sg-banner.ok { border-left-color: var(--accent); }
+.sg-banner.waiting { border-left-color: var(--sim); background: var(--sim-bg); }
+.sg-banner.bad { border-left-color: var(--warn); }
+.sg-banner p { margin: .4rem 0; }
+.sg-banner code { overflow-wrap: anywhere; }
+.sg-stats { display: flex; flex-wrap: wrap; gap: .3rem 1.4rem; margin-top: .5rem; }
+.sg-stats div { display: flex; flex-direction: column; font-size: 13px; }
+.sg-none { padding: .7rem .9rem; background: var(--code); border-radius: 6px; }
+
+.sg-rows { list-style: none; margin: 0; padding: 0; }
+.sg-row { border: 1px solid var(--line); border-left: 3px solid var(--muted); border-radius: 6px; margin-bottom: .45rem; overflow: hidden; }
+.sg-row.paid { border-left-color: var(--accent); }
+.sg-row.refused { border-left-color: var(--warn); }
+.sg-head { display: grid; grid-template-columns: 3rem 1fr auto auto; gap: .2rem .7rem; align-items: baseline; width: 100%; text-align: left; border: 0; border-radius: 0; background: none; padding: .55rem .8rem; }
+.sg-head:hover { background: var(--code); }
+.sg-id { color: var(--muted); font: 13px/1.4 ui-monospace, Menlo, monospace; }
+.sg-title { font-weight: 600; overflow-wrap: anywhere; }
+.sg-amount { font: 600 13px/1.4 ui-monospace, Menlo, monospace; white-space: nowrap; }
+.sg-state { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.sg-row.paid .sg-state { color: var(--accent); }
+.sg-row.refused .sg-state { color: var(--warn); }
+/* A decided outcome is prose the reader is meant to believe, including
+   "no reason was given": it is never muted, because muted reads as missing. */
+.sg-outcome { margin: 0; padding: 0 .8rem .55rem 3.7rem; font-size: 14px; }
+.sg-detail { padding: .3rem .8rem .8rem; border-top: 1px solid var(--line); }
+.sg-kv { display: flex; flex-wrap: wrap; gap: .2rem 1.4rem; }
+.sg-kv div { display: flex; flex-direction: column; font-size: 13px; }
+.sg-kv code { overflow-wrap: anywhere; }
+.sg-detail blockquote { margin: .6rem 0; padding-left: .8rem; border-left: 3px solid var(--line); }
+.sg-ballots { border-collapse: collapse; font-size: 13px; width: 100%; }
+.sg-ballots th, .sg-ballots td { border: 1px solid var(--line); padding: .2rem .5rem; text-align: left; }
+
+.sg-ask { margin-top: 1.6rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.sg-ask label { display: flex; flex-direction: column; gap: .2rem; margin: .6rem 0; font-size: 13px; color: var(--muted); }
+.sg-ask input, .sg-ask textarea { font-size: 15px; color: var(--fg); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: .4rem .6rem; width: 100%; }
+.sg-ask textarea { font-family: inherit; resize: vertical; }
+.sg-problems { list-style: none; margin: .6rem 0; padding: .5rem .8rem; border: 1px solid var(--warn); border-radius: 6px; }
+.sg-problems li { color: var(--warn); font-size: 14px; }
+.sg-review { margin: .8rem 0; padding: .7rem .9rem; border: 1px solid var(--line); border-radius: 6px; background: var(--code); }
+.sg-review ul { margin: .4rem 0; padding-left: 1.2rem; }
+.sg-review p { margin: .5rem 0; }
+.sg-review code { overflow-wrap: anywhere; }
+.sg-accept { color: var(--accent); }
+.sg-refuse { color: var(--warn); }
+.sg-ask pre { background: var(--code); padding: .7rem; border-radius: 6px; overflow-x: auto; white-space: pre; }
+.sg-ask summary { cursor: pointer; font-weight: 600; }
+.sg-ask button:disabled { opacity: .45; cursor: not-allowed; }
+.sg-ask input[name="key"] { width: auto; flex: 1; }
+
+/* A phone: the row header stacks instead of squeezing four columns. */
+@media (max-width: 34rem) {
+  .sg-head { grid-template-columns: 3rem 1fr; }
+  .sg-amount, .sg-state { grid-column: 2; }
+  .sg-outcome { padding-left: .8rem; }
+}
+
 .md img { max-width: 100%; }
 .md .table { overflow-x: auto; }
 .md table { border-collapse: collapse; }
@@ -102,3 +164,26 @@ body.dryrun .custom button, body.dryrun .txbtn { border-style: dashed; border-co
 @keyframes pending-pulse { 50% { opacity: .25; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .pending, .spin { animation: none; } }
+
+/* --- small-grants surface (grants.html): the desk + network chooser --- */
+
+/* The chooser sits under the header. flex-wrap, so on a 390px phone the three
+   controls stack instead of pushing a horizontal scrollbar. Every control is
+   min-width:0 and width:100% inside its label, which is what actually stops the
+   select from refusing to shrink below its content. */
+.deskbar { max-width: 64rem; margin: 0 auto; padding: .7rem 1.2rem; display: flex; flex-wrap: wrap; align-items: end; gap: .7rem; }
+.deskbar label { flex: 1 1 12rem; min-width: 0; display: flex; flex-direction: column; gap: .2rem; font-size: 12px; color: var(--muted); }
+.deskbar select, .deskbar input { width: 100%; min-width: 0; max-width: 100%; }
+.deskbar .netpick { flex: 1 1 10rem; }
+.netbadge { flex: 0 0 auto; align-self: center; font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: .2rem .55rem; border-radius: 999px; white-space: nowrap; border: 1px solid var(--line); }
+.netbadge.mainnet { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.netbadge.testnet { background: var(--sim-bg); color: var(--warn); border-color: var(--sim); }
+.netbadge.local { background: var(--code); color: var(--muted); }
+
+/* The loud strip: anything that is not mainnet gets a full-width banner, not a
+   hint in the corner. */
+.netnote { max-width: 64rem; margin: 0 auto .4rem; padding: .55rem .9rem; border-radius: 6px; font-size: 13px; border: 1px solid var(--line); border-left: 3px solid var(--sim); }
+.netnote.testnet { background: var(--sim-bg); border-left-color: var(--sim); }
+.netnote.local { background: var(--code); border-left-color: var(--muted); color: var(--muted); }
+.netnote code { overflow-wrap: anywhere; }
+.grants-surface main { padding-top: .4rem; }

@@ -80,7 +80,10 @@ async function viewHome() {
   const byPath = new Map((await loadCatalog()).map((c) => [c.pkgpath, c]));
   for (const app of FEATURED) {
     const c = byPath.get(app.path);
-    const off = c && !live(c);
+    // A featured path the catalog does not carry yet is not on this network
+    // either: a realm reaches contracts.json before it reaches a chain, so the
+    // missing entry is the stronger signal, not a reason to say nothing.
+    const off = !c || !live(c);
     main.querySelector("#featured").append(h(`
       <a class="card${app.module ? " app" : ""}${off ? " off" : ""}" href="#${short(app.path)}">
         <div><strong>${esc(app.title)}</strong>${app.module ? ` ${LIVE}` : ""}</div>
@@ -151,8 +154,18 @@ async function paneRender(pane, pkgpath, args) {
     const md = await client.render(pkgpath, args);
     pane.innerHTML = `<article class="md">${renderMD(md, makeLinker(pkgpath, NETWORKS[net].web))}</article>`;
   } catch (e) {
-    pane.innerHTML = `<p class="err">${esc(e.message)}</p>`;
+    pane.innerHTML = queryFailed(e, pkgpath);
   }
+}
+
+// What a failed read of a realm says. A realm that is not on this network is
+// not a failure to report with a stack frame number ("88 - package not
+// found"): it is the normal state of anything before its first deploy, and of
+// everything on a network it was never published to.
+function queryFailed(e, pkgpath) {
+  return /package not found|unknown import path|invalid package path/i.test(e.message)
+    ? `<p class="muted">Not published on ${esc(net)}: there is no <code>${esc(pkgpath)}</code> on this network yet.</p>`
+    : `<p class="err">${esc(e.message)}</p>`;
 }
 
 async function paneFuncs(pane, pkgpath) {
@@ -161,7 +174,7 @@ async function paneFuncs(pane, pkgpath) {
   try {
     funcs = (await client.funcs(pkgpath)).filter((f) => f.FuncName !== "Render");
   } catch (e) {
-    pane.innerHTML = `<p class="err">${esc(e.message)}</p>`;
+    pane.innerHTML = queryFailed(e, pkgpath);
     return;
   }
   pane.innerHTML = funcs.length ? "" : '<p class="muted">no exported function</p>';
@@ -214,7 +227,7 @@ async function paneSource(pane, pkgpath) {
       <section class="file"><h3 id="src-${esc(f)}">${esc(f)} <span class="muted">${bodies[i].split("\n").length} lines</span></h3>
       <pre class="src">${esc(bodies[i])}</pre></section>`).join("");
   } catch (e) {
-    pane.innerHTML = `<p class="err">${esc(e.message)}</p>`;
+    pane.innerHTML = queryFailed(e, pkgpath);
   }
 }
 
