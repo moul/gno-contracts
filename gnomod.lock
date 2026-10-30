@@ -250,6 +250,10 @@ module = "gno.land/p/moul/x/daily/base32/v0"
 source = { dir = "p/moul/x/daily/base32" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/base45/v0"
+source = { dir = "p/moul/x/daily/base45" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/bech32/v0"
 source = { dir = "p/moul/x/daily/bech32" }
 
@@ -775,6 +779,10 @@ hash = "h1:s1tqxem7Drgk00EfCQUfO/BQ/+htOGRDpaqqhbXitlg="
 [[module]]
 module = "gno.land/r/moul/x/daily/base32demo/v1"
 source = { dir = "r/moul/x/daily/base32demo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/base45demo/v0"
+source = { dir = "r/moul/x/daily/base45demo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/bech32demo/v0"
