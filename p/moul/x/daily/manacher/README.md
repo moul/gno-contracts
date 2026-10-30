@@ -46,8 +46,16 @@ the three single bytes and the two pairs are different substrings that happen
 to read alike. It is pinned against a quadratic brute-force scan over every
 substring.
 
-`MaxInput` is 4096, the one allocation a caller has to reason about: the
-working array is 2n+1 ints. Past it the functions refuse rather than truncate.
+`MaxInput` is 4096. A `Radii` call allocates 2n+1 bytes for the interleaved
+form plus 2n+1 ints for the result, and `Spans` adds one `Span` per non-empty
+centre, up to about 2n+1 of them. Past the limit the functions refuse rather
+than truncate, and they refuse by returning the same zero values they return
+for an input with nothing in it, so a caller who cares about the difference
+checks the length itself.
+
+`IsPalindrome` is the exception and is not bounded at all: it allocates
+nothing, compares at most half the bytes and stops at the first mismatch, so
+there is no cost for the limit to protect.
 
 **Live demo:** [`r/moul/x/daily/manacherdemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/manacherdemo)
 · render it at [`/r/moul/x/daily/manacherdemo/v0`](https://gno.land/r/moul/x/daily/manacherdemo/v0).

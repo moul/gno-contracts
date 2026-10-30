@@ -25,8 +25,13 @@
 // [r/moul/x/daily/manacherdemo](/r/moul/x/daily/manacherdemo/v0).
 package manacher
 
-// MaxInput bounds the input so gas stays predictable. The working array is
-// 2n+1 ints, so this is the only allocation a caller has to reason about.
+// MaxInput bounds the input so gas stays predictable. A Radii call allocates
+// 2n+1 bytes for the interleaved form plus 2n+1 ints for the result, and
+// Spans allocates one Span per non-empty centre on top of that, so the worst
+// case is about 2n+1 of them. [IsPalindrome] is deliberately NOT bounded: it
+// is a two-pointer scan that allocates nothing, so there is no cost for the
+// limit to protect, and refusing a long string there would only make the
+// cheapest function in the package the fussiest.
 const MaxInput = 4096
 
 // sep is the interleaved separator. It needs no special value and does not
@@ -149,6 +154,10 @@ func Spans(s string, minLength int) []Span {
 
 // IsPalindrome reports whether s reads the same backwards, byte for byte. The
 // empty string and every single byte are palindromes.
+//
+// Unlike the rest of the package it is not bounded by [MaxInput], because it
+// allocates nothing: it compares at most len(s)/2 pairs and stops at the first
+// mismatch.
 func IsPalindrome(s string) bool {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
 		if s[i] != s[j] {
