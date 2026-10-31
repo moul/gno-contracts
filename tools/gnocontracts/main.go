@@ -103,10 +103,12 @@ func main() {
 	}
 }
 
-func usage() {
-	fmt.Fprint(os.Stderr, `gno-contracts — repository maintenance CLI
+// usageText is the help banner. Its `usage:` line is the command a reader is
+// meant to paste, so it has to be the one the Makefile uses: see
+// TestUsageInvocationMatchesMakefile, which compares the two.
+const usageText = `gno-contracts — repository maintenance CLI
 
-usage: go run ./tools <command> [flags]
+usage: go -C tools tool gnocontracts <command> [flags]
 
 commands:
   manifest   refresh contracts.json from the p/moul and r/moul trees
@@ -135,7 +137,10 @@ commands:
                    fail on a hit the baseline does not already record
   review-advice    should this diff get a Copilot review? REVIEW or SKIP, with why
   graph      write per-package + global dependency graphs into _assets/
-`)
+`
+
+func usage() {
+	fmt.Fprint(os.Stderr, usageText)
 }
 
 func fatal(err error) {
