@@ -168,8 +168,10 @@ func renderInput(in string) string {
 		b.WriteString(mt.String() + "\n")
 	} else {
 		b.WriteString("The matrix is only shown up to " +
-			strconv.Itoa(bwt.MaxMatrixLen) + " bytes: it costs n squared to build, " +
-			"while the transform itself costs n.\n\n")
+			strconv.Itoa(bwt.MaxMatrixLen) + " bytes: it holds every rotation at " +
+			"once, n squared bytes of them, while the transform compares rotations " +
+			"in place and holds only n. Both do the same quadratic amount of " +
+			"comparing; it is the memory that differs.\n\n")
 	}
 
 	b.WriteString("[back](/r/moul/x/daily/bwtdemo/v0)\n")
@@ -195,8 +197,10 @@ func roundTrip(ok bool) string {
 	return "❌"
 }
 
+// parseArg takes the one routing slash off and nothing else. It does not trim:
+// the transform is byte-preserving, so a page that silently dropped the
+// caller's leading or trailing spaces would show the result of transforming a
+// string they never sent, and "   " would be mistaken for the root page.
 func parseArg(path string) string {
-	s := strings.TrimSpace(path)
-	s = strings.TrimPrefix(s, "/")
-	return s
+	return strings.TrimPrefix(path, "/")
 }
