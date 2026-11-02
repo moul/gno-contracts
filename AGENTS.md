@@ -1087,9 +1087,13 @@ PR CI checks only source: `gno lint` and `gno test` pass for every contract, and
 
 | workflow | when | what it owns |
 |---|---|---|
-| `ci` | push to main, every pull request | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make guards lint test` |
+| `ci` | push to main, every pull request | the gate: `guard-generated`, `go -C tools tool gnopm tool ci`, the tool tests, `make guards lint test` |
 | `pr` | pull request opened / pushed / reopened | **one** sticky comment, the path labels, the published preview at `pr-<N>/` |
 | `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, README footers, `_assets/`, and on-chain status |
+| `audit-patterns` | push to main, every pull request, weekly | the second gate: `make audit-patterns` and `make gnovet`, both ratchets. `make guards` runs `gnovet` but **not** `audit-patterns`, so local green is not this check green |
+| `gnobench` | pull requests touching `p/**`, `vendor/**`, `gnobench/**`, Mondays | the storage and gas deltas in the job summary. Never fails the build, by design |
+| `web` | push to main under `web/**`, manual | the dashboard build |
+| `copilot-review-log` | hourly | the review log, off pull requests entirely |
 
 **One bot comment per pull request**, marker `<!-- gnocontracts-pr -->`, rendered by
 `gnocontracts pr`. It fits in three lines: counts, risk signals, preview link, everything
