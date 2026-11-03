@@ -80,13 +80,37 @@ func ExampleRender_input() {
 	//
 	// | # | code | bits | means |
 	// | --- | --- | --- | --- |
-	// | 1 | 98 | 9 | `b` |
-	// | 2 | 97 | 9 | `a` |
-	// | 3 | 110 | 9 | `n` |
-	// | 4 | 257 | 9 | `an` |
-	// | 5 | 97 | 9 | `a` |
+	// | 1 | 98 | 9 | b |
+	// | 2 | 97 | 9 | a |
+	// | 3 | 110 | 9 | n |
+	// | 4 | 257 | 9 | an |
+	// | 5 | 97 | 9 | a |
 	//
 	// 45 bits against 48 raw, 3 saved (6%).
+	//
+	// [back](/r/moul/x/daily/lzwdemo/v0)
+}
+
+// ExampleRender_pipe is the regression for the one way a caller's string can
+// still rewrite this page: a pipe ends a table cell from inside a code span,
+// so the entry column goes through ui.Cell and not md.InlineCode. Before the
+// fix this row had five cells under a four-column header.
+func ExampleRender_pipe() {
+	print(Render("/a|b|c"))
+	// Output:
+	// # LZW
+	//
+	// Input: `a|b|c`
+	//
+	// | # | code | bits | means |
+	// | --- | --- | --- | --- |
+	// | 1 | 97 | 9 | a |
+	// | 2 | 124 | 9 | \| |
+	// | 3 | 98 | 9 | b |
+	// | 4 | 124 | 9 | \| |
+	// | 5 | 99 | 9 | c |
+	//
+	// 45 bits against 40 raw, -5 saved (-12%).
 	//
 	// [back](/r/moul/x/daily/lzwdemo/v0)
 }

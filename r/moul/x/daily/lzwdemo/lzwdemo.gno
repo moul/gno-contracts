@@ -190,9 +190,11 @@ func Render(path string) string {
 }
 
 // renderInput compresses a caller's text. Everything echoed back goes through
-// md.InlineCode or ui.Cell: the string arrives from the URL and is
-// attacker-controlled markdown until it is escaped. A hand-built code span
-// would not do, because an escaped backtick still closes the span.
+// md.InlineCode or ui.Cell, picked by slot: the string arrives from the URL
+// and is attacker-controlled markdown until it is escaped. A hand-built code
+// span would not do, because an escaped backtick still closes the span, and a
+// code span is not enough inside a TABLE, because a pipe ends the cell from
+// inside one.
 func renderInput(in string) string {
 	var b strings.Builder
 	b.WriteString("# LZW\n\n")
@@ -211,11 +213,16 @@ func renderInput(in string) string {
 
 	t := ui.NewTable("#", "code", "bits", "means")
 	for i, s := range steps {
+		// ui.Cell and not md.InlineCode: an entry is a slice of the caller's
+		// own bytes, so it can hold a pipe, and a code span does NOT stop a
+		// pipe from ending the cell early. Measured on this realm before the
+		// fix: Render("/a|b|c") produced a five-cell row under a four-column
+		// header. Cell costs the monospace and is the helper for this slot.
 		t.Row(
 			strconv.Itoa(i+1),
 			strconv.Itoa(s.Code),
 			strconv.Itoa(s.Width),
-			md.InlineCode(s.Entry),
+			ui.Cell(s.Entry),
 		)
 	}
 	b.WriteString(t.String() + "\n")
