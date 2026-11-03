@@ -213,22 +213,33 @@ func renderInput(in string) string {
 
 	t := ui.NewTable("#", "code", "bits", "means")
 	for i, s := range steps {
-		// ui.Cell and not md.InlineCode: an entry is a slice of the caller's
-		// own bytes, so it can hold a pipe, and a code span does NOT stop a
-		// pipe from ending the cell early. Measured on this realm before the
-		// fix: Render("/a|b|c") produced a five-cell row under a four-column
-		// header. Cell costs the monospace and is the helper for this slot.
 		t.Row(
 			strconv.Itoa(i+1),
 			strconv.Itoa(s.Code),
 			strconv.Itoa(s.Width),
-			ui.Cell(s.Entry),
+			codeCell(s.Entry),
 		)
 	}
 	b.WriteString(t.String() + "\n")
 	b.WriteString(ratioLine(enc) + "\n\n")
 	b.WriteString("[back](/r/moul/x/daily/lzwdemo/v0)\n")
 	return b.String()
+}
+
+// codeCell puts a caller's bytes in a code span inside a table cell. An Entry
+// is a slice of the string that arrived in the URL, so it can hold a pipe, and
+// a code span does NOT stop a pipe from ending the cell: the GFM row splitter
+// runs before inline parsing. Measured on this realm before the fix,
+// Render("/a|b|c") produced a five-cell row under a four-column header.
+//
+// ui.Cell alone would be safe and would lose the monospace, which is the whole
+// point of the column. Its backslashes would also reach the reader verbatim if
+// they were then wrapped in backticks, because markdown applies no escapes
+// inside a code span. So md.InlineCode builds the span, which handles the
+// empty string, a leading or trailing space and any run of backticks, and the
+// pipe is escaped on top. Same helper, same reasoning, as r/moul/x/vm/bfdemo.
+func codeCell(s string) string {
+	return strings.ReplaceAll(md.InlineCode(s), "|", "\\|")
 }
 
 // newEntry names the dictionary entry step i creates, which is the previous
