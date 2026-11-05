@@ -7,3 +7,10 @@ gno = "0.9"
 # suffix would be a promise this realm cannot keep. The directory URL is the
 # thing people bookmark, so it is the one that should not carry it.
 private = true
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/toolbox"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/toolbox"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:23:01Z"
