@@ -6,3 +6,10 @@ private = true
 # usual one, a redeploy wipes every crew, share and credit while the coins stay
 # at the address, and it is worth taking while the design is still moving. The
 # v1 in README.md, one realm per crew, is the move that closes the door.
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/social/crews/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/social/crews/v0"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:23:01Z"

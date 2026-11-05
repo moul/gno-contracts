@@ -98,6 +98,13 @@ type Pub struct {
 	State string `json:"state,omitempty"`
 	Tx    string `json:"tx,omitempty"`
 	Which string `json:"which,omitempty"` // "v1", "monorepo", or "both"
+	// Path is where the package actually is on THIS chain, set only when that
+	// is not PkgPath. A chain where the signer does not own the namespace takes
+	// the upload under the signer's own address instead, so
+	// gno.land/p/moul/once/v0 is gno.land/p/g1magld5.../once/v0 on onyx. The
+	// catalog keeps the canonical path as the contract's identity and carries
+	// the real one here, so a reader can link to something that exists.
+	Path string `json:"path,omitempty"`
 }
 
 // defaultNetworks is the AUTHORITATIVE set of chains we track upload status

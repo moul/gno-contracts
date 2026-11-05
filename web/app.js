@@ -111,12 +111,22 @@ async function viewRealm(route) {
   const app = FEATURED.find((a) => a.path === pkgpath);
   const web = NETWORKS[net].web;
   const entry = (await loadCatalog()).find((c) => c.pkgpath === pkgpath);
+  // Where this package actually is on THIS chain. A namespace is the signer's
+  // own address or a name that signer owns, so a chain where @moul's key does
+  // not own `moul` takes the upload under the publisher's address instead:
+  // gno.land/p/moul/once/v0 is gno.land/p/g1magld5…/once/v0 on onyx. The
+  // canonical path stays the identity, in the URL and against the catalog;
+  // every call to the chain goes to `onchain` or it asks about a path that is
+  // not there.
+  const onchain = entry?.published?.[net]?.path || pkgpath;
+  const moved = onchain !== pkgpath;
 
   main.innerHTML = `
     <nav class="crumbs"><a href="#/">← all dapps</a>
       <code>${esc(short(pkgpath))}${args ? ":" + esc(args) : ""}</code>
-      <a href="${web}${short(pkgpath)}${args ? ":" + esc(args) : ""}" target="_blank" rel="noopener">gnoweb ↗</a>
+      <a href="${web}${short(onchain)}${args ? ":" + esc(args) : ""}" target="_blank" rel="noopener">gnoweb ↗</a>
       ${entry ? `<a href="${REPO}${esc(entry.dir)}" target="_blank" rel="noopener">repo ↗</a>` : ""}
+      ${moved ? `<span class="tag" title="published under the publisher's own address: ${esc(onchain)}">at ${esc(short(onchain).split("/")[2] || "")} on ${esc(net)}</span>` : ""}
     </nav>
     ${app?.module ? '<section class="custom" id="custom"></section><div id="sim-slot"></div>' : ""}
     <div class="tabs"><button data-tab="render" class="on">Render</button><button data-tab="funcs">Functions</button><button data-tab="source">Source</button></div>
@@ -125,19 +135,19 @@ async function viewRealm(route) {
   if (app?.module) {
     const mod = await import(`./apps/${app.module}.js`);
     unmount = mod.mount(main.querySelector("#custom"), {
-      client, net, path: pkgpath,
+      client, net, path: onchain,
       wallet,
       call: (func, a = [], opts = {}) => {
         // The third argument used to be the amount to send. A string there now
         // would be read as `"100ugnot".send`, undefined, and go out with no coins.
         if (typeof opts === "string") throw new Error("call(func, args, { send, onSubmit }): pass the amount as { send }");
-        return wallet.call(net, pkgpath, func, a, opts.send || "", { slot: main.querySelector("#sim-slot"), onSubmit: opts.onSubmit });
+        return wallet.call(net, onchain, func, a, opts.send || "", { slot: main.querySelector("#sim-slot"), onSubmit: opts.onSubmit });
       },
     });
   }
 
   const pane = main.querySelector("#pane");
-  const tabs = { render: () => paneRender(pane, pkgpath, args), funcs: () => paneFuncs(pane, pkgpath), source: () => paneSource(pane, pkgpath) };
+  const tabs = { render: () => paneRender(pane, onchain, args), funcs: () => paneFuncs(pane, onchain), source: () => paneSource(pane, onchain) };
   main.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => {
     main.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("on", x === b));
     tabs[b.dataset.tab]();

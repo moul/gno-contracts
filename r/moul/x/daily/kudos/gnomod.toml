@@ -1,2 +1,9 @@
 module = "gno.land/r/moul/x/daily/kudos/v0"
 gno = "0.9"
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/kudos/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/kudos/v0"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:10:22Z"

@@ -13,3 +13,10 @@ gno = "0.9"
 # Every thread, every balance and every pin under this path belongs to the
 # people who wrote them, so a fix ships as a v1 beside it rather than as a
 # redeploy that silently wipes the lot.
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/social/threads/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/social/threads/v0"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:23:01Z"

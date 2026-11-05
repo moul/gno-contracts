@@ -3,3 +3,10 @@ gno = "0.9"
 
 # public: every pair instance imports it to announce itself, and holds the
 # *pair.Pair it registers here. A private realm cannot be imported at all.
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/pairreg/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/pairreg/v0"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:10:22Z"

@@ -13,3 +13,10 @@ private = true
 # challenges and the credit ledger would all go while the money they account
 # for stayed. A redeploy of a live list is therefore a migration and not a fix,
 # and anything beyond a patch ships as a v1 beside it.
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/social/curated/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/social/curated/v0"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:23:01Z"

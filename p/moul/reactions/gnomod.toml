@@ -1,2 +1,9 @@
 module = "gno.land/p/moul/reactions/v0"
 gno = "0.9"
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/p/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/reactions/v0"
+  url = "https://onyx.testnets.gno.land/p/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/reactions/v0"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:10:22Z"

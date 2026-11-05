@@ -4,3 +4,10 @@ gno = "0.9"
 # public: a pilot account persists the module object in its roster, and a
 # value of a type defined in a private realm cannot be persisted by anyone
 # else. Every pilot module has to be public for the same reason.
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/pilotdemo/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/pilotdemo/v0"
+  revision = "4c02d6d9369d80732665898a5c4a95002c68bfd4"
+  at = "2026-11-05T11:10:22Z"
