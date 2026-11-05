@@ -58,14 +58,22 @@ func cmdStatus(root string, args []string) error {
 		// is what the pacing and the circuit breaker below exist to survive.
 		idx, bulk := queryChainIndex(net.RPC)
 		up, parked, unknown, streak := 0, 0, 0, 0
+		moved := 0
 		for j := range m.Contracts {
 			c := &m.Contracts[j]
 			if c.Draft {
 				continue
 			}
+			// Where this package actually is on THIS chain. Empty means the
+			// ordinary case and the canonical path is the right question.
+			probePath := c.PkgPath
+			if dp := deployedPath(root, c.Dir, net.ChainID, c.PkgPath); dp != "" {
+				probePath = dp
+				moved++
+			}
 			var state probe
 			if bulk {
-				state = idx.lookup(c.PkgPath)
+				state = idx.lookup(probePath)
 			} else {
 				// rpc.gno.land sits behind a load balancer that starts answering
 				// 403 to every request, /status included, once queries arrive fast
@@ -78,7 +86,7 @@ func cmdStatus(root string, args []string) error {
 					break
 				}
 				time.Sleep(*pace)
-				state = queryPkgStatus(net.RPC, c.PkgPath)
+				state = queryPkgStatus(net.RPC, probePath)
 			}
 			switch state {
 			case probeUnknown:
@@ -93,7 +101,7 @@ func cmdStatus(root string, args []string) error {
 				parked++
 			}
 			streak = 0
-			c.setPublished(net.Name, state)
+			c.setPublished(net.Name, state, probePath)
 			checks++
 		}
 		note := ""
@@ -105,6 +113,9 @@ func cmdStatus(root string, args []string) error {
 		}
 		if unknown > 0 {
 			note += fmt.Sprintf("  (%d unanswered, left as they were)", unknown)
+		}
+		if moved > 0 {
+			note += fmt.Sprintf("  (%d asked at a moved path)", moved)
 		}
 		fmt.Printf("  %-12s %d live / %d contracts%s\n", net.Name, up, len(m.Contracts), note)
 	}
@@ -134,12 +145,18 @@ func cmdStatus(root string, args []string) error {
 // instead, because it is on the chain without being usable, and flattening
 // that into the same empty cell as "never sent" is the thing this stopped
 // doing.
-func (c *Contract) setPublished(net string, state probe) {
+func (c *Contract) setPublished(net string, state probe, at string) {
 	if c.Published == nil {
 		c.Published = map[string]Pub{}
 	}
 	pub := c.Published[net]
 	pub.Uploaded = state == probePresent
+	// Only when it differs, so the ordinary chain keeps the field out of the
+	// catalog entirely rather than repeating the pkgpath 393 times.
+	pub.Path = ""
+	if at != "" && at != c.PkgPath {
+		pub.Path = at
+	}
 	pub.State = ""
 	if state == probeParked {
 		pub.State = "inert"

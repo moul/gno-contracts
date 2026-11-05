@@ -171,16 +171,16 @@ func TestNetReachableRejectsAnythingButAChainAnswer(t *testing.T) {
 
 func TestSetPublishedLabelsProvenance(t *testing.T) {
 	ours := &Contract{PkgPath: "gno.land/r/moul/hello/v0"}
-	ours.setPublished("mainnet", probePresent)
+	ours.setPublished("mainnet", probePresent, "")
 	if got := ours.Published["mainnet"]; !got.Uploaded || got.Which != "ours" {
 		t.Fatalf("published = %+v, want uploaded/ours", got)
 	}
 	mirrored := &Contract{PkgPath: "gno.land/p/moul/md/v0", Upstream: "gno.land/p/moul/md"}
-	mirrored.setPublished("mainnet", probePresent)
+	mirrored.setPublished("mainnet", probePresent, "")
 	if got := mirrored.Published["mainnet"]; got.Which != "monorepo" {
 		t.Fatalf("which = %q, want monorepo", got.Which)
 	}
-	mirrored.setPublished("mainnet", probeAbsent)
+	mirrored.setPublished("mainnet", probeAbsent, "")
 	if got := mirrored.Published["mainnet"]; got.Uploaded || got.Which != "" || got.State != "" {
 		t.Fatalf("published = %+v, want absent with no provenance", got)
 	}
@@ -188,7 +188,7 @@ func TestSetPublishedLabelsProvenance(t *testing.T) {
 	// A parked package is not live, so it carries no provenance and no link,
 	// but it is emphatically not the same as never having been sent.
 	queued := &Contract{PkgPath: "gno.land/r/moul/queued/v0"}
-	queued.setPublished("mainnet", probeParked)
+	queued.setPublished("mainnet", probeParked, "")
 	if got := queued.Published["mainnet"]; got.Uploaded || got.State != "inert" || got.Which != "" {
 		t.Fatalf("published = %+v, want a parked entry", got)
 	}
