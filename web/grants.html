@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Small grants</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>">
+</head>
+<body class="grants-surface">
+<header>
+  <a class="brand" href="./grants.html">🪙 Small grants</a>
+  <span class="spacer"></span>
+  <button id="dryrun" aria-pressed="false" title="Simulate transactions instead of sending them">🧪 dry run</button>
+  <button id="connect">Connect</button>
+</header>
+
+<nav class="deskbar">
+  <label class="deskpick">Desk
+    <select id="desk" aria-label="which grant desk"></select>
+  </label>
+  <label class="deskpath" hidden>Realm path
+    <input id="realm" placeholder="gno.land/r/…" autocomplete="off" spellcheck="false" inputmode="url">
+  </label>
+  <label class="netpick">Network
+    <select id="net" aria-label="network"></select>
+  </label>
+  <span id="netbadge" class="netbadge" title="which network this page is reading"></span>
+</nav>
+
+<div id="netnote"></div>
+
+<main>
+  <section class="custom" id="grants"></section>
+  <div id="sim-slot"></div>
+</main>
+
+<footer class="muted">
+  One page, several desks: pick a desk above or type a realm path. The selected desk and network
+  are in the URL, so a link points at exactly what you are looking at.
+  Reads straight from the chain's RPC; writes through <a href="https://adena.app" target="_blank" rel="noopener">Adena</a>
+  or a pasted gnokey command. Contracts: <a href="https://github.com/moul/gno-contracts">moul/gno-contracts</a>.
+</footer>
+<script type="module" src="grants.js"></script>
+</body>
+</html>
