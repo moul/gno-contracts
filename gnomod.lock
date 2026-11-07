@@ -1456,6 +1456,11 @@ source = { dir = "r/moul/x/games/lastwords" }
 
 [[module]]
 module = "gno.land/r/moul/x/grc20faucet/v0"
+source = { commit = "d1b0e4d7db74bfc19a72230919f7c3d310c56adc", dir = "r/moul/x/grc20faucet" }
+hash = "h1:zwqXbRWhZy/Pwwc9O/zavV042UA9tTDnDlG9TSFsX8Q="
+
+[[module]]
+module = "gno.land/r/moul/x/grc20faucet/v1"
 source = { dir = "r/moul/x/grc20faucet" }
 
 [[module]]
