@@ -93,6 +93,11 @@ source = { dir = "p/moul/gnopm" }
 
 [[module]]
 module = "gno.land/p/moul/grants/v0"
+source = { commit = "d1529f43536b4791c9304d5f403f49eb0b131585", dir = "p/moul/grants" }
+hash = "h1:aILj62OZAeTZaSb/9dG4p9bTWPcZKkWXekzuXJTmwn8="
+
+[[module]]
+module = "gno.land/p/moul/grants/v1"
 source = { dir = "p/moul/grants" }
 
 [[module]]
@@ -676,6 +681,10 @@ source = { dir = "r/moul/gnopm/registry" }
 [[module]]
 module = "gno.land/r/moul/gns/v0"
 source = { dir = "r/moul/gns" }
+
+[[module]]
+module = "gno.land/r/moul/govgrant/v0"
+source = { dir = "r/moul/govgrant" }
 
 [[module]]
 module = "gno.land/r/moul/grant/v0"
