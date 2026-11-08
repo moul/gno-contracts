@@ -408,6 +408,10 @@ module = "gno.land/p/moul/x/daily/semver/v0"
 source = { dir = "p/moul/x/daily/semver" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/sha1/v0"
+source = { dir = "p/moul/x/daily/sha1" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/shuntingyard/v0"
 source = { dir = "p/moul/x/daily/shuntingyard" }
 
@@ -1285,6 +1289,10 @@ source = { dir = "r/moul/x/daily/rpsoracle" }
 [[module]]
 module = "gno.land/r/moul/x/daily/semverdemo/v0"
 source = { dir = "r/moul/x/daily/semverdemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/sha1demo/v0"
+source = { dir = "r/moul/x/daily/sha1demo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/shuntingyarddemo/v0"
