@@ -5,3 +5,10 @@ gno = "0.9"
 # buys a redeploy, and a redeploy of an issuer replaces the code that decided not
 # to claw anybody's balance back while the coins themselves survive. Holders of a
 # coin from here are trusting this code, so this path can never be rewritten.
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/nativeify/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/nativeify/v0"
+  revision = "37499287b12e78eff6f75f442bf9bda51ac5f4e7"
+  at = "2026-11-09T00:17:06Z"
