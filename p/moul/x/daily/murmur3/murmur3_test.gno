@@ -103,6 +103,16 @@ func TestBucket(t *testing.T) {
 	uassert.Equal(t, Bucket("moul", 16), Bucket("moul", 16))
 }
 
+// A shard count above 2^32 is still a positive n, and the doc promises -1 only
+// for a non-positive one. Narrowing the divisor to uint32 turns 1<<32 into a
+// divide by zero.
+func TestBucketHugeShardCount(t *testing.T) {
+	const huge = 1 << 32
+	got := Bucket("anything", huge)
+	uassert.True(t, got >= 0 && got < huge, "bucket out of range for a huge shard count")
+	uassert.Equal(t, int(Sum32("anything")), got)
+}
+
 // 1000 keys over 16 buckets: every bucket used, none of them swallowing the
 // table. A hash that returned a constant would put 1000 in one bucket and 0 in
 // the other fifteen, which is exactly what this refuses.

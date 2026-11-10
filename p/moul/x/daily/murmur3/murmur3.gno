@@ -125,11 +125,20 @@ func SumHex(s string) string { return Hex(Sum32(s)) }
 // This is the thing the hash is actually good for: a deterministic, evenly
 // spread slot for a key, with no storage and no ordering. Do not use it where
 // the key comes from someone with a reason to collide.
+//
+// The remainder is taken in uint64 rather than uint32 on purpose: gno's int is
+// 64-bit, so a caller may legitimately pass an n above 2^32, and narrowing the
+// divisor would turn 1<<32 into a divide by zero on a value the doc above
+// promises to accept.
+//
+// For an n that does not divide 2^32 the low buckets are very slightly
+// favoured, by at most one key in 2^32. That bias is irrelevant for spreading
+// and would matter for sampling; this is the spreading function.
 func Bucket(s string, n int) int {
 	if n <= 0 {
 		return -1
 	}
-	return int(Sum32(s) % uint32(n))
+	return int(uint64(Sum32(s)) % uint64(n))
 }
 
 // Verification returns the SMHasher verification value for this hash, which is
