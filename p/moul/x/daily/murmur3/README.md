@@ -23,6 +23,13 @@ sizing a sketch, picking a deterministic slot, keying one of the independent
 hash functions a Bloom filter or a count-min sketch needs (that is what the
 seed is for: it re-keys the whole function).
 
+`Bucket` spreads evenly up to `MaxBuckets`, which is `1 << 32`, and the ceiling
+is the hash rather than the arithmetic: 32 bits of output name 2^32 slots and
+no more. A larger `n` is accepted and answered in range, but every index from
+2^32 up is unreachable, so the top half of a 2^33-way split would never see a
+key. Nothing rejects it, because that `n` is a caller bug and a panic inside a
+`Render` is a worse way to find out than a skewed table.
+
 `Verification` is the reason this package can claim to be the same function as
 everyone else's. It runs SMHasher's procedure, hashing 256 keys of growing
 length under 256 seeds and hashing the results, and a correct MurmurHash3

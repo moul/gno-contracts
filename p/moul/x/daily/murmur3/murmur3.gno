@@ -120,20 +120,32 @@ func Hex(h uint32) string {
 // SumHex is Sum32 rendered with Hex.
 func SumHex(s string) string { return Hex(Sum32(s)) }
 
+// MaxBuckets is the largest shard count [Bucket] can spread over evenly: the
+// hash is 32 bits, so it names 2^32 slots and no more.
+const MaxBuckets = 1 << 32
+
 // Bucket returns a shard index in [0, n) for s, or -1 when n is not positive.
 //
 // This is the thing the hash is actually good for: a deterministic, evenly
 // spread slot for a key, with no storage and no ordering. Do not use it where
 // the key comes from someone with a reason to collide.
 //
-// The remainder is taken in uint64 rather than uint32 on purpose: gno's int is
-// 64-bit, so a caller may legitimately pass an n above 2^32, and narrowing the
-// divisor would turn 1<<32 into a divide by zero on a value the doc above
-// promises to accept.
+// The spread is even only up to [MaxBuckets] shards, and that ceiling is the
+// hash, not the arithmetic: 32 bits of output cannot name more than 2^32
+// distinct slots. An n above it is accepted and answered in range, but every
+// index from 2^32 upwards is unreachable, so roughly the top half of a
+// 2^33-way split would never receive a key. Nothing here rejects such an n,
+// because a shard count that large is a caller bug and a panic deep inside a
+// Render is a worse way to learn about it than a skewed table.
 //
-// For an n that does not divide 2^32 the low buckets are very slightly
-// favoured, by at most one key in 2^32. That bias is irrelevant for spreading
-// and would matter for sampling; this is the spreading function.
+// The remainder is taken in uint64 rather than uint32 on purpose: gno's int is
+// 64-bit, so a caller may pass an n above 2^32, and narrowing the divisor
+// would turn 1<<32 into a divide by zero on a value the first line of this
+// comment promises to accept.
+//
+// For an n below the ceiling that does not divide 2^32 the low buckets are
+// very slightly favoured, by at most one key in 2^32. That bias is irrelevant
+// for spreading and would matter for sampling; this is the spreading function.
 func Bucket(s string, n int) int {
 	if n <= 0 {
 		return -1

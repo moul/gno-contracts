@@ -107,10 +107,23 @@ func TestBucket(t *testing.T) {
 // for a non-positive one. Narrowing the divisor to uint32 turns 1<<32 into a
 // divide by zero.
 func TestBucketHugeShardCount(t *testing.T) {
-	const huge = 1 << 32
-	got := Bucket("anything", huge)
-	uassert.True(t, got >= 0 && got < huge, "bucket out of range for a huge shard count")
+	got := Bucket("anything", MaxBuckets)
+	uassert.True(t, got >= 0 && got < MaxBuckets, "bucket out of range for a huge shard count")
 	uassert.Equal(t, int(Sum32("anything")), got)
+}
+
+// Past MaxBuckets the answer is in range and the spread is not: a 32-bit hash
+// cannot reach an index of 2^32 or above, whatever n says. The doc says so and
+// this pins it, because "in range" is the weaker claim and the one a test
+// drifts towards.
+func TestBucketCeiling(t *testing.T) {
+	for _, s := range []string{"", "a", "abc", "moul", "gno.land", "key-999"} {
+		uassert.True(t, Bucket(s, MaxBuckets*2) < MaxBuckets,
+			"the top half of a 2^33-way split is unreachable, yet "+s+" reached it")
+	}
+	// Doubling n past the ceiling cannot change the answer, which is the same
+	// statement from the other side.
+	uassert.Equal(t, Bucket("moul", MaxBuckets), Bucket("moul", MaxBuckets*2))
 }
 
 // 1000 keys over 16 buckets: every bucket used, none of them swallowing the
