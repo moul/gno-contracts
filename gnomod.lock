@@ -323,6 +323,10 @@ module = "gno.land/p/moul/x/daily/glob/v0"
 source = { dir = "p/moul/x/daily/glob" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/hashring/v0"
+source = { dir = "p/moul/x/daily/hashring" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/heap/v0"
 source = { dir = "p/moul/x/daily/heap" }
 
@@ -1029,6 +1033,10 @@ source = { dir = "r/moul/x/daily/handles" }
 [[module]]
 module = "gno.land/r/moul/x/daily/hangman/v0"
 source = { dir = "r/moul/x/daily/hangman" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/hashringdemo/v0"
+source = { dir = "r/moul/x/daily/hashringdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/heapdemo/v0"
