@@ -83,6 +83,11 @@ var (
 	ErrNothingSent   = errors.New("grants: a donation must be a positive amount")
 	ErrUnderfunded   = errors.New("grants: the treasury cannot cover this tranche")
 	ErrBadSpec       = errors.New("grants: milestones must read \"title:amount,title:amount\"")
+	ErrBoardTooSmall = errors.New("grants: a board of two cannot remove a member by itself")
+	ErrNoMembers     = errors.New("grants: a board needs at least one member")
+	ErrOverCap       = errors.New("grants: the request asks for more than the program's cap")
+	ErrBadCap        = errors.New("grants: the cap must be zero (none) or positive")
+	ErrPaused        = errors.New("grants: payouts are paused")
 )
 
 // IndexRequests is how many requests a board's page lists.
@@ -391,12 +396,51 @@ func (b *Board) Eligible(r *Request) int {
 // Majority is the number of concurring ballots a decision on r needs. It is
 // recomputed on every ballot, so a board that changes size mid-vote moves its
 // own bar rather than freezing a stale one.
+//
+// A removal counts every seat, the subject's included, even though the
+// subject may not vote. Counting only the eligible set made a removal on a
+// board of two a decision of ONE: either member could remove the other, then
+// approve a sock's grant alone. The same rule makes a removal on any even
+// board need one more ballot, which is the point: the board cannot be shrunk
+// towards a size its minority controls.
 func (b *Board) Majority(r *Request) int {
 	n := b.Eligible(r)
+	if r.Kind == KindMember && !r.Add {
+		n++ // the subject's seat
+	}
 	if n <= 0 {
 		return 1 // an unreachable bar beats a bar of zero
 	}
 	return n/2 + 1
+}
+
+// SetMembers replaces the whole board, for whoever stands above it: the funder
+// of a funded board, typically a DAO. It is the only way to recover a board
+// whose members lost their keys, and the only way to shrink a board of two,
+// which cannot remove a member by itself (see Majority).
+//
+// A member who stays keeps their join height; a new one joins at height.
+// Invalid addresses refuse the whole call, duplicates collapse, and an empty
+// set is refused because a board with no members can never decide anything
+// again, including its own repopulation. Ballots already cast by a member who
+// leaves stay on the record and stop counting, as with any removal.
+func (b *Board) SetMembers(height int64, addrs ...address) error {
+	next := avl.NewTree()
+	for _, a := range addrs {
+		if !a.IsValid() {
+			return ErrBadAddress
+		}
+		joined := height
+		if j := b.JoinedAt(a); j >= 0 {
+			joined = j
+		}
+		next.Set(a.String(), joined)
+	}
+	if next.Size() == 0 {
+		return ErrNoMembers
+	}
+	b.members = next
+	return nil
 }
 
 // Get returns a request by id, or nil.

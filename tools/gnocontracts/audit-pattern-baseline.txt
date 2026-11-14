@@ -15,6 +15,7 @@
 #
 # Rules mirrored from gnolang/gno misc/audit-pattern-harness.
 
+callback_param r/moul/govgrant 2
 current_guard p/moul/pilot 2
 current_guard p/moul/x/pair 3
 current_guard r/moul/agents/capwallet 3

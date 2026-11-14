@@ -363,13 +363,16 @@ func TestMembershipRequestAddsAndRemoves(t *testing.T) {
 	uassert.True(t, b.IsMember(dave))
 	uassert.Equal(t, int64(7), b.JoinedAt(dave), "joined at the deciding height")
 
-	// Now four members: a majority excluding the subject is still two.
+	// Now four members: three may vote, but the subject's seat still counts,
+	// so the bar is a majority of four.
 	rm, err := b.SubmitMemberChange(alice, carol, false, "inactive", 8)
 	urequire.NoError(t, err)
 	uassert.Equal(t, 3, b.Eligible(rm))
+	uassert.Equal(t, 3, b.Majority(rm))
 	uassert.ErrorIs(t, errOf(b.Vote(carol, rm.ID, false, "no", 9)), ErrConflict, "the subject may not vote")
 	urequire.NoError(t, errOf(b.Vote(alice, rm.ID, true, "", 10)))
 	urequire.NoError(t, errOf(b.Vote(bob, rm.ID, true, "", 11)))
+	urequire.NoError(t, errOf(b.Vote(dave, rm.ID, true, "", 12)))
 	uassert.False(t, b.IsMember(carol))
 	uassert.Equal(t, 3, b.MemberCount())
 }
