@@ -532,20 +532,22 @@ a convention until 2026-09-22 and the convention lost: `r/moul/x/reaper` rendere
 a caller's note body raw one PR after 25 other realms were ported to `ui.*`.
 
 **The baseline is not an allowlist.**
-`tools/gnocontracts/untrusted-render-baseline.txt` lists the 54 realms that were
+`tools/gnocontracts/untrusted-render-baseline.txt` lists the realms that were
 already live when the guard landed. They cannot be fixed in place, so the guard
-grandfathers them and gates the 55th. An entry leaves the file when the realm
-ships a fixed version, and a stale entry is itself a failure: it would silence a
-realm nobody is watching any more. Do not add to it by hand to quiet a failure,
-that is what the opt-out is for.
+grandfathers them and gates the next one. The count has one owner and it is not
+prose: the file itself, which `make guard-untrusted-render` prints on every run.
+An entry leaves the file when the realm ships a fixed version, and a stale entry
+is itself a failure: it would silence a realm nobody is watching any more. Do not
+add to it by hand to quiet a failure, that is what the opt-out is for.
 
 ## A markdown table is `ui.NewTable`, and `make guard-tables` enforces it
 
-The single most repeated mistake in this repository's history: **102 files built a markdown
-table by concatenating pipes**, and the package that tells everyone else not to,
-`p/moul/pilot`, is one of them. Present tense, because it cannot be fixed: nearly every
-contract in the catalog is live on mainnet, `p/moul/pilot/v0` among them, and a public
-package path is immutable. That is the whole argument for the guard.
+The single most repeated mistake in this repository's history: **every package in
+`tools/gnocontracts/handrolled-table-baseline.txt` built a markdown table by concatenating
+pipes**, and the package that tells everyone else not to, `p/moul/pilot`, is one of them.
+Present tense, because it cannot be fixed: nearly every contract in the catalog is live on
+mainnet, `p/moul/pilot/v0` among them, and a public package path is immutable. That is the
+whole argument for the guard.
 
 Four things a hand-rolled table gets wrong, every time, none of them visible in a diff:
 
@@ -564,11 +566,11 @@ it is nothing. A bare `"| a | b |"` is genuinely ambiguous with prose, so it is 
 and the cost of that choice is a table assembled without a separator, which does not render
 anyway.
 
-It is a **ratchet over a baseline**: 100 packages recorded the day it landed, a package not
+It is a **ratchet over a baseline**: the packages recorded the day it landed, a package not
 listed may not start, and a listed package that stops must leave the file or it hides the
-next one. **Nearly all 100 are permanent**, for the reason above: their `Render` can never be
-replaced at that path, so they are fixed in a `vN+1` and its importers, or not at all. This
-guard buys nothing retroactively. It is a **pre-deploy** gate and only that.
+next one. **Nearly all of them are permanent**, for the reason above: their `Render` can
+never be replaced at that path, so they are fixed in a `vN+1` and its importers, or not at
+all. This guard buys nothing retroactively. It is a **pre-deploy** gate and only that.
 
 > Learned the expensive way while writing it: `p/moul/pilot`'s `Render` was rewritten through
 > `ui.NewTable`, `ui.Addr` and `num.GNOTf`, green, with its pinned `TestRender` updated, before
