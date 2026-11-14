@@ -1082,8 +1082,12 @@ Go tools here are **standard library only** and never built into a committed bin
 
 ## CI
 
-PR CI checks only source: `gno lint` and `gno test` pass for every contract, and committed
-`vendor/` matches `make deps`. It does not run `make check` (rule 3).
+PR CI checks only source: `gno lint` and `gno test` pass for every contract, against
+the committed `vendor/` exactly as it is. CI never re-vendors and never compares the tree
+to `make deps`: `.github/workflows/ci.yml` says why, re-vendoring from live master would
+couple the gate to monorepo drift. So a dependency bump is deliberate and local
+(`make deps`, and `make deps-chain` for the chain-only ones), and a stale or hand-edited
+`vendor/` entry fails nothing here. CI does not run `make check` either (rule 3).
 
 | workflow | when | what it owns |
 |---|---|---|
