@@ -1,18 +1,18 @@
-# `gno.land/r/moul/x/grc20faucet/v0`
+# `gno.land/r/moul/x/grc20faucet/v1`
 
 **Two free GRC20 tokens, RED and BLUE, so experiments have something to run on.**
 Worthless by construction, unlimited, and shared.
 
 ```
-maketx call -pkgpath gno.land/r/moul/x/grc20faucet/v0 -func Claim
+maketx call -pkgpath gno.land/r/moul/x/grc20faucet/v1 -func Claim
 ```
 
 100.0000 of each per claim (4 decimals), once every 100 blocks per account.
 
 | token | symbol | registry key |
 |---|---|---|
-| Red Token | `RED` | `gno.land/r/moul/x/grc20faucet/v0.RED` |
-| Blue Token | `BLUE` | `gno.land/r/moul/x/grc20faucet/v0.BLUE` |
+| Red Token | `RED` | `gno.land/r/moul/x/grc20faucet/v1.RED` |
+| Blue Token | `BLUE` | `gno.land/r/moul/x/grc20faucet/v1.BLUE` |
 
 Both are registered in [`r/nt/grc20reg`](https://gno.land/r/nt/grc20reg/v0), which
 is the point: another realm can find and move them by key without importing this
