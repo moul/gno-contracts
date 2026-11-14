@@ -8,3 +8,10 @@ gno = "0.9"
 # nothing else may import it. A redeploy RE-RUNS init() and resets realm state,
 # so content/ is the source of truth and tools/gnohome pushes the slots back.
 private = true
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/home"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/home"
+  revision = "bb0b94772ecdc60cb6a6c7d214322b800d9dfd30"
+  at = "2026-11-14T00:17:06Z"
