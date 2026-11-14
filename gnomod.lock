@@ -275,6 +275,10 @@ module = "gno.land/p/moul/x/daily/cliffvesting/v1"
 source = { dir = "p/moul/x/daily/cliffvesting" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/cobs/v0"
+source = { dir = "p/moul/x/daily/cobs" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/commitreveal/v0"
 source = { dir = "p/moul/x/daily/commitreveal" }
 
@@ -835,6 +839,10 @@ hash = "h1:ODLBA9hbN4rnJchc/k8Ix6GbKdM0qK4Bi1yELU+edcE="
 [[module]]
 module = "gno.land/r/moul/x/daily/closestguess/v1"
 source = { dir = "r/moul/x/daily/closestguess" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/cobsdemo/v0"
+source = { dir = "r/moul/x/daily/cobsdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/coinflipduel/v0"
