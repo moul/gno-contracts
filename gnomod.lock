@@ -242,6 +242,10 @@ module = "gno.land/p/moul/x/daily/ahocorasick/v0"
 source = { dir = "p/moul/x/daily/ahocorasick" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/ascii85/v0"
+source = { dir = "p/moul/x/daily/ascii85" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/b58/v0"
 source = { dir = "p/moul/x/daily/b58" }
 
@@ -749,6 +753,10 @@ source = { dir = "r/moul/x/compact" }
 [[module]]
 module = "gno.land/r/moul/x/daily/ahocorasickdemo/v0"
 source = { dir = "r/moul/x/daily/ahocorasickdemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/ascii85demo/v0"
+source = { dir = "r/moul/x/daily/ascii85demo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/asciiart/v0"
