@@ -8,6 +8,7 @@
 // Adding one: a line here. Promoting one: write the module, add `module`.
 
 export const FEATURED = [
+  { path: "gno.land/r/moul/smallgrants/v0", module: "smallgrants", title: "Small grants", blurb: "A public desk for small GNOT grants: see every request and what was decided, and file one yourself." },
   { path: "gno.land/r/moul/x/daily/counter/v0", module: "counter", title: "Counter Club", blurb: "A shared counter, live: read it every few seconds, Inc and Dec from your wallet." },
   { path: "gno.land/r/moul/x/daily/dice/v0", module: "dice", title: "Dice", blurb: "Roll a die from your wallet and watch the distribution move." },
   { path: "gno.land/r/moul/x/daily/hangman/v0", module: "hangman", title: "Hangman", blurb: "One shared word a day. Click a letter, everyone sees it." },
