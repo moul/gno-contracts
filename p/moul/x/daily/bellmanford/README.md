@@ -1,0 +1,37 @@
+# `gno.land/p/moul/x/daily/bellmanford/v0`
+
+**Cheapest routes across a graph whose arcs may cost less than nothing**: `AddEdge`, `From`, `State`, `Dist`, `Path`, `Cycle`.
+
+```go
+import "gno.land/p/moul/x/daily/bellmanford/v0"
+
+g := bellmanford.New()
+g.AddEdge("gate", "market", 4)
+g.AddEdge("gate", "depot", 5)
+g.AddEdge("depot", "market", -3)   // a rebate, which Dijkstra cannot take
+
+r := g.From("gate")
+r.Dist("market")                   // → 2, true   (5-3 through depot, not the direct arc of 4)
+r.PathString("market", " -> ")     // → "gate -> depot -> market"
+r.State("market")                  // → Settled
+r.HasNegativeCycle()               // → false
+```
+
+A realm pricing a route across its own fee table has negative arcs the moment anything pays a rebate, a refund or a subsidy. [`dijkstra`](/p/moul/x/daily/dijkstra/v0) refuses them outright, which is the right call: it settles a node at its best known cost and never revisits it, so one negative arc would not raise an error later, it would return a confident wrong number. This is the search to use instead. It costs `O(V*E)` against `O((V+E) log V)`, and the extra passes buy the only thing that matters here: the answer is right.
+
+**It also answers the question a single-pass search cannot even ask: whether a cheapest route exists.** Go round a cycle whose arcs sum below zero and the total keeps falling, so there is no cheapest route to anything that cycle reaches, only cheaper ones. Those nodes report `Unbounded` rather than a number, `Cycle` hands back the ring itself, `CycleWeight` says what one turn of it is worth, and the nodes the cycle cannot reach keep their real distances. A fee table with one broken loop in it is still useful everywhere else, and failing the whole query would throw that away.
+
+Four things to know before you use it:
+
+- **`Dist` has no unreachable sentinel, and cannot have one.** `-1` is a legitimate distance here, so every value it could reserve is one a real route might have. With `ok=false` the int is `0` and means nothing at all. `State` is the call that tells you *why*: `Unknown` (never heard the name), `Unreached` (nothing gets there), `Unbounded` (too much gets there). They are three different mistakes and the remedies differ.
+- **`Rounds` is the figure to watch, not the node count.** The bound is `V-1` passes over the arc list, and the real number is decided by the order the arcs were added in: the same 12-hop chain takes 2 passes declared front to back and 12 declared back to front. Declare arcs roughly along the direction traffic flows and most graphs settle in two.
+- **Self-loops are legal, and `AddUndirected` deliberately does not exist.** A negative self-loop is the smallest negative cycle there is, and refusing it would have hidden a case rather than simplified one. A negative arc recorded in both directions, on the other hand, is a negative cycle by construction, so the convenience method would be a trap with a friendly name.
+- **A negative cycle elsewhere in the graph is not reported.** Detection is relative to the source: if the source cannot reach the cycle, every distance this run gives is a real shortest path and `HasNegativeCycle` is false.
+
+`MaxNodes` is 512, `MaxEdges` is 4000 and `MaxWeight` is 2^40. The first two bound the worst case at `V*E` relaxations, which is what lets a caller price the gas before it sends the transaction; the third keeps the largest total a path can carry well inside an int. Exceeding any of them panics at build time, where the caller can still do something about it.
+
+The run is deterministic: arcs relax in the order they were added, every pass, and a relaxation that merely ties the incumbent never replaces it. A search that broke ties by map iteration order would make a `Render` differ between validators, which is a consensus bug rather than a cosmetic one.
+
+A `Result` is a snapshot. Mutating the graph afterwards does not update it, which is what makes it safe to compute once and hold across a `Render`.
+
+Live demo: [`r/moul/x/daily/bellmanforddemo`](/r/moul/x/daily/bellmanforddemo/v0).
