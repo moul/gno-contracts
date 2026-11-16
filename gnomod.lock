@@ -356,6 +356,10 @@ module = "gno.land/p/moul/x/daily/luhn/v0"
 source = { dir = "p/moul/x/daily/luhn" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/manacher/v0"
+source = { dir = "p/moul/x/daily/manacher" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/markov/v0"
 source = { dir = "p/moul/x/daily/markov" }
 
@@ -1110,6 +1114,10 @@ hash = "h1:I8X8zFUGhAViF6Sc3H0zyGyh0DiwaNpVvyNPuTzJeF4="
 [[module]]
 module = "gno.land/r/moul/x/daily/luhndemo/v1"
 source = { dir = "r/moul/x/daily/luhndemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/manacherdemo/v0"
+source = { dir = "r/moul/x/daily/manacherdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/markovdemo/v0"
