@@ -424,6 +424,10 @@ module = "gno.land/p/moul/x/daily/sparkline/v0"
 source = { dir = "p/moul/x/daily/sparkline" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/tarjan/v0"
+source = { dir = "p/moul/x/daily/tarjan" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/toposort/v0"
 source = { dir = "p/moul/x/daily/toposort" }
 
@@ -1350,6 +1354,10 @@ hash = "h1:6EbGvnkw6YbFeLWPZRLdJHey1VWUx9Jv0PXD31FL/tg="
 [[module]]
 module = "gno.land/r/moul/x/daily/tamagotchi/v1"
 source = { dir = "r/moul/x/daily/tamagotchi" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/tarjandemo/v0"
+source = { dir = "r/moul/x/daily/tarjandemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/tictactoe/v0"
