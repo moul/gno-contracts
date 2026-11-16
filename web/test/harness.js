@@ -3,6 +3,9 @@
 // the test's hands. No browser, no network: the apps only ever touch the page
 // through data-attribute selectors, which a map of stub nodes can answer.
 
+import { fixtures as GRANTS } from "./fixtures.js";
+export { GRANTS };
+
 export const ME = "g1manfred47kzduec920z88wfr64ylksmdcedlf5";
 export const STRANGER = "g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5";
 export const short = (a) => `${a.slice(0, 8)}…${a.slice(-4)}`;
@@ -27,6 +30,7 @@ function node() {
     },
     addEventListener(ev, fn) { (this.listeners[ev] ||= []).push(fn); },
     querySelector(s) { return (this._sub ||= {})[s] ||= node(); },
+    querySelectorAll(s) { return (this._all ||= {})[s] || []; },
     fire(ev, arg = { preventDefault() {} }) { return Promise.all((this.listeners[ev] || []).map((f) => f(arg))); },
   };
   return n;
@@ -48,7 +52,7 @@ function makeEl() {
 // request is MADE, so every answer is a snapshot of the chain at that moment,
 // and it is only delivered when the test flushes. That is what lets a test
 // hold an old read in flight while the chain moves on.
-export function mount(app, { answer, address = ME, wallet: mode = "gnokey", setup = () => {} }) {
+export function mount(app, { answer, address = ME, wallet: mode = "gnokey", setup = () => {}, net = "test" }) {
   const el = makeEl();
   setup(el);
 
@@ -58,7 +62,13 @@ export function mount(app, { answer, address = ME, wallet: mode = "gnokey", setu
     try { out = answer(kind, expr); } catch (e) { out = e; }
     pending.push(() => (out instanceof Error ? reject(out) : resolve(out)));
   });
-  const client = { eval: (_, expr) => req("eval", expr), render: (_, args) => req("render", args) };
+  const client = {
+    eval: (_, expr) => req("eval", expr),
+    render: (_, args) => req("render", args),
+    // An app that checks a call before asking anyone to sign it needs this;
+    // the chain answers it like any other read, so the test holds it too.
+    simulate: (caller, _pkg, func, args) => req("simulate", `${caller} ${func}(${args.join("|")})`),
+  };
 
   const calls = [];
   const adena = [];
@@ -79,7 +89,7 @@ export function mount(app, { answer, address = ME, wallet: mode = "gnokey", setu
   const realSetInterval = globalThis.setInterval;
   globalThis.setInterval = (fn) => { poll = fn; return 0; };
   try {
-    app.mount(el, { client, net: "test", path: "gno.land/r/test", call, wallet });
+    app.mount(el, { client, net, path: "gno.land/r/test", call, wallet });
   } finally {
     globalThis.setInterval = realSetInterval;
   }
@@ -197,6 +207,45 @@ export function hangmanChain() {
     return "# 🪢 Hangman\n\nDay: `1` · Block: `10`\n\n```\n  +---+\n=========\n```\n\n" +
       `## Word\n\n\`${masked}\`\n\nWrong: **0 / 6**  ·  Lives left: **6**\n\nGuessed letters: ${letters}\n\n` +
       "## Status\n\nGame in progress. Call `Guess(\"a\")` with a letter.\n\n";
+  };
+  return c;
+}
+
+// grantsChain answers with the realm's REAL Render output: the markdown in
+// test/fixtures.js, which is generated from render.gno's own format by
+// test/gen-fixtures.mjs and locked to the realm's committed golden. This chain
+// only plays that fixture back and toggles the states a visitor lands in
+// (published / not, paused / not, reachable / not) and the on-chain constants
+// the page reads with vm/qeval. Nothing here is hand-written to agree with the
+// parser: if the realm's format changes, the fixture is regenerated and these
+// tests move with it.
+export function grantsChain() {
+  const ctrl = GRANTS.controllers;
+  const c = {
+    published: true, paused: false, fail: false,
+    cap: 100_000_000,
+    realm: GRANTS.ADDR,
+    allow: new Set([ctrl.Moul, ctrl.Jaekwon, ctrl.Aeddi]),
+    sim: { gasUsed: 1_234_567, data: "(7 int)" },
+  };
+  const notFound = () => { throw new Error("package not found: " + GRANTS.PATH); };
+
+  c.index = () => (c.paused ? GRANTS.indexPaused : GRANTS.index);
+  c.page = (id) => GRANTS.requests[id] || `# Not found\n\nThere is no request \`${id}\`.\n`;
+
+  c.answer = (kind, expr) => {
+    if (!c.published) notFound();
+    if (c.fail) throw new Error("test: HTTP 429");
+    if (kind === "eval") {
+      if (expr === "MaxGrant") return `(${c.cap} int64)`;
+      if (expr === "Address()") return `("${c.realm}" .uverse.address)`;
+      const m = expr.match(/^IsAllowed\("(g1\w+)"\)$/);
+      if (m) return `(${c.allow.has(m[1]) ? "true" : "false"} bool)`;
+      throw new Error(`unexpected eval ${expr}`);
+    }
+    if (kind === "simulate") return c.sim.error ? { error: c.sim.error } : { gasUsed: c.sim.gasUsed, data: c.sim.data, events: [], deposits: [] };
+    const m = String(expr).match(/^request\/(\d+)$/);
+    return m ? c.page(Number(m[1])) : c.index();
   };
   return c;
 }

@@ -19,6 +19,8 @@ Published at <https://moul.github.io/gno-contracts/>.
   address instead of sent, and the result lands in a dashed yellow box: what the call
   would return or the panic it would hit, the gas and fee, the storage it would lock,
   and the events it would emit. Nothing is signed.
+- **The gnokey command itself** is [`lib/cmd.js`](./lib/cmd.js): pure, no DOM and no
+  storage, so it is unit-tested and any app can print it inline instead of in the modal.
 - **No build step, no dependency.** Plain ES modules; what is in this folder is what
   is served. [`lib/amino.js`](./lib/amino.js), the encoder simulation needs, is copied
   from [moul/gno4](https://github.com/moul/gno4/blob/main/web/amino.js), where it is
@@ -57,6 +59,34 @@ list, and sorts first. Today:
 | `x/daily/dice/v0` | [`dice.js`](./apps/dice.js) | the distribution as bars, Roll, your own rolls |
 | `x/daily/hangman/v0` | [`hangman.js`](./apps/hangman.js) | gallows and word lifted from `Render`, an A to Z keyboard of `Guess` calls |
 | `x/daily/eightball/v1` | [`eightball.js`](./apps/eightball.js) | a question box, the answer the transaction returned |
+| `smallgrants` | [`smallgrants.js`](./apps/smallgrants.js) | every grant request with its outcome, and a checked form to file one |
+
+## The small-grants page
+
+Two things only: **see the list**, and **ask for a grant**. Deciding a request pays money
+and is not on this page; it shows what the controllers decided and why, and stops there.
+
+- **The list** reads the realm's public `Render` and lifts the rows out of the markdown,
+  by column name and row label, never by position. A decided request's own page is read
+  once and cached, because a decision is final: that is what puts the reason next to the
+  outcome in the list instead of behind a click. **A refusal with no reason reads as a
+  decision somebody took**, in body text, not greyed out; and before a reason has been read
+  at all the page says nothing about one, rather than claiming there was none.
+- **Asking is checked before anything is signed**, in three layers: the realm's own rules
+  re-stated in the page (the 100 GNOT cap, the bech32 address, the two byte limits, the
+  pause rule, the invisible characters that do not count as text); a review that says in
+  words what is about to be sent and that **it sends no coins**; and a simulation against
+  the chain, whose panic disables the signature. A measurement is thrown away the moment
+  the form changes, because a green check against different arguments is worse than none.
+- **gnokey support is the command, because a browser cannot run gnokey.** The exact
+  `gnokey maketx call` sits under the form and stays correct as you type; once the call has
+  been simulated it carries the measured gas, and until then it says so instead of guessing.
+- **Not published yet is a first-class state**, not an error screen: it is what
+  `r/moul/smallgrants/v0` shows today, and the form still validates and still prints the
+  command while it waits.
+
+When the realm grows a machine-readable getter for the list, `parseIndex` and `parseRequest`
+are the two functions to replace, and nothing else in the page changes.
 
 ## Optimistic UI
 
