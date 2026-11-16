@@ -1082,12 +1082,15 @@ Go tools here are **standard library only** and never built into a committed bin
 
 ## CI
 
-PR CI checks only source: `gno lint` and `gno test` pass for every contract, and committed
-`vendor/` matches `make deps`. It does not run `make check` (rule 3).
+PR CI checks only source: `gno lint` and `gno test` pass for every contract, resolving every
+`gno.land/*` dependency from committed `vendor/`. It does **not** re-vendor to check that
+`vendor/` is current: that step was removed in `2fec68ab` (2026-07-24) so the gate is not
+coupled to monorepo drift. A dependency bump is therefore a deliberate local `make deps`
+plus a commit, and nothing in CI fails if you skip it. It does not run `make check` (rule 3).
 
 | workflow | when | what it owns |
 |---|---|---|
-| `ci` | push to main, every pull request | the gate: `guard-generated`, `gnopm verify`, the tool tests, `make guards lint test` |
+| `ci` | push to main, every pull request | the gate: `guard-generated` (pull requests only), `gnopm tool ci`, the tool tests, `make test-web`, `make guards lint test` |
 | `pr` | pull request opened / pushed / reopened | **one** sticky comment, the path labels, the published preview at `pr-<N>/` |
 | `main` | push to main, hourly, manual | the single writer of `contracts.json`, the README table, README footers, `_assets/`, and on-chain status |
 
