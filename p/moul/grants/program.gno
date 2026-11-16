@@ -13,11 +13,27 @@ import (
 // Payment it hands back. That split is the whole point: everything a grant
 // program decides is testable without a node, and the realm on top is thin
 // enough to read in one screen.
+//
+// Cap, Paused and Sweep are for a FUNDED board, one whose money comes from
+// someone standing above the members (a DAO) rather than from the members
+// themselves. They are the funder's levers, and a realm exposes them to the
+// funder only: the members can neither raise the cap nor unpause themselves.
 type Program struct {
 	Board     *Board
 	Denom     string
 	Donations []Donation
 	Payments  []Payment
+	Sweeps    []Sweep
+
+	// Cap is the most one grant request may ask for in total, or 0 for no
+	// cap. It is checked when a request is filed, so lowering it does not
+	// touch grants already approved: the board's promises stand.
+	Cap int64
+
+	// Paused refuses every verdict that would release a tranche. Filing,
+	// voting and refusing proofs still work, so the record keeps moving while
+	// the money stops.
+	Paused bool
 }
 
 // Donation is one top-up of the treasury, credited to a name.
@@ -35,6 +51,14 @@ type Payment struct {
 	Milestone int
 	To        address
 	Amount    int64
+}
+
+// Sweep is money taken out of the treasury by the funder, not paid as a
+// grant: unspent budget handed back, or a board wound down.
+type Sweep struct {
+	Height int64
+	To     address
+	Amount int64
 }
 
 // NewProgram returns a program whose board is seated with founders. denom is
@@ -71,7 +95,59 @@ func (p *Program) ApplyFor(applicant, beneficiary address, reason, title, body, 
 	if err != nil {
 		return nil, err
 	}
+	if p.Cap > 0 {
+		var total int64
+		for _, m := range ms {
+			// Each amount is checked against the cap before it is added, so
+			// the sum can never wrap around int64 and sneak under it.
+			if m.Amount > p.Cap || total > p.Cap-m.Amount {
+				return nil, ErrOverCap
+			}
+			total += m.Amount
+		}
+	}
 	return p.Board.SubmitFor(applicant, beneficiary, reason, title, body, ms, height)
+}
+
+// SetCap sets the most one request may ask for; 0 removes the cap.
+func (p *Program) SetCap(cap int64) error {
+	if cap < 0 {
+		return ErrBadCap
+	}
+	p.Cap = cap
+	return nil
+}
+
+// Sweep records money the funder takes back out of the treasury and hands it
+// back for the caller to execute, as Review does for a tranche. balance is
+// what the treasury holds right now; a sweep larger than that is refused.
+//
+// It is deliberately not limited to the unpromised part of the balance: the
+// funder may need to empty a board that has gone wrong, and a grantee's
+// recourse then is the funder, not the contract. A renderer should show the
+// promised amount next to the sweeps so that choice is visible.
+func (p *Program) Sweep(to address, amount, height, balance int64) (*Sweep, error) {
+	if amount <= 0 {
+		return nil, ErrNothingSent
+	}
+	if !to.IsValid() {
+		return nil, ErrBadAddress
+	}
+	if amount > balance {
+		return nil, ErrUnderfunded
+	}
+	s := Sweep{Height: height, To: to, Amount: amount}
+	p.Sweeps = append(p.Sweeps, s)
+	return &s, nil
+}
+
+// Swept is everything ever taken back out through Sweep.
+func (p *Program) Swept() int64 {
+	var n int64
+	for _, s := range p.Sweeps {
+		n += s.Amount
+	}
+	return n
 }
 
 // Review casts a member's verdict on the proof under review and, when that
@@ -79,12 +155,16 @@ func (p *Program) ApplyFor(applicant, beneficiary address, reason, title, body, 
 // caller to execute.
 //
 // balance is what the treasury holds right now. A verdict that would release
-// more than that is refused with ErrUnderfunded and changes NOTHING: no
-// ballot, no release, no payment. That ordering is the reason Board.Review is
+// more than that is refused with ErrUnderfunded, and one that would release
+// anything while the program is Paused with ErrPaused; either changes
+// NOTHING: no ballot, no release, no payment. That ordering is the reason Board.Review is
 // not called directly by a realm. A refusal is always free to record, since it
 // costs the treasury nothing.
 func (p *Program) Review(voter address, id, idx int, accept bool, reason string, height, balance int64) (Outcome, *Payment, error) {
 	if releases, out := p.Board.ReviewDecides(id, idx, voter, accept); releases && out == Accepted {
+		if p.Paused {
+			return UnderReview, nil, ErrPaused
+		}
 		if amount := p.Board.Get(id).Milestones[idx].Amount; balance < amount {
 			return UnderReview, nil, ErrUnderfunded
 		}

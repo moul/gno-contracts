@@ -88,11 +88,15 @@ func (rr Renderer) index() string {
 	b.WriteString("A decision needs a majority of the members eligible to cast a ballot on it,\n")
 	b.WriteString("recomputed every time: the party a decision is about never votes on it, so an\n")
 	b.WriteString("applicant who sits on the board shrinks the room rather than packing it.\n\n")
-	b.WriteString("| Member | Joined at height |\n|---|---|\n")
-	for _, m := range p.Board.Members() {
-		b.WriteString("| " + ui.AddrFull(m) + " | " + i64(p.Board.JoinedAt(m)) + " |\n")
+	if p.Board.MemberCount() == 0 {
+		b.WriteString("Nobody sits on this board, so nothing can be approved or paid.\n\n")
+	} else {
+		b.WriteString("| Member | Joined at height |\n|---|---|\n")
+		for _, m := range p.Board.Members() {
+			b.WriteString("| " + ui.AddrFull(m) + " | " + i64(p.Board.JoinedAt(m)) + " |\n")
+		}
+		b.WriteString("\n")
 	}
-	b.WriteString("\n")
 
 	b.WriteString("## Requests\n\n")
 	all := p.Board.List()

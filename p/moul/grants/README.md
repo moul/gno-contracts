@@ -91,6 +91,12 @@ carries it executes immediately, going straight to `Completed`. Only a member ma
 opening a grant board's own composition to anyone with a keypair is how it gets captured.
 The last member cannot be removed.
 
+**A removal counts the subject's seat.** The subject may not vote on their own removal, but
+the bar is a majority of the whole board, theirs included. Before v1 it was a majority of
+the eligible set only, so on a board of two either member could remove the other alone and
+then approve a sock's grant on one signature. A board of two now cannot remove a member by
+itself (`ErrBoardTooSmall`); whoever stands above it uses `Board.SetMembers`.
+
 ## The money: `Program`
 
 ```go
@@ -121,6 +127,21 @@ release a tranche it cannot cover. If so it returns `ErrUnderfunded` and changes
 no ballot, no release, no payment. A **refusal** is always free to record, because it costs
 the treasury nothing. `Board.Decides` and `Board.ReviewDecides` expose the same preview for
 anything else that needs to check a precondition it cannot roll back.
+
+## A funded board: `Cap`, `Paused`, `Sweep`, `SetMembers`
+
+When the money comes from someone standing above the members (a DAO that funds the board
+once and lets it spend), that funder needs levers the members cannot pull themselves. The
+library holds them; the realm decides who may call them.
+
+| | |
+|---|---|
+| `Program.SetCap(n)` | the most one request may ask for in total, checked at filing; 0 is no cap |
+| `Program.Paused` | refuses every verdict that would release a tranche (`ErrPaused`); the record keeps moving |
+| `Program.Sweep(to, amount, height, balance)` | money taken back out, on its own ledger, never counted as a grant |
+| `Board.SetMembers(height, addrs...)` | replace the board; a member who stays keeps their seniority |
+
+[`r/moul/govgrant`](../../../r/moul/govgrant) is that board, with GovDAO as the funder.
 
 ## The pages: `Renderer`
 
