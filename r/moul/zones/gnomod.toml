@@ -2,3 +2,10 @@ module = "gno.land/r/moul/zones/v0"
 gno = "0.9"
 
 # public: the registry is meant to be read by other realms (a config generator for node operators first), and a private realm cannot be imported
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/zones/v0"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/zones/v0"
+  revision = "a0f6c887050ce6b81994a8152d60d4ef0c73dd3a"
+  at = "2026-11-17T16:17:07Z"
