@@ -3,3 +3,10 @@ gno = "0.9"
 
 # public: posts its own tree into r/moul/x/plan9/ns, and a private realm may
 # not persist an object it owns into another realm
+
+[[deployment]]
+  chain = "onyx-1"
+  path = "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/plan9/dev/v1"
+  url = "https://onyx.testnets.gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/plan9/dev/v1"
+  revision = "4742586105af4d27237d7e68aa1470c843658725"
+  at = "2026-11-19T12:17:06Z"
