@@ -38,7 +38,9 @@ byte nor an implied zero: the same payload, two frames, two hashes for one piece
 `Decode` returns `ErrNotCanonical` for that shape rather than accepting both, so a realm
 storing or comparing frames finds out at the boundary instead of at the comparison. It is also
 the single most common way an implementation ends up disagreeing with every other one on the
-wire, which is why all ten rows of Table 1 of Cheshire and Baker are pinned as test vectors.
+wire, which is why all eleven rows of the encoding examples table in Wikipedia's
+[COBS article](https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing#Encoding_examples)
+are pinned as test vectors.
 
 Four behaviours worth knowing before you use it:
 

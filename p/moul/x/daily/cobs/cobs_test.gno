@@ -22,7 +22,7 @@ func hex(s string) string {
 	return b.String()
 }
 
-// rng returns the bytes lo..hi inclusive, the run the paper's long vectors are
+// rng returns the bytes lo..hi inclusive, the run the long example vectors are
 // built from.
 func rng(lo, hi byte) string {
 	var b strings.Builder
@@ -32,12 +32,14 @@ func rng(lo, hi byte) string {
 	return b.String()
 }
 
-// Table 1 of Cheshire and Baker, "Consistent Overhead Byte Stuffing", all ten
-// rows. The last five are the ones that decide whether the group boundary is
-// handled lazily: an encoder that closes a full group eagerly produces a
-// trailing 01 the paper does not have, and the frames then disagree with every
-// other implementation on the wire.
-func TestPaperVectors(t *testing.T) {
+// The "Encoding examples" table of the Wikipedia article "Consistent Overhead
+// Byte Stuffing", all eleven rows, numbered as there. They are not from
+// Cheshire and Baker's paper, whose Table 1 has no byte-pair examples. The last
+// five are the ones that decide whether the group boundary is handled lazily:
+// an encoder that closes a full group eagerly produces a trailing 01 the table
+// does not have, and the frames then disagree with every other implementation
+// on the wire.
+func TestExampleTableVectors(t *testing.T) {
 	cases := []struct {
 		name     string
 		in, want string
@@ -45,14 +47,15 @@ func TestPaperVectors(t *testing.T) {
 		{"empty", "", "\x01"},
 		{"1: one zero", "\x00", "\x01\x01"},
 		{"2: two zeros", "\x00\x00", "\x01\x01\x01"},
-		{"3: zero in the middle", "\x11\x22\x00\x33", "\x03\x11\x22\x02\x33"},
-		{"4: no zero at all", "\x11\x22\x33\x44", "\x05\x11\x22\x33\x44"},
-		{"5: trailing zeros", "\x11\x00\x00\x00", "\x02\x11\x01\x01\x01"},
-		{"6: a full group, exactly", rng(0x01, 0xfe), "\xff" + rng(0x01, 0xfe)},
-		{"7: zero then a full group", "\x00" + rng(0x01, 0xfe), "\x01\xff" + rng(0x01, 0xfe)},
-		{"8: one byte past a full group", rng(0x01, 0xff), "\xff" + rng(0x01, 0xfe) + "\x02\xff"},
-		{"9: a full group then a zero", rng(0x02, 0xff) + "\x00", "\xff" + rng(0x02, 0xff) + "\x01\x01"},
-		{"10: a zero one short of the boundary", rng(0x03, 0xff) + "\x00\x01", "\xfe" + rng(0x03, 0xff) + "\x02\x01"},
+		{"3: a zero on each side", "\x00\x11\x00", "\x01\x02\x11\x01"},
+		{"4: zero in the middle", "\x11\x22\x00\x33", "\x03\x11\x22\x02\x33"},
+		{"5: no zero at all", "\x11\x22\x33\x44", "\x05\x11\x22\x33\x44"},
+		{"6: trailing zeros", "\x11\x00\x00\x00", "\x02\x11\x01\x01\x01"},
+		{"7: a full group, exactly", rng(0x01, 0xfe), "\xff" + rng(0x01, 0xfe)},
+		{"8: zero then a full group", "\x00" + rng(0x01, 0xfe), "\x01\xff" + rng(0x01, 0xfe)},
+		{"9: one byte past a full group", rng(0x01, 0xff), "\xff" + rng(0x01, 0xfe) + "\x02\xff"},
+		{"10: a full group then a zero", rng(0x02, 0xff) + "\x00", "\xff" + rng(0x02, 0xff) + "\x01\x01"},
+		{"11: a zero one short of the boundary", rng(0x03, 0xff) + "\x00\x01", "\xfe" + rng(0x03, 0xff) + "\x02\x01"},
 	}
 	for _, c := range cases {
 		got := Encode(c.in)

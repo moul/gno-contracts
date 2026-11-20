@@ -19,8 +19,8 @@ import (
 // Fixed inputs, never chain state: a demo whose output moves with the block
 // height cannot be pinned by an example test.
 var (
-	// The rows of Table 1 in Cheshire and Baker, abbreviated where the paper
-	// prints a 254-byte run.
+	// Short rows of the encoding examples table in Wikipedia's COBS article;
+	// the rows built on a 254-byte run are left to the library's tests.
 	vectors = []struct{ label, in string }{
 		{"the empty payload", ""},
 		{"one zero", "\x00"},
@@ -180,8 +180,8 @@ func payloadBytes(rs []string) int {
 	return n
 }
 
-// run returns the bytes lo..hi inclusive, which is how the paper writes its
-// long vectors.
+// run returns the bytes lo..hi inclusive, which is how the example table
+// writes its long vectors.
 func run(lo, hi byte) string {
 	var b strings.Builder
 	for c := int(lo); c <= int(hi); c++ {
