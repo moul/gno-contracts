@@ -305,3 +305,68 @@ func TestHashSpreadsAcrossRegisters(t *testing.T) {
 	uassert.True(t, touched > 600,
 		"only "+strconv.Itoa(touched)+" of 1024 registers were touched")
 }
+
+// TestSnapshotRejectsImpossibleRegisters: an Add at precision p records a
+// zero-run of at most 65-p, so a register above that did not come from
+// Snapshot, and one register at 255 alone would drag Count wherever it liked.
+func TestSnapshotRejectsImpossibleRegisters(t *testing.T) {
+	const p = 10
+	top := uint8(65 - p)
+
+	regs := make([]uint8, 1<<p)
+	regs[7] = top
+	_, err := FromSnapshot(p, regs)
+	uassert.NoError(t, err, "the largest register an Add can produce was refused")
+
+	regs[7] = top + 1
+	_, err = FromSnapshot(p, regs)
+	uassert.ErrorIs(t, err, ErrBadSnapshot, "a register past 65-p was accepted")
+
+	regs[7] = 255
+	_, err = FromSnapshot(p, regs)
+	uassert.ErrorIs(t, err, ErrBadSnapshot)
+
+	// And the bound is what Add actually reaches: every register a long
+	// stream leaves behind passes it.
+	s := NewDefault()
+	fill(s, "b", 0, 5000)
+	_, err = FromSnapshot(s.Precision(), s.Snapshot())
+	uassert.NoError(t, err)
+}
+
+// TestCopyIsTheSameSketch: a copied Sketch value shares one state. Copying
+// the fields shared the registers but not the Add count, so the copy and the
+// original disagreed about what they had seen.
+func TestCopyIsTheSameSketch(t *testing.T) {
+	s := NewDefault()
+	fill(s, "v", 0, 10)
+
+	c := *s
+	c.Add("one-more")
+
+	uassert.Equal(t, int64(11), s.Adds(), "the original missed an Add made through a copy")
+	uassert.Equal(t, c.Count(), s.Count())
+}
+
+// TestLinearCountingIsCountsOwnSwitch: the label a caller renders comes from
+// the branch Count took. A demo reading "more than half the registers empty"
+// instead called 1,000 elements "harmonic mean" while Count was still on
+// linear counting.
+func TestLinearCountingIsCountsOwnSwitch(t *testing.T) {
+	cases := []struct {
+		n      int
+		linear bool
+	}{
+		{0, true},
+		{10, true},
+		{1000, true},
+		{5000, false},
+	}
+	for _, tc := range cases {
+		s := NewDefault()
+		fill(s, "e", 0, tc.n)
+		est, m, zeros := s.raw()
+		uassert.Equal(t, tc.linear, s.LinearCounting(), "n="+strconv.Itoa(tc.n))
+		uassert.Equal(t, est <= 2.5*m && zeros > 0, s.LinearCounting(), "n="+strconv.Itoa(tc.n))
+	}
+}

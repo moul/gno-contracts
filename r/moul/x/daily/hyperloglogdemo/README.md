@@ -14,7 +14,7 @@ The library's own tests prove the estimate lands inside its error bar. They cann
 
 Three things the page is built to show:
 
-- **The estimator switches, and the table says which one answered.** The first three rows are still in the small range, where counting the empty registers is exact; the last two are past it, where the harmonic mean takes over. A demo that only showed large cardinalities would make the structure look worse than it is, and one that only showed small ones would make it look like a counter.
+- **The estimator switches, and the table says which one answered.** The first four rows are still in the small range, where the answer comes from counting the empty registers, exact for the first three and 29 out at a thousand; the last is past it, where the harmonic mean takes over. The label comes from the library's `LinearCounting`, the same switch `Count` uses. A demo that only showed large cardinalities would make the structure look worse than it is, and one that only showed small ones would make it look like a counter.
 - **The merge example overlaps by half.** Two shards of a thousand, sharing five hundred, so a sum would answer 2,000 and the union is 1,500. Overlapping is the only arrangement in which a union is distinguishable from a sum.
 - **The space table is the actual argument.** Halving the error costs four times the registers, which is why the useful range is narrow and the default sits in the middle of it.
 

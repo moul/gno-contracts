@@ -19,8 +19,9 @@ import (
 )
 
 // sizes are the cardinalities the accuracy table walks, chosen to straddle the
-// switch between the two estimators: the first three sit in the small range
-// where linear counting still answers exactly, the last two are past it.
+// switch between the two estimators: the first four sit in the small range
+// where linear counting answers, exactly for the first three, and the last is
+// past it. The estimator column asks the library which branch answered.
 var sizes = []int{1, 10, 100, 1000, 5000}
 
 // precisions are the sizes the space table compares. 10 is the library
@@ -54,7 +55,7 @@ func Render(path string) string {
 	b.WriteString("## Three sketches, three questions\n\n")
 	ft := ui.NewTable("question", "structure", "what it cannot do")
 	ft.Row("have I seen this one?",
-		"[bloom filter](/r/moul/x/daily/bloomfilter)",
+		"[bloom filter](/r/moul/x/daily/bloomfilter/v0)",
 		"tell you how many there were")
 	ft.Row("how often did this one arrive?",
 		"[count-min sketch](/p/moul/x/daily/countminsketch/v0)",
@@ -94,10 +95,10 @@ func Render(path string) string {
 	}
 	b.WriteString(at.String() + "\n")
 	b.WriteString("Two estimators, and the switch between them is where naive ")
-	b.WriteString("implementations go wrong. While most registers are still ")
-	b.WriteString("empty the answer comes from counting the empty ones, which ")
-	b.WriteString("is exact until two elements collide. Once they are mostly ")
-	b.WriteString("full the harmonic mean of the registers takes over, and ")
+	b.WriteString("implementations go wrong. Up to about two and a half times ")
+	b.WriteString("the register count the answer comes from counting the empty ")
+	b.WriteString("registers, which is exact until two elements share one. Past ")
+	b.WriteString("that the harmonic mean of the registers takes over, and ")
 	b.WriteString("the answer becomes an estimate with a published error bar ")
 	b.WriteString("rather than a number.\n\n")
 
@@ -175,10 +176,10 @@ func shard(prefix string, first, count int) *hyperloglog.Sketch {
 }
 
 // estimator names which of the two branches produced a sketch's answer. It
-// reads the same signal the library does, the number of registers still at
-// zero, rather than being told.
+// asks the library rather than guessing from the zero count: a threshold of
+// its own would mislabel every row between the two.
 func estimator(s *hyperloglog.Sketch) string {
-	if s.Zeros() > s.Registers()/2 {
+	if s.LinearCounting() {
 		return "linear counting"
 	}
 	return "harmonic mean"

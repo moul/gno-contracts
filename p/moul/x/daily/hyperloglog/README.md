@@ -24,14 +24,14 @@ It is the third member of a family already in this catalog, and none of the thre
 
 | question | structure |
 |---|---|
-| have I seen this one? | [`bloomfilter`](/r/moul/x/daily/bloomfilter) |
+| have I seen this one? | [`bloomfilter`](/r/moul/x/daily/bloomfilter/v0) |
 | how often did this one arrive? | [`countminsketch`](/p/moul/x/daily/countminsketch/v0) |
 | how many different ones were there? | this one |
 
 Four behaviours worth knowing before you use it:
 
 - **It cannot tell you whether it has seen you.** Membership is not a weaker version of cardinality, it is a different question, and a sketch that has counted a million elements holds none of them. Nothing can be removed either: a register is a maximum, and a maximum cannot be undone.
-- **There are two estimators and the switch between them is where naive implementations go wrong.** While most registers are still empty the answer comes from counting the empty ones (linear counting), which is exact until two elements collide. Once they are mostly full the harmonic mean takes over and the answer becomes an estimate with an error bar. The small-range branch is what makes `Count` return exactly 3 for three elements rather than 7.
+- **There are two estimators and the switch between them is where naive implementations go wrong.** Up to a raw estimate of 2.5m, with a register still empty, the answer comes from counting the empty registers (linear counting), which is exact until two elements share one. Past that the harmonic mean takes over and the answer becomes an estimate with an error bar. The small-range branch is what makes `Count` return exactly 3 for three elements rather than 7. `LinearCounting` reports which branch answered, so a caller labelling the figure uses the same switch.
 - **The error does not depend on the cardinality.** `RelativeError` is `1.04/sqrt(m)` and nothing else, so the same kilobyte is about as wrong at a thousand elements as at a billion. It is one standard deviation, not a bound: about a third of sketches land outside it, so render it as "about 1,500 unique callers", never as 1,512.
 - **`Merge` is why it beats a counter, not just a set.** It is a register-wise maximum, so shards counted separately combine into the union with the overlap counted once and without either side shipping its elements. It is idempotent for the same reason, which matters when the shards are days of history and a job gets re-run.
 

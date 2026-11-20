@@ -19,7 +19,7 @@ func ExampleRender() {
 	//
 	// | question | structure | what it cannot do |
 	// | --- | --- | --- |
-	// | have I seen this one? | [bloom filter](/r/moul/x/daily/bloomfilter) | tell you how many there were |
+	// | have I seen this one? | [bloom filter](/r/moul/x/daily/bloomfilter/v0) | tell you how many there were |
 	// | how often did this one arrive? | [count-min sketch](/p/moul/x/daily/countminsketch/v0) | tell you how many were different |
 	// | how many different ones were there? | **this one** | tell you whether it has seen YOU |
 	//
@@ -34,10 +34,10 @@ func ExampleRender() {
 	// | 1 | 1 | 0 | +0.00% | 1 of 1024 | linear counting |
 	// | 10 | 10 | 0 | +0.00% | 10 of 1024 | linear counting |
 	// | 100 | 100 | 0 | +0.00% | 95 of 1024 | linear counting |
-	// | 1000 | 1029 | +29 | +2.90% | 649 of 1024 | harmonic mean |
+	// | 1000 | 1029 | +29 | +2.90% | 649 of 1024 | linear counting |
 	// | 5000 | 5059 | +59 | +1.18% | 1021 of 1024 | harmonic mean |
 	//
-	// Two estimators, and the switch between them is where naive implementations go wrong. While most registers are still empty the answer comes from counting the empty ones, which is exact until two elements collide. Once they are mostly full the harmonic mean of the registers takes over, and the answer becomes an estimate with a published error bar rather than a number.
+	// Two estimators, and the switch between them is where naive implementations go wrong. Up to about two and a half times the register count the answer comes from counting the empty registers, which is exact until two elements share one. Past that the harmonic mean of the registers takes over, and the answer becomes an estimate with a published error bar rather than a number.
 	//
 	// ## What the kilobyte buys
 	//

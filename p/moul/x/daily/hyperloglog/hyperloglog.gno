@@ -75,13 +75,23 @@ var (
 	// ErrNilSketch is returned by Merge for a nil argument.
 	ErrNilSketch = errors.New("hyperloglog: nil sketch")
 	// ErrBadSnapshot is returned by FromSnapshot when the register count does
-	// not match the precision.
-	ErrBadSnapshot = errors.New("hyperloglog: snapshot length does not match precision")
+	// not match the precision, or when a register holds a zero-run no Add at
+	// that precision could have produced.
+	ErrBadSnapshot = errors.New("hyperloglog: snapshot does not match precision")
 )
 
 // Sketch is a HyperLogLog over string elements. The zero value is not usable:
 // build one with New, NewDefault or FromSnapshot.
+//
+// All of a sketch's state sits behind one pointer, so a copy of a Sketch value
+// is the same sketch. Copying the fields would share the registers but not the
+// Add count, and the two copies would then disagree about what they had seen.
+// Clone is the way to get an independent one.
 type Sketch struct {
+	st *sketchState
+}
+
+type sketchState struct {
 	precision int
 	reg       []uint8 // m registers, each the longest zero-run seen
 	limit     uint8   // the cap on a zero-run, 64 - precision
@@ -93,11 +103,11 @@ func New(precision int) (*Sketch, error) {
 	if precision < MinPrecision || precision > MaxPrecision {
 		return nil, ErrBadPrecision
 	}
-	return &Sketch{
+	return &Sketch{st: &sketchState{
 		precision: precision,
 		reg:       make([]uint8, 1<<uint(precision)),
 		limit:     uint8(64 - precision),
-	}, nil
+	}}, nil
 }
 
 // NewDefault returns an empty sketch at DefaultPrecision.
@@ -106,8 +116,10 @@ func NewDefault() *Sketch {
 	return s
 }
 
-// FromSnapshot rebuilds a sketch from registers produced by Snapshot. The Add
-// count is NOT carried: a restored sketch has observed nothing itself, and
+// FromSnapshot rebuilds a sketch from registers produced by Snapshot. Every
+// register must be at most 65 - precision, the longest zero-run an Add at that
+// precision can record; anything higher did not come from Snapshot and would
+// skew Count without bound. The Add count is NOT carried: a restored sketch has observed nothing itself, and
 // reporting somebody else's call count as its own would be a lie a realm would
 // then render.
 func FromSnapshot(precision int, registers []uint8) (*Sketch, error) {
@@ -115,24 +127,29 @@ func FromSnapshot(precision int, registers []uint8) (*Sketch, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(registers) != len(s.reg) {
+	if len(registers) != len(s.st.reg) {
 		return nil, ErrBadSnapshot
 	}
-	copy(s.reg, registers)
+	for _, r := range registers {
+		if r > s.st.limit+1 {
+			return nil, ErrBadSnapshot
+		}
+	}
+	copy(s.st.reg, registers)
 	return s, nil
 }
 
 // Add records one element. The empty string is an element like any other.
 func (s *Sketch) Add(element string) {
 	h := hash64(element)
-	idx := h >> uint(64-s.precision)
+	idx := h >> uint(64-s.st.precision)
 	// The register bits are shifted out before the zero-run is measured, so
 	// the same element can never contribute its index to its own estimate.
-	r := rho(h<<uint(s.precision), s.limit)
-	if r > s.reg[idx] {
-		s.reg[idx] = r
+	r := rho(h<<uint(s.st.precision), s.st.limit)
+	if r > s.st.reg[idx] {
+		s.st.reg[idx] = r
 	}
-	s.adds++
+	s.st.adds++
 }
 
 // AddAll records every element of a slice. Exactly equivalent to the loop,
@@ -157,21 +174,40 @@ func (s *Sketch) AddAll(elements []string) {
 // start to matter somewhere past 10^18 elements, which is not a number a chain
 // is going to reach.
 func (s *Sketch) Count() int64 {
-	m := float64(len(s.reg))
+	estimate, m, zeros := s.raw()
+	if linearRange(estimate, m, zeros) {
+		estimate = m * math.Log(m/float64(zeros))
+	}
+	return int64(estimate + 0.5)
+}
+
+// LinearCounting reports whether Count is currently answering from linear
+// counting, the small-range estimator, rather than from the harmonic mean. It
+// applies the exact switch Count applies, so a caller labelling the answer
+// cannot pick a threshold of its own that disagrees with it.
+func (s *Sketch) LinearCounting() bool {
+	return linearRange(s.raw())
+}
+
+// raw is the harmonic-mean estimate before the small-range switch, with the
+// register count and the number of registers still empty that the switch
+// reads.
+func (s *Sketch) raw() (estimate, m float64, zeros int) {
+	m = float64(len(s.st.reg))
 	sum := 0.0
-	zeros := 0
-	for _, r := range s.reg {
+	for _, r := range s.st.reg {
 		if r == 0 {
 			zeros++
 		}
 		sum += 1.0 / float64(uint64(1)<<uint(r))
 	}
+	return alpha(len(s.st.reg)) * m * m / sum, m, zeros
+}
 
-	estimate := alpha(len(s.reg)) * m * m / sum
-	if estimate <= 2.5*m && zeros > 0 {
-		estimate = m * math.Log(m/float64(zeros))
-	}
-	return int64(estimate + 0.5)
+// linearRange is the switch between the two estimators: a raw estimate at or
+// below 2.5m, with at least one register still empty.
+func linearRange(raw, m float64, zeros int) bool {
+	return raw <= 2.5*m && zeros > 0
 }
 
 // Merge folds other into s, so that s afterwards estimates the union of the
@@ -186,48 +222,48 @@ func (s *Sketch) Merge(other *Sketch) error {
 	if other == nil {
 		return ErrNilSketch
 	}
-	if other.precision != s.precision {
+	if other.st.precision != s.st.precision {
 		return ErrPrecisionMismatch
 	}
-	for i, r := range other.reg {
-		if r > s.reg[i] {
-			s.reg[i] = r
+	for i, r := range other.st.reg {
+		if r > s.st.reg[i] {
+			s.st.reg[i] = r
 		}
 	}
-	s.adds += other.adds
+	s.st.adds += other.st.adds
 	return nil
 }
 
 // Clone returns an independent copy.
 func (s *Sketch) Clone() *Sketch {
-	c := &Sketch{precision: s.precision, limit: s.limit, adds: s.adds}
-	c.reg = make([]uint8, len(s.reg))
-	copy(c.reg, s.reg)
-	return c
+	c := &sketchState{precision: s.st.precision, limit: s.st.limit, adds: s.st.adds}
+	c.reg = make([]uint8, len(s.st.reg))
+	copy(c.reg, s.st.reg)
+	return &Sketch{st: c}
 }
 
 // Reset empties the sketch, keeping its precision.
 func (s *Sketch) Reset() {
-	for i := range s.reg {
-		s.reg[i] = 0
+	for i := range s.st.reg {
+		s.st.reg[i] = 0
 	}
-	s.adds = 0
+	s.st.adds = 0
 }
 
 // Snapshot returns a copy of the registers, which is the whole state. Store it
 // and hand it back to FromSnapshot later. It is a copy rather than the live
 // slice so that a stored snapshot does not keep changing underneath its owner.
 func (s *Sketch) Snapshot() []uint8 {
-	out := make([]uint8, len(s.reg))
-	copy(out, s.reg)
+	out := make([]uint8, len(s.st.reg))
+	copy(out, s.st.reg)
 	return out
 }
 
 // Precision returns p, the number of hash bits used to pick a register.
-func (s *Sketch) Precision() int { return s.precision }
+func (s *Sketch) Precision() int { return s.st.precision }
 
 // Registers returns m, the number of registers.
-func (s *Sketch) Registers() int { return len(s.reg) }
+func (s *Sketch) Registers() int { return len(s.st.reg) }
 
 // Zeros returns how many registers are still untouched. It is the quantity
 // linear counting is built on, and on its own it is a useful honesty signal: a
@@ -235,7 +271,7 @@ func (s *Sketch) Registers() int { return len(s.reg) }
 // estimate rather than a count.
 func (s *Sketch) Zeros() int {
 	n := 0
-	for _, r := range s.reg {
+	for _, r := range s.st.reg {
 		if r == 0 {
 			n++
 		}
@@ -248,7 +284,7 @@ func (s *Sketch) Zeros() int {
 // log2(count) has been handed an unlucky element rather than a lot of them.
 func (s *Sketch) Max() uint8 {
 	var top uint8
-	for _, r := range s.reg {
+	for _, r := range s.st.reg {
 		if r > top {
 			top = r
 		}
@@ -259,11 +295,11 @@ func (s *Sketch) Max() uint8 {
 // Adds returns how many Add calls landed, duplicates included. The contrast
 // with Count is the point of the structure: Adds is what arrived, Count is how
 // much of it was different.
-func (s *Sketch) Adds() int64 { return s.adds }
+func (s *Sketch) Adds() int64 { return s.st.adds }
 
 // Bytes returns the register footprint. It is a function of the precision
 // alone: the same number before and after a million elements.
-func (s *Sketch) Bytes() int { return len(s.reg) }
+func (s *Sketch) Bytes() int { return len(s.st.reg) }
 
 // RelativeError returns the theoretical standard error, 1.04/sqrt(m). It is
 // independent of the cardinality, which is the counter-intuitive part: the
@@ -273,7 +309,7 @@ func (s *Sketch) Bytes() int { return len(s.reg) }
 // are further out than this, and a caller rendering a figure should say
 // "about" rather than quote it to the unit.
 func (s *Sketch) RelativeError() float64 {
-	return 1.04 / math.Sqrt(float64(len(s.reg)))
+	return 1.04 / math.Sqrt(float64(len(s.st.reg)))
 }
 
 // alpha is the bias correction for the harmonic mean. The three small cases
