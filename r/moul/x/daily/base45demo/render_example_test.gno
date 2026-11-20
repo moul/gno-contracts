@@ -61,6 +61,6 @@ func ExampleRenderArgument() {
 	// | field | value |
 	// | --- | --- |
 	// | input | 8 bytes |
-	// | base45 | I3DM2EPVD0/D |
+	// | base45 | `I3DM2EPVD0/D` |
 	// | characters | 12 |
 }

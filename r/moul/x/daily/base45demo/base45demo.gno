@@ -43,7 +43,10 @@ func Render(path string) string {
 		}
 		t := ui.NewTable("field", "value")
 		t.Row("input", strconv.Itoa(len(in))+" bytes")
-		t.Row("base45", ui.Cell(enc))
+		// A code span, not a bare cell: GFM trims a bare cell, and base45
+		// can start or end with a space ("Q" is " 1"), which would then
+		// decode to different bytes.
+		t.Row("base45", md.InlineCode(enc))
 		t.Row("characters", strconv.Itoa(len(enc)))
 		b.WriteString(t.String())
 		return b.String()
