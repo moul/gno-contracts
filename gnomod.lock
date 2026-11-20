@@ -254,6 +254,10 @@ module = "gno.land/p/moul/x/daily/bech32/v0"
 source = { dir = "p/moul/x/daily/bech32" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/bellmanford/v0"
+source = { dir = "p/moul/x/daily/bellmanford" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/bencode/v0"
 source = { dir = "p/moul/x/daily/bencode" }
 
@@ -787,6 +791,10 @@ source = { dir = "r/moul/x/daily/base32demo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/bech32demo/v0"
 source = { dir = "r/moul/x/daily/bech32demo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/bellmanforddemo/v0"
+source = { dir = "r/moul/x/daily/bellmanforddemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/bencodedemo/v0"
