@@ -111,6 +111,36 @@ func TestDecodeRefusesOverflow(t *testing.T) {
 	uassert.Equal(t, "\xff\xff\xff\xff", got)
 }
 
+// TestDecodeIsNotCanonical pins the aliases the package doc admits to. Each
+// row is a text Encode never produces that still decodes to the bytes of the
+// canonical one. If Decode is ever made canonical, this table flips to
+// ErrCorrupt and the doc has to change with it.
+func TestDecodeIsNotCanonical(t *testing.T) {
+	cases := []struct {
+		name      string
+		alias     string
+		canonical string
+	}{
+		{"whitespace", "87cU RD]i,\n\"Ebo80", "87cURD]i,\"Ebo80"},
+		{"frame", "<~87cURD]i,\"Ebo80~>", "87cURD]i,\"Ebo80"},
+		{"spelled-out zero group", "!!!!!", "z"},
+		{"partial group, other last digit", "!#", "!!"},
+	}
+	for _, tc := range cases {
+		want, err := Decode(tc.canonical)
+		uassert.NoError(t, err, tc.name)
+		got, err := Decode(tc.alias)
+		uassert.NoError(t, err, tc.name)
+		uassert.Equal(t, want, got, tc.name)
+
+		// The check the doc tells a caller to make tells them apart.
+		re, err := Encode(got)
+		uassert.NoError(t, err, tc.name)
+		uassert.Equal(t, tc.canonical, re, tc.name)
+		uassert.NotEqual(t, tc.alias, re, tc.name)
+	}
+}
+
 func TestDecodeRejects(t *testing.T) {
 	cases := []struct {
 		name string

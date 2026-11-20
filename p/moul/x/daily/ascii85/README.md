@@ -31,6 +31,13 @@ instead. It is the one deliberate incompatibility, and `s8W-!`, the group one
 below the limit, still decodes, so the check is a boundary and not a blanket
 refusal of large groups.
 
+**That closes one alias, not all of them: `Decode` is not canonical.** It
+accepts what Go's decoder accepts below the limit. Whitespace and the optional
+frame are ignored, `!!!!!` decodes to the same four zero bytes as `z`, and a
+final partial group has more than one spelling (`!!` and `!#` are both one zero
+byte). Where the text itself is signed, compared or used as a key, check it
+against `Encode` of what it decodes to.
+
 **The output is not a fixed ratio of the input.** Four zero bytes are written
 as the single character `z`, but only on a group boundary: `abcd` + four
 zeroes + `efgh` encodes to `@:E_WzAS,Rg`, while the same four zeroes one byte

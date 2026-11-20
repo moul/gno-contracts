@@ -25,6 +25,14 @@
 // the text is what gets signed, compared or used as a key, so Decode returns
 // [ErrOverflow] instead. It is the one deliberate incompatibility here.
 //
+// That closes the overflow alias, not every alias: Decode is not canonical,
+// and it accepts the same texts Go's decoder does. Whitespace and the
+// optional frame are ignored; "!!!!!" decodes to the same four zero bytes as
+// "z"; and a final partial group has more than one spelling, so "!!" and "!#"
+// both decode to one zero byte. A caller that needs exactly one text per byte
+// string has to compare its text against [Encode] of the decoded bytes rather
+// than rely on Decode to refuse the others.
+//
 // A live demo of this package is at
 // [r/moul/x/daily/ascii85demo](/r/moul/x/daily/ascii85demo/v0).
 package ascii85
