@@ -222,6 +222,45 @@ func TestResultIsASnapshot(t *testing.T) {
 	uassert.Equal(t, 1, mustDist(t, g.From("a"), "b"))
 }
 
+// The mutations that grow the index space are the ones that used to break the
+// snapshot: State indexed the shared name map into the Result's shorter slices
+// and panicked, and CycleWeight rescanned the live arc list.
+func TestResultSurvivesGraphGrowth(t *testing.T) {
+	g := loop()
+	r := g.From("mint")
+	g.AddNode("late")
+	g.AddEdge("loopB", "loopC", -100) // a cheaper hop on the reported cycle
+	g.AddEdge("sink", "later", 1)
+
+	tests := []struct {
+		node string
+		want State
+	}{
+		{"late", Unknown},
+		{"later", Unknown},
+		{"sink", Unbounded},
+		{"safe", Settled},
+	}
+	for _, tt := range tests {
+		uassert.Equal(t, tt.want.String(), r.State(tt.node).String(), "state of "+tt.node)
+	}
+	_, ok := r.Dist("late")
+	uassert.False(t, ok)
+	uassert.Equal(t, "", r.PathString("later", ">"))
+	_, ok = r.Via("late")
+	uassert.False(t, ok)
+	uassert.Equal(t, -1, r.CycleWeight(), "the cycle weighs what it weighed when From ran")
+	uassert.Equal(t, "loopA,loopB,loopC,sink", strings.Join(r.UnboundedNodes(), ","))
+	uassert.Equal(t, 6, r.Reachable())
+}
+
+// driftBound is a typed const, so the compiler already refuses caps whose
+// product overflows; this pins the headroom the current caps leave.
+func TestDriftBoundFits(t *testing.T) {
+	uassert.True(t, driftBound > 0)
+	uassert.True(t, driftBound <= (1<<63-1)/2, "half the int64 range left for the positive side")
+}
+
 // Parallel arcs are kept rather than collapsed, and the search takes the
 // cheapest of them whichever way round they were declared.
 func TestParallelArcsTakeTheCheapest(t *testing.T) {

@@ -46,11 +46,21 @@ const (
 	// worst case, so these two caps are what make that worst case a number
 	// rather than a hope.
 	MaxEdges = 4000
-	// MaxWeight bounds a single arc's cost, in either direction. A path is at
-	// most MaxNodes arcs long, so MaxNodes*MaxWeight is the largest total this
-	// package can produce, and it stays well inside a 64-bit int.
+	// MaxWeight bounds a single arc's cost, in either direction. The bound on
+	// a distance is not a path's length times this: while a negative cycle is
+	// still being relaxed, one pass can walk every one of MaxEdges arcs and the
+	// run makes up to MaxNodes passes, so a distance can drift as far as
+	// MaxNodes*MaxEdges*MaxWeight. driftBound below makes the compiler check
+	// that product fits.
 	MaxWeight = 1 << 40
 )
+
+// driftBound is the furthest a distance can move during a run, cycle included:
+// MaxNodes passes, each over at most MaxEdges arcs, each worth at most
+// MaxWeight. It is a typed const so that raising any of the three caps past
+// what an int64 holds fails to compile instead of wrapping a distance and
+// silently reporting no negative cycle.
+const driftBound int64 = MaxNodes * MaxEdges * MaxWeight
 
 // State is what a run can say about one node. It exists because "no distance"
 // has two different causes here and they call for opposite reactions: nothing
@@ -164,9 +174,13 @@ func (g *Graph) Has(nm string) bool {
 }
 
 // Result holds one single-source run. It is a snapshot: mutating the graph
-// afterwards does not update it.
+// afterwards does not update it. It keeps its own views of the node names and
+// the arc list, capped at their length when From ran, so a node or an arc
+// added later is invisible to it rather than an index past its slices.
 type Result struct {
-	g         *Graph
+	names     []string       // the graph's names as of From, capped
+	arcs      []arc          // the graph's arcs as of From, capped
+	index     map[string]int // shared with the graph: always bounds-check against names
 	src       int
 	dist      []int
 	prev      []int
@@ -191,7 +205,10 @@ func (g *Graph) From(source string) *Result {
 	}
 
 	n := len(g.names)
-	r := &Result{g: g, src: s}
+	// Both slices are only ever appended to, so a full-slice expression is a
+	// snapshot: a later append reallocates or writes past len, never inside it.
+	m := len(g.arcs)
+	r := &Result{names: g.names[:n:n], arcs: g.arcs[:m:m], index: g.index, src: s}
 	r.dist = make([]int, n)
 	r.prev = make([]int, n)
 	r.reached = make([]bool, n)
@@ -228,7 +245,7 @@ func (g *Graph) From(source string) *Result {
 // makes two runs of the same graph produce the same predecessors.
 func (r *Result) relaxAll() bool {
 	changed := false
-	for _, a := range r.g.arcs {
+	for _, a := range r.arcs {
 		if !r.reached[a.from] {
 			continue
 		}
@@ -260,7 +277,7 @@ func (r *Result) relaxAll() bool {
 // unbounded, and walking back from it lands on the cycle itself.
 func (r *Result) detectCycle() {
 	var witnesses []int
-	for _, a := range r.g.arcs {
+	for _, a := range r.arcs {
 		if !r.reached[a.from] {
 			continue
 		}
@@ -286,7 +303,7 @@ func (r *Result) detectCycle() {
 // reach has no cheapest route, and that is true however far downstream it
 // sits, so the flood follows arcs rather than stopping at the cycle.
 func (r *Result) markUnbounded(witnesses []int) {
-	queue := make([]int, 0, len(r.g.names))
+	queue := make([]int, 0, len(r.names))
 	for _, w := range witnesses {
 		if !r.unbounded[w] {
 			r.unbounded[w] = true
@@ -295,8 +312,8 @@ func (r *Result) markUnbounded(witnesses []int) {
 	}
 	// An adjacency list built here rather than held on the Graph: this walk
 	// is the only thing that needs one, and only when a cycle exists.
-	adj := make([][]int, len(r.g.names))
-	for _, a := range r.g.arcs {
+	adj := make([][]int, len(r.names))
+	for _, a := range r.arcs {
 		adj[a.from] = append(adj[a.from], a.to)
 	}
 	for len(queue) > 0 {
@@ -320,7 +337,7 @@ func (r *Result) markUnbounded(witnesses []int) {
 // steps is more than the cycle is long. From there the chain is the cycle.
 func (r *Result) walkBackToCycle(witness int) []int {
 	at := witness
-	for i := 0; i < len(r.g.names); i++ {
+	for i := 0; i < len(r.names); i++ {
 		if r.prev[at] == -1 {
 			// Not reachable, so not a cycle. Defensive: a witness always has
 			// a predecessor, by the assignment in detectCycle.
@@ -334,7 +351,7 @@ func (r *Result) walkBackToCycle(witness int) []int {
 	for {
 		rev = append(rev, at)
 		at = r.prev[at]
-		if at == start || at == -1 || len(rev) > len(r.g.names) {
+		if at == start || at == -1 || len(rev) > len(r.names) {
 			break
 		}
 	}
@@ -349,15 +366,20 @@ func (r *Result) walkBackToCycle(witness int) []int {
 	return append(out, out[0])
 }
 
+// at returns the index of a node State has already called Settled.
+func (r *Result) at(nm string) int { return r.index[nm] }
+
 // Source returns the node the run started from.
-func (r *Result) Source() string { return r.g.names[r.src] }
+func (r *Result) Source() string { return r.names[r.src] }
 
 // State reports what the run can say about one node. It is the call to make
 // before Dist whenever the difference between "nothing reaches it" and "a
 // negative cycle reaches it" changes what the caller does.
 func (r *Result) State(nm string) State {
-	i, known := r.g.index[nm]
-	if !known {
+	i, known := r.index[nm]
+	if !known || i >= len(r.names) {
+		// A name the graph learned after From is unknown to this run: the
+		// index is shared, but the Result's own slices stop at its snapshot.
 		return Unknown
 	}
 	if r.unbounded[i] {
@@ -380,7 +402,7 @@ func (r *Result) Dist(nm string) (int, bool) {
 	if r.State(nm) != Settled {
 		return 0, false
 	}
-	return r.dist[r.g.index[nm]], true
+	return r.dist[r.at(nm)], true
 }
 
 // Path returns the cheapest route to nm, source first and nm last. It returns
@@ -392,12 +414,12 @@ func (r *Result) Path(nm string) []string {
 		return nil
 	}
 	var rev []int
-	for at := r.g.index[nm]; at != -1; at = r.prev[at] {
+	for at := r.at(nm); at != -1; at = r.prev[at] {
 		rev = append(rev, at)
 	}
 	out := make([]string, len(rev))
 	for k, at := range rev {
-		out[len(rev)-1-k] = r.g.names[at]
+		out[len(rev)-1-k] = r.names[at]
 	}
 	return out
 }
@@ -418,11 +440,11 @@ func (r *Result) Via(nm string) (string, bool) {
 	if r.State(nm) != Settled {
 		return "", false
 	}
-	p := r.prev[r.g.index[nm]]
+	p := r.prev[r.at(nm)]
 	if p == -1 {
 		return "", false
 	}
-	return r.g.names[p], true
+	return r.names[p], true
 }
 
 // Reachable returns how many nodes a route leaves the source for, the source
@@ -466,7 +488,7 @@ func (r *Result) Cycle() []string {
 	}
 	out := make([]string, len(r.cycle))
 	for i, at := range r.cycle {
-		out[i] = r.g.names[at]
+		out[i] = r.names[at]
 	}
 	return out
 }
@@ -491,7 +513,7 @@ func (r *Result) CycleWeight() int {
 func (r *Result) cheapestArc(from, to int) int {
 	best := 0
 	found := false
-	for _, a := range r.g.arcs {
+	for _, a := range r.arcs {
 		if a.from != from || a.to != to {
 			continue
 		}
@@ -510,7 +532,7 @@ func (r *Result) UnboundedNodes() []string {
 	var out []string
 	for i, u := range r.unbounded {
 		if u {
-			out = append(out, r.g.names[i])
+			out = append(out, r.names[i])
 		}
 	}
 	return out
