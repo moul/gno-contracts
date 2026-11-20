@@ -59,6 +59,11 @@ func TestPackageDocNamesTheRealInvocation(t *testing.T) {
 	if strings.Contains(doc, "go run ./tools") {
 		t.Errorf("the package doc still names `go run ./tools`, which exits 1; use %q", invocation)
 	}
+	// Forbidding the one old string is not enough: the doc could drift to a
+	// different command that does not run and stay green. Require the owner's.
+	if !strings.Contains(doc, invocation) {
+		t.Errorf("the package doc does not name the real invocation %q", invocation)
+	}
 }
 
 func captureUsage(t *testing.T) string {
