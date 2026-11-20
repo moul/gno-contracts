@@ -404,6 +404,10 @@ module = "gno.land/p/moul/x/daily/rps/v0"
 source = { dir = "p/moul/x/daily/rps" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/segmenttree/v0"
+source = { dir = "p/moul/x/daily/segmenttree" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/semver/v0"
 source = { dir = "p/moul/x/daily/semver" }
 
@@ -1281,6 +1285,10 @@ hash = "h1:zfX3wl2WaXqpJry6X2FZkPrVi++2GFQOXFaCvDuWzd8="
 [[module]]
 module = "gno.land/r/moul/x/daily/rpsoracle/v1"
 source = { dir = "r/moul/x/daily/rpsoracle" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/segmenttreedemo/v0"
+source = { dir = "r/moul/x/daily/segmenttreedemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/semverdemo/v0"
