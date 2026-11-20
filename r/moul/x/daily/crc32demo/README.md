@@ -17,8 +17,8 @@ library — no checksum logic lives here. Stateless, so `Render` is deterministi
 
 The table includes `123456789` → `cbf43926`, the standard CRC-32 check value,
 so the pinned example doubles as a conformance test. The last two rows differ by
-a single letter and share no hex digits — that avalanche is the property worth
-seeing.
+a single letter and their checksums differ in 15 of 32 bits: one changed byte
+moves the whole value.
 
 Built for gno 0.9.
 

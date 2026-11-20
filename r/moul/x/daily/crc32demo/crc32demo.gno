@@ -49,8 +49,8 @@ func Render(path string) string {
 	}
 	b.WriteString("\n`123456789` → `cbf43926` is the standard CRC-32 check value, ")
 	b.WriteString("so this table doubles as a conformance test.\n\n")
-	b.WriteString("> The last two rows differ by one letter and share no digits: ")
-	b.WriteString("that avalanche is the point.\n\n")
+	b.WriteString("> The last two rows differ by one letter and their checksums differ ")
+	b.WriteString("in 15 of 32 bits: one changed byte moves the whole value.\n\n")
 	b.WriteString("> A CRC detects **accidents**, not tampering — it is linear, so a ")
 	b.WriteString("matching message is easy to craft. Never authenticate with it.\n")
 	return b.String()
