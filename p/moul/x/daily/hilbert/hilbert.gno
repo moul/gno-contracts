@@ -41,8 +41,10 @@ const MaxOrder = 31
 
 // MaxBoxCells caps how many cells Ranges will walk. Ranges is proportional to
 // the area of the box, not to its perimeter, so the cap is what stops a caller
-// from asking a realm to visit four billion cells inside one transaction.
-const MaxBoxCells = 1 << 16
+// from asking a realm to visit four billion cells inside one transaction. It
+// is 4096 (a 64x64 box) because the cap has to admit only calls a block can
+// hold: at 65536 one Ranges call measured 10,916,035,280 gas, 3.6x a block.
+const MaxBoxCells = 1 << 12
 
 var (
 	// ErrOrder is returned for an order outside 0..MaxOrder.
@@ -200,7 +202,7 @@ func Ranges(order int, x0, y0, x1, y1 uint32) ([]Range, error) {
 }
 
 // sortIndices sorts in place, bottom up, with one scratch buffer. A merge sort
-// rather than an insertion sort because MaxBoxCells is 65536 and the quadratic
+// rather than an insertion sort because MaxBoxCells is 4096 and the quadratic
 // one would be the whole gas budget; bottom up rather than recursive because
 // the depth is then a loop bound and not a call stack.
 func sortIndices(a []uint64) {

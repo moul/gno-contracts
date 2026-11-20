@@ -281,7 +281,9 @@ func TestRangesErrors(t *testing.T) {
 		{"y reversed", 4, 0, 5, 1, 2, ErrBox},
 		{"corner off the grid", 2, 0, 0, 4, 1, ErrPoint},
 		{"box too large", 10, 0, 0, 511, 511, ErrTooLarge},
-		{"largest box allowed", 8, 0, 0, 255, 255, nil},
+		{"largest box allowed", 6, 0, 0, 63, 63, nil},
+		{"one row past the cap", 7, 0, 0, 63, 64, ErrTooLarge},
+		{"old cap, now refused", 8, 0, 0, 255, 255, ErrTooLarge},
 	}
 	for _, tc := range cases {
 		_, err := Ranges(tc.order, tc.x0, tc.y0, tc.x1, tc.y1)

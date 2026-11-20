@@ -28,8 +28,9 @@ property `Ranges` is built on.
 Three behaviours worth knowing before you use it:
 
 - **`Ranges` costs the area of the box, not its perimeter.** It walks every
-  cell, so it refuses a box above `MaxBoxCells` (65536) with `ErrTooLarge`
-  rather than serving it slowly. A big grid wants a coarse order for the key
+  cell, so it refuses a box above `MaxBoxCells` (4096, a 64x64 box) with
+  `ErrTooLarge` rather than serving it slowly. The cap is sized so that the
+  largest call it admits still fits in a block. A big grid wants a coarse order for the key
   and a finer coordinate inside the value, not one order fine enough to need a
   huge box.
 - **A run is tight in both directions.** Scanning everything `Ranges` returns
