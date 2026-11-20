@@ -5,7 +5,8 @@
 ---
 
 Shows the published SHA-1 vectors, the git object ids anyone can check from a
-terminal, the RFC 2202 HMAC answers, and hashes whatever you put in the path.
+terminal, HMAC answers starting with RFC 2202 test case 2, and hashes whatever
+you put in the path, slashes and spaces included.
 
 ```
 /r/moul/x/daily/sha1demo/v0        → the vector tables

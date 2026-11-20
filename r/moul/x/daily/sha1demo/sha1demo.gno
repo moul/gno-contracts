@@ -1,13 +1,15 @@
 // Package sha1demo is a small gnoweb demo of the SHA-1 implementation provided
 // by the [p/moul/x/daily/sha1](/p/moul/x/daily/sha1/v0) library: the published
 // test vectors, the git object ids anyone can check with `git hash-object`,
-// the RFC 2202 HMAC vectors, and a path that hashes whatever you give it.
+// HMAC answers led by RFC 2202 test case 2, and a path that hashes whatever
+// you give it.
 //
 // It contains no hashing logic of its own. Stateless, so Render is
 // deterministic.
 package sha1demo
 
 import (
+	"strconv"
 	"strings"
 
 	"gno.land/p/moul/kit/ui/v0"
@@ -22,8 +24,9 @@ var vectors = []string{"", "a", "abc", "message digest", "hello world", "hello w
 // blobs are checkable from a terminal: `printf '%s' <content> | git hash-object --stdin`.
 var blobs = []string{"", "hello world\n", "Hello World\n"}
 
-// macs are the first three RFC 2202 HMAC-SHA1 test cases, written with keys
-// that print, so the table is readable.
+// macs are RFC 2202 HMAC-SHA1 test case 2, the one with a key that prints,
+// followed by two representative answers that are not from the RFC: the
+// quick-brown-fox example and the empty key over the empty message.
 var macs = []struct{ key, msg string }{
 	{"Jefe", "what do ya want for nothing?"},
 	{"key", "The quick brown fox jumps over the lazy dog"},
@@ -45,7 +48,7 @@ func Render(path string) string {
 		t := ui.NewTable("what", "value")
 		t.Row("sha1", md.InlineCode(sha1.SumHex(in)))
 		t.Row("git blob id", md.InlineCode(sha1.GitBlobID(in)))
-		t.Row("bytes", md.InlineCode(itoa(len(in))))
+		t.Row("bytes", md.InlineCode(strconv.Itoa(len(in))))
 		b.WriteString(t.String() + "\n")
 		b.WriteString("The git id is not the hash of the content: it is the hash ")
 		b.WriteString("of `blob <len>\\x00<content>`, which is why the two rows ")
@@ -113,25 +116,8 @@ func Render(path string) string {
 	return b.String()
 }
 
+// parseArg strips only the routing slash. The realm has no subpaths, so a
+// slash or a space in the rest is input to hash: a file path always has one.
 func parseArg(path string) string {
-	s := strings.TrimSpace(path)
-	s = strings.TrimPrefix(s, "/")
-	if i := strings.IndexByte(s, '/'); i >= 0 {
-		s = s[:i]
-	}
-	return s
-}
-
-func itoa(n int) string {
-	if n == 0 {
-		return "0"
-	}
-	var b [20]byte
-	i := len(b)
-	for n > 0 {
-		i--
-		b[i] = byte('0' + n%10)
-		n /= 10
-	}
-	return string(b[i:])
+	return strings.TrimPrefix(path, "/")
 }
