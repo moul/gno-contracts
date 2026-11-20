@@ -16,14 +16,19 @@
 // never the rounded Jaro score rounded a second time, which is where a naive
 // integer port loses its last digit.
 //
-// The exact arithmetic is done in int64 and holds for inputs up to roughly
-// 6,000 runes, well past what the O(n*m) window walk is worth on chain.
+// The exact fraction is held in int64 and scaled to parts per million in 128
+// bits, so it holds for inputs up to about 600,000 runes (where 30*n^3, the
+// Winkler denominator, reaches 2^63), far past what the O(n*m) window walk is
+// worth on chain.
 //
 // A live demo of this package is at
 // [r/moul/x/daily/jarowinklerdemo](/r/moul/x/daily/jarowinklerdemo/v0).
 package jarowinkler
 
-import "strconv"
+import (
+	"math/bits"
+	"strconv"
+)
 
 // Scale is the value of a perfect match: scores are parts per million, so
 // 944444 reads as 0.944444 and [Percent] turns it into "94.44%".
@@ -161,7 +166,7 @@ func (s Stats) Jaro() int {
 	if s.Matches == 0 {
 		return 0
 	}
-	return int(round(Scale*s.num, s.den))
+	return int(scaleRound(s.num, s.den))
 }
 
 // Winkler returns the Jaro-Winkler similarity of a and b, from 0 to [Scale]:
@@ -176,8 +181,8 @@ func Winkler(a, b string) int {
 
 // WinklerTuned is [Winkler] with its two constants exposed. boostThreshold is
 // the Jaro score below which no boost applies at all, on the same 0 to [Scale]
-// range; prefixSize caps how many leading runes may be counted, and 0 turns
-// the boost off entirely, leaving plain Jaro.
+// range; prefixSize caps how many leading runes may be counted, and 0 or any
+// negative value turns the boost off entirely, leaving plain Jaro.
 func WinklerTuned(a, b string, boostThreshold, prefixSize int) int {
 	return Explain(a, b).WinklerTuned(boostThreshold, prefixSize)
 }
@@ -199,6 +204,11 @@ func (s Stats) WinklerTuned(boostThreshold, prefixSize int) int {
 	if limit := int64(prefixSize); l > limit {
 		l = limit
 	}
+	// A negative cap counts no runes, like 0. Left alone it would make the
+	// boost a penalty and push the score below plain Jaro.
+	if l < 0 {
+		l = 0
+	}
 	if l == 0 {
 		return jaro
 	}
@@ -206,7 +216,7 @@ func (s Stats) WinklerTuned(boostThreshold, prefixSize int) int {
 	// so the score is rounded once rather than built out of a rounded one.
 	num := 10*s.num + l*(s.den-s.num)
 	den := 10 * s.den
-	return int(round(Scale*num, den))
+	return int(scaleRound(num, den))
 }
 
 // Percent formats a 0 to [Scale] score as a percentage with two decimals, as
@@ -225,8 +235,17 @@ func Percent(score int) string {
 	return out + strconv.Itoa(cents) + "%"
 }
 
-// round divides num by den, rounding halves away from zero. Both are positive
-// here: every numerator above is a count of matched runes.
-func round(num, den int64) int64 {
-	return (num + den/2) / den
+// scaleRound returns Scale*num/den, rounding halves away from zero. Both are
+// positive here: every numerator above is a count of matched runes, and num
+// never exceeds den, so the result never exceeds Scale.
+//
+// The product Scale*num is taken in 128 bits. In 64 it overflows long before
+// the fraction itself does: two identical 7,000-rune strings already make
+// 10*Scale*num pass 2^63 in the Winkler path.
+func scaleRound(num, den int64) int64 {
+	hi, lo := bits.Mul64(uint64(num), Scale)
+	lo, carry := bits.Add64(lo, uint64(den/2), 0)
+	hi += carry
+	q, _ := bits.Div64(hi, lo, uint64(den))
+	return int64(q)
 }

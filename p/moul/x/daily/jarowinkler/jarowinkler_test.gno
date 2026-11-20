@@ -102,6 +102,35 @@ func TestWinklerTunedKnobs(t *testing.T) {
 	uassert.Equal(t, 944444, WinklerTuned("MARTHA", "MARHTA", 950000, 4), "a threshold above the score")
 }
 
+// TestWinklerNegativePrefixSize pins that a negative cap behaves like 0: the
+// boost may only raise a score, so it must never come back below plain Jaro.
+func TestWinklerNegativePrefixSize(t *testing.T) {
+	jaro := Jaro("TRATE", "TRACE")
+	uassert.Equal(t, 866667, jaro)
+	for _, size := range []int{-1, -4, -1000} {
+		uassert.Equal(t, jaro, WinklerTuned("TRATE", "TRACE", 0, size), "prefix size "+strconv.Itoa(size))
+	}
+}
+
+// TestLongInputDoesNotOverflow pins the case Scale*num used to overflow in 64
+// bits: two identical 7,000-rune strings, whose Jaro fraction is 3n^3/3n^3.
+// The stats are built directly because walking 7,000 runes in a test costs
+// far more than the arithmetic being checked.
+func TestLongInputDoesNotOverflow(t *testing.T) {
+	for _, n := range []int64{7000, 100000, 600000} {
+		s := Stats{LenA: int(n), LenB: int(n), Matches: int(n), Prefix: int(n), num: 3 * n * n * n, den: 3 * n * n * n}
+		uassert.Equal(t, Scale, s.Jaro(), "jaro at "+strconv.Itoa(int(n)))
+		uassert.Equal(t, Scale, s.Winkler(), "winkler at "+strconv.Itoa(int(n)))
+	}
+	// One unmatched rune in 7,000: the boost must still land strictly between
+	// the Jaro score and a perfect match.
+	n := int64(7000)
+	m := n - 1
+	s := Stats{LenA: int(n), LenB: int(n), Matches: int(m), Prefix: 4, num: m*m*n + m*m*n + m*n*n, den: 3 * n * n * m}
+	j, w := s.Jaro(), s.Winkler()
+	uassert.True(t, j < w && w < Scale, "jaro "+strconv.Itoa(j)+" winkler "+strconv.Itoa(w))
+}
+
 func TestPercent(t *testing.T) {
 	cases := []struct {
 		score int
