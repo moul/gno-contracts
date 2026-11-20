@@ -92,7 +92,7 @@ func Render(path string) string {
 			lt.Row(
 				strconv.Itoa(i+1),
 				strconv.Itoa(j+1),
-				"`"+strconv.Quote(f)+"`",
+				literal(f),
 				strconv.Itoa(len(f)),
 			)
 		}
@@ -133,9 +133,9 @@ func Render(path string) string {
 			yes = "yes"
 		}
 		qt.Row(
-			"`"+strconv.Quote(c.f)+"`",
+			literal(c.f),
 			yes,
-			"`"+strconv.Quote(csv.Field(c.f, ','))+"`",
+			literal(csv.Field(c.f, ',')),
 			c.why,
 		)
 	}
@@ -180,7 +180,7 @@ func Render(path string) string {
 		if _, err := csv.Parse(bad); err != nil {
 			msg = err.Error()
 		}
-		et.Row("`"+strconv.Quote(bad)+"`", ui.Cell(msg))
+		et.Row(literal(bad), ui.Cell(msg))
 	}
 	b.WriteString(et.String() + "\n")
 	b.WriteString("The record and the field are both counted from one and ")
@@ -198,6 +198,14 @@ func Render(path string) string {
 	b.WriteString("comma inside a note, on chain, permanently.\n")
 
 	return b.String()
+}
+
+// literal renders s as a Go-quoted code span for a table cell. The pipe is
+// escaped after the span is built: a GFM table splits its row on every
+// unescaped "|", inside a code span too, so "a|b" would otherwise open a
+// fifth column and push the byte count out of its own.
+func literal(s string) string {
+	return strings.ReplaceAll("`"+strconv.Quote(s)+"`", "|", "\\|")
 }
 
 // field returns one field of a record, or an empty string past its end, so a

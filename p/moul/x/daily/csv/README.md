@@ -60,7 +60,9 @@ test.
 
 ## The round trip is on the records, not on the bytes
 
-`Parse(Format(records))` returns `records`. `Format(Parse(text))` does **not**
+`Parse(Format(records))` returns `records`, with one exception: a record
+with **no fields at all** is written as a blank line and comes back as
+nothing, because no csv text spells it. `Format(Parse(text))` does **not**
 always return `text`, and the difference is deliberate: a bare quote comes
 back as a quoted field, because a writer that emitted it bare would be leaning
 on the forgiveness this reader extends and that no other reader owes it.

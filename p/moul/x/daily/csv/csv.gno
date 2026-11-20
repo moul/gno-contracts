@@ -272,6 +272,11 @@ func Format(records [][]string) string {
 //     dialect's comment byte, which the parser would otherwise read as a
 //     comment and drop with it the whole record.
 //
+// A record with no fields at all is the one input this does not round trip.
+// No csv text parses to it: the only spelling it could have is a blank line,
+// and a blank line is not a record. It is written as an empty line and the
+// parser drops it, so a caller holding one should not expect it back.
+//
 // An invalid dialect falls back to the defaults rather than panicking: this
 // returns no error, and a writer that silently refused to write would be
 // worse than one that wrote valid csv in the wrong dialect.

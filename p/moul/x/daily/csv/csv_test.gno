@@ -296,6 +296,23 @@ func TestFormat(t *testing.T) {
 	}
 }
 
+// TestZeroFieldRecordDoesNotRoundTrip pins the one documented exception to
+// the round trip: a record with no fields is written as a blank line, and a
+// blank line is not a record. If that ever changes, the doc on FormatDialect
+// has to change with it.
+func TestZeroFieldRecordDoesNotRoundTrip(t *testing.T) {
+	in := [][]string{{"a"}, {}, {"b"}}
+	out := Format(in)
+	if out != "a\n\nb\n" {
+		t.Fatalf("Format: got %q, want %q", out, "a\n\nb\n")
+	}
+	got, err := Parse(out)
+	if err != nil {
+		t.Fatalf("Parse(%q): %v", out, err)
+	}
+	eq(t, got, [][]string{{"a"}, {"b"}})
+}
+
 // TestRoundTrip is the only test here that covers the two halves together,
 // and the only one that would have caught the sole-empty-field case: each
 // half is defensible on its own and the pair still loses a record.
