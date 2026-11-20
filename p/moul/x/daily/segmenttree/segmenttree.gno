@@ -260,7 +260,14 @@ func (t *Tree) Nodes() []Node {
 	if t.n == 0 {
 		return nil
 	}
-	out := []Node{}
+	// Count first: level k keeps ceil(n / span) nodes, so the slice is
+	// allocated once instead of regrowing on the way down.
+	count := 0
+	for level := 0; (1 << level) <= t.size; level++ {
+		span := t.size >> level
+		count += (t.n + span - 1) / span
+	}
+	out := make([]Node, 0, count)
 	for level := 0; (1 << level) <= t.size; level++ {
 		span := t.size >> level
 		for j := 0; j < (1 << level); j++ {

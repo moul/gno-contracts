@@ -48,11 +48,12 @@ Three behaviours worth knowing before you use it:
   the rest to `Len`. That is what lets a demo draw the structure instead of
   describing it.
 
-Cost: `2 * next_power_of_two(n)` int64 slots, so up to twice the data in the
-worst case, which is the price of the aligned ranges. `Sum` wraps on int64
-overflow, exactly as `+` does; a realm summing balances should cap what it
-stores rather than hoping. Construction is `O(n)`, every other operation is
-`O(log n)`.
+Cost: `2 * next_power_of_two(n)` int64 slots, so up to four times the data in
+the worst case (`n` one past a power of two), which is the price of the
+aligned ranges. `Sum` wraps on int64 overflow, exactly as `+` does; a realm
+summing balances should cap what it stores rather than hoping. Construction is
+`O(n)`. `Query`, `Total`, `Set` and `Add` are `O(log n)`; `At` and `Len` are
+`O(1)`; `Values` and `Nodes` copy out every slot or node, so they are `O(n)`.
 
 **Live demo:** [`r/moul/x/daily/segmenttreedemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/segmenttreedemo)
 · render it at [`/r/moul/x/daily/segmenttreedemo/v0`](https://gno.land/r/moul/x/daily/segmenttreedemo/v0).

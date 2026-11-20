@@ -222,6 +222,34 @@ func TestNodesCoverTheLeafRanges(t *testing.T) {
 	}
 }
 
+// TestNodesIsAllocatedOnce pins the preallocation: the count pass has to agree
+// with what the walk appends, or the slice regrows (count too low) or carries
+// dead capacity (count too high).
+func TestNodesIsAllocatedOnce(t *testing.T) {
+	for n := 1; n <= 33; n++ {
+		nodes := NewSum(make([]int64, n)).Nodes()
+		if len(nodes) != cap(nodes) {
+			t.Errorf("n = %d: len %d, cap %d", n, len(nodes), cap(nodes))
+		}
+	}
+	// Five slots padded to eight: ceil(5/8) + ceil(5/4) + ceil(5/2) + 5, so
+	// 1 + 2 + 3 + 5 real nodes.
+	uassert.Equal(t, 11, len(NewSum([]int64{1, 2, 3, 4, 5}).Nodes()))
+}
+
+// TestStorageIsUnderFourTimesTheData pins the README's cost line. The worst
+// case is one slot past a power of two, where the padding nearly doubles the
+// leaves and the internal nodes double them again, so "twice" was wrong.
+func TestStorageIsUnderFourTimesTheData(t *testing.T) {
+	for n := 1; n <= 65; n++ {
+		tr := NewSum(make([]int64, n))
+		if len(tr.node) > 4*n {
+			t.Errorf("n = %d stores %d slots, over four times", n, len(tr.node))
+		}
+	}
+	uassert.Equal(t, 32, len(NewSum(make([]int64, 9)).node), "9 slots store 32, more than twice 9")
+}
+
 func TestPaddingIsNeutralForMinAndMax(t *testing.T) {
 	// Three values pad to a width of four. Query stops at Len, so the padding
 	// slot is never part of an answer and Total alone cannot see a wrong pad:
