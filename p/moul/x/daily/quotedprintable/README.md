@@ -59,8 +59,9 @@ bytes that were sent. No `B` (base64) encoded-words, which return
 correct for an unstructured field such as `Subject` and not sufficient for a
 display name inside a structured one.
 
-Input is capped at `MaxLen` (4096 bytes; four times that for `Decode`) so gas
-stays predictable.
+Input is capped at `MaxLen` (4096 bytes; four times that for `Decode` and for
+an encoded-word given to `DecodeWord`) so gas stays predictable. `EncodeWord("")`
+returns `""`, since RFC 2047 forbids a word with empty encoded-text.
 
 **Live demo:** [`r/moul/x/daily/quotedprintabledemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/quotedprintabledemo)
 · render it at [`/r/moul/x/daily/quotedprintabledemo/v0`](https://gno.land/r/moul/x/daily/quotedprintabledemo/v0).

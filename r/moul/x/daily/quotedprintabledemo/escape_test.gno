@@ -37,3 +37,13 @@ func TestRenderLongInputSaysSo(t *testing.T) {
 	uassert.True(t, strings.Contains(got, "encoded-word too long"),
 		"the header word refuses past 75 characters")
 }
+
+// TestRenderKeepsWhitespace pins that the demo encodes the caller's bytes,
+// trailing space included: the body must escape it as "=20" and the header
+// word must turn it into "_".
+func TestRenderKeepsWhitespace(t *testing.T) {
+	got := Render("/hello ")
+	uassert.False(t, strings.Contains(got, "## `hello`\n"), "the echo keeps the space")
+	uassert.True(t, strings.Contains(got, "- body: `hello=20`"), "a trailing space is escaped in a body")
+	uassert.True(t, strings.Contains(got, "- header word: `=?UTF-8?Q?hello_?=`"), "and becomes _ in a word")
+}

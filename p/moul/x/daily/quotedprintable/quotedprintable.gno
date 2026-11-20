@@ -185,9 +185,16 @@ func Decode(s string) (string, error) {
 // A space becomes "_", and "_", "?" and "=" lose the literal status they have
 // in a body. The result is refused with [ErrWordTooLong] past 75 characters
 // rather than silently emitting a header no parser is required to accept.
+//
+// An empty src returns "": RFC 2047 requires at least one character of
+// encoded-text, so "=?UTF-8?Q??=" is not a valid word, and the empty string is
+// what [DecodeWord] gives back for "" anyway.
 func EncodeWord(src string) (string, error) {
 	if len(src) > MaxLen {
 		return "", ErrTooLong
+	}
+	if src == "" {
+		return "", nil
 	}
 	var b strings.Builder
 	for i := 0; i < len(src); i++ {
@@ -216,10 +223,17 @@ func EncodeWord(src string) (string, error) {
 // header parser wants: most fields are plain text and only some are encoded.
 // The charset label is read and ignored, so the bytes come back as they were
 // sent; for anything other than UTF-8 or US-ASCII the caller transcodes.
+//
+// An encoded-word longer than MaxLen*4, the bound [Decode] applies, is
+// [ErrTooLong]. Plain text passes through unchanged at any length, since it is
+// returned without being scanned.
 func DecodeWord(s string) (string, error) {
 	if len(s) < len(wordPrefix)+len(wordSuffix) ||
 		!strings.HasPrefix(s, "=?") || !strings.HasSuffix(s, wordSuffix) {
 		return s, nil
+	}
+	if len(s) > MaxLen*4 {
+		return "", ErrTooLong
 	}
 	body := s[2 : len(s)-2]
 	i := strings.IndexByte(body, '?')

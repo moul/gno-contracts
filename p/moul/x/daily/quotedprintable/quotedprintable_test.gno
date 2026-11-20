@@ -123,6 +123,33 @@ func TestLimit(t *testing.T) {
 	uassert.ErrorIs(t, err, ErrTooLong)
 }
 
+// TestDecodeWordLimit pins that DecodeWord is bounded like Decode: an
+// oversized encoded-word is refused before it is scanned, while plain text of
+// any length still passes through untouched.
+func TestDecodeWordLimit(t *testing.T) {
+	text := MaxLen*4 - len(wordPrefix) - len(wordSuffix)
+	_, err := DecodeWord(wordPrefix + strings.Repeat("a", text+1) + wordSuffix)
+	uassert.ErrorIs(t, err, ErrTooLong)
+	got, err := DecodeWord(wordPrefix + strings.Repeat("a", text) + wordSuffix)
+	uassert.NoError(t, err)
+	uassert.Equal(t, text, len(got))
+	plain := strings.Repeat("a", MaxLen*4+1)
+	got, err = DecodeWord(plain)
+	uassert.NoError(t, err)
+	uassert.Equal(t, plain, got)
+}
+
+// TestEncodeWordEmpty pins that an empty input yields no word at all rather
+// than "=?UTF-8?Q??=", whose empty encoded-text RFC 2047 forbids.
+func TestEncodeWordEmpty(t *testing.T) {
+	got, err := EncodeWord("")
+	uassert.NoError(t, err)
+	uassert.Equal(t, "", got)
+	dec, err := DecodeWord(got)
+	uassert.NoError(t, err)
+	uassert.Equal(t, "", dec)
+}
+
 func TestEncodeWord(t *testing.T) {
 	cases := []struct {
 		name string

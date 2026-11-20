@@ -102,9 +102,10 @@ func visible(s string) string {
 	return strings.ReplaceAll(s, "\t", "\\t")
 }
 
+// parseArg strips only the routing slash. Whitespace is payload here: the body
+// encoder's trailing-space rule is one of the things the demo shows.
 func parseArg(path string) string {
-	s := strings.TrimSpace(path)
-	s = strings.TrimPrefix(s, "/")
+	s := strings.TrimPrefix(path, "/")
 	if i := strings.IndexByte(s, '/'); i >= 0 {
 		s = s[:i]
 	}
