@@ -27,9 +27,10 @@ func mustHex(t *testing.T, s string) []byte {
 	return b
 }
 
-// TestRFC4231Vectors runs the five HMAC-SHA-256 test cases of RFC 4231 that
-// apply here (cases 1 to 7, minus the two that only differ in truncation),
-// plus the empty-key empty-message case. These are published constants: an
+// TestRFC4231Vectors runs six of RFC 4231's seven HMAC-SHA-256 test cases
+// (1, 2, 3, 5, 6 and 7; case 5 at full length, its truncation is tested
+// separately) plus the empty-key empty-message case. Case 4 is the seventh and
+// lives in its own test below. These are published constants: an
 // implementation that disagrees with them is wrong, not merely different.
 func TestRFC4231Vectors(t *testing.T) {
 	cases := []struct {
@@ -154,20 +155,27 @@ func TestTagDependsOnBothInputs(t *testing.T) {
 // construction rather than a second code path.
 func TestSumIsGenericOverTheHash(t *testing.T) {
 	key, msg := []byte("Jefe"), []byte("what do ya want for nothing?")
-	a := hex.EncodeToString(Sum(SHA256, BlockSizeSHA256, key, msg))
+	a := hex.EncodeToString(Sum(NewHash(SHA256, BlockSizeSHA256), key, msg))
 	b := hex.EncodeToString(SumSHA256(key, msg))
 	if a != b {
 		t.Errorf("Sum = %s, SumSHA256 = %s, want them equal", a, b)
 	}
+	if got := len(SumSHA256(key, msg)); got != sizeSHA256 {
+		t.Errorf("tag is %d bytes, want %d", got, sizeSHA256)
+	}
 }
 
-// TestSumRejectsAnUnusableBlockSize covers the two panics, including the one
-// that matters: a block size smaller than the digest leaves nowhere to put the
+// TestSumRejectsAnUnusableBlockSize covers the panics, including the one that
+// matters: a block size smaller than the digest leaves nowhere to put the
 // hashed key, and silently producing a tag there would be worse than aborting.
+// The short-key cases are the regression: the digest check used to run only
+// when the key was long enough to be folded, so a 1-byte key slipped past it.
 func TestSumRejectsAnUnusableBlockSize(t *testing.T) {
-	assertPanics(t, "non-positive block size", func() { Sum(SHA256, 0, []byte("k"), []byte("m")) })
-	assertPanics(t, "digest longer than block", func() { Sum(SHA256, 16, rep(0x61, 100), []byte("m")) })
-	assertPanics(t, "nil hash", func() { Sum(nil, BlockSizeSHA256, []byte("k"), []byte("m")) })
+	assertPanics(t, "non-positive block size", func() { NewHash(SHA256, 0) })
+	assertPanics(t, "digest longer than block, long key", func() { Sum(NewHash(SHA256, 16), rep(0x61, 100), []byte("m")) })
+	assertPanics(t, "digest longer than block, short key", func() { Sum(NewHash(SHA256, 16), []byte("k"), []byte("m")) })
+	assertPanics(t, "nil hash", func() { NewHash(nil, BlockSizeSHA256) })
+	assertPanics(t, "zero Hash", func() { Sum(Hash{}, []byte("k"), []byte("m")) })
 }
 
 func assertPanics(t *testing.T, what string, fn func()) {

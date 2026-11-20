@@ -30,7 +30,7 @@ func ExampleRender() {
 	// | 131 copies of `0xaa` | 131 | `f7cc137015898c0e3b1a06b1164895fb91d62ba0e12f8c5972c3a39e135319ae` |
 	// | its SHA-256 | 32 | `f7cc137015898c0e3b1a06b1164895fb91d62ba0e12f8c5972c3a39e135319ae` |
 	//
-	// A key longer than the 64-byte block is replaced by its own digest before use, so those two keys are the same key. Equal: **yes**. The mirror of this rule is that a short key is zero-padded, so `moul` and `moul` followed by zeros are also one key. Pick keys of exactly 32 random bytes and neither collision class can reach you.
+	// A key longer than the 64-byte block is replaced by its own digest before use, so those two keys are the same key. Equal: **yes**. The mirror of this rule is that a short key is zero-padded, so `moul` and `moul` followed by zeros are also one key. `moul` is short, so it sits in that class itself. Generating every key at exactly 32 random bytes does not remove the class; it means no two keys you generate can land in it together.
 	//
 	// ## Why not sha256(key + message)
 	//

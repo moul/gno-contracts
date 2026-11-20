@@ -98,8 +98,10 @@ func Render(path string) string {
 	b.WriteString("digest before use, so those two keys are the same key. ")
 	b.WriteString("Equal: **" + yesNo(a == c) + "**. The mirror of this rule is that a ")
 	b.WriteString("short key is zero-padded, so `moul` and `moul` followed by zeros ")
-	b.WriteString("are also one key. Pick keys of exactly 32 random bytes and ")
-	b.WriteString("neither collision class can reach you.\n\n")
+	b.WriteString("are also one key. `moul` is short, so it sits in that class ")
+	b.WriteString("itself. Generating every key at exactly 32 random bytes does not ")
+	b.WriteString("remove the class; it means no two keys you generate can land in ")
+	b.WriteString("it together.\n\n")
 
 	b.WriteString("## Why not sha256(key + message)\n\n")
 	naive := sha256.Sum256([]byte(demoKey + demoMessage))
@@ -162,9 +164,9 @@ func ufmtInt(n int) string {
 	return string(digits)
 }
 
+// arg strips the one routing slash and nothing else. The message is tagged
+// byte-for-byte as the caller sent it, spaces and a leading colon included, so
+// the tag on the page is the tag of the input in the URL.
 func arg(path string) string {
-	s := strings.TrimSpace(path)
-	s = strings.TrimPrefix(s, "/")
-	s = strings.TrimPrefix(s, ":")
-	return s
+	return strings.TrimPrefix(path, "/")
 }

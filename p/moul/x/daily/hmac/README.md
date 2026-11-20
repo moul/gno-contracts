@@ -1,7 +1,7 @@
 # `gno.land/p/moul/x/daily/hmac/v0`
 
-**Keyed-hash message authentication** (`Sum`, `SumSHA256`, `HexSHA256`, `VerifySHA256`,
-`Equal`, `Truncate`, `SHA256`).
+**Keyed-hash message authentication** (`Sum`, `NewHash`, `HashSHA256`, `SumSHA256`,
+`HexSHA256`, `VerifySHA256`, `Equal`, `Truncate`, `SHA256`).
 
 A hash answers "has this message changed". A MAC answers "did the holder of this key produce
 this message", which is the question almost every protocol is actually asking. HMAC, as
@@ -46,8 +46,10 @@ same helper as the code it tests can be wrong in the same direction.
 | longer than 64 bytes | its own SHA-256 | a 131-byte key and its 32-byte digest are one key |
 | shorter than 64 bytes | zero-padded to 64 | `k` and `k` followed by zeros are one key |
 
-Both are pinned by tests and both are the RFC's behaviour. Keys of exactly 32 random bytes
-sit in neither class.
+Both are pinned by tests and both are the RFC's behaviour. A 32-byte key is still shorter
+than the block, so it is still zero-padded and still equal to itself followed by zeros. What a
+protocol that only ever generates keys of exactly 32 random bytes buys is that no two keys it
+generates can collide this way; the equivalence itself does not go away.
 
 **`Equal` buys an answer, not constant time.** It compares lengths first, then reads every
 byte of both. The point is that a verifier returning on the first differing byte tells the
@@ -55,10 +57,13 @@ caller how many leading bytes of a guessed tag were right, which turns forging f
 work into 32 rounds of 256 guesses. Wall-clock timing is not something a contract can observe
 or promise, so the doc comment claims the operation count and nothing more.
 
-**The hash is a parameter.** `Sum` takes a `HashFunc`, a one-shot `func([]byte) []byte`, and
-the hash's internal block size. 64 for SHA-256, which is not its 32-byte digest size: using
-the digest size there produces tags that look fine and match nothing. `SumSHA256` is the thin
-wrapper and a test pins that it is nothing more.
+**The hash is a parameter, bound to its block size.** `Sum` takes a `Hash`: a one-shot
+`func([]byte) []byte` and the hash's internal block size, built together by `NewHash` or taken
+ready-made from `HashSHA256`. SHA-256's block is 64, which is not its 32-byte digest size:
+passing the digest size produces tags that look fine and match nothing, which is why the two
+are no longer separate arguments. `NewHash` refuses a block smaller than the digest up front,
+whatever the key length. `SumSHA256` is the thin wrapper and a test pins that it is nothing
+more.
 
 > ⚠️ **A realm cannot keep a secret.** Everything in realm state is readable by anyone, so a
 > long-lived key stored on chain authenticates nobody. The shapes that work are verifying

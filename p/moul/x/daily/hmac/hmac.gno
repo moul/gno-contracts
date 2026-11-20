@@ -49,8 +49,10 @@ const (
 	// tags that look fine and match nothing.
 	BlockSizeSHA256 = 64
 
-	// SizeSHA256 is the length in bytes of an HMAC-SHA-256 tag.
-	SizeSHA256 = 32
+	// sizeSHA256 is the length in bytes of an HMAC-SHA-256 tag. It is not
+	// exported: an exported 32 sitting next to the 64 is the number a caller
+	// passes as a block size by mistake.
+	sizeSHA256 = 32
 
 	ipad = 0x36
 	opad = 0x5c
@@ -68,29 +70,55 @@ func SHA256(data []byte) []byte {
 	return sum[:]
 }
 
-// Sum returns the HMAC of message under key, computed with h over blocks of
-// blockSize bytes. blockSize is the hash's INTERNAL block size, not its digest
-// size: for SHA-256 that is 64, which is what [BlockSizeSHA256] holds.
+// Hash is a one-shot hash bound to its INTERNAL block size, the width HMAC pads
+// the key to. The two travel together because passing them separately is how a
+// caller ends up handing SHA-256 its 32-byte digest size instead of its 64-byte
+// block and gets tags that look fine and match nothing. The zero value is not
+// usable: build one with [NewHash], or take [HashSHA256].
+type Hash struct {
+	fn        HashFunc
+	blockSize int
+}
+
+// NewHash binds fn to its block size. It panics if fn is nil, if blockSize is
+// not positive, or if fn's digest is longer than blockSize: a folded key would
+// not fit in the block, and that check runs here, for every key, rather than
+// only on the path where a long key is folded.
 //
-// It panics if h is nil, if blockSize is not positive, or, when the key is
-// long enough to be folded, if h's own digest is longer than blockSize: there
-// is nowhere to put the folded key and a tag produced anyway would mean
-// nothing. That last check only runs on the folding path, so a mismatched
-// blockSize paired with a short key is accepted and produces a tag no other
-// implementation will reproduce. Pass the hash's real block size.
-//
-// Neither key nor message is modified.
-func Sum(h HashFunc, blockSize int, key, message []byte) []byte {
-	if h == nil {
+// It cannot know fn's real block size, so it cannot refuse a smaller one that
+// still holds the digest. Use [HashSHA256] for SHA-256.
+func NewHash(fn HashFunc, blockSize int) Hash {
+	if fn == nil {
 		panic("hmac: nil hash function")
 	}
 	if blockSize <= 0 {
 		panic("hmac: block size must be positive")
 	}
+	if len(fn(nil)) > blockSize {
+		panic("hmac: hash digest is longer than the block size")
+	}
+	return Hash{fn: fn, blockSize: blockSize}
+}
+
+// HashSHA256 returns SHA-256 bound to its 64-byte block.
+func HashSHA256() Hash { return Hash{fn: SHA256, blockSize: BlockSizeSHA256} }
+
+// Sum returns the HMAC of message under key, computed with h.
+//
+// It panics on a zero Hash, and if h's digest of a long key does not fit the
+// block, which [NewHash] already refused for the empty input but a hash whose
+// output length varies could still produce.
+//
+// Neither key nor message is modified.
+func Sum(h Hash, key, message []byte) []byte {
+	if h.fn == nil {
+		panic("hmac: zero Hash, build one with NewHash")
+	}
+	blockSize := h.blockSize
 
 	k := key
 	if len(k) > blockSize {
-		k = h(k)
+		k = h.fn(k)
 		if len(k) > blockSize {
 			panic("hmac: hash digest is longer than the block size")
 		}
@@ -108,13 +136,13 @@ func Sum(h HashFunc, blockSize int, key, message []byte) []byte {
 	}
 	copy(inner[blockSize:], message)
 
-	return h(append(outer, h(inner)...))
+	return h.fn(append(outer, h.fn(inner)...))
 }
 
 // SumSHA256 returns the HMAC-SHA-256 tag of message under key, a 32-byte
 // slice. This is the one to reach for unless you have another hash.
 func SumSHA256(key, message []byte) []byte {
-	return Sum(SHA256, BlockSizeSHA256, key, message)
+	return Sum(HashSHA256(), key, message)
 }
 
 // HexSHA256 returns [SumSHA256] as lowercase hex, for the common case where
