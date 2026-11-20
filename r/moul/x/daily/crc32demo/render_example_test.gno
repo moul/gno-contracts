@@ -21,7 +21,7 @@ func ExampleRender() {
 	//
 	// `123456789` → `cbf43926` is the standard CRC-32 check value, so this table doubles as a conformance test.
 	//
-	// > The last two rows differ by one letter and share no digits: that avalanche is the point.
+	// > The last two rows differ by one letter and their checksums differ in 15 of 32 bits: one changed byte moves the whole value.
 	//
 	// > A CRC detects **accidents**, not tampering — it is linear, so a matching message is easy to craft. Never authenticate with it.
 }

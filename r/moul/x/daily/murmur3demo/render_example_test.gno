@@ -22,7 +22,7 @@ func ExampleRender() {
 	// | `hello world` | `5e928f0f` | `4343ed22` |
 	// | `hello worle` | `b97415bf` | `3d75e0dc` |
 	//
-	// The last two inputs differ by one letter and share no digits. That avalanche is the finalizer doing its job.
+	// The last two inputs differ by one letter, and their seed-0 hashes differ in 18 of 32 bits, close to the half a good mix aims for. That avalanche is the finalizer doing its job.
 	//
 	// ## Self-test
 	//

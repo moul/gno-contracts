@@ -55,7 +55,8 @@ func Render(path string) string {
 		st.Row(label, md.InlineCode(murmur3.SumHex(s)), md.InlineCode(murmur3.Hex(murmur3.Sum32Seed(s, 1))))
 	}
 	b.WriteString(st.String())
-	b.WriteString("\nThe last two inputs differ by one letter and share no digits. ")
+	b.WriteString("\nThe last two inputs differ by one letter, and their seed-0 hashes ")
+	b.WriteString("differ in 18 of 32 bits, close to the half a good mix aims for. ")
 	b.WriteString("That avalanche is the finalizer doing its job.\n\n")
 
 	b.WriteString("## Self-test\n\n")

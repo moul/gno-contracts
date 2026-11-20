@@ -72,13 +72,20 @@ func TestEveryTailLength(t *testing.T) {
 	}
 }
 
-// One flipped letter must share nothing with the original.
+// One flipped letter must move about half of the output bits. The demo quotes
+// the exact count, so it is pinned here: 18 of 32. The two hex strings still
+// have digits in common, which is chance and not a property worth claiming.
 func TestAvalanche(t *testing.T) {
 	a := SumHex("hello world")
 	b := SumHex("hello worle")
 	uassert.Equal(t, "5e928f0f", a)
 	uassert.Equal(t, "b97415bf", b)
-	uassert.NotEqual(t, a, b)
+	diff := Sum32("hello world") ^ Sum32("hello worle")
+	n := 0
+	for ; diff != 0; diff &= diff - 1 {
+		n++
+	}
+	uassert.Equal(t, 18, n)
 }
 
 func TestHexIsZeroPadded(t *testing.T) {
