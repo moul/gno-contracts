@@ -344,6 +344,10 @@ module = "gno.land/p/moul/x/daily/humanize/v1"
 source = { dir = "p/moul/x/daily/humanize" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/ipaddr/v0"
+source = { dir = "p/moul/x/daily/ipaddr" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/kmp/v0"
 source = { dir = "p/moul/x/daily/kmp" }
 
@@ -1045,6 +1049,10 @@ source = { dir = "r/moul/x/daily/huffmandemo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/humanizedemo/v0"
 source = { dir = "r/moul/x/daily/humanizedemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/ipaddrdemo/v0"
+source = { dir = "r/moul/x/daily/ipaddrdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/kingofdice/v0"
