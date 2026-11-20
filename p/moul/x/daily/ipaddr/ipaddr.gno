@@ -151,7 +151,8 @@ func (a Addr) IsLinkLocal() bool { return a>>16 == 169<<8|254 }
 func (a Addr) IsMulticast() bool { return a>>28 == 0xe }
 
 // IsBroadcast reports whether the address is the limited broadcast address,
-// 255.255.255.255. The per-subnet broadcast address is [Prefix.Last].
+// 255.255.255.255. The per-subnet broadcast address of a /30 or shorter prefix
+// is [Prefix.Last]; a /31 or /32 has none.
 func (a Addr) IsBroadcast() bool { return uint64(a) == maxAddr }
 
 // IsGlobalUnicast reports whether the address is routable on the public
@@ -332,8 +333,9 @@ func (p Prefix) Overlaps(q Prefix) bool {
 // First returns the network address of the block, the lowest address in it.
 func (p Prefix) First() Addr { return p.base & p.Mask() }
 
-// Last returns the highest address in the block, which for a /31 or wider is
-// also its broadcast address.
+// Last returns the highest address in the block. For a /30 or shorter prefix
+// that is also its broadcast address. A /31 has none (RFC 3021: both of its
+// addresses are hosts, see [Prefix.Usable]), and a /32 is a single host.
 func (p Prefix) Last() Addr { return p.First() | ^p.Mask() }
 
 // Count returns how many addresses the block holds, network and broadcast
