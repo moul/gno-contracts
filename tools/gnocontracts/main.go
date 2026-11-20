@@ -20,7 +20,7 @@
 //	           ratcheting baseline
 //
 // It is invoked from the repository root, typically via the Makefile
-// (`go run ./tools <cmd>`).
+// (`go -C tools tool gnocontracts <cmd>`).
 package main
 
 import (
@@ -103,12 +103,15 @@ func main() {
 	}
 }
 
+// invocation is how this CLI is really called: the form the Makefile's
+// GNOCONTRACTS variable and every workflow already use. It is a `go tool`
+// directive in tools/go.mod, so there is no `go run` path to it.
+// TestUsageInvocationMatchesMakefile holds this to the Makefile.
+const invocation = "go -C tools tool gnocontracts"
+
 func usage() {
-	fmt.Fprint(os.Stderr, `gno-contracts — repository maintenance CLI
-
-usage: go run ./tools <command> [flags]
-
-commands:
+	fmt.Fprintf(os.Stderr, "gno-contracts — repository maintenance CLI\n\nusage: %s <command> [flags]\n\n", invocation)
+	fmt.Fprint(os.Stderr, `commands:
   manifest   refresh contracts.json from the p/moul and r/moul trees
   readme     regenerate the contracts table in README.md
   readmes    ensure every package has a README (repo link + disclaimer)
