@@ -1,8 +1,8 @@
 # CI internals
 
-The four workflows, what each owns and when it runs, are in
-[`AGENTS.md`](../AGENTS.md) § CI. This file is the part you only need when changing CI
-itself or chasing a preview that did not appear.
+Every workflow in this directory, what each owns and when it runs, is in
+[`AGENTS.md`](../AGENTS.md) § CI, which owns that list. This file is the part you
+only need when changing CI itself or chasing a preview that did not appear.
 
 ## The composite actions
 
