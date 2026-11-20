@@ -223,6 +223,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/b58/v0`](p/moul/x/daily/b58) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/b58/v0) | [✅](https://gno.land/p/moul/x/daily/b58/v0) | — | — | — |
 | [`p/moul/x/daily/base32/v0`](p/moul/x/daily/base32) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/base32/v0) | [✅](https://gno.land/p/moul/x/daily/base32/v0) | — | — | — |
 | [`p/moul/x/daily/bech32/v0`](p/moul/x/daily/bech32) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/bech32/v0) | — | — | — | — |
+| [`p/moul/x/daily/bellmanford/v0`](p/moul/x/daily/bellmanford) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/bencode/v0`](p/moul/x/daily/bencode) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/bencode/v0) | — | — | — | — |
 | [`p/moul/x/daily/bidimap/v0`](p/moul/x/daily/bidimap) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/bidimap/v0) | [✅](https://gno.land/p/moul/x/daily/bidimap/v0) | — | — | — |
 | [`p/moul/x/daily/bitset/v0`](p/moul/x/daily/bitset) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/bitset/v0) | [✅](https://gno.land/p/moul/x/daily/bitset/v0) | — | — | — |
@@ -250,6 +251,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/luhn/v0`](p/moul/x/daily/luhn) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/luhn/v0) | [✅](https://gno.land/p/moul/x/daily/luhn/v0) | — | — | — |
 | [`p/moul/x/daily/markov/v0`](p/moul/x/daily/markov) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/markov/v0) | [✅](https://gno.land/p/moul/x/daily/markov/v0) | — | — | 1 |
 | [`p/moul/x/daily/multiset/v0`](p/moul/x/daily/multiset) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/multiset/v0) | [✅](https://gno.land/p/moul/x/daily/multiset/v0) | — | — | — |
+| [`p/moul/x/daily/murmur3/v0`](p/moul/x/daily/murmur3) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/myersdiff/v0`](p/moul/x/daily/myersdiff) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/myersdiff/v0) | — | — | — | — |
 | [`p/moul/x/daily/orderedmap/v0`](p/moul/x/daily/orderedmap) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/orderedmap/v0) | [✅](https://gno.land/p/moul/x/daily/orderedmap/v0) | — | — | — |
 | [`p/moul/x/daily/piglatin/v0`](p/moul/x/daily/piglatin) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/piglatin/v0) | [✅](https://gno.land/p/moul/x/daily/piglatin/v0) | — | — | — |
@@ -261,6 +263,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/x/daily/rot13/v0`](p/moul/x/daily/rot13) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/rot13/v0) | [✅](https://gno.land/p/moul/x/daily/rot13/v0) | — | — | — |
 | [`p/moul/x/daily/rps/v0`](p/moul/x/daily/rps) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/rps/v0) | — | — | — | — |
 | [`p/moul/x/daily/semver/v0`](p/moul/x/daily/semver) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/semver/v0) | [✅](https://gno.land/p/moul/x/daily/semver/v0) | — | — | — |
+| [`p/moul/x/daily/sha1/v0`](p/moul/x/daily/sha1) 📦 | — | — | — | — | — |
 | [`p/moul/x/daily/shuntingyard/v0`](p/moul/x/daily/shuntingyard) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/shuntingyard/v0) | — | — | — | — |
 | [`p/moul/x/daily/sieve/v0`](p/moul/x/daily/sieve) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/sieve/v0) | [✅](https://gno.land/p/moul/x/daily/sieve/v0) | — | — | — |
 | [`p/moul/x/daily/soundex/v0`](p/moul/x/daily/soundex) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/x/daily/soundex/v0) | [✅](https://gno.land/p/moul/x/daily/soundex/v0) | — | — | — |
@@ -352,6 +355,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/base32demo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/base32demo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/base32demo/v0) | — | — | 1 |
 | [`r/moul/x/daily/base32demo/v1`](r/moul/x/daily/base32demo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/base32demo/v1) | — | — | — | 2 |
 | [`r/moul/x/daily/bech32demo/v0`](r/moul/x/daily/bech32demo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/bech32demo/v0) | — | — | — | 4 |
+| [`r/moul/x/daily/bellmanforddemo/v0`](r/moul/x/daily/bellmanforddemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/bencodedemo/v0`](r/moul/x/daily/bencodedemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/bencodedemo/v0) | — | — | — | 2 |
 | [`r/moul/x/daily/bidimapdemo/v0`](r/moul/x/daily/bidimapdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/bidimapdemo/v0) | [✅](https://gno.land/r/moul/x/daily/bidimapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/bitsetdemo/v0`](r/moul/x/daily/bitsetdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/bitsetdemo/v0) | [✅](https://gno.land/r/moul/x/daily/bitsetdemo/v0) | — | — | 1 |
@@ -439,6 +443,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/moodstone/v1`](r/moul/x/daily/moodstone) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/moodstone/v1) | [✅](https://gno.land/r/moul/x/daily/moodstone/v1) | — | — | 1 |
 | [`r/moul/x/daily/multisetdemo/v0`](r/moul/x/daily/multisetdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/multisetdemo/v0) | [✅](https://gno.land/r/moul/x/daily/multisetdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/multisig/v0`](r/moul/x/daily/multisig) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/multisig/v0) | [✅](https://gno.land/r/moul/x/daily/multisig/v0) | — | — | 1 |
+| [`r/moul/x/daily/murmur3demo/v0`](r/moul/x/daily/murmur3demo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/myersdiffdemo/v0`](r/moul/x/daily/myersdiffdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/myersdiffdemo/v0) | — | — | — | 3 |
 | [`r/moul/x/daily/numguess/v0`](r/moul/x/daily/numguess) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/numguess/v0) | [✅](https://gno.land/r/moul/x/daily/numguess/v0) | — | — | 1 |
 | [`r/moul/x/daily/orderedmapdemo/v0`](r/moul/x/daily/orderedmapdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/orderedmapdemo/v0) | [✅](https://gno.land/r/moul/x/daily/orderedmapdemo/v0) | — | — | 1 |
@@ -470,6 +475,7 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/rpsoracle/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/rpsoracle) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rpsoracle/v0) | — | — | 1 |
 | [`r/moul/x/daily/rpsoracle/v1`](r/moul/x/daily/rpsoracle) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/rpsoracle/v1) | [✅](https://gno.land/r/moul/x/daily/rpsoracle/v1) | — | — | 3 |
 | [`r/moul/x/daily/semverdemo/v0`](r/moul/x/daily/semverdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/semverdemo/v0) | [✅](https://gno.land/r/moul/x/daily/semverdemo/v0) | — | — | 3 |
+| [`r/moul/x/daily/sha1demo/v0`](r/moul/x/daily/sha1demo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/shuntingyarddemo/v0`](r/moul/x/daily/shuntingyarddemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/shuntingyarddemo/v0) | — | — | — | 3 |
 | [`r/moul/x/daily/sievedemo/v0`](r/moul/x/daily/sievedemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/sievedemo/v0) | [✅](https://gno.land/r/moul/x/daily/sievedemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/soundexdemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/soundexdemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/soundexdemo/v0) | — | — | 1 |
@@ -562,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-20T20:27:28Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-20T21:13:46Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
