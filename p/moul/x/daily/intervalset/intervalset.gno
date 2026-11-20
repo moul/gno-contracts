@@ -29,10 +29,15 @@
 // [r/moul/x/daily/intervalsetdemo](/r/moul/x/daily/intervalsetdemo/v0).
 package intervalset
 
-// MaxSpans bounds the set so gas stays predictable. Only an Add that would
-// create a new span is refused; one that merges into an existing span is always
-// allowed, because it cannot grow the count.
+// MaxSpans bounds the set so gas stays predictable. Only an operation that
+// would raise the count past it is refused: an Add that would create a new span,
+// or a Remove that would split one. An Add that merges and a Remove that trims
+// or deletes are always allowed, because they cannot grow the count.
 const MaxSpans = 1024
+
+// maxMeasure is what Measure returns when the true total does not fit an
+// int64: a single span can be [minInt64, maxInt64), 2^64-1 integers.
+const maxMeasure = int64(^uint64(0) >> 1)
 
 // Span is the half-open range [Lo, Hi). Hi is never covered.
 type Span struct {
@@ -55,10 +60,18 @@ func (s *Set) Len() int { return len(s.spans) }
 
 // Measure returns the total number of integers covered, counting an overlap
 // once. The invariant is what makes this a plain sum.
+//
+// The sum saturates: when the covered total does not fit an int64 (one span
+// can be wider than 2^63), Measure returns the largest int64 rather than a
+// wrapped, negative count.
 func (s *Set) Measure() int64 {
 	var total int64
 	for _, sp := range s.spans {
-		total += sp.Hi - sp.Lo
+		d := sp.Hi - sp.Lo
+		if d < 0 || total+d < total {
+			return maxMeasure
+		}
+		total += d
 	}
 	return total
 }
@@ -114,10 +127,14 @@ func (s *Set) Add(lo, hi int64) bool {
 }
 
 // Remove uncovers [lo, hi). A range removed from the middle of a span splits
-// it in two, which is the only operation here that can raise the span count.
-func (s *Set) Remove(lo, hi int64) {
+// it in two, which is the only removal that can raise the span count.
+//
+// It returns false, changing nothing, only when the set is already at MaxSpans
+// and the removal would split a span. An empty or inverted range, or one that
+// covers nothing, is a no-op and reports true: nothing was refused.
+func (s *Set) Remove(lo, hi int64) bool {
 	if hi <= lo {
-		return
+		return true
 	}
 	// Strict inequalities both ways: a span merely touching the removed range
 	// shares no integer with it and must be left alone.
@@ -130,7 +147,7 @@ func (s *Set) Remove(lo, hi int64) {
 		j++
 	}
 	if i == j {
-		return
+		return true
 	}
 	kept := []Span{}
 	if s.spans[i].Lo < lo {
@@ -139,7 +156,11 @@ func (s *Set) Remove(lo, hi int64) {
 	if s.spans[j-1].Hi > hi {
 		kept = append(kept, Span{Lo: hi, Hi: s.spans[j-1].Hi})
 	}
+	if len(s.spans)-(j-i)+len(kept) > MaxSpans {
+		return false // a split, and there is no room for the extra span
+	}
 	s.spans = replace(s.spans, i, j, kept)
+	return true
 }
 
 // Contains reports whether v is covered. O(log n).
@@ -215,16 +236,19 @@ func itoa(v int64) string {
 	if v == 0 {
 		return "0"
 	}
+	// The magnitude is unsigned: -v overflows for the minimum int64, which
+	// left it negative and rendered the endpoint as a bare "-".
 	neg := v < 0
+	m := uint64(v)
 	if neg {
-		v = -v
+		m = -m
 	}
 	buf := [20]byte{}
 	i := len(buf)
-	for v > 0 {
+	for m > 0 {
 		i--
-		buf[i] = byte('0' + v%10)
-		v /= 10
+		buf[i] = byte('0' + m%10)
+		m /= 10
 	}
 	if neg {
 		i--

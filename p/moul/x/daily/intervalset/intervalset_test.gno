@@ -215,6 +215,56 @@ func TestMaxSpans(cur realm, t *testing.T) {
 	uassert.Equal(t, MaxSpans-1, s.Len())
 }
 
+// Remove used to skip the cap: 3072 interior removals on one span left the
+// set at 3073 spans. A split at the cap is now refused and changes nothing,
+// while a removal that trims or deletes is still allowed.
+func TestRemoveRespectsMaxSpans(t *testing.T) {
+	s := New()
+	s.Add(0, 1000000)
+	for i := int64(1); s.Len() < MaxSpans; i++ {
+		uassert.True(t, s.Remove(i*4, i*4+1))
+	}
+	uassert.Equal(t, MaxSpans, s.Len())
+	before := s.String()
+
+	last := s.Spans()[MaxSpans-1] // the wide tail, [4*1023+1, 1000000)
+	uassert.False(t, s.Remove(last.Lo+10, last.Lo+11), "a split at the cap is refused")
+	uassert.Equal(t, MaxSpans, s.Len())
+	uassert.Equal(t, before, s.String())
+
+	uassert.True(t, s.Remove(last.Lo, last.Lo+10), "trimming a span is allowed at the cap")
+	uassert.True(t, s.Remove(0, 4), "deleting a span is allowed at the cap")
+	uassert.Equal(t, MaxSpans-1, s.Len())
+	uassert.True(t, s.Remove(5, 5), "an empty range reports true")
+}
+
+// Measure used to wrap: [minInt64, maxInt64) is 2^64-1 integers and the sum
+// came back as -1. It saturates now, at a single wide span and at a sum of
+// spans that only overflows once added up.
+func TestMeasureSaturates(t *testing.T) {
+	const minI, maxI = int64(-1 << 63), int64(1<<63 - 1)
+	s := New()
+	s.Add(minI, maxI)
+	uassert.Equal(t, maxI, s.Measure())
+
+	s = New()
+	s.Add(minI, -1)
+	uassert.Equal(t, maxI, s.Measure()) // 2^63-1 exactly, still fits
+	s.Add(1, 3)
+	uassert.Equal(t, maxI, s.Measure()) // the sum overflows
+
+	s = New()
+	s.Add(minI, minI+5)
+	uassert.Equal(t, int64(5), s.Measure())
+}
+
+// itoa negated the minimum int64, which stays negative, and rendered "-".
+func TestStringMinInt64(t *testing.T) {
+	s := New()
+	s.Add(-1<<63, 0)
+	uassert.Equal(t, "[-9223372036854775808,0)", s.String())
+}
+
 // Measure is the covered length, and double-counting it is the bug that makes
 // a hand-rolled list of windows wrong for billing.
 func TestMeasureDoesNotDoubleCount(t *testing.T) {

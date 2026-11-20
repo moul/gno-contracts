@@ -48,7 +48,11 @@ Semantics worth knowing, each with a test:
   because the invariant guarantees a real gap between spans.
 - **`Add` returns false only when the set is at `MaxSpans`** (1024) *and* the
   range would add a span. One that merges is always allowed: it cannot grow the
-  count.
+  count. **`Remove` returns false** on the same terms, when the set is at
+  `MaxSpans` and the removal would split a span.
+- **`Measure` saturates.** One span can cover more integers than an `int64`
+  holds, so a total that does not fit returns the largest `int64` instead of a
+  wrapped negative count.
 
 `Add`, `Remove` and `Measure` are `O(n)` in the number of spans; `Contains`,
 `Covers` and `Overlaps` are `O(log n)`, and those are the ones a `Render` calls.
