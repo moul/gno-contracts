@@ -3,8 +3,8 @@
 // library: where keys land, and how few of them move when the membership
 // changes.
 //
-// It contains no placement logic of its own. Stateless, so Render is
-// deterministic, which is what lets the migration table below be a measurement
+// It contains no placement logic of its own. Its only package state is fixed
+// at deploy time and no function writes it, so Render is deterministic, which is what lets the migration table below be a measurement
 // rather than an illustration.
 package hashringdemo
 
@@ -113,11 +113,13 @@ func Render(path string) string {
 		"with where `key-1` lived, only with how many nodes there are.\n\n")
 
 	b.WriteString(md.H2("On chain"))
-	b.WriteString("\nThe ring is a value, not realm state. This page builds one " +
-		"per call and throws it away, and a realm that wanted to keep one would " +
-		"store the membership, a handful of strings, and rebuild. Persisting `" +
-		strconv.Itoa(ring.Len()) + "` sorted points to avoid a few hundred hashes " +
-		"is the wrong trade when storage is the thing you are charged for.\n\n")
+	b.WriteString("\nThe library's ring is a value, not realm state. This page " +
+		"keeps one built at deploy time from four fixed names and never changes " +
+		"it, so nothing a visitor does can move a number above. A realm whose " +
+		"membership did change would store the membership, a handful of " +
+		"strings, and rebuild. Persisting `" + strconv.Itoa(ring.Len()) +
+		"` sorted points to avoid a few hundred hashes is the wrong trade when " +
+		"storage is the thing you are charged for.\n\n")
 
 	b.WriteString("> Place your own key: append it to the path, for instance " +
 		"[`/hello`](/r/moul/x/daily/hashringdemo/v0:/hello).\n")
@@ -170,24 +172,30 @@ func migrationTable() string {
 	before := placements(ring)
 	after := placements(build(remove(nodes, leaving)))
 
-	ringMoved, strandedOnly := 0, 0
+	ringMoved, ringStranded := 0, 0
 	for i := range keys {
 		if before[i] != after[i] {
 			ringMoved++
 		}
 		if before[i] == leaving {
-			strandedOnly++
+			ringStranded++
 		}
 	}
 
-	modMoved := 0
+	// Each strategy's floor is the keys it had put on the departed node,
+	// counted against its own placement: the modulo shard put a different set
+	// of keys on gamma than the ring did.
+	shrunk := remove(nodes, leaving)
+	modMoved, modStranded := 0, 0
 	for _, k := range keys {
 		h := hashring.Hash(k)
 		was := nodes[int(h%uint64(len(nodes)))]
-		shrunk := remove(nodes, leaving)
 		now := shrunk[int(h%uint64(len(shrunk)))]
 		if was != now {
 			modMoved++
+		}
+		if was == leaving {
+			modStranded++
 		}
 	}
 
@@ -196,13 +204,13 @@ func migrationTable() string {
 		"consistent hashing",
 		strconv.Itoa(ringMoved),
 		pct(ringMoved, len(keys)),
-		strconv.Itoa(strandedOnly),
+		strconv.Itoa(ringStranded),
 	)
 	t.Row(
 		md.InlineCode("hash(key) % n"),
 		strconv.Itoa(modMoved),
 		pct(modMoved, len(keys)),
-		strconv.Itoa(strandedOnly),
+		strconv.Itoa(modStranded),
 	)
 	return t.String()
 }

@@ -40,13 +40,13 @@ func ExampleRender() {
 	// | strategy | keys moved | share | unavoidable |
 	// | --- | --- | --- | --- |
 	// | consistent hashing | 517 | 25.8% | 517 |
-	// | `hash(key) % n` | 1463 | 73.1% | 517 |
+	// | `hash(key) % n` | 1463 | 73.1% | 515 |
 	//
 	// That is the whole argument. The ring moves the keys that have to move and not one more, because their owner is a position on a circle and the circle did not change. A modulo shard moves almost everything, because the modulus moved under every key at once: nothing was wrong with where `key-1` lived, only with how many nodes there are.
 	//
 	// ## On chain
 	//
-	// The ring is a value, not realm state. This page builds one per call and throws it away, and a realm that wanted to keep one would store the membership, a handful of strings, and rebuild. Persisting `256` sorted points to avoid a few hundred hashes is the wrong trade when storage is the thing you are charged for.
+	// The library's ring is a value, not realm state. This page keeps one built at deploy time from four fixed names and never changes it, so nothing a visitor does can move a number above. A realm whose membership did change would store the membership, a handful of strings, and rebuild. Persisting `256` sorted points to avoid a few hundred hashes is the wrong trade when storage is the thing you are charged for.
 	//
 	// > Place your own key: append it to the path, for instance [`/hello`](/r/moul/x/daily/hashringdemo/v0:/hello).
 }

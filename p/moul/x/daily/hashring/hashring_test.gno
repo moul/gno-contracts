@@ -1,6 +1,7 @@
 package hashring
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
@@ -300,4 +301,67 @@ func TestWrapAround(t *testing.T) {
 	uassert.Equal(t, first.Node, r.owner(last.Hash+1), "a key past the last point did not wrap")
 	uassert.Equal(t, first.Node, r.owner(^uint64(0)), "the largest possible hash did not wrap")
 	uassert.Equal(t, first.Node, r.owner(first.Hash), "a key landing exactly on a point missed its owner")
+}
+
+// TestCollisionWinnerIsTheSmallestName pins the tie-break. A real 64-bit
+// collision never shows up in a fixture, so the merge is driven directly: the
+// survivor at a shared position must not depend on which side was there first.
+func TestCollisionWinnerIsTheSmallestName(t *testing.T) {
+	zeta := []Point{{Hash: 5, Node: "zeta"}}
+	alpha := []Point{{Hash: 5, Node: "alpha"}}
+
+	for _, got := range [][]Point{mergePoints(zeta, alpha), mergePoints(alpha, zeta)} {
+		uassert.Equal(t, 1, len(got), "a collision left two points at one position")
+		uassert.Equal(t, "alpha", got[0].Node, "the collision winner depends on arrival order")
+	}
+
+	// Inside one side too: byPosition puts the winner first and the merge
+	// keeps only the first point at each position.
+	one := []Point{{Hash: 9, Node: "zeta"}, {Hash: 3, Node: "beta"}, {Hash: 9, Node: "alpha"}}
+	sort.Sort(byPosition(one))
+	got := mergePoints(nil, one)
+	uassert.Equal(t, 2, len(got))
+	uassert.Equal(t, "beta", got[0].Node)
+	uassert.Equal(t, "alpha", got[1].Node)
+}
+
+// TestAddRejectsTheEmptyName: "" is Get's answer for "no owner", so a node by
+// that name would make an owned key and an empty ring look the same.
+func TestAddRejectsTheEmptyName(t *testing.T) {
+	r := New(4)
+	uassert.False(t, r.Add(""), "Add accepted the empty node name")
+	uassert.Equal(t, 0, r.Len())
+	uassert.Equal(t, 0, len(r.Nodes()))
+}
+
+// TestCopyIsTheSameRing: a copied Ring value shares one state. With three
+// slice headers in the struct, an Add through the copy grew a backing array
+// the original could not see, and the two disagreed about the membership.
+func TestCopyIsTheSameRing(t *testing.T) {
+	r := New(4)
+	r.Add("alpha")
+	r.Add("beta")
+
+	c := *r
+	uassert.True(t, c.Add("gamma"))
+
+	uassert.True(t, r.Has("gamma"), "the original missed an Add made through a copy")
+	uassert.Equal(t, 12, r.Len())
+	uassert.Equal(t, "alpha,beta,gamma", strings.Join(r.Nodes(), ","))
+	uassert.Equal(t, r.Get("key-0"), c.Get("key-0"))
+}
+
+// TestReadmeExample pins the placements the README quotes, so the
+// documentation cannot drift from the code it documents.
+func TestReadmeExample(t *testing.T) {
+	r := New(DefaultReplicas)
+	r.Add("alpha")
+	r.Add("beta")
+	r.Add("gamma")
+
+	uassert.Equal(t, "beta", r.Get("session-91"))
+	uassert.Equal(t, "beta,gamma,alpha", strings.Join(r.GetN("session-91", 3), ","))
+
+	r.Remove("beta")
+	uassert.Equal(t, "gamma", r.Get("session-91"))
 }

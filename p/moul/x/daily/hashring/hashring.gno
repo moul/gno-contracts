@@ -80,10 +80,19 @@ type Point struct {
 
 // Ring is a consistent hashing ring. The zero value is not usable; call New.
 //
-// points is kept strictly increasing by Hash at all times, which is what makes
-// Get a binary search rather than a scan, and nodes is kept sorted so that two
-// rings built from the same membership in different orders are the same ring.
+// All of a ring's state sits behind one pointer, so a copy of a Ring value is
+// the same ring and not half of one: copying three slice headers would let an
+// Add through the copy grow a shared backing array that the original's
+// shorter headers never see, and the two would disagree about the membership.
 type Ring struct {
+	st *ringState
+}
+
+// ringState is the ring itself. points is kept strictly increasing by Hash at
+// all times, which is what makes Get a binary search rather than a scan, and
+// nodes is kept sorted so that two rings built from the same membership in
+// different orders are the same ring.
+type ringState struct {
 	replicas int
 	points   []Point
 	nodes    []string
@@ -100,53 +109,63 @@ func New(replicas int) *Ring {
 	if replicas > MaxReplicas {
 		replicas = MaxReplicas
 	}
-	return &Ring{replicas: replicas}
+	return &Ring{st: &ringState{replicas: replicas}}
 }
 
 // Replicas is the per-node point count this ring was built with.
-func (r *Ring) Replicas() int { return r.replicas }
+func (r *Ring) Replicas() int { return r.st.replicas }
 
 // Len is the number of points on the circle, which is Replicas times the
 // membership. For the membership itself, use Nodes.
-func (r *Ring) Len() int { return len(r.points) }
+func (r *Ring) Len() int { return len(r.st.points) }
 
 // Nodes returns the membership, sorted, as a copy.
 func (r *Ring) Nodes() []string {
-	out := make([]string, len(r.nodes))
-	copy(out, r.nodes)
+	out := make([]string, len(r.st.nodes))
+	copy(out, r.st.nodes)
 	return out
 }
 
 // Has reports whether node is in the ring.
 func (r *Ring) Has(node string) bool {
-	i := sort.SearchStrings(r.nodes, node)
-	return i < len(r.nodes) && r.nodes[i] == node
+	i := sort.SearchStrings(r.st.nodes, node)
+	return i < len(r.st.nodes) && r.st.nodes[i] == node
 }
 
 // Points returns the circle, ordered, as a copy. The copy is the point: the
 // live slice is what Get binary-searches, and a caller that sorted or trimmed
 // it would silently corrupt every later placement.
 func (r *Ring) Points() []Point {
-	out := make([]Point, len(r.points))
-	copy(out, r.points)
+	out := make([]Point, len(r.st.points))
+	copy(out, r.st.points)
 	return out
 }
 
 // Add puts node on the ring and reports whether that changed anything. It
-// returns false for a node already present and for one that would push the
-// membership past MaxNodes.
+// returns false for a node already present, for one that would push the
+// membership past MaxNodes, and for the empty name: "" is what Get answers on
+// an empty ring, so a node called "" would make "no owner" and "owned by the
+// empty name" the same answer.
+//
+// The node's points are hashed, sorted among themselves and merged into the
+// circle in one pass, into a fresh array: one O(len) merge rather than one
+// O(len) shift per virtual point.
 func (r *Ring) Add(node string) bool {
-	if r.Has(node) || len(r.nodes) >= MaxNodes {
+	st := r.st
+	if node == "" || r.Has(node) || len(st.nodes) >= MaxNodes {
 		return false
 	}
-	i := sort.SearchStrings(r.nodes, node)
-	r.nodes = append(r.nodes, "")
-	copy(r.nodes[i+1:], r.nodes[i:])
-	r.nodes[i] = node
+	i := sort.SearchStrings(st.nodes, node)
+	st.nodes = append(st.nodes, "")
+	copy(st.nodes[i+1:], st.nodes[i:])
+	st.nodes[i] = node
 
-	for v := 0; v < r.replicas; v++ {
-		r.insert(Point{Hash: pointHash(node, v), Node: node})
+	fresh := make([]Point, 0, st.replicas)
+	for v := 0; v < st.replicas; v++ {
+		fresh = append(fresh, Point{Hash: pointHash(node, v), Node: node})
 	}
+	sort.Sort(byPosition(fresh))
+	st.points = mergePoints(st.points, fresh)
 	return true
 }
 
@@ -160,19 +179,20 @@ func (r *Ring) Remove(node string) bool {
 	// place: a slice is one persisted object and the deposit only comes back
 	// when that object is dropped, so a ring that shrank in place would keep
 	// paying for the membership it used to have.
-	i := sort.SearchStrings(r.nodes, node)
-	nodes := make([]string, 0, len(r.nodes)-1)
-	nodes = append(nodes, r.nodes[:i]...)
-	nodes = append(nodes, r.nodes[i+1:]...)
-	r.nodes = nodes
+	st := r.st
+	i := sort.SearchStrings(st.nodes, node)
+	nodes := make([]string, 0, len(st.nodes)-1)
+	nodes = append(nodes, st.nodes[:i]...)
+	nodes = append(nodes, st.nodes[i+1:]...)
+	st.nodes = nodes
 
-	points := make([]Point, 0, len(r.points))
-	for _, p := range r.points {
+	points := make([]Point, 0, len(st.points))
+	for _, p := range st.points {
 		if p.Node != node {
 			points = append(points, p)
 		}
 	}
-	r.points = points
+	st.points = points
 	return true
 }
 
@@ -189,18 +209,18 @@ func (r *Ring) Get(key string) string {
 // nodes is a caller's miscount and padding the list with repeats would turn it
 // into one that looks like it has n distinct homes and does not.
 func (r *Ring) GetN(key string, n int) []string {
-	if n < 1 || len(r.points) == 0 {
+	if n < 1 || len(r.st.points) == 0 {
 		return nil
 	}
-	if n > len(r.nodes) {
-		n = len(r.nodes)
+	if n > len(r.st.nodes) {
+		n = len(r.st.nodes)
 	}
 
 	out := make([]string, 0, n)
 	seen := make(map[string]bool, n)
 	start := r.search(Hash(key))
-	for i := 0; i < len(r.points) && len(out) < n; i++ {
-		node := r.points[(start+i)%len(r.points)].Node
+	for i := 0; i < len(r.st.points) && len(out) < n; i++ {
+		node := r.st.points[(start+i)%len(r.st.points)].Node
 		if seen[node] {
 			continue
 		}
@@ -214,38 +234,77 @@ func (r *Ring) GetN(key string, n int) []string {
 // case can be tested at a hash the test chose rather than at whatever string
 // happens to hash past the last point.
 func (r *Ring) owner(h uint64) string {
-	if len(r.points) == 0 {
+	if len(r.st.points) == 0 {
 		return ""
 	}
-	return r.points[r.search(h)].Node
+	return r.st.points[r.search(h)].Node
 }
 
 // search returns the index of the first point at or clockwise of h, wrapping
 // to 0 when h is past the last point. That wrap is the only place the circle
 // is a circle rather than a sorted slice.
 func (r *Ring) search(h uint64) int {
-	i := sort.Search(len(r.points), func(i int) bool { return r.points[i].Hash >= h })
-	if i == len(r.points) {
+	i := sort.Search(len(r.st.points), func(i int) bool { return r.st.points[i].Hash >= h })
+	if i == len(r.st.points) {
 		return 0
 	}
 	return i
 }
 
-// insert places p so that points stays strictly increasing by Hash. A hash
-// already on the circle is dropped rather than inserted beside its twin: two
-// points at one position would make the arc between them empty, so the loser
-// of a collision owns nothing and is only a slower binary search. At 64-bit
-// hashes and a 131,072-point ceiling the odds of ever seeing one are about
-// 2^-31, and the alternative, an order that depends on which node was added
-// first, is a ring that two chains with the same membership disagree about.
-func (r *Ring) insert(p Point) {
-	i := sort.Search(len(r.points), func(i int) bool { return r.points[i].Hash >= p.Hash })
-	if i < len(r.points) && r.points[i].Hash == p.Hash {
-		return
+// mergePoints merges two circles, each ordered by Hash, into a fresh one that
+// is strictly increasing. Where both hold a point at the same position only
+// one survives: two points at one position would make the arc between them
+// empty, so the loser of a collision owns nothing and is only a slower binary
+// search.
+//
+// The winner is the point whose node name sorts first, never the one that was
+// there first. Keeping the incumbent would make the ring depend on the order
+// the membership arrived in, which is a ring two chains with the same
+// membership disagree about. At 64-bit hashes and a 131,072-point ceiling the
+// odds of ever seeing a collision are about 2^-31, which is why the rule has
+// to be right without real data ever exercising it.
+func mergePoints(a, b []Point) []Point {
+	out := make([]Point, 0, len(a)+len(b))
+	i, j := 0, 0
+	for i < len(a) || j < len(b) {
+		var p Point
+		switch {
+		case j == len(b):
+			p, i = a[i], i+1
+		case i == len(a):
+			p, j = b[j], j+1
+		case a[i].Hash < b[j].Hash:
+			p, i = a[i], i+1
+		case a[i].Hash > b[j].Hash:
+			p, j = b[j], j+1
+		default:
+			p = a[i]
+			if b[j].Node < p.Node {
+				p = b[j]
+			}
+			i, j = i+1, j+1
+		}
+		if n := len(out); n > 0 && out[n-1].Hash == p.Hash {
+			// A collision inside one side, a node against its own points:
+			// byPosition already put the winner first.
+			continue
+		}
+		out = append(out, p)
 	}
-	r.points = append(r.points, Point{})
-	copy(r.points[i+1:], r.points[i:])
-	r.points[i] = p
+	return out
+}
+
+// byPosition orders points by Hash, then by Node, so that among points at one
+// position the collision winner comes first.
+type byPosition []Point
+
+func (s byPosition) Len() int      { return len(s) }
+func (s byPosition) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s byPosition) Less(i, j int) bool {
+	if s[i].Hash != s[j].Hash {
+		return s[i].Hash < s[j].Hash
+	}
+	return s[i].Node < s[j].Node
 }
 
 // pointHash is where a node's v-th virtual point lands. The separator keeps

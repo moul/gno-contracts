@@ -1,6 +1,7 @@
 # `gno.land/p/moul/x/daily/hashring/v0`
 
 **Consistent hashing with virtual nodes** (`New`, `Add`, `Remove`, `Get`, `GetN`, `Hash`).
+`Add` refuses the empty name, which is what `Get` answers on an empty ring.
 
 A placement that survives a membership change. `hash(key) % n` is balanced and one
 instruction, and it is wrong the moment `n` moves: going from four shards to five remaps
@@ -50,10 +51,11 @@ stay green through a hash swap that silently moved every key on chain.
 caller's miscount, and a list padded with repeats looks like it names `n` distinct homes
 while naming fewer. It returns the membership instead.
 
-**Colliding points are dropped, not stacked.** Two virtual points at one position leave the
-later one owning an empty arc, so it buys nothing and costs a deeper binary search. The
-alternative, ordering them by which node was added first, is a ring that two chains with the
-same membership disagree about. At 64-bit hashes and a 131,072-point ceiling the odds of ever
+**Colliding points are dropped, not stacked.** Two virtual points at one position leave one
+of them owning an empty arc, so it buys nothing and costs a deeper binary search. The point
+that stays is the one whose node name sorts first, never the one that arrived first: keeping
+the incumbent is a ring that two chains with the same membership, added in a different order,
+disagree about. `Remove` does not bring a dropped point back. At 64-bit hashes and a 131,072-point ceiling the odds of ever
 seeing one are about 2^-31.
 
 **It is a value, not realm state.** Nothing here imports the chain. A realm that wants a ring

@@ -1,7 +1,7 @@
 # `gno.land/r/moul/x/daily/hashringdemo/v0`
 
 **A gnoweb demo of [`p/moul/x/daily/hashring`](/p/moul/x/daily/hashring/v0)**: where keys
-land, what it costs to lose a node, no state, no placement logic of its own.
+land, what it costs to lose a node, no mutable state, no placement logic of its own.
 
 ```
 /r/moul/x/daily/hashringdemo/v0         the ring, the shares, and the migration cost
@@ -10,16 +10,17 @@ land, what it costs to lose a node, no state, no placement logic of its own.
 
 **The third table is the whole page.** Four nodes, 2,000 keys, then `gamma` is taken out and
 the same keys are placed again. Consistent hashing moves 517 of them; `hash(key) % n` moves
-1,463. The 517 is the floor, the keys that lived on the departed node and have nowhere else
-to be, and the ring pays exactly it. The modulo shard pays it and then moves 946 keys that
-had nothing wrong with where they were.
+1,463. Each strategy's floor is the keys it had put on the departed node, which have nowhere
+else to be: 517 for the ring, which pays exactly that, and 515 for the modulo shard, which
+pays its own and then moves 948 keys that had nothing wrong with where they were.
 
 Both numbers are computed in `Render`, against the same key set, on every call. They are a
 measurement rather than a worked example in prose, which is why the realm builds the modulo
 placement too instead of quoting a figure at the reader.
 
-**Fixed inputs, never chain state, deliberately.** Every value rendered here is a package
-level variable. Output that moved with the block height could not be pinned by
+**Fixed inputs, never mutable chain state, deliberately.** Every value rendered here is
+derived from package level variables set at deploy time, the ring included, and no function
+writes any of them. Output that moved with the block height could not be pinned by
 `ExampleRender`, and an unpinned `Render` is how a realm ships a page nobody ever read.
 
 **The visitor's key reaches the page once, inside a code span**, through `md.InlineCode` and
