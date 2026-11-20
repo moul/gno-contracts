@@ -123,7 +123,32 @@ func TestDecodeRejectsOverflow(t *testing.T) {
 	uassert.Error(t, err)
 }
 
+// With maxDelta at 1<<40 this crafted delta wrapped through the rune
+// conversion and decoded to "ñ", colliding with the real Decode("ida").
+func TestDecodeRejectsWrappingDelta(t *testing.T) {
+	_, err := Decode("t3902716a")
+	uassert.ErrorIs(t, err, ErrOverflow)
+
+	got, err := Decode("ida")
+	uassert.NoError(t, err)
+	uassert.Equal(t, "ñ", got)
+}
+
+// Malformed UTF-8 is refused, not replaced with U+FFFD and encoded.
+func TestEncodeRejectsInvalidUTF8(t *testing.T) {
+	for _, s := range []string{"\xff", "a\xffb", "\xc3", "b\xfccher"} {
+		_, err := Encode(s)
+		uassert.ErrorIs(t, err, ErrInvalid)
+		_, err = EncodeDomain(s + ".example")
+		uassert.ErrorIs(t, err, ErrInvalid)
+	}
+}
+
 func TestTooLong(t *testing.T) {
+	uassert.Equal(t, 253, MaxLen)
+	_, errAtCap := Encode(strings.Repeat("a", MaxLen))
+	uassert.NoError(t, errAtCap)
+
 	_, err := Encode(strings.Repeat("a", MaxLen+1))
 	uassert.ErrorIs(t, err, ErrTooLong)
 

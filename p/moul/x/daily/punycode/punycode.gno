@@ -29,6 +29,7 @@ package punycode
 import (
 	"errors"
 	"strings"
+	"unicode/utf8"
 )
 
 // The RFC 3492 section 5 bootstring parameters for punycode. They are not
@@ -47,23 +48,28 @@ const (
 // ACEPrefix marks a domain label as punycode-encoded.
 const ACEPrefix = "xn--"
 
-// MaxLen bounds input so gas stays predictable. A DNS label is 63 bytes and a
-// full name 253, so this is generous for the real use and still a hard stop.
-const MaxLen = 1024
+// MaxLen bounds input so gas stays predictable. It is 253 bytes, the longest
+// full DNS name; a single label is 63. At 1024 a single Render of a caller's
+// argument measured 2,168,853,770 gas, 72% of maxGasQuery; at 253 it measured
+// 148,375,136.
+const MaxLen = 253
 
 // maxRune is the largest valid unicode code point.
 const maxRune = 0x10FFFF
 
 // maxDelta bounds the bootstring accumulator. A legitimate value never exceeds
-// maxRune*(MaxLen+1), about 1.1e9; anything past this cap is a crafted input,
-// and stopping here is what keeps the arithmetic below inside int.
-const maxDelta = 1 << 40
+// maxRune*(MaxLen+1), about 2.8e8; anything past it is a crafted input. The cap
+// must be this figure and not a looser one: Decode converts i/points to a rune
+// before the maxRune check, so a cap past int32 lets a crafted delta wrap round
+// to a real code point ("t3902716a" decoded to "ñ" when the cap was 1<<40).
+const maxDelta = maxRune * (MaxLen + 1)
 
 var (
 	// ErrTooLong is returned when input exceeds MaxLen.
 	ErrTooLong = errors.New("punycode: input too long")
-	// ErrInvalid is returned for input that is not valid punycode: a non-ASCII
-	// byte, a character that is not a bootstring digit, or a truncated number.
+	// ErrInvalid is returned for input that is not valid punycode (a non-ASCII
+	// byte, a character that is not a bootstring digit, a truncated number), and
+	// by Encode for input that is not valid UTF-8.
 	ErrInvalid = errors.New("punycode: invalid input")
 	// ErrOverflow is returned when a decode describes a code point outside the
 	// unicode range, which only a crafted input does.
@@ -131,6 +137,11 @@ func decodeDigit(c byte) int {
 func Encode(s string) (string, error) {
 	if len(s) > MaxLen {
 		return "", ErrTooLong
+	}
+	// []rune would turn each malformed byte into U+FFFD and succeed, so the
+	// round trip would silently change the input.
+	if !utf8.ValidString(s) {
+		return "", ErrInvalid
 	}
 	input := []rune(s)
 

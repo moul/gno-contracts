@@ -19,7 +19,8 @@ address bar shows `münchen.de` while DNS carries `xn--mnchen-3ya.de`.
 **Punycode is not a cipher over bytes, and that is the whole design.** Every
 basic (ASCII) character is copied out first, verbatim, and only the *positions*
 of the non-basic ones are compressed afterwards. So `Hello-münchen-2024` stays
-legible in its encoded form, and an all-ASCII string encodes to itself.
+legible in its encoded form, and an all-ASCII string encodes to itself plus a
+trailing `-` delimiter.
 
 Four behaviours worth knowing before you use it:
 
@@ -45,8 +46,11 @@ unreadable page, and a decoder that loops on one is worse.
 no confusable or bidi checks. It encodes exactly what it is given, so it is a
 codec and never an answer to whether two domain names are the same.
 
-Input is capped at `MaxLen` (1024 bytes). A DNS label is 63 bytes and a full
-name 253, so the cap is generous for the real use and still a hard stop on gas.
+Input is capped at `MaxLen`, 253 bytes, the longest full DNS name (a single
+label is 63). It is a hard stop on gas: at 1024, one `Render` of a caller's
+argument measured 72% of `maxGasQuery`. `Encode` also rejects input that is
+not valid UTF-8 with `ErrInvalid`, rather than replacing the bad bytes with
+U+FFFD.
 
 **Live demo:** [`r/moul/x/daily/punycodedemo`](https://github.com/moul/gno-contracts/tree/main/r/moul/x/daily/punycodedemo)
 · render it at [`/r/moul/x/daily/punycodedemo/v0`](https://gno.land/r/moul/x/daily/punycodedemo/v0).
