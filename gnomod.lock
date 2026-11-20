@@ -380,6 +380,10 @@ module = "gno.land/p/moul/x/daily/pullpayment/v0"
 source = { dir = "p/moul/x/daily/pullpayment" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/quotedprintable/v0"
+source = { dir = "p/moul/x/daily/quotedprintable" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/ratelimit/v0"
 source = { dir = "p/moul/x/daily/ratelimit" }
 
@@ -1195,6 +1199,10 @@ source = { dir = "r/moul/x/daily/pullpaymentdemo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/quizstreak/v0"
 source = { dir = "r/moul/x/daily/quizstreak" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/quotedprintabledemo/v0"
+source = { dir = "r/moul/x/daily/quotedprintabledemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/quotes/v0"
