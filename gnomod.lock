@@ -331,6 +331,10 @@ module = "gno.land/p/moul/x/daily/hexdump/v0"
 source = { dir = "p/moul/x/daily/hexdump" }
 
 [[module]]
+module = "gno.land/p/moul/x/daily/hilbert/v0"
+source = { dir = "p/moul/x/daily/hilbert" }
+
+[[module]]
 module = "gno.land/p/moul/x/daily/huffman/v0"
 source = { dir = "p/moul/x/daily/huffman" }
 
@@ -1037,6 +1041,10 @@ source = { dir = "r/moul/x/daily/heapdemo" }
 [[module]]
 module = "gno.land/r/moul/x/daily/hexdumpdemo/v0"
 source = { dir = "r/moul/x/daily/hexdumpdemo" }
+
+[[module]]
+module = "gno.land/r/moul/x/daily/hilbertdemo/v0"
+source = { dir = "r/moul/x/daily/hilbertdemo" }
 
 [[module]]
 module = "gno.land/r/moul/x/daily/huffmandemo/v0"
