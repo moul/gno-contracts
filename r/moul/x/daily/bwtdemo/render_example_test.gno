@@ -64,7 +64,9 @@ const probe = "a`|![p](h)"
 //
 // The pipes are the ones that bite: a code span is not an escape, so an
 // md.InlineCode cell with a pipe in it opens a column and shifts every value
-// after it. v0 of this file did exactly that.
+// after it. v0 of this file did exactly that. codeCell escapes each pipe to
+// `\|`, which GFM unescapes inside the span, and keeps the span because a
+// bare cell is trimmed.
 func ExampleRender_escapesCallerInput() {
 	print(Render("/" + probe))
 	// Output:
@@ -74,7 +76,7 @@ func ExampleRender_escapesCallerInput() {
 	//
 	// | field | value |
 	// | --- | --- |
-	// | transformed | \|\]h\!pa\)\(\[\` |
+	// | transformed | `` \|]h!pa)([` `` |
 	// | index | 6 |
 	// | runs | 10 → 10 = |
 	// | round-trips | ✅ |
@@ -83,16 +85,16 @@ func ExampleRender_escapesCallerInput() {
 	//
 	// | row | rotation | last byte |
 	// | --- | --- | --- |
-	// | 0 | \!\[p\]\(h\)a\`\| | \| |
-	// | 1 | \(h\)a\`\|\!\[p\] | \] |
-	// | 2 | \)a\`\|\!\[p\]\(h | h |
-	// | 3 | \[p\]\(h\)a\`\|\! | \! |
-	// | 4 | \]\(h\)a\`\|\!\[p | p |
-	// | 5 | \`\|\!\[p\]\(h\)a | a |
-	// | **6** | a\`\|\!\[p\]\(h\) | \) |
-	// | 7 | h\)a\`\|\!\[p\]\( | \( |
-	// | 8 | p\]\(h\)a\`\|\!\[ | \[ |
-	// | 9 | \|\!\[p\]\(h\)a\` | \` |
+	// | 0 | ``![p](h)a`\|`` | `\|` |
+	// | 1 | ``(h)a`\|![p]`` | `]` |
+	// | 2 | ``)a`\|![p](h`` | `h` |
+	// | 3 | ``[p](h)a`\|!`` | `!` |
+	// | 4 | ``](h)a`\|![p`` | `p` |
+	// | 5 | `` `\|![p](h)a `` | `a` |
+	// | **6** | ``a`\|![p](h)`` | `)` |
+	// | 7 | ``h)a`\|![p](`` | `(` |
+	// | 8 | ``p](h)a`\|![`` | `[` |
+	// | 9 | `` \|![p](h)a` `` | `` ` `` |
 	//
 	// [back](/r/moul/x/daily/bwtdemo/v0)
 }

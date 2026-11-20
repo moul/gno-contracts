@@ -143,12 +143,13 @@ func renderInput(in string) string {
 		return b.String()
 	}
 
-	// ui.Cell, not md.InlineCode: a code span escapes nothing a table cares
-	// about, so a pipe in the caller's input survives into the cell and opens
-	// a column. The transformed string is a permutation of their bytes, which
-	// means it carries every pipe and backtick they sent.
+	// codeCell, not ui.Cell: a bare cell is trimmed, so a transform ending in
+	// a space ("hello world" gives "olhdrellwo ") rendered one byte short.
+	// The transformed string is a permutation of the caller's bytes, which
+	// means it carries every pipe and backtick they sent, and codeCell escapes
+	// the pipes a code span alone would let open a column.
 	t := ui.NewTable("field", "value")
-	t.Row("transformed", ui.Cell(last))
+	t.Row("transformed", codeCell(last))
 	t.Row("index", strconv.Itoa(idx))
 	t.Row("runs", strconv.Itoa(bwt.Runs(in))+" → "+strconv.Itoa(bwt.Runs(last))+
 		" "+verdict(bwt.Runs(in), bwt.Runs(last)))
@@ -163,7 +164,7 @@ func renderInput(in string) string {
 			if i == primary {
 				label = "**" + label + "**"
 			}
-			mt.Row(label, ui.Cell(r), ui.Cell(string(r[len(r)-1])))
+			mt.Row(label, codeCell(r), codeCell(string(r[len(r)-1])))
 		}
 		b.WriteString(mt.String() + "\n")
 	} else {
@@ -176,6 +177,14 @@ func renderInput(in string) string {
 
 	b.WriteString("[back](/r/moul/x/daily/bwtdemo/v0)\n")
 	return b.String()
+}
+
+// codeCell renders a caller-derived string as a table cell that keeps every
+// byte: a code span, so leading and trailing spaces survive the cell trim,
+// with each pipe escaped to `\|`, which GFM unescapes inside a table's code
+// span instead of splitting the row on it.
+func codeCell(s string) string {
+	return strings.ReplaceAll(md.InlineCode(s), "|", `\|`)
 }
 
 // verdict labels a run count against the one it came from, so the table says
