@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 	"slices"
@@ -146,5 +147,48 @@ func TestLookupNetworkRejectsUnknown(t *testing.T) {
 		if !strings.Contains(err.Error(), want) {
 			t.Errorf("error %q does not name %q", err, want)
 		}
+	}
+}
+
+// A package that produced no output and still exited non-zero was killed, not
+// linted. The parallel path used to drop cmd.Run's error and keep only the
+// directory name, so a kill and a real lint finding read identically in the CI
+// log and a red run had to be rerun before it meant anything.
+func TestRunGnoHeaderCarriesTheFailure(t *testing.T) {
+	root := t.TempDir()
+	bindir := t.TempDir()
+	// $1 is the verb and $2 is ./<dir>: the doomed package dies on a signal
+	// without writing a byte, which is what a killed child looks like here.
+	writeFile(t, bindir, "gno", "#!/bin/sh\nif [ \"$2\" = ./doomed ]; then kill -9 $$; fi\nexit 0\n")
+	bin := filepath.Join(bindir, "gno")
+	if err := os.Chmod(bin, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	stdout := os.Stdout
+	os.Stdout = w
+	runErr := runGno(root, t.TempDir(), bin, "lint", []string{"fine", "doomed"}, 2)
+	os.Stdout = stdout
+	w.Close()
+	out, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if runErr == nil {
+		t.Fatal("runGno returned nil although a package's process was killed")
+	}
+	if !strings.Contains(runErr.Error(), "doomed") {
+		t.Fatalf("the summary does not name the package: %v", runErr)
+	}
+	if got := string(out); !strings.Contains(got, "== lint doomed FAILED: signal: killed ==") {
+		t.Fatalf("the header does not say why it failed, so a kill and a lint finding look alike:\n%s", got)
+	}
+	if got := string(out); !strings.Contains(got, "== lint fine ==") {
+		t.Fatalf("a package that passed must keep its plain header:\n%s", got)
 	}
 }

@@ -238,7 +238,17 @@ func runGno(root, view, bin, verb string, dirs []string, jobs int) error {
 			err := cmd.Run()
 			mu.Lock()
 			defer mu.Unlock()
-			fmt.Printf("== %s %s ==\n", verb, d)
+			// The header carries WHY, not just the name. A package that
+			// wrote nothing and still exited non-zero was killed rather than
+			// linted, and `signal: killed` is the only thing in the run that
+			// says so. Dropping the error made an OOM-killed child and a real
+			// lint finding read identically, so a red run had to be rerun
+			// before it meant anything.
+			status := ""
+			if err != nil {
+				status = " FAILED: " + err.Error()
+			}
+			fmt.Printf("== %s %s%s ==\n", verb, d, status)
 			os.Stdout.Write(buf.Bytes())
 			if err != nil {
 				failed = append(failed, d)
