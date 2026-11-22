@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-11-22T00:47:18Z",
+  "status_checked_at": "2026-11-22T01:28:01Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
