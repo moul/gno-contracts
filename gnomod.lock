@@ -1495,6 +1495,10 @@ module = "gno.land/r/moul/x/kitindexdemo/v0"
 source = { dir = "r/moul/x/kitindexdemo" }
 
 [[module]]
+module = "gno.land/r/moul/x/mdpack/v0"
+source = { dir = "r/moul/x/mdpack" }
+
+[[module]]
 module = "gno.land/r/moul/x/moultest/v0"
 source = { dir = "r/moul/x/moultest" }
 
