@@ -158,8 +158,8 @@ func Render(path string) string {
 
 	s += "\n## Use it\n\n"
 	s += "```\n"
-	s += "gnokey maketx call -pkgpath gno.land/r/moul/x/grc20faucet/v0 -func Claim ...\n"
-	s += "gnokey maketx call -pkgpath gno.land/r/moul/x/grc20faucet/v0 -func Approve \\\n"
+	s += "gnokey maketx call -pkgpath gno.land/r/moul/x/grc20faucet/v1 -func Claim ...\n"
+	s += "gnokey maketx call -pkgpath gno.land/r/moul/x/grc20faucet/v1 -func Approve \\\n"
 	s += "  -args RED -args <spender> -args 1000000 ...\n"
 	s += "```\n\n"
 	s += "Both tokens are registered in [grc20reg](/r/nt/grc20reg/v0), so a realm can\n"
@@ -167,9 +167,16 @@ func Render(path string) string {
 	s += "[grc20wrapdemo](/r/moul/x/grc20wrapdemo/v0) does with them.\n"
 
 	if path != "" {
+		// address(path) is a cast, not a check: validate before echoing, and
+		// echo the address rather than the path, so an invalid one is never
+		// written back to the page.
 		s += "\n---\n\n"
+		who := address(path)
+		if !who.IsValid() {
+			return s + "Not a valid address.\n"
+		}
 		s += ufmt.Sprintf("Balance of `%s`: RED %d, BLUE %d\n",
-			path, Red.BalanceOf(address(path)), Blue.BalanceOf(address(path)))
+			who.String(), Red.BalanceOf(who), Blue.BalanceOf(who))
 	}
 	return s
 }

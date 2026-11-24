@@ -73,8 +73,8 @@ func TestUnknownSymbolIsRefused(cur realm, t *testing.T) {
 // Both tokens are in the registry under their own realm and symbol, which is
 // what lets another realm move them without importing this one.
 func TestBothTokensAreRegistered(t *testing.T) {
-	uassert.Equal(t, "gno.land/r/moul/x/grc20faucet/v0.RED", RedKey)
-	uassert.Equal(t, "gno.land/r/moul/x/grc20faucet/v0.BLUE", BlueKey)
+	uassert.Equal(t, "gno.land/r/moul/x/grc20faucet/v1.RED", RedKey)
+	uassert.Equal(t, "gno.land/r/moul/x/grc20faucet/v1.BLUE", BlueKey)
 	uassert.Equal(t, "Red Token", grc20reg.MustGet(RedKey).GetName())
 	uassert.Equal(t, "Blue Token", grc20reg.MustGet(BlueKey).GetName())
 	uassert.Equal(t, 4, grc20reg.MustGet(BlueKey).GetDecimals())
@@ -93,4 +93,13 @@ func TestRender(cur realm, t *testing.T) {
 	page := Render(who.String())
 	uassert.True(t, strings.Contains(page, "Balance of"), page)
 	uassert.True(t, strings.Contains(page, "RED 1000000"), page)
+}
+
+// TestRenderValidatesBeforeEcho pins that the balance line is written only for
+// a valid address: address(path) is a cast, not a check, and v0 echoed any
+// path into a code span it could close.
+func TestRenderValidatesBeforeEcho(t *testing.T) {
+	got := Render("x` ![p](https:e.io) `y")
+	uassert.True(t, strings.HasSuffix(got, "\n---\n\nNot a valid address.\n"), "no refusal")
+	uassert.False(t, strings.Contains(got, "![p]"), "the path was echoed")
 }
