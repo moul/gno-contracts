@@ -7,9 +7,9 @@
 # The only fix is a new version at a new path, which is a deliberate deploy and
 # not something a guard should force.
 #
-# So the guard's job is to stop the 55th, not to relitigate the 54. An entry
-# leaves this file when the realm ships a fixed version, and a realm that is not
-# in it must escape or say why.
+# So the guard's job is to stop the next one, not to relitigate the ones already
+# here. An entry leaves this file when the realm ships a fixed version, and a
+# realm that is not in it must escape or say why.
 #
 # Generated 2026-09-23 from the tree at that date. Do not add to it by hand to
 # silence a failure: that is what the `// untrusted-render: <why>` opt-out is
