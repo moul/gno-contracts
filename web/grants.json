@@ -1,0 +1,12 @@
+{
+  "_comment": "The desks this page can manage. Adding one is an edit here, not a code change: a label, its realm path, and the network it lives on. `default` is the desk shown when no ?realm is in the URL and nothing is remembered; change that one line to move the default. The network a desk names is the one the page switches to when you pick it; you can still change network by hand afterwards.",
+  "default": "gno.land/r/moul/smallgrants/v0",
+  "desks": [
+    {
+      "label": "Small grants (demo)",
+      "path": "gno.land/r/moul/smallgrants/v0",
+      "network": "onyx",
+      "blurb": "A public desk for small GNOT grants on a testnet: see every request and what was decided, and file one yourself."
+    }
+  ]
+}
