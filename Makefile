@@ -46,6 +46,8 @@ fmt: ## gno fmt every contract in place
 # workflow beside the upstream-drift step that needs a gno master checkout, and
 # `guard-generated` takes a base and a head ref, so it only means anything on a
 # pull request (.github/workflows/audit-patterns.yml, .github/workflows/ci.yml).
+# ARGS on `make test` belongs to the Gno runner. gnovet is an unfiltered guard.
+guards: override ARGS :=
 guards: toolcheck guard-examples guard-render guard-readmes guard-private guard-untrusted-render guard-tables gnovet ## every CI guard that reads only this tree
 
 toolcheck: ## fail if this gno skips example tests, which would make them false-green
@@ -181,4 +183,4 @@ test-web: ## test the dashboard's live apps under node, against a scripted chain
 	node --test web/test/*.test.js
 
 clean: ## remove the GNOROOT view, the gnopm assembly, the previews and the caches
-	rm -rf bin .gnoroot-view .gnopm .cache _preview _site
+	rm -rf bin .gnoroot-view .gnoroot-view-legacy .gnopm .cache _preview _site

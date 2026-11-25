@@ -11,6 +11,7 @@ tools/tools
 
 # ephemeral stdlib-only GNOROOT view, rebuilt by every gno invocation
 /.gnoroot-view/
+/.gnoroot-view-legacy/
 
 # gnopm's assembly of package versions that no longer exist in the working
 # tree, rebuilt from gnomod.lock by `gnopm install`. Tool output, never

@@ -1,0 +1,16 @@
+# Exact package versions rejected by the declaration gate in gnolang/gno#6208.
+# Module path followed by the production fingerprint from gnoProductionHash.
+gno.land/p/moul/forge/v0 fc9e417adbad86b46225488b27c7f86e37914214217c698b1f69cdbff5a66482
+gno.land/p/moul/forge/v1 6f0a5adf8455c62367473d0a482332bd858208666f791ba718468d83765e991d
+gno.land/p/moul/x/daily/ahocorasick/v0 1577a0079f3914f050a85f0a983aa7d376822c9145bf36470026f07952941cdc
+gno.land/p/moul/x/daily/cowsay/v0 241a1f11bcd2fd34510611b428ce338deaf42468714ea73aba49bd75b9b9368f
+gno.land/p/moul/x/daily/huffman/v0 a7418df1d6e16f6842a3f86ef1420b4fc219cd06e99fa73e4efd48d33168726b
+gno.land/p/moul/x/daily/pullpayment/v0 0dbc582d8517803b8405c37d04d24e4c94d597e09946619ff1a3fbfc8af9c3af
+gno.land/p/moul/x/daily/ratelimit/v0 f4dab46c2a202ef0f693847906476298d6868b46b20e1a4b33e7e617e306f16b
+gno.land/p/moul/x/daily/toposort/v0 20a0a3d4cd1e307354fbe93cf25bf63896a7214802ac01b79945ef983907c5fb
+gno.land/p/moul/x/plan9/memfs/v0 0fc7f0c5fa30aa66b65822fc1838079c24b763124d03b163e45d8512ebfbc808
+gno.land/p/moul/x/plan9/ns/v0 f0ea833b63d5aa87b80b4c560019481b533388cb43a849bdbbfbc8ac9610436f
+gno.land/r/moul/gns/v0 79e68b4f5e6fe01896e2b43a6506222923316be4823d1ae0657df7069dc09249
+gno.land/r/moul/x/daily/collatz/v0 d0fdf2b96b0bd203ef348856f3f435609c5cef08ab3485b8ff06387cea140151
+gno.land/r/moul/x/daily/collatz/v1 15d543e83d734a1256ed7a594298c12325746e576e5205c11466fc489ba58e15
+gno.land/r/moul/x/daily/quizstreak/v0 3e2e0c4d788c7a8f97d26d5dfc64e267c4e6e0ff5b4dc11367badd48974860a7

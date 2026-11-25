@@ -90,7 +90,9 @@ func cmdGno(root string, args []string) error {
 		return nil
 	case "toolcheck":
 		return toolcheck(root, view, *bin)
-	case "lint", "test", "fmt":
+	case "lint", "test":
+		return runGnoWithLegacy(root, view, *bin, verb, dirs, *jobs)
+	case "fmt":
 		return runGno(root, view, *bin, verb, dirs, *jobs)
 	default:
 		return fmt.Errorf("unknown gno subcommand %q (want lint, test, fmt, toolcheck or list)", verb)
@@ -160,8 +162,10 @@ func selectDirs(dirs, sel []string) []string {
 // while the view was the Makefile's job and the environment was a step's, so
 // it is now an error rather than a comment.
 func ensureView(root string) (string, error) {
-	view := filepath.Join(root, viewDir)
-	gnoroot := os.Getenv("GNOROOT")
+	return ensureViewAt(filepath.Join(root, viewDir), os.Getenv("GNOROOT"))
+}
+
+func ensureViewAt(view, gnoroot string) (string, error) {
 	if gnoroot == "" {
 		return "", fmt.Errorf("GNOROOT must point at a gnolang/gno checkout (it provides the gno stdlibs)")
 	}
@@ -170,7 +174,7 @@ func ensureView(root string) (string, error) {
 		return "", err
 	}
 	if abs == view {
-		return "", fmt.Errorf("GNOROOT is %s, the ephemeral view: it must name the real gnolang/gno checkout", viewDir)
+		return "", fmt.Errorf("GNOROOT is %s, the ephemeral view: it must name the real gnolang/gno checkout", filepath.Base(view))
 	}
 	entries, err := os.ReadDir(abs)
 	if err != nil {
