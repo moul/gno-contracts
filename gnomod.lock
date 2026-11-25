@@ -1479,6 +1479,10 @@ module = "gno.land/r/moul/x/games/lastwords/v0"
 source = { dir = "r/moul/x/games/lastwords" }
 
 [[module]]
+module = "gno.land/r/moul/x/grc20aliases/v0"
+source = { dir = "r/moul/x/grc20aliases" }
+
+[[module]]
 module = "gno.land/r/moul/x/grc20faucet/v0"
 source = { dir = "r/moul/x/grc20faucet" }
 

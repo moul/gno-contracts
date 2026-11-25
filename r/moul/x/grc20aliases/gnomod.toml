@@ -1,0 +1,4 @@
+module = "gno.land/r/moul/x/grc20aliases/v0"
+gno = "0.9"
+
+# public: clients can import Resolve to look up canonical GRC20 registry keys.
