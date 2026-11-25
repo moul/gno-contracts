@@ -18,9 +18,11 @@ package main
 // one package (measured 2026-09-21: 193 packages, node ready in 9s).
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path"
@@ -158,14 +160,15 @@ func cmdPreview(root string, args []string) error {
 	if err != nil {
 		return err
 	}
-	stop, died, err := startGnodev(*gnodev, root, dirs, *out, *port, "gnodev.log")
+	node, err := startGnodev(*gnodev, root, dirs, *out, *port, "gnodev.log")
 	if err != nil {
 		return err
 	}
-	defer stop()
+	defer node.stop()
 
 	c := &Crawler{
-		Base:         fmt.Sprintf("http://127.0.0.1:%d", *port),
+		Base:         node.base,
+		chainID:      node.chainID,
 		Paths:        plan.Paths,
 		MaxPages:     *maxPages,
 		Live:         strings.TrimSuffix(*live, "/"),
@@ -178,7 +181,7 @@ func cmdPreview(root string, args []string) error {
 		// affordable, and on the main snapshot every one of them is the point.
 		c.FileBudget = unlimitedFiles
 	}
-	if err := waitServing(c.Base, gnowebPath(plan.Paths[0]), *timeout, died); err != nil {
+	if err := node.waitServing(gnowebPath(plan.Paths[0]), *timeout); err != nil {
 		return err
 	}
 	if err := c.Run(); err != nil {
@@ -397,14 +400,31 @@ func workspacePkgDirs(root string) ([]string, error) {
 	return dirs, nil
 }
 
+type previewNode struct {
+	base    string
+	chainID string
+	stop    func()
+	died    <-chan error
+}
+
 // startGnodev boots gnodev on the workspace. GNOROOT is the stdlib-only view
 // cmdPreview built, so gno.land/* dependencies resolve from committed vendor/
 // exactly as they do for lint and test, rather than from whatever the monorepo
 // checkout happens to hold.
-func startGnodev(bin, root string, dirs []string, out string, port int, logName string) (func(), <-chan error, error) {
+func startGnodev(bin, root string, dirs []string, out string, port int, logName string) (*previewNode, error) {
+	webAddr := fmt.Sprintf("127.0.0.1:%d", port)
+	listener, err := net.Listen("tcp4", webAddr)
+	if err != nil {
+		return nil, fmt.Errorf("preview port %d is unavailable (choose a free -port): %w", port, err)
+	}
+	listener.Close()
+
+	// A process can take the port between the availability check and gnodev's
+	// bind. Give the local chain an ID that gnoweb can report back to us.
+	chainID := "gnoc-preview-" + strings.ToLower(rand.Text())
 	args := []string{
-		"local", "-no-watch",
-		"-web-listener", fmt.Sprintf("127.0.0.1:%d", port),
+		"local", "-no-watch", "-chain-id", chainID,
+		"-web-listener", webAddr,
 		// The RPC listener and the keybase both default to fixed locations, so
 		// the before/after passes — which run one after the other but leave
 		// state behind — would collide on them. Derive both from the web port.
@@ -415,14 +435,14 @@ func startGnodev(bin, root string, dirs []string, out string, port int, logName 
 	args = append(args, dirs...)
 	log, err := os.Create(filepath.Join(out, logName))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	cmd := exec.Command(bin, args...)
 	cmd.Stdout, cmd.Stderr = log, log
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	if err := cmd.Start(); err != nil {
 		log.Close()
-		return nil, nil, fmt.Errorf("start gnodev: %w", err)
+		return nil, fmt.Errorf("start gnodev: %w", err)
 	}
 	// Nothing else watches this process. Without the channel, a gnodev that
 	// dies on startup (a port already taken, a package that will not load)
@@ -434,11 +454,16 @@ func startGnodev(bin, root string, dirs []string, out string, port int, logName 
 		died <- cmd.Wait()
 		close(waited)
 	}()
-	return func() {
-		_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM) // gnodev spawns a node
-		<-waited
-		log.Close()
-	}, died, nil
+	return &previewNode{
+		base:    "http://" + webAddr,
+		chainID: chainID,
+		died:    died,
+		stop: func() {
+			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM) // gnodev spawns a node
+			<-waited
+			log.Close()
+		},
+	}, nil
 }
 
 // renderBase renders the changed packages a second time from the merge-base
@@ -473,15 +498,16 @@ func renderBase(gnodev, baseRoot, out string, plan *previewPlan, head *Crawler, 
 		return nil, newPkgs
 	}
 	basePort := port + 1
-	stop, died, err := startGnodev(gnodev, baseRoot, dirs, out, basePort, "gnodev-base.log")
+	node, err := startGnodev(gnodev, baseRoot, dirs, out, basePort, "gnodev-base.log")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "  ! base render:", err)
 		return nil, newPkgs
 	}
-	defer stop()
+	defer node.stop()
 
 	base := &Crawler{
-		Base:       fmt.Sprintf("http://127.0.0.1:%d", basePort),
+		Base:       node.base,
+		chainID:    node.chainID,
 		Paths:      paths,
 		MaxPages:   len(paths),
 		Live:       strings.TrimSuffix(live, "/"),
@@ -489,7 +515,7 @@ func renderBase(gnodev, baseRoot, out string, plan *previewPlan, head *Crawler, 
 		Prefix:     beforeDir,
 	}
 	for _, step := range []func() error{
-		func() error { return waitServing(base.Base, gnowebPath(paths[0]), timeout, died) },
+		func() error { return node.waitServing(gnowebPath(paths[0]), timeout) },
 		base.Run,
 		func() error { return base.Write(out, "") },
 	} {

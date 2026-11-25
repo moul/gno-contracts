@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestSplitGnowebURL(t *testing.T) {
@@ -419,5 +422,65 @@ func TestSupersededVersionsAreLoadedButNeverCrawled(t *testing.T) {
 	}
 	if contains(plan.Paths, "gno.land/r/moul/old/v0") {
 		t.Fatalf("a history-pinned version was pulled in as a dependent: %v", plan.Paths)
+	}
+}
+
+func TestPreviewRejectsHTTP200FromAnotherChain(t *testing.T) {
+	const probe = "/r/moul/hello/v0"
+	for _, tc := range []struct {
+		name, status string
+		ready        bool
+	}{
+		{"unrelated HTTP service", `<html>Everything here is HTTP 200</html>`, false},
+		{"another gnoweb", `{"gnoland":{"connected":true,"chain_id":"another-dev-chain"}}`, false},
+		{"disconnected gnoweb", `{"gnoland":{"connected":false,"chain_id":"my-dev-chain"}}`, false},
+		{"own gnoweb", `{"gnoland":{"connected":true,"chain_id":"my-dev-chain"}}`, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/status.json" {
+					fmt.Fprint(w, tc.status)
+					return
+				}
+				if !tc.ready || r.URL.Path != probe {
+					t.Errorf("unexpected package request: %s", r.URL.Path)
+				}
+				fmt.Fprint(w, "200 OK")
+			}))
+			defer srv.Close()
+			node := &previewNode{base: srv.URL, chainID: "my-dev-chain"}
+			timeout := 50 * time.Millisecond
+			if tc.ready {
+				timeout = 2 * time.Second
+			}
+			if err := node.waitServing(probe, timeout); (err == nil) != tc.ready {
+				t.Fatalf("waitServing = %v, want ready=%t", err, tc.ready)
+			}
+		})
+	}
+}
+
+func TestStartGnodevReportsOccupiedWebPort(t *testing.T) {
+	listener, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	port := listener.Addr().(*net.TCPAddr).Port
+	root := t.TempDir()
+	_, err = startGnodev("unused-gnodev", root, nil, root, port, "gnodev.log")
+	if err == nil || !strings.Contains(err.Error(), "choose a free -port") {
+		t.Fatalf("startGnodev = %v, want a port collision error", err)
+	}
+}
+
+func TestPreviewSnapshotUsesStableChainID(t *testing.T) {
+	c := Crawler{chainID: "gnoc-preview-unique"}
+	page := &pvPage{
+		File: "r/moul/hello/v0/index.html",
+		Body: `<meta name="gnoconnect:chainid" content="gnoc-preview-unique"><code>gnokey sign -chainid "gnoc-preview-unique"</code>`,
+	}
+	if got := c.rewrite(page); strings.Contains(got, c.chainID) || !strings.Contains(got, `-chainid "dev"`) {
+		t.Fatalf("rewrite did not preserve the dev chain label: %s", got)
 	}
 }
