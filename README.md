@@ -559,16 +559,16 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/upgrade/wrap/v0`](r/moul/x/upgrade/wrap/gen0) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/upgrade/wrap/v0) | [✅](https://gno.land/r/moul/x/upgrade/wrap/v0) | — | — | 1 |
 | [`r/moul/x/upgrade/wrap/v1`](r/moul/x/upgrade/wrap/gen1) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/upgrade/wrap/v1) | [✅](https://gno.land/r/moul/x/upgrade/wrap/v1) | — | — | 2 |
 | [`r/moul/x/vm/bfdemo/v0`](r/moul/x/vm/bfdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/vm/bfdemo/v0) | [✅](https://gno.land/r/moul/x/vm/bfdemo/v0) | — | — | 7 |
-| [`r/moul/x/vm/riscvdemo/v0`](r/moul/x/vm/riscvdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/vm/riscvdemo/v0) | [✅](https://gno.land/r/moul/x/vm/riscvdemo/v0) | — | — | 7 |
-| [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/wesh/v0) | [✅](https://gno.land/r/moul/x/wesh/v0) | — | — | 3 |
-| [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/wiki/v0) | [✅](https://gno.land/r/moul/x/wiki/v0) | — | — | 8 |
+| [`r/moul/x/vm/riscvdemo/v0`](r/moul/x/vm/riscvdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/vm/riscvdemo/v0) | — | — | 7 |
+| [`r/moul/x/wesh/v0`](r/moul/x/wesh) 🏛️ | — | [✅](https://gno.land/r/moul/x/wesh/v0) | — | — | 3 |
+| [`r/moul/x/wiki/v0`](r/moul/x/wiki) 🏛️ | — | [✅](https://gno.land/r/moul/x/wiki/v0) | — | — | 8 |
 | [`r/moul/zones/v0`](r/moul/zones) 🏛️ | — | [✅](https://gno.land/r/moul/zones/v0) | — | — | 5 |
 
 _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinned in `gnomod.lock`, still built)._
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-26T19:28:59Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-26T20:27:44Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
