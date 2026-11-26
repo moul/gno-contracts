@@ -531,19 +531,19 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/plan9/dev/v1`](r/moul/x/plan9/dev) 🏛️ | — | [✅](https://gno.land/r/moul/x/plan9/dev/v1) | — | — | 5 |
 | [`r/moul/x/plan9/ns/v0`](https://github.com/moul/gno-contracts/tree/998c902855ad5aea1ed9c8c71f0a0fee1985119f/r/moul/x/plan9/ns) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/plan9/ns/v0) | — | — | 6 |
 | [`r/moul/x/plan9/ns/v1`](r/moul/x/plan9/ns) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/plan9/ns/v1) | [✅](https://gno.land/r/moul/x/plan9/ns/v1) | — | — | 8 |
-| [`r/moul/x/provable/v0`](r/moul/x/provable) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/provable/v0) | [✅](https://gno.land/r/moul/x/provable/v0) | — | — | 2 |
+| [`r/moul/x/provable/v0`](r/moul/x/provable) 🏛️ | — | [✅](https://gno.land/r/moul/x/provable/v0) | — | — | 2 |
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
-| [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/reaper/v1) | [✅](https://gno.land/r/moul/x/reaper/v1) | — | — | 5 |
-| [`r/moul/x/social/crews/v0`](r/moul/x/social/crews) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/social/crews/v0) | [✅](https://gno.land/r/moul/x/social/crews/v0) | — | — | 8 |
-| [`r/moul/x/social/curated/v0`](r/moul/x/social/curated) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/social/curated/v0) | [✅](https://gno.land/r/moul/x/social/curated/v0) | — | — | 7 |
-| [`r/moul/x/social/patron/v0`](r/moul/x/social/patron) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/social/patron/v0) | [✅](https://gno.land/r/moul/x/social/patron/v0) | — | — | 8 |
-| [`r/moul/x/social/threads/v0`](r/moul/x/social/threads) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/social/threads/v0) | [✅](https://gno.land/r/moul/x/social/threads/v0) | — | — | 7 |
-| [`r/moul/x/social/vouch/v0`](r/moul/x/social/vouch) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/social/vouch/v0) | [✅](https://gno.land/r/moul/x/social/vouch/v0) | — | — | 6 |
-| [`r/moul/x/upgrade/adminreg/facade/v0`](r/moul/x/upgrade/adminreg/facade) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/upgrade/adminreg/facade/v0) | [✅](https://gno.land/r/moul/x/upgrade/adminreg/facade/v0) | — | — | 3 |
+| [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | [✅](https://gno.land/r/moul/x/reaper/v1) | — | — | 5 |
+| [`r/moul/x/social/crews/v0`](r/moul/x/social/crews) 🏛️ | — | [✅](https://gno.land/r/moul/x/social/crews/v0) | — | — | 8 |
+| [`r/moul/x/social/curated/v0`](r/moul/x/social/curated) 🏛️ | — | [✅](https://gno.land/r/moul/x/social/curated/v0) | — | — | 7 |
+| [`r/moul/x/social/patron/v0`](r/moul/x/social/patron) 🏛️ | — | [✅](https://gno.land/r/moul/x/social/patron/v0) | — | — | 8 |
+| [`r/moul/x/social/threads/v0`](r/moul/x/social/threads) 🏛️ | — | [✅](https://gno.land/r/moul/x/social/threads/v0) | — | — | 7 |
+| [`r/moul/x/social/vouch/v0`](r/moul/x/social/vouch) 🏛️ | — | [✅](https://gno.land/r/moul/x/social/vouch/v0) | — | — | 6 |
+| [`r/moul/x/upgrade/adminreg/facade/v0`](r/moul/x/upgrade/adminreg/facade) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/adminreg/facade/v0) | — | — | 3 |
 | [`r/moul/x/upgrade/adminreg/impl/v0`](r/moul/x/upgrade/adminreg/impl/gen0) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/adminreg/impl/v0) | — | — | 1 |
 | [`r/moul/x/upgrade/adminreg/impl/v1`](r/moul/x/upgrade/adminreg/impl/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/adminreg/impl/v1) | — | — | 1 |
-| [`r/moul/x/upgrade/lazy/v0`](r/moul/x/upgrade/lazy/gen0) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/upgrade/lazy/v0) | [✅](https://gno.land/r/moul/x/upgrade/lazy/v0) | — | — | 2 |
-| [`r/moul/x/upgrade/lazy/v1`](r/moul/x/upgrade/lazy/gen1) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/upgrade/lazy/v1) | [✅](https://gno.land/r/moul/x/upgrade/lazy/v1) | — | — | 3 |
+| [`r/moul/x/upgrade/lazy/v0`](r/moul/x/upgrade/lazy/gen0) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/lazy/v0) | — | — | 2 |
+| [`r/moul/x/upgrade/lazy/v1`](r/moul/x/upgrade/lazy/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/lazy/v1) | — | — | 3 |
 | [`r/moul/x/upgrade/lock/v0`](r/moul/x/upgrade/lock/gen0) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/lock/v0) | — | — | 2 |
 | [`r/moul/x/upgrade/lock/v1`](r/moul/x/upgrade/lock/gen1) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/lock/v1) | — | — | 2 |
 | [`r/moul/x/upgrade/schema/facade/v0`](r/moul/x/upgrade/schema/facade) 🏛️ | — | [✅](https://gno.land/r/moul/x/upgrade/schema/facade/v0) | — | — | 3 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-26T21:27:34Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-26T22:27:27Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
