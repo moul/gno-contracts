@@ -521,16 +521,16 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/kitindexdemo/v0`](r/moul/x/kitindexdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/kitindexdemo/v0) | [✅](https://gno.land/r/moul/x/kitindexdemo/v0) | — | — | 5 |
 | [`r/moul/x/moultest/v0`](r/moul/x/moultest) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/moultest/v0) | [✅](https://gno.land/r/moul/x/moultest/v0) | — | — | 4 |
 | [`r/moul/x/nativeify/v0`](r/moul/x/nativeify) 🏛️ | — | [✅](https://gno.land/r/moul/x/nativeify/v0) | — | — | 8 |
-| [`r/moul/x/nativereg/v0`](r/moul/x/nativereg) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/nativereg/v0) | [✅](https://gno.land/r/moul/x/nativereg/v0) | — | — | 4 |
-| [`r/moul/x/pairreg/v0`](r/moul/x/pairreg) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/pairreg/v0) | [✅](https://gno.land/r/moul/x/pairreg/v0) | — | — | 4 |
-| [`r/moul/x/pairs/aaa/v0`](r/moul/x/pairs/aaa) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/pairs/aaa/v0) | [✅](https://gno.land/r/moul/x/pairs/aaa/v0) | — | — | 2 |
+| [`r/moul/x/nativereg/v0`](r/moul/x/nativereg) 🏛️ | — | [✅](https://gno.land/r/moul/x/nativereg/v0) | — | — | 4 |
+| [`r/moul/x/pairreg/v0`](r/moul/x/pairreg) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairreg/v0) | — | — | 4 |
+| [`r/moul/x/pairs/aaa/v0`](r/moul/x/pairs/aaa) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/aaa/v0) | — | — | 2 |
 | [`r/moul/x/pairs/aaabbb/v0`](r/moul/x/pairs/aaabbb) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/aaabbb/v0) | — | — | 5 |
-| [`r/moul/x/pairs/bbb/v0`](r/moul/x/pairs/bbb) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/pairs/bbb/v0) | [✅](https://gno.land/r/moul/x/pairs/bbb/v0) | — | — | 2 |
-| [`r/moul/x/pilotdemo/v0`](r/moul/x/pilotdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/pilotdemo/v0) | [✅](https://gno.land/r/moul/x/pilotdemo/v0) | — | — | 3 |
+| [`r/moul/x/pairs/bbb/v0`](r/moul/x/pairs/bbb) 🏛️ | — | [✅](https://gno.land/r/moul/x/pairs/bbb/v0) | — | — | 2 |
+| [`r/moul/x/pilotdemo/v0`](r/moul/x/pilotdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/pilotdemo/v0) | — | — | 3 |
 | [`r/moul/x/plan9/dev/v0`](https://github.com/moul/gno-contracts/tree/998c902855ad5aea1ed9c8c71f0a0fee1985119f/r/moul/x/plan9/dev) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/plan9/dev/v0) | — | — | 3 |
 | [`r/moul/x/plan9/dev/v1`](r/moul/x/plan9/dev) 🏛️ | — | [✅](https://gno.land/r/moul/x/plan9/dev/v1) | — | — | 5 |
 | [`r/moul/x/plan9/ns/v0`](https://github.com/moul/gno-contracts/tree/998c902855ad5aea1ed9c8c71f0a0fee1985119f/r/moul/x/plan9/ns) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/plan9/ns/v0) | — | — | 6 |
-| [`r/moul/x/plan9/ns/v1`](r/moul/x/plan9/ns) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/plan9/ns/v1) | [✅](https://gno.land/r/moul/x/plan9/ns/v1) | — | — | 8 |
+| [`r/moul/x/plan9/ns/v1`](r/moul/x/plan9/ns) 🏛️ | — | [✅](https://gno.land/r/moul/x/plan9/ns/v1) | — | — | 8 |
 | [`r/moul/x/provable/v0`](r/moul/x/provable) 🏛️ | — | [✅](https://gno.land/r/moul/x/provable/v0) | — | — | 2 |
 | [`r/moul/x/reaper/v0`](https://github.com/moul/gno-contracts/tree/72317f0ab9702651dfd50da24b9cc1599399e6a1/r/moul/x/reaper) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/reaper/v0) | — | — | 6 |
 | [`r/moul/x/reaper/v1`](r/moul/x/reaper) 🏛️ | — | [✅](https://gno.land/r/moul/x/reaper/v1) | — | — | 5 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-26T22:27:27Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-26T23:27:49Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
