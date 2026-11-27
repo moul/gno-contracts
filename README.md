@@ -327,17 +327,17 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/faucet/v0`](https://github.com/moul/gno-contracts/tree/a04bb0d9caf27fb01fe37c64629ce8c8ae4a77cf/r/moul/faucet) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/faucet/v0) | — | — | 2 |
 | [`r/moul/faucet/v1`](r/moul/faucet) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/faucet/v1) | [✅](https://gno.land/r/moul/faucet/v1) | — | — | 2 |
 | [`r/moul/forge/v0`](r/moul/forge) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/forge/v0) | [✅](https://gno.land/r/moul/forge/v0) | — | — | 5 |
-| [`r/moul/gallery/v0`](r/moul/gallery) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/gallery/v0) | [✅](https://gno.land/r/moul/gallery/v0) | — | — | 7 |
-| [`r/moul/gnopm/registry/v0`](r/moul/gnopm/registry) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/gnopm/registry/v0) | [✅](https://gno.land/r/moul/gnopm/registry/v0) | — | — | 5 |
-| [`r/moul/gns/v0`](r/moul/gns) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/gns/v0) | [✅](https://gno.land/r/moul/gns/v0) | — | — | 2 |
-| [`r/moul/grant/v0`](r/moul/grant) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/grant/v0) | [✅](https://gno.land/r/moul/grant/v0) | — | — | 1 |
-| [`r/moul/hello/v0`](r/moul/hello) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/hello/v0) | [✅](https://gno.land/r/moul/hello/v0) | — | — | 1 |
+| [`r/moul/gallery/v0`](r/moul/gallery) 🏛️ | — | [✅](https://gno.land/r/moul/gallery/v0) | — | — | 7 |
+| [`r/moul/gnopm/registry/v0`](r/moul/gnopm/registry) 🏛️ | — | [✅](https://gno.land/r/moul/gnopm/registry/v0) | — | — | 5 |
+| [`r/moul/gns/v0`](r/moul/gns) 🏛️ | — | [✅](https://gno.land/r/moul/gns/v0) | — | — | 2 |
+| [`r/moul/grant/v0`](r/moul/grant) 🏛️ | — | [✅](https://gno.land/r/moul/grant/v0) | — | — | 1 |
+| [`r/moul/hello/v0`](r/moul/hello) 🏛️ | — | [✅](https://gno.land/r/moul/hello/v0) | — | — | 1 |
 | [`r/moul/home`](r/moul/home) 🏛️ | — | [✅](https://gno.land/r/moul/home) | — | — | 5 |
 | [`r/moul/home/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/home) 🏛️ 🧊 | — | — | — | — | — |
-| [`r/moul/outfmt/v0`](r/moul/outfmt) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/outfmt/v0) | [✅](https://gno.land/r/moul/outfmt/v0) | — | — | 1 |
-| [`r/moul/pilot/v0`](r/moul/pilot) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/pilot/v0) | [✅](https://gno.land/r/moul/pilot/v0) | — | — | 1 |
-| [`r/moul/present/v0`](r/moul/present) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/present/v0) | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
-| [`r/moul/reactions/v0`](r/moul/reactions) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/reactions/v0) | [✅](https://gno.land/r/moul/reactions/v0) | — | — | 2 |
+| [`r/moul/outfmt/v0`](r/moul/outfmt) 🏛️ | — | [✅](https://gno.land/r/moul/outfmt/v0) | — | — | 1 |
+| [`r/moul/pilot/v0`](r/moul/pilot) 🏛️ | — | [✅](https://gno.land/r/moul/pilot/v0) | — | — | 1 |
+| [`r/moul/present/v0`](r/moul/present) 🏛️ | — | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
+| [`r/moul/reactions/v0`](r/moul/reactions) 🏛️ | — | [✅](https://gno.land/r/moul/reactions/v0) | — | — | 2 |
 | [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | — | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
 | [`r/moul/toolbox`](r/moul/toolbox) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/toolbox/usernames`](r/moul/toolbox/usernames) 🏛️ | — | — | — | — | 5 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T14:28:10Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T15:29:14Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
