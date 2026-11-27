@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-11-27T10:28:11Z",
+  "status_checked_at": "2026-11-27T11:27:26Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -7818,8 +7818,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/globdemo/v0"
         },
         "staging": {
@@ -7880,8 +7879,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/governor/v1"
         },
         "pearl": {
@@ -7948,8 +7946,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/guestbook/v1"
         },
         "pearl": {
@@ -8018,8 +8015,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/handles/v1"
         },
         "pearl": {
@@ -8054,8 +8050,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/hangman/v0"
         },
         "pearl": {

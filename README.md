@@ -406,14 +406,14 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/flatmapdemo/v0`](r/moul/x/daily/flatmapdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/flatmapdemo/v0) | [✅](https://gno.land/r/moul/x/daily/flatmapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/fractiondemo/v0`](r/moul/x/daily/fractiondemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/fractiondemo/v0) | [✅](https://gno.land/r/moul/x/daily/fractiondemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/geohashdemo/v0`](r/moul/x/daily/geohashdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/geohashdemo/v0) | — | — | — | 1 |
-| [`r/moul/x/daily/globdemo/v0`](r/moul/x/daily/globdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/globdemo/v0) | — | — | — | 2 |
+| [`r/moul/x/daily/globdemo/v0`](r/moul/x/daily/globdemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/governor/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/governor) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/governor/v0) | — | — | 1 |
-| [`r/moul/x/daily/governor/v1`](r/moul/x/daily/governor) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/governor/v1) | [✅](https://gno.land/r/moul/x/daily/governor/v1) | — | — | 2 |
+| [`r/moul/x/daily/governor/v1`](r/moul/x/daily/governor) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/governor/v1) | — | — | 2 |
 | [`r/moul/x/daily/guestbook/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/guestbook) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/guestbook/v0) | — | — | 1 |
-| [`r/moul/x/daily/guestbook/v1`](r/moul/x/daily/guestbook) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/guestbook/v1) | [✅](https://gno.land/r/moul/x/daily/guestbook/v1) | — | — | 2 |
+| [`r/moul/x/daily/guestbook/v1`](r/moul/x/daily/guestbook) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/guestbook/v1) | — | — | 2 |
 | [`r/moul/x/daily/handles/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/handles) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/handles/v0) | — | — | 1 |
-| [`r/moul/x/daily/handles/v1`](r/moul/x/daily/handles) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/handles/v1) | [✅](https://gno.land/r/moul/x/daily/handles/v1) | — | — | 3 |
-| [`r/moul/x/daily/hangman/v0`](r/moul/x/daily/hangman) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/hangman/v0) | [✅](https://gno.land/r/moul/x/daily/hangman/v0) | — | — | 1 |
+| [`r/moul/x/daily/handles/v1`](r/moul/x/daily/handles) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/handles/v1) | — | — | 3 |
+| [`r/moul/x/daily/hangman/v0`](r/moul/x/daily/hangman) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/hangman/v0) | — | — | 1 |
 | [`r/moul/x/daily/heapdemo/v0`](r/moul/x/daily/heapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/heapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/hexdumpdemo/v0`](r/moul/x/daily/hexdumpdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/hexdumpdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/huffmandemo/v0`](r/moul/x/daily/huffmandemo) 🏛️ | — | — | — | — | 3 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T10:28:11Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T11:27:26Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
