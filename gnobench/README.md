@@ -182,6 +182,76 @@ history is the record of how the answer changed. Every row carries the gno commi
 gnobench commit that produced it, so any figure can be traced back to the two revisions it
 depends on.
 
+## One call into one realm: `call`
+
+The suites compare candidates with each other. `call` answers a narrower question about a
+single realm, usually one still being written and possibly living in another repository: what
+does one call into it cost?
+
+```sh
+make install-local GNOROOT=~/gno   # optional: measure GNOROOT's VM, not the one go.mod pins
+./gnobench call -dir ~/src/myrealm -register test1 \
+  -call  'PostMessage(cross, "Hello #gno")' \
+  -setup 'PostMessage(cross, "seed post {i} #gno")' -n 0,10,100,1000
+```
+
+It deploys the realm in `-dir` at the path its `gnomod.toml` declares, commits `-setup` *n*
+times in one transaction, then measures one more transaction making `-call`. That transaction
+starts with an empty object cache and an untouched store, as a `MsgCall` does, and every *n*
+gets a fresh store.
+
+- The caller is test1 unless `-caller` names another account. `-register NAME` first
+  registers it in `r/sys/users`, at genesis height, the one height where any caller may.
+- `-deps workspace`, the default, resolves the realm's imports from this repository and its
+  `vendor/`, then `$GNOROOT/examples`. `-deps gnoroot` uses `$GNOROOT/examples` only, which
+  is what a gnodev built from that checkout loads. Nothing is downloaded: a package found in
+  neither is an error.
+- The stdlibs and the examples come from GNOROOT, but the interpreter and every gas price come
+  from the gno that go.mod pins. When the two are different commits, `call` warns on stderr
+  and above the table, since the numbers then mix two revisions that no node runs together.
+  `make install-local` builds against GNOROOT and records its commit, so the warning also
+  catches a GNOROOT that has moved on since that build.
+- It writes nothing. `results/` and `reports/` belong to the suites.
+
+**Before and after.** Give `-dir` twice to measure two versions of a realm on the same plan:
+the first directory is the code before a change, the second after it. Each setup count gets
+three rows: before, after, and Δ (after minus before, with the total's change as a percentage).
+For example, here is what a social realm saves on a post with two tags, already used by the
+earlier posts, when it stops indexing hashtags:
+
+```sh
+./gnobench call -dir ~/src/myrealm -dir /tmp/myrealm-nohashtags -register test1 \
+  -call  'PostMessage(cross, "Hello from gnobench! #gno #gnoland")' \
+  -setup 'PostMessage(cross, "seed post {i} #gno #gnoland #buildinpublic")' -n 1,100
+```
+
+| setup calls | realm | VM gas | store gas | **total gas** | kv reads | kv writes | storage bytes | deposit | wall | returned |
+|--:|---|--:|--:|--:|--:|--:|--:|--:|--:|---|
+| 1 | before | 2,899,291 | 11,281,261 | **14,180,552** | 102 | 50 | 6,873 | 687,300 ugnot | 8.66ms | 2 |
+| | after | 1,435,894 | 8,772,893 | **10,208,787** | 78 | 28 | 5,198 | 519,800 ugnot | 5.14ms | 2 |
+| | **Δ** | -1,463,397 | -2,508,368 | **-3,971,765** (-28.0%) | -24 | -22 | -1,675 | -167,500 ugnot | -3.52ms | same |
+| 100 | before | 3,144,733 | 13,563,959 | **16,708,692** | 122 | 66 | 6,755 | 675,500 ugnot | 10.1ms | 101 |
+| | after | 1,572,802 | 9,914,601 | **11,487,403** | 88 | 36 | 5,173 | 517,300 ugnot | 6.05ms | 101 |
+| | **Δ** | -1,571,931 | -3,649,358 | **-5,221,289** (-31.2%) | -34 | -30 | -1,582 | -158,200 ugnot | -4.05ms | same |
+
+The two versions share one dependency set, the union of their imports. If they return
+different values for the same call, the Δ row says **differs**: the change measured also
+changes what the call does. `-json` prints one object per setup count, with `before`,
+`after` and `diff`.
+
+The total is the VM's meter plus what the chain charges at the store boundary, priced per store
+the way a node mounts them: object bytes, types and counters go to the flat-priced `base`
+store, the hashes of escaped objects and the package index to the depth-priced `main` tree.
+Stdlib reads cost nothing, as on a node, which caches every stdlib when it starts.
+
+**Checked against a node.** On a gnodev built from gno `a6fa06145` (2026-11-24), a user's
+first and second post to a social realm used 11,876,044 and 13,123,713 gas. `call` measured
+10,965,777 and 12,213,356 for the same two calls, and the same storage deltas to the byte,
+37,870 and 6,182. The difference is constant, 910,267 and 910,357: what the ante handler
+charges before any call runs (the signature, the transaction's bytes at 10 gas each, the
+account and the fee), which `call` leaves out. Add about 0.9M to a `call` total for what a
+`MsgCall` is charged.
+
 ## Suites
 
 | suite | what it asks |
@@ -215,7 +285,9 @@ differently.
 
 | file | what |
 |---|---|
-| `main.go` | the CLI: `run`, `report`, `list`, `compare`, `affected`, `env` |
+| `main.go` | the CLI: `run`, `report`, `list`, `call`, `compare`, `affected`, `env` |
+| `call.go` | `call`: deploy one realm from its directory and measure one cold call into it, or compare two versions of it |
+| `chaingas.go` | what the chain charges for store I/O, for a depth-priced and a flat-priced store |
 | `run.go` | generation, execution, baseline subtraction |
 | `template.go` | the single gno file every measurement is rendered into, and the warm/cold placement |
 | `env.go` | machine and toolchain detection |

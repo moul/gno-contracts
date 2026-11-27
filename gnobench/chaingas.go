@@ -55,6 +55,19 @@ func chainStoreGas(cfg types.GasConfig, gets, getBytes, sets, setBytes, dels int
 	return g + s + d
 }
 
+// flatStoreGas is chainStoreGas for a store with no depth estimator, which
+// the cache store charges flat per operation: GET is ReadCostFlat plus
+// ReadCostPerByte, SET is WriteCostFlat plus WriteCostPerByte, DELETE is
+// DeleteCost. gno.land's "base" store, a plain dbadapter that holds every
+// object's bytes, is one. Only "main", the B+32 tree that holds the hashes of
+// escaped objects and the package index, is priced by depth.
+func flatStoreGas(cfg types.GasConfig, gets, getBytes, sets, setBytes, dels int64) int64 {
+	g := gets*int64(cfg.ReadCostFlat) + getBytes*int64(cfg.ReadCostPerByte)
+	s := sets*int64(cfg.WriteCostFlat) + setBytes*int64(cfg.WriteCostPerByte)
+	d := dels * int64(cfg.DeleteCost)
+	return g + s + d
+}
+
 // ChainGas is what a deployed chain would charge this row for storage I/O,
 // derived rather than stored: storing it would freeze a gas schedule that
 // governance can and does reprice, and old result files would then disagree

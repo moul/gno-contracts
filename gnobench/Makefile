@@ -13,8 +13,15 @@ N       ?= 100,1000
 VALUE   ?= str,obj
 REPEAT  ?= 2
 
+# GNOROOT supplies the stdlibs, but the interpreter and its gas meter are the
+# gnolang/gno Go module go.mod pins. install-local builds against GNOROOT's Go
+# code instead, through a copy of go.mod kept in the gitignored scratch
+# directory, so the committed one never changes. The build records GNOROOT's
+# commit, so `call` can warn once GNOROOT has moved on without a rebuild.
+LOCALMOD := ../.gno/scratch/gnobench-localmod
+
 .DEFAULT_GOAL := help
-.PHONY: help bench bench-quick bench-full report report-check list test install clean
+.PHONY: help bench bench-quick bench-full report report-check list test install install-local clean
 
 help: ## show this help
 	@awk 'BEGIN{FS=":.*?## "} /^##@/{printf "\n%s\n",substr($$0,5)} /^[a-z][a-z-]*:.*?## /{printf "  %-13s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -52,6 +59,13 @@ test: ## go test
 install: ## build the binary into this directory
 	go build -o gnobench .
 
+install-local: ## build the binary against the Go code of GNOROOT, not the gno go.mod pins
+	mkdir -p $(LOCALMOD)
+	cp go.mod go.sum $(LOCALMOD)/
+	go mod edit -modfile=$(LOCALMOD)/go.mod -replace github.com/gnolang/gno=$(abspath $(GNOROOT))
+	go build -mod=mod -modfile=$(LOCALMOD)/go.mod \
+		-ldflags "-X main.builtGnoCommit=$$(git -C $(GNOROOT) rev-parse HEAD 2>/dev/null)" -o gnobench .
+
 clean: ## remove the built binary and the generated sources
 	rm -f gnobench
-	rm -rf ../.gno/scratch/gnobench
+	rm -rf ../.gno/scratch/gnobench $(LOCALMOD)
