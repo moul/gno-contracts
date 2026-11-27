@@ -436,16 +436,16 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/markovdemo/v0`](r/moul/x/daily/markovdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/markovdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/memory/v0`](r/moul/x/daily/memory) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/memory/v0) | [✅](https://gno.land/r/moul/x/daily/memory/v0) | — | — | — |
 | [`r/moul/x/daily/merkledrop/v0`](https://github.com/moul/gno-contracts/tree/5b5c3384dcdb1be75699cedb99e03d7be11e0312/r/moul/x/daily/merkledrop) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/merkledrop/v0) | — | — | 1 |
-| [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/merkledrop/v1) | [✅](https://gno.land/r/moul/x/daily/merkledrop/v1) | — | — | 3 |
+| [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/merkledrop/v1) | — | — | 3 |
 | [`r/moul/x/daily/microblog/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/microblog) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/microblog/v0) | — | — | — |
-| [`r/moul/x/daily/microblog/v1`](r/moul/x/daily/microblog) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/microblog/v1) | [✅](https://gno.land/r/moul/x/daily/microblog/v1) | — | — | 1 |
+| [`r/moul/x/daily/microblog/v1`](r/moul/x/daily/microblog) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/microblog/v1) | — | — | 1 |
 | [`r/moul/x/daily/moodstone/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/moodstone) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/moodstone/v0) | — | — | — |
-| [`r/moul/x/daily/moodstone/v1`](r/moul/x/daily/moodstone) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/moodstone/v1) | [✅](https://gno.land/r/moul/x/daily/moodstone/v1) | — | — | 1 |
-| [`r/moul/x/daily/multisetdemo/v0`](r/moul/x/daily/multisetdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/multisetdemo/v0) | [✅](https://gno.land/r/moul/x/daily/multisetdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/multisig/v0`](r/moul/x/daily/multisig) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/multisig/v0) | [✅](https://gno.land/r/moul/x/daily/multisig/v0) | — | — | 1 |
+| [`r/moul/x/daily/moodstone/v1`](r/moul/x/daily/moodstone) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/moodstone/v1) | — | — | 1 |
+| [`r/moul/x/daily/multisetdemo/v0`](r/moul/x/daily/multisetdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/multisetdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/multisig/v0`](r/moul/x/daily/multisig) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/multisig/v0) | — | — | 1 |
 | [`r/moul/x/daily/murmur3demo/v0`](r/moul/x/daily/murmur3demo) 🏛️ | — | — | — | — | 3 |
-| [`r/moul/x/daily/myersdiffdemo/v0`](r/moul/x/daily/myersdiffdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/myersdiffdemo/v0) | — | — | — | 3 |
-| [`r/moul/x/daily/numguess/v0`](r/moul/x/daily/numguess) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/numguess/v0) | [✅](https://gno.land/r/moul/x/daily/numguess/v0) | — | — | 1 |
+| [`r/moul/x/daily/myersdiffdemo/v0`](r/moul/x/daily/myersdiffdemo) 🏛️ | — | — | — | — | 3 |
+| [`r/moul/x/daily/numguess/v0`](r/moul/x/daily/numguess) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/numguess/v0) | — | — | 1 |
 | [`r/moul/x/daily/orderedmapdemo/v0`](r/moul/x/daily/orderedmapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/orderedmapdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/piglatindemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/piglatindemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/piglatindemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/piglatindemo/v1`](r/moul/x/daily/piglatindemo) 🏛️ | — | — | — | — | 2 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T08:30:53Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T09:30:28Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
