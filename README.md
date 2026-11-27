@@ -338,8 +338,8 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/pilot/v0`](r/moul/pilot) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/pilot/v0) | [✅](https://gno.land/r/moul/pilot/v0) | — | — | 1 |
 | [`r/moul/present/v0`](r/moul/present) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/present/v0) | [✅](https://gno.land/r/moul/present/v0) | — | — | 9 |
 | [`r/moul/reactions/v0`](r/moul/reactions) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/reactions/v0) | [✅](https://gno.land/r/moul/reactions/v0) | — | — | 2 |
-| [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/sapin/v0) | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
-| [`r/moul/toolbox`](r/moul/toolbox) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/toolbox) | — | — | — | 3 |
+| [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | — | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
+| [`r/moul/toolbox`](r/moul/toolbox) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/toolbox/usernames`](r/moul/toolbox/usernames) 🏛️ | — | — | — | — | 5 |
 | [`r/moul/vesting/v0`](r/moul/vesting) 🏛️ | — | [✅](https://gno.land/r/moul/vesting/v0) | — | — | 6 |
 | [`r/moul/x/across/v0`](r/moul/x/across) 🏛️ | — | [✅](https://gno.land/r/moul/x/across/v0) | — | — | 16 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T13:28:03Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T14:28:10Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
