@@ -38,6 +38,8 @@ func usage() error {
   run      measure a suite and merge the results into this machine's file
   report   regenerate the reports, the charts and the README region from every result file
   list     what suites, candidates and workloads exist
+  call     deploy one realm from its directory and measure one cold call into it;
+           -dir twice compares two versions of the realm
   compare  diff two result files and print what moved, as markdown
   affected read changed paths on stdin, print the -filter regexp they imply
   env      print this machine's id and toolchain, as JSON
@@ -60,6 +62,8 @@ func run() error {
 		return cmdReport(args)
 	case "list":
 		return cmdList(args)
+	case "call":
+		return cmdCall(args)
 	case "compare":
 		return cmdCompare(args)
 	case "affected":

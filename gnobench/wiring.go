@@ -283,16 +283,24 @@ func wireCall(m *gno.Machine, i int) {
 }
 
 // wireEval activates the realm package and evaluates one crossing call.
-func wireEval(m *gno.Machine, expr string) {
-	pv := m.Store.GetPackage(wiringPkgPath, false)
+func wireEval(m *gno.Machine, expr string) { evalOn(m, wiringPkgPath, expr) }
+
+// evalOn binds the package at path to the name `pkg` in a throwaway `main`
+// package, the shape the VM keeper builds for a MsgCall, and evaluates one
+// crossing call against it.
+func evalOn(m *gno.Machine, path, expr string) []gno.TypedValue {
+	pv := m.Store.GetPackage(path, false)
+	if pv == nil {
+		panic(fmt.Sprintf("package %s is not in the store", path))
+	}
 	mpn := gno.NewPackageNode("main", "", nil)
 	mpn.Define("pkg", gno.TypedValue{T: &gno.PackageType{}, V: pv})
 	m.SetActivePackage(mpn.NewPackage(m.Store.GetAllocator()))
-	wireEvalIn(m, expr)
+	return wireEvalIn(m, expr)
 }
 
 // wireEvalIn evaluates expr in whatever package is already active.
-func wireEvalIn(m *gno.Machine, expr string) {
+func wireEvalIn(m *gno.Machine, expr string) []gno.TypedValue {
 	x := m.MustParseExpr(expr)
 	// The compiler-internal `.origin` sentinel is the only way to mint an
 	// EOA-origin `cur` from outside user source; it is what the VM keeper
@@ -300,17 +308,35 @@ func wireEvalIn(m *gno.Machine, expr string) {
 	if cx, ok := x.(*gno.CallExpr); ok && len(cx.Args) > 0 {
 		cx.Args[0] = gno.Nx(".origin")
 	}
-	m.Eval(x)
+	return m.Eval(x)
 }
 
 func wireTx(cs *countStore, gnoStore gno.Store, fn func(*gno.Machine)) wireTally {
-	before := *cs
+	t, _ := txWith(cs, cs, gnoStore, test.Context("", wiringPkgPath, nil), fn)
+	return t
+}
+
+// txWith runs fn as one transaction under ctx, the execution context that
+// names the caller, the height and the time, and then commits it.
+//
+// base and iavl are the two stores a gno.land node hands the VM
+// (gno.land/pkg/gnoland/app.go): base takes object bytes, types and counters,
+// iavl the hashes of escaped objects and the package index, and the chain
+// prices their I/O differently. Passing the same counter for both counts
+// them together, as the wiring suite does, and the second tally is then
+// empty. The first tally carries the gas, the storage diff and the time.
+func txWith(base, iavl *countStore, gnoStore gno.Store, ctx any, fn func(*gno.Machine)) (wireTally, wireTally) {
+	b0, i0 := *base, *iavl
 	gasMeter := store.NewInfiniteGasMeter()
 	t0 := time.Now()
-	tcw := cs.CacheWrap()
-	txs := gnoStore.BeginTransaction(tcw, tcw, nil, gasMeter)
+	bw := base.CacheWrap()
+	iw := bw
+	if iavl != base {
+		iw = iavl.CacheWrap()
+	}
+	txs := gnoStore.BeginTransaction(bw, iw, nil, gasMeter)
 	m := gno.NewMachineWithOptions(gno.MachineOptions{
-		Output: io.Discard, Store: txs, Context: test.Context("", wiringPkgPath, nil),
+		Output: io.Discard, Store: txs, Context: ctx,
 		MaxAllocBytes: 1 << 40, GasMeter: gasMeter, ReviveEnabled: true,
 	})
 	fn(m)
@@ -319,15 +345,27 @@ func wireTx(cs *countStore, gnoStore gno.Store, fn func(*gno.Machine)) wireTally
 		net += int64(d)
 	}
 	txs.Write()
-	tcw.Write()
+	bw.Write()
+	if iw != bw {
+		iw.Write()
+	}
 	m.Release()
+	bt := kvDelta(base, b0)
+	bt.Gas, bt.NetRealm, bt.Wall, bt.Txs = gasMeter.GasConsumed(), net, time.Since(t0), 1
+	var it wireTally
+	if iavl != base {
+		it = kvDelta(iavl, i0)
+	}
+	return bt, it
+}
+
+// kvDelta is what reached cs since the snapshot before was taken.
+func kvDelta(cs *countStore, before countStore) wireTally {
 	return wireTally{
-		Gas: gasMeter.GasConsumed(), NetRealm: net,
 		KVSets: cs.Sets - before.Sets, KVSetBytes: cs.SetBytes - before.SetBytes,
 		KVKeyBytes: cs.KeyBytes - before.KeyBytes,
 		KVGets:     cs.Gets - before.Gets, KVGetBytes: cs.GetBytes - before.GetBytes,
 		KVDels: cs.Dels - before.Dels,
-		Wall:   time.Since(t0), Txs: 1,
 	}
 }
 
