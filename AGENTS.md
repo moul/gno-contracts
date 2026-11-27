@@ -131,6 +131,10 @@ exported realm functions are crossing functions, first parameter `cur realm`.
 `make help` lists every target, grouped. `make lint test` is the gate; add
 `PKG=<substring>` to narrow any of them to one package.
 
+CI pairs current Gno with the pre-#6208 toolchain for a small set of byte-matched
+legacy versions. To reproduce the gate locally, see
+[linting and testing older versions](./.github/ci-internals.md#linting-and-testing-older-package-versions).
+
 **Nothing reads `$GNOROOT` directly.** `gnocontracts gno` builds `.gnoroot-view/`, a
 symlink image of the checkout whose `examples/` is empty, and points the toolchain at
 that. gno resolves a `gno.land/*` import from `GNOROOT/examples` before anywhere else, so

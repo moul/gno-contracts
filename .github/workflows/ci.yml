@@ -1,7 +1,7 @@
 name: CI
 
-# The gate: the guards, then lint and test for every contract against a gno
-# built from master.
+# The gate: the guards, then lint and test every contract. Use gno master
+# for new and changed production source.
 #
 # workflow_dispatch is here because the push trigger has been observed to drop
 # a run: 2bbd2377 landed on main on 2026-09-29 and no push-triggered CI or main
@@ -46,9 +46,15 @@ jobs:
             -base "${{ github.event.pull_request.base.sha }}" \
             -head "${{ github.event.pull_request.head.sha }}"
 
+      # The older gno runs only for byte-matched versions admitted before
+      # gnolang/gno#6208. The second setup makes master the default for all
+      # other targets, including the toolchain canary in make guards.
       - uses: ./.github/actions/setup-gno
+        id: legacy-gno
         with:
-          binaries: gno
+          ref: f0f9c70fc7004d6a67d8cdafccff7128c625267b
+      - uses: ./.github/actions/setup-gno
+        id: current-gno
 
       - name: gno version
         run: gno version
@@ -117,11 +123,21 @@ jobs:
         run: make guards
 
       - name: Lint
+        env:
+          GNO: ${{ steps.current-gno.outputs.bin }}/gno
+          GNOROOT: ${{ steps.current-gno.outputs.root }}
+          GNO_LEGACY: ${{ steps.legacy-gno.outputs.bin }}/gno
+          GNOROOT_LEGACY: ${{ steps.legacy-gno.outputs.root }}
         run: make lint
 
       # `make test` re-runs the guards as a prerequisite, which is seconds and
       # keeps the local `make test` a complete gate on its own.
       - name: Test
+        env:
+          GNO: ${{ steps.current-gno.outputs.bin }}/gno
+          GNOROOT: ${{ steps.current-gno.outputs.root }}
+          GNO_LEGACY: ${{ steps.legacy-gno.outputs.bin }}/gno
+          GNOROOT_LEGACY: ${{ steps.legacy-gno.outputs.root }}
         run: make test
 
       # NOTE: no `make check` here. PRs carry only package SOURCE — the

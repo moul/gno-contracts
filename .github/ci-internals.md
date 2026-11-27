@@ -7,10 +7,34 @@ only need when changing CI itself or chasing a preview that did not appear.
 ## The composite actions
 
 Three actions carry what the workflows share: `.github/actions/setup-gno` (clone gno
-master outside the workspace, build the requested binaries, cached on the upstream SHA,
-Go version from `tools/go.mod`), `.github/actions/previews-sync` (rewrite one subfolder of
+master or an explicit revision outside the workspace, build the requested binaries
+cached on the same commit, Go version from `tools/go.mod`), `.github/actions/previews-sync` (rewrite one subfolder of
 the previews site and push, retrying when a parallel job moved the branch) and
 `.github/actions/pr-comment` (upsert the one sticky comment and delete any duplicate).
+
+## Linting and testing older package versions
+
+[gnolang/gno#6208](https://github.com/gnolang/gno/pull/6208) tightened the
+admission rules for declarations such as `cur` and `cap`. Gno keeps already
+admitted packages runnable. Its CLI checks each explicit lint or test target
+like a new deploy, including historical versions extracted by `gnopm sync`.
+
+CI still runs lint and tests for every target. It uses the current Gno for
+new versions and changed production source. The versions listed in
+`tools/gnocontracts/legacy-gno-packages.txt` use the parent of the admission
+change, with its matching stdlibs, when their production files and
+`gnomod.toml` match the recorded fingerprint. A new file or any production
+edit takes the target back to the current toolchain. The match follows a
+version into `.gnopm/` after a bump. Tests and docs can be updated, and the
+legacy test command runs the updated tests. The lock verification still
+checks every materialized pin against Git history.
+
+To reproduce CI locally, set `GNO` and `GNOROOT` to a current binary and
+checkout, and set `GNO_LEGACY` and `GNOROOT_LEGACY` to the binary and checkout
+for the revision in `ci.yml`. Then run `make lint test`. With the legacy pair
+unset, both commands use the current toolchain for every selected target.
+Remove the fallback once upstream provides an equivalent CLI mode for already
+admitted source.
 
 ## Previews
 

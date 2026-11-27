@@ -1,70 +1,92 @@
 name: Set up gno
 description: >
-  Build the gno toolchain from gnolang/gno master, outside the workspace, and
-  export GNOROOT. Five workflows used to carry their own copy of this, with the
-  Go version drifting between them.
+  Build the gno toolchain outside the workspace and export GNOROOT.
+  Defaults to the current gnolang/gno master.
 
 inputs:
   binaries:
     description: which binaries to build, space separated (gno, gnokey, gnodev)
     required: false
     default: gno
+  ref:
+    description: full commit SHA or ref in gnolang/gno
+    required: false
+    default: refs/heads/master
+
+outputs:
+  root:
+    description: location of the Gno source checkout
+    value: ${{ steps.upstream.outputs.root }}
+  bin:
+    description: directory containing the requested binaries
+    value: ${{ steps.upstream.outputs.bin }}
 
 runs:
   using: composite
   steps:
-    # The Go version lives in go.mod and nowhere else.
     - uses: actions/setup-go@v5
       with:
         go-version-file: tools/go.mod
 
-    # The build is keyed on the upstream commit, so a run only pays for it when
-    # gno master has actually moved. Resolving the SHA first is what makes the
-    # cache key honest; `master` alone would serve a stale binary forever.
     - id: upstream
       shell: bash
-      run: echo "sha=$(git ls-remote https://github.com/gnolang/gno HEAD | cut -f1)" >> "$GITHUB_OUTPUT"
+      env:
+        GNO_REF: ${{ inputs.ref }}
+      run: |
+        set -euo pipefail
+        if [[ "$GNO_REF" =~ ^[0-9a-f]{40}$ ]]; then
+          sha="$GNO_REF"
+        else
+          sha=$(git ls-remote --exit-code https://github.com/gnolang/gno "$GNO_REF" | cut -f1)
+        fi
+        if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+          echo "::error::Expected one Gno commit for '$GNO_REF', got '$sha'" >&2
+          exit 1
+        fi
+        echo "sha=$sha" >> "$GITHUB_OUTPUT"
+        echo "root=$RUNNER_TEMP/gno-src-$sha" >> "$GITHUB_OUTPUT"
+        echo "bin=$RUNNER_TEMP/gno-bin-$sha" >> "$GITHUB_OUTPUT"
 
     - id: cache
       uses: actions/cache@v4
       with:
-        # A dedicated directory, not ~/.local/bin: that one already holds
-        # runner-image tooling, and caching it would both capture and shadow
-        # things that have nothing to do with gno.
-        path: ~/gno-bin
-        key: gno-bin-${{ runner.os }}-${{ steps.upstream.outputs.sha }}-${{ inputs.binaries }}
+        path: ${{ steps.upstream.outputs.bin }}
+        key: gno-bin-${{ runner.os }}-${{ runner.arch }}-${{ steps.upstream.outputs.sha }}-${{ inputs.binaries }}
 
-    # The clone happens either way: GNOROOT is a source tree, not a binary.
-    # lint/test read the stdlibs out of it, and `regen` reads examples/ to
-    # resolve each contract's monorepo counterpart. It must live OUTSIDE the
-    # repo workspace: inside (say ./.gno), the
-    # gnowork.toml workspace would discover the toolchain's bundled examples/
-    # and pkg/mod packages and they would shadow our committed vendor/,
-    # breaking reproducible resolution.
+    # GNOROOT supplies stdlibs and examples even on a binary cache hit. Fetch
+    # the SHA from the cache key so an upstream push between resolution and
+    # checkout cannot pair a cached binary with a different source tree.
+    # Keep it outside the workspace so its bundled modules cannot shadow
+    # committed vendor/ packages.
     - shell: bash
       env:
         BINARIES: ${{ inputs.binaries }}
         CACHED: ${{ steps.cache.outputs.cache-hit }}
+        GNO_SHA: ${{ steps.upstream.outputs.sha }}
+        GNO_SOURCE: ${{ steps.upstream.outputs.root }}
+        GNO_BIN: ${{ steps.upstream.outputs.bin }}
       run: |
         set -euo pipefail
-        git clone --quiet --depth 1 https://github.com/gnolang/gno "$HOME/gno"
-        echo "GNOROOT=$HOME/gno" >> "$GITHUB_ENV"
-        echo "$HOME/gno-bin" >> "$GITHUB_PATH"
-        mkdir -p "$HOME/gno-bin"
+        if [ ! -d "$GNO_SOURCE/.git" ]; then
+          git init --quiet "$GNO_SOURCE"
+        fi
+        git -C "$GNO_SOURCE" fetch --quiet --depth 1 https://github.com/gnolang/gno "$GNO_SHA"
+        git -C "$GNO_SOURCE" checkout --quiet --detach FETCH_HEAD
+        echo "GNOROOT=$GNO_SOURCE" >> "$GITHUB_ENV"
+        echo "$GNO_BIN" >> "$GITHUB_PATH"
+        mkdir -p "$GNO_BIN"
         if [ "$CACHED" = "true" ]; then
           echo "gno binaries restored from cache ($BINARIES)"
           exit 0
         fi
         for b in $BINARIES; do
-          # gnodev lives in contribs/, which is its OWN Go module: it has to be
-          # built from inside that directory, not as a package path of the root
-          # module.
+          # gnodev lives in its own Go module under contribs/.
           case "$b" in
-            gno)    dir="$HOME/gno";                pkg=./gnovm/cmd/gno ;;
-            gnokey) dir="$HOME/gno";                pkg=./gno.land/cmd/gnokey ;;
-            gnodev) dir="$HOME/gno/contribs/gnodev"; pkg=. ;;
+            gno)    dir="$GNO_SOURCE";                 pkg=./gnovm/cmd/gno ;;
+            gnokey) dir="$GNO_SOURCE";                 pkg=./gno.land/cmd/gnokey ;;
+            gnodev) dir="$GNO_SOURCE/contribs/gnodev"; pkg=. ;;
             *) echo "::error::unknown gno binary '$b'"; exit 1 ;;
           esac
           echo "building $b"
-          ( cd "$dir" && GOTOOLCHAIN=auto go build -o "$HOME/gno-bin/$b" "$pkg" )
+          ( cd "$dir" && GOTOOLCHAIN=auto go build -o "$GNO_BIN/$b" "$pkg" )
         done
