@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-11-27T00:45:15Z",
+  "status_checked_at": "2026-11-27T01:28:07Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -11483,8 +11483,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/grc20wrapdemo/v0"
         },
         "pearl": {
@@ -11521,8 +11520,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/gsdash/v0"
         },
         "pearl": {
@@ -11554,8 +11552,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/kitindexdemo/v0"
         },
         "staging": {
@@ -11583,8 +11580,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/moultest/v0"
         },
         "pearl": {
