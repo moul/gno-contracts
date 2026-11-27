@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-11-27T11:27:26Z",
+  "status_checked_at": "2026-11-27T12:33:11Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -5984,8 +5984,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/b58demo/v0"
         },
         "pearl": {
@@ -6019,8 +6018,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/ballot/v0"
         },
         "pearl": {
@@ -6086,8 +6084,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/base32demo/v1"
         },
         "staging": {
@@ -6114,8 +6111,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/bech32demo/v0"
         },
         "staging": {
@@ -6164,8 +6160,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/bencodedemo/v0"
         },
         "staging": {
@@ -6193,8 +6188,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/bidimapdemo/v0"
         },
         "pearl": {
@@ -6228,8 +6222,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/bitsetdemo/v0"
         },
         "pearl": {
@@ -6297,8 +6290,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/blog/v1"
         },
         "pearl": {
@@ -6331,8 +6323,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/bloomfilter/v0"
         },
         "pearl": {
@@ -6396,8 +6387,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/bullscows/v1"
         },
         "pearl": {
@@ -6430,8 +6420,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/calc/v0"
         },
         "pearl": {
@@ -6497,8 +6486,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/cliffvestingdemo/v1"
         },
         "pearl": {
@@ -6559,8 +6547,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/closestguess/v1"
         },
         "pearl": {
@@ -6627,8 +6614,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/coinflipduel/v1"
         },
         "pearl": {
@@ -6696,8 +6682,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/collatz/v1"
         },
         "staging": {
@@ -6758,8 +6743,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/commitrevealdemo/v1"
         },
         "pearl": {
@@ -6827,8 +6811,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/connect4/v1"
         },
         "pearl": {
@@ -6861,8 +6844,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/counter/v0"
         },
         "pearl": {
@@ -6896,8 +6878,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/countminsketchdemo/v0"
         },
         "pearl": {
@@ -6931,8 +6912,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/cowsaydemo/v0"
         },
         "pearl": {
@@ -6998,8 +6978,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/crc32demo/v1"
         },
         "staging": {
@@ -7024,8 +7003,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/crondemo/v0"
         },
         "staging": {
@@ -7086,8 +7064,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/crowdfund/v1"
         },
         "pearl": {
@@ -7121,8 +7098,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/dice/v0"
         },
         "pearl": {
@@ -7153,8 +7129,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/dijkstrademo/v0"
         },
         "staging": {
@@ -7182,8 +7157,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/disjointsetdemo/v0"
         },
         "pearl": {
@@ -7217,8 +7191,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/dutchauction/v0"
         },
         "pearl": {
@@ -7285,8 +7258,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/eggling/v1"
         },
         "pearl": {
@@ -7351,8 +7323,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/eightball/v1"
         },
         "pearl": {
@@ -7420,8 +7391,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/englishauction/v1"
         },
         "pearl": {
@@ -7455,8 +7425,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/erc1155/v0"
         },
         "pearl": {
@@ -7488,8 +7457,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/erc20/v0"
         },
         "pearl": {
@@ -7556,8 +7524,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/erc721/v1"
         },
         "pearl": {
@@ -7625,8 +7592,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/escrow/v1"
         },
         "pearl": {
@@ -7661,8 +7627,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/faucet/v0"
         },
         "pearl": {
@@ -7694,8 +7659,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/fenwickdemo/v0"
         },
         "pearl": {
@@ -7726,8 +7690,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/flatmapdemo/v0"
         },
         "pearl": {
@@ -7761,8 +7724,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/fractiondemo/v0"
         },
         "pearl": {
@@ -7792,8 +7754,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/geohashdemo/v0"
         },
         "staging": {
