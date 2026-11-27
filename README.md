@@ -414,27 +414,27 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/handles/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/handles) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/handles/v0) | — | — | 1 |
 | [`r/moul/x/daily/handles/v1`](r/moul/x/daily/handles) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/handles/v1) | [✅](https://gno.land/r/moul/x/daily/handles/v1) | — | — | 3 |
 | [`r/moul/x/daily/hangman/v0`](r/moul/x/daily/hangman) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/hangman/v0) | [✅](https://gno.land/r/moul/x/daily/hangman/v0) | — | — | 1 |
-| [`r/moul/x/daily/heapdemo/v0`](r/moul/x/daily/heapdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/heapdemo/v0) | [✅](https://gno.land/r/moul/x/daily/heapdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/hexdumpdemo/v0`](r/moul/x/daily/hexdumpdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/hexdumpdemo/v0) | [✅](https://gno.land/r/moul/x/daily/hexdumpdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/huffmandemo/v0`](r/moul/x/daily/huffmandemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/huffmandemo/v0) | — | — | — | 3 |
-| [`r/moul/x/daily/humanizedemo/v0`](r/moul/x/daily/humanizedemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/humanizedemo/v0) | [✅](https://gno.land/r/moul/x/daily/humanizedemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/heapdemo/v0`](r/moul/x/daily/heapdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/heapdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/hexdumpdemo/v0`](r/moul/x/daily/hexdumpdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/hexdumpdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/huffmandemo/v0`](r/moul/x/daily/huffmandemo) 🏛️ | — | — | — | — | 3 |
+| [`r/moul/x/daily/humanizedemo/v0`](r/moul/x/daily/humanizedemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/humanizedemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/kingofdice/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/kingofdice) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/kingofdice/v0) | — | — | 1 |
-| [`r/moul/x/daily/kingofdice/v1`](r/moul/x/daily/kingofdice) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/kingofdice/v1) | [✅](https://gno.land/r/moul/x/daily/kingofdice/v1) | — | — | 2 |
-| [`r/moul/x/daily/kmpdemo/v0`](r/moul/x/daily/kmpdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/kmpdemo/v0) | [✅](https://gno.land/r/moul/x/daily/kmpdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/kudos/v0`](r/moul/x/daily/kudos) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/kudos/v0) | [✅](https://gno.land/r/moul/x/daily/kudos/v0) | — | — | 1 |
+| [`r/moul/x/daily/kingofdice/v1`](r/moul/x/daily/kingofdice) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/kingofdice/v1) | — | — | 2 |
+| [`r/moul/x/daily/kmpdemo/v0`](r/moul/x/daily/kmpdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/kmpdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/kudos/v0`](r/moul/x/daily/kudos) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/kudos/v0) | — | — | 1 |
 | [`r/moul/x/daily/leaderboard/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/leaderboard) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/leaderboard/v0) | — | — | 1 |
-| [`r/moul/x/daily/leaderboard/v1`](r/moul/x/daily/leaderboard) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/leaderboard/v1) | [✅](https://gno.land/r/moul/x/daily/leaderboard/v1) | — | — | 2 |
+| [`r/moul/x/daily/leaderboard/v1`](r/moul/x/daily/leaderboard) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/leaderboard/v1) | — | — | 2 |
 | [`r/moul/x/daily/levenshteindemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/levenshteindemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/levenshteindemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/levenshteindemo/v1`](r/moul/x/daily/levenshteindemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/levenshteindemo/v1) | — | — | — | 3 |
-| [`r/moul/x/daily/life/v0`](r/moul/x/daily/life) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/life/v0) | [✅](https://gno.land/r/moul/x/daily/life/v0) | — | — | — |
+| [`r/moul/x/daily/levenshteindemo/v1`](r/moul/x/daily/levenshteindemo) 🏛️ | — | — | — | — | 3 |
+| [`r/moul/x/daily/life/v0`](r/moul/x/daily/life) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/life/v0) | — | — | — |
 | [`r/moul/x/daily/linktree/v0`](https://github.com/moul/gno-contracts/tree/64ba64c0f83f22fcbb7c2f5887d4d5731462237d/r/moul/x/daily/linktree) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/linktree/v0) | — | — | 1 |
-| [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/linktree/v1) | [✅](https://gno.land/r/moul/x/daily/linktree/v1) | — | — | 2 |
-| [`r/moul/x/daily/lottery/v0`](r/moul/x/daily/lottery) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/lottery/v0) | [✅](https://gno.land/r/moul/x/daily/lottery/v0) | — | — | 1 |
-| [`r/moul/x/daily/lru/v0`](r/moul/x/daily/lru) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/lru/v0) | [✅](https://gno.land/r/moul/x/daily/lru/v0) | — | — | — |
+| [`r/moul/x/daily/linktree/v1`](r/moul/x/daily/linktree) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/linktree/v1) | — | — | 2 |
+| [`r/moul/x/daily/lottery/v0`](r/moul/x/daily/lottery) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/lottery/v0) | — | — | 1 |
+| [`r/moul/x/daily/lru/v0`](r/moul/x/daily/lru) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/lru/v0) | — | — | — |
 | [`r/moul/x/daily/luhndemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/luhndemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/luhndemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/luhndemo/v1`](r/moul/x/daily/luhndemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/luhndemo/v1) | — | — | — | 2 |
+| [`r/moul/x/daily/luhndemo/v1`](r/moul/x/daily/luhndemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/markovdemo/v0`](r/moul/x/daily/markovdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/markovdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/memory/v0`](r/moul/x/daily/memory) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/memory/v0) | [✅](https://gno.land/r/moul/x/daily/memory/v0) | — | — | — |
+| [`r/moul/x/daily/memory/v0`](r/moul/x/daily/memory) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/memory/v0) | — | — | — |
 | [`r/moul/x/daily/merkledrop/v0`](https://github.com/moul/gno-contracts/tree/5b5c3384dcdb1be75699cedb99e03d7be11e0312/r/moul/x/daily/merkledrop) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/merkledrop/v0) | — | — | 1 |
 | [`r/moul/x/daily/merkledrop/v1`](r/moul/x/daily/merkledrop) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/merkledrop/v1) | — | — | 3 |
 | [`r/moul/x/daily/microblog/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/microblog) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/microblog/v0) | — | — | — |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T09:30:28Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T10:28:11Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
