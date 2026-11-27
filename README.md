@@ -323,10 +323,10 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/demo/render/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/demo/render) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/demo/render/v0) | — | — | — |
 | [`r/moul/demo/render/v1`](r/moul/demo/render) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/demo/render/v1) | — | — | — | 1 |
 | [`r/moul/demo/vault/v0`](r/moul/demo/vault) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/demo/vault/v0) | [✅](https://gno.land/r/moul/demo/vault/v0) | — | — | 1 |
-| [`r/moul/demo/wikicoin/v0`](r/moul/demo/wikicoin) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/demo/wikicoin/v0) | [✅](https://gno.land/r/moul/demo/wikicoin/v0) | — | — | 2 |
+| [`r/moul/demo/wikicoin/v0`](r/moul/demo/wikicoin) 🏛️ | — | [✅](https://gno.land/r/moul/demo/wikicoin/v0) | — | — | 2 |
 | [`r/moul/faucet/v0`](https://github.com/moul/gno-contracts/tree/a04bb0d9caf27fb01fe37c64629ce8c8ae4a77cf/r/moul/faucet) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/faucet/v0) | — | — | 2 |
-| [`r/moul/faucet/v1`](r/moul/faucet) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/faucet/v1) | [✅](https://gno.land/r/moul/faucet/v1) | — | — | 2 |
-| [`r/moul/forge/v0`](r/moul/forge) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/forge/v0) | [✅](https://gno.land/r/moul/forge/v0) | — | — | 5 |
+| [`r/moul/faucet/v1`](r/moul/faucet) 🏛️ | — | [✅](https://gno.land/r/moul/faucet/v1) | — | — | 2 |
+| [`r/moul/forge/v0`](r/moul/forge) 🏛️ | — | [✅](https://gno.land/r/moul/forge/v0) | — | — | 5 |
 | [`r/moul/gallery/v0`](r/moul/gallery) 🏛️ | — | [✅](https://gno.land/r/moul/gallery/v0) | — | — | 7 |
 | [`r/moul/gnopm/registry/v0`](r/moul/gnopm/registry) 🏛️ | — | [✅](https://gno.land/r/moul/gnopm/registry/v0) | — | — | 5 |
 | [`r/moul/gns/v0`](r/moul/gns) 🏛️ | — | [✅](https://gno.land/r/moul/gns/v0) | — | — | 2 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T15:29:14Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T16:29:27Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
