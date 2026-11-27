@@ -340,16 +340,16 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/reactions/v0`](r/moul/reactions) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/reactions/v0) | [✅](https://gno.land/r/moul/reactions/v0) | — | — | 2 |
 | [`r/moul/sapin/v0`](r/moul/sapin) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/sapin/v0) | [✅](https://gno.land/r/moul/sapin/v0) | — | — | — |
 | [`r/moul/toolbox`](r/moul/toolbox) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/toolbox) | — | — | — | 3 |
-| [`r/moul/toolbox/usernames`](r/moul/toolbox/usernames) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/toolbox/usernames) | — | — | — | 5 |
-| [`r/moul/vesting/v0`](r/moul/vesting) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/vesting/v0) | [✅](https://gno.land/r/moul/vesting/v0) | — | — | 6 |
+| [`r/moul/toolbox/usernames`](r/moul/toolbox/usernames) 🏛️ | — | — | — | — | 5 |
+| [`r/moul/vesting/v0`](r/moul/vesting) 🏛️ | — | [✅](https://gno.land/r/moul/vesting/v0) | — | — | 6 |
 | [`r/moul/x/across/v0`](r/moul/x/across) 🏛️ | — | [✅](https://gno.land/r/moul/x/across/v0) | — | — | 16 |
-| [`r/moul/x/allinone/devtools/v0`](r/moul/x/allinone/devtools) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/allinone/devtools/v0) | [✅](https://gno.land/r/moul/x/allinone/devtools/v0) | — | — | 10 |
-| [`r/moul/x/allinone/textlab/v0`](r/moul/x/allinone/textlab) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/allinone/textlab/v0) | [✅](https://gno.land/r/moul/x/allinone/textlab/v0) | — | — | 9 |
-| [`r/moul/x/amm/v0`](r/moul/x/amm) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/amm/v0) | [✅](https://gno.land/r/moul/x/amm/v0) | — | — | 6 |
-| [`r/moul/x/compact/v0`](r/moul/x/compact) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/compact/v0) | [✅](https://gno.land/r/moul/x/compact/v0) | — | — | 5 |
-| [`r/moul/x/daily/ahocorasickdemo/v0`](r/moul/x/daily/ahocorasickdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/ahocorasickdemo/v0) | — | — | — | 3 |
+| [`r/moul/x/allinone/devtools/v0`](r/moul/x/allinone/devtools) 🏛️ | — | [✅](https://gno.land/r/moul/x/allinone/devtools/v0) | — | — | 10 |
+| [`r/moul/x/allinone/textlab/v0`](r/moul/x/allinone/textlab) 🏛️ | — | [✅](https://gno.land/r/moul/x/allinone/textlab/v0) | — | — | 9 |
+| [`r/moul/x/amm/v0`](r/moul/x/amm) 🏛️ | — | [✅](https://gno.land/r/moul/x/amm/v0) | — | — | 6 |
+| [`r/moul/x/compact/v0`](r/moul/x/compact) 🏛️ | — | [✅](https://gno.land/r/moul/x/compact/v0) | — | — | 5 |
+| [`r/moul/x/daily/ahocorasickdemo/v0`](r/moul/x/daily/ahocorasickdemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/asciiart/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/asciiart) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/asciiart/v0) | — | — | 1 |
-| [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/asciiart/v1) | [✅](https://gno.land/r/moul/x/daily/asciiart/v1) | — | — | 2 |
+| [`r/moul/x/daily/asciiart/v1`](r/moul/x/daily/asciiart) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/asciiart/v1) | — | — | 2 |
 | [`r/moul/x/daily/b58demo/v0`](r/moul/x/daily/b58demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/b58demo/v0) | — | — | 2 |
 | [`r/moul/x/daily/ballot/v0`](r/moul/x/daily/ballot) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ballot/v0) | — | — | 1 |
 | [`r/moul/x/daily/base32demo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/base32demo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/base32demo/v0) | — | — | 1 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T12:33:11Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T13:28:03Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
