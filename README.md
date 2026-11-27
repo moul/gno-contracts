@@ -302,18 +302,18 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`p/moul/xmath/v0`](https://github.com/moul/gno-contracts/tree/3d9206ae5f4656e8c33bb775fd349fb656ff9c07/p/moul/xmath) 📦 🧊 | — | [✅](https://gno.land/p/moul/xmath/v0) | — | — | — |
 | [`p/moul/xmath/v1`](p/moul/xmath) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/xmath/v1) | [✅](https://gno.land/p/moul/xmath/v1) | — | — | — |
 | [`p/moul/zones/v0`](p/moul/zones) 📦 | [✅](https://onyx.testnets.gno.land/p/moul/zones/v0) | [✅](https://gno.land/p/moul/zones/v0) | — | — | 3 |
-| [`r/moul/agents/capwallet/v0`](r/moul/agents/capwallet) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/agents/capwallet/v0) | [✅](https://gno.land/r/moul/agents/capwallet/v0) | — | — | 1 |
-| [`r/moul/agents/gnomem/v0`](r/moul/agents/gnomem) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/agents/gnomem/v0) | [✅](https://gno.land/r/moul/agents/gnomem/v0) | — | — | 1 |
-| [`r/moul/agents/jury/v0`](r/moul/agents/jury) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/agents/jury/v0) | [✅](https://gno.land/r/moul/agents/jury/v0) | — | — | 3 |
-| [`r/moul/agents/maintainer/v0`](r/moul/agents/maintainer) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/agents/maintainer/v0) | [✅](https://gno.land/r/moul/agents/maintainer/v0) | — | — | 1 |
-| [`r/moul/agents/passport/v0`](r/moul/agents/passport) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/agents/passport/v0) | [✅](https://gno.land/r/moul/agents/passport/v0) | — | — | 2 |
-| [`r/moul/agents/receipt/v0`](r/moul/agents/receipt) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/agents/receipt/v0) | [✅](https://gno.land/r/moul/agents/receipt/v0) | — | — | 1 |
-| [`r/moul/agents/relay/v0`](r/moul/agents/relay) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/agents/relay/v0) | [✅](https://gno.land/r/moul/agents/relay/v0) | — | — | 5 |
-| [`r/moul/blog`](r/moul/blog) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/blog) | [✅](https://gno.land/r/moul/blog) | — | — | 3 |
+| [`r/moul/agents/capwallet/v0`](r/moul/agents/capwallet) 🏛️ | — | [✅](https://gno.land/r/moul/agents/capwallet/v0) | — | — | 1 |
+| [`r/moul/agents/gnomem/v0`](r/moul/agents/gnomem) 🏛️ | — | [✅](https://gno.land/r/moul/agents/gnomem/v0) | — | — | 1 |
+| [`r/moul/agents/jury/v0`](r/moul/agents/jury) 🏛️ | — | [✅](https://gno.land/r/moul/agents/jury/v0) | — | — | 3 |
+| [`r/moul/agents/maintainer/v0`](r/moul/agents/maintainer) 🏛️ | — | [✅](https://gno.land/r/moul/agents/maintainer/v0) | — | — | 1 |
+| [`r/moul/agents/passport/v0`](r/moul/agents/passport) 🏛️ | — | [✅](https://gno.land/r/moul/agents/passport/v0) | — | — | 2 |
+| [`r/moul/agents/receipt/v0`](r/moul/agents/receipt) 🏛️ | — | [✅](https://gno.land/r/moul/agents/receipt/v0) | — | — | 1 |
+| [`r/moul/agents/relay/v0`](r/moul/agents/relay) 🏛️ | — | [✅](https://gno.land/r/moul/agents/relay/v0) | — | — | 5 |
+| [`r/moul/blog`](r/moul/blog) 🏛️ | — | [✅](https://gno.land/r/moul/blog) | — | — | 3 |
 | [`r/moul/config/v0`](https://github.com/moul/gno-contracts/tree/bd1ff5de0053958282ac81f08ed8bfcb2081982c/r/moul/config) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/config/v0) | — | — | 1 |
-| [`r/moul/config/v1`](r/moul/config) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/config/v1) | [✅](https://gno.land/r/moul/config/v1) | — | — | 4 |
-| [`r/moul/demo/args/v0`](r/moul/demo/args) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/demo/args/v0) | [✅](https://gno.land/r/moul/demo/args/v0) | — | — | — |
-| [`r/moul/demo/data/v0`](r/moul/demo/data) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/demo/data/v0) | [✅](https://gno.land/r/moul/demo/data/v0) | — | — | — |
+| [`r/moul/config/v1`](r/moul/config) 🏛️ | — | [✅](https://gno.land/r/moul/config/v1) | — | — | 4 |
+| [`r/moul/demo/args/v0`](r/moul/demo/args) 🏛️ | — | [✅](https://gno.land/r/moul/demo/args/v0) | — | — | — |
+| [`r/moul/demo/data/v0`](r/moul/demo/data) 🏛️ | — | [✅](https://gno.land/r/moul/demo/data/v0) | — | — | — |
 | [`r/moul/demo/gnoface/v0`](r/moul/demo/gnoface) 🏛️ | — | [✅](https://gno.land/r/moul/demo/gnoface/v0) | — | — | 2 |
 | [`r/moul/demo/grc20/v0`](r/moul/demo/grc20) 🏛️ | — | [✅](https://gno.land/r/moul/demo/grc20/v0) | — | — | 1 |
 | [`r/moul/demo/hello/v0`](r/moul/demo/hello) 🏛️ | — | [✅](https://gno.land/r/moul/demo/hello/v0) | — | — | — |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T18:30:09Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T19:27:47Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
