@@ -454,15 +454,15 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/polls/v1`](r/moul/x/daily/polls) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/polls/v1) | [✅](https://gno.land/r/moul/x/daily/polls/v1) | — | — | 2 |
 | [`r/moul/x/daily/pullpaymentdemo/v0`](r/moul/x/daily/pullpaymentdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/pullpaymentdemo/v0) | [✅](https://gno.land/r/moul/x/daily/pullpaymentdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/quizstreak/v0`](r/moul/x/daily/quizstreak) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/quizstreak/v0) | [✅](https://gno.land/r/moul/x/daily/quizstreak/v0) | — | — | 2 |
-| [`r/moul/x/daily/quotes/v0`](r/moul/x/daily/quotes) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/quotes/v0) | [✅](https://gno.land/r/moul/x/daily/quotes/v0) | — | — | — |
+| [`r/moul/x/daily/quotes/v0`](r/moul/x/daily/quotes) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/quotes/v0) | — | — | — |
 | [`r/moul/x/daily/qvote/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/qvote) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/qvote/v0) | — | — | 1 |
-| [`r/moul/x/daily/qvote/v1`](r/moul/x/daily/qvote) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/qvote/v1) | [✅](https://gno.land/r/moul/x/daily/qvote/v1) | — | — | 2 |
-| [`r/moul/x/daily/ratelimitdemo/v0`](r/moul/x/daily/ratelimitdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/ratelimitdemo/v0) | [✅](https://gno.land/r/moul/x/daily/ratelimitdemo/v0) | — | — | 2 |
-| [`r/moul/x/daily/reactions/v0`](r/moul/x/daily/reactions) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/reactions/v0) | [✅](https://gno.land/r/moul/x/daily/reactions/v0) | — | — | 2 |
-| [`r/moul/x/daily/ringbufferdemo/v0`](r/moul/x/daily/ringbufferdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/ringbufferdemo/v0) | [✅](https://gno.land/r/moul/x/daily/ringbufferdemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/ringlog/v0`](r/moul/x/daily/ringlog) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/ringlog/v0) | [✅](https://gno.land/r/moul/x/daily/ringlog/v0) | — | — | — |
+| [`r/moul/x/daily/qvote/v1`](r/moul/x/daily/qvote) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/qvote/v1) | — | — | 2 |
+| [`r/moul/x/daily/ratelimitdemo/v0`](r/moul/x/daily/ratelimitdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ratelimitdemo/v0) | — | — | 2 |
+| [`r/moul/x/daily/reactions/v0`](r/moul/x/daily/reactions) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/reactions/v0) | — | — | 2 |
+| [`r/moul/x/daily/ringbufferdemo/v0`](r/moul/x/daily/ringbufferdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ringbufferdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/ringlog/v0`](r/moul/x/daily/ringlog) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/ringlog/v0) | — | — | — |
 | [`r/moul/x/daily/rledemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/rledemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/rledemo/v0) | — | — | 1 |
-| [`r/moul/x/daily/rledemo/v1`](r/moul/x/daily/rledemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/rledemo/v1) | — | — | — | 2 |
+| [`r/moul/x/daily/rledemo/v1`](r/moul/x/daily/rledemo) 🏛️ | — | — | — | — | 2 |
 | [`r/moul/x/daily/romannumdemo/v0`](r/moul/x/daily/romannumdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/romannumdemo/v0) | — | — | 2 |
 | [`r/moul/x/daily/rot13demo/v0`](r/moul/x/daily/rot13demo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rot13demo/v0) | — | — | 1 |
 | [`r/moul/x/daily/rpgroom/v0`](r/moul/x/daily/rpgroom) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/rpgroom/v0) | — | — | 2 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T06:37:25Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T07:29:18Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
