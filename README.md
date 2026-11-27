@@ -486,13 +486,13 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/stack/v0`](r/moul/x/daily/stack) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/stack/v0) | [✅](https://gno.land/r/moul/x/daily/stack/v0) | — | — | — |
 | [`r/moul/x/daily/staking/v0`](r/moul/x/daily/staking) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/staking/v0) | [✅](https://gno.land/r/moul/x/daily/staking/v0) | — | — | 1 |
 | [`r/moul/x/daily/streak/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/streak) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/streak/v0) | — | — | 1 |
-| [`r/moul/x/daily/streak/v1`](r/moul/x/daily/streak) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/streak/v1) | — | — | — | 1 |
+| [`r/moul/x/daily/streak/v1`](r/moul/x/daily/streak) 🏛️ | — | — | — | — | 1 |
 | [`r/moul/x/daily/streaks/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/streaks) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/streaks/v0) | — | — | 1 |
-| [`r/moul/x/daily/streaks/v1`](r/moul/x/daily/streaks) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/streaks/v1) | [✅](https://gno.land/r/moul/x/daily/streaks/v1) | — | — | 3 |
+| [`r/moul/x/daily/streaks/v1`](r/moul/x/daily/streaks) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/streaks/v1) | — | — | 3 |
 | [`r/moul/x/daily/tamagotchi/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/tamagotchi) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/tamagotchi/v0) | — | — | 1 |
-| [`r/moul/x/daily/tamagotchi/v1`](r/moul/x/daily/tamagotchi) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/tamagotchi/v1) | [✅](https://gno.land/r/moul/x/daily/tamagotchi/v1) | — | — | 3 |
+| [`r/moul/x/daily/tamagotchi/v1`](r/moul/x/daily/tamagotchi) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/tamagotchi/v1) | — | — | 3 |
 | [`r/moul/x/daily/tictactoe/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/tictactoe) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/tictactoe/v0) | — | — | 1 |
-| [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/tictactoe/v1) | [✅](https://gno.land/r/moul/x/daily/tictactoe/v1) | — | — | 1 |
+| [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/tictactoe/v1) | — | — | 1 |
 | [`r/moul/x/daily/timecapsule/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/timecapsule) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/timecapsule/v0) | — | — | 2 |
 | [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/timecapsule/v1) | — | — | 2 |
 | [`r/moul/x/daily/timelock/v0`](r/moul/x/daily/timelock) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/timelock/v0) | — | — | 2 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T03:31:10Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T04:29:55Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 
