@@ -12,8 +12,10 @@ package main
 // path, and its previews cover pure packages too, not only realms.
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"html"
 	"io"
@@ -90,6 +92,9 @@ type Crawler struct {
 	// if the budget did not exist. Reading 0 as "no argument pages" is the
 	// obvious interpretation and the wrong one.
 	ArgBudget int
+
+	// Keep the per-process readiness marker out of published pages.
+	chainID string
 
 	fileBudget map[string]int
 	argBudget  map[string]int
@@ -396,6 +401,9 @@ func (c *Crawler) rewrite(p *pvPage) string {
 	up := strings.Repeat("../", depth)
 
 	body := setNoindex(p.Body)
+	if c.chainID != "" {
+		body = strings.ReplaceAll(body, c.chainID, "dev")
+	}
 	body = pvAttrRe.ReplaceAllStringFunc(body, func(m string) string {
 		sub := pvAttrRe.FindStringSubmatch(m)
 		attr, raw := sub[1], sub[2]
@@ -618,31 +626,65 @@ func copyAssets(src, dst string) (int, error) {
 	return rewrites, err
 }
 
-// waitServing polls probe until gnoweb answers, the process exits, or the
-// deadline passes. died carries the node's exit so a crash fails in seconds
-// with the real reason instead of timing out minutes later on "not ready".
-func waitServing(base, probe string, timeout time.Duration, died <-chan error) error {
-	deadline := time.Now().Add(timeout)
+// waitServing checks that gnoweb is connected to the node we launched before
+// taking any HTTP 200 from the package URL as a successful render.
+func (node *previewNode) waitServing(probe string, timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	poll := time.NewTimer(0)
+	defer poll.Stop()
 	client := &http.Client{Timeout: 3 * time.Second}
-	u, err := url.JoinPath(base, probe)
+	u, err := url.JoinPath(node.base, probe)
 	if err != nil {
 		return err
 	}
-	for time.Now().Before(deadline) {
+	for {
 		select {
-		case err := <-died:
-			return fmt.Errorf("gnodev exited before serving %s — see the gnodev log: %w", probe, err)
-		default:
+		case err := <-node.died:
+			if err == nil {
+				return fmt.Errorf("gnodev exited before serving %s (see the gnodev log)", probe)
+			}
+			return fmt.Errorf("gnodev exited before serving %s: %w (see the gnodev log)", probe, err)
+		case <-ctx.Done():
+			return fmt.Errorf("gnoweb at %s did not serve %s on chain %s after %s", node.base, probe, node.chainID, timeout)
+		case <-poll.C:
 		}
-		if resp, err := client.Get(u); err == nil {
-			resp.Body.Close()
-			if resp.StatusCode == http.StatusOK {
-				return nil
+		if node.servesChain(ctx, client) {
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+			if err != nil {
+				return err
+			}
+			if resp, err := client.Do(req); err == nil {
+				resp.Body.Close()
+				if resp.StatusCode == http.StatusOK {
+					return nil
+				}
 			}
 		}
-		time.Sleep(time.Second)
+		poll.Reset(time.Second)
 	}
-	return fmt.Errorf("gnoweb not ready after %s", timeout)
+}
+
+func (node *previewNode) servesChain(ctx context.Context, client *http.Client) bool {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, node.base+"/status.json", nil)
+	if err != nil {
+		return false
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+	var status struct {
+		Gnoland struct {
+			Connected bool   `json:"connected"`
+			ChainID   string `json:"chain_id"`
+		} `json:"gnoland"`
+	}
+	return json.NewDecoder(resp.Body).Decode(&status) == nil && status.Gnoland.Connected && status.Gnoland.ChainID == node.chainID
 }
 
 func sortedStrings(m map[string]bool) []string {

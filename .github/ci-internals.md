@@ -30,6 +30,11 @@ crawls it. Three things there are load-bearing:
    transitive, so touching `p/moul/md` renders every realm that renders markdown. The
    previous preview rendered nothing at all for a diff touching no `r/`.
 
+The web port defaults to 8899. Use `make preview ARGS="-port 8903 ./r/moul/home"`
+if another service is already listening. Each gnodev launch gets its own chain
+ID, and the crawler checks it in gnoweb's `/status.json` before capturing pages.
+The saved pages keep the stable `dev` chain label.
+
 Bounds, because a realm may link as many pages as it likes: at most 25 packages on a pull
 request (changed ones are never dropped, and the comment says how many were), 10
 render-argument pages per package, and never a `$state`, `$help&func=`, `$download` or
