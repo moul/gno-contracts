@@ -494,22 +494,22 @@ make publish KEY=moul PKG=kit/store    # publish that package and what it import
 | [`r/moul/x/daily/tictactoe/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/tictactoe) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/tictactoe/v0) | — | — | 1 |
 | [`r/moul/x/daily/tictactoe/v1`](r/moul/x/daily/tictactoe) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/tictactoe/v1) | [✅](https://gno.land/r/moul/x/daily/tictactoe/v1) | — | — | 1 |
 | [`r/moul/x/daily/timecapsule/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/timecapsule) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/timecapsule/v0) | — | — | 2 |
-| [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/timecapsule/v1) | [✅](https://gno.land/r/moul/x/daily/timecapsule/v1) | — | — | 2 |
-| [`r/moul/x/daily/timelock/v0`](r/moul/x/daily/timelock) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/timelock/v0) | [✅](https://gno.land/r/moul/x/daily/timelock/v0) | — | — | 2 |
+| [`r/moul/x/daily/timecapsule/v1`](r/moul/x/daily/timecapsule) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/timecapsule/v1) | — | — | 2 |
+| [`r/moul/x/daily/timelock/v0`](r/moul/x/daily/timelock) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/timelock/v0) | — | — | 2 |
 | [`r/moul/x/daily/tipjar/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/tipjar) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/tipjar/v0) | — | — | 1 |
-| [`r/moul/x/daily/tipjar/v1`](r/moul/x/daily/tipjar) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/tipjar/v1) | [✅](https://gno.land/r/moul/x/daily/tipjar/v1) | — | — | 2 |
+| [`r/moul/x/daily/tipjar/v1`](r/moul/x/daily/tipjar) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/tipjar/v1) | — | — | 2 |
 | [`r/moul/x/daily/todos/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/todos) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/todos/v0) | — | — | 1 |
-| [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/todos/v1) | [✅](https://gno.land/r/moul/x/daily/todos/v1) | — | — | 2 |
-| [`r/moul/x/daily/toposortdemo/v0`](r/moul/x/daily/toposortdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/toposortdemo/v0) | [✅](https://gno.land/r/moul/x/daily/toposortdemo/v0) | — | — | 1 |
+| [`r/moul/x/daily/todos/v1`](r/moul/x/daily/todos) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/todos/v1) | — | — | 2 |
+| [`r/moul/x/daily/toposortdemo/v0`](r/moul/x/daily/toposortdemo) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/toposortdemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/triedemo/v0`](https://github.com/moul/gno-contracts/tree/d1b0e4d7db74bfc19a72230919f7c3d310c56adc/r/moul/x/daily/triedemo) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/triedemo/v0) | — | — | 1 |
 | [`r/moul/x/daily/triedemo/v1`](r/moul/x/daily/triedemo) 🏛️ | — | — | — | — | 2 |
-| [`r/moul/x/daily/trivia/v0`](r/moul/x/daily/trivia) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/trivia/v0) | [✅](https://gno.land/r/moul/x/daily/trivia/v0) | — | — | 1 |
+| [`r/moul/x/daily/trivia/v0`](r/moul/x/daily/trivia) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/trivia/v0) | — | — | 1 |
 | [`r/moul/x/daily/urlshort/v0`](https://github.com/moul/gno-contracts/tree/4f2df83869b80470eb81c48a82fdbe82256b8113/r/moul/x/daily/urlshort) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/urlshort/v0) | — | — | 1 |
-| [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/urlshort/v1) | [✅](https://gno.land/r/moul/x/daily/urlshort/v1) | — | — | 3 |
-| [`r/moul/x/daily/varintdemo/v0`](r/moul/x/daily/varintdemo) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/varintdemo/v0) | — | — | — | 3 |
+| [`r/moul/x/daily/urlshort/v1`](r/moul/x/daily/urlshort) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/urlshort/v1) | — | — | 3 |
+| [`r/moul/x/daily/varintdemo/v0`](r/moul/x/daily/varintdemo) 🏛️ | — | — | — | — | 3 |
 | [`r/moul/x/daily/vault/v0`](https://github.com/moul/gno-contracts/tree/64ba64c0f83f22fcbb7c2f5887d4d5731462237d/r/moul/x/daily/vault) 🏛️ 🧊 | — | [✅](https://gno.land/r/moul/x/daily/vault/v0) | — | — | 1 |
-| [`r/moul/x/daily/vault/v1`](r/moul/x/daily/vault) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/vault/v1) | [✅](https://gno.land/r/moul/x/daily/vault/v1) | — | — | 2 |
-| [`r/moul/x/daily/vestoken/v0`](r/moul/x/daily/vestoken) 🏛️ | [✅](https://onyx.testnets.gno.land/r/moul/x/daily/vestoken/v0) | [✅](https://gno.land/r/moul/x/daily/vestoken/v0) | — | — | — |
+| [`r/moul/x/daily/vault/v1`](r/moul/x/daily/vault) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/vault/v1) | — | — | 2 |
+| [`r/moul/x/daily/vestoken/v0`](r/moul/x/daily/vestoken) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/vestoken/v0) | — | — | — |
 | [`r/moul/x/daily/wordle/v0`](r/moul/x/daily/wordle) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/wordle/v0) | — | — | — |
 | [`r/moul/x/daily/wrapped/v0`](r/moul/x/daily/wrapped) 🏛️ | — | [✅](https://gno.land/r/moul/x/daily/wrapped/v0) | — | — | 1 |
 | [`r/moul/x/framelab/probe/v0`](r/moul/x/framelab/probe) 🏛️ | — | [✅](https://gno.land/r/moul/x/framelab/probe/v0) | — | — | 2 |
@@ -568,7 +568,7 @@ _📦 pkg · 🏛️ realm · 🚧 draft · 🧊 superseded (no directory; pinne
 
 _Monorepo `src` vs our copy: 🟰 identical · ≈ identical `.gno` (meta differs) · 〜 identical `.gno` except tests · ✂️ `.gno` drifted._
 
-_On-chain status last checked: 2026-11-27T02:31:17Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
+_On-chain status last checked: 2026-11-27T03:31:10Z (✅ = published from this repo, 🗄️ = the monorepo's copy at the same path, ⏳ = sent and queued behind the chain's code-submission policy, not yet live)._
 
 <!-- END CONTRACTS TABLE -->
 

@@ -16,7 +16,7 @@
       "rpc": "https://rpc.staging.gno.land:443"
     }
   ],
-  "status_checked_at": "2026-11-27T02:31:17Z",
+  "status_checked_at": "2026-11-27T03:31:10Z",
   "contracts": [
     {
       "pkgpath": "gno.land/p/moul/addrset/v0",
@@ -10746,8 +10746,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/timecapsule/v1"
         },
         "pearl": {
@@ -10783,8 +10782,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/timelock/v0"
         },
         "pearl": {
@@ -10851,8 +10849,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/tipjar/v1"
         },
         "pearl": {
@@ -10920,8 +10917,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/todos/v1"
         },
         "pearl": {
@@ -10956,8 +10952,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/toposortdemo/v0"
         },
         "pearl": {
@@ -11050,8 +11045,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/trivia/v0"
         },
         "pearl": {
@@ -11119,8 +11113,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/urlshort/v1"
         },
         "pearl": {
@@ -11153,8 +11146,7 @@
           "uploaded": false
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/varintdemo/v0"
         },
         "staging": {
@@ -11215,8 +11207,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/vault/v1"
         },
         "staging": {
@@ -11242,8 +11233,7 @@
           "which": "ours"
         },
         "onyx": {
-          "uploaded": true,
-          "which": "ours",
+          "uploaded": false,
           "path": "gno.land/r/g1magld5ptgzaktqcexxq0pgq5lmdf0kz6re8hlv/x/daily/vestoken/v0"
         },
         "pearl": {
